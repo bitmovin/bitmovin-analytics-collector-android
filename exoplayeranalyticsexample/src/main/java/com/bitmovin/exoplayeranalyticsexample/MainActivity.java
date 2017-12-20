@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void createPlayer() {
-
         if(player==null) {
             TrackSelection.Factory videoTrackSelectionFactory
                     = new AdaptiveTrackSelection.Factory(bandwidthMeter);
