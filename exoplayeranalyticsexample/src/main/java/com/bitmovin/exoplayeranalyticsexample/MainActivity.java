@@ -69,8 +69,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     buildHttpDataSourceFactory(bandwidthMeter));
 
             Uri uri = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
+            Uri uri2 = Uri.parse("http://vm2.dashif.org/livesim-dev/segtimeline_1/testpic_6s/Manifest.mpd");
 
-            DashMediaSource dashMediaSource = new DashMediaSource(uri, dataSourceFactory,
+
+            DashMediaSource dashMediaSource = new DashMediaSource(uri2, dataSourceFactory,
                     new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
 
             player.prepare(dashMediaSource);

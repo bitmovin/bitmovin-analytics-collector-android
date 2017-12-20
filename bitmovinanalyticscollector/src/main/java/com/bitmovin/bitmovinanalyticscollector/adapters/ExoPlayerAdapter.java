@@ -14,6 +14,9 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.dash.manifest.DashManifest;
+import com.google.android.exoplayer2.source.hls.HlsManifest;
+import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
@@ -133,7 +136,16 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener {
             data.setVideoDuration(duration);
         }
 
+        //isLive
         Object manifest = exoplayer.getCurrentManifest();
+        if(manifest instanceof DashManifest){
+            DashManifest dashManifest = (DashManifest) manifest;
+            data.setLive(dashManifest.dynamic);
+        }else if(manifest instanceof HlsMediaPlaylist){
+            HlsMediaPlaylist mediaPlaylist = (HlsMediaPlaylist) manifest;
+            data.setLive(!mediaPlaylist.hasEndTag);
+        }
+
 
         if (exoplayer.getCurrentTrackSelections() != null) {
             for (int i = 0; i < exoplayer.getCurrentTrackSelections().length; i++) {
