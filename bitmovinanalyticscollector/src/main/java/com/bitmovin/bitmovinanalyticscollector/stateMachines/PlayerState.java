@@ -10,6 +10,7 @@ public enum PlayerState {
     SETUP {
         @Override
         void onEnterState(PlayerStateMachine machine) {
+
         }
 
         @Override

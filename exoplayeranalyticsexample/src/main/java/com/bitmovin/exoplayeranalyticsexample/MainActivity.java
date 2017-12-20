@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         simpleExoPlayerView = (SimpleExoPlayerView) findViewById(R.id.a_main_exoplayer);
-
         createPlayer();
         attachPlayerView();
         preparePlayer();

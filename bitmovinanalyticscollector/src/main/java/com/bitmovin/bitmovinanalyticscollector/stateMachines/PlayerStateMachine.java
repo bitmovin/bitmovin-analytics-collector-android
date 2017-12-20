@@ -29,7 +29,6 @@ public class PlayerStateMachine {
         this.initialTimestamp = Util.getTimeStamp();
         this.config = config;
         setCurrentState(PlayerState.SETUP);
-        this.onEnterStateTimeStamp = Util.getTimeStamp();
     }
 
     private void setCurrentState(final PlayerState newPlayerState){
@@ -39,7 +38,6 @@ public class PlayerStateMachine {
     public synchronized void transitionState(PlayerState destinationPlayerState){
         currentState.onExitState(this);
         long timeStamp = Util.getTimeStamp();
-        Log.d(TAG,String.format("Transitioning from %s to %s - Duration: %d", currentState, destinationPlayerState,timeStamp - this.onEnterStateTimeStamp));
         this.onEnterStateTimeStamp = timeStamp;
         destinationPlayerState.onEnterState(this);
         setCurrentState(destinationPlayerState);

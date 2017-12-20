@@ -17,6 +17,8 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
+import static com.google.android.exoplayer2.C.TIME_UNSET;
+
 /**
  * Created by zachmanc on 12/14/17.
  */
@@ -124,7 +126,13 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener {
     }
 
     private void decorateDataWithPlaybackInformation(EventData data) {
-        data.setVideoDuration(exoplayer.getDuration());
+
+        //duration
+        long duration = exoplayer.getDuration();
+        if(duration != TIME_UNSET) {
+            data.setVideoDuration(duration);
+        }
+
         Object manifest = exoplayer.getCurrentManifest();
 
         if (exoplayer.getCurrentTrackSelections() != null) {
