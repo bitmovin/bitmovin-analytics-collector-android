@@ -51,7 +51,6 @@ public class PlayerStateMachine {
 
     public void setFirstReadyTimestamp(long firstReadyTimestamp) {
         this.firstReadyTimestamp = firstReadyTimestamp;
-        Log.d(TAG,String.format("Startup Time %d",firstReadyTimestamp-initialTimestamp));
     }
 
     public long getOnEnterStateTimeStamp() {
@@ -70,6 +69,11 @@ public class PlayerStateMachine {
 
     List<StateMachineListener> getListeners() {
         return listeners;
+    }
+
+    public long getStartupTime(){
+        Log.d(TAG,String.format("Startup Time %d",firstReadyTimestamp-initialTimestamp));
+        return firstReadyTimestamp-initialTimestamp;
     }
 
 

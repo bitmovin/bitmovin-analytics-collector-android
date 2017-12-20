@@ -7,86 +7,79 @@ import com.bitmovin.bitmovinanalyticscollector.utils.Util;
  */
 
 public enum PlayerState {
-    SETUP{
+    SETUP {
         @Override
         void onEnterState(PlayerStateMachine machine) {
-            for (StateMachineListener listener : machine.getListeners()){
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine) {
+            for (StateMachineListener listener : machine.getListeners()) {
                 listener.onSetup();
             }
         }
+    },
+    BUFFERING {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+        }
 
         @Override
         void onExitState(PlayerStateMachine machine) {
-
-        }
-    },
-    BUFFERING{
-        @Override
-        void onEnterState(PlayerStateMachine machine) {
-            for (StateMachineListener listener : machine.getListeners()){
+            for (StateMachineListener listener : machine.getListeners()) {
                 listener.onRebuffering();
-
             }
         }
+    },
+    ERROR {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+        }
 
         @Override
         void onExitState(PlayerStateMachine machine) {
-
-        }
-    },
-    ERROR{
-        @Override
-        void onEnterState(PlayerStateMachine machine) {
-            for (StateMachineListener listener : machine.getListeners()){
+            for (StateMachineListener listener : machine.getListeners()) {
                 listener.onError();
             }
         }
-
-        @Override
-        void onExitState(PlayerStateMachine machine) {
-
-        }
     },
-    PLAYING{
+    PLAYING {
         @Override
         void onEnterState(PlayerStateMachine machine) {
-            if(machine.getFirstReadyTimestamp() == 0){
+            if (machine.getFirstReadyTimestamp() == 0) {
                 machine.setFirstReadyTimestamp(Util.getTimeStamp());
                 for (StateMachineListener listener : machine.getListeners()) {
-                    listener.onStartup();
-                }
-            }else {
-                for (StateMachineListener listener : machine.getListeners()) {
-                    listener.onPlaying();
+                    listener.onStartup(machine.getStartupTime());
                 }
             }
         }
 
         @Override
         void onExitState(PlayerStateMachine machine) {
-
+            for (StateMachineListener listener : machine.getListeners()) {
+                listener.onPlayExit();
+            }
         }
     },
-    PAUSE{
+    PAUSE {
         @Override
         void onEnterState(PlayerStateMachine machine) {
-            if(machine.getFirstReadyTimestamp() == 0){
+            if (machine.getFirstReadyTimestamp() == 0) {
                 machine.setFirstReadyTimestamp(Util.getTimeStamp());
                 for (StateMachineListener listener : machine.getListeners()) {
-                    listener.onStartup();
+                    listener.onStartup(machine.getStartupTime());
                 }
-            }
-            for (StateMachineListener listener : machine.getListeners()){
-                listener.onPause();
             }
         }
 
         @Override
         void onExitState(PlayerStateMachine machine) {
-
+            for (StateMachineListener listener : machine.getListeners()) {
+                listener.onPauseExit();
+            }
         }
     },
-    END{
+    END {
         @Override
         void onEnterState(PlayerStateMachine machine) {
         }
@@ -98,6 +91,7 @@ public enum PlayerState {
     };
 
     abstract void onEnterState(PlayerStateMachine machine);
+
     abstract void onExitState(PlayerStateMachine machine);
 
 }

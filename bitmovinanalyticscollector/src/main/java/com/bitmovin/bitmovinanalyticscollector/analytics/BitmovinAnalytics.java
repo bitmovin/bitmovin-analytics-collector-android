@@ -39,24 +39,26 @@ public class BitmovinAnalytics implements StateMachineListener {
     }
 
     @Override
-    public void onStartup() {
+    public void onStartup(long time) {
         Log.d(TAG,"onStartup");
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setDuration(time);
+        data.setVideoStartupTime(time);
         sendEventData(data);
     }
 
     @Override
-    public void onPause() {
-        Log.d(TAG,"onPause");
+    public void onPauseExit() {
+        Log.d(TAG,"onPauseExit");
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         sendEventData(data);
     }
 
     @Override
-    public void onPlaying() {
-        Log.d(TAG,"onPlaying");
+    public void onPlayExit() {
+        Log.d(TAG,"onPlayExit");
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         sendEventData(data);
