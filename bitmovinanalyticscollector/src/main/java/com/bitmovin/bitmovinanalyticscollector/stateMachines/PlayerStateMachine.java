@@ -1,5 +1,6 @@
 package com.bitmovin.bitmovinanalyticscollector.stateMachines;
 
+import android.os.Handler;
 import android.util.Log;
 
 import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
@@ -23,6 +24,9 @@ public class PlayerStateMachine {
     private final String userId;
     private final BitmovinAnalyticsConfig config;
 
+    private Handler heartbeatHandler = new Handler();
+    private int heartbeatDelay = 59700; //milliseconds
+
     public PlayerStateMachine(BitmovinAnalyticsConfig config){
         this.userId = Util.getUUID();
         this.impressionId = Util.getUUID();
@@ -31,9 +35,30 @@ public class PlayerStateMachine {
         setCurrentState(PlayerState.SETUP);
     }
 
+    void enableHeartbeat(){
+        heartbeatHandler.postDelayed(new Runnable(){
+            public void run(){
+                long currentTimestamp = Util.getTimeStamp();
+                long enterTimestamp = getOnEnterStateTimeStamp();
+
+                for (StateMachineListener listener : getListeners()){
+                    listener.onHeartbeat(currentTimestamp - onEnterStateTimeStamp);
+                }
+                onEnterStateTimeStamp = currentTimestamp;
+                heartbeatHandler.postDelayed(this, heartbeatDelay);
+            }
+        }, heartbeatDelay);
+    }
+
+    void disableHeartbeat(){
+        heartbeatHandler.removeCallbacksAndMessages(null);
+    }
+
     private void setCurrentState(final PlayerState newPlayerState){
         this.currentState = newPlayerState;
     }
+
+
 
     public synchronized void transitionState(PlayerState destinationPlayerState){
         currentState.onExitState(this);
@@ -70,7 +95,6 @@ public class PlayerStateMachine {
     }
 
     public long getStartupTime(){
-        Log.d(TAG,String.format("Startup Time %d",firstReadyTimestamp-initialTimestamp));
         return firstReadyTimestamp-initialTimestamp;
     }
 

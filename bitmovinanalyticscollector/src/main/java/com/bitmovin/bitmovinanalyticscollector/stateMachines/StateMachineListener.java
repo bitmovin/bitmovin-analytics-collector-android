@@ -7,9 +7,10 @@ package com.bitmovin.bitmovinanalyticscollector.stateMachines;
 public interface StateMachineListener {
 
     void onSetup();
-    void onStartup(long time);
-    void onPauseExit();
-    void onPlayExit();
+    void onStartup(long duration);
+    void onPauseExit(long duration);
+    void onPlayExit(long duration);
+    void onHeartbeat(long duration);
     void onRebuffering();
     void onError();
     void onAd();
@@ -18,7 +19,6 @@ public interface StateMachineListener {
 
 
     void onUpdateSample();
-    void onHeartbeat();
     void onQualityChange();
     void onVideoChange();
 

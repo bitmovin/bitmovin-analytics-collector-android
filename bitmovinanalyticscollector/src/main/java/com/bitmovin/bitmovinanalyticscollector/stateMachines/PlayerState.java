@@ -53,13 +53,20 @@ public enum PlayerState {
                     listener.onStartup(machine.getStartupTime());
                 }
             }
+
+            machine.enableHeartbeat();
         }
 
         @Override
         void onExitState(PlayerStateMachine machine) {
             for (StateMachineListener listener : machine.getListeners()) {
-                listener.onPlayExit();
+                long currentTimestamp = Util.getTimeStamp();
+                long enterTimestamp = machine.getOnEnterStateTimeStamp();
+                listener.onPlayExit(currentTimestamp - enterTimestamp);
             }
+
+            machine.disableHeartbeat();
+
         }
     },
     PAUSE {
@@ -71,13 +78,20 @@ public enum PlayerState {
                     listener.onStartup(machine.getStartupTime());
                 }
             }
+
+            machine.enableHeartbeat();
+
         }
 
         @Override
         void onExitState(PlayerStateMachine machine) {
             for (StateMachineListener listener : machine.getListeners()) {
-                listener.onPauseExit();
+                long currentTimestamp = Util.getTimeStamp();
+                long enterTimestamp = machine.getOnEnterStateTimeStamp();
+                listener.onPauseExit(currentTimestamp - enterTimestamp);
             }
+
+            machine.disableHeartbeat();
         }
     },
     END {

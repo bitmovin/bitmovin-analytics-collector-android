@@ -1,5 +1,6 @@
 package com.bitmovin.bitmovinanalyticscollector.analytics;
 
+import android.os.Handler;
 import android.util.Log;
 
 import com.bitmovin.bitmovinanalyticscollector.adapters.ExoPlayerAdapter;
@@ -22,7 +23,6 @@ public class BitmovinAnalytics implements StateMachineListener {
     private PlayerAdapter playerAdapter;
     private PlayerStateMachine playerStateMachine;
 
-
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig);
@@ -39,28 +39,30 @@ public class BitmovinAnalytics implements StateMachineListener {
     }
 
     @Override
-    public void onStartup(long time) {
+    public void onStartup(long duration) {
         Log.d(TAG,"onStartup");
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
-        data.setDuration(time);
-        data.setVideoStartupTime(time);
+        data.setDuration(duration);
+        data.setVideoStartupTime(duration);
         sendEventData(data);
     }
 
     @Override
-    public void onPauseExit() {
+    public void onPauseExit(long duration) {
         Log.d(TAG,"onPauseExit");
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setDuration(duration);
         sendEventData(data);
     }
 
     @Override
-    public void onPlayExit() {
+    public void onPlayExit(long duration) {
         Log.d(TAG,"onPlayExit");
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setDuration(duration);
         sendEventData(data);
     }
 
@@ -77,6 +79,15 @@ public class BitmovinAnalytics implements StateMachineListener {
         Log.d(TAG,"onError");
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        sendEventData(data);
+    }
+
+    @Override
+    public void onHeartbeat(long duration) {
+        Log.d(TAG,String.format("onHeartbeat %s",playerStateMachine.getCurrentState().toString().toLowerCase()));
+        EventData data = playerAdapter.createEventData();
+        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setDuration(duration);
         sendEventData(data);
     }
 
@@ -98,11 +109,6 @@ public class BitmovinAnalytics implements StateMachineListener {
     @Override
     public void onUpdateSample() {
         Log.d(TAG,"onUpdateSample");
-    }
-
-    @Override
-    public void onHeartbeat() {
-        Log.d(TAG,"onHeartbeat");
     }
 
     @Override
