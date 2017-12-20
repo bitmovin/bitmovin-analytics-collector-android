@@ -16,7 +16,7 @@ public class EventData {
     private int screenHeight;
     private boolean isLive;
     private boolean isCasting;
-    private int videoDuration = 0;
+    private long videoDuration = 0;
     private long time =  0;
     private int videoWindowWidth = 0;
     private int videoWindowHeight = 0;
@@ -69,6 +69,7 @@ public class EventData {
         this.videoId = bitmovinAnalyticsConfig.getVideoId();
         this.userId = bitmovinAnalyticsConfig.getUserId();
         this.customUserId = bitmovinAnalyticsConfig.getCustomUserId();
+        this.playerTech = Util.getPlayerTech();
 
         if(bitmovinAnalyticsConfig.getCdnProvider() != null) {
             this.cdnProvider = bitmovinAnalyticsConfig.getCdnProvider().toString();
@@ -82,6 +83,7 @@ public class EventData {
             this.domain = bitmovinAnalyticsConfig.getContext().getPackageName();
             this.screenHeight = bitmovinAnalyticsConfig.getContext().getResources().getDisplayMetrics().heightPixels;
             this.screenWidth = bitmovinAnalyticsConfig.getContext().getResources().getDisplayMetrics().widthPixels;
+            this.language = Util.getLocale();
         }
 
     }
@@ -118,7 +120,7 @@ public class EventData {
         isCasting = casting;
     }
 
-    public void setVideoDuration(int videoDuration) {
+    public void setVideoDuration(long videoDuration) {
         this.videoDuration = videoDuration;
     }
 

@@ -27,8 +27,7 @@ public enum EventType {
     PLAYBACK_FINISHED ("end"),
     SCREEN_RESIZE ("resize"),
     UNLOAD ("unload"),
-    END ("end"),
-    METADATA_LOADED ("Fancy Mode 3");
+    END ("end");
 
     private final String name;
 

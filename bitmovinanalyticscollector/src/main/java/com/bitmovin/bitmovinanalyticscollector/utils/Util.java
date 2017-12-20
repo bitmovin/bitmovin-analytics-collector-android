@@ -1,9 +1,11 @@
 package com.bitmovin.bitmovinanalyticscollector.utils;
 
+import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 
 import com.bitmovin.bitmovinanalyticscollector.BuildConfig;
+import com.google.android.exoplayer2.Player;
 
 import java.util.UUID;
 
@@ -22,16 +24,26 @@ public class Util {
 
     public static String exoStateToString(int state){
         switch (state){
-            case 1:
+            case Player.STATE_IDLE:
                 return "Idle";
-            case 2:
+            case Player.STATE_BUFFERING:
                 return "Buffering";
-            case 3:
+            case Player.STATE_READY:
                 return "Ready";
-            case 4:
+            case Player.STATE_ENDED:
                 return "Ended";
             default:
-                return String.format("%d",state);
+                return "Unknown PlayerState";
         }
+    }
+
+    public static long getTimeStamp(){
+        return System.currentTimeMillis();
+    }
+
+    public static String getPlayerTech() {return "Native"; }
+
+    public static String getLocale(){
+        return Resources.getSystem().getConfiguration().locale.toString();
     }
 }

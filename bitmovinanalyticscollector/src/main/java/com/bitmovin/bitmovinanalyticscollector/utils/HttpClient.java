@@ -18,7 +18,6 @@ public class HttpClient {
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
     private static final String TAG = "HttpClient";
-
     private final OkHttpClient client = new OkHttpClient();
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
 
