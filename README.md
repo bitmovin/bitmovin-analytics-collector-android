@@ -2,15 +2,12 @@
 Android client that allows you to monitor your ExoPlayer playback with (Bitmovin Analytics)[https://bitmovin.com/video-analytics/]
 
 # Getting started
-## Maven
-Add this to your pom.xml:
+## Gradle
+Add this to your build.gradle:
 ```
-xml
-<dependency>
-      <groupId>com.bitmovin.api</groupId>
-      <artifactId>bitmovin-java</artifactId>
-      <version>1.8.0</version>
-</dependency>
+dependencies {
+    compile project(path: ':bitmovinanalyticscollector')
+}
 ```
 
 ## Examples

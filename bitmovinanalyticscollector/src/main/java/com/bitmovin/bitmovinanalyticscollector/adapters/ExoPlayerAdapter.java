@@ -146,7 +146,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener {
             data.setLive(!mediaPlaylist.hasEndTag);
         }
 
-
+        //Info on current tracks that are playing
         if (exoplayer.getCurrentTrackSelections() != null) {
             for (int i = 0; i < exoplayer.getCurrentTrackSelections().length; i++) {
                 TrackSelection trackSelection = exoplayer.getCurrentTrackSelections().get(i);
