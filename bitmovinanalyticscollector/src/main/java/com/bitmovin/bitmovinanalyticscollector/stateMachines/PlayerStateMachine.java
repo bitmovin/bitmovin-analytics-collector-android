@@ -20,6 +20,7 @@ public class PlayerStateMachine {
     private long initialTimestamp = 0;
     private long firstReadyTimestamp = 0;
     private long onEnterStateTimeStamp= 0;
+    private long seekTimeStamp = 0;
     private final String impressionId;
     private final String userId;
     private final BitmovinAnalyticsConfig config;
@@ -61,8 +62,8 @@ public class PlayerStateMachine {
 
 
     public synchronized void transitionState(PlayerState destinationPlayerState){
-        currentState.onExitState(this);
         long timeStamp = Util.getTimeStamp();
+        currentState.onExitState(this,timeStamp,destinationPlayerState);
         this.onEnterStateTimeStamp = timeStamp;
         destinationPlayerState.onEnterState(this);
         setCurrentState(destinationPlayerState);
@@ -78,6 +79,14 @@ public class PlayerStateMachine {
 
     public long getOnEnterStateTimeStamp() {
         return onEnterStateTimeStamp;
+    }
+
+    public long getSeekTimeStamp() {
+        return seekTimeStamp;
+    }
+
+    public void setSeekTimeStamp(long seekTimeStamp) {
+        this.seekTimeStamp = seekTimeStamp;
     }
 
     public void addListener(StateMachineListener toAdd) {

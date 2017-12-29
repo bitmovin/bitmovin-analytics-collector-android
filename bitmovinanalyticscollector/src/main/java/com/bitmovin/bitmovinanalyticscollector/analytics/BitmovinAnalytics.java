@@ -6,6 +6,7 @@ import android.util.Log;
 import com.bitmovin.bitmovinanalyticscollector.adapters.ExoPlayerAdapter;
 import com.bitmovin.bitmovinanalyticscollector.adapters.PlayerAdapter;
 import com.bitmovin.bitmovinanalyticscollector.data.EventData;
+import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerState;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerStateMachine;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.StateMachineListener;
 import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
@@ -79,6 +80,16 @@ public class BitmovinAnalytics implements StateMachineListener {
         Log.d(TAG,"onError");
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        sendEventData(data);
+    }
+
+    @Override
+    public void onSeekComplete(long duration, PlayerState desintationPlayerState) {
+        Log.d(TAG,"onSeekComplete");
+        EventData data = playerAdapter.createEventData();
+        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setSeeked(duration);
+        data.setDuration(duration);
         sendEventData(data);
     }
 

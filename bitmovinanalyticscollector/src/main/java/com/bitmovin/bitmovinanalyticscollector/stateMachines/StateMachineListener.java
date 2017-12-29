@@ -13,6 +13,7 @@ public interface StateMachineListener {
     void onHeartbeat(long duration);
     void onRebuffering();
     void onError();
+    void onSeekComplete(long duration, PlayerState destinationPlayerState);
     void onAd();
     void onMute();
     void onUnmute();

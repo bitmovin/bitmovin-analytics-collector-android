@@ -1,6 +1,7 @@
 package com.bitmovin.exoplayeranalyticsexample;
 
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
@@ -70,12 +72,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             Uri uri = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
             Uri uri2 = Uri.parse("http://vm2.dashif.org/livesim-dev/segtimeline_1/testpic_6s/Manifest.mpd");
+            Uri uri3 = Uri.parse("https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8");
+            Uri uri4 = Uri.parse("http://c742eca4-lp-omega.ums.ustream.tv/playlist/auditorium/channel/9408562/playlist.m3u8?token=208723_1514483442312&appType=11&appVersion=3&ts=1514483442&chunkingType=improved&geo=US&sgn=353890216fdb617d960b71bc428583675e89f0c3&preferredBitrate=0&cdnHost=uhs-akamai.ustream.tv");
 
-
-            DashMediaSource dashMediaSource = new DashMediaSource(uri2, dataSourceFactory,
+            DashMediaSource dashMediaSource = new DashMediaSource(uri, dataSourceFactory,
                     new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
 
+            HlsMediaSource hlsMediaSource = new HlsMediaSource(uri4,dataSourceFactory,new Handler(), null);
+
+
             player.prepare(dashMediaSource);
+
         }
     }
 

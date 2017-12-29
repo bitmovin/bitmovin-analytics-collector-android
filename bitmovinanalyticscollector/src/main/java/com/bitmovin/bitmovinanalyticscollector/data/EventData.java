@@ -25,7 +25,7 @@ public class EventData {
     private int buffered = 0;
     private int paused = 0;
     private boolean ad = false;
-    private int seeked = 0;
+    private long seeked = 0;
     private int videoPlaybackWidth = 0;
     private int videoPlaybackHeight = 0;
     private int videoBitrate = 0;
@@ -156,7 +156,7 @@ public class EventData {
         this.ad = ad;
     }
 
-    public void setSeeked(int seeked) {
+    public void setSeeked(long seeked) {
         this.seeked = seeked;
     }
 
