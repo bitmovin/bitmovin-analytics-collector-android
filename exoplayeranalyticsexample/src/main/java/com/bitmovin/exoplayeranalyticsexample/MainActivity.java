@@ -70,18 +70,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, bandwidthMeter,
                     buildHttpDataSourceFactory(bandwidthMeter));
 
-            Uri uri = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
-            Uri uri2 = Uri.parse("http://vm2.dashif.org/livesim-dev/segtimeline_1/testpic_6s/Manifest.mpd");
-            Uri uri3 = Uri.parse("https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8");
-            Uri uri4 = Uri.parse("http://c742eca4-lp-omega.ums.ustream.tv/playlist/auditorium/channel/9408562/playlist.m3u8?token=208723_1514483442312&appType=11&appVersion=3&ts=1514483442&chunkingType=improved&geo=US&sgn=353890216fdb617d960b71bc428583675e89f0c3&preferredBitrate=0&cdnHost=uhs-akamai.ustream.tv");
+            Uri dashStatic = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
+            Uri dashDynamic = Uri.parse("http://vm2.dashif.org/livesim-dev/segtimeline_1/testpic_6s/Manifest.mpd");
+            Uri hlsStatic = Uri.parse("https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8");
+            Uri hlsDynamic = Uri.parse("http://c742eca4-lp-omega.ums.ustream.tv/playlist/auditorium/channel/9408562/playlist.m3u8?token=208723_1514483442312&appType=11&appVersion=3&ts=1514483442&chunkingType=improved&geo=US&sgn=353890216fdb617d960b71bc428583675e89f0c3&preferredBitrate=0&cdnHost=uhs-akamai.ustream.tv");
 
-            DashMediaSource dashMediaSource = new DashMediaSource(uri, dataSourceFactory,
+            Uri mp4Url = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4");
+
+            DashMediaSource dashMediaSource = new DashMediaSource(dashStatic, dataSourceFactory,
                     new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
 
-            HlsMediaSource hlsMediaSource = new HlsMediaSource(uri4,dataSourceFactory,new Handler(), null);
+            HlsMediaSource hlsMediaSource = new HlsMediaSource(hlsStatic,dataSourceFactory,new Handler(), null);
 
+            //DASH example
+//            player.prepare(dashMediaSource);
 
-            player.prepare(dashMediaSource);
+            //HLS example
+            player.prepare(hlsMediaSource);
 
         }
     }

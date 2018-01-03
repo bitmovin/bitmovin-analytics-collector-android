@@ -28,7 +28,8 @@ public enum PlayerState {
         @Override
         void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState desintationPlayerState) {
             for (StateMachineListener listener : machine.getListeners()) {
-                listener.onRebuffering();
+                long enterTimestamp = machine.getOnEnterStateTimeStamp();
+                listener.onRebuffering(timeStamp - enterTimestamp);
             }
         }
     },
@@ -90,6 +91,18 @@ public enum PlayerState {
             }
 
             machine.disableHeartbeat();
+        }
+    },
+    QUALITYCHANGE {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState destinationPlayerState) {
+            for (StateMachineListener listener : machine.getListeners()) {
+                listener.onQualityChange();
+            }
         }
     },
     SEEKING {

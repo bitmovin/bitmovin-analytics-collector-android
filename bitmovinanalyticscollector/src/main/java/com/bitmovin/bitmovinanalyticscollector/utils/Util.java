@@ -14,6 +14,8 @@ import java.util.UUID;
  */
 
 public class Util {
+    private static final String QUALITY_CHANGE_STRING = "qualitychange";
+
     public static String getUUID(){
         return UUID.randomUUID().toString();
     }

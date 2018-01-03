@@ -11,7 +11,7 @@ public interface StateMachineListener {
     void onPauseExit(long duration);
     void onPlayExit(long duration);
     void onHeartbeat(long duration);
-    void onRebuffering();
+    void onRebuffering(long duration);
     void onError();
     void onSeekComplete(long duration, PlayerState destinationPlayerState);
     void onAd();

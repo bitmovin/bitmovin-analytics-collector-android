@@ -54,8 +54,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
     private void attachDebugListeners(){
         if(this.exoplayer instanceof SimpleExoPlayer){
             SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
-            simpleExoPlayer.setVideoDebugListener(this);
-            simpleExoPlayer.setAudioDebugListener(this);
+            simpleExoPlayer.addVideoDebugListener(this);
+            simpleExoPlayer.addAudioDebugListener(this);
         }
     }
 
@@ -182,10 +182,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         }
     }
 
-    private void decorateDataWithSimpleExoPlayer(EventData data){
-
-    }
-
     @Override
     public void onVideoEnabled(DecoderCounters counters) {
 
@@ -198,7 +194,12 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     @Override
     public void onVideoInputFormatChanged(Format format) {
-
+        Log.d(TAG,String.format("OnVideoInputFormatChanged: Bitrate: %d Resolution: %d x %d",format.bitrate, format.width,format.height));
+        if((this.stateMachine.getCurrentState() == PlayerState.PLAYING) || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)){
+            PlayerState originalState = this.stateMachine.getCurrentState();
+            this.stateMachine.transitionState(PlayerState.QUALITYCHANGE);
+            this.stateMachine.transitionState(originalState);
+        }
     }
 
     @Override
@@ -239,7 +240,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     @Override
     public void onAudioInputFormatChanged(Format format) {
-
+        Log.d(TAG,String.format("OnAudioInputFormatChnaged: Bitrate: %d MimeType: %s",format.sampleRate,format.sampleMimeType));
     }
 
     @Override

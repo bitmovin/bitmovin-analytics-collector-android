@@ -22,7 +22,7 @@ public class EventData {
     private int videoWindowHeight = 0;
     private int droppedFrames = 0;
     private int played = 0;
-    private int buffered = 0;
+    private long buffered = 0;
     private int paused = 0;
     private boolean ad = false;
     private long seeked = 0;
@@ -144,7 +144,7 @@ public class EventData {
         this.played = played;
     }
 
-    public void setBuffered(int buffered) {
+    public void setBuffered(long buffered) {
         this.buffered = buffered;
     }
 

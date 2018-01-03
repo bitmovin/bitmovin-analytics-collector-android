@@ -6,6 +6,8 @@ import android.util.Log;
 import com.bitmovin.bitmovinanalyticscollector.adapters.ExoPlayerAdapter;
 import com.bitmovin.bitmovinanalyticscollector.adapters.PlayerAdapter;
 import com.bitmovin.bitmovinanalyticscollector.data.EventData;
+import com.bitmovin.bitmovinanalyticscollector.data.IEventDataDispatcher;
+import com.bitmovin.bitmovinanalyticscollector.data.SimpleEventDataDispatcher;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerState;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerStateMachine;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.StateMachineListener;
@@ -23,11 +25,13 @@ public class BitmovinAnalytics implements StateMachineListener {
     private final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
     private PlayerAdapter playerAdapter;
     private PlayerStateMachine playerStateMachine;
+    private IEventDataDispatcher eventDataDispatcher;
 
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig);
         this.playerStateMachine.addListener(this);
+        this.eventDataDispatcher = new SimpleEventDataDispatcher();
     }
 
     public void attachPlayer(ExoPlayer exoPlayer){
@@ -68,10 +72,12 @@ public class BitmovinAnalytics implements StateMachineListener {
     }
 
     @Override
-    public void onRebuffering() {
+    public void onRebuffering(long duration) {
         Log.d(TAG,"onRebuffering");
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setDuration(duration);
+        data.setBuffered(duration);
         sendEventData(data);
     }
 
@@ -125,6 +131,10 @@ public class BitmovinAnalytics implements StateMachineListener {
     @Override
     public void onQualityChange() {
         Log.d(TAG,"onQualityChange");
+        EventData data = playerAdapter.createEventData();
+        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setDuration(0);
+        sendEventData(data);
     }
 
     @Override
@@ -136,5 +146,8 @@ public class BitmovinAnalytics implements StateMachineListener {
         Gson gson = new Gson();
         String json = gson.toJson(data);
         Log.d(TAG,json);
+
+        this.eventDataDispatcher.push(data);
+
     }
 }
