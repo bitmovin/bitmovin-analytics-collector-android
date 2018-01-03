@@ -14,7 +14,8 @@ import java.util.UUID;
  */
 
 public class Util {
-    private static final String QUALITY_CHANGE_STRING = "qualitychange";
+    public static final String DASH_STREAM_FORMAT = "dash";
+    public static final String HLS_STREAM_FORMAT = "hls";
 
     public static String getUUID(){
         return UUID.randomUUID().toString();

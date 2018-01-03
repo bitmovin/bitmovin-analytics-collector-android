@@ -62,6 +62,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2", this);
             bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
+
+            //Optional
+            bitmovinAnalyticsConfig.setExperimentName("experiment-1");
+            bitmovinAnalyticsConfig.setVideoId("videoId1234");
             BitmovinAnalytics analyticsCollector = new BitmovinAnalytics(bitmovinAnalyticsConfig);
             analyticsCollector.attachPlayer(player);
 

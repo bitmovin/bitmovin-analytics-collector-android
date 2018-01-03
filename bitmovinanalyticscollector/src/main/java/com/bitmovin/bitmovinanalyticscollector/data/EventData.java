@@ -69,6 +69,7 @@ public class EventData {
         this.videoId = bitmovinAnalyticsConfig.getVideoId();
         this.userId = bitmovinAnalyticsConfig.getUserId();
         this.customUserId = bitmovinAnalyticsConfig.getCustomUserId();
+        this.experimentName = bitmovinAnalyticsConfig.getExperimentName();
         this.playerTech = Util.getPlayerTech();
 
         if(bitmovinAnalyticsConfig.getCdnProvider() != null) {

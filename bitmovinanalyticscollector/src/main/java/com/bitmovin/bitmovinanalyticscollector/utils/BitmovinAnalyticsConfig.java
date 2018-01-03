@@ -22,6 +22,7 @@ public class BitmovinAnalyticsConfig {
     private String customData3;
     private String customData4;
     private String customData5;
+    private String experimentName;
     private String userId;
     private Context context;
 
@@ -29,6 +30,7 @@ public class BitmovinAnalyticsConfig {
         this.key = key;
         this.playerKey = playerKey;
         this.context = context;
+        this.userId = Util.getUUID();
     }
 
     public static String getAnalyticsUrl() {
@@ -84,6 +86,14 @@ public class BitmovinAnalyticsConfig {
     }
 
     public Context getContext() { return context; }
+
+    public String getExperimentName() {
+        return experimentName;
+    }
+
+    public void setExperimentName(String experimentName) {
+        this.experimentName = experimentName;
+    }
 
     public void setContext(Context context) { this.context = context; }
 

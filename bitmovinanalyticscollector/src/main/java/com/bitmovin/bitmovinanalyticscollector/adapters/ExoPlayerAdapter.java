@@ -49,8 +49,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         attachDebugListeners();
     }
 
-
-
     private void attachDebugListeners(){
         if(this.exoplayer instanceof SimpleExoPlayer){
             SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
@@ -158,6 +156,14 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
         //isLive
         data.setLive(exoplayer.isCurrentWindowDynamic());
+
+        //streamFormat
+        Object manifest = exoplayer.getCurrentManifest();
+        if(manifest instanceof DashManifest){
+            data.setStreamFormat(Util.DASH_STREAM_FORMAT);
+        }else if(manifest instanceof HlsManifest){
+            data.setStreamFormat(Util.HLS_STREAM_FORMAT);
+        }
 
         //Info on current tracks that are playing
         if (exoplayer.getCurrentTrackSelections() != null) {
