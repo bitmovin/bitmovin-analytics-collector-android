@@ -5,7 +5,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.bitmovin.bitmovinanalyticscollector.enums.CDNProvider;
-import com.bitmovin.bitmovinanalyticscollector.enums.Player;
+import com.bitmovin.bitmovinanalyticscollector.enums.PlayerType;
 import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
 import com.google.gson.Gson;
 
@@ -27,7 +27,7 @@ public class EventDataTest {
 
         bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2", appContext);
         bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.AKAMAI);
-        bitmovinAnalyticsConfig.setPlayer(Player.EXOPLAYER);
+        bitmovinAnalyticsConfig.setPlayerType(PlayerType.EXOPLAYER);
         bitmovinAnalyticsConfig.setVideoId("video1234");
         bitmovinAnalyticsConfig.setUserId("user1234");
 

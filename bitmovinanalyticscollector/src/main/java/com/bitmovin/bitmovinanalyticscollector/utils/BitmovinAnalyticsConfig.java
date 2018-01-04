@@ -3,7 +3,7 @@ package com.bitmovin.bitmovinanalyticscollector.utils;
 import android.content.Context;
 
 import com.bitmovin.bitmovinanalyticscollector.enums.CDNProvider;
-import com.bitmovin.bitmovinanalyticscollector.enums.Player;
+import com.bitmovin.bitmovinanalyticscollector.enums.PlayerType;
 
 /**
  * Created by zachmanc on 12/14/17.
@@ -14,7 +14,7 @@ public class BitmovinAnalyticsConfig {
     private String key;
     private String playerKey;
     private CDNProvider cdnProvider;
-    private Player player;
+    private PlayerType playerType;
     private String videoId;
     private String customUserId;
     private String customData1;
@@ -49,8 +49,8 @@ public class BitmovinAnalyticsConfig {
         return cdnProvider;
     }
 
-    public Player getPlayer() {
-        return player;
+    public PlayerType getPlayerType() {
+        return playerType;
     }
 
     public String getVideoId() {
@@ -99,8 +99,8 @@ public class BitmovinAnalyticsConfig {
 
     public void setCdnProvider(CDNProvider cdnProvider) { this.cdnProvider = cdnProvider; }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void setPlayerType(PlayerType playerType) {
+        this.playerType = playerType;
     }
 
     public void setVideoId(String videoId) {

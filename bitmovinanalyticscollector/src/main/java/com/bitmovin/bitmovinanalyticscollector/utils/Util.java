@@ -1,9 +1,8 @@
 package com.bitmovin.bitmovinanalyticscollector.utils;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
-import android.os.Build;
-import android.preference.PreferenceManager;
-
 import com.bitmovin.bitmovinanalyticscollector.BuildConfig;
 import com.google.android.exoplayer2.Player;
 
@@ -38,6 +37,14 @@ public class Util {
             default:
                 return "Unknown PlayerState";
         }
+    }
+
+    public static String getUserAgent(Context context){
+        ApplicationInfo applicationInfo = context.getApplicationInfo();
+        int stringId = applicationInfo.labelRes;
+        String applicationName = stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
+
+        return com.google.android.exoplayer2.util.Util.getUserAgent(context,applicationName);
     }
 
     public static long getTimeStamp(){

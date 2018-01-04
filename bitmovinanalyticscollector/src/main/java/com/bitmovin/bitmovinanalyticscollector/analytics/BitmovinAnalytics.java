@@ -12,6 +12,7 @@ import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerState;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerStateMachine;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.StateMachineListener;
 import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
+import com.bitmovin.bitmovinanalyticscollector.utils.HttpClient;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.gson.Gson;
 
@@ -31,7 +32,7 @@ public class BitmovinAnalytics implements StateMachineListener {
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig);
         this.playerStateMachine.addListener(this);
-        this.eventDataDispatcher = new SimpleEventDataDispatcher();
+        this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig);
     }
 
     public void attachPlayer(ExoPlayer exoPlayer){
@@ -143,11 +144,6 @@ public class BitmovinAnalytics implements StateMachineListener {
     }
 
     public void sendEventData(EventData data){
-        Gson gson = new Gson();
-        String json = gson.toJson(data);
-        Log.d(TAG,json);
-
-        this.eventDataDispatcher.push(data);
-
+        this.eventDataDispatcher.add(data);
     }
 }

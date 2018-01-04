@@ -4,13 +4,13 @@ package com.bitmovin.bitmovinanalyticscollector.enums;
  * Created by zachmanc on 12/15/17.
  */
 
-public enum Player {
+public enum PlayerType {
     BITMOVIN ("bitmovin"),
     EXOPLAYER ("exoplayer");
 
     private final String name;
 
-    Player(String name) {
+    PlayerType(String name) {
         this.name = name;
     }
 

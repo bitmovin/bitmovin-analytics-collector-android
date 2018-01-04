@@ -22,14 +22,12 @@ public class PlayerStateMachine {
     private long onEnterStateTimeStamp= 0;
     private long seekTimeStamp = 0;
     private final String impressionId;
-    private final String userId;
     private final BitmovinAnalyticsConfig config;
 
     private Handler heartbeatHandler = new Handler();
     private int heartbeatDelay = 59700; //milliseconds
 
     public PlayerStateMachine(BitmovinAnalyticsConfig config){
-        this.userId = Util.getUUID();
         this.impressionId = Util.getUUID();
         this.initialTimestamp = Util.getTimeStamp();
         this.config = config;
@@ -107,8 +105,9 @@ public class PlayerStateMachine {
         return firstReadyTimestamp-initialTimestamp;
     }
 
-
-
+    public String getImpressionId() {
+        return impressionId;
+    }
 
 }
 

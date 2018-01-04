@@ -9,7 +9,6 @@ import java.util.List;
 public interface IEventDataDispatcher {
 
 
-    public void push(EventData data);
+    public void add(EventData data);
     public void clear();
-    public List<EventData> pop(int count);
 }

@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.bitmovin.bitmovinanalyticscollector.data.EventData;
+import com.bitmovin.bitmovinanalyticscollector.enums.PlayerType;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerState;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerStateMachine;
 import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
@@ -20,6 +21,7 @@ import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.manifest.DashManifest;
 import com.google.android.exoplayer2.source.hls.HlsManifest;
+import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
@@ -138,7 +140,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     @Override
     public EventData createEventData() {
-        EventData data = new EventData(config);
+        EventData data = new EventData(config,stateMachine.getImpressionId());
+        data.setPlayer(PlayerType.EXOPLAYER.toString());
         decorateDataWithPlaybackInformation(data);
         return data;
     }
@@ -152,17 +155,30 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         }
 
         //ad
-        data.setAd(exoplayer.isPlayingAd());
+        if(exoplayer.isPlayingAd()){
+            data.setAd(1);
+        }
 
         //isLive
         data.setLive(exoplayer.isCurrentWindowDynamic());
 
-        //streamFormat
+        //streamFormat, mpdUrl, and m3u8Url
         Object manifest = exoplayer.getCurrentManifest();
         if(manifest instanceof DashManifest){
+            DashManifest dashManifest = (DashManifest) manifest;
             data.setStreamFormat(Util.DASH_STREAM_FORMAT);
+            if(dashManifest != null && dashManifest.location != null) {
+                data.setMpdUrl(dashManifest.location.toString());
+            }
         }else if(manifest instanceof HlsManifest){
+            HlsMasterPlaylist masterPlaylist = ((HlsManifest) manifest).masterPlaylist;
+            HlsMediaPlaylist mediaPlaylist = ((HlsManifest) manifest).mediaPlaylist;
             data.setStreamFormat(Util.HLS_STREAM_FORMAT);
+            if(masterPlaylist != null && masterPlaylist.baseUri != null){
+                data.setM3u8Url(masterPlaylist.baseUri);
+            }else if (mediaPlaylist != null){
+                data.setM3u8Url(mediaPlaylist.baseUri);
+            }
         }
 
         //Info on current tracks that are playing

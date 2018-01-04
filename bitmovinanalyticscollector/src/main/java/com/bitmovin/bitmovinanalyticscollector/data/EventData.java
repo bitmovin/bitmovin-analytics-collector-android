@@ -9,7 +9,7 @@ import com.bitmovin.bitmovinanalyticscollector.utils.Util;
 
 public class EventData {
     private String domain;
-    private String path;
+    private String path = "";
     private String language;
     private String userAgent;
     private int screenWidth;
@@ -24,7 +24,7 @@ public class EventData {
     private int played = 0;
     private long buffered = 0;
     private int paused = 0;
-    private boolean ad = false;
+    private int ad = 0;
     private long seeked = 0;
     private int videoPlaybackWidth = 0;
     private int videoPlaybackHeight = 0;
@@ -62,7 +62,7 @@ public class EventData {
     private String progUrl;
     private boolean isMuted = false;
 
-    public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
+    public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId) {
         this.analyticsVersion = Util.getVersion();
         this.key = bitmovinAnalyticsConfig.getKey();
         this.playerKey = bitmovinAnalyticsConfig.getPlayerKey();
@@ -71,13 +71,15 @@ public class EventData {
         this.customUserId = bitmovinAnalyticsConfig.getCustomUserId();
         this.experimentName = bitmovinAnalyticsConfig.getExperimentName();
         this.playerTech = Util.getPlayerTech();
+        this.setUserAgent(Util.getUserAgent(bitmovinAnalyticsConfig.getContext()));
+        this.impressionId = impressionId;
 
         if(bitmovinAnalyticsConfig.getCdnProvider() != null) {
             this.cdnProvider = bitmovinAnalyticsConfig.getCdnProvider().toString();
         }
 
-        if(bitmovinAnalyticsConfig.getPlayer() != null){
-            this.player = bitmovinAnalyticsConfig.getPlayer().toString();
+        if(bitmovinAnalyticsConfig.getPlayerType() != null){
+            this.player = bitmovinAnalyticsConfig.getPlayerType().toString();
         }
 
         if(bitmovinAnalyticsConfig.getContext() != null){
@@ -153,7 +155,7 @@ public class EventData {
         this.paused = paused;
     }
 
-    public void setAd(boolean ad) {
+    public void setAd(int ad) {
         this.ad = ad;
     }
 
