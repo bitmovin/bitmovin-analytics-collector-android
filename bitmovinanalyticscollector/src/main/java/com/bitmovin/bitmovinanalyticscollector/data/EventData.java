@@ -67,7 +67,7 @@ public class EventData {
         this.key = bitmovinAnalyticsConfig.getKey();
         this.playerKey = bitmovinAnalyticsConfig.getPlayerKey();
         this.videoId = bitmovinAnalyticsConfig.getVideoId();
-        this.userId = bitmovinAnalyticsConfig.getUserId();
+        this.userId = Util.getUserId(bitmovinAnalyticsConfig.getContext());
         this.customUserId = bitmovinAnalyticsConfig.getCustomUserId();
         this.experimentName = bitmovinAnalyticsConfig.getExperimentName();
         this.playerTech = Util.getPlayerTech();

@@ -3,6 +3,8 @@ package com.bitmovin.bitmovinanalyticscollector.utils;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
+import android.provider.Settings;
+
 import com.bitmovin.bitmovinanalyticscollector.BuildConfig;
 import com.google.android.exoplayer2.Player;
 
@@ -20,6 +22,10 @@ public class Util {
         return UUID.randomUUID().toString();
     }
 
+    public static String getUserId(Context context){
+        return Settings.Secure.getString(context.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+    }
     public static String getVersion(){
         return BuildConfig.VERSION_NAME;
     }

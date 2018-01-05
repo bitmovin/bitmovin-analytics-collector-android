@@ -1,7 +1,6 @@
 package com.bitmovin.bitmovinanalyticscollector.stateMachines;
 
 import android.os.Handler;
-import android.util.Log;
 
 import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
 import com.bitmovin.bitmovinanalyticscollector.utils.Util;

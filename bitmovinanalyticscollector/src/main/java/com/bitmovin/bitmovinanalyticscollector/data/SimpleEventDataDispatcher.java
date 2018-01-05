@@ -28,7 +28,6 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher {
 
     @Override
     public void add(EventData data) {
-
         // Currently not using the stack and just sending the data as it comes in. Not sure the format to send multiple messages at a time
         this.data.push(data);
         Gson gson = new Gson();

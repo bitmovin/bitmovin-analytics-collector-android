@@ -1,7 +1,5 @@
 package com.bitmovin.bitmovinanalyticscollector.data;
 
-import java.util.List;
-
 /**
  * Created by zachmanc on 12/19/17.
  */

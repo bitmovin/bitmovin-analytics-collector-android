@@ -1,6 +1,5 @@
 package com.bitmovin.bitmovinanalyticscollector.analytics;
 
-import android.os.Handler;
 import android.util.Log;
 
 import com.bitmovin.bitmovinanalyticscollector.adapters.ExoPlayerAdapter;
@@ -12,9 +11,7 @@ import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerState;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerStateMachine;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.StateMachineListener;
 import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
-import com.bitmovin.bitmovinanalyticscollector.utils.HttpClient;
 import com.google.android.exoplayer2.ExoPlayer;
-import com.google.gson.Gson;
 
 /**
  * Created by zachmanc on 12/15/17.

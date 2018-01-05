@@ -11,6 +11,7 @@ import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
 import com.bitmovin.bitmovinanalyticscollector.utils.Util;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -161,6 +162,9 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
         //isLive
         data.setLive(exoplayer.isCurrentWindowDynamic());
+
+        //version
+        data.setVersion(ExoPlayerLibraryInfo.VERSION);
 
         //streamFormat, mpdUrl, and m3u8Url
         Object manifest = exoplayer.getCurrentManifest();
