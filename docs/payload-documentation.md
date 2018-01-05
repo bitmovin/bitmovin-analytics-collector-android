@@ -68,7 +68,7 @@ playerStartupTime: 0
 videoBitrate: 4800000
 ```
 
-As you can see a lot of fields with `0` are being sent subsequently. The JSON payload always has the same fields, but depending on the state the player is in they are either set or not. There are some fields that are always set, notably the custom data fields like `videoId`, `cdnProvider`, `customData1-5` as well as fields that don't represent a distinct state change but rather information about the state of the player during the current sample, regardless of it's state like `streamFormat` (which stream technology was used, DASH/HLS or Progressive) or the `playerTech` (either native, html5 or flash).
+As you can see a lot of fields with `0` are being sent subsequently. The JSON payload always has the same fields, but depending on the state the player is in they are either set or not. There are some fields that are always set, notably the custom data fields like `videoId`, `cdnProvider`, `customData1-5` as well as fields that don't represent a distinct state change but rather information about the state of the player during the current sample, regardless of it's state like `streamFormat` (which stream technology was used -  dash,hls or mp4) or the `playerTech` (native).
 
 A full list of the JSON payload fields and their description can be found here:
 
