@@ -68,6 +68,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //Optional
             bitmovinAnalyticsConfig.setExperimentName("experiment-1");
             bitmovinAnalyticsConfig.setVideoId("videoId1234");
+            bitmovinAnalyticsConfig.setCustomData1("customData1");
+            bitmovinAnalyticsConfig.setCustomData2("customData2");
+            bitmovinAnalyticsConfig.setCustomData3("customData3");
+            bitmovinAnalyticsConfig.setCustomData4("customData4");
+            bitmovinAnalyticsConfig.setCustomData5("customData5");
+
+
             BitmovinAnalytics analyticsCollector = new BitmovinAnalytics(bitmovinAnalyticsConfig);
             analyticsCollector.attachPlayer(player);
 
@@ -88,11 +95,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
             //DASH example
-//            player.prepare(dashMediaSource);
+          player.prepare(dashMediaSource);
 
             //HLS example
-             HlsMediaSource hlsMediaSource = new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(hlsStatic,new Handler(), null);
-             player.prepare(hlsMediaSource);
+            // HlsMediaSource hlsMediaSource = new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(hlsStatic,new Handler(), null);
+            // player.prepare(hlsMediaSource);
 
         }
     }

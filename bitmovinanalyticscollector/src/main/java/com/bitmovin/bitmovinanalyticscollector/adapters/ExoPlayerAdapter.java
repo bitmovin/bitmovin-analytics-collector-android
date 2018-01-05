@@ -87,7 +87,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
                 }
                 break;
             case Player.STATE_BUFFERING:
-                if(this.stateMachine.getCurrentState() != PlayerState.SEEKING) {
+                if(this.stateMachine.getCurrentState() != PlayerState.SEEKING && this.stateMachine.getFirstReadyTimestamp() != 0) {
                     this.stateMachine.transitionState(PlayerState.BUFFERING);
                 }
                 break;
