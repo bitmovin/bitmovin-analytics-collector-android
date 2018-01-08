@@ -48,8 +48,10 @@ public class Util {
     public static String getUserAgent(Context context){
         ApplicationInfo applicationInfo = context.getApplicationInfo();
         int stringId = applicationInfo.labelRes;
-        String applicationName = stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
-
+        String applicationName = "Unknown";
+        if (stringId == 0 && applicationInfo.nonLocalizedLabel != null){
+            applicationInfo.nonLocalizedLabel.toString();
+        }
         return com.google.android.exoplayer2.util.Util.getUserAgent(context,applicationName);
     }
 

@@ -7,7 +7,7 @@ import com.bitmovin.bitmovinanalyticscollector.data.EventData;
 import com.bitmovin.bitmovinanalyticscollector.enums.PlayerType;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerState;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerStateMachine;
-import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
+import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.bitmovinanalyticscollector.utils.Util;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;

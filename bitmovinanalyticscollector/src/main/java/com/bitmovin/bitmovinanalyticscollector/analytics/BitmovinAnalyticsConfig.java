@@ -1,9 +1,10 @@
-package com.bitmovin.bitmovinanalyticscollector.utils;
+package com.bitmovin.bitmovinanalyticscollector.analytics;
 
 import android.content.Context;
 
 import com.bitmovin.bitmovinanalyticscollector.enums.CDNProvider;
 import com.bitmovin.bitmovinanalyticscollector.enums.PlayerType;
+import com.google.android.exoplayer2.Player;
 
 /**
  * Created by zachmanc on 12/14/17.
@@ -14,8 +15,8 @@ public class BitmovinAnalyticsConfig {
     private String key;
     private String playerKey;
     private CDNProvider cdnProvider;
-    private PlayerType playerType;
     private String videoId;
+    private PlayerType playerType;
     private String customUserId;
     private String customData1;
     private String customData2;
@@ -45,10 +46,6 @@ public class BitmovinAnalyticsConfig {
 
     public CDNProvider getCdnProvider() {
         return cdnProvider;
-    }
-
-    public PlayerType getPlayerType() {
-        return playerType;
     }
 
     public String getVideoId() {
@@ -85,42 +82,95 @@ public class BitmovinAnalyticsConfig {
         return experimentName;
     }
 
-    public void setExperimentName(String experimentName) {
-        this.experimentName = experimentName;
+    public PlayerType getPlayerType() {
+        return playerType;
     }
 
-    public void setContext(Context context) { this.context = context; }
-
-    public void setCdnProvider(CDNProvider cdnProvider) { this.cdnProvider = cdnProvider; }
-
+    /**
+     *  PlayerType that the current video is being played back with.
+     *
+     *  @param playerType {@link PlayerType}
+     */
     public void setPlayerType(PlayerType playerType) {
         this.playerType = playerType;
     }
 
+    /**
+     *  A/B Test Experiment Name
+     */
+    public void setExperimentName(String experimentName) {
+        this.experimentName = experimentName;
+    }
+
+    /* Android Context. Needed to grab the package name, application name, device information, ANDROID_ID, and window information */
+    public void setContext(Context context) { this.context = context; }
+
+    /**
+     *  CDN Provider used to play out Content
+     *
+     *  @param cdnProvider {@link CDNProvider}
+     */
+    public void setCdnProvider(CDNProvider cdnProvider) { this.cdnProvider = cdnProvider; }
+
+    /**
+     *  ID of the Video in the Customer System
+     *
+     *  @param videoId
+     */
     public void setVideoId(String videoId) {
         this.videoId = videoId;
     }
 
+    /**
+     *  User-ID in the Customer System
+     *
+     *  @param customUserId
+     */
     public void setCustomUserId(String customUserId) {
         this.customUserId = customUserId;
     }
 
+    /**
+     *  Optional free-form data
+     *
+     *  @param customData1
+     */
     public void setCustomData1(String customData1) {
         this.customData1 = customData1;
     }
 
+    /**
+     *  Optional free-form data
+     *
+     *  @param customData2
+     */
     public void setCustomData2(String customData2) {
         this.customData2 = customData2;
     }
 
+    /**
+     *  Optional free-form data
+     *
+     *  @param customData3
+     */
     public void setCustomData3(String customData3) {
         this.customData3 = customData3;
     }
 
+    /**
+     *  Optional free-form data
+     *
+     *  @param customData4
+     */
     public void setCustomData4(String customData4) {
         this.customData4 = customData4;
     }
 
+    /**
+     *  Optional free-form data
+     *
+     *  @param customData5
+     */
     public void setCustomData5(String customData5) {
         this.customData5 = customData5;
     }

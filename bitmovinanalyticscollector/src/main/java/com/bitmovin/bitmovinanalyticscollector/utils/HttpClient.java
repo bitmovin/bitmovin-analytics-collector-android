@@ -2,6 +2,8 @@ package com.bitmovin.bitmovinanalyticscollector.utils;
 
 import android.util.Log;
 
+import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
+
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -29,7 +31,7 @@ public class HttpClient {
 
     public void post(String postBody) {
 
-        Log.d(TAG, String.format("Posting Analytics JSON: %s",postBody));
+        Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n",postBody));
         Request request = new Request.Builder()
                 .url(bitmovinAnalyticsConfig.analyticsUrl)
                 .header("Origin",String.format("http://%s",bitmovinAnalyticsConfig.getContext().getPackageName()))

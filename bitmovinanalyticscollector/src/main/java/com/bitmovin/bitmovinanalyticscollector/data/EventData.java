@@ -1,6 +1,6 @@
 package com.bitmovin.bitmovinanalyticscollector.data;
 
-import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
+import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.bitmovinanalyticscollector.utils.Util;
 
 /**
@@ -61,7 +61,7 @@ public class EventData {
     private String m3u8Url;
     private String progUrl;
     private boolean isMuted = false;
-
+    
     public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId) {
         this.analyticsVersion = Util.getVersion();
         this.key = bitmovinAnalyticsConfig.getKey();

@@ -1,8 +1,6 @@
 package com.bitmovin.bitmovinanalyticscollector.data;
 
-import android.util.Log;
-
-import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
+import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.bitmovinanalyticscollector.utils.HttpClient;
 import com.google.gson.Gson;
 

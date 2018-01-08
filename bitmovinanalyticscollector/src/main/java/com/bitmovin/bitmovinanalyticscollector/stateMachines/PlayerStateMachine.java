@@ -2,7 +2,7 @@ package com.bitmovin.bitmovinanalyticscollector.stateMachines;
 
 import android.os.Handler;
 
-import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
+import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.bitmovinanalyticscollector.utils.Util;
 
 import java.util.ArrayList;
@@ -20,17 +20,15 @@ public class PlayerStateMachine {
     private long firstReadyTimestamp = 0;
     private long onEnterStateTimeStamp= 0;
     private long seekTimeStamp = 0;
-    private final String impressionId;
+    private String impressionId;
     private final BitmovinAnalyticsConfig config;
 
     private Handler heartbeatHandler = new Handler();
     private int heartbeatDelay = 59700; //milliseconds
 
     public PlayerStateMachine(BitmovinAnalyticsConfig config){
-        this.impressionId = Util.getUUID();
-        this.initialTimestamp = Util.getTimeStamp();
         this.config = config;
-        setCurrentState(PlayerState.SETUP);
+        resetStateMachine();
     }
 
     void enableHeartbeat(){
@@ -56,7 +54,12 @@ public class PlayerStateMachine {
         this.currentState = newPlayerState;
     }
 
-
+    public void resetStateMachine(){
+        disableHeartbeat();
+        this.impressionId = Util.getUUID();
+        this.initialTimestamp = Util.getTimeStamp();
+        setCurrentState(PlayerState.SETUP);
+    }
 
     public synchronized void transitionState(PlayerState destinationPlayerState){
         long timeStamp = Util.getTimeStamp();

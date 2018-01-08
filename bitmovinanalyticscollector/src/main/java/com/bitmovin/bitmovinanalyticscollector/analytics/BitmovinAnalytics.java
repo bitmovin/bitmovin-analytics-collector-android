@@ -10,13 +10,16 @@ import com.bitmovin.bitmovinanalyticscollector.data.SimpleEventDataDispatcher;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerState;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerStateMachine;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.StateMachineListener;
-import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
 import com.google.android.exoplayer2.ExoPlayer;
 
 /**
  * Created by zachmanc on 12/15/17.
  */
 
+/**
+ * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
+ * supports analytics of ExoPlayer video players
+ */
 public class BitmovinAnalytics implements StateMachineListener {
     private static final String TAG = "BitmovinAnalytics";
 
@@ -25,6 +28,11 @@ public class BitmovinAnalytics implements StateMachineListener {
     private PlayerStateMachine playerStateMachine;
     private IEventDataDispatcher eventDataDispatcher;
 
+    /**
+     * Bitmovin Analytics
+     *
+     * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
+     */
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig);
@@ -32,7 +40,15 @@ public class BitmovinAnalytics implements StateMachineListener {
         this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig);
     }
 
+    /**
+     * Attach an exoPlayer instance to this analytics plugin. After this is completed, BitmovinAnalytics
+     * will start monitoring and sending analytics data based on the attached exoPlayer instance.
+     *
+     * To attach a different exoPlayer instance, simply call this method again.
+     * @param exoPlayer
+     */
     public void attachPlayer(ExoPlayer exoPlayer){
+        this.playerStateMachine.resetStateMachine();
         this.playerAdapter = new ExoPlayerAdapter(exoPlayer,bitmovinAnalyticsConfig,playerStateMachine);
     }
 

@@ -9,7 +9,7 @@ import android.widget.Button;
 
 import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalytics;
 import com.bitmovin.bitmovinanalyticscollector.enums.CDNProvider;
-import com.bitmovin.bitmovinanalyticscollector.utils.BitmovinAnalyticsConfig;
+import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;

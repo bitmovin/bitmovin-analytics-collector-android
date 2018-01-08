@@ -7,5 +7,5 @@ import com.bitmovin.bitmovinanalyticscollector.data.EventData;
  */
 
 public interface PlayerAdapter {
-    public EventData createEventData();
+    EventData createEventData();
 }
