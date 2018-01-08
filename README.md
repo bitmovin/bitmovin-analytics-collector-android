@@ -1,5 +1,5 @@
 # [![bitmovin](http://bitmovin-a.akamaihd.net/webpages/bitmovin-logo-github.png)](http://www.bitmovin.com)
-Android client that allows you to monitor your ExoPlayer playback with (Bitmovin Analytics)[https://bitmovin.com/video-analytics/]
+Android client that allows you to monitor your ExoPlayer playback with [Bitmovin Analytics](https://bitmovin.com/video-analytics/)
 
 # Getting started
 ## Gradle
@@ -16,15 +16,30 @@ The following example creates a BitmovinAnalytics object and attaches an ExoPlay
 
 ```java
 // Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key and your Bitmovin Player Key
-BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", "<BITMOVIN_PLAYER_KEY>", this);
+BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", "<BITMOVIN_PLAYER_KEY>", getApplicationContext());
 
-//Create a BitmovinAnalytics object using the BitmovinAnalyitcsConfig you just created
+// Create a BitmovinAnalytics object using the BitmovinAnalyitcsConfig you just created
 BitmovinAnalytics analyticsCollector = new BitmovinAnalytics(bitmovinAnalyticsConfig);
 
-//Attach your ExoPlayer instance
+// Attach your player instance
 analyticsCollector.attachPlayer(exoPlayer);
 
+// Detach your player when you are done. For example, call this method when you call ExoPlayer's release() method
+bitmovinAnalytics.detachPlayer();
 ```
 
+
+#### Optional Configuration Parameters
+```java
+bitmovinAnalyticsConfig.setVideoId("videoId1234"); 
+bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
+bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
+bitmovinAnalyticsConfig.setExperimentName("experiment-1");
+bitmovinAnalyticsConfig.setCustomData1("customData1");
+bitmovinAnalyticsConfig.setCustomData2("customData2");
+bitmovinAnalyticsConfig.setCustomData3("customData3");
+bitmovinAnalyticsConfig.setCustomData4("customData4");
+bitmovinAnalyticsConfig.setCustomData5("customData5");
+```
 
 A [full example app](https://github.com/bitmovin/bitmovin-analytics-exoplayer-private/blob/master/exoplayeranalyticsexample/src/main/java/com/bitmovin/exoplayeranalyticsexample/MainActivity.java) can be seen in the github repo 
