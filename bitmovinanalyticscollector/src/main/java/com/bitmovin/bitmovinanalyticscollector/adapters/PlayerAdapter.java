@@ -8,4 +8,5 @@ import com.bitmovin.bitmovinanalyticscollector.data.EventData;
 
 public interface PlayerAdapter {
     EventData createEventData();
+    public void release();
 }

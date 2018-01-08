@@ -5,8 +5,8 @@ package com.bitmovin.bitmovinanalyticscollector.enums;
  */
 
 public enum PlayerType {
-    BITMOVIN ("bitmovin"),
-    EXOPLAYER ("exoplayer");
+    BITMOVIN("bitmovin"),
+    EXOPLAYER("exoplayer");
 
     private final String name;
 

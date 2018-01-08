@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button releaseButton;
     private Button createButton;
     private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+    private BitmovinAnalytics bitmovinAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +50,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         releaseButton.setOnClickListener(this);
         createButton = findViewById(R.id.create_button);
         createButton.setOnClickListener(this);
+
         createPlayer();
     }
+
+    private void createAnalyticsCollector() {
+        //Step 1: Create your analytics config object
+        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2", getApplicationContext());
+
+        //Optional
+        bitmovinAnalyticsConfig.setVideoId("videoId1234");
+        bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
+        bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
+        bitmovinAnalyticsConfig.setExperimentName("experiment-1");
+        bitmovinAnalyticsConfig.setCustomData1("customData1");
+        bitmovinAnalyticsConfig.setCustomData2("customData2");
+        bitmovinAnalyticsConfig.setCustomData3("customData3");
+        bitmovinAnalyticsConfig.setCustomData4("customData4");
+        bitmovinAnalyticsConfig.setCustomData5("customData5");
+
+        bitmovinAnalytics = new BitmovinAnalytics(bitmovinAnalyticsConfig);
+    }
+
+
 
 
 
@@ -62,21 +84,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             player = ExoPlayerFactory.newSimpleInstance(renderersFactory,
                     new DefaultTrackSelector(videoTrackSelectionFactory), new DefaultLoadControl());
 
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2", this);
-            bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
+            createAnalyticsCollector();
 
-            //Optional
-            bitmovinAnalyticsConfig.setExperimentName("experiment-1");
-            bitmovinAnalyticsConfig.setVideoId("videoId1234");
-            bitmovinAnalyticsConfig.setCustomData1("customData1");
-            bitmovinAnalyticsConfig.setCustomData2("customData2");
-            bitmovinAnalyticsConfig.setCustomData3("customData3");
-            bitmovinAnalyticsConfig.setCustomData4("customData4");
-            bitmovinAnalyticsConfig.setCustomData5("customData5");
-
-
-            BitmovinAnalytics analyticsCollector = new BitmovinAnalytics(bitmovinAnalyticsConfig);
-            analyticsCollector.attachPlayer(player);
+            bitmovinAnalytics.attachPlayer(player);
 
             simpleExoPlayerView.setPlayer(player);
 
@@ -93,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
             DashMediaSource dashMediaSource = new DashMediaSource.Factory(source,dataSourceFactory).createMediaSource(dashStatic, new Handler(),null);
 
-
             //DASH example
           player.prepare(dashMediaSource);
 
@@ -107,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void releasePlayer(){
         if(player != null){
             player.release();
+            bitmovinAnalytics.detachPlayer();
             player = null;
         }
     }

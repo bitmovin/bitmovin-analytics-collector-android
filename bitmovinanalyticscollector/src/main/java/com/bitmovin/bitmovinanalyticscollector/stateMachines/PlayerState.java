@@ -14,7 +14,7 @@ public enum PlayerState {
         }
 
         @Override
-        void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState desintationPlayerState) {
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState desintationPlayerState) {
             for (StateMachineListener listener : machine.getListeners()) {
                 listener.onSetup();
             }
@@ -26,7 +26,7 @@ public enum PlayerState {
         }
 
         @Override
-        void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState desintationPlayerState) {
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState desintationPlayerState) {
             for (StateMachineListener listener : machine.getListeners()) {
                 long enterTimestamp = machine.getOnEnterStateTimeStamp();
                 listener.onRebuffering(timeStamp - enterTimestamp);
@@ -39,7 +39,7 @@ public enum PlayerState {
         }
 
         @Override
-        void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState desintationPlayerState) {
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState desintationPlayerState) {
             for (StateMachineListener listener : machine.getListeners()) {
                 listener.onError();
             }
@@ -59,7 +59,7 @@ public enum PlayerState {
         }
 
         @Override
-        void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState desintationPlayerState) {
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState desintationPlayerState) {
             for (StateMachineListener listener : machine.getListeners()) {
                 long enterTimestamp = machine.getOnEnterStateTimeStamp();
                 listener.onPlayExit(timeStamp - enterTimestamp);
@@ -84,7 +84,7 @@ public enum PlayerState {
         }
 
         @Override
-        void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState desintationPlayerState) {
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState desintationPlayerState) {
             for (StateMachineListener listener : machine.getListeners()) {
                 long enterTimestamp = machine.getOnEnterStateTimeStamp();
                 listener.onPauseExit(timeStamp - enterTimestamp);
@@ -99,7 +99,7 @@ public enum PlayerState {
         }
 
         @Override
-        void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState destinationPlayerState) {
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState destinationPlayerState) {
             for (StateMachineListener listener : machine.getListeners()) {
                 listener.onQualityChange();
             }
@@ -112,9 +112,9 @@ public enum PlayerState {
         }
 
         @Override
-        void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState destinationPlayerState) {
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState destinationPlayerState) {
             for (StateMachineListener listener : machine.getListeners()) {
-                listener.onSeekComplete(timeStamp - machine.getSeekTimeStamp(),destinationPlayerState);
+                listener.onSeekComplete(timeStamp - machine.getSeekTimeStamp(), destinationPlayerState);
             }
             machine.setSeekTimeStamp(0);
         }
@@ -125,13 +125,13 @@ public enum PlayerState {
         }
 
         @Override
-        void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState desintationPlayerState) {
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState desintationPlayerState) {
 
         }
     };
 
     abstract void onEnterState(PlayerStateMachine machine);
 
-    abstract void onExitState(PlayerStateMachine machine,long timeStamp, PlayerState desintationPlayerState);
+    abstract void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState desintationPlayerState);
 
 }

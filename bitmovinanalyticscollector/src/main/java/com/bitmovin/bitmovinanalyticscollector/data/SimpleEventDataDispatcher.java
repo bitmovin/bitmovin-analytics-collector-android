@@ -1,6 +1,7 @@
 package com.bitmovin.bitmovinanalyticscollector.data;
 
 import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.bitmovinanalyticscollector.utils.EventDataSerializer;
 import com.bitmovin.bitmovinanalyticscollector.utils.HttpClient;
 import com.google.gson.Gson;
 
@@ -40,10 +41,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher {
     public void add(EventData data) {
 //      Currently not using the stack and just sending the data as it comes in. Not sure the format to send multiple messages at a time
 //      this.data.add(data);
-        Gson gson = new Gson();
-        String json = gson.toJson(data);
-
-        this.httpClient.post(json);
+        this.httpClient.post(EventDataSerializer.serialize(data));
     }
 
     @Override
@@ -53,10 +51,10 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher {
 
     public List<EventData> pop(int count) {
         ArrayList<EventData> list = new ArrayList<EventData>();
-        for (int i=0; i<count; i++){
-            try{
+        for (int i = 0; i < count; i++) {
+            try {
                 list.add(data.remove());
-            }catch (EmptyStackException e){
+            } catch (EmptyStackException e) {
                 break;
             }
         }

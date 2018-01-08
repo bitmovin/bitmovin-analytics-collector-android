@@ -17,7 +17,7 @@ public class EventData {
     private boolean isLive;
     private boolean isCasting;
     private long videoDuration = 0;
-    private long time =  0;
+    private long time = 0;
     private int videoWindowWidth = 0;
     private int videoWindowHeight = 0;
     private int droppedFrames = 0;
@@ -61,7 +61,7 @@ public class EventData {
     private String m3u8Url;
     private String progUrl;
     private boolean isMuted = false;
-    
+
     public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId) {
         this.analyticsVersion = Util.getVersion();
         this.key = bitmovinAnalyticsConfig.getKey();
@@ -79,15 +79,15 @@ public class EventData {
         this.setUserAgent(Util.getUserAgent(bitmovinAnalyticsConfig.getContext()));
         this.impressionId = impressionId;
 
-        if(bitmovinAnalyticsConfig.getCdnProvider() != null) {
+        if (bitmovinAnalyticsConfig.getCdnProvider() != null) {
             this.cdnProvider = bitmovinAnalyticsConfig.getCdnProvider().toString();
         }
 
-        if(bitmovinAnalyticsConfig.getPlayerType() != null){
+        if (bitmovinAnalyticsConfig.getPlayerType() != null) {
             this.player = bitmovinAnalyticsConfig.getPlayerType().toString();
         }
 
-        if(bitmovinAnalyticsConfig.getContext() != null){
+        if (bitmovinAnalyticsConfig.getContext() != null) {
             this.domain = bitmovinAnalyticsConfig.getContext().getPackageName();
             this.screenHeight = bitmovinAnalyticsConfig.getContext().getResources().getDisplayMetrics().heightPixels;
             this.screenWidth = bitmovinAnalyticsConfig.getContext().getResources().getDisplayMetrics().widthPixels;

@@ -18,7 +18,7 @@ public class PlayerStateMachine {
     private PlayerState currentState;
     private long initialTimestamp = 0;
     private long firstReadyTimestamp = 0;
-    private long onEnterStateTimeStamp= 0;
+    private long onEnterStateTimeStamp = 0;
     private long seekTimeStamp = 0;
     private String impressionId;
     private final BitmovinAnalyticsConfig config;
@@ -26,18 +26,18 @@ public class PlayerStateMachine {
     private Handler heartbeatHandler = new Handler();
     private int heartbeatDelay = 59700; //milliseconds
 
-    public PlayerStateMachine(BitmovinAnalyticsConfig config){
+    public PlayerStateMachine(BitmovinAnalyticsConfig config) {
         this.config = config;
         resetStateMachine();
     }
 
-    void enableHeartbeat(){
-        heartbeatHandler.postDelayed(new Runnable(){
-            public void run(){
+    void enableHeartbeat() {
+        heartbeatHandler.postDelayed(new Runnable() {
+            public void run() {
                 long currentTimestamp = Util.getTimeStamp();
                 long enterTimestamp = getOnEnterStateTimeStamp();
 
-                for (StateMachineListener listener : getListeners()){
+                for (StateMachineListener listener : getListeners()) {
                     listener.onHeartbeat(currentTimestamp - onEnterStateTimeStamp);
                 }
                 onEnterStateTimeStamp = currentTimestamp;
@@ -46,24 +46,24 @@ public class PlayerStateMachine {
         }, heartbeatDelay);
     }
 
-    void disableHeartbeat(){
+    void disableHeartbeat() {
         heartbeatHandler.removeCallbacksAndMessages(null);
     }
 
-    private void setCurrentState(final PlayerState newPlayerState){
+    private void setCurrentState(final PlayerState newPlayerState) {
         this.currentState = newPlayerState;
     }
 
-    public void resetStateMachine(){
+    public void resetStateMachine() {
         disableHeartbeat();
         this.impressionId = Util.getUUID();
         this.initialTimestamp = Util.getTimeStamp();
         setCurrentState(PlayerState.SETUP);
     }
 
-    public synchronized void transitionState(PlayerState destinationPlayerState){
+    public synchronized void transitionState(PlayerState destinationPlayerState) {
         long timeStamp = Util.getTimeStamp();
-        currentState.onExitState(this,timeStamp,destinationPlayerState);
+        currentState.onExitState(this, timeStamp, destinationPlayerState);
         this.onEnterStateTimeStamp = timeStamp;
         destinationPlayerState.onEnterState(this);
         setCurrentState(destinationPlayerState);
@@ -93,18 +93,20 @@ public class PlayerStateMachine {
         listeners.add(toAdd);
     }
 
-    public void removeListener(StateMachineListener toRemove){
+    public void removeListener(StateMachineListener toRemove) {
         listeners.remove(toRemove);
     }
 
-    public PlayerState getCurrentState() { return currentState; }
+    public PlayerState getCurrentState() {
+        return currentState;
+    }
 
     List<StateMachineListener> getListeners() {
         return listeners;
     }
 
-    public long getStartupTime(){
-        return firstReadyTimestamp-initialTimestamp;
+    public long getStartupTime() {
+        return firstReadyTimestamp - initialTimestamp;
     }
 
     public String getImpressionId() {

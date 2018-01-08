@@ -52,8 +52,19 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         attachDebugListeners();
     }
 
-    private void attachDebugListeners(){
-        if(this.exoplayer instanceof SimpleExoPlayer){
+    private void attachDebugListeners() {
+        if (this.exoplayer instanceof SimpleExoPlayer) {
+            SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
+            simpleExoPlayer.addVideoDebugListener(this);
+            simpleExoPlayer.addAudioDebugListener(this);
+        }
+    }
+
+    public void release() {
+        if (this.exoplayer != null) {
+            this.exoplayer.removeListener(this);
+        }
+        if (this.exoplayer instanceof SimpleExoPlayer) {
             SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
             simpleExoPlayer.addVideoDebugListener(this);
             simpleExoPlayer.addAudioDebugListener(this);
@@ -87,7 +98,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
                 }
                 break;
             case Player.STATE_BUFFERING:
-                if(this.stateMachine.getCurrentState() != PlayerState.SEEKING && this.stateMachine.getFirstReadyTimestamp() != 0) {
+                if (this.stateMachine.getCurrentState() != PlayerState.SEEKING && this.stateMachine.getFirstReadyTimestamp() != 0) {
                     this.stateMachine.transitionState(PlayerState.BUFFERING);
                 }
                 break;
@@ -141,7 +152,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     @Override
     public EventData createEventData() {
-        EventData data = new EventData(config,stateMachine.getImpressionId());
+        EventData data = new EventData(config, stateMachine.getImpressionId());
         data.setPlayer(PlayerType.EXOPLAYER.toString());
         decorateDataWithPlaybackInformation(data);
         return data;
@@ -151,12 +162,12 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
         //duration
         long duration = exoplayer.getDuration();
-        if(duration != TIME_UNSET) {
+        if (duration != TIME_UNSET) {
             data.setVideoDuration(duration);
         }
 
         //ad
-        if(exoplayer.isPlayingAd()){
+        if (exoplayer.isPlayingAd()) {
             data.setAd(1);
         }
 
@@ -168,19 +179,19 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
         //streamFormat, mpdUrl, and m3u8Url
         Object manifest = exoplayer.getCurrentManifest();
-        if(manifest instanceof DashManifest){
+        if (manifest instanceof DashManifest) {
             DashManifest dashManifest = (DashManifest) manifest;
             data.setStreamFormat(Util.DASH_STREAM_FORMAT);
-            if(dashManifest != null && dashManifest.location != null) {
+            if (dashManifest != null && dashManifest.location != null) {
                 data.setMpdUrl(dashManifest.location.toString());
             }
-        }else if(manifest instanceof HlsManifest){
+        } else if (manifest instanceof HlsManifest) {
             HlsMasterPlaylist masterPlaylist = ((HlsManifest) manifest).masterPlaylist;
             HlsMediaPlaylist mediaPlaylist = ((HlsManifest) manifest).mediaPlaylist;
             data.setStreamFormat(Util.HLS_STREAM_FORMAT);
-            if(masterPlaylist != null && masterPlaylist.baseUri != null){
+            if (masterPlaylist != null && masterPlaylist.baseUri != null) {
                 data.setM3u8Url(masterPlaylist.baseUri);
-            }else if (mediaPlaylist != null){
+            } else if (mediaPlaylist != null) {
                 data.setM3u8Url(mediaPlaylist.baseUri);
             }
         }
@@ -189,7 +200,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         if (exoplayer.getCurrentTrackSelections() != null) {
             for (int i = 0; i < exoplayer.getCurrentTrackSelections().length; i++) {
                 TrackSelection trackSelection = exoplayer.getCurrentTrackSelections().get(i);
-                if(trackSelection != null) {
+                if (trackSelection != null) {
                     Format format = trackSelection.getSelectedFormat();
                     switch (exoplayer.getRendererType(i)) {
                         case TRACK_TYPE_AUDIO:
@@ -220,8 +231,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     @Override
     public void onVideoInputFormatChanged(Format format) {
-        Log.d(TAG,String.format("OnVideoInputFormatChanged: Bitrate: %d Resolution: %d x %d",format.bitrate, format.width,format.height));
-        if((this.stateMachine.getCurrentState() == PlayerState.PLAYING) || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)){
+        Log.d(TAG, String.format("OnVideoInputFormatChanged: Bitrate: %d Resolution: %d x %d", format.bitrate, format.width, format.height));
+        if ((this.stateMachine.getCurrentState() == PlayerState.PLAYING) || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)) {
             PlayerState originalState = this.stateMachine.getCurrentState();
             this.stateMachine.transitionState(PlayerState.QUALITYCHANGE);
             this.stateMachine.transitionState(originalState);
@@ -230,13 +241,13 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     @Override
     public void onDroppedFrames(int count, long elapsedMs) {
-        Log.d(TAG,String.format("OnDroppedFrames: %d over %d",count, elapsedMs));
+        Log.d(TAG, String.format("OnDroppedFrames: %d over %d", count, elapsedMs));
 
     }
 
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-        Log.d(TAG,String.format("On Video Sized Changed: %d x %d",width,height));
+        Log.d(TAG, String.format("On Video Sized Changed: %d x %d", width, height));
     }
 
     @Override
@@ -251,7 +262,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     @Override
     public void onAudioEnabled(DecoderCounters counters) {
-        
+
     }
 
     @Override
@@ -266,7 +277,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     @Override
     public void onAudioInputFormatChanged(Format format) {
-        Log.d(TAG,String.format("OnAudioInputFormatChnaged: Bitrate: %d MimeType: %s",format.sampleRate,format.sampleMimeType));
+        Log.d(TAG, String.format("OnAudioInputFormatChnaged: Bitrate: %d MimeType: %s", format.sampleRate, format.sampleMimeType));
     }
 
     @Override

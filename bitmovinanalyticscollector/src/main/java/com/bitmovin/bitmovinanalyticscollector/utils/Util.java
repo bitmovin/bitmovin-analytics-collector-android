@@ -18,20 +18,21 @@ public class Util {
     public static final String DASH_STREAM_FORMAT = "dash";
     public static final String HLS_STREAM_FORMAT = "hls";
 
-    public static String getUUID(){
+    public static String getUUID() {
         return UUID.randomUUID().toString();
     }
 
-    public static String getUserId(Context context){
+    public static String getUserId(Context context) {
         return Settings.Secure.getString(context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
     }
-    public static String getVersion(){
+
+    public static String getVersion() {
         return BuildConfig.VERSION_NAME;
     }
 
-    public static String exoStateToString(int state){
-        switch (state){
+    public static String exoStateToString(int state) {
+        switch (state) {
             case Player.STATE_IDLE:
                 return "Idle";
             case Player.STATE_BUFFERING:
@@ -45,23 +46,25 @@ public class Util {
         }
     }
 
-    public static String getUserAgent(Context context){
+    public static String getUserAgent(Context context) {
         ApplicationInfo applicationInfo = context.getApplicationInfo();
         int stringId = applicationInfo.labelRes;
         String applicationName = "Unknown";
-        if (stringId == 0 && applicationInfo.nonLocalizedLabel != null){
+        if (stringId == 0 && applicationInfo.nonLocalizedLabel != null) {
             applicationInfo.nonLocalizedLabel.toString();
         }
-        return com.google.android.exoplayer2.util.Util.getUserAgent(context,applicationName);
+        return com.google.android.exoplayer2.util.Util.getUserAgent(context, applicationName);
     }
 
-    public static long getTimeStamp(){
+    public static long getTimeStamp() {
         return System.currentTimeMillis();
     }
 
-    public static String getPlayerTech() {return "Native"; }
+    public static String getPlayerTech() {
+        return "Native";
+    }
 
-    public static String getLocale(){
+    public static String getLocale() {
         return Resources.getSystem().getConfiguration().locale.toString();
     }
 }

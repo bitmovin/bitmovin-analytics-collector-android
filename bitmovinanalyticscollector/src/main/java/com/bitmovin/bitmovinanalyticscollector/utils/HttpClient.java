@@ -31,10 +31,10 @@ public class HttpClient {
 
     public void post(String postBody) {
 
-        Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n",postBody));
+        Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody));
         Request request = new Request.Builder()
                 .url(bitmovinAnalyticsConfig.analyticsUrl)
-                .header("Origin",String.format("http://%s",bitmovinAnalyticsConfig.getContext().getPackageName()))
+                .header("Origin", String.format("http://%s", bitmovinAnalyticsConfig.getContext().getPackageName()))
                 .post(RequestBody.create(JSON, postBody))
                 .build();
 
