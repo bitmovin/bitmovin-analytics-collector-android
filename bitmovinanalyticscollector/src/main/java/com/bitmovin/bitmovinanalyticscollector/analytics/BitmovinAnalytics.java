@@ -90,6 +90,7 @@ public class BitmovinAnalytics implements StateMachineListener {
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
+        data.setPaused(duration);
         sendEventData(data);
     }
 
@@ -99,6 +100,7 @@ public class BitmovinAnalytics implements StateMachineListener {
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
+        data.setPlayed(duration);
         sendEventData(data);
     }
 
@@ -136,6 +138,20 @@ public class BitmovinAnalytics implements StateMachineListener {
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
+
+        switch (playerStateMachine.getCurrentState()){
+            case PLAYING:
+                data.setPlayed(duration);
+                break;
+            case PAUSE:
+                data.setPaused(duration);
+                break;
+            case BUFFERING:
+                data.setBuffered(duration);
+                break;
+
+        }
+
         sendEventData(data);
     }
 

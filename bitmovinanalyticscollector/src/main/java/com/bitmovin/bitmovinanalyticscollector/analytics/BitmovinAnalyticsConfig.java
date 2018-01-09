@@ -25,6 +25,7 @@ public class BitmovinAnalyticsConfig {
     private String customData5;
     private String experimentName;
     private Context context;
+    private int heartbeatInterval = 60;
 
     public BitmovinAnalyticsConfig(String key, String playerKey, Context context) {
         this.key = key;
@@ -86,6 +87,14 @@ public class BitmovinAnalyticsConfig {
 
     public PlayerType getPlayerType() {
         return playerType;
+    }
+
+    public int getHeartbeatInterval() {
+        return heartbeatInterval;
+    }
+
+    public void setHeartbeatInterval(int heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
     }
 
     /**

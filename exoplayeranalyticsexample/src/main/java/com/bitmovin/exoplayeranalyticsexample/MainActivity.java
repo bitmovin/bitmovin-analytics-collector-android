@@ -32,15 +32,14 @@ import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
-
     private SimpleExoPlayer player;
     private SimpleExoPlayerView simpleExoPlayerView;
     private Button releaseButton;
     private Button createButton;
     private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
     private BitmovinAnalytics bitmovinAnalytics;
-
+    private Handler automationHandler;
+    private int automationDelay = 90000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +51,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         createButton.setOnClickListener(this);
 
         createPlayer();
+
+//        automationHandler = new Handler();
+//
+//        automationHandler.postDelayed(new Runnable(){
+//            public void run(){
+//
+//
+//                releasePlayer();
+//
+//                createPlayer();
+//
+//                automationHandler.postDelayed(this, automationDelay);
+//            }
+//        }, automationDelay);
+
     }
 
     private void createAnalyticsCollector() {
@@ -59,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2", getApplicationContext());
 
         //Optional
-        bitmovinAnalyticsConfig.setVideoId("videoId1234");
+        bitmovinAnalyticsConfig.setVideoId("testVideoId");
         bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
         bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
         bitmovinAnalyticsConfig.setExperimentName("experiment-1");
@@ -103,8 +117,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
             DashMediaSource dashMediaSource = new DashMediaSource.Factory(source,dataSourceFactory).createMediaSource(dashStatic, new Handler(),null);
 
+
+
             //DASH example
-          player.prepare(dashMediaSource);
+            player.prepare(dashMediaSource);
+            player.setPlayWhenReady(true);
 
             //HLS example
             // HlsMediaSource hlsMediaSource = new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(hlsStatic,new Handler(), null);

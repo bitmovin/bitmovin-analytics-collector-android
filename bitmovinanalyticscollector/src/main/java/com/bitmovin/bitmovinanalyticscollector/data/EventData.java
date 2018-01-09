@@ -21,9 +21,9 @@ public class EventData {
     private int videoWindowWidth = 0;
     private int videoWindowHeight = 0;
     private int droppedFrames = 0;
-    private int played = 0;
+    private long played = 0;
     private long buffered = 0;
-    private int paused = 0;
+    private long paused = 0;
     private int ad = 0;
     private long seeked = 0;
     private int videoPlaybackWidth = 0;
@@ -148,7 +148,7 @@ public class EventData {
         this.droppedFrames = droppedFrames;
     }
 
-    public void setPlayed(int played) {
+    public void setPlayed(long played) {
         this.played = played;
     }
 
@@ -156,7 +156,7 @@ public class EventData {
         this.buffered = buffered;
     }
 
-    public void setPaused(int paused) {
+    public void setPaused(long paused) {
         this.paused = paused;
     }
 
