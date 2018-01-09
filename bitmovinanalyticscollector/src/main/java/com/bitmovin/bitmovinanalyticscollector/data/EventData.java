@@ -30,8 +30,8 @@ public class EventData {
     private int videoPlaybackHeight = 0;
     private int videoBitrate = 0;
     private int audioBitrate = 0;
-    private int videoTimeStart = 0;
-    private int videoTimeEnd = 0;
+    private long videoTimeStart = 0;
+    private long videoTimeEnd = 0;
     private long videoStartupTime = 0;
     private long duration = 0;
     private long startupTime = 0;
@@ -184,11 +184,11 @@ public class EventData {
         this.audioBitrate = audioBitrate;
     }
 
-    public void setVideoTimeStart(int videoTimeStart) {
+    public void setVideoTimeStart(long videoTimeStart) {
         this.videoTimeStart = videoTimeStart;
     }
 
-    public void setVideoTimeEnd(int videoTimeEnd) {
+    public void setVideoTimeEnd(long videoTimeEnd) {
         this.videoTimeEnd = videoTimeEnd;
     }
 

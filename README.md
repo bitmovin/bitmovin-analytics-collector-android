@@ -40,6 +40,8 @@ bitmovinAnalyticsConfig.setCustomData2("customData2");
 bitmovinAnalyticsConfig.setCustomData3("customData3");
 bitmovinAnalyticsConfig.setCustomData4("customData4");
 bitmovinAnalyticsConfig.setCustomData5("customData5");
+bitmovinAnalyticsConfig.setHeartbeatInterval(59700); // value is in ms 
+
 ```
 
 A [full example app](https://github.com/bitmovin/bitmovin-analytics-exoplayer-private/blob/master/exoplayeranalyticsexample/src/main/java/com/bitmovin/exoplayeranalyticsexample/MainActivity.java) can be seen in the github repo 

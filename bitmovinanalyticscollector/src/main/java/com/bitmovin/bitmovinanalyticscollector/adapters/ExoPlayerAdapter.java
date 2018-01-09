@@ -88,29 +88,29 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        long videoTime = exoplayer.getContentPosition();
         Log.d(TAG, String.format("onPlayerStateChanged: %b, %s", playWhenReady, Util.exoStateToString(playbackState)));
         switch (playbackState) {
             case Player.STATE_READY:
                 if (playWhenReady) {
-                    this.stateMachine.transitionState(PlayerState.PLAYING);
+                    this.stateMachine.transitionState(PlayerState.PLAYING,videoTime);
                 } else {
-                    this.stateMachine.transitionState(PlayerState.PAUSE);
+                    this.stateMachine.transitionState(PlayerState.PAUSE,videoTime);
                 }
                 break;
             case Player.STATE_BUFFERING:
                 if (this.stateMachine.getCurrentState() != PlayerState.SEEKING && this.stateMachine.getFirstReadyTimestamp() != 0) {
-                    this.stateMachine.transitionState(PlayerState.BUFFERING);
+                    this.stateMachine.transitionState(PlayerState.BUFFERING,videoTime);
                 }
                 break;
             case Player.STATE_IDLE:
-                this.stateMachine.transitionState(PlayerState.SETUP);
+                this.stateMachine.transitionState(PlayerState.SETUP,videoTime);
                 break;
             case Player.STATE_ENDED:
-                this.stateMachine.transitionState(PlayerState.END);
+                this.stateMachine.transitionState(PlayerState.END,videoTime);
                 break;
             default:
                 Log.d(TAG, "Unknown Player PlayerState encountered");
-                return;
         }
 
     }
@@ -130,13 +130,15 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
     @Override
     public void onPlayerError(ExoPlaybackException error) {
         Log.d(TAG, "onPlayerError");
-        this.stateMachine.transitionState(PlayerState.ERROR);
+        long videoTime = exoplayer.getContentPosition();
+        this.stateMachine.transitionState(PlayerState.ERROR,videoTime);
     }
 
     @Override
     public void onPositionDiscontinuity(int reason) {
         Log.d(TAG, "onPositionDiscontinuity");
-        this.stateMachine.transitionState(PlayerState.SEEKING);
+        long videoTime = exoplayer.getContentPosition();
+        this.stateMachine.transitionState(PlayerState.SEEKING,videoTime);
 
     }
 
@@ -180,9 +182,10 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         //streamFormat, mpdUrl, and m3u8Url
         Object manifest = exoplayer.getCurrentManifest();
         if (manifest instanceof DashManifest) {
-            DashManifest dashManifest = (DashManifest) manifest;
+            DashManifest dashManifest;
+            dashManifest = (DashManifest) manifest;
             data.setStreamFormat(Util.DASH_STREAM_FORMAT);
-            if (dashManifest != null && dashManifest.location != null) {
+            if (dashManifest.location != null) {
                 data.setMpdUrl(dashManifest.location.toString());
             }
         } else if (manifest instanceof HlsManifest) {
@@ -233,9 +236,10 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
     public void onVideoInputFormatChanged(Format format) {
         Log.d(TAG, String.format("OnVideoInputFormatChanged: Bitrate: %d Resolution: %d x %d", format.bitrate, format.width, format.height));
         if ((this.stateMachine.getCurrentState() == PlayerState.PLAYING) || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)) {
+            long videoTime = exoplayer.getContentPosition();
             PlayerState originalState = this.stateMachine.getCurrentState();
-            this.stateMachine.transitionState(PlayerState.QUALITYCHANGE);
-            this.stateMachine.transitionState(originalState);
+            this.stateMachine.transitionState(PlayerState.QUALITYCHANGE,videoTime);
+            this.stateMachine.transitionState(originalState,videoTime);
         }
     }
 

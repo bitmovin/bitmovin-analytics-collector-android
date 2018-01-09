@@ -20,6 +20,8 @@ public class PlayerStateMachine {
     private long firstReadyTimestamp = 0;
     private long onEnterStateTimeStamp = 0;
     private long seekTimeStamp = 0;
+    private long videoTimeStart;
+    private long videoTimeEnd;
     private String impressionId;
     private final BitmovinAnalyticsConfig config;
 
@@ -28,6 +30,7 @@ public class PlayerStateMachine {
 
     public PlayerStateMachine(BitmovinAnalyticsConfig config) {
         this.config = config;
+        this.heartbeatDelay = this.config.getHeartbeatInterval();
         resetStateMachine();
     }
 
@@ -61,10 +64,12 @@ public class PlayerStateMachine {
         setCurrentState(PlayerState.SETUP);
     }
 
-    public synchronized void transitionState(PlayerState destinationPlayerState) {
+    public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
         long timeStamp = Util.getTimeStamp();
+        videoTimeEnd = videoTime;
         currentState.onExitState(this, timeStamp, destinationPlayerState);
         this.onEnterStateTimeStamp = timeStamp;
+        videoTimeStart = videoTimeEnd;
         destinationPlayerState.onEnterState(this);
         setCurrentState(destinationPlayerState);
     }
@@ -77,18 +82,6 @@ public class PlayerStateMachine {
         this.firstReadyTimestamp = firstReadyTimestamp;
     }
 
-    public long getOnEnterStateTimeStamp() {
-        return onEnterStateTimeStamp;
-    }
-
-    public long getSeekTimeStamp() {
-        return seekTimeStamp;
-    }
-
-    public void setSeekTimeStamp(long seekTimeStamp) {
-        this.seekTimeStamp = seekTimeStamp;
-    }
-
     public void addListener(StateMachineListener toAdd) {
         listeners.add(toAdd);
     }
@@ -97,12 +90,12 @@ public class PlayerStateMachine {
         listeners.remove(toRemove);
     }
 
-    public PlayerState getCurrentState() {
-        return currentState;
-    }
-
     List<StateMachineListener> getListeners() {
         return listeners;
+    }
+
+    public PlayerState getCurrentState() {
+        return currentState;
     }
 
     public long getStartupTime() {
@@ -111,6 +104,35 @@ public class PlayerStateMachine {
 
     public String getImpressionId() {
         return impressionId;
+    }
+
+
+    public long getVideoTimeStart() {
+        return videoTimeStart;
+    }
+
+    public long getVideoTimeEnd() {
+        return videoTimeEnd;
+    }
+
+    public long getOnEnterStateTimeStamp() {
+        return onEnterStateTimeStamp;
+    }
+
+    public long getSeekTimeStamp() {
+        return seekTimeStamp;
+    }
+
+    public void setVideoTimeStart(long videoTimeStart) {
+        this.videoTimeStart = videoTimeStart;
+    }
+
+    public void setVideoTimeEnd(long videoTimeEnd) {
+        this.videoTimeEnd = videoTimeEnd;
+    }
+
+    public void setSeekTimeStamp(long seekTimeStamp) {
+        this.seekTimeStamp = seekTimeStamp;
     }
 
 }

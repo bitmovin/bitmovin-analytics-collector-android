@@ -25,7 +25,7 @@ public class BitmovinAnalyticsConfig {
     private String customData5;
     private String experimentName;
     private Context context;
-    private int heartbeatInterval = 60;
+    private int heartbeatInterval = 59700;
 
     public BitmovinAnalyticsConfig(String key, String playerKey, Context context) {
         this.key = key;
@@ -93,6 +93,11 @@ public class BitmovinAnalyticsConfig {
         return heartbeatInterval;
     }
 
+    /**
+     * The frequency that heartbeats should be sent, in milliseconds
+     *
+     * @param heartbeatInterval
+     */
     public void setHeartbeatInterval(int heartbeatInterval) {
         this.heartbeatInterval = heartbeatInterval;
     }
