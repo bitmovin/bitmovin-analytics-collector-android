@@ -78,9 +78,10 @@ public class BitmovinAnalytics implements StateMachineListener {
     public void onStartup(long duration) {
         Log.d(TAG, String.format("onStartup %s", playerStateMachine.getImpressionId()));
         EventData data = playerAdapter.createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState("startup");
         data.setDuration(duration);
         data.setVideoStartupTime(duration);
+        data.setStartupTime(duration);
         sendEventData(data);
     }
 

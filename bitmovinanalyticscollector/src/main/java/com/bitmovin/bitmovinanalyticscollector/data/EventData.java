@@ -34,7 +34,7 @@ public class EventData {
     private int videoTimeEnd = 0;
     private long videoStartupTime = 0;
     private long duration = 0;
-    private int startupTime = 0;
+    private long startupTime = 0;
     private String analyticsVersion;
     private String key;
     private String playerKey;
@@ -52,7 +52,7 @@ public class EventData {
     private String impressionId;
     private String state;
     private int playerStartupTime;
-    private int pageLoadType;
+    private int pageLoadType = 1;
     private int pageLoadTime;
     private String version;
     private String playerTech;
@@ -200,7 +200,7 @@ public class EventData {
         this.duration = duration;
     }
 
-    public void setStartupTime(int startupTime) {
+    public void setStartupTime(long startupTime) {
         this.startupTime = startupTime;
     }
 
