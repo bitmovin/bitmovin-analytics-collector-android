@@ -71,6 +71,22 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         }
     }
 
+    private long getPosition() {
+        Timeline timeline = this.exoplayer.getCurrentTimeline();
+        int currentWindowIndex = this.exoplayer.getCurrentWindowIndex();
+        if (currentWindowIndex >= 0 && currentWindowIndex < timeline.getWindowCount()) {
+            Timeline.Window currentWindow = new Timeline.Window();
+            timeline.getWindow(currentWindowIndex, currentWindow);
+            int firstPeriodInWindowIndex = currentWindow.firstPeriodIndex;
+            Timeline.Period firstPeriodInWindow = new Timeline.Period();
+            if (firstPeriodInWindowIndex >= 0 && firstPeriodInWindowIndex < timeline.getPeriodCount()) {
+                timeline.getPeriod(firstPeriodInWindowIndex, firstPeriodInWindow);
+                return (exoplayer.getCurrentPosition() - firstPeriodInWindow.getPositionInWindowMs()) / 1000;
+            }
+        }
+        return 0;
+    }
+
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
         Log.d(TAG, "onTimelineChanged");
@@ -88,26 +104,26 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        long videoTime = exoplayer.getContentPosition();
+        long videoTime = getPosition();
         Log.d(TAG, String.format("onPlayerStateChanged: %b, %s", playWhenReady, Util.exoStateToString(playbackState)));
         switch (playbackState) {
             case Player.STATE_READY:
                 if (playWhenReady) {
-                    this.stateMachine.transitionState(PlayerState.PLAYING,videoTime);
+                    this.stateMachine.transitionState(PlayerState.PLAYING, videoTime);
                 } else {
-                    this.stateMachine.transitionState(PlayerState.PAUSE,videoTime);
+                    this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                 }
                 break;
             case Player.STATE_BUFFERING:
                 if (this.stateMachine.getCurrentState() != PlayerState.SEEKING && this.stateMachine.getFirstReadyTimestamp() != 0) {
-                    this.stateMachine.transitionState(PlayerState.BUFFERING,videoTime);
+                    this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
                 }
                 break;
             case Player.STATE_IDLE:
-                this.stateMachine.transitionState(PlayerState.SETUP,videoTime);
+                this.stateMachine.transitionState(PlayerState.SETUP, videoTime);
                 break;
             case Player.STATE_ENDED:
-                this.stateMachine.transitionState(PlayerState.END,videoTime);
+                this.stateMachine.transitionState(PlayerState.END, videoTime);
                 break;
             default:
                 Log.d(TAG, "Unknown Player PlayerState encountered");
@@ -130,15 +146,15 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
     @Override
     public void onPlayerError(ExoPlaybackException error) {
         Log.d(TAG, "onPlayerError");
-        long videoTime = exoplayer.getContentPosition();
-        this.stateMachine.transitionState(PlayerState.ERROR,videoTime);
+        long videoTime = getPosition();
+        this.stateMachine.transitionState(PlayerState.ERROR, videoTime);
     }
 
     @Override
     public void onPositionDiscontinuity(int reason) {
         Log.d(TAG, "onPositionDiscontinuity");
-        long videoTime = exoplayer.getContentPosition();
-        this.stateMachine.transitionState(PlayerState.SEEKING,videoTime);
+        long videoTime = getPosition();
+        this.stateMachine.transitionState(PlayerState.SEEKING, videoTime);
 
     }
 
@@ -236,10 +252,10 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
     public void onVideoInputFormatChanged(Format format) {
         Log.d(TAG, String.format("OnVideoInputFormatChanged: Bitrate: %d Resolution: %d x %d", format.bitrate, format.width, format.height));
         if ((this.stateMachine.getCurrentState() == PlayerState.PLAYING) || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)) {
-            long videoTime = exoplayer.getContentPosition();
+            long videoTime = getPosition();
             PlayerState originalState = this.stateMachine.getCurrentState();
-            this.stateMachine.transitionState(PlayerState.QUALITYCHANGE,videoTime);
-            this.stateMachine.transitionState(originalState,videoTime);
+            this.stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
+            this.stateMachine.transitionState(originalState, videoTime);
         }
     }
 
