@@ -52,29 +52,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         createPlayer();
     }
 
-    private void createAnalyticsCollector() {
-        //Step 1: Create your analytics config object
-        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2", getApplicationContext());
-
-        //Step 2: Add optional parameters
-        bitmovinAnalyticsConfig.setVideoId("androidVideoHLSDynamic");
-        bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
-        bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
-        bitmovinAnalyticsConfig.setExperimentName("experiment-1");
-        bitmovinAnalyticsConfig.setCustomData1("customData1");
-        bitmovinAnalyticsConfig.setCustomData2("customData2");
-        bitmovinAnalyticsConfig.setCustomData3("customData3");
-        bitmovinAnalyticsConfig.setCustomData4("customData4");
-        bitmovinAnalyticsConfig.setCustomData5("customData5");
-        bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
-
-        bitmovinAnalytics = new BitmovinAnalytics(bitmovinAnalyticsConfig);
-    }
-
-
-
-
-
     private void createPlayer() {
         if(player==null) {
             TrackSelection.Factory videoTrackSelectionFactory
@@ -82,16 +59,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             RenderersFactory renderersFactory = new DefaultRenderersFactory(this);
             player = ExoPlayerFactory.newSimpleInstance(renderersFactory,
                     new DefaultTrackSelector(videoTrackSelectionFactory), new DefaultLoadControl());
-
-            createAnalyticsCollector();
-
-            bitmovinAnalytics.attachPlayer(player);
-
-            simpleExoPlayerView.setPlayer(player);
-
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, bandwidthMeter,
                     buildHttpDataSourceFactory(bandwidthMeter));
 
+            //Step 1: Create your analytics config object
+            BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2", getApplicationContext());
+
+            //Step 2: Add optional parameters
+            bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
+            bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
+            bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
+            bitmovinAnalyticsConfig.setExperimentName("experiment-1");
+            bitmovinAnalyticsConfig.setCustomData1("customData1");
+            bitmovinAnalyticsConfig.setCustomData2("customData2");
+            bitmovinAnalyticsConfig.setCustomData3("customData3");
+            bitmovinAnalyticsConfig.setCustomData4("customData4");
+            bitmovinAnalyticsConfig.setCustomData5("customData5");
+            bitmovinAnalyticsConfig.setPath("/vod/new/");
+            bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
+
+            //Step 3: Create Analytics Colelctor
+            bitmovinAnalytics = new BitmovinAnalytics(bitmovinAnalyticsConfig);
+
+            //Step 4: Attach ExoPlayer
+            bitmovinAnalytics.attachPlayer(player);
+
+            //Step 5: Create, prepeare, and play media source
+            simpleExoPlayerView.setPlayer(player);
             Uri dashStatic = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
             //DASH example
             DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);

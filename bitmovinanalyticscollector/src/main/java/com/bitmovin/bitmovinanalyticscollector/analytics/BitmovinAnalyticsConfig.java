@@ -24,6 +24,7 @@ public class BitmovinAnalyticsConfig {
     private String customData4;
     private String customData5;
     private String experimentName;
+    private String path;
     private Context context;
     private int heartbeatInterval = 59700;
 
@@ -89,6 +90,8 @@ public class BitmovinAnalyticsConfig {
         return playerType;
     }
 
+    public String getPath() { return path; }
+
     public int getHeartbeatInterval() {
         return heartbeatInterval;
     }
@@ -110,6 +113,13 @@ public class BitmovinAnalyticsConfig {
     public void setPlayerType(PlayerType playerType) {
         this.playerType = playerType;
     }
+
+    /**
+     * Breadcrumb path
+     *
+     * @param path
+     */
+    public void setPath(String path) { this.path = path; }
 
     /**
      * A/B Test Experiment Name

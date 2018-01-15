@@ -118,16 +118,6 @@ public enum PlayerState {
             }
             machine.setSeekTimeStamp(0);
         }
-    },
-    END {
-        @Override
-        void onEnterState(PlayerStateMachine machine) {
-        }
-
-        @Override
-        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState desintationPlayerState) {
-
-        }
     };
 
     abstract void onEnterState(PlayerStateMachine machine);

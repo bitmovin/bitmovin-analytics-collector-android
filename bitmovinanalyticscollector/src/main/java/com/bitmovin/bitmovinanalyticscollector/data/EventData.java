@@ -74,6 +74,7 @@ public class EventData {
         this.customData3 = bitmovinAnalyticsConfig.getCustomData3();
         this.customData4 = bitmovinAnalyticsConfig.getCustomData4();
         this.customData5 = bitmovinAnalyticsConfig.getCustomData5();
+        this.path = bitmovinAnalyticsConfig.getPath();
         this.experimentName = bitmovinAnalyticsConfig.getExperimentName();
         this.playerTech = Util.getPlayerTech();
         this.setUserAgent(Util.getUserAgent(bitmovinAnalyticsConfig.getContext()));

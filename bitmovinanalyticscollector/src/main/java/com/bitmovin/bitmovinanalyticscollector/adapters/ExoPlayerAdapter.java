@@ -123,7 +123,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
                 this.stateMachine.transitionState(PlayerState.SETUP, videoTime);
                 break;
             case Player.STATE_ENDED:
-                this.stateMachine.transitionState(PlayerState.END, videoTime);
+                this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                 break;
             default:
                 Log.d(TAG, "Unknown Player PlayerState encountered");
