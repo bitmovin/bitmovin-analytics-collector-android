@@ -38,8 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button createButton;
     private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
     private BitmovinAnalytics bitmovinAnalytics;
-    private Handler automationHandler;
-    private int automationDelay = 90000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,29 +50,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         createButton.setOnClickListener(this);
 
         createPlayer();
-
-//        automationHandler = new Handler();
-//
-//        automationHandler.postDelayed(new Runnable(){
-//            public void run(){
-//
-//
-//                releasePlayer();
-//
-//                createPlayer();
-//
-//                automationHandler.postDelayed(this, automationDelay);
-//            }
-//        }, automationDelay);
-
     }
 
     private void createAnalyticsCollector() {
         //Step 1: Create your analytics config object
         BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2", getApplicationContext());
 
-        //Optional
-        bitmovinAnalyticsConfig.setVideoId("testVideoId");
+        //Step 2: Add optional parameters
+        bitmovinAnalyticsConfig.setVideoId("androidVideoHLSDynamic");
         bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
         bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
         bitmovinAnalyticsConfig.setExperimentName("experiment-1");
@@ -82,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmovinAnalyticsConfig.setCustomData3("customData3");
         bitmovinAnalyticsConfig.setCustomData4("customData4");
         bitmovinAnalyticsConfig.setCustomData5("customData5");
+        bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
 
         bitmovinAnalytics = new BitmovinAnalytics(bitmovinAnalyticsConfig);
     }
@@ -108,24 +93,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     buildHttpDataSourceFactory(bandwidthMeter));
 
             Uri dashStatic = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
-            Uri dashDynamic = Uri.parse("http://vm2.dashif.org/livesim-dev/segtimeline_1/testpic_6s/Manifest.mpd");
-            Uri hlsStatic = Uri.parse("https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8");
-            Uri hlsDynamic = Uri.parse("http://c742eca4-lp-omega.ums.ustream.tv/playlist/auditorium/channel/9408562/playlist.m3u8?token=208723_1514483442312&appType=11&appVersion=3&ts=1514483442&chunkingType=improved&geo=US&sgn=353890216fdb617d960b71bc428583675e89f0c3&preferredBitrate=0&cdnHost=uhs-akamai.ustream.tv");
-            Uri hlsMediaPlaylist = Uri.parse("https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/gear1/prog_index.m3u8");
-            Uri mp4Url = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4");
-
+            //DASH example
             DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
             DashMediaSource dashMediaSource = new DashMediaSource.Factory(source,dataSourceFactory).createMediaSource(dashStatic, new Handler(),null);
-
-
-
-            //DASH example
             player.prepare(dashMediaSource);
             player.setPlayWhenReady(true);
-
-            //HLS example
-            // HlsMediaSource hlsMediaSource = new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(hlsStatic,new Handler(), null);
-            // player.prepare(hlsMediaSource);
 
         }
     }

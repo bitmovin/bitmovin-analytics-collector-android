@@ -20,7 +20,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher {
 
     private Queue<EventData> data;
     private HttpClient httpClient;
-    private boolean enabled;
+    private boolean enabled = true;
 
     public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config) {
         this.data = new ConcurrentLinkedQueue<EventData>();
@@ -41,7 +41,10 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher {
     public void add(EventData data) {
 //      Currently not using the stack and just sending the data as it comes in. Not sure the format to send multiple messages at a time
 //      this.data.add(data);
-        this.httpClient.post(EventDataSerializer.serialize(data));
+
+        if(this.enabled) {
+            this.httpClient.post(EventDataSerializer.serialize(data));
+        }
     }
 
     @Override

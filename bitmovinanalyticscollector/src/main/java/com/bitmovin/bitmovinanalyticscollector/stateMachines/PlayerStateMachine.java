@@ -26,7 +26,7 @@ public class PlayerStateMachine {
     private final BitmovinAnalyticsConfig config;
 
     private Handler heartbeatHandler = new Handler();
-    private int heartbeatDelay = 59700; //milliseconds
+    private int heartbeatDelay = 59700; // default to 60 seconds
 
     public PlayerStateMachine(BitmovinAnalyticsConfig config) {
         this.config = config;
@@ -121,14 +121,6 @@ public class PlayerStateMachine {
 
     public long getSeekTimeStamp() {
         return seekTimeStamp;
-    }
-
-    public void setVideoTimeStart(long videoTimeStart) {
-        this.videoTimeStart = videoTimeStart;
-    }
-
-    public void setVideoTimeEnd(long videoTimeEnd) {
-        this.videoTimeEnd = videoTimeEnd;
     }
 
     public void setSeekTimeStamp(long seekTimeStamp) {
