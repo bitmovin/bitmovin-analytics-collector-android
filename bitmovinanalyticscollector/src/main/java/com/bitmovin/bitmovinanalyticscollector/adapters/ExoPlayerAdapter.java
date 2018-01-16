@@ -159,24 +159,36 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
 
     private void mapError(ExoPlaybackException error){
         error.printStackTrace();
+        ErrorCode errorCode = ErrorCode.UNKNOWN_ERROR;
         switch(error.type){
             case TYPE_SOURCE:
                 IOException exception = error.getSourceException();
                 if(exception instanceof HttpDataSource.InvalidResponseCodeException) {
-                    ErrorCode errorCode = ErrorCode.MANIFEST_HTTP_FAILURE;
+                    errorCode = ErrorCode.DATASOURCE_HTTP_FAILURE;
                     HttpDataSource.InvalidResponseCodeException responseCodeException = (HttpDataSource.InvalidResponseCodeException) exception;
-                    errorCode.setDescription(errorCode.getDescription() + responseCodeException.responseCode);
-                    this.stateMachine.setErrorCode(ErrorCode.MANIFEST_HTTP_FAILURE);
+                    errorCode.setDescription("Data Source request failed with HTTP status: " + responseCodeException.responseCode + " - " + responseCodeException.dataSpec.uri);
+                    this.stateMachine.setErrorCode(errorCode);
+                }else if (exception instanceof HttpDataSource.InvalidContentTypeException){
+                    HttpDataSource.InvalidContentTypeException contentTypeException = (HttpDataSource.InvalidContentTypeException) exception;
+                    errorCode = ErrorCode.DATASOURCE_INVALID_CONTENT_TYPE;
+                    errorCode.setDescription("Invalid Content Type: " + contentTypeException.contentType);
+                    this.stateMachine.setErrorCode(errorCode);
+                }else if (exception instanceof HttpDataSource.HttpDataSourceException){
+                    HttpDataSource.HttpDataSourceException httpDataSourceException = (HttpDataSource.HttpDataSourceException) exception;
+                    errorCode = ErrorCode.DATASOURCE_UNABLE_TO_CONNECT;
+                    errorCode.setDescription("Unable to connect: " + httpDataSourceException.dataSpec.uri);
+                    this.stateMachine.setErrorCode(errorCode);
                 }
                 break;
             case TYPE_RENDERER:
-                Exception rendererException = error.getRendererException();
+                errorCode = ErrorCode.EXOPLAYER_RENDERER_ERROR;
                 break;
-            case TYPE_UNEXPECTED:
-                RuntimeException runtimeException = error.getUnexpectedException();
+            default:
+                errorCode = ErrorCode.UNKNOWN_ERROR;
                 break;
-
         }
+
+        this.stateMachine.setErrorCode(errorCode);
     }
 
     @Override

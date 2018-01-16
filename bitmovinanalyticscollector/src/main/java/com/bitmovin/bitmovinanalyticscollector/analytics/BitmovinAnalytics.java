@@ -132,7 +132,7 @@ public class BitmovinAnalytics implements StateMachineListener {
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
         data.setErrorCode(errorCode.getErrorCode());
-        data.setErrorDescription(errorCode.getDescription());
+        data.setErrorMessage(errorCode.getDescription());
         sendEventData(data);
     }
 

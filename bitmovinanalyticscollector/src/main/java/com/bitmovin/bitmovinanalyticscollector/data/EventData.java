@@ -52,7 +52,7 @@ public class EventData {
     private String impressionId;
     private String state;
     private int errorCode;
-    private String errorDescription;
+    private String errorMessage;
     private int playerStartupTime;
     private int pageLoadType = 1;
     private int pageLoadTime;
@@ -215,8 +215,8 @@ public class EventData {
         this.errorCode = errorCode;
     }
 
-    public void setErrorDescription(String errorDescription) {
-        this.errorDescription = errorDescription;
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     public void setKey(String key) {
