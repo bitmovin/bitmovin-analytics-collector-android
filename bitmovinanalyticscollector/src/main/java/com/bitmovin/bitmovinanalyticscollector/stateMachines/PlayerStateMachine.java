@@ -3,6 +3,7 @@ package com.bitmovin.bitmovinanalyticscollector.stateMachines;
 import android.os.Handler;
 
 import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.bitmovinanalyticscollector.data.ErrorCode;
 import com.bitmovin.bitmovinanalyticscollector.utils.Util;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class PlayerStateMachine {
     private long seekTimeStamp = 0;
     private long videoTimeStart;
     private long videoTimeEnd;
+    private ErrorCode errorCode;
     private String impressionId;
     private final BitmovinAnalyticsConfig config;
 
@@ -106,7 +108,6 @@ public class PlayerStateMachine {
         return impressionId;
     }
 
-
     public long getVideoTimeStart() {
         return videoTimeStart;
     }
@@ -121,6 +122,14 @@ public class PlayerStateMachine {
 
     public long getSeekTimeStamp() {
         return seekTimeStamp;
+    }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(ErrorCode errorCode) {
+        this.errorCode = errorCode;
     }
 
     public void setSeekTimeStamp(long seekTimeStamp) {

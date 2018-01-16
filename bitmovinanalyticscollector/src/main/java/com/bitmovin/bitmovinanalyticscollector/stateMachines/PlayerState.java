@@ -41,7 +41,7 @@ public enum PlayerState {
         @Override
         void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState desintationPlayerState) {
             for (StateMachineListener listener : machine.getListeners()) {
-                listener.onError();
+                listener.onError(machine.getErrorCode());
             }
         }
     },

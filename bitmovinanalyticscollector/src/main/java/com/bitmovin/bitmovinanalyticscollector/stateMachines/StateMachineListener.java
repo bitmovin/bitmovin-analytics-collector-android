@@ -1,5 +1,7 @@
 package com.bitmovin.bitmovinanalyticscollector.stateMachines;
 
+import com.bitmovin.bitmovinanalyticscollector.data.ErrorCode;
+
 /**
  * Created by zachmanc on 12/19/17.
  */
@@ -18,7 +20,7 @@ public interface StateMachineListener {
 
     void onRebuffering(long duration);
 
-    void onError();
+    void onError(ErrorCode errorCode);
 
     void onSeekComplete(long duration, PlayerState destinationPlayerState);
 

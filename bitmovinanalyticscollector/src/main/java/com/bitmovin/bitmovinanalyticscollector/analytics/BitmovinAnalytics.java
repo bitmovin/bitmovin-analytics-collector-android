@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.bitmovin.bitmovinanalyticscollector.adapters.ExoPlayerAdapter;
 import com.bitmovin.bitmovinanalyticscollector.adapters.PlayerAdapter;
+import com.bitmovin.bitmovinanalyticscollector.data.ErrorCode;
 import com.bitmovin.bitmovinanalyticscollector.data.EventData;
 import com.bitmovin.bitmovinanalyticscollector.data.IEventDataDispatcher;
 import com.bitmovin.bitmovinanalyticscollector.data.SimpleEventDataDispatcher;
@@ -124,12 +125,14 @@ public class BitmovinAnalytics implements StateMachineListener {
     }
 
     @Override
-    public void onError() {
+    public void onError(ErrorCode errorCode) {
         Log.d(TAG, String.format("onError %s", playerStateMachine.getImpressionId()));
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+        data.setErrorCode(errorCode.getErrorCode());
+        data.setErrorDescription(errorCode.getDescription());
         sendEventData(data);
     }
 

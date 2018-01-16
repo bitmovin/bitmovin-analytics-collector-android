@@ -3,6 +3,7 @@ package com.bitmovin.bitmovinanalyticscollector.adapters;
 import android.util.Log;
 import android.view.Surface;
 
+import com.bitmovin.bitmovinanalyticscollector.data.ErrorCode;
 import com.bitmovin.bitmovinanalyticscollector.data.EventData;
 import com.bitmovin.bitmovinanalyticscollector.enums.PlayerType;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerState;
@@ -26,11 +27,17 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
+
+import java.io.IOException;
 
 import static com.google.android.exoplayer2.C.TIME_UNSET;
 import static com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO;
 import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
+import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_RENDERER;
+import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
+import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_UNEXPECTED;
 
 /**
  * Created by zachmanc on 12/14/17.
@@ -128,7 +135,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
             default:
                 Log.d(TAG, "Unknown Player PlayerState encountered");
         }
-
     }
 
     @Override
@@ -147,7 +153,30 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
     public void onPlayerError(ExoPlaybackException error) {
         Log.d(TAG, "onPlayerError");
         long videoTime = getPosition();
+        mapError(error);
         this.stateMachine.transitionState(PlayerState.ERROR, videoTime);
+    }
+
+    private void mapError(ExoPlaybackException error){
+        error.printStackTrace();
+        switch(error.type){
+            case TYPE_SOURCE:
+                IOException exception = error.getSourceException();
+                if(exception instanceof HttpDataSource.InvalidResponseCodeException) {
+                    ErrorCode errorCode = ErrorCode.MANIFEST_HTTP_FAILURE;
+                    HttpDataSource.InvalidResponseCodeException responseCodeException = (HttpDataSource.InvalidResponseCodeException) exception;
+                    errorCode.setDescription(errorCode.getDescription() + responseCodeException.responseCode);
+                    this.stateMachine.setErrorCode(ErrorCode.MANIFEST_HTTP_FAILURE);
+                }
+                break;
+            case TYPE_RENDERER:
+                Exception rendererException = error.getRendererException();
+                break;
+            case TYPE_UNEXPECTED:
+                RuntimeException runtimeException = error.getUnexpectedException();
+                break;
+
+        }
     }
 
     @Override
@@ -155,7 +184,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         Log.d(TAG, "onPositionDiscontinuity");
         long videoTime = getPosition();
         this.stateMachine.transitionState(PlayerState.SEEKING, videoTime);
-
     }
 
     @Override

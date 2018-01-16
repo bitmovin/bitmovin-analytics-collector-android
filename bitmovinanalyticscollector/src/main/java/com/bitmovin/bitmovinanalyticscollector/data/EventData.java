@@ -51,6 +51,8 @@ public class EventData {
     private String userId;
     private String impressionId;
     private String state;
+    private int errorCode;
+    private String errorDescription;
     private int playerStartupTime;
     private int pageLoadType = 1;
     private int pageLoadTime;
@@ -207,6 +209,14 @@ public class EventData {
 
     public void setAnalyticsVersion(String analyticsVersion) {
         this.analyticsVersion = analyticsVersion;
+    }
+
+    public void setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public void setErrorDescription(String errorDescription) {
+        this.errorDescription = errorDescription;
     }
 
     public void setKey(String key) {
