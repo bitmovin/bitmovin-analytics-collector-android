@@ -51,7 +51,7 @@ public class EventData {
     private String userId;
     private String impressionId;
     private String state;
-    private int errorCode;
+    private Integer errorCode;
     private String errorMessage;
     private int playerStartupTime;
     private int pageLoadType = 1;
@@ -211,7 +211,7 @@ public class EventData {
         this.analyticsVersion = analyticsVersion;
     }
 
-    public void setErrorCode(int errorCode) {
+    public void setErrorCode(Integer errorCode) {
         this.errorCode = errorCode;
     }
 
