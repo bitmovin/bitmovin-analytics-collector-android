@@ -22,7 +22,7 @@ public interface StateMachineListener {
 
     void onError(ErrorCode errorCode);
 
-    void onSeekComplete(long duration, PlayerState destinationPlayerState);
+    void onSeekComplete(long duration);
 
     void onAd();
 

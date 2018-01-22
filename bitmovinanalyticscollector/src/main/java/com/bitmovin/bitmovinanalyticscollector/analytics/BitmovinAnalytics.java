@@ -137,7 +137,7 @@ public class BitmovinAnalytics implements StateMachineListener {
     }
 
     @Override
-    public void onSeekComplete(long duration, PlayerState desintationPlayerState) {
+    public void onSeekComplete(long duration) {
         Log.d(TAG, String.format("onSeekComplete %s", playerStateMachine.getImpressionId()));
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());

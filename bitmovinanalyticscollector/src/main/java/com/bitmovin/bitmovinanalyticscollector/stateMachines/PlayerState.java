@@ -36,13 +36,13 @@ public enum PlayerState {
     ERROR {
         @Override
         void onEnterState(PlayerStateMachine machine) {
+            for (StateMachineListener listener : machine.getListeners()) {
+                listener.onError(machine.getErrorCode());
+            }
         }
 
         @Override
         void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState desintationPlayerState) {
-            for (StateMachineListener listener : machine.getListeners()) {
-                listener.onError(machine.getErrorCode());
-            }
         }
     },
     PLAYING {
@@ -114,7 +114,7 @@ public enum PlayerState {
         @Override
         void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState destinationPlayerState) {
             for (StateMachineListener listener : machine.getListeners()) {
-                listener.onSeekComplete(timeStamp - machine.getSeekTimeStamp(), destinationPlayerState);
+                listener.onSeekComplete(timeStamp - machine.getSeekTimeStamp());
             }
             machine.setSeekTimeStamp(0);
         }
