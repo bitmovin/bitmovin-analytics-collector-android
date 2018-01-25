@@ -8,7 +8,7 @@ import com.google.gson.Gson;
  */
 
 public class EventDataSerializer {
-    public static String serialize(EventData data){
+    public static String serialize(EventData data) {
         Gson gson = new Gson();
         return gson.toJson(data);
     }

@@ -15,6 +15,7 @@ import java.util.List;
 
 public class PlayerStateMachine {
     private static final String TAG = "PlayerStateMachine";
+    private final BitmovinAnalyticsConfig config;
     private List<StateMachineListener> listeners = new ArrayList<StateMachineListener>();
     private PlayerState currentState;
     private long initialTimestamp = 0;
@@ -25,8 +26,6 @@ public class PlayerStateMachine {
     private long videoTimeEnd;
     private ErrorCode errorCode;
     private String impressionId;
-    private final BitmovinAnalyticsConfig config;
-
     private Handler heartbeatHandler = new Handler();
     private int heartbeatDelay = 59700; // default to 60 seconds
 
@@ -53,10 +52,6 @@ public class PlayerStateMachine {
 
     void disableHeartbeat() {
         heartbeatHandler.removeCallbacksAndMessages(null);
-    }
-
-    private void setCurrentState(final PlayerState newPlayerState) {
-        this.currentState = newPlayerState;
     }
 
     public void resetStateMachine() {
@@ -100,6 +95,10 @@ public class PlayerStateMachine {
         return currentState;
     }
 
+    private void setCurrentState(final PlayerState newPlayerState) {
+        this.currentState = newPlayerState;
+    }
+
     public long getStartupTime() {
         return firstReadyTimestamp - initialTimestamp;
     }
@@ -124,16 +123,16 @@ public class PlayerStateMachine {
         return seekTimeStamp;
     }
 
+    public void setSeekTimeStamp(long seekTimeStamp) {
+        this.seekTimeStamp = seekTimeStamp;
+    }
+
     public ErrorCode getErrorCode() {
         return errorCode;
     }
 
     public void setErrorCode(ErrorCode errorCode) {
         this.errorCode = errorCode;
-    }
-
-    public void setSeekTimeStamp(long seekTimeStamp) {
-        this.seekTimeStamp = seekTimeStamp;
     }
 
 }

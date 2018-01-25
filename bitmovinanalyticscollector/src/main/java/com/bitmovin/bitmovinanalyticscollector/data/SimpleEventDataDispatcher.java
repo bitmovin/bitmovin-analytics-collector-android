@@ -3,7 +3,6 @@ package com.bitmovin.bitmovinanalyticscollector.data;
 import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.bitmovinanalyticscollector.utils.EventDataSerializer;
 import com.bitmovin.bitmovinanalyticscollector.utils.HttpClient;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;
@@ -42,7 +41,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher {
 //      Currently not using the stack and just sending the data as it comes in. Not sure the format to send multiple messages at a time
 //      this.data.add(data);
 
-        if(this.enabled) {
+        if (this.enabled) {
             this.httpClient.post(EventDataSerializer.serialize(data));
         }
     }

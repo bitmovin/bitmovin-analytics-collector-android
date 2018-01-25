@@ -3,12 +3,12 @@ package com.bitmovin.bitmovinanalyticscollector.adapters;
 import android.util.Log;
 import android.view.Surface;
 
+import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.bitmovinanalyticscollector.data.ErrorCode;
 import com.bitmovin.bitmovinanalyticscollector.data.EventData;
 import com.bitmovin.bitmovinanalyticscollector.enums.PlayerType;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerState;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerStateMachine;
-import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.bitmovinanalyticscollector.utils.Util;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -37,7 +37,6 @@ import static com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO;
 import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_RENDERER;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
-import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_UNEXPECTED;
 
 /**
  * Created by zachmanc on 12/14/17.
@@ -45,10 +44,9 @@ import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_UNEXPECTED
 
 public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, VideoRendererEventListener, AudioRendererEventListener {
     private static final String TAG = "ExoPlayerAdapter";
-
+    private final BitmovinAnalyticsConfig config;
     private ExoPlayer exoplayer;
     private PlayerStateMachine stateMachine;
-    private final BitmovinAnalyticsConfig config;
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
@@ -157,23 +155,23 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         this.stateMachine.transitionState(PlayerState.ERROR, videoTime);
     }
 
-    private void mapError(ExoPlaybackException error){
+    private void mapError(ExoPlaybackException error) {
         error.printStackTrace();
         ErrorCode errorCode = ErrorCode.UNKNOWN_ERROR;
-        switch(error.type){
+        switch (error.type) {
             case TYPE_SOURCE:
                 IOException exception = error.getSourceException();
-                if(exception instanceof HttpDataSource.InvalidResponseCodeException) {
+                if (exception instanceof HttpDataSource.InvalidResponseCodeException) {
                     errorCode = ErrorCode.DATASOURCE_HTTP_FAILURE;
                     HttpDataSource.InvalidResponseCodeException responseCodeException = (HttpDataSource.InvalidResponseCodeException) exception;
                     errorCode.setDescription("Data Source request failed with HTTP status: " + responseCodeException.responseCode + " - " + responseCodeException.dataSpec.uri);
                     this.stateMachine.setErrorCode(errorCode);
-                }else if (exception instanceof HttpDataSource.InvalidContentTypeException){
+                } else if (exception instanceof HttpDataSource.InvalidContentTypeException) {
                     HttpDataSource.InvalidContentTypeException contentTypeException = (HttpDataSource.InvalidContentTypeException) exception;
                     errorCode = ErrorCode.DATASOURCE_INVALID_CONTENT_TYPE;
                     errorCode.setDescription("Invalid Content Type: " + contentTypeException.contentType);
                     this.stateMachine.setErrorCode(errorCode);
-                }else if (exception instanceof HttpDataSource.HttpDataSourceException){
+                } else if (exception instanceof HttpDataSource.HttpDataSourceException) {
                     HttpDataSource.HttpDataSourceException httpDataSourceException = (HttpDataSource.HttpDataSourceException) exception;
                     errorCode = ErrorCode.DATASOURCE_UNABLE_TO_CONNECT;
                     errorCode.setDescription("Unable to connect: " + httpDataSourceException.dataSpec.uri);

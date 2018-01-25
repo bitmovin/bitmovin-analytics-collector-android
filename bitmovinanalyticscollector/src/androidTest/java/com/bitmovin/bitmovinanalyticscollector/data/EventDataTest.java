@@ -4,8 +4,8 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.bitmovin.bitmovinanalyticscollector.enums.CDNProvider;
 import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.bitmovinanalyticscollector.enums.CDNProvider;
 import com.google.gson.Gson;
 
 import org.junit.Assert;
@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 public class EventDataTest {
     private EventData eventData;
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
+
     @Before
     public void setUp() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();

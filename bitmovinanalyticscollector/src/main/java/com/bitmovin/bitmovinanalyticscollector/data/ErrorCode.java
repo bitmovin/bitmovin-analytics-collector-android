@@ -15,7 +15,7 @@ public enum ErrorCode {
     UNKNOWN_ERROR(3000, "Unknown Error"),
     DATASOURCE_HTTP_FAILURE(3006, "Data Source request failed with HTTP status: "),
     DATASOURCE_INVALID_CONTENT_TYPE(1000001, "Invalid content type: "),
-    DATASOURCE_UNABLE_TO_CONNECT(1000002,"Unable to connect: "),
+    DATASOURCE_UNABLE_TO_CONNECT(1000002, "Unable to connect: "),
     EXOPLAYER_RENDERER_ERROR(1000003, "ExoPlayer Renderer Error");
 
     private final int errorCode;

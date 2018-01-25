@@ -8,7 +8,6 @@ import com.bitmovin.bitmovinanalyticscollector.data.ErrorCode;
 import com.bitmovin.bitmovinanalyticscollector.data.EventData;
 import com.bitmovin.bitmovinanalyticscollector.data.IEventDataDispatcher;
 import com.bitmovin.bitmovinanalyticscollector.data.SimpleEventDataDispatcher;
-import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerState;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerStateMachine;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.StateMachineListener;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -155,7 +154,7 @@ public class BitmovinAnalytics implements StateMachineListener {
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
 
-        switch (playerStateMachine.getCurrentState()){
+        switch (playerStateMachine.getCurrentState()) {
             case PLAYING:
                 data.setPlayed(duration);
                 break;
