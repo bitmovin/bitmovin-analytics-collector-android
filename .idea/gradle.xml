@@ -9,7 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/bitmovinanalyticscollector" />
-            <option value="$PROJECT_DIR$/exoplayeranalyticsexample" />
+            <option value="$PROJECT_DIR$/bitmovinanalyticscollectorexample" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

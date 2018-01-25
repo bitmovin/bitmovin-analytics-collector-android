@@ -1,1 +1,1 @@
-include ':bitmovinanalyticscollector', ':exoplayeranalyticsexample'
+include ':bitmovinanalyticscollector', ':bitmovinanalyticscollectorexample'
