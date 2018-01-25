@@ -316,6 +316,6 @@ public class EventData {
     }
 
     public void setMuted(boolean muted) {
-        isMuted = muted;
+        this.isMuted = muted;
     }
 }
