@@ -17,7 +17,7 @@ public class EventData {
     private boolean isLive;
     private boolean isCasting;
     private long videoDuration = 0;
-    private long time = 0;
+    private long time = Util.getTimeStamp();
     private int videoWindowWidth = 0;
     private int videoWindowHeight = 0;
     private int droppedFrames = 0;
