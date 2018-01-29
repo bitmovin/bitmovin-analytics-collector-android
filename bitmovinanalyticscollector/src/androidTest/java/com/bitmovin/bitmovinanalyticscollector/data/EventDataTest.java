@@ -13,9 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- * Created by zachmanc on 12/15/17.
- */
 @RunWith(AndroidJUnit4.class)
 public class EventDataTest {
     private EventData eventData;

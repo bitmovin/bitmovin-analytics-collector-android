@@ -38,10 +38,6 @@ import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_RENDERER;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 
-/**
- * Created by zachmanc on 12/14/17.
- */
-
 public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, VideoRendererEventListener, AudioRendererEventListener {
     private static final String TAG = "ExoPlayerAdapter";
     private final BitmovinAnalyticsConfig config;

@@ -9,10 +9,6 @@ import com.bitmovin.bitmovinanalyticscollector.utils.Util;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by zachmanc on 12/15/17.
- */
-
 public class PlayerStateMachine {
     private static final String TAG = "PlayerStateMachine";
     private final BitmovinAnalyticsConfig config;

@@ -5,10 +5,6 @@ import android.content.Context;
 import com.bitmovin.bitmovinanalyticscollector.enums.CDNProvider;
 import com.bitmovin.bitmovinanalyticscollector.enums.PlayerType;
 
-/**
- * Created by zachmanc on 12/14/17.
- */
-
 public class BitmovinAnalyticsConfig {
     public static final String analyticsUrl = "https://analytics-ingress-global.bitmovin.com/analytics";
     private String key;

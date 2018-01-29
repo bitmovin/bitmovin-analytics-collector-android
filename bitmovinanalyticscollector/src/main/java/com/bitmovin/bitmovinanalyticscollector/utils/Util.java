@@ -10,10 +10,6 @@ import com.google.android.exoplayer2.Player;
 
 import java.util.UUID;
 
-/**
- * Created by zachmanc on 12/15/17.
- */
-
 public class Util {
     public static final String DASH_STREAM_FORMAT = "dash";
     public static final String HLS_STREAM_FORMAT = "hls";

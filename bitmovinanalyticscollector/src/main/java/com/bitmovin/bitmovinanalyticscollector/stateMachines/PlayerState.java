@@ -2,10 +2,6 @@ package com.bitmovin.bitmovinanalyticscollector.stateMachines;
 
 import com.bitmovin.bitmovinanalyticscollector.utils.Util;
 
-/**
- * Created by zachmanc on 12/19/17.
- */
-
 public enum PlayerState {
     SETUP {
         @Override

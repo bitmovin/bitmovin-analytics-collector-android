@@ -3,10 +3,6 @@ package com.bitmovin.bitmovinanalyticscollector.data;
 import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.bitmovinanalyticscollector.utils.Util;
 
-/**
- * Created by zachmanc on 12/14/17.
- */
-
 public class EventData {
     private String domain;
     private String path = "";

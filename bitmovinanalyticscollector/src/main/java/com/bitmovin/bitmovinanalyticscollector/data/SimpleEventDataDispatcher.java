@@ -10,10 +10,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/**
- * Created by zachmanc on 12/29/17.
- */
-
 public class SimpleEventDataDispatcher implements IEventDataDispatcher {
     private static final String TAG = "SimpleDispatcher";
 

@@ -1,9 +1,5 @@
 package com.bitmovin.bitmovinanalyticscollector.data;
 
-/**
- * Created by zachmanc on 1/16/18.
- */
-
 public enum ErrorCode {
     LICENSE_ERROR(1016, "A license error has occurred"),
     LICENSE_ERROR_INVALID_DOMAIN(1017, "License error invalid domain"),

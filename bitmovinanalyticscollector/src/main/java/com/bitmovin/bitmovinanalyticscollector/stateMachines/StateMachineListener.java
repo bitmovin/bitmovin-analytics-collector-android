@@ -2,10 +2,6 @@ package com.bitmovin.bitmovinanalyticscollector.stateMachines;
 
 import com.bitmovin.bitmovinanalyticscollector.data.ErrorCode;
 
-/**
- * Created by zachmanc on 12/19/17.
- */
-
 public interface StateMachineListener {
 
     void onSetup();

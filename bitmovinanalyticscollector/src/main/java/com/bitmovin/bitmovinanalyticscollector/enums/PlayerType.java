@@ -1,9 +1,5 @@
 package com.bitmovin.bitmovinanalyticscollector.enums;
 
-/**
- * Created by zachmanc on 12/15/17.
- */
-
 public enum PlayerType {
     BITMOVIN("bitmovin"),
     EXOPLAYER("exoplayer");

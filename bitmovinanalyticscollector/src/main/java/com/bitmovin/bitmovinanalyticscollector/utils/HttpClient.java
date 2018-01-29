@@ -14,10 +14,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-/**
- * Created by zachmanc on 12/14/17.
- */
-
 public class HttpClient {
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
