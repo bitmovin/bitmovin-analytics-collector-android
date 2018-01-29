@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BitmovinAnalyticsCollectorAndroid.iml" filepath="$PROJECT_DIR$/BitmovinAnalyticsCollectorAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/bitmovinanalyticscollector/bitmovinanalyticscollector.iml" filepath="$PROJECT_DIR$/bitmovinanalyticscollector/bitmovinanalyticscollector.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bitmovinanalyticscollectorexample/exoplayeranalyticsexample.iml" filepath="$PROJECT_DIR$/bitmovinanalyticscollectorexample/exoplayeranalyticsexample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bitmovinanalyticscollectorexample/bitmovinanalyticscollectorexample.iml" filepath="$PROJECT_DIR$/bitmovinanalyticscollectorexample/bitmovinanalyticscollectorexample.iml" />
     </modules>
   </component>
 </project>

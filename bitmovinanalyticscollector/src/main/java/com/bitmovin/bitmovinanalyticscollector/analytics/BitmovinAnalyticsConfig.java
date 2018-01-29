@@ -27,6 +27,12 @@ public class BitmovinAnalyticsConfig {
     private Context context;
     private int heartbeatInterval = 59700;
 
+    public BitmovinAnalyticsConfig(String key, Context context) {
+        this.key = key;
+        this.playerKey = "";
+        this.context = context;
+    }
+
     public BitmovinAnalyticsConfig(String key, String playerKey, Context context) {
         this.key = key;
         this.playerKey = playerKey;

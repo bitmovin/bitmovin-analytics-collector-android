@@ -14,9 +14,10 @@ dependencies {
 
 The following example creates a BitmovinAnalytics object and attaches an ExoPlayer instance to it. 
 
+#### Basic analytics monitoring 
 ```java
 // Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key and your Bitmovin Player Key
-BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", "<BITMOVIN_PLAYER_KEY>", getApplicationContext());
+BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", getApplicationContext());
 
 // Create a BitmovinAnalytics object using the BitmovinAnalyitcsConfig you just created
 BitmovinAnalytics analyticsCollector = new BitmovinAnalytics(bitmovinAnalyticsConfig);
@@ -27,6 +28,21 @@ analyticsCollector.attachPlayer(exoPlayer);
 // Detach your player when you are done. For example, call this method when you call ExoPlayer's release() method
 bitmovinAnalytics.detachPlayer();
 ```
+
+#### Switching to a new video 
+When switching to a new video we recommend that you follow the sequence of events below. 
+
+```java
+//Detach your player when the first video is completed 
+analyticsCollector.attachPlayer(oldExoPlayer);
+
+//Update your config with new optional parameters related to the new video playback
+bitmovinAnalyticsConfig.setVideoId("newVideoId"); 
+bitmovinAnalyticsConfig.setCustomData1("newCustomData"); 
+
+//Reattach your player instance 
+analyticsCollector.attachPlayer(newExoPlayer);
+``` 
 
 
 #### Optional Configuration Parameters
