@@ -9,7 +9,7 @@ public class BitmovinAnalyticsConfig {
     public static final String analyticsUrl = "https://analytics-ingress-global.bitmovin.com/analytics";
     private String key;
     private String playerKey;
-    private CDNProvider cdnProvider;
+    private String cdnProvider;
     private String videoId;
     private PlayerType playerType;
     private String customUserId;
@@ -47,7 +47,7 @@ public class BitmovinAnalyticsConfig {
         return playerKey;
     }
 
-    public CDNProvider getCdnProvider() {
+    public String getCdnProvider() {
         return cdnProvider;
     }
 
@@ -56,7 +56,7 @@ public class BitmovinAnalyticsConfig {
      *
      * @param cdnProvider {@link CDNProvider}
      */
-    public void setCdnProvider(CDNProvider cdnProvider) {
+    public void setCdnProvider(String cdnProvider) {
         this.cdnProvider = cdnProvider;
     }
 
