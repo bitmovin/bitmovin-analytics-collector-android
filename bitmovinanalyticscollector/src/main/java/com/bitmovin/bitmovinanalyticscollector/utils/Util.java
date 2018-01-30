@@ -57,7 +57,7 @@ public class Util {
     }
 
     public static String getPlayerTech() {
-        return "Native";
+        return "Android";
     }
 
     public static String getLocale() {
