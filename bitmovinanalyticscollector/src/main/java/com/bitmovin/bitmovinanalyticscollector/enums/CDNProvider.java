@@ -1,21 +1,11 @@
 package com.bitmovin.bitmovinanalyticscollector.enums;
 
-public enum CDNProvider {
-    BITMOVIN("bitmovin"),
-    AKAMAI("akamai"),
-    FASTLY("fastly"),
-    MAXCDN("maxcdn"),
-    CLOUDFRONT("cloudfront"),
-    CHINACACHE("chinacache"),
-    BITGRAVITY("bitgravity");
-
-    private final String name;
-
-    CDNProvider(String name) {
-        this.name = name;
-    }
-
-    public String toString() {
-        return this.name;
-    }
+public class CDNProvider {
+    public static String BITMOVIN = "bitmovin";
+    public static String AKAMAI = "akamai";
+    public static String FASTLY = "fastly";
+    public static String MAXCDN = "maxcdn";
+    public static String CLOUDFRONT = "cloudfront";
+    public static String CHINACACHE = "chinacache";
+    public static String BITGRAVITY = "bitgravity";
 }
