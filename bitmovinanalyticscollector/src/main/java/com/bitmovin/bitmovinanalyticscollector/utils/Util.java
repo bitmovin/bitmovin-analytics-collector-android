@@ -57,7 +57,7 @@ public class Util {
     }
 
     public static String getPlayerTech() {
-        return "Android";
+        return "Android:Exoplayer";
     }
 
     public static String getLocale() {
