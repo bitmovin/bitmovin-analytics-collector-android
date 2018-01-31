@@ -34,7 +34,7 @@ When switching to a new video we recommend that you follow the sequence of event
 
 ```java
 //Detach your player when the first video is completed 
-analyticsCollector.attachPlayer(oldExoPlayer);
+analyticsCollector.detachPlayer();
 
 //Update your config with new optional parameters related to the new video playback
 bitmovinAnalyticsConfig.setVideoId("newVideoId"); 
