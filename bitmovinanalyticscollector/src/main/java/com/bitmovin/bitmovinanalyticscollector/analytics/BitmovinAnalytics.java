@@ -47,6 +47,7 @@ public class BitmovinAnalytics implements StateMachineListener {
      */
     public void attachPlayer(ExoPlayer exoPlayer) {
         detachPlayer();
+        eventDataDispatcher.enable();
         this.playerAdapter = new ExoPlayerAdapter(exoPlayer, bitmovinAnalyticsConfig, playerStateMachine);
     }
 
@@ -63,6 +64,7 @@ public class BitmovinAnalytics implements StateMachineListener {
         if (this.playerStateMachine != null) {
             this.playerStateMachine.resetStateMachine();
         }
+        eventDataDispatcher.disable();
     }
 
     @Override

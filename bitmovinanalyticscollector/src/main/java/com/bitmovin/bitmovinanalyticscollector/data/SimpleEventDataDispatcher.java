@@ -1,30 +1,46 @@
 package com.bitmovin.bitmovinanalyticscollector.data;
 
 import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.bitmovinanalyticscollector.utils.EventDataSerializer;
+import com.bitmovin.bitmovinanalyticscollector.utils.DataSerializer;
 import com.bitmovin.bitmovinanalyticscollector.utils.HttpClient;
+import com.bitmovin.bitmovinanalyticscollector.utils.LicenseCall;
+import com.bitmovin.bitmovinanalyticscollector.utils.LicenseCallback;
 
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class SimpleEventDataDispatcher implements IEventDataDispatcher {
+public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseCallback {
     private static final String TAG = "SimpleDispatcher";
 
     private Queue<EventData> data;
     private HttpClient httpClient;
-    private boolean enabled = true;
+    private boolean enabled = false;
+    private BitmovinAnalyticsConfig config;
 
     public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config) {
         this.data = new ConcurrentLinkedQueue<EventData>();
-        this.httpClient = new HttpClient(config);
+        this.httpClient = new HttpClient(config.getContext(), BitmovinAnalyticsConfig.analyticsUrl);
+        this.config = config;
+    }
+
+    @Override
+    synchronized public void authenticationCompleted(boolean success) {
+        if (success) {
+            enabled = true;
+            Iterator<EventData> it = data.iterator();
+            while (it.hasNext()) {
+                EventData eventData = it.next();
+                this.httpClient.post(DataSerializer.serialize(eventData), null);
+                it.remove();
+            }
+        }
     }
 
     @Override
     public void enable() {
-        this.enabled = true;
+        LicenseCall licenseCall = new LicenseCall(config);
+        licenseCall.authenticate(this);
     }
 
     @Override
@@ -33,12 +49,11 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher {
     }
 
     @Override
-    public void add(EventData data) {
-//      Currently not using the stack and just sending the data as it comes in. Not sure the format to send multiple messages at a time
-//      this.data.add(data);
-
-        if (this.enabled) {
-            this.httpClient.post(EventDataSerializer.serialize(data));
+    public void add(EventData eventData) {
+        if (enabled) {
+            this.httpClient.post(DataSerializer.serialize(eventData), null);
+        } else {
+            this.data.add(eventData);
         }
     }
 
@@ -46,18 +61,5 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher {
     public void clear() {
         this.data.clear();
     }
-
-    public List<EventData> pop(int count) {
-        ArrayList<EventData> list = new ArrayList<EventData>();
-        for (int i = 0; i < count; i++) {
-            try {
-                list.add(data.remove());
-            } catch (EmptyStackException e) {
-                break;
-            }
-        }
-        return list;
-    }
-
 
 }
