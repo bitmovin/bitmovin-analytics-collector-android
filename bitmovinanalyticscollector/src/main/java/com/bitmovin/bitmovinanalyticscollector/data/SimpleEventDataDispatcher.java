@@ -45,6 +45,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
 
     @Override
     public void disable() {
+        this.data.clear();
         this.enabled = false;
     }
 
