@@ -17,11 +17,13 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     private HttpClient httpClient;
     private boolean enabled = false;
     private BitmovinAnalyticsConfig config;
+    private LicenseCallback callback;
 
-    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config) {
+    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, LicenseCallback callback) {
         this.data = new ConcurrentLinkedQueue<EventData>();
         this.httpClient = new HttpClient(config.getContext(), BitmovinAnalyticsConfig.analyticsUrl);
         this.config = config;
+        this.callback = callback;
     }
 
     @Override
@@ -34,6 +36,10 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
                 this.httpClient.post(DataSerializer.serialize(eventData), null);
                 it.remove();
             }
+        }
+
+        if(callback != null) {
+            callback.authenticationCompleted(success);
         }
     }
 
