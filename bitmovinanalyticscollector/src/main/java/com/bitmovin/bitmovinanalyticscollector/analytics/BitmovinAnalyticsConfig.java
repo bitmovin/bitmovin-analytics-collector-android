@@ -7,6 +7,8 @@ import com.bitmovin.bitmovinanalyticscollector.enums.PlayerType;
 
 public class BitmovinAnalyticsConfig {
     public static final String analyticsUrl = "https://analytics-ingress-global.bitmovin.com/analytics";
+    public static final String licenseUrl = "https://analytics-ingress-global.bitmovin.com/licensing";
+
     private String key;
     private String playerKey;
     private String cdnProvider;

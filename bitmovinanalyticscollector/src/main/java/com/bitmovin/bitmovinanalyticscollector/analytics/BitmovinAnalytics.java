@@ -10,6 +10,7 @@ import com.bitmovin.bitmovinanalyticscollector.data.IEventDataDispatcher;
 import com.bitmovin.bitmovinanalyticscollector.data.SimpleEventDataDispatcher;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.PlayerStateMachine;
 import com.bitmovin.bitmovinanalyticscollector.stateMachines.StateMachineListener;
+import com.bitmovin.bitmovinanalyticscollector.utils.LicenseCallback;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 
@@ -17,7 +18,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener {
+public class BitmovinAnalytics implements StateMachineListener, LicenseCallback {
     private static final String TAG = "BitmovinAnalytics";
 
     private final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
@@ -34,7 +35,7 @@ public class BitmovinAnalytics implements StateMachineListener {
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig);
         this.playerStateMachine.addListener(this);
-        this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig);
+        this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this);
     }
 
     /**
@@ -47,6 +48,7 @@ public class BitmovinAnalytics implements StateMachineListener {
      */
     public void attachPlayer(ExoPlayer exoPlayer) {
         detachPlayer();
+        eventDataDispatcher.enable();
         this.playerAdapter = new ExoPlayerAdapter(exoPlayer, bitmovinAnalyticsConfig, playerStateMachine);
     }
 
@@ -63,6 +65,7 @@ public class BitmovinAnalytics implements StateMachineListener {
         if (this.playerStateMachine != null) {
             this.playerStateMachine.resetStateMachine();
         }
+        eventDataDispatcher.disable();
     }
 
     @Override
@@ -206,5 +209,12 @@ public class BitmovinAnalytics implements StateMachineListener {
 
     public void sendEventData(EventData data) {
         this.eventDataDispatcher.add(data);
+    }
+
+    @Override
+    public void authenticationCompleted(boolean success) {
+        if(!success){
+            detachPlayer();
+        }
     }
 }

@@ -1,8 +1,7 @@
 package com.bitmovin.bitmovinanalyticscollector.utils;
 
+import android.content.Context;
 import android.util.Log;
-
-import com.bitmovin.bitmovinanalyticscollector.analytics.BitmovinAnalyticsConfig;
 
 import java.io.IOException;
 
@@ -19,18 +18,20 @@ public class HttpClient {
             = MediaType.parse("application/json; charset=utf-8");
     private static final String TAG = "HttpClient";
     private final OkHttpClient client = new OkHttpClient();
-    private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
+    private Context context;
+    private String url;
 
-    public HttpClient(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
-        this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
+    public HttpClient(Context context, String url) {
+        this.url = url;
+        this.context = context;
     }
 
-    public void post(String postBody) {
+    public void post(String postBody, final Callback callback) {
 
         Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody));
         Request request = new Request.Builder()
-                .url(bitmovinAnalyticsConfig.analyticsUrl)
-                .header("Origin", String.format("http://%s", bitmovinAnalyticsConfig.getContext().getPackageName()))
+                .url(url)
+                .header("Origin", String.format("http://%s", context.getPackageName()))
                 .post(RequestBody.create(JSON, postBody))
                 .build();
 
@@ -39,14 +40,20 @@ public class HttpClient {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.e(TAG, "HTTP Error: ", e);
+                if (callback != null) {
+                    callback.onFailure(call, e);
+                }
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response != null) {
                     Log.i(TAG, String.format("Analytics HTTP response: %d", response.code()));
-                    response.close();
                 }
+                if (callback != null) {
+                    callback.onResponse(call, response);
+                }
+                response.close();
             }
         });
     }
