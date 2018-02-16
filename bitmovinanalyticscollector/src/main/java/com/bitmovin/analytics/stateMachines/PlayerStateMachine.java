@@ -54,6 +54,7 @@ public class PlayerStateMachine {
         disableHeartbeat();
         this.impressionId = Util.getUUID();
         this.initialTimestamp = Util.getTimeStamp();
+        this.firstReadyTimestamp = 0;
         setCurrentState(PlayerState.SETUP);
     }
 
