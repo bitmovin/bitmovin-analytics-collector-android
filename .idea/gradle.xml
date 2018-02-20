@@ -8,8 +8,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/bitmovinanalyticscollector" />
-            <option value="$PROJECT_DIR$/bitmovinanalyticscollectorexample" />
+            <option value="$PROJECT_DIR$/analytics" />
+            <option value="$PROJECT_DIR$/analyticsexample" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -38,6 +38,7 @@ public class LicenseCall {
                     LicenseResponse licenseResponse = DataSerializer.deserialize(response.body().string(), LicenseResponse.class);
                     if (licenseResponse != null && licenseResponse.getStatus().equals("granted")) {
                         callback.authenticationCompleted(true);
+                        return;
                     }
                 }
                 callback.authenticationCompleted(false);

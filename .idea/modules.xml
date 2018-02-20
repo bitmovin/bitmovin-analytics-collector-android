@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BitmovinAnalyticsCollectorAndroid.iml" filepath="$PROJECT_DIR$/BitmovinAnalyticsCollectorAndroid.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bitmovinanalyticscollector/bitmovinanalyticscollector.iml" filepath="$PROJECT_DIR$/bitmovinanalyticscollector/bitmovinanalyticscollector.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bitmovinanalyticscollectorexample/bitmovinanalyticscollectorexample.iml" filepath="$PROJECT_DIR$/bitmovinanalyticscollectorexample/bitmovinanalyticscollectorexample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/analytics/bitmovinanalyticscollector.iml" filepath="$PROJECT_DIR$/analytics/bitmovinanalyticscollector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/analyticsexample/bitmovinanalyticscollectorexample.iml" filepath="$PROJECT_DIR$/analyticsexample/bitmovinanalyticscollectorexample.iml" />
     </modules>
   </component>
 </project>

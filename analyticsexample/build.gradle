@@ -33,7 +33,7 @@ dependencies {
     compile 'com.google.android.exoplayer:exoplayer:2.6.1'
 
     //Compile from source
-    compile project(path: ':bitmovinanalyticscollector')
+    compile project(path: ':analytics')
 
     // Pull from Maven Repo
     //compile 'com.bitmovin.analytics:bitmovinanalyticscollector:1.0.0'
