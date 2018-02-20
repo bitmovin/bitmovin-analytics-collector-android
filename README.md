@@ -9,10 +9,8 @@ Add this to your top level `build.gradle`
 ```
 allprojects {
     repositories {
-		maven {
-			url  'http://bitmovin.bintray.com/maven'
-		}
-	}
+        jcenter()
+    }
 }
 ```
 
