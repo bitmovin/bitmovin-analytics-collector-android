@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/analytics" />
             <option value="$PROJECT_DIR$/analyticsexample" />
+            <option value="$PROJECT_DIR$/bitmovinanalyticsexample" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
