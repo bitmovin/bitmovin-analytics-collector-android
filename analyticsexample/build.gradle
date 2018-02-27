@@ -36,7 +36,7 @@ dependencies {
     compile project(path: ':analytics')
 
     // Pull from Maven Repo
-    // compile 'com.bitmovin:analytics:1.0.0'
+    // compile 'com.bitmovin.analytics:analytics:1.0.0'
 
 
 }

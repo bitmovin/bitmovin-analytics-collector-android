@@ -9,8 +9,10 @@ Add this to your top level `build.gradle`
 ```
 allprojects {
     repositories {
-        jcenter()
-    }
+		maven {
+			url  'http://bitmovin.bintray.com/maven'
+		}
+	}
 }
 ```
 
@@ -18,7 +20,7 @@ And this line to your main project `build.gradle`
 
 ```
 dependencies {
-    compile 'com.bitmovin:analytics:1.0.0'
+    compile 'com.bitmovin.analytics:analytics:1.0.0'
 }
 ```
 

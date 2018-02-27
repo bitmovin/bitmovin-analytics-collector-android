@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
-def packageName = 'com.bitmovin'
+def packageName = 'com.bitmovin.analytics'
 def libraryVersion = '1.0.0'
 
 android {
