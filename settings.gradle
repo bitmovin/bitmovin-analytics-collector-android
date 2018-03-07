@@ -1,1 +1,1 @@
-include ':bitmovinanalyticscollector', ':bitmovinanalyticscollectorexample'
+include ':analytics', ':analyticsexample'
