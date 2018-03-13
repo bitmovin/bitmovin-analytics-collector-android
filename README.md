@@ -74,4 +74,4 @@ bitmovinAnalyticsConfig.setHeartbeatInterval(59700); // value is in ms
 
 ```
 
-A [full example app](https://github.com/bitmovin/bitmovin-analytics-exoplayer-private/blob/master/exoplayeranalyticsexample/src/main/java/com/bitmovin/exoplayeranalyticsexample/MainActivity.java) can be seen in the github repo 
+A [full example app](https://github.com/bitmovin/bitmovin-analytics-collector-android/tree/master/analyticsexample) can be seen in the github repo 
