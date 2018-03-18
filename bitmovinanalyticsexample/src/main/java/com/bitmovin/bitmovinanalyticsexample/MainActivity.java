@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (bitmovinPlayer != null) {
             bitmovinAnalytics.detachPlayer();
             bitmovinPlayer.unload();
-
         }
     }
 
