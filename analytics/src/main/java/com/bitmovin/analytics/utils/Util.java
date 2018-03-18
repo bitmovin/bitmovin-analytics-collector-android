@@ -13,6 +13,8 @@ import java.util.UUID;
 public class Util {
     public static final String DASH_STREAM_FORMAT = "dash";
     public static final String HLS_STREAM_FORMAT = "hls";
+    public static final int MILLISECONDS_IN_SECONDS = 1000;
+
 
     public static String getUUID() {
         return UUID.randomUUID().toString();

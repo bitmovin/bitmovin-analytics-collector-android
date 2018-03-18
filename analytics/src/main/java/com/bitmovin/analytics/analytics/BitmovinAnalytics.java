@@ -2,6 +2,7 @@ package com.bitmovin.analytics.analytics;
 
 import android.util.Log;
 
+import com.bitmovin.analytics.adapters.BitmovinSdkAdapter;
 import com.bitmovin.analytics.adapters.ExoPlayerAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.ErrorCode;
@@ -11,6 +12,7 @@ import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.LicenseCallback;
+import com.bitmovin.player.BitmovinPlayer;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 
@@ -53,17 +55,32 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     /**
+     * Attach a player instance to this analytics plugin. After this is completed, BitmovinAnalytics
+     * will start monitoring and sending analytics data based on the attached player instance.
+     * <p>
+     * To attach a different player instance, simply call this method again.
+     *
+     * @param bitmovinPlayer
+     */
+    public void attachPlayer(BitmovinPlayer bitmovinPlayer) {
+        detachPlayer();
+        eventDataDispatcher.enable();
+        this.playerAdapter = new BitmovinSdkAdapter(bitmovinPlayer, bitmovinAnalyticsConfig, playerStateMachine);
+    }
+
+    /**
      * Detach the current player that is being used with Bitmovin Analytics.
      * <p>
      * For ExoPlayer implementations: Call this method when you call ExoPlayer's
      * {@link SimpleExoPlayer#release()} )} method
      */
     public void detachPlayer() {
-        if (this.playerAdapter != null) {
-            this.playerAdapter.release();
+        if (playerAdapter != null) {
+            playerAdapter.release();
         }
-        if (this.playerStateMachine != null) {
-            this.playerStateMachine.resetStateMachine();
+
+        if (playerStateMachine != null) {
+            playerStateMachine.resetStateMachine();
         }
         eventDataDispatcher.disable();
     }
