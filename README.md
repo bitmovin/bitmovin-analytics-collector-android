@@ -9,8 +9,10 @@ Add this to your top level `build.gradle`
 ```
 allprojects {
     repositories {
-        jcenter()
-    }
+		maven {
+			url  'http://bitmovin.bintray.com/maven'
+		}
+	}
 }
 ```
 
@@ -18,7 +20,7 @@ And this line to your main project `build.gradle`
 
 ```
 dependencies {
-    compile 'com.bitmovin:analytics:1.0.0'
+    compile 'com.bitmovin.analytics:analytics:1.0.0'
 }
 ```
 
@@ -72,4 +74,4 @@ bitmovinAnalyticsConfig.setHeartbeatInterval(59700); // value is in ms
 
 ```
 
-A [full example app](https://github.com/bitmovin/bitmovin-analytics-exoplayer-private/blob/master/exoplayeranalyticsexample/src/main/java/com/bitmovin/exoplayeranalyticsexample/MainActivity.java) can be seen in the github repo 
+A [full example app](https://github.com/bitmovin/bitmovin-analytics-collector-android/tree/master/analyticsexample) can be seen in the github repo 
