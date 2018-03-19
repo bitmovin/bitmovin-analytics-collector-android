@@ -52,7 +52,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     public void release() {
         if (bitmovinPlayer != null) {
             removePlayerListener();
-            stateMachine.resetStateMachine();
         }
     }
 
