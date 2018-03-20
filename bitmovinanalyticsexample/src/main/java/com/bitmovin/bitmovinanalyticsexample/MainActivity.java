@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected void initializeAnalytics(){
         //Step 1: Create your analytics config object
-        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2", getApplicationContext());
+        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>", "<YOUR_PLAYER_KEY>", getApplicationContext());
 
         //Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SourceConfiguration sourceConfiguration = new SourceConfiguration();
 
         // Add a new source item
-        sourceConfiguration.addSourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
+        sourceConfiguration.addSourceItem("https://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
 
 
         //Step 4: Attach BitmovinPlayer

@@ -5,7 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/BitmovinAnalyticsCollectorAndroid.iml" filepath="$PROJECT_DIR$/BitmovinAnalyticsCollectorAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/analyticsexample/analyticsexample.iml" filepath="$PROJECT_DIR$/analyticsexample/analyticsexample.iml" />
       <module fileurl="file://$PROJECT_DIR$/bitmovinanalyticsexample/bitmovinanalyticsexample.iml" filepath="$PROJECT_DIR$/bitmovinanalyticsexample/bitmovinanalyticsexample.iml" />
-      <module fileurl="file://$PROJECT_DIR$/collector/analytics.iml" filepath="$PROJECT_DIR$/collector/analytics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/collector/collector.iml" filepath="$PROJECT_DIR$/collector/collector.iml" />
     </modules>
   </component>
 </project>
