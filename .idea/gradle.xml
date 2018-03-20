@@ -8,9 +8,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/analytics" />
             <option value="$PROJECT_DIR$/analyticsexample" />
             <option value="$PROJECT_DIR$/bitmovinanalyticsexample" />
+            <option value="$PROJECT_DIR$/collector" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
