@@ -1,5 +1,5 @@
 # [![bitmovin](http://bitmovin-a.akamaihd.net/webpages/bitmovin-logo-github.png)](http://www.bitmovin.com)
-Android client that allows you to monitor your ExoPlayer playback with [Bitmovin Analytics](https://bitmovin.com/video-analytics/)
+Android client that allows you to monitor your Bitmovin Native SDK or ExoPlayer playback with [Bitmovin Analytics](https://bitmovin.com/video-analytics/)
 
 # Getting started
 ## Gradle
@@ -20,24 +20,29 @@ And this line to your main project `build.gradle`
 
 ```
 dependencies {
-    compile 'com.bitmovin.analytics:analytics:1.0.0'
+    compile 'com.bitmovin.analytics:collector:1.1.0'
 }
 ```
 
 ## Examples
 
-The following example creates a BitmovinAnalytics object and attaches an ExoPlayer instance to it. 
+The following example creates a BitmovinAnalytics object and attaches an Bitmovin Native SDK or ExoPlayer instance to it. 
 
 #### Basic analytics monitoring 
 ```java
-// Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key and your Bitmovin Player Key
-BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", getApplicationContext());
+// Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key and (optionally) your Bitmovin Player Key
+
+    //Bitmovin Native: 
+    BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", "<BITMOVIN_PLAYER_KEY>", getApplicationContext());
+
+    //ExoPlayer monitoring:
+    BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", getApplicationContext());
 
 // Create a BitmovinAnalytics object using the BitmovinAnalyitcsConfig you just created
 BitmovinAnalytics analyticsCollector = new BitmovinAnalytics(bitmovinAnalyticsConfig);
 
 // Attach your player instance
-analyticsCollector.attachPlayer(exoPlayer);
+analyticsCollector.attachPlayer(player);
 
 // Detach your player when you are done. For example, call this method when you call ExoPlayer's release() method
 bitmovinAnalytics.detachPlayer();
@@ -55,7 +60,7 @@ bitmovinAnalyticsConfig.setVideoId("newVideoId");
 bitmovinAnalyticsConfig.setCustomData1("newCustomData"); 
 
 //Reattach your player instance 
-analyticsCollector.attachPlayer(newExoPlayer);
+analyticsCollector.attachPlayer(newPlayer);
 ``` 
 
 
