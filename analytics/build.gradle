@@ -6,7 +6,6 @@ def packageName = 'com.bitmovin.analytics'
 def libraryVersion = '1.1.0'
 
 android {
-    publishNonDefault true
 
     compileSdkVersion 26
 
@@ -24,17 +23,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    flavorDimensions "bitmovin", "exo"
-
-    productFlavors{
-        exo {
-            dimension "exo"
-        }
-        bitmovin {
-            dimension "bitmovin"
         }
     }
 }

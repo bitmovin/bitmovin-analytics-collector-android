@@ -1,6 +1,7 @@
 package com.bitmovin.bitmovinanalyticsexample;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +20,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BitmovinAnalytics bitmovinAnalytics;
     private Button releaseButton;
     private Button createButton;
+    private Handler automationHandler;
+    private int automationDelay = 90000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +34,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         this.bitmovinPlayerView = this.findViewById(R.id.bitmovinPlayerView);
         this.bitmovinPlayer = this.bitmovinPlayerView.getPlayer();
+        this.bitmovinPlayer.getConfig().getPlaybackConfiguration().setAutoplayEnabled(true);
 
         this.initializeAnalytics();
 
         this.initializePlayer();
+
+        automationHandler = new Handler();
+
+        automationHandler.postDelayed(new Runnable(){
+            public void run(){
+                releasePlayer();
+                initializePlayer();
+                automationHandler.postDelayed(this, automationDelay);
+            }
+        }, automationDelay);
     }
 
     protected void initializeAnalytics(){
@@ -94,8 +108,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void releasePlayer() {
         if (bitmovinPlayer != null) {
-            bitmovinAnalytics.detachPlayer();
             bitmovinPlayer.unload();
+            bitmovinAnalytics.detachPlayer();
         }
     }
 

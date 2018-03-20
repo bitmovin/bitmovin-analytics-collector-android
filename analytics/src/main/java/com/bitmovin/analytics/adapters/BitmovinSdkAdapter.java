@@ -105,7 +105,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         //isLive
         data.setLive(bitmovinPlayer.isLive());
 
-        //version TODO
+        //version
+        data.setVersion(com.bitmovin.player.BuildConfig.VERSION_NAME);
 
         //isCasting
         data.setCasting(bitmovinPlayer.isCasting());
@@ -161,7 +162,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onPaused(PausedEvent pausedEvent) {
             Log.d(TAG, "On Pause Listener");
-            stateMachine.transitionState(PlayerState.PAUSE, getPosition());
+            //Do not transition to a paused state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times
+            if(stateMachine.getFirstReadyTimestamp() != 0) {
+                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+            }
         }
     };
 
@@ -169,7 +173,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onPlay(PlayEvent playEvent) {
             Log.d(TAG, "On Play Listener");
-            stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+            //Do not transition to a playing state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times when autopplay is enabled
+            if(stateMachine.getFirstReadyTimestamp() != 0) {
+                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+            }
         }
     };
 
