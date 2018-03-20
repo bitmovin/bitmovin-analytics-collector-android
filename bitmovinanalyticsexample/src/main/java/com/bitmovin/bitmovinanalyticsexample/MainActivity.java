@@ -40,15 +40,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         this.initializePlayer();
 
-        automationHandler = new Handler();
-
-        automationHandler.postDelayed(new Runnable(){
-            public void run(){
-                releasePlayer();
-                initializePlayer();
-                automationHandler.postDelayed(this, automationDelay);
-            }
-        }, automationDelay);
+//        automationHandler = new Handler();
+//
+//        automationHandler.postDelayed(new Runnable(){
+//            public void run(){
+//                releasePlayer();
+//                initializePlayer();
+//                automationHandler.postDelayed(this, automationDelay);
+//            }
+//        }, automationDelay);
     }
 
     protected void initializeAnalytics(){

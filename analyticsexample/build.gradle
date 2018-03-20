@@ -34,12 +34,12 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile 'com.google.android.exoplayer:exoplayer:2.6.1'
+    compile 'com.google.android.exoplayer:exoplayer:2.7.0'
 
     //Compile from source
-    compile project(path: ':analytics')
+    compile project(path: ':collector')
 
     // Pull from Maven Repo
-    // compile 'com.bitmovin.analytics:analytics:1.1.0'
+    // compile 'com.bitmovin.analytics:collector:1.1.0'
 
 }
