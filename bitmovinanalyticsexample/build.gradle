@@ -3,12 +3,15 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
 
+
+
     defaultConfig {
-        applicationId "com.bitmovin.exoplayeranalyticsexample"
+        applicationId "com.bitmovin.bitmovinanalyticsexample"
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
@@ -22,7 +25,7 @@ android {
 }
 
 configurations {
-    exoReleaseCompile
+    bitmovinReleaseCompile
 }
 
 dependencies {
@@ -34,12 +37,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile 'com.google.android.exoplayer:exoplayer:2.6.1'
-
-    //Compile from source
     compile project(path: ':analytics')
-
-    // Pull from Maven Repo
-    // compile 'com.bitmovin.analytics:analytics:1.0.0'
-
 }

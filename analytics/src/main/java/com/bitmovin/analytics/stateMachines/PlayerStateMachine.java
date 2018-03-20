@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.stateMachines;
 
 import android.os.Handler;
+import android.util.Log;
 
 import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
@@ -31,7 +32,7 @@ public class PlayerStateMachine {
         resetStateMachine();
     }
 
-    void enableHeartbeat() {
+    public void enableHeartbeat() {
         heartbeatHandler.postDelayed(new Runnable() {
             public void run() {
                 long currentTimestamp = Util.getTimeStamp();
@@ -46,7 +47,7 @@ public class PlayerStateMachine {
         }, heartbeatDelay);
     }
 
-    void disableHeartbeat() {
+    public void disableHeartbeat() {
         heartbeatHandler.removeCallbacksAndMessages(null);
     }
 
@@ -61,6 +62,9 @@ public class PlayerStateMachine {
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
         long timeStamp = Util.getTimeStamp();
         videoTimeEnd = videoTime;
+
+        Log.d(TAG, "Transitioning from " + currentState.toString() + " to " + destinationPlayerState.toString());
+
         currentState.onExitState(this, timeStamp, destinationPlayerState);
         this.onEnterStateTimeStamp = timeStamp;
         videoTimeStart = videoTimeEnd;

@@ -89,7 +89,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
     }
 
     @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest) {
+    public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
         Log.d(TAG, "onTimelineChanged");
     }
 
