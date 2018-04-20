@@ -33,7 +33,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private SimpleExoPlayer player;
-    private SimpleExoPlayerView simpleExoPlayerView;
+    private PlayerView simpleExoPlayerView;
     private Button releaseButton;
     private Button createButton;
     private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
