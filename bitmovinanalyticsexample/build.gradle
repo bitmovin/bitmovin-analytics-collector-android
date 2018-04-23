@@ -37,7 +37,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile project(path: ':collector')
+    implementation project(path: ':collector')
 
 //     compile 'com.bitmovin.analytics:collector:1.1.0'
 

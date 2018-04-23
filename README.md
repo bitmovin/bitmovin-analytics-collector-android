@@ -20,7 +20,7 @@ And this line to your main project `build.gradle`
 
 ```
 dependencies {
-    compile 'com.bitmovin.analytics:collector:1.1.0'
+    compile 'com.bitmovin.analytics:collector:1.2.0'
 }
 ```
 
