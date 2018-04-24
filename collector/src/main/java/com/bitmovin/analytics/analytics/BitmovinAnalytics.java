@@ -97,7 +97,11 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setState("startup");
         data.setDuration(duration);
         data.setVideoStartupTime(duration);
-        data.setStartupTime(duration);
+
+        //Setting a startup time of 1 to workaround dashboard issue
+        data.setPlayerStartupTime(1);
+        data.setStartupTime(duration+1);
+
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
         sendEventData(data);
