@@ -21,7 +21,7 @@ import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -33,7 +33,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private SimpleExoPlayer player;
-    private SimpleExoPlayerView simpleExoPlayerView;
+    private PlayerView playerView;
     private Button releaseButton;
     private Button createButton;
     private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        simpleExoPlayerView = (SimpleExoPlayerView) findViewById(R.id.a_main_exoplayer);
+        playerView = findViewById(R.id.a_main_exoplayer);
         releaseButton = findViewById(R.id.release_button);
         releaseButton.setOnClickListener(this);
         createButton = findViewById(R.id.create_button);
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalytics.attachPlayer(player);
 
             //Step 5: Create, prepeare, and play media source
-            simpleExoPlayerView.setPlayer(player);
+            playerView.setPlayer(player);
 
             Random r = new Random();
             int randomInt = r.nextInt(100) + 1;
