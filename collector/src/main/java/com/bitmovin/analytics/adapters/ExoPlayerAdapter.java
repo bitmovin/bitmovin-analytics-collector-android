@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.adapters;
 
+import android.net.NetworkInfo;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
 
@@ -18,8 +20,11 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
+import com.google.android.exoplayer2.metadata.Metadata;
+import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.manifest.DashManifest;
 import com.google.android.exoplayer2.source.hls.HlsManifest;
@@ -38,7 +43,7 @@ import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_RENDERER;
 import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 
-public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, VideoRendererEventListener, AudioRendererEventListener {
+public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener {
     private static final String TAG = "ExoPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private ExoPlayer exoplayer;
@@ -56,8 +61,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
     private void attachDebugListeners() {
         if (this.exoplayer instanceof SimpleExoPlayer) {
             SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
-            simpleExoPlayer.addVideoDebugListener(this);
-            simpleExoPlayer.addAudioDebugListener(this);
+            simpleExoPlayer.addAnalyticsListener(this);
         }
     }
 
@@ -67,8 +71,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         }
         if (this.exoplayer instanceof SimpleExoPlayer) {
             SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
-            simpleExoPlayer.addVideoDebugListener(this);
-            simpleExoPlayer.addAudioDebugListener(this);
+            simpleExoPlayer.removeAnalyticsListener(this);
         }
     }
 
@@ -272,19 +275,139 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
         }
     }
 
+
     @Override
-    public void onVideoEnabled(DecoderCounters counters) {
+    public void onPlayerStateChanged(EventTime eventTime, boolean playWhenReady, int playbackState) {
 
     }
 
     @Override
-    public void onVideoDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
+    public void onTimelineChanged(EventTime eventTime, int reason) {
 
     }
 
     @Override
-    public void onVideoInputFormatChanged(Format format) {
-        Log.d(TAG, String.format("OnVideoInputFormatChanged: Bitrate: %d Resolution: %d x %d", format.bitrate, format.width, format.height));
+    public void onPositionDiscontinuity(EventTime eventTime, int reason) {
+
+    }
+
+    @Override
+    public void onSeekStarted(EventTime eventTime) {
+
+    }
+
+    @Override
+    public void onSeekProcessed(EventTime eventTime) {
+
+    }
+
+    @Override
+    public void onPlaybackParametersChanged(EventTime eventTime, PlaybackParameters playbackParameters) {
+
+    }
+
+    @Override
+    public void onRepeatModeChanged(EventTime eventTime, int repeatMode) {
+
+    }
+
+    @Override
+    public void onShuffleModeChanged(EventTime eventTime, boolean shuffleModeEnabled) {
+
+    }
+
+    @Override
+    public void onLoadingChanged(EventTime eventTime, boolean isLoading) {
+
+    }
+
+    @Override
+    public void onPlayerError(EventTime eventTime, ExoPlaybackException error) {
+
+    }
+
+    @Override
+    public void onTracksChanged(EventTime eventTime, TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+    }
+
+    @Override
+    public void onLoadStarted(EventTime eventTime, MediaSourceEventListener.LoadEventInfo loadEventInfo, MediaSourceEventListener.MediaLoadData mediaLoadData) {
+
+    }
+
+    @Override
+    public void onLoadCompleted(EventTime eventTime, MediaSourceEventListener.LoadEventInfo loadEventInfo, MediaSourceEventListener.MediaLoadData mediaLoadData) {
+
+    }
+
+    @Override
+    public void onLoadCanceled(EventTime eventTime, MediaSourceEventListener.LoadEventInfo loadEventInfo, MediaSourceEventListener.MediaLoadData mediaLoadData) {
+
+    }
+
+    @Override
+    public void onLoadError(EventTime eventTime, MediaSourceEventListener.LoadEventInfo loadEventInfo, MediaSourceEventListener.MediaLoadData mediaLoadData, IOException error, boolean wasCanceled) {
+
+    }
+
+    @Override
+    public void onDownstreamFormatChanged(EventTime eventTime, MediaSourceEventListener.MediaLoadData mediaLoadData) {
+    }
+
+    @Override
+    public void onUpstreamDiscarded(EventTime eventTime, MediaSourceEventListener.MediaLoadData mediaLoadData) {
+
+    }
+
+    @Override
+    public void onMediaPeriodCreated(EventTime eventTime) {
+
+    }
+
+    @Override
+    public void onMediaPeriodReleased(EventTime eventTime) {
+
+    }
+
+    @Override
+    public void onReadingStarted(EventTime eventTime) {
+
+    }
+
+    @Override
+    public void onBandwidthEstimate(EventTime eventTime, int totalLoadTimeMs, long totalBytesLoaded, long bitrateEstimate) {
+
+    }
+
+    @Override
+    public void onViewportSizeChange(EventTime eventTime, int width, int height) {
+
+    }
+
+    @Override
+    public void onNetworkTypeChanged(EventTime eventTime, @Nullable NetworkInfo networkInfo) {
+
+    }
+
+    @Override
+    public void onMetadata(EventTime eventTime, Metadata metadata) {
+
+    }
+
+    @Override
+    public void onDecoderEnabled(EventTime eventTime, int trackType, DecoderCounters decoderCounters) {
+
+    }
+
+    @Override
+    public void onDecoderInitialized(EventTime eventTime, int trackType, String decoderName, long initializationDurationMs) {
+
+    }
+
+    @Override
+    public void onDecoderInputFormatChanged(EventTime eventTime, int trackType, Format format) {
+        Log.d(TAG, String.format("onDecoderInputFormatChanged: Bitrate: %d Resolution: %d x %d", format.bitrate, format.width, format.height));
         if ((this.stateMachine.getCurrentState() == PlayerState.PLAYING) || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)) {
             long videoTime = getPosition();
             PlayerState originalState = this.stateMachine.getCurrentState();
@@ -294,53 +417,52 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, Vi
     }
 
     @Override
-    public void onDroppedFrames(int count, long elapsedMs) {
-        Log.d(TAG, String.format("OnDroppedFrames: %d over %d", count, elapsedMs));
+    public void onDecoderDisabled(EventTime eventTime, int trackType, DecoderCounters decoderCounters) {
 
     }
 
     @Override
-    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-        Log.d(TAG, String.format("On Video Sized Changed: %d x %d", width, height));
-    }
-
-    @Override
-    public void onRenderedFirstFrame(Surface surface) {
+    public void onAudioSessionId(EventTime eventTime, int audioSessionId) {
 
     }
 
     @Override
-    public void onVideoDisabled(DecoderCounters counters) {
+    public void onAudioUnderrun(EventTime eventTime, int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
 
     }
 
     @Override
-    public void onAudioEnabled(DecoderCounters counters) {
+    public void onDroppedVideoFrames(EventTime eventTime, int droppedFrames, long elapsedMs) {
+        Log.d(TAG, String.format("OnDroppedFrames: %d over %d", droppedFrames, elapsedMs));
+    }
+
+    @Override
+    public void onVideoSizeChanged(EventTime eventTime, int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+        Log.d(TAG, String.format("On Video Sized Changed: %d x %d Rotation Degrees: %d, PixelRation: %f", width, height, unappliedRotationDegrees, pixelWidthHeightRatio));
+    }
+
+    @Override
+    public void onRenderedFirstFrame(EventTime eventTime, Surface surface) {
 
     }
 
     @Override
-    public void onAudioSessionId(int audioSessionId) {
+    public void onDrmKeysLoaded(EventTime eventTime) {
 
     }
 
     @Override
-    public void onAudioDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
+    public void onDrmSessionManagerError(EventTime eventTime, Exception error) {
 
     }
 
     @Override
-    public void onAudioInputFormatChanged(Format format) {
-        Log.d(TAG, String.format("OnAudioInputFormatChnaged: Bitrate: %d MimeType: %s", format.sampleRate, format.sampleMimeType));
-    }
-
-    @Override
-    public void onAudioSinkUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+    public void onDrmKeysRestored(EventTime eventTime) {
 
     }
 
     @Override
-    public void onAudioDisabled(DecoderCounters counters) {
+    public void onDrmKeysRemoved(EventTime eventTime) {
 
     }
 }
