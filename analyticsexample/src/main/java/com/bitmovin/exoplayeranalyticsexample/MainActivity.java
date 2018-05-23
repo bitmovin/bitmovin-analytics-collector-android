@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             //DASH example
             DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
-            DashMediaSource dashMediaSource = new DashMediaSource.Factory(source,dataSourceFactory).createMediaSource(dashStatic, new Handler(),null);
+            DashMediaSource dashMediaSource = new DashMediaSource.Factory(source,dataSourceFactory).createMediaSource(dashStatic);
             player.prepare(dashMediaSource);
             player.setPlayWhenReady(true);
 
