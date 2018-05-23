@@ -21,7 +21,6 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.analytics.AnalyticsListener;
-import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.source.MediaSourceEventListener;
@@ -33,7 +32,6 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
-import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import java.io.IOException;
 
@@ -55,10 +53,10 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.exoplayer.addListener(this);
         this.config = config;
 
-        attachDebugListeners();
+        attachAnalyticsListener();
     }
 
-    private void attachDebugListeners() {
+    private void attachAnalyticsListener() {
         if (this.exoplayer instanceof SimpleExoPlayer) {
             SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
             simpleExoPlayer.addAnalyticsListener(this);
@@ -407,8 +405,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public void onDecoderInputFormatChanged(EventTime eventTime, int trackType, Format format) {
-        Log.d(TAG, String.format("onDecoderInputFormatChanged: Bitrate: %d Resolution: %d x %d", format.bitrate, format.width, format.height));
         if ((this.stateMachine.getCurrentState() == PlayerState.PLAYING) || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)) {
+            Log.d(TAG, String.format("onDecoderInputFormatChanged: Bitrate: %d Resolution: %d x %d", format.bitrate, format.width, format.height));
             long videoTime = getPosition();
             PlayerState originalState = this.stateMachine.getCurrentState();
             this.stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
