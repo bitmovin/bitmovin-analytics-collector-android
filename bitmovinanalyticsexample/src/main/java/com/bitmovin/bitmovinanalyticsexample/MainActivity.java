@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmovinAnalyticsConfig.setPath("/vod/new/");
         bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
 
-        //Step 3: Create Analytics Colelctor
+        //Step 3: Create Analytics Collector
         bitmovinAnalytics = new BitmovinAnalytics(bitmovinAnalyticsConfig);
     }
 
