@@ -56,7 +56,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     }
 
     private void addPlayerListeners() {
-        Log.d(TAG,"Adding Player Listeners");
+        Log.d(TAG, "Adding Player Listeners");
         this.bitmovinPlayer.addEventListener(onSourceLoadedListener);
         this.bitmovinPlayer.addEventListener(onPlayListener);
         this.bitmovinPlayer.addEventListener(onPausedListener);
@@ -71,7 +71,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     }
 
     private void removePlayerListener() {
-        Log.d(TAG,"Removing Player Listeners");
+        Log.d(TAG, "Removing Player Listeners");
         this.bitmovinPlayer.removeEventListener(onSourceLoadedListener);
         this.bitmovinPlayer.removeEventListener(onPlayListener);
         this.bitmovinPlayer.removeEventListener(onPausedListener);
@@ -163,7 +163,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onPaused(PausedEvent pausedEvent) {
             Log.d(TAG, "On Pause Listener");
             //Do not transition to a paused state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times
-            if(stateMachine.getFirstReadyTimestamp() != 0) {
+            if (stateMachine.getFirstReadyTimestamp() != 0) {
                 stateMachine.transitionState(PlayerState.PLAYING, getPosition());
             }
         }
@@ -174,7 +174,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onPlay(PlayEvent playEvent) {
             Log.d(TAG, "On Play Listener");
             //Do not transition to a playing state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times when autopplay is enabled
-            if(stateMachine.getFirstReadyTimestamp() != 0) {
+            if (stateMachine.getFirstReadyTimestamp() != 0) {
                 stateMachine.transitionState(PlayerState.PLAYING, getPosition());
             }
         }
@@ -249,6 +249,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     errorCode = ErrorCode.LICENSE_ERROR_INVALID_SERVER_URL;
                     errorCode.setDescription(errorEvent.getMessage());
                     break;
+                case 1020:
+                    errorCode = ErrorCode.SOURCE_ERROR;
+                    errorCode.setDescription(errorEvent.getMessage());
+                    break;
+                case 3011:
+                    errorCode = ErrorCode.DRM_REQUEST_HTTP_STATUS;
+                    errorCode.setDescription(errorEvent.getMessage());
                 case 3019:
                     errorCode = ErrorCode.DRM_REQUEST_ERROR;
                     errorCode.setDescription(errorEvent.getMessage());
@@ -259,6 +266,26 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     break;
                 case 4000:
                     errorCode = ErrorCode.DRM_SESSION_ERROR;
+                    errorCode.setDescription(errorEvent.getMessage());
+                    break;
+                case 4001:
+                    errorCode = ErrorCode.FILE_ACCESS;
+                    errorCode.setDescription(errorEvent.getMessage());
+                    break;
+                case 4002:
+                    errorCode = ErrorCode.LOCKED_FOLDER;
+                    errorCode.setDescription(errorEvent.getMessage());
+                    break;
+                case 4003:
+                    errorCode = ErrorCode.DEAD_LOCK;
+                    errorCode.setDescription(errorEvent.getMessage());
+                    break;
+                case 4004:
+                    errorCode = ErrorCode.DRM_KEY_EXPIRED;
+                    errorCode.setDescription(errorEvent.getMessage());
+                    break;
+                case 4005:
+                    errorCode = ErrorCode.PLAYER_SETUP_ERROR;
                     errorCode.setDescription(errorEvent.getMessage());
                     break;
                 case 3006:
