@@ -20,8 +20,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BitmovinAnalytics bitmovinAnalytics;
     private Button releaseButton;
     private Button createButton;
-    private Handler automationHandler;
-    private int automationDelay = 90000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +38,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         this.initializePlayer();
 
-//        automationHandler = new Handler();
-//
-//        automationHandler.postDelayed(new Runnable(){
-//            public void run(){
-//                releasePlayer();
-//                initializePlayer();
-//                automationHandler.postDelayed(this, automationDelay);
-//            }
-//        }, automationDelay);
     }
 
     protected void initializeAnalytics(){
