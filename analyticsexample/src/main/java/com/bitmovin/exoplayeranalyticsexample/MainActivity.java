@@ -1,15 +1,15 @@
 package com.bitmovin.exoplayeranalyticsexample;
 
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import com.bitmovin.analytics.analytics.BitmovinAnalytics;
-import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.enums.CDNProvider;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -28,8 +28,6 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
-
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private SimpleExoPlayer player;
@@ -56,8 +54,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         automationHandler = new Handler();
 
-        automationHandler.postDelayed(new Runnable(){
-            public void run(){
+        automationHandler.postDelayed(new Runnable() {
+            public void run() {
                 releasePlayer();
                 createPlayer();
                 automationHandler.postDelayed(this, automationDelay);
@@ -67,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void createPlayer() {
-        if(player==null) {
+        if (player == null) {
             TrackSelection.Factory videoTrackSelectionFactory
                     = new AdaptiveTrackSelection.Factory(bandwidthMeter);
             RenderersFactory renderersFactory = new DefaultRenderersFactory(this);
@@ -101,24 +99,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //Step 5: Create, prepeare, and play media source
             playerView.setPlayer(player);
 
-            Random r = new Random();
-            int randomInt = r.nextInt(100) + 1;
-
             Uri dashStatic = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
-            if(randomInt >= 100) {
-                dashStatic = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-88adfadfa99-f0f6155f6efa.mpd");
-            }
+
             //DASH example
             DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
-            DashMediaSource dashMediaSource = new DashMediaSource.Factory(source,dataSourceFactory).createMediaSource(dashStatic);
+            DashMediaSource dashMediaSource = new DashMediaSource.Factory(source, dataSourceFactory).createMediaSource(dashStatic);
             player.prepare(dashMediaSource);
             player.setPlayWhenReady(true);
 
         }
     }
 
-    private void releasePlayer(){
-        if(player != null){
+    private void releasePlayer() {
+        if (player != null) {
             player.release();
             bitmovinAnalytics.detachPlayer();
             player = null;
@@ -132,9 +125,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v == releaseButton){
+        if (v == releaseButton) {
             releasePlayer();
-        }else if (v == createButton){
+        } else if (v == createButton) {
             createPlayer();
         }
     }

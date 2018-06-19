@@ -100,7 +100,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
         //Setting a startup time of 1 to workaround dashboard issue
         data.setPlayerStartupTime(1);
-        data.setStartupTime(duration+1);
+        data.setStartupTime(duration + 1);
 
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
@@ -234,7 +234,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
     @Override
     public void authenticationCompleted(boolean success) {
-        if(!success){
+        if (!success) {
             detachPlayer();
         }
     }
