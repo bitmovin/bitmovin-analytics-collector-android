@@ -20,6 +20,7 @@ import com.bitmovin.player.api.event.data.SeekedEvent;
 import com.bitmovin.player.api.event.data.SourceLoadedEvent;
 import com.bitmovin.player.api.event.data.StallEndedEvent;
 import com.bitmovin.player.api.event.data.StallStartedEvent;
+import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
 import com.bitmovin.player.api.event.data.VideoQualityChangedEvent;
 import com.bitmovin.player.api.event.listener.OnErrorListener;
 import com.bitmovin.player.api.event.listener.OnPausedListener;
@@ -31,6 +32,7 @@ import com.bitmovin.player.api.event.listener.OnSeekedListener;
 import com.bitmovin.player.api.event.listener.OnSourceLoadedListener;
 import com.bitmovin.player.api.event.listener.OnStallEndedListener;
 import com.bitmovin.player.api.event.listener.OnStallStartedListener;
+import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener;
 import com.bitmovin.player.api.event.listener.OnVideoQualityChangedListener;
 import com.bitmovin.player.config.quality.VideoQuality;
 
@@ -66,7 +68,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.addEventListener(onStallStartedListener);
         this.bitmovinPlayer.addEventListener(onPlaybackFinishedListener);
         this.bitmovinPlayer.addEventListener(onReadyListener);
-        this.bitmovinPlayer.addEventListener(onVideoQualityChangedListener);
+        this.bitmovinPlayer.addEventListener(onVideoPlaybackQualityChangedListener);
         this.bitmovinPlayer.addEventListener(onErrorListener);
     }
 
@@ -81,7 +83,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.removeEventListener(onSeekListener);
         this.bitmovinPlayer.removeEventListener(onPlaybackFinishedListener);
         this.bitmovinPlayer.removeEventListener(onReadyListener);
-        this.bitmovinPlayer.removeEventListener(onVideoQualityChangedListener);
+        this.bitmovinPlayer.removeEventListener(onVideoPlaybackQualityChangedListener);
         this.bitmovinPlayer.removeEventListener(onErrorListener);
     }
 
@@ -219,9 +221,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         }
     };
 
-    private OnVideoQualityChangedListener onVideoQualityChangedListener = new OnVideoQualityChangedListener() {
+    private OnVideoPlaybackQualityChangedListener onVideoPlaybackQualityChangedListener = new OnVideoPlaybackQualityChangedListener() {
         @Override
-        public void onVideoQualityChanged(VideoQualityChangedEvent videoQualityChangedEvent) {
+        public void onVideoPlaybackQualityChanged(VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
+            Log.d(TAG, "On Video Quality Changed");
             if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
