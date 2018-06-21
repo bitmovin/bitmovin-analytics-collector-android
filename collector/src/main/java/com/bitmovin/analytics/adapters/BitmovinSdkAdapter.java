@@ -18,10 +18,10 @@ import com.bitmovin.player.api.event.data.ReadyEvent;
 import com.bitmovin.player.api.event.data.SeekEvent;
 import com.bitmovin.player.api.event.data.SeekedEvent;
 import com.bitmovin.player.api.event.data.SourceLoadedEvent;
+import com.bitmovin.player.api.event.data.SourceUnloadedEvent;
 import com.bitmovin.player.api.event.data.StallEndedEvent;
 import com.bitmovin.player.api.event.data.StallStartedEvent;
 import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
-import com.bitmovin.player.api.event.data.VideoQualityChangedEvent;
 import com.bitmovin.player.api.event.listener.OnErrorListener;
 import com.bitmovin.player.api.event.listener.OnPausedListener;
 import com.bitmovin.player.api.event.listener.OnPlayListener;
@@ -30,10 +30,10 @@ import com.bitmovin.player.api.event.listener.OnReadyListener;
 import com.bitmovin.player.api.event.listener.OnSeekListener;
 import com.bitmovin.player.api.event.listener.OnSeekedListener;
 import com.bitmovin.player.api.event.listener.OnSourceLoadedListener;
+import com.bitmovin.player.api.event.listener.OnSourceUnloadedListener;
 import com.bitmovin.player.api.event.listener.OnStallEndedListener;
 import com.bitmovin.player.api.event.listener.OnStallStartedListener;
 import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener;
-import com.bitmovin.player.api.event.listener.OnVideoQualityChangedListener;
 import com.bitmovin.player.config.quality.VideoQuality;
 
 public class BitmovinSdkAdapter implements PlayerAdapter {
@@ -60,6 +60,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private void addPlayerListeners() {
         Log.d(TAG, "Adding Player Listeners");
         this.bitmovinPlayer.addEventListener(onSourceLoadedListener);
+        this.bitmovinPlayer.addEventListener(onSourceUnloadedListener);
+
         this.bitmovinPlayer.addEventListener(onPlayListener);
         this.bitmovinPlayer.addEventListener(onPausedListener);
         this.bitmovinPlayer.addEventListener(onStallEndedListener);
@@ -75,6 +77,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private void removePlayerListener() {
         Log.d(TAG, "Removing Player Listeners");
         this.bitmovinPlayer.removeEventListener(onSourceLoadedListener);
+        this.bitmovinPlayer.removeEventListener(onSourceUnloadedListener);
+
         this.bitmovinPlayer.removeEventListener(onPlayListener);
         this.bitmovinPlayer.removeEventListener(onPausedListener);
         this.bitmovinPlayer.removeEventListener(onStallEndedListener);
@@ -146,7 +150,14 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onSourceLoaded(SourceLoadedEvent sourceLoadedEvent) {
             Log.d(TAG, "On Source Loaded");
+        }
+    };
 
+    private OnSourceUnloadedListener onSourceUnloadedListener = new OnSourceUnloadedListener() {
+        @Override
+        public void onSourceUnloaded(SourceUnloadedEvent sourceUnloadedEvent) {
+            Log.d(TAG, "On Source Unloaded");
+            stateMachine.resetStateMachine();
         }
     };
 
