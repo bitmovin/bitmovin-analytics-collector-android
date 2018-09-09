@@ -20,6 +20,7 @@ public class BitmovinAnalyticsConfig {
     private String customData3;
     private String customData4;
     private String customData5;
+    private String title;
     private String experimentName;
     private String path;
     private Context context;
@@ -73,6 +74,19 @@ public class BitmovinAnalyticsConfig {
      */
     public void setVideoId(String videoId) {
         this.videoId = videoId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * Title of the asset in your CMS system
+     *
+     * @param title
+     */
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getCustomUserId() {

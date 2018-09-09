@@ -1,7 +1,6 @@
 package com.bitmovin.bitmovinanalyticsexample;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -40,12 +39,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    protected void initializeAnalytics(){
+    protected void initializeAnalytics() {
         //Step 1: Create your analytics config object
         BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>", "<YOUR_PLAYER_KEY>", getApplicationContext());
 
         //Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
+        bitmovinAnalyticsConfig.setTitle("Video Title");
         bitmovinAnalyticsConfig.setCustomUserId("customBitmovinUserId1");
         bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
         bitmovinAnalyticsConfig.setExperimentName("experiment-1");

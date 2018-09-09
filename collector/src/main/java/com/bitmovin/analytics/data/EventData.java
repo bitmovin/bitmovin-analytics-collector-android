@@ -37,6 +37,7 @@ public class EventData {
     private String player;
     private String cdnProvider;
     private String videoId;
+    private String title;
     private String customUserId;
     private String customData1;
     private String customData2;
@@ -72,6 +73,7 @@ public class EventData {
         this.customData3 = bitmovinAnalyticsConfig.getCustomData3();
         this.customData4 = bitmovinAnalyticsConfig.getCustomData4();
         this.customData5 = bitmovinAnalyticsConfig.getCustomData5();
+        this.title = bitmovinAnalyticsConfig.getTitle();
         this.path = bitmovinAnalyticsConfig.getPath();
         this.experimentName = bitmovinAnalyticsConfig.getExperimentName();
         this.playerTech = Util.getPlayerTech();
