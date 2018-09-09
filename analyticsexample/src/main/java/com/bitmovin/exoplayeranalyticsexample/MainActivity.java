@@ -30,11 +30,11 @@ import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
     private SimpleExoPlayer player;
     private PlayerView playerView;
     private Button releaseButton;
     private Button createButton;
-    private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
     private BitmovinAnalytics bitmovinAnalytics;
     private Handler automationHandler;
     private int automationDelay = 90000;
@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //Step 2: Add optional parameters
             bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
+            bitmovinAnalyticsConfig.setTitle("Video Title");
             bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
             bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
             bitmovinAnalyticsConfig.setExperimentName("experiment-1");

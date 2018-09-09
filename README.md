@@ -20,7 +20,7 @@ And this line to your main project `build.gradle`
 
 ```
 dependencies {
-    compile 'com.bitmovin.analytics:collector:1.3.8'
+    compile 'com.bitmovin.analytics:collector:1.3.9'
 }
 ```
 
@@ -56,7 +56,8 @@ When switching to a new video we recommend that you follow the sequence of event
 analyticsCollector.detachPlayer();
 
 //Update your config with new optional parameters related to the new video playback
-bitmovinAnalyticsConfig.setVideoId("newVideoId"); 
+bitmovinAnalyticsConfig.setVideoId("newVideoId");
+bitmovinAnalyticsConfig.setVideoTitle("Video Title");
 bitmovinAnalyticsConfig.setCustomData1("newCustomData"); 
 
 //Reattach your player instance 
@@ -66,7 +67,8 @@ analyticsCollector.attachPlayer(newPlayer);
 
 #### Optional Configuration Parameters
 ```java
-bitmovinAnalyticsConfig.setVideoId("videoId1234"); 
+bitmovinAnalyticsConfig.setVideoId("videoId1234");
+bitmovinAnalyticsConfig.setTitle("Video Title");
 bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
 bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
 bitmovinAnalyticsConfig.setExperimentName("experiment-1");
