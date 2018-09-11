@@ -111,7 +111,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         long videoTime = getPosition();
-        Log.d(TAG, String.format("onPlayerStateChanged: %b, %s", playWhenReady, Util.exoStateToString(playbackState)));
+        Log.d(TAG, String.format("onPlayerStateChanged: %b, %s", playWhenReady, ExoUtil.exoStateToString(playbackState)));
         switch (playbackState) {
             case Player.STATE_READY:
                 if (playWhenReady) {

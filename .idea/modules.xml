@@ -4,8 +4,12 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BitmovinAnalyticsCollectorAndroid.iml" filepath="$PROJECT_DIR$/BitmovinAnalyticsCollectorAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/analyticsexample/analyticsexample.iml" filepath="$PROJECT_DIR$/analyticsexample/analyticsexample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android.iml" filepath="$PROJECT_DIR$/android.iml" />
       <module fileurl="file://$PROJECT_DIR$/bitmovinanalyticsexample/bitmovinanalyticsexample.iml" filepath="$PROJECT_DIR$/bitmovinanalyticsexample/bitmovinanalyticsexample.iml" />
       <module fileurl="file://$PROJECT_DIR$/collector/collector.iml" filepath="$PROJECT_DIR$/collector/collector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/collector-bitmovin-player/collector-bitmovin-player.iml" filepath="$PROJECT_DIR$/collector-bitmovin-player/collector-bitmovin-player.iml" />
+      <module fileurl="file://$PROJECT_DIR$/collector-exoplayer/collector-exoplayer.iml" filepath="$PROJECT_DIR$/collector-exoplayer/collector-exoplayer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/collector-bitmovin-player/src/main/main.iml" filepath="$PROJECT_DIR$/collector-bitmovin-player/src/main/main.iml" />
     </modules>
   </component>
 </project>

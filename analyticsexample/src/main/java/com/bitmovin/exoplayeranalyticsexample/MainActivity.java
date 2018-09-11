@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalytics = new BitmovinAnalytics(bitmovinAnalyticsConfig);
 
             //Step 4: Attach ExoPlayer
-            bitmovinAnalytics.attachPlayer(player);
+            bitmovinAnalytics.attachAdapter(new ExoPlayerAdapter(player));
 
             //Step 5: Create, prepeare, and play media source
             playerView.setPlayer(player);

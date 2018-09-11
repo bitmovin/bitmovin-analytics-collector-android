@@ -11,9 +11,12 @@
             <option value="$PROJECT_DIR$/analyticsexample" />
             <option value="$PROJECT_DIR$/bitmovinanalyticsexample" />
             <option value="$PROJECT_DIR$/collector" />
+            <option value="$PROJECT_DIR$/collector-bitmovin-player" />
+            <option value="$PROJECT_DIR$/collector-exoplayer" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
+        <option name="useAutoImport" value="true" />
       </GradleProjectSettings>
     </option>
   </component>

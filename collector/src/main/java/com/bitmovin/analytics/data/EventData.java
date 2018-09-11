@@ -75,7 +75,7 @@ public class EventData {
         this.path = bitmovinAnalyticsConfig.getPath();
         this.experimentName = bitmovinAnalyticsConfig.getExperimentName();
         this.playerTech = Util.getPlayerTech();
-        this.setUserAgent(Util.getUserAgent(bitmovinAnalyticsConfig.getContext()));
+        this.setUserAgent("unknown"); //Util.getUserAgent(bitmovinAnalyticsConfig.getContext()));
         this.impressionId = impressionId;
 
         if (bitmovinAnalyticsConfig.getCdnProvider() != null) {
