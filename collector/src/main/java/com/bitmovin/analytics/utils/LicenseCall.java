@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.utils;
 
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.LicenseCallData;
 import com.bitmovin.analytics.data.LicenseResponse;
 

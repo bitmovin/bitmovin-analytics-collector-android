@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.exoplayer;
 
-import com.bitmovin.analytics.analytics.BitmovinAnalytics;
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BitmovinAnalytics;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.google.android.exoplayer2.ExoPlayer;
 
 public class ExoPlayerCollector extends BitmovinAnalytics {

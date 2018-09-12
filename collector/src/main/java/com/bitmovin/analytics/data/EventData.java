@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.data;
 
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.utils.Util;
 
 public class EventData {

@@ -3,7 +3,7 @@ package com.bitmovin.analytics.stateMachines;
 import android.os.Handler;
 import android.util.Log;
 
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.utils.Util;
 

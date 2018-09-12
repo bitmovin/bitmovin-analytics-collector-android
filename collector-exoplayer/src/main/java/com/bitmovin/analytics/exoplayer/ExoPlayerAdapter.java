@@ -6,7 +6,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.bitmovin.analytics.adapters.PlayerAdapter;
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.PlayerType;

@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player;
 
-import com.bitmovin.analytics.analytics.BitmovinAnalytics;
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BitmovinAnalytics;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.player.BitmovinPlayer;
 
 public class BitmovinPlayerCollector extends BitmovinAnalytics {
