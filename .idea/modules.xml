@@ -9,7 +9,6 @@
       <module fileurl="file://$PROJECT_DIR$/collector/collector.iml" filepath="$PROJECT_DIR$/collector/collector.iml" />
       <module fileurl="file://$PROJECT_DIR$/collector-bitmovin-player/collector-bitmovin-player.iml" filepath="$PROJECT_DIR$/collector-bitmovin-player/collector-bitmovin-player.iml" />
       <module fileurl="file://$PROJECT_DIR$/collector-exoplayer/collector-exoplayer.iml" filepath="$PROJECT_DIR$/collector-exoplayer/collector-exoplayer.iml" />
-      <module fileurl="file://$PROJECT_DIR$/collector-bitmovin-player/src/main/main.iml" filepath="$PROJECT_DIR$/collector-bitmovin-player/src/main/main.iml" />
     </modules>
   </component>
 </project>

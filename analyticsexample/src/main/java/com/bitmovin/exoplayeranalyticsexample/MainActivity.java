@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.bitmovin.analytics.adapters.ExoPlayerAdapter;
-import com.bitmovin.analytics.adapters.ExoPlayerCollector;
+import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
 import com.bitmovin.analytics.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.enums.CDNProvider;

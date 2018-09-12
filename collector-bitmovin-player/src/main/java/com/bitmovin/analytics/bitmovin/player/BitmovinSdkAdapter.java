@@ -1,7 +1,8 @@
-package com.bitmovin.analytics.adapters;
+package com.bitmovin.analytics.bitmovin.player;
 
 import android.util.Log;
 
+import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;

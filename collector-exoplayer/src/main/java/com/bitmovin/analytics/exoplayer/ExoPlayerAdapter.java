@@ -1,10 +1,11 @@
-package com.bitmovin.analytics.adapters;
+package com.bitmovin.analytics.exoplayer;
 
 import android.net.NetworkInfo;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
 
+import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
