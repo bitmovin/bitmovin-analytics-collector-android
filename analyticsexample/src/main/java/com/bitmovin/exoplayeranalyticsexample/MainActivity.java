@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import com.bitmovin.analytics.adapters.ExoPlayerAdapter;
+import com.bitmovin.analytics.adapters.ExoPlayerCollector;
 import com.bitmovin.analytics.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.enums.CDNProvider;
@@ -91,10 +93,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
 
             //Step 3: Create Analytics Colelctor
-            bitmovinAnalytics = new BitmovinAnalytics(bitmovinAnalyticsConfig);
+            ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(
+                bitmovinAnalyticsConfig);
 
             //Step 4: Attach ExoPlayer
-            bitmovinAnalytics.attachAdapter(new ExoPlayerAdapter(player));
+            bitmovinAnalytics.attachPlayer(player);
+
 
             //Step 5: Create, prepeare, and play media source
             playerView.setPlayer(player);

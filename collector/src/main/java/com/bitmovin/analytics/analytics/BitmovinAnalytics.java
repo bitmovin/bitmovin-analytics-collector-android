@@ -18,10 +18,10 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
   private static final String TAG = "BitmovinAnalytics";
 
-  private final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
-  private PlayerAdapter playerAdapter;
-  private PlayerStateMachine playerStateMachine;
-  private IEventDataDispatcher eventDataDispatcher;
+  protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
+  protected PlayerAdapter playerAdapter;
+  protected PlayerStateMachine playerStateMachine;
+  protected IEventDataDispatcher eventDataDispatcher;
 
   /**
    * Bitmovin Analytics
@@ -41,7 +41,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
    * <p>
    * To attach a different player instance, simply call this method again.
    */
-  public void attach(PlayerAdapter adapter) {
+  protected void attach(PlayerAdapter adapter) {
     detachPlayer();
     eventDataDispatcher.enable();
     this.playerAdapter = adapter;
