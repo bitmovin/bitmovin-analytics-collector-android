@@ -15,7 +15,7 @@ import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
-import com.bitmovin.player.BitmovinPlayer;
+import com.bitmovin.player.*;
 import com.bitmovin.player.api.event.data.ErrorEvent;
 import com.bitmovin.player.api.event.data.PausedEvent;
 import com.bitmovin.player.api.event.data.PlayEvent;
@@ -113,7 +113,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             versionName = "?";
         }
 
-        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") " + "BitmovinPlayer/2.8.3";
+        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") " + "BitmovinPlayer/" + com.bitmovin.player.BuildConfig.VERSION_NAME;
     }
 
     @Override
