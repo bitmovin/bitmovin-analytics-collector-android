@@ -1,5 +1,10 @@
 package com.bitmovin.analytics.bitmovin.player;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 
 import com.bitmovin.analytics.adapters.PlayerAdapter;
@@ -92,10 +97,29 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.removeEventListener(onErrorListener);
     }
 
+    private String getUserAgent(Context context) {
+        ApplicationInfo applicationInfo = context.getApplicationInfo();
+        int stringId = applicationInfo.labelRes;
+        String applicationName = "Unknown";
+        if (stringId == 0 && applicationInfo.nonLocalizedLabel != null) {
+            applicationInfo.nonLocalizedLabel.toString();
+        }
+        String versionName;
+        try {
+            String packageName = context.getPackageName();
+            PackageInfo info = context.getPackageManager().getPackageInfo(packageName, 0);
+            versionName = info.versionName;
+        } catch (PackageManager.NameNotFoundException var5) {
+            versionName = "?";
+        }
+
+        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") " + "BitmovinPlayer/2.8.3";
+    }
+
     @Override
     public EventData createEventData() {
 
-        EventData data = new EventData(config, stateMachine.getImpressionId());
+        EventData data = new EventData(config, stateMachine.getImpressionId(), getUserAgent(config.getContext())));
         data.setPlayer(PlayerType.BITMOVIN.toString());
 
         //duration

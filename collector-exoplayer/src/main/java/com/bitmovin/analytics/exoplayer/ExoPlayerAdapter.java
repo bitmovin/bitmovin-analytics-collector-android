@@ -210,7 +210,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public EventData createEventData() {
-        EventData data = new EventData(config, stateMachine.getImpressionId());
+        EventData data = new EventData(config, stateMachine.getImpressionId(), ExoUtil.getUserAgent(config.getContext()));
         data.setPlayer(PlayerType.EXOPLAYER.toString());
         decorateDataWithPlaybackInformation(data);
         return data;
