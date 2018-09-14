@@ -26,7 +26,7 @@ public class EventDataTest {
         bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.AKAMAI);
         bitmovinAnalyticsConfig.setVideoId("video1234");
 
-        eventData = new EventData(bitmovinAnalyticsConfig, "1234");
+        eventData = new EventData(bitmovinAnalyticsConfig, "1234", "user agent");
     }
 
     @Test

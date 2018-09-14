@@ -119,7 +119,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     @Override
     public EventData createEventData() {
 
-        EventData data = new EventData(config, stateMachine.getImpressionId(), getUserAgent(config.getContext())));
+        EventData data = new EventData(config, stateMachine.getImpressionId(), getUserAgent(config.getContext()));
         data.setPlayer(PlayerType.BITMOVIN.toString());
 
         //duration
