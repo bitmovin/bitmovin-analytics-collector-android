@@ -237,6 +237,8 @@ public class EventData {
         this.videoId = videoId;
     }
 
+    public void setTitle(String title) { this.title = title; }
+
     public void setCustomUserId(String customUserId) {
         this.customUserId = customUserId;
     }
