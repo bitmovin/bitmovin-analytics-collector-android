@@ -39,7 +39,7 @@ dependencies {
 
     compile project(path: ':collector')
     compile project(path: ':collector-bitmovin-player')
-    implementation 'com.bitmovin.player:playercore:2.13.0'
+    implementation 'com.bitmovin.player:playercore:2.+'
 
 //    compile 'com.bitmovin.analytics:collector-bitmovin-player:1.4.0'
 

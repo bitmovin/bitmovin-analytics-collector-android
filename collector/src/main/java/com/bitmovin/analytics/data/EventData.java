@@ -37,6 +37,7 @@ public class EventData {
     private String player;
     private String cdnProvider;
     private String videoId;
+    private String title;
     private String customUserId;
     private String customData1;
     private String customData2;
@@ -65,6 +66,7 @@ public class EventData {
         this.key = bitmovinAnalyticsConfig.getKey();
         this.playerKey = bitmovinAnalyticsConfig.getPlayerKey();
         this.videoId = bitmovinAnalyticsConfig.getVideoId();
+        this.title = bitmovinAnalyticsConfig.getTitle();
         this.userId = Util.getUserId(bitmovinAnalyticsConfig.getContext());
         this.customUserId = bitmovinAnalyticsConfig.getCustomUserId();
         this.customData1 = bitmovinAnalyticsConfig.getCustomData1();
@@ -234,6 +236,8 @@ public class EventData {
     public void setVideoId(String videoId) {
         this.videoId = videoId;
     }
+
+    public void setTitle(String title) { this.title = title; }
 
     public void setCustomUserId(String customUserId) {
         this.customUserId = customUserId;

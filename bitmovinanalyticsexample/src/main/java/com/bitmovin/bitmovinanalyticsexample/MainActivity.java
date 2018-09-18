@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
+        bitmovinAnalyticsConfig.setTitle("Android ExoPlayer Video with DASH");
         bitmovinAnalyticsConfig.setCustomUserId("customBitmovinUserId1");
         bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
         bitmovinAnalyticsConfig.setExperimentName("experiment-1");
