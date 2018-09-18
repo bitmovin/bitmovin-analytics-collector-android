@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.google.gson.Gson;
 
@@ -26,7 +26,7 @@ public class EventDataTest {
         bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.AKAMAI);
         bitmovinAnalyticsConfig.setVideoId("video1234");
 
-        eventData = new EventData(bitmovinAnalyticsConfig, "1234");
+        eventData = new EventData(bitmovinAnalyticsConfig, "1234", "user agent");
     }
 
     @Test

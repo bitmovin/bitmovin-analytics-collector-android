@@ -1,13 +1,12 @@
 package com.bitmovin.bitmovinanalyticsexample;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import com.bitmovin.analytics.analytics.BitmovinAnalytics;
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.player.BitmovinPlayer;
 import com.bitmovin.player.BitmovinPlayerView;
@@ -17,7 +16,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private BitmovinPlayerView bitmovinPlayerView;
     private BitmovinPlayer bitmovinPlayer;
-    private BitmovinAnalytics bitmovinAnalytics;
+    private BitmovinPlayerCollector bitmovinAnalytics;
     private Button releaseButton;
     private Button createButton;
 
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    protected void initializeAnalytics(){
+    protected void initializeAnalytics() {
         //Step 1: Create your analytics config object
         BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>", "<YOUR_PLAYER_KEY>", getApplicationContext());
 
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
 
         //Step 3: Create Analytics Collector
-        bitmovinAnalytics = new BitmovinAnalytics(bitmovinAnalyticsConfig);
+        bitmovinAnalytics = new BitmovinPlayerCollector(bitmovinAnalyticsConfig);
     }
 
 

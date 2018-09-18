@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.data;
 
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.utils.Util;
 
 public class EventData {
@@ -60,7 +60,7 @@ public class EventData {
     private String progUrl;
     private boolean isMuted = false;
 
-    public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId) {
+    public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId, String userAgent) {
         this.analyticsVersion = Util.getVersion();
         this.key = bitmovinAnalyticsConfig.getKey();
         this.playerKey = bitmovinAnalyticsConfig.getPlayerKey();
@@ -75,7 +75,7 @@ public class EventData {
         this.path = bitmovinAnalyticsConfig.getPath();
         this.experimentName = bitmovinAnalyticsConfig.getExperimentName();
         this.playerTech = Util.getPlayerTech();
-        this.setUserAgent(Util.getUserAgent(bitmovinAnalyticsConfig.getContext()));
+        this.setUserAgent(userAgent);
         this.impressionId = impressionId;
 
         if (bitmovinAnalyticsConfig.getCdnProvider() != null) {

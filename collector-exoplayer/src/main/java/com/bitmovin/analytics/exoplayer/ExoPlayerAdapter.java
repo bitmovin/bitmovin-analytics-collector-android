@@ -1,11 +1,12 @@
-package com.bitmovin.analytics.adapters;
+package com.bitmovin.analytics.exoplayer;
 
 import android.net.NetworkInfo;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
 
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.PlayerType;
@@ -111,7 +112,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         long videoTime = getPosition();
-        Log.d(TAG, String.format("onPlayerStateChanged: %b, %s", playWhenReady, Util.exoStateToString(playbackState)));
+        Log.d(TAG, String.format("onPlayerStateChanged: %b, %s", playWhenReady, ExoUtil.exoStateToString(playbackState)));
         switch (playbackState) {
             case Player.STATE_READY:
                 if (playWhenReady) {
@@ -209,7 +210,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public EventData createEventData() {
-        EventData data = new EventData(config, stateMachine.getImpressionId());
+        EventData data = new EventData(config, stateMachine.getImpressionId(), ExoUtil.getUserAgent(config.getContext()));
         data.setPlayer(PlayerType.EXOPLAYER.toString());
         decorateDataWithPlaybackInformation(data);
         return data;

@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.analytics;
+package com.bitmovin.analytics;
 
 import android.content.Context;
 

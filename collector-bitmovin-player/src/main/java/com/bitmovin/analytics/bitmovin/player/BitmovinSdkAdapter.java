@@ -1,15 +1,21 @@
-package com.bitmovin.analytics.adapters;
+package com.bitmovin.analytics.bitmovin.player;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 
-import com.bitmovin.analytics.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
-import com.bitmovin.player.BitmovinPlayer;
+import com.bitmovin.player.*;
 import com.bitmovin.player.api.event.data.ErrorEvent;
 import com.bitmovin.player.api.event.data.PausedEvent;
 import com.bitmovin.player.api.event.data.PlayEvent;
@@ -91,10 +97,29 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.removeEventListener(onErrorListener);
     }
 
+    private String getUserAgent(Context context) {
+        ApplicationInfo applicationInfo = context.getApplicationInfo();
+        int stringId = applicationInfo.labelRes;
+        String applicationName = "Unknown";
+        if (stringId == 0 && applicationInfo.nonLocalizedLabel != null) {
+            applicationInfo.nonLocalizedLabel.toString();
+        }
+        String versionName;
+        try {
+            String packageName = context.getPackageName();
+            PackageInfo info = context.getPackageManager().getPackageInfo(packageName, 0);
+            versionName = info.versionName;
+        } catch (PackageManager.NameNotFoundException var5) {
+            versionName = "?";
+        }
+
+        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") " + "BitmovinPlayer/" + com.bitmovin.player.BuildConfig.VERSION_NAME;
+    }
+
     @Override
     public EventData createEventData() {
 
-        EventData data = new EventData(config, stateMachine.getImpressionId());
+        EventData data = new EventData(config, stateMachine.getImpressionId(), getUserAgent(config.getContext()));
         data.setPlayer(PlayerType.BITMOVIN.toString());
 
         //duration
