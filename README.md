@@ -18,35 +18,59 @@ allprojects {
 
 And this line to your main project `build.gradle`
 
+For Bitmovin Player:
+
 ```
 dependencies {
-    compile 'com.bitmovin.analytics:collector:1.3.8'
+    compile 'com.bitmovin.analytics:collector-bitmovin-player:1.4.0'
+
 }
 ```
 
+For ExoPlayer:
+
+```
+dependencies {
+    compile 'com.bitmovin.analytics:collector-exoplayer:1.4.0'
+}
+```
+
+
 ## Examples
 
-The following example creates a BitmovinAnalytics object and attaches an Bitmovin Native SDK or ExoPlayer instance to it. 
+The following example creates a BitmovinAnalytics object and attaches an Bitmovin Native SDK instance to it.
 
-#### Basic analytics monitoring 
+#### Basic analytics monitoring with Bitmovin Player SDK
 ```java
 // Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key and (optionally) your Bitmovin Player Key
+BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", "<BITMOVIN_PLAYER_KEY>", getApplicationContext());
 
-    //Bitmovin Native: 
-    BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", "<BITMOVIN_PLAYER_KEY>", getApplicationContext());
 
-    //ExoPlayer monitoring:
-    BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", getApplicationContext());
-
-// Create a BitmovinAnalytics object using the BitmovinAnalyitcsConfig you just created
-BitmovinAnalytics analyticsCollector = new BitmovinAnalytics(bitmovinAnalyticsConfig);
+// Create a BitmovinPlayerCollector object using the BitmovinAnalyitcsConfig you just created
+BitmovinAnalytics analyticsCollector = new BitmovinPlayerCollector(bitmovinAnalyticsConfig);
 
 // Attach your player instance
 analyticsCollector.attachPlayer(player);
 
-// Detach your player when you are done. For example, call this method when you call ExoPlayer's release() method
-bitmovinAnalytics.detachPlayer();
+// Detach your player when you are done. For example, call this method when you call the release() method
+analyticsCollector.detachPlayer();
 ```
+
+#### Basic analytics monitoring with ExoPlayer
+```java
+// Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key
+BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", getApplicationContext());
+
+Create Analytics Collector for ExoPlayer
+ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig);
+
+//Attach your ExoPlayer instance
+bitmovinAnalytics.attachPlayer(player);
+
+// Detach your player when you are done. For example, call this method when you call ExoPlayer's release() method
+analyticsCollector.detachPlayer();
+```
+
 
 #### Switching to a new video 
 When switching to a new video we recommend that you follow the sequence of events below. 
