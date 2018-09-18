@@ -168,7 +168,7 @@ public class BitmovinAnalyticsConfig {
     }
 
     /**
-     * Human readable video title currently playing
+     * Human readable title of the video asset currently playing
      * @return
      */
     public String getTitle() {
