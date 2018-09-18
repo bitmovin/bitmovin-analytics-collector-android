@@ -20,6 +20,7 @@ public class BitmovinAnalyticsConfig {
     private String customData3;
     private String customData4;
     private String customData5;
+    private String title;
     private String experimentName;
     private String path;
     private Context context;
@@ -164,6 +165,22 @@ public class BitmovinAnalyticsConfig {
 
     public String getExperimentName() {
         return experimentName;
+    }
+
+    /**
+     * Human readable video title currently playing
+     * @return
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * Human readable title of the video asset currently playing
+     * @param title
+     */
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     /**
