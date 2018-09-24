@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 
+
 android {
     compileSdkVersion 27
 
@@ -17,8 +18,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            multiDexEnabled true
+        }
         release {
             minifyEnabled false
+            multiDexEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -37,11 +42,12 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile project(path: ':collector')
+//    compile project(path: ':collector')
     compile project(path: ':collector-bitmovin-player')
     implementation 'com.bitmovin.player:playercore:2.+'
 
-//    compile 'com.bitmovin.analytics:collector-bitmovin-player:1.4.0'
+    implementation 'com.bitmovin.analytics:collector:1.4.0'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.4.0'
 
 }
 
