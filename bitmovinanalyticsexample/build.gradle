@@ -47,7 +47,7 @@ dependencies {
     implementation 'com.bitmovin.player:playercore:2.+'
 
 //    implementation 'com.bitmovin.analytics:collector:1.4.0'
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.4.0'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.4.1'
 
 }
 
