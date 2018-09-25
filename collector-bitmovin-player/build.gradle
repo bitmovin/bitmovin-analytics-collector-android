@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
 def packageName = 'com.bitmovin.analytics'
-def libraryVersion = '1.4.0'
+def libraryVersion = '1.4.1'
 
 android {
 
@@ -13,7 +13,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 13
-        versionName "1.4.0"
+        versionName "1.4.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -35,7 +35,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    api 'com.bitmovin.analytics:collector:1.4.0'
+    api 'com.bitmovin.analytics:collector:1.4.1'
     api 'com.bitmovin.player:playercore:2.+'
 
 }
@@ -66,6 +66,11 @@ publishing {
                                 (it.group == 'com.google.android.gms' && it.name == 'play-services-cast-framework') ||
                                 (it.group == 'com.google.ads.interactivemedia.v3' && it.name == 'interactivemedia') ||
                                 (it.group == 'com.google.android.gms' && it.name == 'play-services-ads')) {
+                            return
+                        }
+
+
+                        if (it.group == null || it.name == null) {
                             return
                         }
 
