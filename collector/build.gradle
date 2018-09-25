@@ -35,8 +35,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile 'com.squareup.okhttp3:okhttp:3.9.1'
-    compile 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    implementation 'com.google.code.gson:gson:2.8.2'
 }
 
 publishing {
@@ -53,10 +53,21 @@ publishing {
                 def dependenciesNode = asNode().appendNode('dependencies')
 
                 //Defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
-                def configurationNames = ['compile']
+                def configurationNames = ['implementation']
 
                 configurationNames.each { configurationName ->
                     configurations[configurationName].allDependencies.each {
+
+                        if ((it.group == 'com.google.android.libraries.cast.companionlibrary' && it.name == 'ccl') ||
+                                (it.group == 'com.android.support' && it.name == 'mediarouter-v7') ||
+                                (it.group == 'com.android.support' && it.name == 'support-v4') ||
+                                (it.group == 'com.android.support' && it.name == 'appcompat-v7') ||
+                                (it.group == 'com.google.android.gms' && it.name == 'play-services-cast-framework') ||
+                                (it.group == 'com.google.ads.interactivemedia.v3' && it.name == 'interactivemedia') ||
+                                (it.group == 'com.google.android.gms' && it.name == 'play-services-ads')) {
+                            return
+                        }
+
                         def dependencyNode = dependenciesNode.appendNode('dependency')
                         dependencyNode.appendNode('groupId', it.group)
                         dependencyNode.appendNode('artifactId', it.name)

@@ -35,11 +35,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile 'com.squareup.okhttp3:okhttp:3.9.1'
-    compile 'com.google.code.gson:gson:2.8.2'
-
-    compile 'com.bitmovin.analytics:collector:1.4.0'
-    compile 'com.google.android.exoplayer:exoplayer:2.8.+'
+    api 'com.bitmovin.analytics:collector:1.4.0'
+    api 'com.google.android.exoplayer:exoplayer:2.8.+'
 
 }
 
@@ -57,7 +54,7 @@ publishing {
                 def dependenciesNode = asNode().appendNode('dependencies')
 
                 //Defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
-                def configurationNames = ['compile']
+                def configurationNames = ['api']
 
                 configurationNames.each { configurationName ->
                     configurations[configurationName].allDependencies.each {
