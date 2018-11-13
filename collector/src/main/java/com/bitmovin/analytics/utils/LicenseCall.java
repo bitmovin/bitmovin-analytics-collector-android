@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.utils;
 
+import android.util.Log;
+
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.LicenseCallData;
 import com.bitmovin.analytics.data.LicenseResponse;
@@ -11,7 +13,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class LicenseCall {
-    private static final String TAG = "LicenseCall";
+    private static final String TAG = "BitmovinAnalytics";
     private BitmovinAnalyticsConfig config;
     private HttpClient httpClient;
 
@@ -29,6 +31,7 @@ public class LicenseCall {
         httpClient.post(json, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Log.d(TAG, "License call was denied", e);
                 callback.authenticationCompleted(false);
             }
 
@@ -37,10 +40,13 @@ public class LicenseCall {
                 if (response != null) {
                     LicenseResponse licenseResponse = DataSerializer.deserialize(response.body().string(), LicenseResponse.class);
                     if (licenseResponse != null && licenseResponse.getStatus().equals("granted")) {
+                        Log.d(TAG, "License response was granted");
                         callback.authenticationCompleted(true);
                         return;
                     }
+                    Log.d(TAG, String.format("License response was denied: %s", licenseResponse.getMessage()));
                 }
+                Log.d(TAG, "License call was denied without providing a response body");
                 callback.authenticationCompleted(false);
             }
         });
