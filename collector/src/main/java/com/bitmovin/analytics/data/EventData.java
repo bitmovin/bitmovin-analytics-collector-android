@@ -60,6 +60,7 @@ public class EventData {
     private String m3u8Url;
     private String progUrl;
     private boolean isMuted = false;
+    private int sequenceNumber = 0;
 
     public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId, String userAgent) {
         this.analyticsVersion = Util.getVersion();
@@ -271,6 +272,8 @@ public class EventData {
         this.userId = userId;
     }
 
+    public String getImpressionId() { return this.impressionId; }
+
     public void setImpressionId(String impressionId) {
         this.impressionId = impressionId;
     }
@@ -318,4 +321,6 @@ public class EventData {
     public void setMuted(boolean muted) {
         this.isMuted = muted;
     }
+
+    public void setSequenceNumber(int sequenceNumber) { this.sequenceNumber = sequenceNumber; }
 }
