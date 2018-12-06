@@ -20,7 +20,6 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     private LicenseCallback callback;
 
     private int sampleSequenceNumber = 0;
-    private String lastImpressionId = "";
 
     public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, LicenseCallback callback) {
         this.data = new ConcurrentLinkedQueue<EventData>();
@@ -56,15 +55,12 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     public void disable() {
         this.data.clear();
         this.enabled = false;
+        this.sampleSequenceNumber = 0;
     }
 
     @Override
     public void add(EventData eventData) {
-        if (!lastImpressionId.equals(eventData.getImpressionId())) {
-            this.sampleSequenceNumber = 0;
-        }
         eventData.setSequenceNumber(this.sampleSequenceNumber++);
-        this.lastImpressionId = eventData.getImpressionId();
 
         if (enabled) {
             this.httpClient.post(DataSerializer.serialize(eventData), null);

@@ -272,8 +272,6 @@ public class EventData {
         this.userId = userId;
     }
 
-    public String getImpressionId() { return this.impressionId; }
-
     public void setImpressionId(String impressionId) {
         this.impressionId = impressionId;
     }
