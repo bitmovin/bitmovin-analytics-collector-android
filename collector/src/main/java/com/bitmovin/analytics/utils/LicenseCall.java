@@ -46,9 +46,9 @@ public class LicenseCall {
                     }
                     Log.d(TAG, String.format("License response was denied: %s", licenseResponse.getMessage()));
                 }
-            else {
-                Log.d(TAG, "License call was denied without providing a response body");
-            }
+                else {
+                    Log.d(TAG, "License call was denied without providing a response body");
+                }
                 callback.authenticationCompleted(false);
             }
         });
