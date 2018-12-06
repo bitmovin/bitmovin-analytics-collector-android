@@ -19,6 +19,8 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     private BitmovinAnalyticsConfig config;
     private LicenseCallback callback;
 
+    private int sampleSequenceNumber = 0;
+
     public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, LicenseCallback callback) {
         this.data = new ConcurrentLinkedQueue<EventData>();
         this.httpClient = new HttpClient(config.getContext(), BitmovinAnalyticsConfig.analyticsUrl);
@@ -53,10 +55,13 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     public void disable() {
         this.data.clear();
         this.enabled = false;
+        this.sampleSequenceNumber = 0;
     }
 
     @Override
     public void add(EventData eventData) {
+        eventData.setSequenceNumber(this.sampleSequenceNumber++);
+
         if (enabled) {
             this.httpClient.post(DataSerializer.serialize(eventData), null);
         } else {
