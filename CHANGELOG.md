@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Logging around LicenseCall responses
+- Sequence Number of outgoing Analytics samples
+- `platform` = android field in outgoing payload
 
 ### Removed
 

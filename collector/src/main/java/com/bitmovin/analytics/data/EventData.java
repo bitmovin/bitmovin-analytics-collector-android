@@ -61,6 +61,7 @@ public class EventData {
     private String progUrl;
     private boolean isMuted = false;
     private int sequenceNumber = 0;
+    private String platform = "android";
 
     public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId, String userAgent) {
         this.analyticsVersion = Util.getVersion();
@@ -321,4 +322,236 @@ public class EventData {
     }
 
     public void setSequenceNumber(int sequenceNumber) { this.sequenceNumber = sequenceNumber; }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public int getScreenWidth() {
+        return screenWidth;
+    }
+
+    public int getScreenHeight() {
+        return screenHeight;
+    }
+
+    public boolean isLive() {
+        return isLive;
+    }
+
+    public boolean isCasting() {
+        return isCasting;
+    }
+
+    public long getVideoDuration() {
+        return videoDuration;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public int getVideoWindowWidth() {
+        return videoWindowWidth;
+    }
+
+    public int getVideoWindowHeight() {
+        return videoWindowHeight;
+    }
+
+    public int getDroppedFrames() {
+        return droppedFrames;
+    }
+
+    public long getPlayed() {
+        return played;
+    }
+
+    public long getBuffered() {
+        return buffered;
+    }
+
+    public long getPaused() {
+        return paused;
+    }
+
+    public int getAd() {
+        return ad;
+    }
+
+    public long getSeeked() {
+        return seeked;
+    }
+
+    public int getVideoPlaybackWidth() {
+        return videoPlaybackWidth;
+    }
+
+    public int getVideoPlaybackHeight() {
+        return videoPlaybackHeight;
+    }
+
+    public int getVideoBitrate() {
+        return videoBitrate;
+    }
+
+    public int getAudioBitrate() {
+        return audioBitrate;
+    }
+
+    public long getVideoTimeStart() {
+        return videoTimeStart;
+    }
+
+    public long getVideoTimeEnd() {
+        return videoTimeEnd;
+    }
+
+    public long getVideoStartupTime() {
+        return videoStartupTime;
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public long getStartupTime() {
+        return startupTime;
+    }
+
+    public String getAnalyticsVersion() {
+        return analyticsVersion;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getPlayerKey() {
+        return playerKey;
+    }
+
+    public String getPlayer() {
+        return player;
+    }
+
+    public String getCdnProvider() {
+        return cdnProvider;
+    }
+
+    public String getVideoId() {
+        return videoId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getCustomUserId() {
+        return customUserId;
+    }
+
+    public String getCustomData1() {
+        return customData1;
+    }
+
+    public String getCustomData2() {
+        return customData2;
+    }
+
+    public String getCustomData3() {
+        return customData3;
+    }
+
+    public String getCustomData4() {
+        return customData4;
+    }
+
+    public String getCustomData5() {
+        return customData5;
+    }
+
+    public String getExperimentName() {
+        return experimentName;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getImpressionId() {
+        return impressionId;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public Integer getErrorCode() {
+        return errorCode;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public int getPlayerStartupTime() {
+        return playerStartupTime;
+    }
+
+    public int getPageLoadType() {
+        return pageLoadType;
+    }
+
+    public int getPageLoadTime() {
+        return pageLoadTime;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getPlayerTech() {
+        return playerTech;
+    }
+
+    public String getStreamFormat() {
+        return streamFormat;
+    }
+
+    public String getMpdUrl() {
+        return mpdUrl;
+    }
+
+    public String getM3u8Url() {
+        return m3u8Url;
+    }
+
+    public String getProgUrl() {
+        return progUrl;
+    }
+
+    public boolean isMuted() {
+        return isMuted;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public int getSequenceNumber() {
+        return sequenceNumber;
+    }
 }
