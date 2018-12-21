@@ -550,4 +550,8 @@ public class EventData {
     public String getPlatform() {
         return platform;
     }
+
+    public int getSequenceNumber() {
+        return sequenceNumber;
+    }
 }
