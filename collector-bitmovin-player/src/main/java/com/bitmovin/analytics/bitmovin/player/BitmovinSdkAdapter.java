@@ -163,6 +163,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             data.setVideoBitrate(videoQuality.getBitrate());
             data.setVideoPlaybackHeight(videoQuality.getHeight());
             data.setVideoPlaybackWidth(videoQuality.getWidth());
+            data.setVideoCodec(videoQuality.getCodec());
         }
 
 
