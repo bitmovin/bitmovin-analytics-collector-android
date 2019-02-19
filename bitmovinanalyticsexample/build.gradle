@@ -5,6 +5,11 @@ android {
     compileSdkVersion 27
 
 
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
 
     defaultConfig {
         applicationId "com.bitmovin.bitmovinanalyticsexample"
