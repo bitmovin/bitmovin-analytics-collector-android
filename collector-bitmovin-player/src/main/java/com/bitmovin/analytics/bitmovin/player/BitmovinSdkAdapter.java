@@ -158,7 +158,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         }
 
         //video quality
-        VideoQuality videoQuality = bitmovinPlayer.getVideoQuality();
+        VideoQuality videoQuality = bitmovinPlayer.getPlaybackVideoData();
         if (videoQuality != null) {
             data.setVideoBitrate(videoQuality.getBitrate());
             data.setVideoPlaybackHeight(videoQuality.getHeight());
