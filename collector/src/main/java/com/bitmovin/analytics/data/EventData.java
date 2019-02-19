@@ -62,6 +62,8 @@ public class EventData {
     private boolean isMuted = false;
     private int sequenceNumber = 0;
     private String platform = "android";
+    private String videoCodec;
+    private String audioCodec;
 
     public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId, String userAgent) {
         this.analyticsVersion = Util.getVersion();
@@ -323,6 +325,10 @@ public class EventData {
 
     public void setSequenceNumber(int sequenceNumber) { this.sequenceNumber = sequenceNumber; }
 
+    public void setVideoCodec(String videoCodec) { this.videoCodec = videoCodec; }
+
+    public void setAudioCodec(String audioCodec) { this.audioCodec = audioCodec; }
+
     public String getDomain() {
         return domain;
     }
@@ -554,4 +560,8 @@ public class EventData {
     public int getSequenceNumber() {
         return sequenceNumber;
     }
+
+    public String getVideoCodec() { return videoCodec; }
+
+    public String getAudioCodec() { return audioCodec; }
 }
