@@ -166,6 +166,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             data.setVideoCodec(videoQuality.getCodec());
         }
 
+        //audio quality
+        AudioQuality audioQuality = bitmovinPlayer.getAudioQuality();
+        if (audioQuality != null) {
+            data.setAudioBitrate(audioQuality.getBitrate());
+            data.setAudioCodec(audioQuality.getCodec());
+        }
+
 
         return data;
     }
