@@ -31,7 +31,7 @@ public class ExoUtil {
     }
     catch(NoSuchFieldException e) {}
     catch(IllegalAccessException e) {}
-    return "";
+    return "unknown";
   }
 
   public static String getUserAgent(Context context) {
