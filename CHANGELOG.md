@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Changed `title` property in payload to `videoTitle`
-- Exoplayer Collector incorrectly reported the exoplayer version it was built against instead of the version in use
+- In some cases the collector reported the player version it was compiled against, not the version in use (both Exoplayer and Bitmovin Player) 
 
 ## v1.4.2
 
