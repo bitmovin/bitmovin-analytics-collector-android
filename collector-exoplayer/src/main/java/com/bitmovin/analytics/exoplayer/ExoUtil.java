@@ -2,7 +2,11 @@ package com.bitmovin.analytics.exoplayer;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+
+import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Player;
+
+import java.lang.reflect.Field;
 
 public class ExoUtil {
   public static String exoStateToString(int state) {
@@ -18,6 +22,16 @@ public class ExoUtil {
       default:
         return "Unknown PlayerState";
     }
+  }
+
+  public static String getPlayerVersion() {
+    try {
+      Field versionField = ExoPlayerLibraryInfo.class.getField("VERSION");
+      return (String)versionField.get(null);
+    }
+    catch(NoSuchFieldException e) {}
+    catch(IllegalAccessException e) {}
+    return "";
   }
 
   public static String getUserAgent(Context context) {

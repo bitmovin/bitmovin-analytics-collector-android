@@ -234,7 +234,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         data.setLive(exoplayer.isCurrentWindowDynamic());
 
         //version
-        data.setVersion(ExoPlayerLibraryInfo.VERSION);
+        data.setVersion(ExoUtil.getPlayerVersion());
 
         //streamFormat, mpdUrl, and m3u8Url
         Object manifest = exoplayer.getCurrentManifest();
