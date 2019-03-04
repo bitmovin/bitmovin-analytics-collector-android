@@ -144,7 +144,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         data.setLive(bitmovinPlayer.isLive());
 
         //version
-        data.setVersion(com.bitmovin.player.BuildConfig.VERSION_NAME);
+        data.setVersion(BitmovinUtil.getPlayerVersion());
 
         //isCasting
         data.setCasting(bitmovinPlayer.isCasting());
