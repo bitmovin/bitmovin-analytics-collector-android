@@ -37,7 +37,7 @@ public class EventData {
     private String player;
     private String cdnProvider;
     private String videoId;
-    private String title;
+    private String videoTitle;
     private String customUserId;
     private String customData1;
     private String customData2;
@@ -62,13 +62,15 @@ public class EventData {
     private boolean isMuted = false;
     private int sequenceNumber = 0;
     private String platform = "android";
+    private String videoCodec;
+    private String audioCodec;
 
     public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId, String userAgent) {
         this.analyticsVersion = Util.getVersion();
         this.key = bitmovinAnalyticsConfig.getKey();
         this.playerKey = bitmovinAnalyticsConfig.getPlayerKey();
         this.videoId = bitmovinAnalyticsConfig.getVideoId();
-        this.title = bitmovinAnalyticsConfig.getTitle();
+        this.videoTitle = bitmovinAnalyticsConfig.getTitle();
         this.userId = Util.getUserId(bitmovinAnalyticsConfig.getContext());
         this.customUserId = bitmovinAnalyticsConfig.getCustomUserId();
         this.customData1 = bitmovinAnalyticsConfig.getCustomData1();
@@ -239,7 +241,7 @@ public class EventData {
         this.videoId = videoId;
     }
 
-    public void setTitle(String title) { this.title = title; }
+    public void setVideoTitle(String videoTitle) { this.videoTitle = videoTitle; }
 
     public void setCustomUserId(String customUserId) {
         this.customUserId = customUserId;
@@ -322,6 +324,10 @@ public class EventData {
     }
 
     public void setSequenceNumber(int sequenceNumber) { this.sequenceNumber = sequenceNumber; }
+
+    public void setVideoCodec(String videoCodec) { this.videoCodec = videoCodec; }
+
+    public void setAudioCodec(String audioCodec) { this.audioCodec = audioCodec; }
 
     public String getDomain() {
         return domain;
@@ -455,8 +461,8 @@ public class EventData {
         return videoId;
     }
 
-    public String getTitle() {
-        return title;
+    public String getVideoTitle() {
+        return videoTitle;
     }
 
     public String getCustomUserId() {
@@ -554,4 +560,8 @@ public class EventData {
     public int getSequenceNumber() {
         return sequenceNumber;
     }
+
+    public String getVideoCodec() { return videoCodec; }
+
+    public String getAudioCodec() { return audioCodec; }
 }

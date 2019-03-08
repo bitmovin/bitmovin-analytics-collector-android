@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
 def packageName = 'com.bitmovin.analytics'
-def libraryVersion = '1.4.2'
+def libraryVersion = '1.4.3'
 
 android {
 
@@ -13,7 +13,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 14
-        versionName "1.4.2"
+        versionName libraryVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -35,8 +35,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    api 'com.bitmovin.analytics:collector:1.4.2'
-    api 'com.bitmovin.player:playercore:2.+'
+    api 'com.bitmovin.analytics:collector:1.4.3'
+    implementation 'com.bitmovin.player:playercore:2.20.1'
 
 }
 

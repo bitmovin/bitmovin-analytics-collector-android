@@ -211,6 +211,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public EventData createEventData() {
         EventData data = new EventData(config, stateMachine.getImpressionId(), ExoUtil.getUserAgent(config.getContext()));
+        data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
         data.setPlayer(PlayerType.EXOPLAYER.toString());
         decorateDataWithPlaybackInformation(data);
         return data;
@@ -233,7 +234,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         data.setLive(exoplayer.isCurrentWindowDynamic());
 
         //version
-        data.setVersion(ExoPlayerLibraryInfo.VERSION);
+        data.setVersion(ExoUtil.getPlayerVersion());
 
         //streamFormat, mpdUrl, and m3u8Url
         Object manifest = exoplayer.getCurrentManifest();
