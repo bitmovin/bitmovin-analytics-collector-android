@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Development
+
+## v1.5.0
+
+### Added
+
+- Currently used Audio and Video Codec of playback
+
+### Fixed
+
+- Player (Bitmovin & Exo) version was reported incorrectly
+- Title was incorrectly named `title` instead of `videoTitle` in outgoing payload
+
 ## v1.4.3
 
 ### Added
