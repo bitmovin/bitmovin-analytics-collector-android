@@ -42,5 +42,5 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.8.1'
 
     // Pull from Maven Repo
-    implementation 'com.bitmovin.analytics:collector-exoplayer:1.4.3'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:1.5.0'
 }
