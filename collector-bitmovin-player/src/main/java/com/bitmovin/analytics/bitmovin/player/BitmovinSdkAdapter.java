@@ -119,7 +119,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             versionName = "?";
         }
 
-        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") " + "BitmovinPlayer/" + com.bitmovin.player.BuildConfig.VERSION_NAME;
+        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") " + "BitmovinPlayer/" + BitmovinUtil.getPlayerVersion();
     }
 
     @Override

@@ -7,18 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
-## v1.5.0
-
-### Added
-
-- Currently used Audio and Video Codec of playback
+## v1.5.1
 
 ### Fixed
 
-- Player (Bitmovin & Exo) version was reported incorrectly
-- Title was incorrectly named `title` instead of `videoTitle` in outgoing payload
+- In the `collector-bitmovin-player`, the `userAgent` contained the player version the collector was compiled against instead of the runtime version
 
-## v1.4.3
+## v1.5.0
 
 ### Added
 
