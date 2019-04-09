@@ -9,6 +9,7 @@ import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.LicenseCallback;
+import com.bitmovin.analytics.utils.Util;
 
 /**
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
@@ -70,6 +71,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
   public void onStartup(long duration) {
     Log.d(TAG, String.format("onStartup %s", playerStateMachine.getImpressionId()));
     EventData data = playerAdapter.createEventData();
+    data.setSupportedVideoCodecs(Util.getSupportedVideoFormats());
     data.setState("startup");
     data.setDuration(duration);
     data.setVideoStartupTime(duration);
