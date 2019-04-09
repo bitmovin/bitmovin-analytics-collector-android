@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+
+- `supportedVideoCodecs` in outgoing payload
+
 ## v1.5.1
 
 ### Fixed
