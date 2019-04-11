@@ -3,6 +3,8 @@ package com.bitmovin.analytics.data;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.utils.Util;
 
+import java.util.List;
+
 public class EventData {
     private String domain;
     private String path = "";
@@ -64,6 +66,7 @@ public class EventData {
     private String platform = "android";
     private String videoCodec;
     private String audioCodec;
+    private List<String> supportedVideoCodecs;
 
     public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId, String userAgent) {
         this.analyticsVersion = Util.getVersion();
@@ -329,6 +332,8 @@ public class EventData {
 
     public void setAudioCodec(String audioCodec) { this.audioCodec = audioCodec; }
 
+    public void setSupportedVideoCodecs(List<String> supportedVideoCodecs) { this.supportedVideoCodecs = supportedVideoCodecs; }
+
     public String getDomain() {
         return domain;
     }
@@ -564,4 +569,6 @@ public class EventData {
     public String getVideoCodec() { return videoCodec; }
 
     public String getAudioCodec() { return audioCodec; }
+
+    public List<String> getSupportedVideoCodec() { return supportedVideoCodecs; }
 }
