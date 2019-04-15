@@ -66,6 +66,7 @@ public class Util {
         return codecs;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isMimeTypeSupported(String mimeType) {
         int numCodecs = MediaCodecList.getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
