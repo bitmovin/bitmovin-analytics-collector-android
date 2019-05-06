@@ -74,7 +74,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
     }
 
-    private long getPosition() {
+    public long getPosition() {
         Timeline timeline = this.exoplayer.getCurrentTimeline();
         int currentWindowIndex = this.exoplayer.getCurrentWindowIndex();
         if (currentWindowIndex >= 0 && currentWindowIndex < timeline.getWindowCount()) {

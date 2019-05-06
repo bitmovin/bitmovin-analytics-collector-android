@@ -31,7 +31,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
    */
   public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
     this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
-    this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig);
+    this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
     this.playerStateMachine.addListener(this);
     this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this);
   }
@@ -153,8 +153,6 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     EventData data = playerAdapter.createEventData();
     data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
     data.setDuration(duration);
-    data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-    data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
 
     switch (playerStateMachine.getCurrentState()) {
       case PLAYING:
@@ -212,6 +210,13 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
   public void sendEventData(EventData data) {
     this.eventDataDispatcher.add(data);
+  }
+
+  public long getPosition() {
+    if(playerAdapter == null) {
+      return 0;
+    }
+    return playerAdapter.getPosition();
   }
 
   @Override
