@@ -179,7 +179,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         return data;
     }
 
-    private long getPosition() {
+    public long getPosition() {
         return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
     }
 

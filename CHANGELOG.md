@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+
+- `videoTimeStart` and `videoTimeEnd` were not set when sending out heartbeats
+
 ## v.1.6.0
 
 ### Added
