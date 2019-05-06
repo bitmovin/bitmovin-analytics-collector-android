@@ -153,7 +153,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     EventData data = playerAdapter.createEventData();
     data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
     data.setDuration(duration);
-    data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
+    data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
     data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
 
     switch (playerStateMachine.getCurrentState()) {
