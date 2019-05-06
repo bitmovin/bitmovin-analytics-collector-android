@@ -37,9 +37,8 @@ public class PlayerStateMachine {
             public void run() {
                 long currentTimestamp = Util.getTimeStamp();
                 long enterTimestamp = getOnEnterStateTimeStamp();
-
                 for (StateMachineListener listener : getListeners()) {
-                    listener.onHeartbeat(currentTimestamp - onEnterStateTimeStamp);
+                    listener.onHeartbeat(currentTimestamp - enterTimestamp);
                 }
                 onEnterStateTimeStamp = currentTimestamp;
                 heartbeatHandler.postDelayed(this, heartbeatDelay);
