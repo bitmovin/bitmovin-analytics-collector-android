@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - `videoTimeStart` and `videoTimeEnd` were not set when sending out heartbeats
+- Exoplayer Collector now reports `playerVersion` as `exoplayer-<SDK-version>`
+- Bitmovin Collector now reports `playerVersion` as `bitmovin-<SDK-version>`
 
 ## v.1.6.0
 
