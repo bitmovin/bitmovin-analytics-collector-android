@@ -74,7 +74,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
     }
 
-    private long getPosition() {
+    public long getPosition() {
         Timeline timeline = this.exoplayer.getCurrentTimeline();
         int currentWindowIndex = this.exoplayer.getCurrentWindowIndex();
         if (currentWindowIndex >= 0 && currentWindowIndex < timeline.getWindowCount()) {
@@ -234,7 +234,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         data.setLive(exoplayer.isCurrentWindowDynamic());
 
         //version
-        data.setVersion(ExoUtil.getPlayerVersion());
+        data.setVersion(PlayerType.EXOPLAYER.toString() + "-" + ExoUtil.getPlayerVersion());
 
         //streamFormat, mpdUrl, and m3u8Url
         Object manifest = exoplayer.getCurrentManifest();

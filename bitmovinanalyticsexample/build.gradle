@@ -50,6 +50,7 @@ dependencies {
     implementation 'com.bitmovin.player:playercore:2.+'
 
     // Pull from Maven Repo
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.6.0'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.6.1'
+    //implementation project(':collector-bitmovin-player')
 }
 

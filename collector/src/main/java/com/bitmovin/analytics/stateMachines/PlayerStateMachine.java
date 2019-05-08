@@ -3,6 +3,7 @@ package com.bitmovin.analytics.stateMachines;
 import android.os.Handler;
 import android.util.Log;
 
+import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.utils.Util;
@@ -25,9 +26,11 @@ public class PlayerStateMachine {
     private String impressionId;
     private Handler heartbeatHandler = new Handler();
     private int heartbeatDelay = 59700; // default to 60 seconds
+    private final BitmovinAnalytics analytics;
 
-    public PlayerStateMachine(BitmovinAnalyticsConfig config) {
+    public PlayerStateMachine(BitmovinAnalyticsConfig config, BitmovinAnalytics analytics) {
         this.config = config;
+        this.analytics = analytics;
         this.heartbeatDelay = this.config.getHeartbeatInterval();
         resetStateMachine();
     }
@@ -37,11 +40,12 @@ public class PlayerStateMachine {
             public void run() {
                 long currentTimestamp = Util.getTimeStamp();
                 long enterTimestamp = getOnEnterStateTimeStamp();
-
+                videoTimeEnd = analytics.getPosition();
                 for (StateMachineListener listener : getListeners()) {
-                    listener.onHeartbeat(currentTimestamp - onEnterStateTimeStamp);
+                    listener.onHeartbeat(currentTimestamp - enterTimestamp);
                 }
                 onEnterStateTimeStamp = currentTimestamp;
+                videoTimeStart = videoTimeEnd;
                 heartbeatHandler.postDelayed(this, heartbeatDelay);
             }
         }, heartbeatDelay);

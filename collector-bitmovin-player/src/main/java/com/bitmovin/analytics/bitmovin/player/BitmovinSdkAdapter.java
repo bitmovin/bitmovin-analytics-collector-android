@@ -144,7 +144,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         data.setLive(bitmovinPlayer.isLive());
 
         //version
-        data.setVersion(BitmovinUtil.getPlayerVersion());
+        data.setVersion(PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.getPlayerVersion());
 
         //isCasting
         data.setCasting(bitmovinPlayer.isCasting());
@@ -179,7 +179,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         return data;
     }
 
-    private long getPosition() {
+    public long getPosition() {
         return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
     }
 
