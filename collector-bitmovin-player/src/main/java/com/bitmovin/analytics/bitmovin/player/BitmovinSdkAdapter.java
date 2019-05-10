@@ -42,6 +42,7 @@ import com.bitmovin.player.api.event.listener.OnSourceUnloadedListener;
 import com.bitmovin.player.api.event.listener.OnStallEndedListener;
 import com.bitmovin.player.api.event.listener.OnStallStartedListener;
 import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener;
+import com.bitmovin.player.config.media.SourceItem;
 import com.bitmovin.player.config.quality.AudioQuality;
 import com.bitmovin.player.config.quality.VideoQuality;
 
@@ -150,12 +151,32 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         data.setCasting(bitmovinPlayer.isCasting());
 
         //streamFormat, mpdUrl, and m3u8Url
-        if (bitmovinPlayer.getConfig() != null && bitmovinPlayer.getConfig().getSourceItem() != null && bitmovinPlayer.getConfig().getSourceItem().getDashSource() != null) {
-            data.setMpdUrl(bitmovinPlayer.getConfig().getSourceItem().getDashSource().getUrl());
-            data.setStreamFormat(Util.DASH_STREAM_FORMAT);
-        } else if (bitmovinPlayer.getConfig() != null && bitmovinPlayer.getConfig().getSourceItem() != null && bitmovinPlayer.getConfig().getSourceItem().getHlsSource() != null) {
-            data.setM3u8Url(bitmovinPlayer.getConfig().getSourceItem().getHlsSource().getUrl());
-            data.setStreamFormat(Util.HLS_STREAM_FORMAT);
+        if (bitmovinPlayer.getConfig() != null && bitmovinPlayer.getConfig().getSourceItem() != null)
+        {
+             SourceItem sourceItem = bitmovinPlayer.getConfig().getSourceItem();
+             switch (sourceItem.getType()) {
+                 case HLS:
+                     if(sourceItem.getHlsSource() != null) {
+                         data.setM3u8Url(sourceItem.getHlsSource().getUrl());
+                     }
+                     data.setStreamFormat(Util.HLS_STREAM_FORMAT);
+                     break;
+                 case DASH:
+                     if(sourceItem.getDashSource() != null) {
+                         data.setMpdUrl(sourceItem.getDashSource().getUrl());
+                     }
+                     data.setStreamFormat(Util.DASH_STREAM_FORMAT);
+                     break;
+                 case PROGRESSIVE:
+                     if(sourceItem.getProgressiveSources() != null && sourceItem.getProgressiveSources().size() > 0) {
+                         data.setM3u8Url(sourceItem.getProgressiveSources().get(0).getUrl());
+                     }
+                     data.setStreamFormat(Util.PROGRESSIVE_STREAM_FORMAT);
+                     break;
+                 case SMOOTH:
+                     data.setStreamFormat(Util.SMOOTH_STREAM_FORMAT);
+                     break;
+             }
         }
 
         //video quality

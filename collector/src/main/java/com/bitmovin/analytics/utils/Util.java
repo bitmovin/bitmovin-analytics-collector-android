@@ -18,6 +18,8 @@ import java.util.UUID;
 public class Util {
     public static final String DASH_STREAM_FORMAT = "dash";
     public static final String HLS_STREAM_FORMAT = "hls";
+    public static final String PROGRESSIVE_STREAM_FORMAT = "progressive";
+    public static final String SMOOTH_STREAM_FORMAT = "smooth";
     public static final int MILLISECONDS_IN_SECONDS = 1000;
 
     private static final Map<String, String> VIDEO_FORMAT_MIME_TYPE_MAP;
