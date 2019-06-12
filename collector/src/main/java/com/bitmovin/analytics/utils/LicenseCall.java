@@ -37,19 +37,20 @@ public class LicenseCall {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response != null) {
-                    LicenseResponse licenseResponse = DataSerializer.deserialize(response.body().string(), LicenseResponse.class);
-                    if (licenseResponse != null && licenseResponse.getStatus().equals("granted")) {
-                        Log.d(TAG, "License response was granted");
-                        callback.authenticationCompleted(true);
-                        return;
-                    }
-                    Log.d(TAG, String.format("License response was denied: %s", licenseResponse.getMessage()));
-                }
-                else {
+                if (response == null) {
                     Log.d(TAG, "License call was denied without providing a response body");
+                    callback.authenticationCompleted(false);
+                    return;
                 }
-                callback.authenticationCompleted(false);
+
+                LicenseResponse licenseResponse = DataSerializer.deserialize(response.body().string(), LicenseResponse.class);
+                if (licenseResponse != null && licenseResponse.getStatus().equals("granted")) {
+                    Log.d(TAG, "License response was granted");
+                    callback.authenticationCompleted(true);
+                    return;
+                }
+                Log.d(TAG, String.format("License response was denied: %s", licenseResponse.getMessage()));
+
             }
         });
 
