@@ -31,7 +31,7 @@ public class LicenseCall {
         httpClient.post(json, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.d(TAG, "License call was denied", e);
+                Log.d(TAG, "License call failed due to connectivity issues", e);
                 callback.authenticationCompleted(false);
             }
 
