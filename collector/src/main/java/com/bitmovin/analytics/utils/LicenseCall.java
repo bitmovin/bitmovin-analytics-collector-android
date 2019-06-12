@@ -31,25 +31,38 @@ public class LicenseCall {
         httpClient.post(json, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.d(TAG, "License call was denied", e);
+                Log.d(TAG, "License call failed due to connectivity issues", e);
                 callback.authenticationCompleted(false);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response != null) {
-                    LicenseResponse licenseResponse = DataSerializer.deserialize(response.body().string(), LicenseResponse.class);
-                    if (licenseResponse != null && licenseResponse.getStatus().equals("granted")) {
-                        Log.d(TAG, "License response was granted");
-                        callback.authenticationCompleted(true);
-                        return;
-                    }
-                    Log.d(TAG, String.format("License response was denied: %s", licenseResponse.getMessage()));
-                }
-                else {
+                if (response == null || response.body() == null) {
                     Log.d(TAG, "License call was denied without providing a response body");
+                    callback.authenticationCompleted(false);
+                    return;
                 }
-                callback.authenticationCompleted(false);
+
+                LicenseResponse licenseResponse = DataSerializer.deserialize(response.body().string(), LicenseResponse.class);
+                if (licenseResponse == null) {
+                    Log.d(TAG, "License call was denied without providing a response body");
+                    callback.authenticationCompleted(false);
+                    return;
+                }
+
+                if (licenseResponse.getStatus() == null) {
+                    Log.d(TAG, String.format("License response was denied without status"));
+                    callback.authenticationCompleted(false);
+                    return;
+                }
+
+                if (!licenseResponse.getStatus().equals("granted")) {
+                    Log.d(TAG, String.format("License response was denied: %s", licenseResponse.getMessage()));
+                    callback.authenticationCompleted(false);
+                    return;
+                }
+                Log.d(TAG, "License response was granted");
+                callback.authenticationCompleted(true);
             }
         });
 
