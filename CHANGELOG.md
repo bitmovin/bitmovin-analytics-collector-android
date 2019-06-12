@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+
+- Fixed a possible NullPointerException if the licensing backend responded with a malformed message that didn't contain a message
+
 ## v1.6.2
 
 ### Fixed
