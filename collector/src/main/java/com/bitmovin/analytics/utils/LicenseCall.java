@@ -50,6 +50,12 @@ public class LicenseCall {
                     return;
                 }
 
+                if (licenseResponse.getStatus() == null) {
+                    Log.d(TAG, String.format("License response was denied without status"));
+                    callback.authenticationCompleted(false);
+                    return;
+                }
+
                 if (!licenseResponse.getStatus().equals("granted")) {
                     Log.d(TAG, String.format("License response was denied: %s", licenseResponse.getMessage()));
                     callback.authenticationCompleted(false);
