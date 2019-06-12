@@ -47,16 +47,13 @@ public class HttpClient {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                try {
-                    if (response != null) {
-                        Log.i(TAG, String.format("Analytics HTTP response: %d", response.code()));
-                    }
-                    if (callback != null) {
-                        callback.onResponse(call, response);
-                    }
-                } finally {
-                    response.close();
+                if (response != null) {
+                    Log.i(TAG, String.format("Analytics HTTP response: %d", response.code()));
                 }
+                if (callback != null) {
+                    callback.onResponse(call, response);
+                }
+                response.close();
             }
         });
     }
