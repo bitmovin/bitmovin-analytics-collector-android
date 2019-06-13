@@ -22,7 +22,7 @@ For Bitmovin Player:
 
 ```
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.6.2'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.6.3'
 
 }
 ```
@@ -31,7 +31,7 @@ For ExoPlayer:
 
 ```
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:1.6.2'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:1.6.3'
 }
 ```
 
