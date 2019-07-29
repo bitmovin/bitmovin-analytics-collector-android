@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected void initializeAnalytics() {
         //Step 1: Create your analytics config object
-        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>", "<YOUR_PLAYER_KEY>", getApplicationContext());
+        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>", "<YOUR_PLAYER_KEY>");
 
         //Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
 
         //Step 3: Create Analytics Collector
-        bitmovinAnalytics = new BitmovinPlayerCollector(bitmovinAnalyticsConfig);
+        bitmovinAnalytics = new BitmovinPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
     }
 
 

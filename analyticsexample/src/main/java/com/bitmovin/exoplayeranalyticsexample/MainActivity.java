@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     buildHttpDataSourceFactory(bandwidthMeter));
 
             //Step 1: Create your analytics config object
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>", getApplicationContext());
+            BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>");
 
             //Step 2: Add optional parameters
             bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //Step 3: Create Analytics Colelctor
             ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(
-                bitmovinAnalyticsConfig);
+                bitmovinAnalyticsConfig, getApplicationContext());
 
             //Step 4: Attach ExoPlayer
             bitmovinAnalytics.attachPlayer(player);
