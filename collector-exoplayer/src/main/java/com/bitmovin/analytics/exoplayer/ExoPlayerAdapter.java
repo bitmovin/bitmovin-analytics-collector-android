@@ -1,5 +1,6 @@
-package com.bitmovin.analytics.exoplayer;
 
+
+import android.content.Context;
 import android.net.NetworkInfo;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -44,17 +45,18 @@ import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener {
     private static final String TAG = "ExoPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
+    private final Context context;
     private ExoPlayer exoplayer;
     private PlayerStateMachine stateMachine;
     private int totalDroppedVideoFrames;
 
-    public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, PlayerStateMachine stateMachine) {
+    public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
         this.config = config;
         this.totalDroppedVideoFrames = 0;
-
+        this.context = context;
         attachAnalyticsListener();
     }
 
@@ -211,7 +213,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public EventData createEventData() {
-        EventData data = new EventData(config, stateMachine.getImpressionId(), ExoUtil.getUserAgent(config.getContext()));
+        EventData data = new EventData(config, context, stateMachine.getImpressionId(), ExoUtil.getUserAgent(this.context));
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
         data.setPlayer(PlayerType.EXOPLAYER.toString());
         decorateDataWithPlaybackInformation(data);
