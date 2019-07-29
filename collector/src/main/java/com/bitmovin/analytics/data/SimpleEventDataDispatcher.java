@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.data;
 
+import android.content.Context;
+
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
@@ -18,14 +20,16 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     private boolean enabled = false;
     private BitmovinAnalyticsConfig config;
     private LicenseCallback callback;
+    private Context context;
 
     private int sampleSequenceNumber = 0;
 
-    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, LicenseCallback callback) {
+    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, LicenseCallback callback) {
         this.data = new ConcurrentLinkedQueue<EventData>();
-        this.httpClient = new HttpClient(config.getContext(), BitmovinAnalyticsConfig.analyticsUrl);
+        this.httpClient = new HttpClient(context, config.getAnalyticsUrl());
         this.config = config;
         this.callback = callback;
+        this.context = context;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
 
     @Override
     public void enable() {
-        LicenseCall licenseCall = new LicenseCall(config);
+        LicenseCall licenseCall = new LicenseCall(config, context);
         licenseCall.authenticate(this);
     }
 

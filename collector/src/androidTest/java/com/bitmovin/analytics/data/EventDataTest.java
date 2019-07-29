@@ -22,11 +22,11 @@ public class EventDataTest {
     public void setUp() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2", appContext);
+        bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2");
         bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.AKAMAI);
         bitmovinAnalyticsConfig.setVideoId("video1234");
 
-        eventData = new EventData(bitmovinAnalyticsConfig, "1234", "user agent");
+        eventData = new EventData(bitmovinAnalyticsConfig, appContext,"1234", "user agent");
     }
 
     @Test

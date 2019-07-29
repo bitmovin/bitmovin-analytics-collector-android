@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.utils;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
@@ -15,18 +16,20 @@ import okhttp3.Response;
 public class LicenseCall {
     private static final String TAG = "BitmovinAnalytics";
     private BitmovinAnalyticsConfig config;
+    private Context context;
     private HttpClient httpClient;
 
-    public LicenseCall(BitmovinAnalyticsConfig config) {
+    public LicenseCall(BitmovinAnalyticsConfig config, Context context) {
         this.config = config;
-        this.httpClient = new HttpClient(config.getContext(), BitmovinAnalyticsConfig.licenseUrl);
+        this.context = context;
+        this.httpClient = new HttpClient(context, config.getLicenseUrl());
     }
 
     public void authenticate(final LicenseCallback callback) {
         LicenseCallData data = new LicenseCallData();
         data.setKey(config.getKey());
         data.setAnalyticsVersion(Util.getVersion());
-        data.setDomain(config.getContext().getPackageName());
+        data.setDomain(context.getPackageName());
         String json = DataSerializer.serialize(data);
         httpClient.post(json, new Callback() {
             @Override

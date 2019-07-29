@@ -1,44 +1,100 @@
 package com.bitmovin.analytics;
 
-import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 
-public class BitmovinAnalyticsConfig {
-    public static final String analyticsUrl = "https://analytics-ingress-global.bitmovin.com/analytics";
-    public static final String licenseUrl = "https://analytics-ingress-global.bitmovin.com/licensing";
-
-    private String key;
-    private String playerKey;
+public class BitmovinAnalyticsConfig implements Parcelable {
+    private String analyticsUrl = "https://analytics-ingress-global.bitmovin.com/analytics";
     private String cdnProvider;
-    private String videoId;
-    private PlayerType playerType;
-    private String customUserId;
     private String customData1;
     private String customData2;
     private String customData3;
     private String customData4;
     private String customData5;
-    private String title;
+    private String customUserId;
     private String experimentName;
-    private String path;
-    private Context context;
     private int heartbeatInterval = 59700;
+    private String licenseUrl = "https://analytics-ingress-global.bitmovin.com/licensing";
+    private String key;
+    private String title;
+    private String path;
+    private String playerKey;
+    private PlayerType playerType;
+    private String videoId;
 
-    public BitmovinAnalyticsConfig(String key, Context context) {
+    public static final Creator<BitmovinAnalyticsConfig> CREATOR = new Creator<BitmovinAnalyticsConfig>() {
+        @Override
+        public BitmovinAnalyticsConfig createFromParcel(Parcel in) {
+            return new BitmovinAnalyticsConfig(in);
+        }
+
+        @Override
+        public BitmovinAnalyticsConfig[] newArray(int size) {
+            return new BitmovinAnalyticsConfig[size];
+        }
+    };
+
+
+    public BitmovinAnalyticsConfig(String key) {
         this.key = key;
         this.playerKey = "";
-        this.context = context;
     }
 
-    public BitmovinAnalyticsConfig(String key, String playerKey, Context context) {
+    public BitmovinAnalyticsConfig(String key, String playerKey) {
         this.key = key;
         this.playerKey = playerKey;
-        this.context = context;
     }
 
-    public static String getAnalyticsUrl() {
+    protected BitmovinAnalyticsConfig(Parcel in) {
+        analyticsUrl = in.readString();
+        cdnProvider = in.readString();
+        customData1 = in.readString();
+        customData2 = in.readString();
+        customData3 = in.readString();
+        customData4 = in.readString();
+        customData5 = in.readString();
+        customUserId = in.readString();
+        experimentName = in.readString();
+        heartbeatInterval = in.readInt();
+        licenseUrl = in.readString();
+        key = in.readString();
+        title = in.readString();
+        path = in.readString();
+        playerKey = in.readString();
+        playerType = in.readParcelable(PlayerType.class.getClassLoader());
+        videoId = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(analyticsUrl);
+        dest.writeString(cdnProvider);
+        dest.writeString(customData1);
+        dest.writeString(customData2);
+        dest.writeString(customData3);
+        dest.writeString(customData4);
+        dest.writeString(customData5);
+        dest.writeString(customUserId);
+        dest.writeString(experimentName);
+        dest.writeInt(heartbeatInterval);
+        dest.writeString(licenseUrl);
+        dest.writeString(key);
+        dest.writeString(title);
+        dest.writeString(path);
+        dest.writeString(playerKey);
+        dest.writeParcelable(playerType, flags);
+        dest.writeString(videoId);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public String getAnalyticsUrl() {
         return analyticsUrl;
     }
 
@@ -154,21 +210,13 @@ public class BitmovinAnalyticsConfig {
         this.customData5 = customData5;
     }
 
-    public Context getContext() {
-        return context;
-    }
-
-    /* Android Context. Needed to grab the package name, application name, device information, ANDROID_ID, and window information */
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
     public String getExperimentName() {
         return experimentName;
     }
 
     /**
      * Human readable title of the video asset currently playing
+     *
      * @return
      */
     public String getTitle() {
@@ -177,6 +225,7 @@ public class BitmovinAnalyticsConfig {
 
     /**
      * Human readable title of the video asset currently playing
+     *
      * @param title
      */
     public void setTitle(String title) {
@@ -227,5 +276,13 @@ public class BitmovinAnalyticsConfig {
      */
     public void setHeartbeatInterval(int heartbeatInterval) {
         this.heartbeatInterval = heartbeatInterval;
+    }
+
+    public String getLicenseUrl() {
+        return licenseUrl;
+    }
+
+    public void setLicenseUrl(String licenseUrl) {
+        this.licenseUrl = licenseUrl;
     }
 }
