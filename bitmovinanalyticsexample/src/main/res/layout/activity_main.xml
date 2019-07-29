@@ -12,9 +12,7 @@
         android:id="@+id/bitmovinPlayerView"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-
-    </com.bitmovin.player.BitmovinPlayerView>
+        android:layout_alignParentStart="true"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,6 +29,14 @@
             android:layout_height="wrap_content"
             android:text="Create"
             />
+
+        <Button
+            android:id="@+id/change_source"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button" />
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

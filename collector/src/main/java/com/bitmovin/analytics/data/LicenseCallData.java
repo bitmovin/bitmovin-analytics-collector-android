@@ -22,5 +22,8 @@ public class LicenseCallData {
     }
 
 
+    public String getKey() {
+        return key;
+    }
 }
 

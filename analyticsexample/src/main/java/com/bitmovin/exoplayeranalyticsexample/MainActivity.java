@@ -92,9 +92,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalyticsConfig.setPath("/vod/new/");
             bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
 
-            //Step 3: Create Analytics Colelctor
-            ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(
-                bitmovinAnalyticsConfig);
+            //Step 3: Create Analytics Collector
+            ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig);
 
             //Step 4: Attach ExoPlayer
             bitmovinAnalytics.attachPlayer(player);

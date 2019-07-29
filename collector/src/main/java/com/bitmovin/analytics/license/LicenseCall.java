@@ -1,10 +1,15 @@
-package com.bitmovin.analytics.utils;
+package com.bitmovin.analytics.license;
 
+import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.LicenseCallData;
 import com.bitmovin.analytics.data.LicenseResponse;
+import com.bitmovin.analytics.utils.DataSerializer;
+import com.bitmovin.analytics.utils.HttpClient;
+import com.bitmovin.analytics.utils.Util;
 
 import java.io.IOException;
 
@@ -13,20 +18,24 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class LicenseCall {
-    private static final String TAG = "BitmovinAnalytics";
+    private static final String TAG = "LicenseCall";
     private BitmovinAnalyticsConfig config;
+    private Context context;
     private HttpClient httpClient;
 
-    public LicenseCall(BitmovinAnalyticsConfig config) {
+    public LicenseCall(BitmovinAnalyticsConfig config, Context context) {
         this.config = config;
-        this.httpClient = new HttpClient(config.getContext(), BitmovinAnalyticsConfig.licenseUrl);
+        this.context = context;
+        String backendUrl = Uri.parse(config.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
+        Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl));
+        this.httpClient = new HttpClient(context, backendUrl);
     }
 
     public void authenticate(final LicenseCallback callback) {
-        LicenseCallData data = new LicenseCallData();
-        data.setKey(config.getKey());
+        final LicenseCallData data = new LicenseCallData();
+        data.setKey(this.config.getKey());
         data.setAnalyticsVersion(Util.getVersion());
-        data.setDomain(config.getContext().getPackageName());
+        data.setDomain(context.getPackageName());
         String json = DataSerializer.serialize(data);
         httpClient.post(json, new Callback() {
             @Override
@@ -43,7 +52,8 @@ public class LicenseCall {
                     return;
                 }
 
-                LicenseResponse licenseResponse = DataSerializer.deserialize(response.body().string(), LicenseResponse.class);
+                String licensingResponseBody = response.body().string();
+                LicenseResponse licenseResponse = DataSerializer.deserialize(licensingResponseBody, LicenseResponse.class);
                 if (licenseResponse == null) {
                     Log.d(TAG, "License call was denied without providing a response body");
                     callback.authenticationCompleted(false);
