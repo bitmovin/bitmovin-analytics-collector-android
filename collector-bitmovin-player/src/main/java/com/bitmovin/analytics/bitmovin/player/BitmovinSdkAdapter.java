@@ -249,7 +249,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             Log.d(TAG, "On Pause Listener");
             //Do not transition to a paused state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times
             if (stateMachine.getFirstReadyTimestamp() != 0) {
-                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                stateMachine.transitionState(PlayerState.PAUSE, getPosition());
             }
         }
     };
