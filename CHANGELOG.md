@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+
+- `BitmovinSdkAdapter` didn't transition to the `pause` state on a pause event
+
 ## v1.6.3
 
 ### Fixed
