@@ -319,7 +319,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private OnDroppedVideoFramesListener onDroppedVideoFramesListener = new OnDroppedVideoFramesListener() {
         @Override
         public void onDroppedVideoFrames(DroppedVideoFramesEvent droppedVideoFramesEvent) {
-            Log.d(TAG, "On Dropped Video Frames");
             totalDroppedVideoFrames += droppedVideoFramesEvent.getDroppedFrames();
         }
     };

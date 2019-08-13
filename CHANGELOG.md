@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Fixed
 
-- DroppedFrames always 0
+- `droppedFrames` was not collected
 
 
 ## v1.6.3
