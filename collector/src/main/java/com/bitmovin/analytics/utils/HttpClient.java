@@ -17,7 +17,7 @@ public class HttpClient {
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
     private static final String TAG = "HttpClient";
-    private final OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client = null;
     private Context context;
     private String url;
 
@@ -26,7 +26,11 @@ public class HttpClient {
         this.context = context;
     }
 
+
     public void post(String postBody, final Callback callback) {
+        if (client == null) {
+            client = new OkHttpClient();
+        }
 
         Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody));
         Request request = new Request.Builder()
