@@ -5,8 +5,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
 
-import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.PlayerType;
@@ -15,7 +15,6 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -47,12 +46,14 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private final BitmovinAnalyticsConfig config;
     private ExoPlayer exoplayer;
     private PlayerStateMachine stateMachine;
+    private int totalDroppedVideoFrames;
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
         this.config = config;
+        this.totalDroppedVideoFrames = 0;
 
         attachAnalyticsListener();
     }
@@ -235,6 +236,10 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
         //version
         data.setVersion(PlayerType.EXOPLAYER.toString() + "-" + ExoUtil.getPlayerVersion());
+
+        // DroppedVideoFrames
+        data.setDroppedFrames(this.totalDroppedVideoFrames);
+        this.totalDroppedVideoFrames = 0;
 
         //streamFormat, mpdUrl, and m3u8Url
         Object manifest = exoplayer.getCurrentManifest();
@@ -437,7 +442,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public void onDroppedVideoFrames(EventTime eventTime, int droppedFrames, long elapsedMs) {
-        Log.d(TAG, String.format("OnDroppedFrames: %d over %d", droppedFrames, elapsedMs));
+        this.totalDroppedVideoFrames += droppedFrames;
     }
 
     @Override

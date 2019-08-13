@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## Fixed
+
+- `droppedFrames` was not collected
+
+
 ## v1.6.3
 
 ### Fixed
