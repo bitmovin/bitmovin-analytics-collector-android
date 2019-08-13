@@ -68,6 +68,9 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         videoId = in.readString();
     }
 
+    public BitmovinAnalyticsConfig() {
+    }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(analyticsUrl);
