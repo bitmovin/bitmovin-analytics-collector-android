@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## Fixed
+
+- DroppedFrames always 0
+
+
 ## v1.6.3
 
 ### Fixed
