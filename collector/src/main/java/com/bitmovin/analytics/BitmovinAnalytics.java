@@ -11,14 +11,14 @@ import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.license.DefaultLicenseProvider;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
-import com.bitmovin.analytics.license.OnAuthCompleted;
+import com.bitmovin.analytics.license.OnLicenseValidated;
 import com.bitmovin.analytics.utils.Util;
 
 /**
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener, OnAuthCompleted {
+public class BitmovinAnalytics implements StateMachineListener, OnLicenseValidated {
 
     private static final String TAG = "BitmovinAnalytics";
 
@@ -227,7 +227,7 @@ public class BitmovinAnalytics implements StateMachineListener, OnAuthCompleted 
     }
 
     @Override
-    public void authenticationCompleted(boolean success, String key) {
+    public void validationCompleted(boolean success, String key) {
         if (!success) {
             detachPlayer();
         }

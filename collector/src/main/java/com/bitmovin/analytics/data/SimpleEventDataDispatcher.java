@@ -7,13 +7,13 @@ import com.bitmovin.analytics.license.LicenseProvider;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
 import com.bitmovin.analytics.license.LicenseCall;
-import com.bitmovin.analytics.license.OnAuthCompleted;
+import com.bitmovin.analytics.license.OnLicenseValidated;
 
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnAuthCompleted {
+public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnLicenseValidated {
     private static final String TAG = "SimpleDispatcher";
     private final LicenseProvider licenseProvider;
 
@@ -21,12 +21,12 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnAuthCo
     private HttpClient httpClient;
     private boolean enabled = false;
     private BitmovinAnalyticsConfig config;
-    private OnAuthCompleted callback;
+    private OnLicenseValidated callback;
     private Context context;
 
     private int sampleSequenceNumber = 0;
 
-    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, OnAuthCompleted callback, LicenseProvider licenseProvider) {
+    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, OnLicenseValidated callback, LicenseProvider licenseProvider) {
         this.licenseProvider = licenseProvider;
         this.data = new ConcurrentLinkedQueue<EventData>();
         this.httpClient = new HttpClient(context, config.getAnalyticsUrl());
@@ -36,7 +36,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnAuthCo
     }
 
     @Override
-    synchronized public void authenticationCompleted(boolean success, String key) {
+    synchronized public void validationCompleted(boolean success, String key) {
         if (success) {
             enabled = true;
             Iterator<EventData> it = data.iterator();
@@ -49,7 +49,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnAuthCo
         }
 
         if(callback != null) {
-            callback.authenticationCompleted(success, key);
+            callback.validationCompleted(success, key);
         }
     }
 
