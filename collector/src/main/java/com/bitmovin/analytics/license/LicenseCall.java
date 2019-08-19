@@ -21,19 +21,19 @@ public class LicenseCall {
     private BitmovinAnalyticsConfig config;
     private Context context;
     private HttpClient httpClient;
-    private Licenser licenser;
+    private LicenseProvider licenseProvider;
 
-    public LicenseCall(BitmovinAnalyticsConfig config, Context context, Licenser licenser) {
+    public LicenseCall(BitmovinAnalyticsConfig config, Context context, LicenseProvider licenseProvider) {
         this.config = config;
         this.context = context;
-        this.licenser = licenser;
+        this.licenseProvider = licenseProvider;
         this.httpClient = new HttpClient(context, config.getLicenseUrl());
     }
 
     private String getLicenseKeyForChecking(){
         String key = config.getKey();
         if (key == null || key.isEmpty()){
-            key = licenser.getAnalyticsLicense();
+            key = licenseProvider.getAnalyticsLicense();
         }
         return key;
     }

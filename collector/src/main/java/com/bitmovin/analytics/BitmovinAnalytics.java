@@ -8,8 +8,7 @@ import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
-import com.bitmovin.analytics.license.DefaultLicenser;
-import com.bitmovin.analytics.license.Licenser;
+import com.bitmovin.analytics.license.DefaultLicenseProvider;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.license.OnAuthCompleted;
@@ -28,7 +27,7 @@ public class BitmovinAnalytics implements StateMachineListener, OnAuthCompleted 
     protected PlayerStateMachine playerStateMachine;
     protected IEventDataDispatcher eventDataDispatcher;
     protected Context context;
-    protected DefaultLicenser licenser;
+    protected DefaultLicenseProvider licenser;
 
     /**
      * Bitmovin Analytics
@@ -38,7 +37,7 @@ public class BitmovinAnalytics implements StateMachineListener, OnAuthCompleted 
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
         this.context = context;
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
-        this.licenser = new DefaultLicenser();
+        this.licenser = new DefaultLicenseProvider();
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
         this.playerStateMachine.addListener(this);
         this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this, licenser);

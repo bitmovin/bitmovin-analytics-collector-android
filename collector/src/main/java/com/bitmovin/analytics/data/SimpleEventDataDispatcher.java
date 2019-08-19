@@ -3,7 +3,7 @@ package com.bitmovin.analytics.data;
 import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.license.Licenser;
+import com.bitmovin.analytics.license.LicenseProvider;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
 import com.bitmovin.analytics.license.LicenseCall;
@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnAuthCompleted {
     private static final String TAG = "SimpleDispatcher";
-    private final Licenser licenser;
+    private final LicenseProvider licenseProvider;
 
     private Queue<EventData> data;
     private HttpClient httpClient;
@@ -26,8 +26,8 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnAuthCo
 
     private int sampleSequenceNumber = 0;
 
-    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, OnAuthCompleted callback, Licenser licenser) {
-        this.licenser = licenser;
+    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, OnAuthCompleted callback, LicenseProvider licenseProvider) {
+        this.licenseProvider = licenseProvider;
         this.data = new ConcurrentLinkedQueue<EventData>();
         this.httpClient = new HttpClient(context, config.getAnalyticsUrl());
         this.config = config;
@@ -42,7 +42,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnAuthCo
             Iterator<EventData> it = data.iterator();
             while (it.hasNext()) {
                 EventData eventData = it.next();
-                eventData.setKey(licenser.getAnalyticsLicense());
+                eventData.setKey(licenseProvider.getAnalyticsLicense());
                 this.httpClient.post(DataSerializer.serialize(eventData), null);
                 it.remove();
             }
@@ -55,7 +55,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnAuthCo
 
     @Override
     public void enable() {
-        LicenseCall licenseCall = new LicenseCall(config, context, licenser);
+        LicenseCall licenseCall = new LicenseCall(config, context, licenseProvider);
         licenseCall.authenticate(this);
     }
 
@@ -69,7 +69,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnAuthCo
     @Override
     public void add(EventData eventData) {
         eventData.setSequenceNumber(this.sampleSequenceNumber++);
-        eventData.setKey(licenser.getAnalyticsLicense());
+        eventData.setKey(licenseProvider.getAnalyticsLicense());
         if (enabled) {
             this.httpClient.post(DataSerializer.serialize(eventData), null);
         } else {

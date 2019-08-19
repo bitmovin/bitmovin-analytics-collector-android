@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.license;
 
-public class DefaultLicenser implements OnAuthCompleted, Licenser {
+public class DefaultLicenseProvider implements OnAuthCompleted, LicenseProvider {
     private String analyticsLicense;
 
     @Override

@@ -1,5 +1,5 @@
 package com.bitmovin.analytics.license;
 
-public interface Licenser {
+public interface LicenseProvider {
     String getAnalyticsLicense();
 }
