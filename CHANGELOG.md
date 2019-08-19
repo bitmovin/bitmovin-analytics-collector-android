@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- `BitmovinAnalyticsConfig` is serializable now. `Context` is now passed seperately where needed.
 - `BitmovinSdkAdapter` didn't transition to the `pause` state on a pause event
 - `droppedFrames` was not collected
 
