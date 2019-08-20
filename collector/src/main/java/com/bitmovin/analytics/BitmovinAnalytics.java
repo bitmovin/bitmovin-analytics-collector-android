@@ -33,6 +33,7 @@ public class BitmovinAnalytics implements StateMachineListener, OnLicenseValidat
      * Bitmovin Analytics
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
+     * @param context {@link Context}
      */
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
         this.context = context;
@@ -41,6 +42,16 @@ public class BitmovinAnalytics implements StateMachineListener, OnLicenseValidat
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
         this.playerStateMachine.addListener(this);
         this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this, licenser);
+    }
+
+    /**
+     * Bitmovin Analytics
+     *
+     * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
+     */
+    @Deprecated
+    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
+        this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
     }
 
     /**

@@ -1,4 +1,4 @@
-
+package com.bitmovin.analytics.exoplayer;
 
 import android.content.Context;
 import android.net.NetworkInfo;

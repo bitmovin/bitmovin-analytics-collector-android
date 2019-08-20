@@ -1,5 +1,6 @@
 package com.bitmovin.analytics;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -24,6 +25,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private String playerKey;
     private PlayerType playerType;
     private String videoId;
+    private Context context;
 
     public static final Creator<BitmovinAnalyticsConfig> CREATOR = new Creator<BitmovinAnalyticsConfig>() {
         @Override
@@ -36,6 +38,19 @@ public class BitmovinAnalyticsConfig implements Parcelable {
             return new BitmovinAnalyticsConfig[size];
         }
     };
+
+    @Deprecated
+    public BitmovinAnalyticsConfig(String key, Context context) {
+        this(key);
+        this.context = context;
+    }
+
+    @Deprecated
+    public BitmovinAnalyticsConfig(String key, String playerKey, Context context) {
+        this(key, playerKey);
+        this.context = context;
+    }
+
 
 
     public BitmovinAnalyticsConfig(String key) {
@@ -287,5 +302,9 @@ public class BitmovinAnalyticsConfig implements Parcelable {
 
     public void setLicenseUrl(String licenseUrl) {
         this.licenseUrl = licenseUrl;
+    }
+
+    public Context getContext() {
+        return context;
     }
 }

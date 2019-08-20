@@ -18,6 +18,12 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
     super(bitmovinAnalyticsConfig, context);
   }
 
+  @Deprecated
+  public BitmovinPlayerCollector(
+          BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
+    this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
+  }
+
   public void attachPlayer(BitmovinPlayer player) {
     BitmovinSdkAdapter adapter = new BitmovinSdkAdapter(player, this.bitmovinAnalyticsConfig, this.context,
             this.playerStateMachine);

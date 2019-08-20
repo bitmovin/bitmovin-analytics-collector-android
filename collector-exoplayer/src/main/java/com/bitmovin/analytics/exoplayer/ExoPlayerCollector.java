@@ -12,10 +12,22 @@ public class ExoPlayerCollector extends BitmovinAnalytics {
    * Bitmovin Analytics
    *
    * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
+   * @param context {@link Context}
    */
   public ExoPlayerCollector(
       BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
     super(bitmovinAnalyticsConfig, context);
+  }
+
+  /**
+   * Bitmovin Analytics
+   *
+   * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
+   */
+  @Deprecated
+  public ExoPlayerCollector(
+          BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
+    this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
   }
 
   public void attachPlayer(ExoPlayer player) {
