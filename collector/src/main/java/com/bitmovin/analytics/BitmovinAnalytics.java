@@ -49,6 +49,8 @@ public class BitmovinAnalytics implements StateMachineListener, OnLicenseValidat
 
     /**
      * Bitmovin Analytics
+     * 
+     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass {@link Context} seperately.
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
      */
