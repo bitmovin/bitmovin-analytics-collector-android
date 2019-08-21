@@ -36,6 +36,9 @@ public class BitmovinAnalytics implements StateMachineListener, OnLicenseValidat
      * @param context {@link Context}
      */
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
+        if (context == null){
+            throw new IllegalArgumentException("Context cannot be null");
+        }
         this.context = context;
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.licenseProvider = new DefaultLicenseProvider();
