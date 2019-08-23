@@ -1,3 +1,8 @@
+def bitmovinProperties = new Properties()
+file("bitmovin.properties").withInputStream {
+    stream -> bitmovinProperties.load(stream)
+}
+
 buildscript {
 
     repositories {
@@ -20,6 +25,13 @@ allprojects {
         jcenter()
         maven {
             url  'http://bitmovin.bintray.com/maven'
+        }
+        maven {
+            credentials {
+                username bitmovinProperties.getProperty('artifactoryUser')
+                password bitmovinProperties.getProperty('artifactoryPassword')
+            }
+            url 'https://bitmovin.jfrog.io/bitmovin/libs-snapshot-local/'
         }
     }
 }
