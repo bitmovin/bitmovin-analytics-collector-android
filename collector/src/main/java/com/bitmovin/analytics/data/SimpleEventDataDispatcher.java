@@ -31,7 +31,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnLicens
         this.config = config;
         this.callback = callback;
         this.context = context;
-        this.backend = new HttpBackend(config, context);
+        this.backend = new BackendFactory().createBackend(config, context);
     }
 
     @Override
