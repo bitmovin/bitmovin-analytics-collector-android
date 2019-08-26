@@ -4,8 +4,6 @@ import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.license.LicenseProvider;
-import com.bitmovin.analytics.utils.DataSerializer;
-import com.bitmovin.analytics.utils.HttpClient;
 import com.bitmovin.analytics.license.LicenseCall;
 import com.bitmovin.analytics.license.OnLicenseValidated;
 
@@ -14,11 +12,12 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnLicenseValidated {
-    private static final String TAG = "SimpleDispatcher";
+    private static final String TAG = "BitmovinAnalytics/SimpleDispatcher";
     private final LicenseProvider licenseProvider;
+    private final Backend backend;
 
     private Queue<EventData> data;
-    private HttpClient httpClient;
+
     private boolean enabled = false;
     private BitmovinAnalyticsConfig config;
     private OnLicenseValidated callback;
@@ -29,10 +28,10 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnLicens
     public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, OnLicenseValidated callback, LicenseProvider licenseProvider) {
         this.licenseProvider = licenseProvider;
         this.data = new ConcurrentLinkedQueue<EventData>();
-        this.httpClient = new HttpClient(context, config.getAnalyticsUrl());
         this.config = config;
         this.callback = callback;
         this.context = context;
+        this.backend = new HttpBackend(config, context);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnLicens
             while (it.hasNext()) {
                 EventData eventData = it.next();
                 eventData.setKey(licenseProvider.getAnalyticsLicense());
-                this.httpClient.post(DataSerializer.serialize(eventData), null);
+                this.backend.send(eventData);
                 it.remove();
             }
         }
@@ -71,7 +70,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, OnLicens
         eventData.setSequenceNumber(this.sampleSequenceNumber++);
         eventData.setKey(licenseProvider.getAnalyticsLicense());
         if (enabled) {
-            this.httpClient.post(DataSerializer.serialize(eventData), null);
+            this.backend.send(eventData);
         } else {
             this.data.add(eventData);
         }

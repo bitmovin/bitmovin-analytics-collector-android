@@ -8,7 +8,6 @@ import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 
 public class BitmovinAnalyticsConfig implements Parcelable {
-    private String analyticsUrl = "https://analytics-ingress-global.bitmovin.com/analytics";
     private String cdnProvider;
     private String customData1;
     private String customData2;
@@ -18,7 +17,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private String customUserId;
     private String experimentName;
     private int heartbeatInterval = 59700;
-    private String licenseUrl = "https://analytics-ingress-global.bitmovin.com/licensing";
     private String key;
     private String title;
     private String path;
@@ -26,6 +24,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private PlayerType playerType;
     private String videoId;
     private Context context;
+    private CollectorConfig collectorConfig = new CollectorConfig();
 
     public static final Creator<BitmovinAnalyticsConfig> CREATOR = new Creator<BitmovinAnalyticsConfig>() {
         @Override
@@ -52,7 +51,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
 
-
     public BitmovinAnalyticsConfig(String key) {
         this.key = key;
         this.playerKey = "";
@@ -64,7 +62,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     protected BitmovinAnalyticsConfig(Parcel in) {
-        analyticsUrl = in.readString();
         cdnProvider = in.readString();
         customData1 = in.readString();
         customData2 = in.readString();
@@ -74,13 +71,13 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         customUserId = in.readString();
         experimentName = in.readString();
         heartbeatInterval = in.readInt();
-        licenseUrl = in.readString();
         key = in.readString();
         title = in.readString();
         path = in.readString();
         playerKey = in.readString();
         playerType = in.readParcelable(PlayerType.class.getClassLoader());
         videoId = in.readString();
+        collectorConfig = in.readParcelable(CollectorConfig.class.getClassLoader());
     }
 
     public BitmovinAnalyticsConfig() {
@@ -88,7 +85,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(analyticsUrl);
         dest.writeString(cdnProvider);
         dest.writeString(customData1);
         dest.writeString(customData2);
@@ -98,22 +94,18 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         dest.writeString(customUserId);
         dest.writeString(experimentName);
         dest.writeInt(heartbeatInterval);
-        dest.writeString(licenseUrl);
         dest.writeString(key);
         dest.writeString(title);
         dest.writeString(path);
         dest.writeString(playerKey);
         dest.writeParcelable(playerType, flags);
         dest.writeString(videoId);
+        dest.writeParcelable(collectorConfig, collectorConfig.describeContents());
     }
 
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    public String getAnalyticsUrl() {
-        return analyticsUrl;
     }
 
     public String getKey() {
@@ -296,15 +288,16 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         this.heartbeatInterval = heartbeatInterval;
     }
 
-    public String getLicenseUrl() {
-        return licenseUrl;
-    }
-
-    public void setLicenseUrl(String licenseUrl) {
-        this.licenseUrl = licenseUrl;
-    }
-
     public Context getContext() {
         return context;
+    }
+
+    /**
+     * Configuration options for the Analytics collector
+     *
+     * @return collector configuration {@link CollectorConfig}
+     */
+    public CollectorConfig getCollectorConfig() {
+        return collectorConfig;
     }
 }

@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.license;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
@@ -17,7 +18,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class LicenseCall {
-    private static final String TAG = "BitmovinAnalytics";
+    private static final String TAG = "BitmovinAnalytics/LicenseCall";
     private BitmovinAnalyticsConfig config;
     private Context context;
     private HttpClient httpClient;
@@ -27,7 +28,9 @@ public class LicenseCall {
         this.config = config;
         this.context = context;
         this.licenseProvider = licenseProvider;
-        this.httpClient = new HttpClient(context, config.getLicenseUrl());
+        String backendUrl = Uri.parse(config.getCollectorConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
+        Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl));
+        this.httpClient = new HttpClient(context, backendUrl);
     }
 
     private String getLicenseKeyForChecking(){
@@ -59,7 +62,8 @@ public class LicenseCall {
                     return;
                 }
 
-                LicenseResponse licenseResponse = DataSerializer.deserialize(response.body().string(), LicenseResponse.class);
+                String licensingResponseBody = response.body().string();
+                LicenseResponse licenseResponse = DataSerializer.deserialize(licensingResponseBody, LicenseResponse.class);
                 if (licenseResponse == null) {
                     Log.d(TAG, "License call was denied without providing a response body");
                     callback.validationCompleted(false, data.getKey());
