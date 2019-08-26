@@ -10,6 +10,7 @@ import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.player.BitmovinPlayer;
 import com.bitmovin.player.BitmovinPlayerView;
+import com.bitmovin.player.config.PlayerConfiguration;
 import com.bitmovin.player.config.media.SourceConfiguration;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BitmovinPlayerCollector bitmovinAnalytics;
     private Button releaseButton;
     private Button createButton;
+    private Button changeSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,11 +30,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         releaseButton.setOnClickListener(this);
         createButton = findViewById(R.id.create_button);
         createButton.setOnClickListener(this);
+        changeSource = findViewById(R.id.change_source);
+        changeSource.setOnClickListener(this);
 
         this.bitmovinPlayerView = this.findViewById(R.id.bitmovinPlayerView);
         this.bitmovinPlayer = this.bitmovinPlayerView.getPlayer();
         this.bitmovinPlayer.getConfig().getPlaybackConfiguration().setAutoplayEnabled(true);
-
+        PlayerConfiguration config = this.bitmovinPlayer.getConfig();
         this.initializeAnalytics();
 
         this.initializePlayer();
@@ -68,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Add a new source item
         sourceConfiguration.addSourceItem("https://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
-
 
         //Step 4: Attach BitmovinPlayer
         bitmovinAnalytics.attachPlayer(bitmovinPlayer);
@@ -108,7 +111,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             releasePlayer();
         } else if (v == createButton) {
             initializePlayer();
+        } else if (v == changeSource) {
+            onPlayerChangeSource();
         }
     }
 
+    private void onPlayerChangeSource() {
+        SourceConfiguration config = new SourceConfiguration();
+        config.addSourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
+        bitmovinPlayer.load(config);
+    }
 }
