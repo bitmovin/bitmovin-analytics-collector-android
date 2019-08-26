@@ -10,6 +10,7 @@ import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.player.BitmovinPlayer;
 import com.bitmovin.player.BitmovinPlayerView;
+import com.bitmovin.player.config.PlaybackConfiguration;
 import com.bitmovin.player.config.PlayerConfiguration;
 import com.bitmovin.player.config.media.SourceConfiguration;
 
@@ -35,7 +36,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         this.bitmovinPlayerView = this.findViewById(R.id.bitmovinPlayerView);
         this.bitmovinPlayer = this.bitmovinPlayerView.getPlayer();
-        this.bitmovinPlayer.getConfig().getPlaybackConfiguration().setAutoplayEnabled(true);
+        PlaybackConfiguration playbackConfiguration = this.bitmovinPlayer.getConfig().getPlaybackConfiguration();
+        playbackConfiguration.setMuted(true);
+        playbackConfiguration.setAutoplayEnabled(true);
+
         PlayerConfiguration config = this.bitmovinPlayer.getConfig();
         this.initializeAnalytics();
 
