@@ -28,7 +28,7 @@ public class LicenseCall {
         this.config = config;
         this.context = context;
         this.licenseProvider = licenseProvider;
-        String backendUrl = Uri.parse(config.getCollectorConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
+        String backendUrl = Uri.parse(config.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
         Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl));
         this.httpClient = new HttpClient(context, backendUrl);
     }

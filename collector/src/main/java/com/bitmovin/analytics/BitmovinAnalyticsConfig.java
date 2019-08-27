@@ -24,7 +24,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private PlayerType playerType;
     private String videoId;
     private Context context;
-    private CollectorConfig collectorConfig = new CollectorConfig();
+    private CollectorConfig config = new CollectorConfig();
 
     public static final Creator<BitmovinAnalyticsConfig> CREATOR = new Creator<BitmovinAnalyticsConfig>() {
         @Override
@@ -77,7 +77,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         playerKey = in.readString();
         playerType = in.readParcelable(PlayerType.class.getClassLoader());
         videoId = in.readString();
-        collectorConfig = in.readParcelable(CollectorConfig.class.getClassLoader());
+        config = in.readParcelable(CollectorConfig.class.getClassLoader());
     }
 
     public BitmovinAnalyticsConfig() {
@@ -100,7 +100,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         dest.writeString(playerKey);
         dest.writeParcelable(playerType, flags);
         dest.writeString(videoId);
-        dest.writeParcelable(collectorConfig, collectorConfig.describeContents());
+        dest.writeParcelable(config, config.describeContents());
     }
 
     @Override
@@ -297,7 +297,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
      *
      * @return collector configuration {@link CollectorConfig}
      */
-    public CollectorConfig getCollectorConfig() {
-        return collectorConfig;
+    public CollectorConfig getConfig() {
+        return config;
     }
 }
