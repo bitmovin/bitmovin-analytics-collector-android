@@ -18,7 +18,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class LicenseCall {
-    private static final String TAG = "BitmovinAnalytics/LicenseCall";
+    private static final String TAG = "LicenseCall";
     private BitmovinAnalyticsConfig config;
     private Context context;
     private HttpClient httpClient;
