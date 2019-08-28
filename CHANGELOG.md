@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.6.4
+
+### Fixed
+
+- `BitmovinSdkAdapter` didn't transition to the `pause` state on a pause event
+- `droppedFrames` was not collected
+
 ## v1.6.3
 
 ### Fixed

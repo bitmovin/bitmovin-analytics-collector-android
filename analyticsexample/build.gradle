@@ -42,6 +42,9 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.8.1'
 
     // Pull from Maven Repo
-    implementation 'com.bitmovin.analytics:collector-exoplayer:1.6.3'
-    //implementation project(':collector-exoplayer')
+    if (rootProject.ext.developLocal == true) {
+        implementation project(':collector-exoplayer')
+    } else {
+        implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
+    }
 }

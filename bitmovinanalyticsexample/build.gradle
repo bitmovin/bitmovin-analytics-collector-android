@@ -5,12 +5,6 @@ android {
     compileSdkVersion 27
 
 
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
-
-
     defaultConfig {
         applicationId "com.bitmovin.bitmovinanalyticsexample"
         minSdkVersion 16
@@ -50,7 +44,12 @@ dependencies {
     implementation 'com.bitmovin.player:playercore:2.+'
 
     // Pull from Maven Repo
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.6.3'
-    //implementation project(':collector-bitmovin-player')
+    if (rootProject.ext.developLocal == true) {
+        implementation project(':collector-bitmovin-player')
+    } else {
+        implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
+    }
+
+
 }
 

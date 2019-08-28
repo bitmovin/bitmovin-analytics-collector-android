@@ -17,6 +17,7 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
 import com.bitmovin.player.*;
 import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent;
+import com.bitmovin.player.api.event.data.DroppedVideoFramesEvent;
 import com.bitmovin.player.api.event.data.ErrorEvent;
 import com.bitmovin.player.api.event.data.PausedEvent;
 import com.bitmovin.player.api.event.data.PlayEvent;
@@ -30,6 +31,7 @@ import com.bitmovin.player.api.event.data.StallEndedEvent;
 import com.bitmovin.player.api.event.data.StallStartedEvent;
 import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
 import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener;
+import com.bitmovin.player.api.event.listener.OnDroppedVideoFramesListener;
 import com.bitmovin.player.api.event.listener.OnErrorListener;
 import com.bitmovin.player.api.event.listener.OnPausedListener;
 import com.bitmovin.player.api.event.listener.OnPlayListener;
@@ -51,11 +53,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private final BitmovinAnalyticsConfig config;
     private final BitmovinPlayer bitmovinPlayer;
     private PlayerStateMachine stateMachine;
+    private int totalDroppedVideoFrames;
 
     public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, PlayerStateMachine stateMachine) {
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
+        this.totalDroppedVideoFrames = 0;
 
         addPlayerListeners();
     }
@@ -82,6 +86,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.addEventListener(onReadyListener);
         this.bitmovinPlayer.addEventListener(onVideoPlaybackQualityChangedListener);
         this.bitmovinPlayer.addEventListener(onAudioPlaybackQualityChangedListener);
+        this.bitmovinPlayer.addEventListener(onDroppedVideoFramesListener);
 
         this.bitmovinPlayer.addEventListener(onErrorListener);
     }
@@ -101,6 +106,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.removeEventListener(onReadyListener);
         this.bitmovinPlayer.removeEventListener(onVideoPlaybackQualityChangedListener);
         this.bitmovinPlayer.removeEventListener(onAudioPlaybackQualityChangedListener);
+        this.bitmovinPlayer.removeEventListener(onDroppedVideoFramesListener);
         this.bitmovinPlayer.removeEventListener(onErrorListener);
     }
 
@@ -149,6 +155,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
 
         //isCasting
         data.setCasting(bitmovinPlayer.isCasting());
+
+        // DroppedVideoFrames
+        data.setDroppedFrames(this.totalDroppedVideoFrames);
+        this.totalDroppedVideoFrames = 0;
 
         //streamFormat, mpdUrl, and m3u8Url
         if (bitmovinPlayer.getConfig() != null && bitmovinPlayer.getConfig().getSourceItem() != null)
@@ -239,7 +249,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             Log.d(TAG, "On Pause Listener");
             //Do not transition to a paused state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times
             if (stateMachine.getFirstReadyTimestamp() != 0) {
-                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                stateMachine.transitionState(PlayerState.PAUSE, getPosition());
             }
         }
     };
@@ -303,6 +313,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
             }
+        }
+    };
+
+    private OnDroppedVideoFramesListener onDroppedVideoFramesListener = new OnDroppedVideoFramesListener() {
+        @Override
+        public void onDroppedVideoFrames(DroppedVideoFramesEvent droppedVideoFramesEvent) {
+            totalDroppedVideoFrames += droppedVideoFramesEvent.getDroppedFrames();
         }
     };
 
