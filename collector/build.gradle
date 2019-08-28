@@ -94,8 +94,6 @@ artifactory {
             // Tell the Artifactory Plugin which artifacts should be published to Artifactory.
             publications('aar')
             publishArtifacts = true
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
 
             // Properties to be attached to the published artifacts.
             properties = ['qa.level': 'basic', 'dev.team': 'core']
