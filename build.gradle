@@ -23,6 +23,12 @@ allprojects {
     }
 }
 
+ext {
+    developLocal = true
+    version = "1.6.4"
+    versionCode = 106004
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
