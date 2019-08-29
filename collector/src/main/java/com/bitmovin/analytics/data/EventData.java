@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.data;
 
+import android.content.Context;
+
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.utils.Util;
 
@@ -68,13 +70,13 @@ public class EventData {
     private String audioCodec;
     private List<String> supportedVideoCodecs;
 
-    public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, String impressionId, String userAgent) {
+    public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context, String impressionId, String userAgent) {
         this.analyticsVersion = Util.getVersion();
         this.key = bitmovinAnalyticsConfig.getKey();
         this.playerKey = bitmovinAnalyticsConfig.getPlayerKey();
         this.videoId = bitmovinAnalyticsConfig.getVideoId();
         this.videoTitle = bitmovinAnalyticsConfig.getTitle();
-        this.userId = Util.getUserId(bitmovinAnalyticsConfig.getContext());
+        this.userId = Util.getUserId(context);
         this.customUserId = bitmovinAnalyticsConfig.getCustomUserId();
         this.customData1 = bitmovinAnalyticsConfig.getCustomData1();
         this.customData2 = bitmovinAnalyticsConfig.getCustomData2();
@@ -95,10 +97,10 @@ public class EventData {
             this.player = bitmovinAnalyticsConfig.getPlayerType().toString();
         }
 
-        if (bitmovinAnalyticsConfig.getContext() != null) {
-            this.domain = bitmovinAnalyticsConfig.getContext().getPackageName();
-            this.screenHeight = bitmovinAnalyticsConfig.getContext().getResources().getDisplayMetrics().heightPixels;
-            this.screenWidth = bitmovinAnalyticsConfig.getContext().getResources().getDisplayMetrics().widthPixels;
+        if (context != null) {
+            this.domain = context.getPackageName();
+            this.screenHeight = context.getResources().getDisplayMetrics().heightPixels;
+            this.screenWidth = context.getResources().getDisplayMetrics().widthPixels;
             this.language = Util.getLocale();
         }
 

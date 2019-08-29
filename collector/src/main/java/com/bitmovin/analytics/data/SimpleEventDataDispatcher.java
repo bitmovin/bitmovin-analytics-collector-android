@@ -1,31 +1,34 @@
 package com.bitmovin.analytics.data;
 
+import android.content.Context;
+
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.utils.DataSerializer;
-import com.bitmovin.analytics.utils.HttpClient;
-import com.bitmovin.analytics.utils.LicenseCall;
-import com.bitmovin.analytics.utils.LicenseCallback;
+import com.bitmovin.analytics.license.LicenseCall;
+import com.bitmovin.analytics.license.LicenseCallback;
 
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseCallback {
-    private static final String TAG = "SimpleDispatcher";
+    private static final String TAG = "BitmovinAnalytics/SimpleDispatcher";
+    private final Backend backend;
 
     private Queue<EventData> data;
-    private HttpClient httpClient;
+
     private boolean enabled = false;
     private BitmovinAnalyticsConfig config;
-    private LicenseCallback callback;
+    private final LicenseCallback callback;
+    private Context context;
 
     private int sampleSequenceNumber = 0;
 
-    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, LicenseCallback callback) {
-        this.data = new ConcurrentLinkedQueue<EventData>();
-        this.httpClient = new HttpClient(config.getContext(), BitmovinAnalyticsConfig.analyticsUrl);
+    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, LicenseCallback callback) {
+        this.data = new ConcurrentLinkedQueue<>();
         this.config = config;
         this.callback = callback;
+        this.context = context;
+        this.backend = new BackendFactory().createBackend(config, context);
     }
 
     @Override
@@ -35,7 +38,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
             Iterator<EventData> it = data.iterator();
             while (it.hasNext()) {
                 EventData eventData = it.next();
-                this.httpClient.post(DataSerializer.serialize(eventData), null);
+                this.backend.send(eventData);
                 it.remove();
             }
         }
@@ -47,7 +50,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
 
     @Override
     public void enable() {
-        LicenseCall licenseCall = new LicenseCall(config);
+        LicenseCall licenseCall = new LicenseCall(config, context);
         licenseCall.authenticate(this);
     }
 
@@ -61,9 +64,8 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     @Override
     public void add(EventData eventData) {
         eventData.setSequenceNumber(this.sampleSequenceNumber++);
-
         if (enabled) {
-            this.httpClient.post(DataSerializer.serialize(eventData), null);
+            this.backend.send(eventData);
         } else {
             this.data.add(eventData);
         }
