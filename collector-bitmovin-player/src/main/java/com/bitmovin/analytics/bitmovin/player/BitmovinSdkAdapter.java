@@ -48,8 +48,6 @@ import com.bitmovin.player.config.media.SourceItem;
 import com.bitmovin.player.config.quality.AudioQuality;
 import com.bitmovin.player.config.quality.VideoQuality;
 
-import java.lang.reflect.Method;
-
 public class BitmovinSdkAdapter implements PlayerAdapter {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
@@ -64,22 +62,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer = bitmovinPlayer;
         this.totalDroppedVideoFrames = 0;
         this.context = context;
-
-        if (hasBundledAnalytics(bitmovinPlayer)){
-            throw new IllegalArgumentException("This player already has Analytics bundled. Please consult current documentation");
-        }
-
         addPlayerListeners();
-    }
-
-    private boolean hasBundledAnalytics(BitmovinPlayer player){
-        Class<? extends BitmovinPlayer> clazz = player.getClass();
-        for (Method method : clazz.getMethods()) {
-            if (method.getName().equalsIgnoreCase("getanalytics")){
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
