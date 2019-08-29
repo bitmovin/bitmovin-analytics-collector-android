@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
 def packageName = 'com.bitmovin.analytics'
-def libraryVersion = '1.6.3'
+def libraryVersion = rootProject.ext.version
 
 android {
 
@@ -12,7 +12,7 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 106003
+        versionCode rootProject.ext.versionCode
         versionName libraryVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -39,8 +39,11 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    api 'com.bitmovin.analytics:collector:1.6.3'
-    //api project(':collector')
+    if (rootProject.ext.developLocal == true) {
+        api project(':collector')
+    } else {
+        api "com.bitmovin.analytics:collector:${libraryVersion}"
+    }
     implementation 'com.google.android.exoplayer:exoplayer:2.8.0'
 
 }
@@ -100,8 +103,6 @@ artifactory {
             // Tell the Artifactory Plugin which artifacts should be published to Artifactory.
             publications('aar')
             publishArtifacts = true
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
 
             // Properties to be attached to the published artifacts.
             properties = ['qa.level': 'basic', 'dev.team': 'core']

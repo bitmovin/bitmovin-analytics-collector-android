@@ -8,7 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Internal
-- `BitmovinAnalyticsConfig` is serializable now. `Context` is now passed seperately where needed. For compat the old constructors are still there.
+- `BitmovinAnalyticsConfig` is Parcelable now.
+- `Context` is now passed seperately where needed. For compat the old constructors are still there.
+- Constructors requiring `Context` are now `@Deprecated`
+
+## v1.6.4
 
 ### Fixed
 
