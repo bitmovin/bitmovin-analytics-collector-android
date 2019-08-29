@@ -22,18 +22,28 @@ public class LicenseCall {
     private BitmovinAnalyticsConfig config;
     private Context context;
     private HttpClient httpClient;
+    private LicenseProvider licenseProvider;
 
-    public LicenseCall(BitmovinAnalyticsConfig config, Context context) {
+    public LicenseCall(BitmovinAnalyticsConfig config, Context context, LicenseProvider licenseProvider) {
         this.config = config;
         this.context = context;
+        this.licenseProvider = licenseProvider;
         String backendUrl = Uri.parse(config.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
         Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl));
         this.httpClient = new HttpClient(context, backendUrl);
     }
 
-    public void authenticate(final LicenseCallback callback) {
+    private String getLicenseKeyForChecking(){
+        String key = config.getKey();
+        if (key == null || key.isEmpty()){
+            key = licenseProvider.getAnalyticsLicense();
+        }
+        return key;
+    }
+
+    public void authenticate(final OnLicenseValidated callback) {
         final LicenseCallData data = new LicenseCallData();
-        data.setKey(this.config.getKey());
+        data.setKey(getLicenseKeyForChecking());
         data.setAnalyticsVersion(Util.getVersion());
         data.setDomain(context.getPackageName());
         String json = DataSerializer.serialize(data);
@@ -41,14 +51,14 @@ public class LicenseCall {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d(TAG, "License call failed due to connectivity issues", e);
-                callback.authenticationCompleted(false);
+                callback.validationCompleted(false, data.getKey());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response == null || response.body() == null) {
                     Log.d(TAG, "License call was denied without providing a response body");
-                    callback.authenticationCompleted(false);
+                    callback.validationCompleted(false, data.getKey());
                     return;
                 }
 
@@ -56,23 +66,23 @@ public class LicenseCall {
                 LicenseResponse licenseResponse = DataSerializer.deserialize(licensingResponseBody, LicenseResponse.class);
                 if (licenseResponse == null) {
                     Log.d(TAG, "License call was denied without providing a response body");
-                    callback.authenticationCompleted(false);
+                    callback.validationCompleted(false, data.getKey());
                     return;
                 }
 
                 if (licenseResponse.getStatus() == null) {
                     Log.d(TAG, String.format("License response was denied without status"));
-                    callback.authenticationCompleted(false);
+                    callback.validationCompleted(false, data.getKey());
                     return;
                 }
 
                 if (!licenseResponse.getStatus().equals("granted")) {
                     Log.d(TAG, String.format("License response was denied: %s", licenseResponse.getMessage()));
-                    callback.authenticationCompleted(false);
+                    callback.validationCompleted(false, data.getKey());
                     return;
                 }
                 Log.d(TAG, "License response was granted");
-                callback.authenticationCompleted(true);
+                callback.validationCompleted(true,data.getKey());
             }
         });
 

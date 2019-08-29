@@ -8,16 +8,17 @@ import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
+import com.bitmovin.analytics.license.DefaultLicenseProvider;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
-import com.bitmovin.analytics.license.LicenseCallback;
+import com.bitmovin.analytics.license.OnLicenseValidated;
 import com.bitmovin.analytics.utils.Util;
 
 /**
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener, LicenseCallback {
+public class BitmovinAnalytics implements StateMachineListener, OnLicenseValidated {
 
     private static final String TAG = "BitmovinAnalytics";
 
@@ -26,6 +27,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     protected PlayerStateMachine playerStateMachine;
     protected IEventDataDispatcher eventDataDispatcher;
     protected Context context;
+    protected DefaultLicenseProvider licenseProvider;
 
     /**
      * Bitmovin Analytics
@@ -40,9 +42,10 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         Log.d(TAG, "Initializing Bitmovin Analytics with Key: " + bitmovinAnalyticsConfig.getKey());
         this.context = context;
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
+        this.licenseProvider = new DefaultLicenseProvider();
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
         this.playerStateMachine.addListener(this);
-        this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this);
+        this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this, licenseProvider);
     }
 
     /**
@@ -241,7 +244,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     @Override
-    public void authenticationCompleted(boolean success) {
+    public void validationCompleted(boolean success, String key) {
         if (!success) {
             detachPlayer();
         }
