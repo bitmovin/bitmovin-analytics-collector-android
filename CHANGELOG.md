@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
-### Internal
-- `BitmovinAnalyticsConfig` is serializable now. `Context` is now passed seperately where needed. For compat the old constructors are still there.
+## v1.6.5
+
+### Changed
+- `BitmovinAnalyticsConfig` is parcelable now.
+- Android `Context` is now passed seperately where needed.
+- Old constructors requiring `Context have been marked as `@Deprecated`
 
 ## v1.6.4
 
