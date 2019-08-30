@@ -1,7 +1,4 @@
-def bitmovinProperties = new Properties()
-file("bitmovin.properties").withInputStream {
-    stream -> bitmovinProperties.load(stream)
-}
+apply from: './bitmovinpropertiesloader.gradle'
 
 buildscript {
 
