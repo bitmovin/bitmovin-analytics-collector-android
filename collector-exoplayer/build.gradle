@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
@@ -51,6 +53,7 @@ dependencies {
         api "com.bitmovin.analytics:collector:${libraryVersion}"
     }
     implementation 'com.google.android.exoplayer:exoplayer:2.8.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 }
 
@@ -121,4 +124,7 @@ artifactory {
             publishPom = true
         }
     }
+}
+repositories {
+    mavenCentral()
 }

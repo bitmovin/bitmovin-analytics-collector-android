@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 
 android {
@@ -54,7 +56,11 @@ dependencies {
     } else {
         implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
     }
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 
+}
+repositories {
+    mavenCentral()
 }
 
