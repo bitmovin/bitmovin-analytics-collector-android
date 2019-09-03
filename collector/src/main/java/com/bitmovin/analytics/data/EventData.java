@@ -69,6 +69,7 @@ public class EventData {
     private String videoCodec;
     private String audioCodec;
     private List<String> supportedVideoCodecs;
+    private DeviceInformation deviceInformation = new DeviceInformation();
 
     public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context, String impressionId, String userAgent) {
         this.analyticsVersion = Util.getVersion();
