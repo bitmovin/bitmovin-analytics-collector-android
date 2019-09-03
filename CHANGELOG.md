@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+- Sending out `Build.MANUFACTURER` and `Build.MODEL` as part of the Sample
+
 ## v1.6.5
 
 ### Changed
