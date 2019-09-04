@@ -36,7 +36,7 @@ allprojects {
 }
 
 ext {
-    developLocal = false
+    developLocal = true
     version = "1.6.5"
     versionCode = 106005
 }
