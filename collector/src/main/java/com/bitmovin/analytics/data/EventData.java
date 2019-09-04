@@ -247,7 +247,9 @@ public class EventData {
         this.videoId = videoId;
     }
 
-    public void setVideoTitle(String videoTitle) { this.videoTitle = videoTitle; }
+    public void setVideoTitle(String videoTitle) {
+        this.videoTitle = videoTitle;
+    }
 
     public void setCustomUserId(String customUserId) {
         this.customUserId = customUserId;
@@ -329,13 +331,21 @@ public class EventData {
         this.isMuted = muted;
     }
 
-    public void setSequenceNumber(int sequenceNumber) { this.sequenceNumber = sequenceNumber; }
+    public void setSequenceNumber(int sequenceNumber) {
+        this.sequenceNumber = sequenceNumber;
+    }
 
-    public void setVideoCodec(String videoCodec) { this.videoCodec = videoCodec; }
+    public void setVideoCodec(String videoCodec) {
+        this.videoCodec = videoCodec;
+    }
 
-    public void setAudioCodec(String audioCodec) { this.audioCodec = audioCodec; }
+    public void setAudioCodec(String audioCodec) {
+        this.audioCodec = audioCodec;
+    }
 
-    public void setSupportedVideoCodecs(List<String> supportedVideoCodecs) { this.supportedVideoCodecs = supportedVideoCodecs; }
+    public void setSupportedVideoCodecs(List<String> supportedVideoCodecs) {
+        this.supportedVideoCodecs = supportedVideoCodecs;
+    }
 
     public String getDomain() {
         return domain;
@@ -569,9 +579,19 @@ public class EventData {
         return sequenceNumber;
     }
 
-    public String getVideoCodec() { return videoCodec; }
+    public String getVideoCodec() {
+        return videoCodec;
+    }
 
-    public String getAudioCodec() { return audioCodec; }
+    public String getAudioCodec() {
+        return audioCodec;
+    }
 
-    public List<String> getSupportedVideoCodec() { return supportedVideoCodecs; }
+    public List<String> getSupportedVideoCodec() {
+        return supportedVideoCodecs;
+    }
+
+    public DeviceInformation getDeviceInformation() {
+        return deviceInformation;
+    }
 }
