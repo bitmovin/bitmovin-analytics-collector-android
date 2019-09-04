@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
@@ -15,6 +17,9 @@ android {
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.version
 
+        testOptions {
+            multiDexEnabled true
+        }
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
@@ -39,11 +44,14 @@ dependencies {
 
     implementation 'com.android.support:appcompat-v7:27.1.1'
     testImplementation 'junit:junit:4.12'
+    testImplementation "org.assertj:assertj-core:3.11.1"
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation "org.assertj:assertj-core:3.11.1"
 
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.google.code.gson:gson:2.8.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
 publishing {
@@ -111,4 +119,7 @@ artifactory {
             publishPom = true
         }
     }
+}
+repositories {
+    mavenCentral()
 }

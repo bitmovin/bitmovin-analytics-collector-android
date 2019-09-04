@@ -1,6 +1,7 @@
 apply from: './bitmovinpropertiesloader.gradle'
 
 buildscript {
+    ext.kotlin_version = '1.3.50'
 
     repositories {
         mavenLocal()
@@ -11,6 +12,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.2'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.8"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -34,7 +36,7 @@ allprojects {
 }
 
 ext {
-    developLocal = false
+    developLocal = true
     version = "1.6.5"
     versionCode = 106005
 }
