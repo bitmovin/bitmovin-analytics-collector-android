@@ -50,6 +50,6 @@ public class EventDataTest {
         BitmovinAnalyticsConfig config = new BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2");
         EventData data = new EventData(config, appContext, "1234", "user agent");
         String serialized = DataSerializer.serialize(data);
-        assertThat(serialized).contains("\"deviceInformation\": {");
+        assertThat(serialized).contains("\"deviceInformation\":{");
     }
 }
