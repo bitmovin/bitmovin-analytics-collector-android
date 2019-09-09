@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.7.0
+
 ### Added
-- Sending out `Build.MANUFACTURER` and `Build.MODEL` as part of the Sample
+- Sending out Device Information about `Build.MANUFACTURER` and `Build.MODEL` as part of the Sample
 
 ## v1.6.5
 
