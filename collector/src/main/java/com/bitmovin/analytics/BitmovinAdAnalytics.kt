@@ -1,7 +1,7 @@
 package com.bitmovin.analytics
 
-import com.bitmovin.analytics.data.AdBreakData
-import com.bitmovin.analytics.data.AdData
+import com.bitmovin.analytics.data.AdBreakSample
+import com.bitmovin.analytics.data.AdSample
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.utils.Util
 
@@ -50,7 +50,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 
     }
 
-    private fun sendAnalyticsRequest(adBreakData: AdBreakData, adData: AdData?) {
+    private fun sendAnalyticsRequest(adBreakSample: AdBreakSample, adSample: AdSample?) {
         if(analytics.playerAdapter == null) {
             return
         }
@@ -70,8 +70,8 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         // eventData.pageLoadType
 
         eventData.setEventData(analytics.playerAdapter.createEventData())
-        eventData.setAdBreakData(adBreakData)
-        eventData.setAdData(adData)
+        eventData.setAdBreakSample(adBreakSample)
+        eventData.setAdSample(adSample)
 
         eventData.time = Util.getTimeStamp()
         eventData.adImpressionId = Util.getUUID()
