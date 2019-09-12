@@ -4,5 +4,6 @@ import com.bitmovin.analytics.data.AdModuleInformation
 
 interface AdAdapter {
     fun release()
+    val isLinearAdActive: Boolean
     val moduleInformation: AdModuleInformation
 }
