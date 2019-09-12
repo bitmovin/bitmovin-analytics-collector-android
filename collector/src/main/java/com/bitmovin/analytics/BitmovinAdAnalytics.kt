@@ -1,5 +1,8 @@
 package com.bitmovin.analytics
 
+import com.bitmovin.analytics.data.AdEventData
+import com.bitmovin.analytics.utils.Util
+
 class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     fun onAdStarted() {
 
@@ -43,5 +46,34 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 
     fun onAdQuartile() {
 
+    }
+
+    private fun sendAnalyticsRequest(adBreakSample: AdBreakData, adSample: AdData?) {
+        if(analytics.playerAdapter == null) {
+            return
+        }
+
+        val eventData = AdEventData()
+
+        eventData.analyticsVersion = Util.getVersion()
+        val moduleInfo = analytics.adAdapter?.moduleInformation
+        if(moduleInfo != null) {
+            eventData.adModule = moduleInfo.name
+            eventData.adModuleVersion = moduleInfo.version
+        }
+        eventData.playerStartupTime = 1
+        // TODO missing
+        // eventData.pageLoadTime
+        // eventData.autoplay
+        // eventData.pageLoadType
+
+        eventData.setEventData(analytics.playerAdapter.createEventData())
+        eventData.setAdBreakData(adBreakData)
+        eventData.setAdData(adData)
+
+        eventData.time = Util.getTimeStamp()
+        eventData.adImpressionId = Util.getUUID()
+        // TODO eventData.percentageInViewport
+        analytics.sendAdEventData(eventData)
     }
 }
