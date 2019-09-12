@@ -7,5 +7,7 @@ public interface IEventDataDispatcher {
 
     public void add(EventData data);
 
+    public void addAd(AdEventData data);
+
     public void clear();
 }

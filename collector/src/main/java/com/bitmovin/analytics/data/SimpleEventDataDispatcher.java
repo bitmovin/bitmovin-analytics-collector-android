@@ -15,6 +15,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     private final Backend backend;
 
     private Queue<EventData> data;
+    private Queue<AdEventData> adData;
 
     private boolean enabled = false;
     private BitmovinAnalyticsConfig config;
@@ -25,6 +26,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
 
     public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, LicenseCallback callback) {
         this.data = new ConcurrentLinkedQueue<>();
+        this.adData = new ConcurrentLinkedQueue<>();
         this.config = config;
         this.callback = callback;
         this.context = context;
@@ -40,6 +42,12 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
                 EventData eventData = it.next();
                 this.backend.send(eventData);
                 it.remove();
+            }
+            Iterator<AdEventData> adIt = adData.iterator();
+            while (adIt.hasNext()) {
+                AdEventData eventData = adIt.next();
+                this.backend.sendAd(eventData);
+                adIt.remove();
             }
         }
 
@@ -57,6 +65,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     @Override
     public void disable() {
         this.data.clear();
+        this.adData.clear();
         this.enabled = false;
         this.sampleSequenceNumber = 0;
     }
@@ -72,8 +81,18 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     }
 
     @Override
+    public void addAd(AdEventData eventData) {
+        if (enabled) {
+            this.backend.sendAd(eventData);
+        } else {
+            this.adData.add(eventData);
+        }
+    }
+
+    @Override
     public void clear() {
         this.data.clear();
+        this.adData.clear();
     }
 
 }
