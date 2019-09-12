@@ -29,5 +29,10 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
             this.playerStateMachine);
 
     this.attach(adapter);
+
+    if(this.adAnalytics != null) {
+      BitmovinSdkAdAdapter adAdapter = new BitmovinSdkAdAdapter(player, this.adAnalytics);
+      this.attachAd(adAdapter);
+    }
   }
 }
