@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Util {
@@ -87,4 +88,11 @@ public class Util {
         }
         return false;
     }
+
+    public static Integer calculatePercentage(Long numerator, Long denominator) {
+        if (denominator == null || denominator == 0) {
+            return null;
+        }
+        return Math.round(((numerator != null ? numerator : 0) / denominator) * 100);
+    };
 }
