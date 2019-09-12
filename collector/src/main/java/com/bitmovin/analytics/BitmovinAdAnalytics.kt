@@ -1,5 +1,7 @@
 package com.bitmovin.analytics
 
+import com.bitmovin.analytics.data.AdBreakData
+import com.bitmovin.analytics.data.AdData
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.utils.Util
 
@@ -48,7 +50,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 
     }
 
-    private fun sendAnalyticsRequest(adBreakSample: AdBreakData, adSample: AdData?) {
+    private fun sendAnalyticsRequest(adBreakData: AdBreakData, adData: AdData?) {
         if(analytics.playerAdapter == null) {
             return
         }

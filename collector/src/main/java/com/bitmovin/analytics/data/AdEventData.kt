@@ -31,7 +31,7 @@ data class AdEventData(
     var xmediaUrl: String? = null,
     var xmidpoint: Long? = 0,
     var xminSuggestedDuration: Long? = null,
-    var xpercentageInViewport: Long? = null,
+    var percentageInViewport: Long? = null,
     var xquartile1: Long? = 0,
     var xquartile3: Long? = 0,
     var xskipped: Long? = 0,
