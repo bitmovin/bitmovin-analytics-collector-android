@@ -3,7 +3,9 @@ package com.bitmovin.analytics;
 import android.content.Context;
 import android.util.Log;
 
+import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
@@ -23,7 +25,9 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
     protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
     protected PlayerAdapter playerAdapter;
+    protected AdAdapter adAdapter;
     protected PlayerStateMachine playerStateMachine;
+    protected BitmovinAdAnalytics adAnalytics;
     protected IEventDataDispatcher eventDataDispatcher;
     protected Context context;
 
@@ -43,6 +47,9 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
         this.playerStateMachine.addListener(this);
         this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this);
+        if(this.bitmovinAnalyticsConfig.getAds()) {
+            this.adAnalytics = new BitmovinAdAnalytics(this);
+        }
     }
 
     /**
@@ -69,10 +76,17 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         this.playerAdapter = adapter;
     }
 
+    protected void attachAd(AdAdapter adapter) {
+        detachAd();
+        this.adAdapter = adapter;
+    }
+
     /**
      * Detach the current player that is being used with Bitmovin Analytics.
      */
     public void detachPlayer() {
+        detachAd();
+
         if (playerAdapter != null) {
             playerAdapter.release();
         }
@@ -81,6 +95,12 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             playerStateMachine.resetStateMachine();
         }
         eventDataDispatcher.disable();
+    }
+
+    private void detachAd() {
+        if(adAdapter != null) {
+            adAdapter.release();
+        }
     }
 
     @Override
