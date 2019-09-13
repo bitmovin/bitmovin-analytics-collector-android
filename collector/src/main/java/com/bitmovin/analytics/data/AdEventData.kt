@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.data
 
+import com.bitmovin.analytics.ads.AdBreak
+import com.bitmovin.analytics.ads.AdConfig
 import com.bitmovin.analytics.utils.Util
 
 data class AdEventData(
@@ -144,23 +146,19 @@ data class AdEventData(
         this.videoCodec = eventData.videoCodec
     }
 
-    fun setAdBreakSample(adBreakSample: AdBreakSample) {
-        adPosition = adBreakSample.adPosition
-        adOffset = adBreakSample.adOffset
-        adScheduleTime = adBreakSample.adScheduleTime
-        adReplaceContentDuration = adBreakSample.adReplaceContentDuration
-        adPreloadOffset = adBreakSample.adPreloadOffset
-        adTagPath = adBreakSample.adTagPath
-        adTagServer = adBreakSample.adTagServer
-        adTagType = adBreakSample.adTagType
-        adTagUrl = adBreakSample.adTagUrl
-        adIsPersistent = adBreakSample.adIsPersistent
-        adIdPlayer = adBreakSample.adIdPlayer
-        manifestDownloadTime = adBreakSample.manifestDownloadTime
-        errorCode = adBreakSample.errorCode
-        errorData  = adBreakSample.errorData
-        errorMessage = adBreakSample.errorMessage
-        adFallbackIndex = adBreakSample.adFallbackIndex
+    fun setAdBreak(adBreak: AdBreak) {
+//        adPosition = adBreakSample.adPosition
+//        adOffset = adBreakSample.adOffset
+//        adScheduleTime = adBreakSample.adScheduleTime
+//        adReplaceContentDuration = adBreakSample.adReplaceContentDuration
+//        adPreloadOffset = adBreakSample.adPreloadOffset
+//        adTagPath = adBreakSample.adTagPath
+//        adTagServer = adBreakSample.adTagServer
+//        adTagType = adBreakSample.adTagType
+//        adTagUrl = adBreakSample.adTagUrl
+//        adIsPersistent = adBreakSample.adIsPersistent
+//        adIdPlayer = adBreakSample.adIdPlayer
+//        adFallbackIndex = adBreakSample.adFallbackIndex
     }
 
     fun setAdSample(adSample: AdSample?) {
@@ -220,6 +218,10 @@ data class AdEventData(
         errorPercentage = adSample.errorPercentage
         timeToContent = adSample.timeToContent
         timeFromContent = adSample.timeFromContent
+        errorCode = adSample.errorCode
+        errorData  = adSample.errorData
+        errorMessage = adSample.errorMessage
+
         // TODO timeUntilHover = adSample.
         // TODO timeHovered = adSample.
         // TODO timeInViewport = adSample.

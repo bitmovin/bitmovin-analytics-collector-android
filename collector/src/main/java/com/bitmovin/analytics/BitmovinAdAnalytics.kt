@@ -61,15 +61,12 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         this.activeAdSample!!.clickPercentage = Util.calculatePercentage(this.activeAdSample!!.clickPosition, this.activeAdSample!!.ad.duration)
     }
 
-    fun onAdError(adConfig: AdConfig?, adBreak: AdBreak?, code: Int?, message: String?) {
-        var adSample: AdSample
-        var errorPosition: Long? = null
+    fun onAdError(adBreak: AdBreak, code: Int?, message: String?) {
+        val adSample: AdSample
         if (this.activeAdSample != null &&
-                adBreak?.ads != null &&
-                adBreak?.ads.any { ad -> ad.id == this.activeAdSample!!.ad.id }) {
+                adBreak.ads.any { ad -> ad.id == this.activeAdSample!!.ad.id }) {
             adSample = this.activeAdSample!!
-            adSample!!.errorPosition = this.currentTime
-            errorPosition = this.currentTime
+            adSample.errorPosition = this.currentTime
             adSample.errorPercentage = Util.calculatePercentage(adSample.errorPosition, adSample.ad.duration)
         } else {
             adSample = AdSample()
@@ -77,14 +74,13 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         adSample.errorCode = code
         // TODO adBreakSample.errorData = JSON.stringify(event.data)
         adSample.errorMessage = message
-        this.completeAd(adBreak ?: adConfig, adSample, errorPosition);
+        this.completeAd(adBreak, adSample, adSample.errorPosition);
     }
 
-    fun onAdManifestLoaded(adConfig: AdConfig?, adBreak: AdBreak?, downloadTime: Long?) {
-        val adTagConfig = adConfig as AdTagConfig
-        if (adTagConfig != null && adTagConfig.tag.type == AdTagType.VMAP) {
-            this.sendAnalyticsRequest(adConfig)
-        } else if (adBreak != null) {
+    fun onAdManifestLoaded(adBreak: AdBreak, downloadTime: Long?) {
+        if (adBreak.tag.type == AdTagType.VMAP) {
+            this.sendAnalyticsRequest(adBreak)
+        } else {
             this.adManifestDownloadTimes[adBreak.id] = downloadTime
         }
     }
@@ -156,7 +152,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 //        }, AdAnalytics.TIMEOUT_CURRENT_TIME_INTERVAL);
     }
 
-    private fun completeAd(adBreak: AdConfig?, adSample: AdSample?, exitPosition: Long? = null) {
+    private fun completeAd(adBreak: AdBreak, adSample: AdSample?, exitPosition: Long? = null) {
         var adSample = adSample ?: AdSample()
         adSample.exitPosition = exitPosition
         adSample.playPercentage = Util.calculatePercentage(adSample.exitPosition, adSample.ad.duration)
@@ -196,7 +192,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         }
     }
 
-    private fun sendAnalyticsRequest(adConfig: AdConfig?, adSample: AdSample? = null) {
+    private fun sendAnalyticsRequest(adBreak: AdBreak, adSample: AdSample? = null) {
         if(analytics.playerAdapter == null) {
             return
         }
@@ -209,7 +205,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
             eventData.adModule = moduleInfo.name
             eventData.adModuleVersion = moduleInfo.version
         }
-        eventData.manifestDownloadTime = getAdManifestDownloadTime(adConfig as AdBreak)
+        eventData.manifestDownloadTime = getAdManifestDownloadTime(adBreak)
         eventData.playerStartupTime = 1
         // TODO missing
         // eventData.pageLoadTime
@@ -217,7 +213,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         // eventData.pageLoadType
 
         eventData.setEventData(analytics.playerAdapter.createEventData())
-        eventData.setAdBreak(adConfig)
+        eventData.setAdBreak(adBreak)
         eventData.setAdSample(adSample)
 
         eventData.time = Util.getTimeStamp()
