@@ -1,7 +1,9 @@
 package com.bitmovin.analytics.data
 
+import com.bitmovin.analytics.utils.Util
+
 data class AdEventData(
-        var wrapperAdsCount: Long? = null,
+        var wrapperAdsCount: Int? = null,
         var adSkippable: Boolean? = null,
         var adSkippableAfter: Long? = null,
         var adClickthroughUrl: String? = null,
@@ -9,14 +11,13 @@ data class AdEventData(
         var adDuration: Long? = null,
         var adId: String? = null,
         var adImpressionId: String? = null,
-        var adPlaybackHeight: Long? = null,
-        var adPlaybackWidth: Long? = null,
+        var adPlaybackHeight: Int? = null,
+        var adPlaybackWidth: Int? = null,
         var adStartupTime: Long? = null,
         var adSystem: String? = null,
         var adTitle: String? = null,
         var advertiserName: String? = null,
         var apiFramework: String? = null,
-        var audioBitrate: Long? = null,
         var clicked: Long? = 0,
         var clickPosition: Long? = null,
         var closed: Long? = 0,
@@ -46,15 +47,15 @@ data class AdEventData(
         // TODO var timeUntilHover: Long? = null,
         var universalAdIdRegistry: String? = null,
         var universalAdIdValue: String? = null,
-        var videoBitrate: Long? = null,
-        var adPodPosition: Long? = null,
+        var videoBitrate: Int? = null,
+        var adPodPosition: Int? = null,
         var exitPosition: Long? = null,
-        var playPercentage: Long? = null,
-        var skipPercentage: Long? = null,
-        var clickPercentage: Long? = null,
-        var closePercentage: Long? = null,
+        var playPercentage: Int? = null,
+        var skipPercentage: Int? = null,
+        var clickPercentage: Int? = null,
+        var closePercentage: Int? = null,
         var errorPosition: Long? = null,
-        var errorPercentage: Long? = null,
+        var errorPercentage: Int? = null,
         var timeToContent: Long? = null,
         var timeFromContent: Long? = null,
         var adPosition: String? = null,
@@ -69,7 +70,7 @@ data class AdEventData(
         var adIsPersistent: Boolean? = null,
         var adIdPlayer: String? = null,
         var manifestDownloadTime: Long? = null,
-        var errorCode: Long? = null,
+        var errorCode: Int? = null,
         var errorData: String? = null,
         var errorMessage: String? = null,
         var adFallbackIndex: Long = 0,
@@ -167,49 +168,48 @@ data class AdEventData(
             return
         }
 
-        wrapperAdsCount = adSample.wrapperAdsCount
-        adSkippable = adSample.adSkippable
-        adSkippableAfter = adSample.adSkippableAfter
-        adClickthroughUrl = adSample.adClickthroughUrl
-        adDescription = adSample.adDescription
-        adDuration = adSample.adDuration
-        adId = adSample.adId
-        adPlaybackHeight = adSample.adPlaybackHeight
-        adPlaybackWidth = adSample.adPlaybackWidth
+        wrapperAdsCount = adSample.ad.wrapperAdsCount
+        adSkippable = adSample.ad.skippable
+        adSkippableAfter = adSample.ad.skippableAfter
+        adClickthroughUrl = adSample.ad.clickThroughUrl
+        adDescription = adSample.ad.description
+        adDuration = adSample.ad.duration
+        adId = adSample.ad.id
+        adPlaybackHeight = adSample.ad.height
+        adPlaybackWidth = adSample.ad.width
+        adSystem = adSample.ad.adSystemName
+        adTitle = adSample.ad.title
+        advertiserName = adSample.ad.advertiserName
+        apiFramework = adSample.ad.apiFramework
+        creativeAdId = adSample.ad.creativeAdId
+        creativeId = adSample.ad.creativeId
+        dealId = adSample.ad.dealId
+        isLinear = adSample.ad.isLinear
+        mediaUrl = adSample.ad.mediaFileUrl
+        minSuggestedDuration = adSample.ad.minSuggestedDuration
+        streamFormat = adSample.ad.mimeType
+        surveyUrl = adSample.ad.surveyUrl
+        universalAdIdRegistry = adSample.ad.universalAdIdRegistry
+        universalAdIdValue = adSample.ad.universalAdIdValue
+        videoBitrate = adSample.ad.bitrate
+        if(adSample.ad.mediaFileUrl != null) {
+            val hostnameAndPath = Util.getHostnameAndPath(adSample.ad.mediaFileUrl)
+            mediaServer = hostnameAndPath.first
+            mediaPath = hostnameAndPath.second
+        }
         adStartupTime = adSample.adStartupTime
-        adSystem = adSample.adSystem
-        adTitle = adSample.adTitle
-        advertiserName = adSample.advertiserName
-        apiFramework = adSample.apiFramework
-        audioBitrate = adSample.audioBitrate
         clicked = adSample.clicked
         clickPosition = adSample.clickPosition
         closed = adSample.closed
         closePosition = adSample.closePosition
         completed = adSample.completed
-        creativeAdId = adSample.creativeAdId
-        creativeId = adSample.creativeId
-        dealId = adSample.dealId
-        isLinear = adSample.isLinear
-        mediaPath = adSample.mediaPath
-        mediaServer = adSample.mediaServer
-        mediaUrl = adSample.mediaUrl
         midpoint = adSample.midpoint
-        minSuggestedDuration = adSample.minSuggestedDuration
         quartile1 = adSample.quartile1
         quartile3 = adSample.quartile3
         skipped = adSample.skipped
         skipPosition = adSample.skipPosition
         started = adSample.started
-        streamFormat = adSample.streamFormat
-        surveyUrl = adSample.surveyUrl
-        // TODO timeHovered = adSample.
-        // TODO timeInViewport = adSample.
         timePlayed = adSample.timePlayed
-        // TODO timeUntilHover = adSample.
-        universalAdIdRegistry = adSample.universalAdIdRegistry
-        universalAdIdValue = adSample.universalAdIdValue
-        videoBitrate = adSample.videoBitrate
         adPodPosition = adSample.adPodPosition
         exitPosition = adSample.exitPosition
         playPercentage = adSample.playPercentage
@@ -220,5 +220,8 @@ data class AdEventData(
         errorPercentage = adSample.errorPercentage
         timeToContent = adSample.timeToContent
         timeFromContent = adSample.timeFromContent
+        // TODO timeUntilHover = adSample.
+        // TODO timeHovered = adSample.
+        // TODO timeInViewport = adSample.
     }
 }
