@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.ads
 
-enum class AdTagType {
-    VAST,
-    VMAP,
-    VPAID
+enum class AdTagType(name: String) {
+    VAST("vast"),
+    VMAP("vmap"),
+    VPAID("vpaid")
 }

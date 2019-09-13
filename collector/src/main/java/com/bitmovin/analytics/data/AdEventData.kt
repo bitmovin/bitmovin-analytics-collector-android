@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.data
 
 import com.bitmovin.analytics.ads.AdBreak
-import com.bitmovin.analytics.ads.AdConfig
 import com.bitmovin.analytics.utils.Util
 
 data class AdEventData(
@@ -147,18 +146,19 @@ data class AdEventData(
     }
 
     fun setAdBreak(adBreak: AdBreak) {
-//        adPosition = adBreakSample.adPosition
-//        adOffset = adBreakSample.adOffset
-//        adScheduleTime = adBreakSample.adScheduleTime
-//        adReplaceContentDuration = adBreakSample.adReplaceContentDuration
-//        adPreloadOffset = adBreakSample.adPreloadOffset
-//        adTagPath = adBreakSample.adTagPath
-//        adTagServer = adBreakSample.adTagServer
-//        adTagType = adBreakSample.adTagType
-//        adTagUrl = adBreakSample.adTagUrl
-//        adIsPersistent = adBreakSample.adIsPersistent
-//        adIdPlayer = adBreakSample.adIdPlayer
-//        adFallbackIndex = adBreakSample.adFallbackIndex
+        adPosition = adBreak.position?.toString()
+        adOffset = adBreak.offset
+        adScheduleTime = adBreak.scheduleTime
+        adReplaceContentDuration = adBreak.replaceContentDuration
+        adPreloadOffset = adBreak.preloadOffset
+        val hostnameAndPath = Util.getHostnameAndPath(adBreak.tagUrl)
+        adTagServer = hostnameAndPath.first
+        adTagPath = hostnameAndPath.second
+        adTagType = adBreak.tagType?.toString()
+        adTagUrl = adBreak.tagUrl
+        adIsPersistent = adBreak.persistent
+        adIdPlayer = adBreak.id
+        adFallbackIndex = adBreak.fallbackIndex
     }
 
     fun setAdSample(adSample: AdSample?) {
@@ -190,11 +190,9 @@ data class AdEventData(
         universalAdIdRegistry = adSample.ad.universalAdIdRegistry
         universalAdIdValue = adSample.ad.universalAdIdValue
         videoBitrate = adSample.ad.bitrate
-        if(adSample.ad.mediaFileUrl != null) {
-            val hostnameAndPath = Util.getHostnameAndPath(adSample.ad.mediaFileUrl)
-            mediaServer = hostnameAndPath.first
-            mediaPath = hostnameAndPath.second
-        }
+        val hostnameAndPath = Util.getHostnameAndPath(adSample.ad.mediaFileUrl)
+        mediaServer = hostnameAndPath.first
+        mediaPath = hostnameAndPath.second
         adStartupTime = adSample.adStartupTime
         clicked = adSample.clicked
         clickPosition = adSample.clickPosition

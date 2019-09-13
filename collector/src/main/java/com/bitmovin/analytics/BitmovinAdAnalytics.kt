@@ -78,10 +78,10 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     }
 
     fun onAdManifestLoaded(adBreak: AdBreak, downloadTime: Long?) {
-        if (adBreak.tag.type == AdTagType.VMAP) {
+        // TODO test if all have an id, otherwise pass the downloadTime in the sendAnalyticsRequest
+        this.adManifestDownloadTimes[adBreak.id] = downloadTime
+        if (adBreak.tagType == AdTagType.VMAP) {
             this.sendAnalyticsRequest(adBreak)
-        } else {
-            this.adManifestDownloadTimes[adBreak.id] = downloadTime
         }
     }
 
