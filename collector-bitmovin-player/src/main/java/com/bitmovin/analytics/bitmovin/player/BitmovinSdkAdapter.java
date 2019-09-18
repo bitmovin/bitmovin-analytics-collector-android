@@ -11,42 +11,19 @@ import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
+import com.bitmovin.analytics.data.LanguageInformation;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
 import com.bitmovin.player.*;
-import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent;
-import com.bitmovin.player.api.event.data.DroppedVideoFramesEvent;
-import com.bitmovin.player.api.event.data.ErrorEvent;
-import com.bitmovin.player.api.event.data.PausedEvent;
-import com.bitmovin.player.api.event.data.PlayEvent;
-import com.bitmovin.player.api.event.data.PlaybackFinishedEvent;
-import com.bitmovin.player.api.event.data.ReadyEvent;
-import com.bitmovin.player.api.event.data.SeekEvent;
-import com.bitmovin.player.api.event.data.SeekedEvent;
-import com.bitmovin.player.api.event.data.SourceLoadedEvent;
-import com.bitmovin.player.api.event.data.SourceUnloadedEvent;
-import com.bitmovin.player.api.event.data.StallEndedEvent;
-import com.bitmovin.player.api.event.data.StallStartedEvent;
-import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
-import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener;
-import com.bitmovin.player.api.event.listener.OnDroppedVideoFramesListener;
-import com.bitmovin.player.api.event.listener.OnErrorListener;
-import com.bitmovin.player.api.event.listener.OnPausedListener;
-import com.bitmovin.player.api.event.listener.OnPlayListener;
-import com.bitmovin.player.api.event.listener.OnPlaybackFinishedListener;
-import com.bitmovin.player.api.event.listener.OnReadyListener;
-import com.bitmovin.player.api.event.listener.OnSeekListener;
-import com.bitmovin.player.api.event.listener.OnSeekedListener;
-import com.bitmovin.player.api.event.listener.OnSourceLoadedListener;
-import com.bitmovin.player.api.event.listener.OnSourceUnloadedListener;
-import com.bitmovin.player.api.event.listener.OnStallEndedListener;
-import com.bitmovin.player.api.event.listener.OnStallStartedListener;
-import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener;
+import com.bitmovin.player.api.event.data.*;
+import com.bitmovin.player.api.event.listener.*;
 import com.bitmovin.player.config.media.SourceItem;
 import com.bitmovin.player.config.quality.AudioQuality;
 import com.bitmovin.player.config.quality.VideoQuality;
+import com.bitmovin.player.config.track.AudioTrack;
+import com.bitmovin.player.config.track.SubtitleTrack;
 
 public class BitmovinSdkAdapter implements PlayerAdapter {
     private static final String TAG = "BitmovinPlayerAdapter";
@@ -88,6 +65,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.addEventListener(onVideoPlaybackQualityChangedListener);
         this.bitmovinPlayer.addEventListener(onAudioPlaybackQualityChangedListener);
         this.bitmovinPlayer.addEventListener(onDroppedVideoFramesListener);
+        this.bitmovinPlayer.addEventListener(onSubtitleChangedListener);
+        this.bitmovinPlayer.addEventListener(onAudioChangedListener);
 
         this.bitmovinPlayer.addEventListener(onErrorListener);
     }
@@ -109,6 +88,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.removeEventListener(onAudioPlaybackQualityChangedListener);
         this.bitmovinPlayer.removeEventListener(onDroppedVideoFramesListener);
         this.bitmovinPlayer.removeEventListener(onErrorListener);
+        this.bitmovinPlayer.removeEventListener(onSubtitleChangedListener);
+        this.bitmovinPlayer.removeEventListener(onAudioChangedListener);
     }
 
     private String getUserAgent(Context context) {
@@ -207,6 +188,21 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             data.setAudioCodec(audioQuality.getCodec());
         }
 
+        LanguageInformation languageInformation = new LanguageInformation();
+
+        //Subtitle info
+        SubtitleTrack subtitle = bitmovinPlayer.getSubtitle();
+        if (subtitle != null && subtitle.getId() != null) {
+            languageInformation.setSubtitleLanguage(subtitle.getLanguage());
+        }
+
+        //Audio language
+        AudioTrack audioTrack = bitmovinPlayer.getAudio();
+        if (audioTrack != null && audioTrack.getId() != null) {
+            languageInformation.setAudioLanguage(audioTrack.getLanguage());
+        }
+
+        data.setLanguageInformation(languageInformation);
 
         return data;
     }
@@ -291,6 +287,30 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 stateMachine.transitionState(PlayerState.PLAYING, getPosition());
             } else if (bitmovinPlayer.isPaused() && stateMachine.getCurrentState() != PlayerState.PAUSE) {
                 stateMachine.transitionState(PlayerState.PAUSE, getPosition());
+            }
+        }
+    };
+
+    private OnAudioChangedListener onAudioChangedListener = new OnAudioChangedListener() {
+        @Override
+        public void onAudioChanged(AudioChangedEvent audioChangedEvent) {
+            Log.d(TAG, "On AudioChanged: " + bitmovinPlayer.getAudio().getId());
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
+                PlayerState originalState = stateMachine.getCurrentState();
+                stateMachine.transitionState(PlayerState.AUDIOTRACKCHANGE, getPosition());
+                stateMachine.transitionState(originalState, getPosition());
+            }
+        }
+    };
+
+    private OnSubtitleChangedListener onSubtitleChangedListener = new OnSubtitleChangedListener() {
+        @Override
+        public void onSubtitleChanged(SubtitleChangedEvent event) {
+            Log.d(TAG, "On SubtitleChanged: " + bitmovinPlayer.getAudio().getId());
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
+                PlayerState originalState = stateMachine.getCurrentState();
+                stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
+                stateMachine.transitionState(originalState, getPosition());
             }
         }
     };

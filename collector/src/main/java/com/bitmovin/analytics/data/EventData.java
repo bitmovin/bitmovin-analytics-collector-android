@@ -70,6 +70,9 @@ public class EventData {
     private String audioCodec;
     private List<String> supportedVideoCodecs;
     private DeviceInformation deviceInformation = new DeviceInformation();
+    private boolean subtitleEnabled = false;
+    private String subtitleLanguage = null;
+    private String audioLanguage = null;
 
     public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context, String impressionId, String userAgent) {
         this.analyticsVersion = Util.getVersion();
@@ -104,7 +107,6 @@ public class EventData {
             this.screenWidth = context.getResources().getDisplayMetrics().widthPixels;
             this.language = Util.getLocale();
         }
-
     }
 
     public void setDomain(String domain) {
@@ -593,5 +595,15 @@ public class EventData {
 
     public DeviceInformation getDeviceInformation() {
         return deviceInformation;
+    }
+
+    public LanguageInformation getLanguageInformation() {
+        return new LanguageInformation(this.subtitleLanguage, this.audioLanguage);
+    }
+
+    public void setLanguageInformation(LanguageInformation languageInformation) {
+        this.subtitleEnabled = languageInformation.getSubtitleEnabled();
+        this.subtitleLanguage = languageInformation.getSubtitleLanguage();
+        this.audioLanguage = languageInformation.getAudioLanguage();
     }
 }
