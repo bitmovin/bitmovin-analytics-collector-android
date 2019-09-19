@@ -20,7 +20,7 @@ public class HttpBackend implements Backend {
 
     @Override
     public void send(EventData eventData) {
-        Log.d(TAG, String.format("Sending sample: %s (state: %s, videoId: %s, startupTime: %d, videoStartupTime: %d, buffered: %d, language: %s)",
+        Log.d(TAG, String.format("Sending sample: %s (state: %s, videoId: %s, startupTime: %d, videoStartupTime: %d, buffered: %d, audioLanguage: %s)",
                 eventData.getImpressionId(),
                 eventData.getVideoId(),
                 eventData.getState(),
