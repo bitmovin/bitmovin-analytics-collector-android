@@ -16,9 +16,39 @@ import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
-import com.bitmovin.player.*;
-import com.bitmovin.player.api.event.data.*;
-import com.bitmovin.player.api.event.listener.*;
+import com.bitmovin.player.BitmovinPlayer;
+import com.bitmovin.player.api.event.data.AudioChangedEvent;
+import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent;
+import com.bitmovin.player.api.event.data.DroppedVideoFramesEvent;
+import com.bitmovin.player.api.event.data.ErrorEvent;
+import com.bitmovin.player.api.event.data.PausedEvent;
+import com.bitmovin.player.api.event.data.PlayEvent;
+import com.bitmovin.player.api.event.data.PlaybackFinishedEvent;
+import com.bitmovin.player.api.event.data.ReadyEvent;
+import com.bitmovin.player.api.event.data.SeekEvent;
+import com.bitmovin.player.api.event.data.SeekedEvent;
+import com.bitmovin.player.api.event.data.SourceLoadedEvent;
+import com.bitmovin.player.api.event.data.SourceUnloadedEvent;
+import com.bitmovin.player.api.event.data.StallEndedEvent;
+import com.bitmovin.player.api.event.data.StallStartedEvent;
+import com.bitmovin.player.api.event.data.SubtitleChangedEvent;
+import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
+import com.bitmovin.player.api.event.listener.OnAudioChangedListener;
+import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener;
+import com.bitmovin.player.api.event.listener.OnDroppedVideoFramesListener;
+import com.bitmovin.player.api.event.listener.OnErrorListener;
+import com.bitmovin.player.api.event.listener.OnPausedListener;
+import com.bitmovin.player.api.event.listener.OnPlayListener;
+import com.bitmovin.player.api.event.listener.OnPlaybackFinishedListener;
+import com.bitmovin.player.api.event.listener.OnReadyListener;
+import com.bitmovin.player.api.event.listener.OnSeekListener;
+import com.bitmovin.player.api.event.listener.OnSeekedListener;
+import com.bitmovin.player.api.event.listener.OnSourceLoadedListener;
+import com.bitmovin.player.api.event.listener.OnSourceUnloadedListener;
+import com.bitmovin.player.api.event.listener.OnStallEndedListener;
+import com.bitmovin.player.api.event.listener.OnStallStartedListener;
+import com.bitmovin.player.api.event.listener.OnSubtitleChangedListener;
+import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener;
 import com.bitmovin.player.config.media.SourceItem;
 import com.bitmovin.player.config.quality.AudioQuality;
 import com.bitmovin.player.config.quality.VideoQuality;
@@ -327,7 +357,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
 
     private OnVideoPlaybackQualityChangedListener onVideoPlaybackQualityChangedListener = new OnVideoPlaybackQualityChangedListener() {
         @Override
-        public void onVideoPlaybackQualityChanged(VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
+        public void onVideoPlaybackQualityChanged(
+            VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Video Quality Changed");
             if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
                 PlayerState originalState = stateMachine.getCurrentState();
@@ -346,7 +377,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
 
     private OnAudioPlaybackQualityChangedListener onAudioPlaybackQualityChangedListener = new OnAudioPlaybackQualityChangedListener() {
         @Override
-        public void onAudioPlaybackQualityChanged(AudioPlaybackQualityChangedEvent audioPlaybackQualityChangedEvent) {
+        public void onAudioPlaybackQualityChanged(
+            AudioPlaybackQualityChangedEvent audioPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Audio Quality Changed");
             if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
                 PlayerState originalState = stateMachine.getCurrentState();
