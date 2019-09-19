@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Added
-- Sending out information about selected audio track language and subtitle language.
+- Sending out information about selected audio track language and subtitle language for the Bitmovin Player.
 
 
 ## v1.7.0
