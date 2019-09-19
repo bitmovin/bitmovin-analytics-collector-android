@@ -218,21 +218,17 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             data.setAudioCodec(audioQuality.getCodec());
         }
 
-        LanguageInformation languageInformation = new LanguageInformation();
-
         //Subtitle info
         SubtitleTrack subtitle = bitmovinPlayer.getSubtitle();
         if (subtitle != null && subtitle.getId() != null) {
-            languageInformation.setSubtitleLanguage(subtitle.getLanguage());
+            data.setSubtitleLanguage(subtitle.getLanguage());
         }
 
         //Audio language
         AudioTrack audioTrack = bitmovinPlayer.getAudio();
         if (audioTrack != null && audioTrack.getId() != null) {
-            languageInformation.setAudioLanguage(audioTrack.getLanguage());
+            data.setAudioLanguage(audioTrack.getLanguage());
         }
-
-        data.setLanguageInformation(languageInformation);
 
         return data;
     }

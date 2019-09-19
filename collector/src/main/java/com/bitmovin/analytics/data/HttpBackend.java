@@ -26,7 +26,7 @@ public class HttpBackend implements Backend {
                 eventData.getState(),
                 eventData.getStartupTime(),
                 eventData.getVideoStartupTime(),
-                eventData.getBuffered(), eventData.getLanguageInformation().getAudioLanguage()));
+                eventData.getBuffered(), eventData.getAudioLanguage()));
         this.httpClient.post(DataSerializer.serialize(eventData), null);
     }
 }

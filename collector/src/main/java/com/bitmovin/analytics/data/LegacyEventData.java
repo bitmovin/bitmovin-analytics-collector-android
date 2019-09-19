@@ -597,14 +597,4 @@ public class LegacyEventData {
     public DeviceInformation getDeviceInformation() {
         return deviceInformation;
     }
-
-    public LanguageInformation getLanguageInformation() {
-        return new LanguageInformation(this.subtitleLanguage, this.audioLanguage);
-    }
-
-    public void setLanguageInformation(LanguageInformation languageInformation) {
-        this.subtitleEnabled = languageInformation.getSubtitleEnabled();
-        this.subtitleLanguage = languageInformation.getSubtitleLanguage();
-        this.audioLanguage = languageInformation.getAudioLanguage();
-    }
 }
