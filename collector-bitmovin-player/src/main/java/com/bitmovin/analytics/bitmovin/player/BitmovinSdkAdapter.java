@@ -306,7 +306,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private OnSubtitleChangedListener onSubtitleChangedListener = new OnSubtitleChangedListener() {
         @Override
         public void onSubtitleChanged(SubtitleChangedEvent event) {
-            Log.d(TAG, "On SubtitleChanged: " + bitmovinPlayer.getAudio().getId());
+            Log.d(TAG, "On SubtitleChanged: " + bitmovinPlayer.getSubtitle().getId());
             if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
