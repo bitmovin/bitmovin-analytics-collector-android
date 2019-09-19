@@ -231,7 +231,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
   @Override
   public void onSubtitleChange() {
-    Log.d(TAG, String.format("onAudioTrackChange %s", playerStateMachine.getImpressionId()));
+    Log.d(TAG, String.format("onSubtitleChange %s", playerStateMachine.getImpressionId()));
     EventData data = playerAdapter.createEventData();
     data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
     data.setDuration(0);
