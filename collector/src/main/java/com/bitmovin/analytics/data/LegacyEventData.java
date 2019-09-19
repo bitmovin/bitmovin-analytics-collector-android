@@ -7,7 +7,8 @@ import com.bitmovin.analytics.utils.Util;
 
 import java.util.List;
 
-public class EventData {
+@Deprecated
+public class LegacyEventData {
     private String domain;
     private String path = "";
     private String language;
@@ -74,7 +75,7 @@ public class EventData {
     private String subtitleLanguage = null;
     private String audioLanguage = null;
 
-    public EventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context, String impressionId, String userAgent) {
+    public LegacyEventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context, String impressionId, String userAgent) {
         this.analyticsVersion = Util.getVersion();
         this.key = bitmovinAnalyticsConfig.getKey();
         this.playerKey = bitmovinAnalyticsConfig.getPlayerKey();
