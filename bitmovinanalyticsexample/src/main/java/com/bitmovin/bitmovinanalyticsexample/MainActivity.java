@@ -13,6 +13,10 @@ import com.bitmovin.player.BitmovinPlayerView;
 import com.bitmovin.player.config.PlaybackConfiguration;
 import com.bitmovin.player.config.PlayerConfiguration;
 import com.bitmovin.player.config.media.SourceConfiguration;
+import com.bitmovin.player.config.track.AudioTrack;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -22,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button releaseButton;
     private Button createButton;
     private Button changeSource;
+    private Button changeAudio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         createButton.setOnClickListener(this);
         changeSource = findViewById(R.id.change_source);
         changeSource.setOnClickListener(this);
+        changeAudio = findViewById(R.id.change_audio);
+        changeAudio.setOnClickListener(this);
 
         this.bitmovinPlayerView = this.findViewById(R.id.bitmovinPlayerView);
         this.bitmovinPlayer = this.bitmovinPlayerView.getPlayer();
@@ -47,9 +54,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    // This is an internal Bitmovin Analytics Key
+    private final String LOCAL_DEVELOPMENT_KEY = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0";
+
     protected void initializeAnalytics() {
+
         //Step 1: Create your analytics config object
-        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>", "<YOUR_PLAYER_KEY>", getApplicationContext());
+        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig(LOCAL_DEVELOPMENT_KEY, "<YOUR_PLAYER_KEY>", getApplicationContext());
 
         //Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
@@ -75,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SourceConfiguration sourceConfiguration = new SourceConfiguration();
 
         // Add a new source item
-        sourceConfiguration.addSourceItem("https://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
+        sourceConfiguration.addSourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
 
         //Step 4: Attach BitmovinPlayer
         bitmovinAnalytics.attachPlayer(bitmovinPlayer);
@@ -117,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             initializePlayer();
         } else if (v == changeSource) {
             onPlayerChangeSource();
+        } else if (v == changeAudio) {
+            onAudioTrackChange();
         }
     }
 
@@ -124,5 +137,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SourceConfiguration config = new SourceConfiguration();
         config.addSourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
         bitmovinPlayer.load(config);
+
+    }
+
+    private void onAudioTrackChange() {
+        AudioTrack[] available = bitmovinPlayer.getAvailableAudio();
+        List<AudioTrack> audioTracks = Arrays.asList(available);
+        int index = audioTracks.indexOf(bitmovinPlayer.getAudio());
+
+        String id = available[(index + 1) % available.length].getId();
+        bitmovinPlayer.setAudio(id);
     }
 }
