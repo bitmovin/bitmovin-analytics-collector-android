@@ -68,9 +68,5 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Conte
     val deviceInformation = DeviceInformation()
     var subtitleEnabled: Boolean = false
     var subtitleLanguage: String? = null
-    set(value) {
-        this.subtitleEnabled = value != null
-        field = value
-    }
     var audioLanguage: String? = null
 }
