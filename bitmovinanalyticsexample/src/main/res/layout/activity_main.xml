@@ -38,6 +38,14 @@
             android:text="@string/exo_track_selection_title_audio" />
 
         <Button
+          android:id="@+id/change_subtitle"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="Subtitle" />
+
+
+        <Button
             android:id="@+id/change_source"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

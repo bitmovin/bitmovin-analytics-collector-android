@@ -15,6 +15,7 @@ import com.bitmovin.player.config.PlayerConfiguration;
 import com.bitmovin.player.config.media.SourceConfiguration;
 import com.bitmovin.player.config.track.AudioTrack;
 
+import com.bitmovin.player.config.track.SubtitleTrack;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button createButton;
     private Button changeSource;
     private Button changeAudio;
+    private Button changeSubtitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         changeSource = findViewById(R.id.change_source);
         changeSource.setOnClickListener(this);
         changeAudio = findViewById(R.id.change_audio);
+        changeAudio.setOnClickListener(this);
+        changeSubtitle = findViewById(R.id.change_subtitle);
         changeAudio.setOnClickListener(this);
 
         this.bitmovinPlayerView = this.findViewById(R.id.bitmovinPlayerView);
@@ -130,6 +134,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             onPlayerChangeSource();
         } else if (v == changeAudio) {
             onAudioTrackChange();
+        } else if (v == changeSubtitle) {
+            onSubtitleChange();
         }
     }
 
@@ -147,5 +153,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         String id = available[(index + 1) % available.length].getId();
         bitmovinPlayer.setAudio(id);
+    }
+
+    private void onSubtitleChange() {
+        SubtitleTrack[] available = bitmovinPlayer.getAvailableSubtitles();
+        List<SubtitleTrack> audioTracks = Arrays.asList(available);
+        int index = audioTracks.indexOf(bitmovinPlayer.getSubtitle());
+
+        String id = available[(index + 1) % available.length].getId();
+        bitmovinPlayer.setSubtitle(id);
     }
 }
