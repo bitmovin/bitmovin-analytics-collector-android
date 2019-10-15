@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.data;
 
-public enum ErrorCode {
+enum class ErrorCode(val errorCode: Int, val description: String, var errorData : ErrorData? = null) {
     LICENSE_ERROR(1016, "A license error has occurred"),
     LICENSE_ERROR_INVALID_DOMAIN(1017, "License error invalid domain"),
     LICENSE_ERROR_INVALID_SERVER_URL(1018, "License error invalid server url"),
@@ -18,33 +18,15 @@ public enum ErrorCode {
     DRM_KEY_EXPIRED(4004, "DRM Key Expired Error"),
     PLAYER_SETUP_ERROR(4005, "Player Setup Error"),
 
-    DATASOURCE_HTTP_FAILURE(3006, "Data Source request failed with HTTP status: "),
-    DATASOURCE_INVALID_CONTENT_TYPE(1000001, "Invalid content type: "),
-    DATASOURCE_UNABLE_TO_CONNECT(1000002, "Unable to connect: "),
+    DATASOURCE_HTTP_FAILURE(3006, "Data Source request failed"),
+    DATASOURCE_INVALID_CONTENT_TYPE(1000001, "Invalid content type"),
+    DATASOURCE_UNABLE_TO_CONNECT(1000002, "Unable to connect"),
     EXOPLAYER_RENDERER_ERROR(1000003, "ExoPlayer Renderer Error");
 
-    private final int errorCode;
-    private String description;
-
-    private ErrorCode(int errorCode, String description) {
-        this.errorCode = errorCode;
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getErrorCode() {
-        return errorCode;
-    }
-
     @Override
-    public String toString() {
-        return errorCode + ": " + description;
+    override fun toString() : String {
+        return errorCode.toString() + ": " + description;
     }
+
+    data class ErrorData(val msg: String, val details: Array<String> = emptyArray())
 }
