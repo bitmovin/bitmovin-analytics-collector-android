@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
+### Fixed
+- Error message contained too much data, so that grouping is not useful
+
+### Changed
+- Stacktrace is now part of the errorData that is logged, to ease analysis
 
 ## v1.8.0
 
