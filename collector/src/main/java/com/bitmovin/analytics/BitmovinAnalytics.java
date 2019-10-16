@@ -1,5 +1,7 @@
 package com.bitmovin.analytics;
 
+import static com.bitmovin.analytics.utils.DataSerializer.serialize;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -11,6 +13,7 @@ import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.license.LicenseCallback;
+import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.Util;
 
 /**
@@ -151,6 +154,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
         data.setErrorCode(errorCode.getErrorCode());
         data.setErrorMessage(errorCode.getDescription());
+        data.setErrorData(serialize(errorCode.getErrorData()));
         sendEventData(data);
     }
 

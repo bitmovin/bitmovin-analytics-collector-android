@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.data;
 
-enum class ErrorCode(val errorCode: Int, val description: String, var errorData : ErrorData? = null) {
+enum class ErrorCode(val errorCode: Int, var description: String, var errorData : ErrorData? = null) {
     LICENSE_ERROR(1016, "A license error has occurred"),
     LICENSE_ERROR_INVALID_DOMAIN(1017, "License error invalid domain"),
     LICENSE_ERROR_INVALID_SERVER_URL(1018, "License error invalid server url"),
