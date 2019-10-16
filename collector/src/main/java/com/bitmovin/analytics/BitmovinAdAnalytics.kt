@@ -63,6 +63,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 
     fun onAdError(adBreak: AdBreak, code: Int?, message: String?) {
         val adSample: AdSample
+        //todo change to references here
         if (this.activeAdSample != null &&
                 adBreak.ads.any { ad -> ad.id == this.activeAdSample!!.ad.id }) {
             adSample = this.activeAdSample!!
