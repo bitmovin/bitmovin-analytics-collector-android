@@ -10,7 +10,7 @@ import com.google.android.exoplayer2.upstream.HttpDataSource
 
 
 class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
-    fun map(error: ExoPlaybackException): ErrorCode {
+    private fun doMap(error: ExoPlaybackException): ErrorCode {
         var errorCode = ErrorCode.UNKNOWN_ERROR
         when (error.type) {
             TYPE_SOURCE -> {
@@ -47,7 +47,7 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
 
     override fun map(throwable: Throwable): ErrorCode {
         return when (throwable) {
-            is ExoPlaybackException -> map(throwable)
+            is ExoPlaybackException -> doMap(throwable)
             else -> {
                 val errorCode = ErrorCode.UNKNOWN_ERROR
                 errorCode.errorData = ErrorData(throwable.message

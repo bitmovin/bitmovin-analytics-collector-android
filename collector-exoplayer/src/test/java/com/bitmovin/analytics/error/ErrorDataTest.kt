@@ -5,7 +5,7 @@ import com.bitmovin.analytics.utils.DataSerializer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
-class UtilTest {
+class ErrorDataTest {
 
     @Test
     fun serializeErrorData() {
