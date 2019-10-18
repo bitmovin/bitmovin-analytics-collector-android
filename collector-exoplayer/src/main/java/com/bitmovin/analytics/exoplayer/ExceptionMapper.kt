@@ -32,7 +32,7 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
                         ?: "", error.rendererException.topOfStacktrace)
             }
             TYPE_UNEXPECTED -> {
-                errorCode = ErrorCode.EXOPLAYER_RENDERER_ERROR
+                errorCode = ErrorCode.UNKNOWN_ERROR
                 errorCode.errorData = ErrorData(error.unexpectedException.message
                         ?: "", error.unexpectedException.topOfStacktrace)
             }
