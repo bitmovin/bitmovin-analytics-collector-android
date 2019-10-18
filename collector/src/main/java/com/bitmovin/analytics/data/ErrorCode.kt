@@ -28,5 +28,4 @@ enum class ErrorCode(val errorCode: Int, var description: String, var errorData 
         return errorCode.toString() + ": " + description;
     }
 
-    data class ErrorData(val msg: String, val details: Array<String> = emptyArray())
 }
