@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Added
-
 - sending information event for `device orientation`
 
 ## v1.9.0

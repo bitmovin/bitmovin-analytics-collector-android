@@ -89,8 +89,6 @@ public class Util {
     }
 
     public static String getDeviceOrientation(Context context) {
-//        Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-//        int deviceOrientation = display.getRotation();
         int deviceOrientation = context.getResources().getConfiguration().orientation;
         switch (deviceOrientation) {
             case Configuration.ORIENTATION_PORTRAIT:
