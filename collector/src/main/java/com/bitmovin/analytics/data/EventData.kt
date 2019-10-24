@@ -70,4 +70,5 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Conte
     var subtitleEnabled: Boolean = false
     var subtitleLanguage: String? = null
     var audioLanguage: String? = null
+    var deviceOrientation: String? = Util.getDeviceOrientation(context)
 }

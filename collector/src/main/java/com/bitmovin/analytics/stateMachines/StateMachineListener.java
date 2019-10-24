@@ -35,4 +35,6 @@ public interface StateMachineListener {
     void onSubtitleChange();
 
     void onAudioTrackChange();
+
+    void onRotate();
 }

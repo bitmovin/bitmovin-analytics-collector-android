@@ -139,6 +139,21 @@ public enum PlayerState {
             }
             machine.setSeekTimeStamp(0);
         }
+
+    },
+
+    ROTATE {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+            machine.setSeekTimeStamp(machine.getOnEnterStateTimeStamp());
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState destinationPlayerState) {
+            for (StateMachineListener listener : machine.getListeners()) {
+                listener.onRotate();
+            }
+        }
     };
 
     abstract void onEnterState(PlayerStateMachine machine);

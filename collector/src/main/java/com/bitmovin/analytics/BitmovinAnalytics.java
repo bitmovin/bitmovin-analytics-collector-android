@@ -1,8 +1,13 @@
 package com.bitmovin.analytics;
 
+import static android.content.Context.SENSOR_SERVICE;
 import static com.bitmovin.analytics.utils.DataSerializer.serialize;
 
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.util.Log;
 
 import com.bitmovin.analytics.adapters.PlayerAdapter;
@@ -10,6 +15,7 @@ import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
+import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.license.LicenseCallback;
@@ -45,6 +51,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
         this.playerStateMachine.addListener(this);
         this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this);
+        this.addDeviceOrientationListener();
     }
 
     /**
@@ -83,6 +90,31 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             playerStateMachine.resetStateMachine();
         }
         eventDataDispatcher.disable();
+    }
+
+    private void addDeviceOrientationListener() {
+
+        SensorEventListener m_sensorEventListener = new SensorEventListener() {
+            private boolean isPortrait = Util.getDeviceOrientation(context).equals("portrait");
+
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if ((playerStateMachine.getCurrentState() == PlayerState.PLAYING || playerStateMachine.getCurrentState() == PlayerState.PAUSE)
+                        && isPortrait != Util.getDeviceOrientation(context).equals("portrait")) {
+                    PlayerState originalState = playerStateMachine.getCurrentState();
+                    playerStateMachine.transitionState(PlayerState.ROTATE, getPosition());
+                    playerStateMachine.transitionState(originalState, getPosition());
+                    isPortrait = !isPortrait;
+                }
+            }
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                // No state change here
+            }
+        };
+
+        SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
+        sm.registerListener(m_sensorEventListener, sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -252,6 +284,16 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     sendEventData(data);
     data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
     data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+  }
+
+  @Override
+  public void onRotate() {
+      Log.d(TAG, String.format("onRotate %s", playerStateMachine.getImpressionId()));
+      EventData data = playerAdapter.createEventData();
+      data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+      data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
+      data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+      sendEventData(data);
   }
 
     public void sendEventData(EventData data) {

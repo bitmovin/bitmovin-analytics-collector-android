@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.utils;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -85,5 +86,19 @@ public class Util {
             }
         }
         return false;
+    }
+
+    public static String getDeviceOrientation(Context context) {
+//        Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+//        int deviceOrientation = display.getRotation();
+        int deviceOrientation = context.getResources().getConfiguration().orientation;
+        switch (deviceOrientation) {
+            case Configuration.ORIENTATION_PORTRAIT:
+                return "portrait";
+            case Configuration.ORIENTATION_LANDSCAPE:
+                return "landscape";
+            default:
+                return "";
+        }
     }
 }
