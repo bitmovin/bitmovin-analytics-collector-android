@@ -13,7 +13,6 @@ import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.license.LicenseCallback;
-import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.Util;
 
 /**

@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.utils;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
