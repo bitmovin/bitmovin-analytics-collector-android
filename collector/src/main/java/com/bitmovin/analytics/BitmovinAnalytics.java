@@ -94,7 +94,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
     private void addDeviceOrientationListener() {
 
-        SensorEventListener m_sensorEventListener = new SensorEventListener() {
+        SensorEventListener sensorEventListener = new SensorEventListener() {
             private boolean isPortrait = Util.getDeviceOrientation(context).equals("portrait");
 
             @Override
@@ -113,8 +113,11 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             }
         };
 
-        SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
-        sm.registerListener(m_sensorEventListener, sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
+        Object serviceObject = context.getSystemService(SENSOR_SERVICE);
+        if(serviceObject != null){
+            SensorManager sm = (SensorManager) serviceObject;
+            sm.registerListener(sensorEventListener , sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     @Override
