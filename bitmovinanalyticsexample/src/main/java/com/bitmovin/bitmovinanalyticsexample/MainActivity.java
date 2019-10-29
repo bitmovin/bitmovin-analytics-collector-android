@@ -41,6 +41,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         this.bitmovinPlayerView = this.findViewById(R.id.bitmovinPlayerView);
 
+        this.bitmovinAnalytics = this.initializeAnalytics();
+
+        this.initializeBitmovinPlayer();
+    }
+
+    protected void initializeBitmovinPlayer(){
         PlayerConfiguration config = new PlayerConfiguration();
 
         SourceConfiguration source = this.createSource();
@@ -53,14 +59,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         playbackConfiguration.setMuted(true);
         playbackConfiguration.setAutoplayEnabled(false);
 
-        this.bitmovinAnalytics = this.initializeAnalytics();
-
         this.bitmovinPlayer = new BitmovinPlayer(getApplicationContext(), config);
+
+        this.bitmovinAnalytics.detachPlayer();
         this.bitmovinAnalytics.attachPlayer(bitmovinPlayer);
 
         this.bitmovinPlayerView.setPlayer(this.bitmovinPlayer);
-
-
     }
 
     protected BitmovinPlayerCollector initializeAnalytics() {
@@ -127,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (v == releaseButton) {
             releasePlayer();
         } else if (v == createButton) {
-            createSource();
+            initializeBitmovinPlayer();
         } else if (v == changeSource) {
             onPlayerChangeSource();
         }
@@ -138,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         config.addSourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
         bitmovinPlayer.load(config);
     }
+
     private static final String AD_SOURCE_1 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=";
     private static final String AD_SOURCE_2 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
     private static final String AD_SOURCE_3 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
