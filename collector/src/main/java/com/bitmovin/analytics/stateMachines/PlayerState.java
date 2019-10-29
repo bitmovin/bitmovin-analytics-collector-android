@@ -101,6 +101,31 @@ public enum PlayerState {
             }
         }
     },
+    AUDIOTRACKCHANGE {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState destinationPlayerState) {
+            for (StateMachineListener listener : machine.getListeners()) {
+                listener.onAudioTrackChange();
+            }
+        }
+    },
+    SUBTITLECHANGE {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine, long timeStamp, PlayerState destinationPlayerState) {
+            for (StateMachineListener listener : machine.getListeners()) {
+                listener.onSubtitleChange();
+            }
+        }
+    },
+
     SEEKING {
         @Override
         void onEnterState(PlayerStateMachine machine) {

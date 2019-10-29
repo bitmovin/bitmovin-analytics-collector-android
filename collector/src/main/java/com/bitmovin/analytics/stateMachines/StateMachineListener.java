@@ -32,4 +32,7 @@ public interface StateMachineListener {
 
     void onVideoChange();
 
+    void onSubtitleChange();
+
+    void onAudioTrackChange();
 }
