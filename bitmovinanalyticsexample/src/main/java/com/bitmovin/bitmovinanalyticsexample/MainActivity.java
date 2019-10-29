@@ -79,11 +79,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected BitmovinPlayerCollector initializeAnalytics() {
-        // This is an internal Bitmovin Analytics Key
-        private final String LOCAL_DEVELOPMENT_KEY = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0";
-
-        //Step 1: Create your analytics config object
-        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig(LOCAL_DEVELOPMENT_KEY);
+        //Step 1: Create your analytics config object with the Local Development Key
+        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0");
 
         //Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");

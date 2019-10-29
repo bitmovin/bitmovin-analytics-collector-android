@@ -37,6 +37,7 @@ public class HttpBackend implements Backend {
     @Override
     public void sendAd(AdEventData eventData) {
         Log.d(TAG, String.format("Sending ad sample: %s (videoImpressionId: %s, adImpressionId: %s)",
+                eventData.getAdImpressionId(),
                 eventData.getVideoImpressionId(),
                 eventData.getAdImpressionId()));
         this.httpClient.post(adsAnalyticsBackendUrl, DataSerializer.serialize(eventData), null);
