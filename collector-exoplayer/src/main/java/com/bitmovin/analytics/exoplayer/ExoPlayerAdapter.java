@@ -1,16 +1,20 @@
 package com.bitmovin.analytics.exoplayer;
 
+import static com.google.android.exoplayer2.C.TIME_UNSET;
+import static com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO;
+import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
+
 import android.content.Context;
 import android.net.NetworkInfo;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
-
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.PlayerType;
+import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
@@ -32,15 +36,7 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.upstream.HttpDataSource;
-
 import java.io.IOException;
-
-import static com.google.android.exoplayer2.C.TIME_UNSET;
-import static com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO;
-import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
-import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_RENDERER;
-import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE;
 
 public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener {
     private static final String TAG = "ExoPlayerAdapter";
@@ -49,6 +45,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private ExoPlayer exoplayer;
     private PlayerStateMachine stateMachine;
     private int totalDroppedVideoFrames;
+    private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
@@ -58,6 +55,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.totalDroppedVideoFrames = 0;
         this.context = context;
         attachAnalyticsListener();
+
     }
 
     private void attachAnalyticsListener() {
@@ -156,43 +154,13 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onPlayerError(ExoPlaybackException error) {
         Log.d(TAG, "onPlayerError");
         long videoTime = getPosition();
-        mapError(error);
+        error.printStackTrace();
+        ErrorCode errorCode = exceptionMapper.map(error);
+        this.stateMachine.setErrorCode(errorCode);
         this.stateMachine.transitionState(PlayerState.ERROR, videoTime);
     }
 
-    private void mapError(ExoPlaybackException error) {
-        error.printStackTrace();
-        ErrorCode errorCode = ErrorCode.UNKNOWN_ERROR;
-        switch (error.type) {
-            case TYPE_SOURCE:
-                IOException exception = error.getSourceException();
-                if (exception instanceof HttpDataSource.InvalidResponseCodeException) {
-                    errorCode = ErrorCode.DATASOURCE_HTTP_FAILURE;
-                    HttpDataSource.InvalidResponseCodeException responseCodeException = (HttpDataSource.InvalidResponseCodeException) exception;
-                    errorCode.setDescription("Data Source request failed with HTTP status: " + responseCodeException.responseCode + " - " + responseCodeException.dataSpec.uri);
-                    this.stateMachine.setErrorCode(errorCode);
-                } else if (exception instanceof HttpDataSource.InvalidContentTypeException) {
-                    HttpDataSource.InvalidContentTypeException contentTypeException = (HttpDataSource.InvalidContentTypeException) exception;
-                    errorCode = ErrorCode.DATASOURCE_INVALID_CONTENT_TYPE;
-                    errorCode.setDescription("Invalid Content Type: " + contentTypeException.contentType);
-                    this.stateMachine.setErrorCode(errorCode);
-                } else if (exception instanceof HttpDataSource.HttpDataSourceException) {
-                    HttpDataSource.HttpDataSourceException httpDataSourceException = (HttpDataSource.HttpDataSourceException) exception;
-                    errorCode = ErrorCode.DATASOURCE_UNABLE_TO_CONNECT;
-                    errorCode.setDescription("Unable to connect: " + httpDataSourceException.dataSpec.uri);
-                    this.stateMachine.setErrorCode(errorCode);
-                }
-                break;
-            case TYPE_RENDERER:
-                errorCode = ErrorCode.EXOPLAYER_RENDERER_ERROR;
-                break;
-            default:
-                errorCode = ErrorCode.UNKNOWN_ERROR;
-                break;
-        }
 
-        this.stateMachine.setErrorCode(errorCode);
-    }
 
     @Override
     public void onPositionDiscontinuity(int reason) {

@@ -17,6 +17,9 @@ android {
         versionCode rootProject.ext.versionCode
         versionName libraryVersion
 
+        testOptions {
+            multiDexEnabled true
+        }
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
@@ -24,7 +27,6 @@ android {
     lintOptions {
         abortOnError false
     }
-
 
     compileOptions {
         sourceCompatibility 1.8
@@ -44,8 +46,12 @@ dependencies {
 
     implementation 'com.android.support:appcompat-v7:27.1.1'
     testImplementation 'junit:junit:4.12'
+    testImplementation "org.assertj:assertj-core:3.11.1"
+    testImplementation 'org.mockito:mockito-core:2.7.22'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation "org.assertj:assertj-core:3.11.1"
+    androidTestImplementation 'org.mockito:mockito-android:2.7.22'
 
     if (rootProject.ext.developLocal == true) {
         api project(':collector')
@@ -54,7 +60,6 @@ dependencies {
     }
     implementation 'com.google.android.exoplayer:exoplayer:2.8.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-
 }
 
 apply from: '../bitmovinpropertiesloader.gradle'

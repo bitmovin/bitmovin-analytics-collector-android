@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.9.0
+### Fixed
+- Error message contained too much data, so that grouping is not useful
+
+### Changed
+- Stacktrace is now part of the errorData that is logged, to ease analysis
+
+## Added
+- Log unexpected `ExoPlaybackException`s and unchecked exceptions
+
+## v1.8.0
+
+### Added
+- Sending out information about selected audio track language and subtitle language for the Bitmovin Player.
+
 ## v1.7.0
 
 ### Added
