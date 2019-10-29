@@ -23,6 +23,9 @@
         <meta-data
             android:name="BITMOVIN_PLAYER_LICENSE_KEY"
             android:value="18ca6ad5-9768-4129-bdf6-17685e0d14d2" />
+        <meta-data
+            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+            android:value="true"/>
     </application>
 
 </manifest>
