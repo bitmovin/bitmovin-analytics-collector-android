@@ -5,13 +5,11 @@ import com.bitmovin.player.model.advertising.AdTag
 
 class AdTagFactory {
 
-    fun FromPlayerAdTag(adTag: AdTag): AdTagType? {
-        if (adTag == null)
-            return null
+    fun FromPlayerAdTag(adTag: AdTag): AdTagType {
         return when {
             adTag.type == com.bitmovin.player.model.advertising.AdTagType.VAST -> AdTagType.VAST
             adTag.type == com.bitmovin.player.model.advertising.AdTagType.VMAP -> AdTagType.VMAP
-            else -> null
+            else -> AdTagType.UNKNOWN
         }
     }
 }
