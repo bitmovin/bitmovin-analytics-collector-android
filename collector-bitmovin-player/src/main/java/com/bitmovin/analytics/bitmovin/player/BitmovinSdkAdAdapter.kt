@@ -2,8 +2,8 @@ package com.bitmovin.analytics.bitmovin.player
 
 import com.bitmovin.analytics.BitmovinAdAnalytics
 import com.bitmovin.analytics.adapters.AdAdapter
-import com.bitmovin.analytics.bitmovin.player.utils.AdBreakFactory
-import com.bitmovin.analytics.bitmovin.player.utils.AdFactory
+import com.bitmovin.analytics.bitmovin.player.utils.AdBreakMapper
+import com.bitmovin.analytics.bitmovin.player.utils.AdMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdQuartileFactory
 import com.bitmovin.analytics.data.AdModuleInformation
 import com.bitmovin.player.BitmovinPlayer
@@ -14,15 +14,17 @@ import com.bitmovin.player.api.event.listener.*
  */
 class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: BitmovinAdAnalytics) : AdAdapter {
 
-    private val adFactory: AdFactory = AdFactory()
-    private val adBreakFactory: AdBreakFactory = AdBreakFactory()
+    private val adMapper: AdMapper = AdMapper()
+    private val adBreakMapper: AdBreakMapper = AdBreakMapper()
     private val adQuartileFactory: AdQuartileFactory = AdQuartileFactory()
 
 
     private val onAdStartedListener = OnAdStartedListener {
-        if(it.ad != null){
-            adAnalytics.onAdStarted(adFactory.FromPlayerAd(it.ad!!))
+        if(it.ad == null){
+            return@OnAdStartedListener
         }
+
+        adAnalytics.onAdStarted(adMapper.FromPlayerAd(it.ad!!))
     }
 
     private val onAdFinishedListener = OnAdFinishedListener {
@@ -30,9 +32,11 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     }
 
     private val onAdBreakStartedListener = OnAdBreakStartedListener {
-        if (it.adBreak != null){
-            adAnalytics.onAdBreakStarted(adBreakFactory.FromPlayerImaAdBreak(it.adBreak!! as com.bitmovin.player.model.advertising.ima.ImaAdBreak))
+        if (it.adBreak == null){
+            return@OnAdBreakStartedListener
         }
+
+        adAnalytics.onAdBreakStarted(adBreakMapper.FromPlayerAdBreak(it.adBreak!!))
     }
 
     private val onAdBreakFinishedListener = OnAdBreakFinishedListener {
@@ -44,13 +48,15 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     }
 
     private val onAdErrorListener = OnAdErrorListener {
-        if(it.adConfiguration != null && it.adConfiguration!! is com.bitmovin.player.model.advertising.ima.ImaAdBreak)
+        if(it.adConfiguration == null)
         {
-            adAnalytics.onAdError(
-                    adBreakFactory.FromPlayerImaAdBreak(it.adConfiguration!! as com.bitmovin.player.model.advertising.ima.ImaAdBreak),
-                    it.code,
-                    it.message)
+            return@OnAdErrorListener
         }
+
+        adAnalytics.onAdError(
+                adBreakMapper.FromPlayerAdConfiguration(it.adConfiguration!!),
+                it.code,
+                it.message)
     }
 
     private val onAdSkippedListener = OnAdSkippedListener {
@@ -58,9 +64,11 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     }
 
     private val onAdManifestLoadedListener = OnAdManifestLoadedListener {
-        if (it.adBreak != null){
-            adAnalytics.onAdManifestLoaded(adBreakFactory.FromPlayerImaAdBreak(it.adBreak!! as com.bitmovin.player.model.advertising.ima.ImaAdBreak), it.downloadTime)
+        if (it.adBreak == null){
+            return@OnAdManifestLoadedListener
         }
+
+        adAnalytics.onAdManifestLoaded(adBreakMapper.FromPlayerAdBreak(it.adBreak!!), it.downloadTime)
     }
 
     private val onPlayListener = OnPlayListener {
@@ -90,7 +98,17 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     }
 
     override fun release() {
-
+        bitmovinPlayer.removeEventListener(onAdStartedListener)
+        bitmovinPlayer.removeEventListener(onAdFinishedListener)
+        bitmovinPlayer.removeEventListener(onAdBreakStartedListener)
+        bitmovinPlayer.removeEventListener(onAdBreakFinishedListener)
+        bitmovinPlayer.removeEventListener(onAdClickedListener)
+        bitmovinPlayer.removeEventListener(onAdErrorListener)
+        bitmovinPlayer.removeEventListener(onAdSkippedListener)
+        bitmovinPlayer.removeEventListener(onAdManifestLoadedListener)
+        bitmovinPlayer.removeEventListener(onPlayListener)
+        bitmovinPlayer.removeEventListener(onPausedListener)
+        bitmovinPlayer.removeEventListener(onAdQuartileListener)
     }
 
     override val isLinearAdActive: Boolean
