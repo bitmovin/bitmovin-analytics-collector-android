@@ -1,8 +1,8 @@
 package com.bitmovin.analytics.ads
 
-data class Ad(var isLinear: Boolean? = null,
-              var width: Int? = null,
-              var height: Int? = null,
+data class Ad(var isLinear: Boolean = false,
+              var width: Int = 0,
+              var height: Int = 0,
               var id: String? = null,
               var mediaFileUrl: String? = null,
               var clickThroughUrl: String? = null,

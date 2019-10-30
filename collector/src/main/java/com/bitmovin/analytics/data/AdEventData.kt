@@ -190,7 +190,7 @@ data class AdEventData(
         universalAdIdRegistry = adSample.ad.universalAdIdRegistry
         universalAdIdValue = adSample.ad.universalAdIdValue
         videoBitrate = adSample.ad.bitrate
-        val hostnameAndPath = Util.getHostnameAndPath(adSample.ad.mediaFileUrl)
+        val hostnameAndPath = Util.getHostnameAndPath(adSample.ad.mediaFileUrl ?: "")
         mediaServer = hostnameAndPath.first
         mediaPath = hostnameAndPath.second
         adStartupTime = adSample.adStartupTime
