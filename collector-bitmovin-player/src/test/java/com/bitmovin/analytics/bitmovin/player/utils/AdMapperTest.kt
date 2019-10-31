@@ -5,6 +5,7 @@ import com.bitmovin.player.model.advertising.LinearAd
 import com.bitmovin.player.model.advertising.VastAdData
 import com.bitmovin.player.model.advertising.ima.ImaAdData
 import junit.framework.Assert
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -33,39 +34,37 @@ class AdMapperTest {
     }
 
     @Test
-    fun test__FromPlayerAdWithAdDataNull() {
+    fun FromPlayerAdWithAdDataNullShouldNotSetAdDataValues() {
         `when`(playerAd.data).thenReturn(null)
         var collectorAd = adMapper.FromPlayerAd(playerAd)
 
-        Assert.assertNull(collectorAd.bitrate)
-        Assert.assertNull(collectorAd.title)
+        assertThat(collectorAd.bitrate).isNull()
+        assertThat(collectorAd.title).isNull()
     }
 
     @Test
-    fun test__FromPlayerAdWithLinearAd() {
+    fun FromPlayerAdWithLinearAdShouldSetLinearAdValues() {
         `when`(linearAd.duration).thenReturn(10.0)
         var collectorAd = adMapper.FromPlayerAd(linearAd)
 
-        Assert.assertEquals(collectorAd.duration, 10.0.toLong().times(1000))
+        assertThat(collectorAd.duration).isEqualTo(10000)
     }
 
     @Test
-    fun test__FromPlayerAdWithVastAdData(){
+    fun FromPlayerAdWithVastAdDataShouldSetVastAdDataValues(){
         `when`(playerAd.data).thenReturn(vastAdData)
         `when`((playerAd.data as VastAdData).adTitle).thenReturn("title")
         var collectorAd = adMapper.FromPlayerAd(playerAd)
 
-        Assert.assertNotNull(collectorAd.title)
+        assertThat(collectorAd.title).isNotNull()
     }
 
     @Test
-    fun test__FromPlayerAdWithImaAdData(){
+    fun FromPlayerAdWithImaAdDataShouldSetImaAdDataValues(){
         `when`(playerAd.data).thenReturn(imaAdData)
         `when`((playerAd.data as ImaAdData).dealId).thenReturn("dealid")
         var collectorAd = adMapper.FromPlayerAd(playerAd)
 
-        Assert.assertNotNull(collectorAd.dealId)
+        assertThat(collectorAd.dealId).isNotNull()
     }
-
-
 }

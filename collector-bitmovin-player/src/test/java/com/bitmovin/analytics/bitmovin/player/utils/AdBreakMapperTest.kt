@@ -7,6 +7,7 @@ import com.bitmovin.player.model.advertising.AdTag
 import com.bitmovin.player.model.advertising.AdTagType
 import com.bitmovin.player.model.advertising.ima.ImaAdBreak
 import junit.framework.Assert
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -30,35 +31,49 @@ class AdBreakMapperTest {
     @Before
     fun setup(){
         MockitoAnnotations.initMocks(this)
+        `when`(adConfiguration.replaceContentDuration).thenReturn(10.0)
+
         `when`(adBreak.id).thenReturn("id")
+        `when`(adBreak.scheduleTime).thenReturn(10.0)
+
         `when`(imaAdBreak.id).thenReturn("id")
         `when`(imaAdBreak.tag).thenReturn(AdTag("", AdTagType.VMAP))
+        `when`(imaAdBreak.position).thenReturn("pre")
     }
 
     @Test
-    fun test__FromPlayerAdConifurationWithAdConfiguration(){
-        `when`(adConfiguration.replaceContentDuration).thenReturn(10.0)
+    fun FromPlayerAdConfigurationWithAdConfigurationShouldSetValuesOfAdConfiguration(){
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adConfiguration)
 
-        Assert.assertNotNull(collectorAdBreak.replaceContentDuration)
-        Assert.assertNull(collectorAdBreak.scheduleTime)
+        assertThat(collectorAdBreak.replaceContentDuration).isNotNull()
     }
 
     @Test
-    fun test__FromPlayerAdConfigurationWithAdBreak() {
-        `when`(adBreak.scheduleTime).thenReturn(10.0)
+    fun FromPlayerAdConfigurationWithAdConfigurationShouldNotSetValuesOfAdBreak(){
+        val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adConfiguration)
+
+        assertThat(collectorAdBreak.scheduleTime).isNull()
+    }
+
+    @Test
+    fun FromPlayerAdConfigurationWithAdBreakShouldSetValuesOfAdBreak() {
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adBreak)
 
-        Assert.assertNotNull(collectorAdBreak.scheduleTime)
-        Assert.assertNull(collectorAdBreak.position)
+        assertThat(collectorAdBreak.scheduleTime).isNotNull()
     }
 
     @Test
-    fun test__FromPlayerAdConfigurationWithImaAdBreak(){
-        `when`(imaAdBreak.position).thenReturn("pre")
+    fun FromPlayerAdConfigurationWithAdBreakShouldNotSetValuesOfImaAdBreak() {
+        val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adBreak)
+
+        assertThat(collectorAdBreak.position).isNull()
+    }
+
+    @Test
+    fun FromPlayerAdConfigurationWithImaAdBreakShouldSetValuesOfImaAdBreak(){
+        `when`(imaAdBreak.currentFallbackIndex).thenReturn(0)
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(imaAdBreak)
 
-        Assert.assertNotNull(collectorAdBreak.position)
-        Assert.assertEquals(collectorAdBreak.position, AdPosition.pre)
+        assertThat(collectorAdBreak.fallbackIndex).isNotNull()
     }
 }
