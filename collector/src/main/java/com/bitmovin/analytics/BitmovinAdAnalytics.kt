@@ -5,7 +5,6 @@ import com.bitmovin.analytics.data.AdSample
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.utils.Util
 
-
 class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     private var activeAdBreak: AdBreak? = null
     private var activeAdSample: AdSample? = null
@@ -14,30 +13,30 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     private var currentTime: Long? = null
     private var beginPlayingTimestamp: Long? = null
     private var isPlaying: Boolean = false
-    private val adManifestDownloadTimes: HashMap<String, Long?> = hashMapOf()
+    private val adManifestDownloadTimes: HashMap<String, Long> = hashMapOf()
 
     fun onAdStarted(ad: Ad) {
-        if (ad.isLinear != true) {
+        if (!ad.isLinear) {
             return
         }
 
         this.resetActiveAd()
         this.activeAdSample = AdSample(ad = ad)
+        val activeAdSample = this.activeAdSample ?: return
         this.currentTime = null
-        this.activeAdSample!!.adStartupTime = if (this.adStartupTimestamp != null) Util.getTimeStamp() - this.adStartupTimestamp!! else null
+        activeAdSample.adStartupTime = if (this.adStartupTimestamp != null) Util.getTimeStamp() - this.adStartupTimestamp!! else null
 
-        this.startAd(this.activeAdSample!!)
+        this.startAd(activeAdSample)
     }
 
     fun onAdFinished() {
-        if (this.activeAdBreak == null || this.activeAdSample == null) {
-            return
-        }
+        val activeAdSample = this.activeAdSample ?: return
+        val activeAdBreak = this.activeAdBreak ?: return
 
-        val adSample = this.activeAdSample!!.copy()
+        val adSample = activeAdSample.copy()
         adSample.completed = 1
         this.resetActiveAd()
-        this.completeAd(this.activeAdBreak!!, adSample, adSample.ad.duration)
+        this.completeAd(activeAdBreak, adSample, adSample.ad.duration)
     }
 
     fun onAdBreakStarted(adBreak: AdBreak) {
@@ -52,33 +51,34 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     }
 
     fun onAdClicked(clickThroughUrl: String?) {
-        if (this.activeAdSample == null) {
-            return
-        }
-        this.activeAdSample!!.ad.clickThroughUrl = clickThroughUrl
-        this.activeAdSample!!.clicked = 1
-        this.activeAdSample!!.clickPosition = this.currentTime
-        this.activeAdSample!!.clickPercentage = Util.calculatePercentage(this.activeAdSample!!.clickPosition, this.activeAdSample!!.ad.duration)
+        val activeAdSample = this.activeAdSample ?: return
+
+        activeAdSample.ad.clickThroughUrl = clickThroughUrl
+        activeAdSample.clicked = 1
+
+        val timestamp = Util.getTimeStamp()
+        val timePlayed: Long = if (activeAdSample.timePlayed != null) activeAdSample.timePlayed!! else 0
+        activeAdSample.clickPosition = timePlayed + timestamp - this.beginPlayingTimestamp!!
+        activeAdSample.clickPercentage = Util.calculatePercentage(activeAdSample.clickPosition, activeAdSample.ad.duration)
     }
 
     fun onAdError(adBreak: AdBreak, code: Int?, message: String?) {
-        val adSample: AdSample
-        //todo change to references here
+        val adSample = this.activeAdSample ?: AdSample()
+
         if (this.activeAdSample != null &&
                 adBreak.ads.any { ad -> ad.id == this.activeAdSample!!.ad.id }) {
-            adSample = this.activeAdSample!!
-            adSample.errorPosition = this.currentTime
+            val timestamp = Util.getTimeStamp()
+            val timePlayed: Long = if (adSample.timePlayed != null) adSample.timePlayed!! else 0
+            adSample.errorPosition = timePlayed + timestamp - this.beginPlayingTimestamp!!
             adSample.errorPercentage = Util.calculatePercentage(adSample.errorPosition, adSample.ad.duration)
-        } else {
-            adSample = AdSample()
         }
+
         adSample.errorCode = code
-        // TODO adBreakSample.errorData = JSON.stringify(event.data)
         adSample.errorMessage = message
         this.completeAd(adBreak, adSample, adSample.errorPosition);
     }
 
-    fun onAdManifestLoaded(adBreak: AdBreak, downloadTime: Long?) {
+    fun onAdManifestLoaded(adBreak: AdBreak, downloadTime: Long) {
         // TODO test if all have an id, otherwise pass the downloadTime in the sendAnalyticsRequest
         this.adManifestDownloadTimes[adBreak.id] = downloadTime
         if (adBreak.tagType == AdTagType.VMAP) {
@@ -103,26 +103,27 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     }
 
     fun onAdSkipped() {
-        if (this.activeAdBreak == null || this.activeAdSample == null) {
-            return;
-        }
+        val activeAdBreak = this.activeAdBreak ?: return
+        val activeAdSample = this.activeAdSample ?: return
 
-        val adSample = this.activeAdSample!!.copy()
+        val adSample = activeAdSample.copy()
         adSample.skipped = 1
-        adSample.skipPosition = this.currentTime
+
+        val timestamp = Util.getTimeStamp()
+        val timePlayed: Long = if (adSample.timePlayed != null) adSample.timePlayed!! else 0
+        adSample.skipPosition = timePlayed + timestamp - this.beginPlayingTimestamp!!
         adSample.skipPercentage = Util.calculatePercentage(adSample.skipPosition, adSample.ad.duration)
+
         this.resetActiveAd()
-        this.completeAd(this.activeAdBreak!!, adSample, adSample.skipPosition)
+        this.completeAd(activeAdBreak, adSample, adSample.skipPosition)
     }
 
     fun onAdQuartile(quartile: AdQuartile) {
-        if (this.activeAdSample == null) {
-            return
-        }
+        val activeAdSample = this.activeAdSample ?: return
         when {
-            quartile === AdQuartile.FIRST_QUARTILE -> this.activeAdSample!!.quartile1 = 1
-            quartile === AdQuartile.MIDPOINT -> this.activeAdSample!!.midpoint = 1
-            quartile === AdQuartile.THIRD_QUARTILE -> this.activeAdSample!!.quartile3 = 1
+            quartile === AdQuartile.FIRST_QUARTILE -> activeAdSample.quartile1 = 1
+            quartile === AdQuartile.MIDPOINT -> activeAdSample.midpoint = 1
+            quartile === AdQuartile.THIRD_QUARTILE -> activeAdSample.quartile3 = 1
         }
     }
 
@@ -210,7 +211,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         eventData.playerStartupTime = 1
         // TODO missing
         // eventData.pageLoadTime
-        // eventData.autoplay
+        eventData.autoplay = this.analytics.adAdapter.isAutoplayEnabled
         // eventData.pageLoadType
 
         eventData.setEventData(analytics.playerAdapter.createEventData())
