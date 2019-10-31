@@ -96,7 +96,7 @@ public class Util {
         if (denominator == null || denominator == 0) {
             return null;
         }
-        return Math.round(((numerator != null ? numerator : 0) / denominator) * 100);
+        return Math.round(((numerator != null ? numerator.floatValue() : 0) / denominator.floatValue()) * 100);
     }
 
     public static Pair<String, String> getHostnameAndPath(String uriString) {
