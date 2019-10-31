@@ -107,7 +107,7 @@ data class AdEventData(
         var analyticsVersion: String? = null,
         // TODO var pageLoadTime: Long? = null,
         // TODO var pageLoadType: Long? = null,
-        // TODO var autoplay: Boolean? = null,
+        var autoplay: Boolean? = null,
         var platform: String? = null,
         var audioCodec: String? = null,
         var videoCodec: String? = null) {
