@@ -20,11 +20,8 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
 
 
     private val onAdStartedListener = OnAdStartedListener {
-        if(it.ad == null){
-            return@OnAdStartedListener
-        }
-
-        adAnalytics.onAdStarted(adMapper.FromPlayerAd(it.ad!!))
+        val ad = it.ad ?: return@OnAdStartedListener
+        adAnalytics.onAdStarted(adMapper.FromPlayerAd(ad))
     }
 
     private val onAdFinishedListener = OnAdFinishedListener {
@@ -32,11 +29,8 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     }
 
     private val onAdBreakStartedListener = OnAdBreakStartedListener {
-        if (it.adBreak == null){
-            return@OnAdBreakStartedListener
-        }
-
-        adAnalytics.onAdBreakStarted(adBreakMapper.FromPlayerAdBreak(it.adBreak!!))
+        val adBreak = it.adBreak ?: return@OnAdBreakStartedListener
+        adAnalytics.onAdBreakStarted(adBreakMapper.FromPlayerAdConfiguration(adBreak))
     }
 
     private val onAdBreakFinishedListener = OnAdBreakFinishedListener {
@@ -48,13 +42,9 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     }
 
     private val onAdErrorListener = OnAdErrorListener {
-        if(it.adConfiguration == null)
-        {
-            return@OnAdErrorListener
-        }
-
+        val adConf = it.adConfiguration ?: return@OnAdErrorListener
         adAnalytics.onAdError(
-                adBreakMapper.FromPlayerAdConfiguration(it.adConfiguration!!),
+                adBreakMapper.FromPlayerAdConfiguration(adConf),
                 it.code,
                 it.message)
     }
@@ -64,11 +54,8 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     }
 
     private val onAdManifestLoadedListener = OnAdManifestLoadedListener {
-        if (it.adBreak == null){
-            return@OnAdManifestLoadedListener
-        }
-
-        adAnalytics.onAdManifestLoaded(adBreakMapper.FromPlayerAdBreak(it.adBreak!!), it.downloadTime)
+        val adBreak = it.adBreak ?: return@OnAdManifestLoadedListener
+        adAnalytics.onAdManifestLoaded(adBreakMapper.FromPlayerAdConfiguration(adBreak), it.downloadTime)
     }
 
     private val onPlayListener = OnPlayListener {

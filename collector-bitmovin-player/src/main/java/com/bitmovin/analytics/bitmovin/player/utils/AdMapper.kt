@@ -3,6 +3,7 @@ package com.bitmovin.analytics.bitmovin.player.utils
 import com.bitmovin.analytics.ads.*
 import com.bitmovin.player.model.advertising.LinearAd
 import com.bitmovin.player.model.advertising.VastAdData
+import com.bitmovin.player.model.advertising.ima.ImaAdData
 
 class AdMapper {
 
@@ -26,8 +27,8 @@ class AdMapper {
         if (playerAd.data is VastAdData)
             FromVastAdData(collectorAd, playerAd.data as VastAdData)
 
-        if (playerAd.data is com.bitmovin.player.model.advertising.ima.ImaAdData)
-            collectorAd.dealId = (playerAd.data as com.bitmovin.player.model.advertising.ima.ImaAdData).dealId
+        if (playerAd.data is ImaAdData)
+            collectorAd.dealId = (playerAd.data as ImaAdData).dealId
 
         if (playerAd is LinearAd)
             FromLinearAd(collectorAd, playerAd)
@@ -35,21 +36,19 @@ class AdMapper {
         return collectorAd
     }
 
-    fun FromLinearAd(collectorAd : Ad, linearAd: LinearAd): Ad {
+    private fun FromLinearAd(collectorAd : Ad, linearAd: LinearAd) {
 
-        collectorAd.duration = linearAd.duration?.toLong()
+        collectorAd.duration = linearAd.duration?.toLong()?.times(1000)
         collectorAd.skippable = linearAd.skippable
-        collectorAd.skippableAfter = linearAd.skippableAfter?.toLong()
-
-        return collectorAd
+        collectorAd.skippableAfter = linearAd.skippableAfter?.toLong()?.times(1000)
     }
 
-    fun FromVastAdData(collectorAd: Ad, vastData: VastAdData): Ad{
+    private fun FromVastAdData(collectorAd: Ad, vastData: VastAdData){
 
         collectorAd.title = vastData.adTitle
         collectorAd.adSystemName = vastData.adSystem?.name
         collectorAd.adSystemVersion = vastData.adSystem?.version
-        collectorAd.wrapperAdsCount = vastData.wrapperAdIds.size
+        collectorAd.wrapperAdsCount = vastData.wrapperAdIds?.size
         collectorAd.description = vastData.adDescription
         collectorAd.advertiserId = vastData.advertiser?.id
         collectorAd.advertiserName = vastData.advertiser?.name
@@ -58,7 +57,6 @@ class AdMapper {
         collectorAd.creativeId = vastData.creative?.id
         collectorAd.universalAdIdRegistry = vastData.creative?.universalAdId?.idRegistry
         collectorAd.universalAdIdValue = vastData.creative?.universalAdId?.value
-        collectorAd.mediaFileUrl = vastData.mediaFileId
         collectorAd.codec = vastData.codec
         collectorAd.minSuggestedDuration = vastData.minSuggestedDuration?.toLong()
         collectorAd.pricingCurrency = vastData.pricing?.currency
@@ -66,7 +64,5 @@ class AdMapper {
         collectorAd.pricingValue = vastData.pricing?.value?.toLong()
         collectorAd.surveyType = vastData.survey?.type
         collectorAd.surveyUrl = vastData.survey?.uri
-
-        return collectorAd
     }
 }
