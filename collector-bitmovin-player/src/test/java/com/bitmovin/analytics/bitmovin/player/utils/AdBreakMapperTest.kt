@@ -27,53 +27,56 @@ class AdBreakMapperTest {
 
     private var adBreakMapper = AdBreakMapper()
 
+    private val TEN_SECONDS = 10.0
+    private val ID = "id"
+    private val PRE = "pre"
 
     @Before
     fun setup(){
         MockitoAnnotations.initMocks(this)
-        `when`(adConfiguration.replaceContentDuration).thenReturn(10.0)
+        `when`(adConfiguration.replaceContentDuration).thenReturn(TEN_SECONDS)
 
-        `when`(adBreak.id).thenReturn("id")
-        `when`(adBreak.scheduleTime).thenReturn(10.0)
+        `when`(adBreak.id).thenReturn(ID )
+        `when`(adBreak.scheduleTime).thenReturn(TEN_SECONDS)
 
-        `when`(imaAdBreak.id).thenReturn("id")
+        `when`(imaAdBreak.id).thenReturn(ID )
         `when`(imaAdBreak.tag).thenReturn(AdTag("", AdTagType.VMAP))
-        `when`(imaAdBreak.position).thenReturn("pre")
+        `when`(imaAdBreak.position).thenReturn(PRE)
     }
 
     @Test
     fun FromPlayerAdConfigurationWithAdConfigurationShouldSetValuesOfAdConfiguration(){
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adConfiguration)
 
-        assertThat(collectorAdBreak.replaceContentDuration).isNotNull()
+        assertThat(collectorAdBreak.replaceContentDuration).isEqualTo(TEN_SECONDS)
     }
 
     @Test
     fun FromPlayerAdConfigurationWithAdConfigurationShouldNotSetValuesOfAdBreak(){
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adConfiguration)
 
-        assertThat(collectorAdBreak.scheduleTime).isNull()
+        assertThat(collectorAdBreak.scheduleTime).isEqualTo(TEN_SECONDS)
     }
 
     @Test
     fun FromPlayerAdConfigurationWithAdBreakShouldSetValuesOfAdBreak() {
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adBreak)
 
-        assertThat(collectorAdBreak.scheduleTime).isNotNull()
+        assertThat(collectorAdBreak.scheduleTime).isEqualTo(TEN_SECONDS)
     }
 
     @Test
     fun FromPlayerAdConfigurationWithAdBreakShouldNotSetValuesOfImaAdBreak() {
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adBreak)
 
-        assertThat(collectorAdBreak.position).isNull()
+        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.pre)
     }
 
     @Test
     fun FromPlayerAdConfigurationWithImaAdBreakShouldSetValuesOfImaAdBreak(){
-        `when`(imaAdBreak.currentFallbackIndex).thenReturn(0)
+        `when`(imaAdBreak.currentFallbackIndex).thenReturn(1)
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(imaAdBreak)
 
-        assertThat(collectorAdBreak.fallbackIndex).isNotNull()
+        assertThat(collectorAdBreak.fallbackIndex).isEqualTo(1)
     }
 }
