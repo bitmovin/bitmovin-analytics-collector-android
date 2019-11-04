@@ -3,6 +3,8 @@ package com.bitmovin.analytics.exoplayer;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.CollectorConfig;
 import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Player;
 
@@ -42,5 +44,12 @@ public class ExoUtil {
       applicationInfo.nonLocalizedLabel.toString();
     }
     return com.google.android.exoplayer2.util.Util.getUserAgent(context, applicationName);
+  }
+
+  public static boolean getIsLiveFromConfigOrPlayer(boolean isPlayerReady, CollectorConfig config, boolean isLiveFromPlayer) {
+    if (isPlayerReady || config == null || config.isLive() == null) {
+      return isLiveFromPlayer;
+    }
+    return config.isLive();
   }
 }

@@ -5,17 +5,20 @@ import android.os.Parcelable;
 
 public class CollectorConfig implements Parcelable {
     private String backendUrl = "https://analytics-ingress-global.bitmovin.com/";
+    private Boolean isLive;
 
     public CollectorConfig() {
     }
 
     protected CollectorConfig(Parcel in) {
         backendUrl = in.readString();
+        isLive = (Boolean) in.readSerializable();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(backendUrl);
+        dest.writeSerializable(isLive);
     }
 
     @Override
@@ -52,5 +55,17 @@ public class CollectorConfig implements Parcelable {
      */
     public void setBackendUrl(String backendUrl) {
         this.backendUrl = backendUrl;
+    }
+
+    /**
+     * Returns true if the stream is live.
+     * @return
+     */
+    public Boolean isLive() {
+        return isLive;
+    }
+
+    public void setIsLive(Boolean live) {
+        isLive = live;
     }
 }

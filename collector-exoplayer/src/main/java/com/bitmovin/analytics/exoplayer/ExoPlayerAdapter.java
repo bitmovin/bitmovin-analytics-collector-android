@@ -45,6 +45,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private ExoPlayer exoplayer;
     private PlayerStateMachine stateMachine;
     private int totalDroppedVideoFrames;
+    private boolean isReady;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
@@ -53,6 +54,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.exoplayer.addListener(this);
         this.config = config;
         this.totalDroppedVideoFrames = 0;
+        this.isReady = false;
         this.context = context;
         attachAnalyticsListener();
 
@@ -66,6 +68,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     public void release() {
+        isReady = false;
         if (this.exoplayer != null) {
             this.exoplayer.removeListener(this);
         }
@@ -202,7 +205,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
 
         //isLive
-        data.setLive(exoplayer.isCurrentWindowDynamic());
+        data.setLive(ExoUtil.getIsLiveFromConfigOrPlayer(isReady, config.getConfig(), exoplayer.isCurrentWindowDynamic()));
 
         //version
         data.setVersion(PlayerType.EXOPLAYER.toString() + "-" + ExoUtil.getPlayerVersion());
@@ -422,7 +425,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public void onRenderedFirstFrame(EventTime eventTime, Surface surface) {
-
+        isReady = true;
     }
 
     @Override

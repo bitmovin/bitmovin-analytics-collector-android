@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.CollectorConfig;
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.player.BitmovinPlayer;
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void initializeAnalytics() {
 
         //Step 1: Create your analytics config object
-        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig(LOCAL_DEVELOPMENT_KEY, "<YOUR_PLAYER_KEY>", getApplicationContext());
+        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig(LOCAL_DEVELOPMENT_KEY, "<YOUR_PLAYER_KEY>");
 
         //Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
@@ -80,8 +81,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmovinAnalyticsConfig.setPath("/vod/new/");
         bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
 
+        CollectorConfig collectorConfig = bitmovinAnalyticsConfig.getConfig();
+        collectorConfig.setIsLive(false);
+        bitmovinAnalyticsConfig.setConfig(collectorConfig);
+
         //Step 3: Create Analytics Collector
-        bitmovinAnalytics = new BitmovinPlayerCollector(bitmovinAnalyticsConfig);
+        bitmovinAnalytics = new BitmovinPlayerCollector(bitmovinAnalyticsConfig, this.getApplicationContext());
     }
 
 

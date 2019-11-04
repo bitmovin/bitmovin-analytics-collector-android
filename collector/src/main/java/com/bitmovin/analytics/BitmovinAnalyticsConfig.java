@@ -300,4 +300,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     public CollectorConfig getConfig() {
         return config;
     }
+
+    public void setConfig(CollectorConfig config) {
+        this.config = config;
+    }
 }
