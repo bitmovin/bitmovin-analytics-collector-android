@@ -22,9 +22,11 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 
         this.resetActiveAd()
         this.activeAdSample = AdSample(ad = ad)
+
         val activeAdSample = this.activeAdSample ?: return
-        this.currentTime = null
-        activeAdSample.adStartupTime = if (this.adStartupTimestamp != null) Util.getTimeStamp() - this.adStartupTimestamp!! else null
+
+        val adStartupTime = this.adStartupTimestamp
+        activeAdSample.adStartupTime = if (adStartupTime != null) Util.getTimeStamp() - adStartupTime else null
 
         this.startAd(activeAdSample)
     }
@@ -56,20 +58,15 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         activeAdSample.ad.clickThroughUrl = clickThroughUrl
         activeAdSample.clicked = 1
 
-        val timestamp = Util.getTimeStamp()
-        val timePlayed: Long = if (activeAdSample.timePlayed != null) activeAdSample.timePlayed!! else 0
-        activeAdSample.clickPosition = timePlayed + timestamp - this.beginPlayingTimestamp!!
+        activeAdSample.clickPosition = this.getCurrentAdPosition(activeAdSample)
         activeAdSample.clickPercentage = Util.calculatePercentage(activeAdSample.clickPosition, activeAdSample.ad.duration)
     }
 
     fun onAdError(adBreak: AdBreak, code: Int?, message: String?) {
         val adSample = this.activeAdSample ?: AdSample()
 
-        if (this.activeAdSample != null &&
-                adBreak.ads.any { ad -> ad.id == this.activeAdSample!!.ad.id }) {
-            val timestamp = Util.getTimeStamp()
-            val timePlayed: Long = if (adSample.timePlayed != null) adSample.timePlayed!! else 0
-            adSample.errorPosition = timePlayed + timestamp - this.beginPlayingTimestamp!!
+        if (adBreak.ads.any { ad -> ad.id == adSample.ad.id }) {
+            adSample.errorPosition = this.getCurrentAdPosition(adSample)
             adSample.errorPercentage = Util.calculatePercentage(adSample.errorPosition, adSample.ad.duration)
         }
 
@@ -96,8 +93,9 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     }
 
     fun onPause() {
+        val activeAdSample = this.activeAdSample ?: return
         if (this.analytics.adAdapter != null && this.analytics.adAdapter.isLinearAdActive && this.activeAdSample != null) {
-            this.updatePlayingTime(this.activeAdSample!!)
+            this.updatePlayingTime(activeAdSample)
             this.isPlaying = false
         }
     }
@@ -109,9 +107,8 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         val adSample = activeAdSample.copy()
         adSample.skipped = 1
 
-        val timestamp = Util.getTimeStamp()
-        val timePlayed: Long = if (adSample.timePlayed != null) adSample.timePlayed!! else 0
-        adSample.skipPosition = timePlayed + timestamp - this.beginPlayingTimestamp!!
+
+        adSample.skipPosition = this.getCurrentAdPosition(activeAdSample)
         adSample.skipPercentage = Util.calculatePercentage(adSample.skipPosition, adSample.ad.duration)
 
         this.resetActiveAd()
@@ -180,10 +177,9 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     }
 
     private fun updatePlayingTime(adSample: AdSample) {
-        val timestamp = Util.getTimeStamp()
         if (this.beginPlayingTimestamp != null && this.isPlaying) {
             if (adSample.timePlayed != null) {
-                adSample.timePlayed = adSample.timePlayed!! + timestamp - this.beginPlayingTimestamp!!
+                adSample.timePlayed = this.getCurrentAdPosition(adSample)
             }
             // TODO
 //            if (this.isContainerInViewport() &&
@@ -192,6 +188,20 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 //                adSample.timeInViewport += timestamp - this.enterViewportTimestamp;
 //            }
         }
+    }
+
+    private fun getCurrentAdPosition(adSample: AdSample? = null): Long?{
+        val activeAdSample = adSample ?: this.activeAdSample
+        val activeAdTimePlayed = activeAdSample?.timePlayed ?: 0
+        val beginPlayingTimestamp = this.beginPlayingTimestamp
+        var timePlayed: Long? = null
+
+        if (beginPlayingTimestamp != null) {
+            val timestamp = Util.getTimeStamp()
+            timePlayed = activeAdTimePlayed + timestamp - beginPlayingTimestamp
+        }
+
+        return timePlayed
     }
 
     private fun sendAnalyticsRequest(adBreak: AdBreak, adSample: AdSample? = null) {
