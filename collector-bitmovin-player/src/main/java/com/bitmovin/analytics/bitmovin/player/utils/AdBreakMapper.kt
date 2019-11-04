@@ -17,7 +17,7 @@ class AdBreakMapper {
 
     fun FromPlayerAdConfiguration(collectorAdBreak: AdBreak, adConfiguration: AdConfiguration): AdBreak{
 
-        collectorAdBreak.replaceContentDuration = adConfiguration.replaceContentDuration?.toLong()
+        collectorAdBreak.replaceContentDuration = adConfiguration.replaceContentDuration?.toLong()?.times(1000)
 
         if (adConfiguration is com.bitmovin.player.model.advertising.AdBreak)
             FromPlayerAdBreak(collectorAdBreak, adConfiguration)
@@ -35,7 +35,7 @@ class AdBreakMapper {
         collectorAdBreak.id = playerAdBreak.id
         collectorAdBreak.ads = ads
 
-        collectorAdBreak.scheduleTime = playerAdBreak.scheduleTime.toLong()
+        collectorAdBreak.scheduleTime = playerAdBreak.scheduleTime.toLong().times(1000)
 
         if (playerAdBreak is ImaAdBreak)
             FromImaAdBreak(collectorAdBreak, playerAdBreak)

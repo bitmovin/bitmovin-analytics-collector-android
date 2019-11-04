@@ -58,7 +58,7 @@ class AdMapper {
         collectorAd.universalAdIdRegistry = vastData.creative?.universalAdId?.idRegistry
         collectorAd.universalAdIdValue = vastData.creative?.universalAdId?.value
         collectorAd.codec = vastData.codec
-        collectorAd.minSuggestedDuration = vastData.minSuggestedDuration?.toLong()
+        collectorAd.minSuggestedDuration = vastData.minSuggestedDuration?.toLong()?.times(1000)
         collectorAd.pricingCurrency = vastData.pricing?.currency
         collectorAd.pricingModel = vastData.pricing?.model
         collectorAd.pricingValue = vastData.pricing?.value?.toLong()

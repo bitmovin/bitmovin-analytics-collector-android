@@ -28,6 +28,7 @@ class AdBreakMapperTest {
     private var adBreakMapper = AdBreakMapper()
 
     private val TEN_SECONDS = 10.0
+    private val TEN_SECONDS_IN_MS: Long = TEN_SECONDS.toLong() *  1000
     private val ID = "id"
     private val PRE = "pre"
 
@@ -48,28 +49,28 @@ class AdBreakMapperTest {
     fun FromPlayerAdConfigurationWithAdConfigurationShouldSetValuesOfAdConfiguration(){
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adConfiguration)
 
-        assertThat(collectorAdBreak.replaceContentDuration).isEqualTo(TEN_SECONDS)
+        assertThat(collectorAdBreak.replaceContentDuration).isEqualTo(TEN_SECONDS_IN_MS)
     }
 
     @Test
     fun FromPlayerAdConfigurationWithAdConfigurationShouldNotSetValuesOfAdBreak(){
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adConfiguration)
 
-        assertThat(collectorAdBreak.scheduleTime).isEqualTo(TEN_SECONDS)
+        assertThat(collectorAdBreak.scheduleTime).isNull()
     }
 
     @Test
     fun FromPlayerAdConfigurationWithAdBreakShouldSetValuesOfAdBreak() {
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adBreak)
 
-        assertThat(collectorAdBreak.scheduleTime).isEqualTo(TEN_SECONDS)
+        assertThat(collectorAdBreak.scheduleTime).isEqualTo(TEN_SECONDS_IN_MS)
     }
 
     @Test
     fun FromPlayerAdConfigurationWithAdBreakShouldNotSetValuesOfImaAdBreak() {
         val collectorAdBreak = adBreakMapper.FromPlayerAdConfiguration(adBreak)
 
-        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.pre)
+        assertThat(collectorAdBreak.position).isNull()
     }
 
     @Test

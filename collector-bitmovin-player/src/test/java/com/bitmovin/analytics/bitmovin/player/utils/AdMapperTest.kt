@@ -45,7 +45,7 @@ class AdMapperTest {
     @Test
     fun FromPlayerAdWithLinearAdShouldSetLinearAdValues() {
         val TEN_SENCONDS = 10.0
-        val TEN_SECONDS_IN_MS = TEN_SENCONDS * 1000
+        val TEN_SECONDS_IN_MS = TEN_SENCONDS.toLong() * 1000
 
         `when`(linearAd.duration).thenReturn(TEN_SENCONDS)
         var collectorAd = adMapper.FromPlayerAd(linearAd)
