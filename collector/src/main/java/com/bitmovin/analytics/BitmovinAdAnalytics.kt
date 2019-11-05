@@ -87,7 +87,6 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         if (this.analytics.adAdapter != null && this.analytics.adAdapter.isLinearAdActive && this.activeAdSample != null) {
             val timestamp = Util.getTimeStamp()
             this.beginPlayingTimestamp = timestamp
-            // TODO this.enterViewportTimestamp = timestamp
             this.isPlaying = true
         }
     }
@@ -131,24 +130,9 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         adSample.adPodPosition = this.adPodPosition
         val timestamp = Util.getTimeStamp()
         this.beginPlayingTimestamp = timestamp
-        // TODO this.enterViewportTimestamp = this.isContainerInViewport() ? timestamp : undefined;
         this.isPlaying = true
         this.currentTime = 0
         this.adPodPosition++
-        // TODO
-//        this.currentTimeInterval = window.setInterval(() => {
-//            try {
-//                if (adSample &&
-//                        adSample.adDuration !== undefined &&
-//                        adSample.adDuration > 0 &&
-//                        this.adapter.isLinearAdActive()) {
-//                    this.currentTime = Utils.calculateTime(Math.max(this.adapter.currentTime(), 0));
-//                }
-//            } catch (e) {
-//                logger.log('AdStarted monitoring interval failed and got cleared', e);
-//                this.resetActiveAd();
-//            }
-//        }, AdAnalytics.TIMEOUT_CURRENT_TIME_INTERVAL);
     }
 
     private fun completeAd(adBreak: AdBreak, adSample: AdSample?, exitPosition: Long? = null) {
@@ -164,7 +148,6 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     }
 
     private fun resetActiveAd() {
-        // TODO window.clearInterval(this.currentTimeInterval)
         this.currentTime = null
         this.activeAdSample = null
     }
@@ -181,12 +164,6 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
             if (adSample.timePlayed != null) {
                 adSample.timePlayed = this.getCurrentAdPosition(adSample)
             }
-            // TODO
-//            if (this.isContainerInViewport() &&
-//                    this.enterViewportTimestamp &&
-//                    adSample.timeInViewport !== undefined) {
-//                adSample.timeInViewport += timestamp - this.enterViewportTimestamp;
-//            }
         }
     }
 
@@ -219,10 +196,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         }
         eventData.manifestDownloadTime = getAdManifestDownloadTime(adBreak)
         eventData.playerStartupTime = 1
-        // TODO missing
-        // eventData.pageLoadTime
         eventData.autoplay = this.analytics.adAdapter.isAutoplayEnabled
-        // eventData.pageLoadType
 
         eventData.setEventData(analytics.playerAdapter.createEventData())
         eventData.setAdBreak(adBreak)
@@ -230,7 +204,6 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 
         eventData.time = Util.getTimeStamp()
         eventData.adImpressionId = Util.getUUID()
-        // TODO eventData.percentageInViewport
         analytics.sendAdEventData(eventData)
     }
 }

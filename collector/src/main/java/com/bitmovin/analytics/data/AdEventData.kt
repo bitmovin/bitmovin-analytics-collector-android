@@ -33,7 +33,6 @@ data class AdEventData(
         var mediaUrl: String? = null,
         var midpoint: Long? = 0,
         var minSuggestedDuration: Long? = null,
-        // TODO var percentageInViewport: Long? = null,
         var quartile1: Long? = 0,
         var quartile3: Long? = 0,
         var skipped: Long? = 0,
@@ -43,7 +42,6 @@ data class AdEventData(
         var surveyUrl: String? = null,
         var time: Long? = null,
         // TODO var timeHovered: Long? = null,
-        // TODO var timeInViewport: Long? = null,
         var timePlayed: Long? = null,
         // TODO var timeUntilHover: Long? = null,
         var universalAdIdRegistry: String? = null,
@@ -222,6 +220,5 @@ data class AdEventData(
 
         // TODO timeUntilHover = adSample.
         // TODO timeHovered = adSample.
-        // TODO timeInViewport = adSample.
     }
 }
