@@ -54,7 +54,7 @@ class AdBreakMapper {
         return when {
             playerPosition == "pre" -> AdPosition.pre
             playerPosition == "post" -> AdPosition.post
-            playerPosition.contains("%") -> AdPosition.mid
+            "([0-9]+.*)".toRegex().matches(playerPosition) -> AdPosition.mid
             else -> null
         }
     }
