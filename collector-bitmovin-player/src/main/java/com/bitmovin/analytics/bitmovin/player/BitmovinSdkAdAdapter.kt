@@ -59,11 +59,11 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     }
 
     private val onPlayListener = OnPlayListener {
-        adAnalytics.onPlay()
+//        adAnalytics.onPlay()
     }
 
     private val onPausedListener = OnPausedListener {
-        adAnalytics.onPause()
+//        adAnalytics.onPause()
     }
 
     private val onAdQuartileListener = OnAdQuartileListener {
