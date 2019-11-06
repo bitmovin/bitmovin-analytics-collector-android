@@ -7,11 +7,11 @@ import com.bitmovin.player.model.advertising.ima.ImaAdData
 
 class AdMapper {
 
-    fun FromPlayerAd(playerAd: com.bitmovin.player.model.advertising.Ad): Ad{
-        return FromPlayerAd(Ad(), playerAd)
+    fun fromPlayerAd(playerAd: com.bitmovin.player.model.advertising.Ad): Ad{
+        return fromPlayerAd(Ad(), playerAd)
     }
 
-    fun FromPlayerAd(collectorAd : Ad, playerAd: com.bitmovin.player.model.advertising.Ad): Ad{
+    fun fromPlayerAd(collectorAd : Ad, playerAd: com.bitmovin.player.model.advertising.Ad): Ad{
 
         collectorAd.isLinear = playerAd.isLinear
         collectorAd.width = playerAd.width
@@ -25,25 +25,25 @@ class AdMapper {
         collectorAd.mimeType = playerAd.data?.mimeType
 
         if (playerAd.data is VastAdData)
-            FromVastAdData(collectorAd, playerAd.data as VastAdData)
+            fromVastAdData(collectorAd, playerAd.data as VastAdData)
 
         if (playerAd.data is ImaAdData)
             collectorAd.dealId = (playerAd.data as ImaAdData).dealId
 
         if (playerAd is LinearAd)
-            FromLinearAd(collectorAd, playerAd)
+            fromLinearAd(collectorAd, playerAd)
 
         return collectorAd
     }
 
-    private fun FromLinearAd(collectorAd : Ad, linearAd: LinearAd) {
+    private fun fromLinearAd(collectorAd : Ad, linearAd: LinearAd) {
 
         collectorAd.duration = linearAd.duration?.toLong()?.times(1000)
         collectorAd.skippable = linearAd.skippable
         collectorAd.skippableAfter = linearAd.skippableAfter?.toLong()?.times(1000)
     }
 
-    private fun FromVastAdData(collectorAd: Ad, vastData: VastAdData){
+    private fun fromVastAdData(collectorAd: Ad, vastData: VastAdData){
 
         collectorAd.title = vastData.adTitle
         collectorAd.adSystemName = vastData.adSystem?.name

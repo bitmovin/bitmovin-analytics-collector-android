@@ -7,30 +7,30 @@ import java.util.ArrayList
 
 class AdBreakMapper {
 
-    fun FromPlayerAdConfiguration(adConfiguration: AdConfiguration): AdBreak{
+    fun fromPlayerAdConfiguration(adConfiguration: AdConfiguration): AdBreak{
         var collectorAdBreak = AdBreak("notset", ArrayList<Ad>() as List<Ad>)
 
-        FromPlayerAdConfiguration(collectorAdBreak, adConfiguration)
+        fromPlayerAdConfiguration(collectorAdBreak, adConfiguration)
 
         return collectorAdBreak
     }
 
-    fun FromPlayerAdConfiguration(collectorAdBreak: AdBreak, adConfiguration: AdConfiguration): AdBreak{
+    fun fromPlayerAdConfiguration(collectorAdBreak: AdBreak, adConfiguration: AdConfiguration): AdBreak{
 
         collectorAdBreak.replaceContentDuration = adConfiguration.replaceContentDuration?.toLong()?.times(1000)
 
         if (adConfiguration is com.bitmovin.player.model.advertising.AdBreak)
-            FromPlayerAdBreak(collectorAdBreak, adConfiguration)
+            fromPlayerAdBreak(collectorAdBreak, adConfiguration)
 
         return collectorAdBreak
     }
 
 
-    private fun FromPlayerAdBreak(collectorAdBreak: AdBreak, playerAdBreak: com.bitmovin.player.model.advertising.AdBreak) {
+    private fun fromPlayerAdBreak(collectorAdBreak: AdBreak, playerAdBreak: com.bitmovin.player.model.advertising.AdBreak) {
 
         val ads = ArrayList<Ad>(playerAdBreak.ads.size)
         if (playerAdBreak.ads.isNotEmpty())
-            playerAdBreak.ads.forEach { ad ->  ads.add(AdMapper().FromPlayerAd(Ad(),ad))}
+            playerAdBreak.ads.forEach { ad ->  ads.add(AdMapper().fromPlayerAd(Ad(),ad))}
 
         collectorAdBreak.id = playerAdBreak.id
         collectorAdBreak.ads = ads
@@ -38,10 +38,10 @@ class AdBreakMapper {
         collectorAdBreak.scheduleTime = playerAdBreak.scheduleTime.toLong().times(1000)
 
         if (playerAdBreak is ImaAdBreak)
-            FromImaAdBreak(collectorAdBreak, playerAdBreak)
+            fromImaAdBreak(collectorAdBreak, playerAdBreak)
     }
 
-    private fun FromImaAdBreak(collectorAdBreak: AdBreak, imaAdBreak: ImaAdBreak){
+    private fun fromImaAdBreak(collectorAdBreak: AdBreak, imaAdBreak: ImaAdBreak){
 
         collectorAdBreak.position = getPositionFromPlayerPosition(imaAdBreak.position)
         collectorAdBreak.fallbackIndex = imaAdBreak.currentFallbackIndex?.toLong() ?: 0

@@ -21,7 +21,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
 
     private val onAdStartedListener = OnAdStartedListener {
         val ad = it.ad ?: return@OnAdStartedListener
-        adAnalytics.onAdStarted(adMapper.FromPlayerAd(ad))
+        adAnalytics.onAdStarted(adMapper.fromPlayerAd(ad))
     }
 
     private val onAdFinishedListener = OnAdFinishedListener {
@@ -30,7 +30,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
 
     private val onAdBreakStartedListener = OnAdBreakStartedListener {
         val adBreak = it.adBreak ?: return@OnAdBreakStartedListener
-        adAnalytics.onAdBreakStarted(adBreakMapper.FromPlayerAdConfiguration(adBreak))
+        adAnalytics.onAdBreakStarted(adBreakMapper.fromPlayerAdConfiguration(adBreak))
     }
 
     private val onAdBreakFinishedListener = OnAdBreakFinishedListener {
@@ -44,7 +44,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     private val onAdErrorListener = OnAdErrorListener {
         val adConf = it.adConfiguration ?: return@OnAdErrorListener
         adAnalytics.onAdError(
-                adBreakMapper.FromPlayerAdConfiguration(adConf),
+                adBreakMapper.fromPlayerAdConfiguration(adConf),
                 it.code,
                 it.message)
     }
@@ -55,7 +55,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
 
     private val onAdManifestLoadedListener = OnAdManifestLoadedListener {
         val adBreak = it.adBreak ?: return@OnAdManifestLoadedListener
-        adAnalytics.onAdManifestLoaded(adBreakMapper.FromPlayerAdConfiguration(adBreak), it.downloadTime)
+        adAnalytics.onAdManifestLoaded(adBreakMapper.fromPlayerAdConfiguration(adBreak), it.downloadTime)
     }
 
     private val onPlayListener = OnPlayListener {
