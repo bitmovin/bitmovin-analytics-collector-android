@@ -58,16 +58,18 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         activeAdSample.ad.clickThroughUrl = clickThroughUrl
         activeAdSample.clicked = 1
 
-        activeAdSample.clickPosition = this.getCurrentAdPosition(activeAdSample)
-        activeAdSample.clickPercentage = Util.calculatePercentage(activeAdSample.clickPosition, activeAdSample.ad.duration)
+        val adPositionAndAdPercentage = getCurrentAdPositionAndAdPercentage(activeAdSample)
+        activeAdSample.clickPosition = adPositionAndAdPercentage.first
+        activeAdSample.clickPercentage = adPositionAndAdPercentage.second
     }
 
     fun onAdError(adBreak: AdBreak, code: Int?, message: String?) {
         val adSample = this.activeAdSample ?: AdSample()
 
         if (adBreak.ads.any { ad -> ad.id == adSample.ad.id }) {
-            adSample.errorPosition = this.getCurrentAdPosition(adSample)
-            adSample.errorPercentage = Util.calculatePercentage(adSample.errorPosition, adSample.ad.duration)
+            val adPositionAndAdPercentage = getCurrentAdPositionAndAdPercentage(adSample)
+            adSample.errorPosition = adPositionAndAdPercentage.first
+            adSample.errorPercentage = adPositionAndAdPercentage.second
         }
 
         adSample.errorCode = code
@@ -106,9 +108,9 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         val adSample = activeAdSample.copy()
         adSample.skipped = 1
 
-
-        adSample.skipPosition = this.getCurrentAdPosition(activeAdSample)
-        adSample.skipPercentage = Util.calculatePercentage(adSample.skipPosition, adSample.ad.duration)
+        val adPositionAndAdPercentage = getCurrentAdPositionAndAdPercentage(activeAdSample)
+        adSample.skipPosition = adPositionAndAdPercentage.first
+        adSample.skipPercentage = adPositionAndAdPercentage.second
 
         this.resetActiveAd()
         this.completeAd(activeAdBreak, adSample, adSample.skipPosition)
@@ -179,6 +181,16 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         }
 
         return timePlayed
+    }
+
+    private fun getCurrentAdPositionAndAdPercentage(adSample: AdSample) : Pair<Long?, Int?>{
+
+        var position = this.getCurrentAdPosition(adSample)
+        var percentage = Util.calculatePercentage(position, adSample.ad.duration)
+        return if(percentage != null && percentage <= 100)
+            Pair<Long?, Int?> (position, percentage)
+        else
+            Pair<Long?, Int?> (null, null)
     }
 
     private fun sendAnalyticsRequest(adBreak: AdBreak, adSample: AdSample? = null) {
