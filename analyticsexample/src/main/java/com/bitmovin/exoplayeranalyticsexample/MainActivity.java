@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     buildHttpDataSourceFactory(bandwidthMeter));
 
             //Step 1: Create your analytics config object
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>", getApplicationContext());
+            BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>");
 
             //Step 2: Add optional parameters
             bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
@@ -91,9 +91,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalyticsConfig.setCustomData5("customData5");
             bitmovinAnalyticsConfig.setPath("/vod/new/");
             bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
+            bitmovinAnalyticsConfig.setIsLive(false);
 
             //Step 3: Create Analytics Collector
-            ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig);
+            ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
 
             //Step 4: Attach ExoPlayer
             bitmovinAnalytics.attachPlayer(player);

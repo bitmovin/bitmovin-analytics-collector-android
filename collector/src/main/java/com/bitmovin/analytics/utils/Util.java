@@ -9,6 +9,7 @@ import android.provider.Settings;
 import android.util.Pair;
 
 import com.bitmovin.analytics.BuildConfig;
+import com.bitmovin.analytics.CollectorConfig;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -107,5 +108,12 @@ public class Util {
 
         }
         return new Pair<>(null, null);
+    }
+    
+    public static boolean getIsLiveFromConfigOrPlayer(boolean isPlayerReady, boolean isLiveFromConfig, boolean isLiveFromPlayer) {
+        if (isPlayerReady) {
+            return isLiveFromPlayer;
+        }
+        return isLiveFromConfig;
     }
 }

@@ -1,10 +1,10 @@
 package com.bitmovin.analytics
 
-import android.view.animation.Animation
 import com.bitmovin.analytics.ads.*
 import com.bitmovin.analytics.data.AdSample
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.utils.Util
+import java.util.Collections.min
 
 class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     private var activeAdBreak: AdBreak? = null
@@ -183,7 +183,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
             timePlayed = activeAdTimePlayed + timestamp - beginPlayingTimestamp
         }
 
-        return min(timePlayed, adSample?.ad?.duration ?: timePlayed)
+        return Math.min(timePlayed, adSample?.ad?.duration ?: timePlayed)
     }
 
     private fun getCurrentAdPositionAndAdPercentage(adSample: AdSample) : Pair<Long?, Int?>{

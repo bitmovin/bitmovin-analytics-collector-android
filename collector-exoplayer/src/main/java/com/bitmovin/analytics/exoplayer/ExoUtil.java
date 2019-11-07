@@ -3,6 +3,8 @@ package com.bitmovin.analytics.exoplayer;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.CollectorConfig;
 import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Player;
 

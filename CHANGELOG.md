@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Added Analytics AdAdapter for Bitmovin Player
+- New boolean configuration field called `isLive` to indicate if the upcoming stream is a live stream. Will be overridden once playback metadata is available.
 
 ### Known Issues
 
@@ -40,7 +41,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - `BitmovinAnalyticsConfig` is parcelable now.
 - Android `Context` is now passed seperately where needed.
-- Old constructors requiring `Context have been marked as `@Deprecated`
+- Old constructors requiring Context have been marked as `@Deprecated`
 
 ## v1.6.4
 
