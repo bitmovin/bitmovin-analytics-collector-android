@@ -181,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String AD_SOURCE_2 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
     private static final String AD_SOURCE_3 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
     private static final String AD_SOURCE_4 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator=";
+    private static final String AD_SOURCE_5 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=";
 
 
     private AdvertisingConfiguration initializeAds(PlayerConfiguration config) {
@@ -189,9 +190,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AdSource secondAdSource = new AdSource(AdSourceType.IMA, AD_SOURCE_2);
         AdSource thirdAdSource = new AdSource(AdSourceType.IMA, AD_SOURCE_3);
         AdSource fourthAdSource = new AdSource(AdSourceType.IMA, AD_SOURCE_4);
+        AdSource fifthAdSource = new AdSource(AdSourceType.IMA, AD_SOURCE_5);
 
         // Setup a pre-roll ad
+//        AdItem preRoll = new AdItem("pre", firstAdSource);
+//        AdItem preRoll = new AdItem("pre", secondAdSource);
         AdItem preRoll = new AdItem("pre", thirdAdSource);
+//        AdItem preRoll = new AdItem("pre", fourthAdSource);
+//        AdItem preRoll = new AdItem("pre", fifthAdSource);
         // Setup a mid-roll waterfalling ad at 10% of the content duration
         // NOTE: AdItems containing more than one AdSource, will be executed as waterfalling ad
         AdItem midRoll = new AdItem("10%", firstAdSource, secondAdSource);
