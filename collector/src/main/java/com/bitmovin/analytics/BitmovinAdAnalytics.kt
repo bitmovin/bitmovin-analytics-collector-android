@@ -183,12 +183,11 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
             timePlayed = activeAdTimePlayed + timestamp - beginPlayingTimestamp
         }
 
-        return timePlayed
+        return min(timePlayed, adSample?.ad?.duration ?: timePlayed)
     }
 
     private fun getCurrentAdPositionAndAdPercentage(adSample: AdSample) : Pair<Long?, Int?>{
-        val tempPosition = this.getCurrentAdPosition(adSample)
-        var position = Math.min(tempPosition, adSample.ad.duration ?: tempPosition)
+        var position = this.getCurrentAdPosition(adSample)
         var percentage = Util.calculatePercentage(position, adSample.ad.duration)
         return Pair<Long?, Int?> (position, percentage)
     }
