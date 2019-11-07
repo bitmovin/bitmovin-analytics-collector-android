@@ -6,13 +6,17 @@ import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.provider.Settings;
+import android.util.Pair;
 
 import com.bitmovin.analytics.BuildConfig;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Util {
@@ -86,5 +90,22 @@ public class Util {
             }
         }
         return false;
+    }
+
+    public static Integer calculatePercentage(Long numerator, Long denominator) {
+        if (denominator == null || denominator == 0 || numerator == null) {
+            return null;
+        }
+        return Math.round((numerator.floatValue() / denominator.floatValue()) * 100);
+    }
+
+    public static Pair<String, String> getHostnameAndPath(String uriString) {
+        try {
+            URI uri = new URI(uriString);
+            return new Pair<>(uri.getHost(), uri.getPath());
+        } catch(URISyntaxException ignored) {
+
+        }
+        return new Pair<>(null, null);
     }
 }

@@ -19,6 +19,7 @@ import okhttp3.Response;
 
 public class LicenseCall {
     private static final String TAG = "LicenseCall";
+    private final String backendUrl;
     private BitmovinAnalyticsConfig config;
     private Context context;
     private HttpClient httpClient;
@@ -26,9 +27,9 @@ public class LicenseCall {
     public LicenseCall(BitmovinAnalyticsConfig config, Context context) {
         this.config = config;
         this.context = context;
-        String backendUrl = Uri.parse(config.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
+        this.backendUrl = Uri.parse(config.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
         Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl));
-        this.httpClient = new HttpClient(context, backendUrl);
+        this.httpClient = new HttpClient(context);
     }
 
     public void authenticate(final LicenseCallback callback) {
@@ -37,7 +38,7 @@ public class LicenseCall {
         data.setAnalyticsVersion(Util.getVersion());
         data.setDomain(context.getPackageName());
         String json = DataSerializer.serialize(data);
-        httpClient.post(json, new Callback() {
+        httpClient.post(this.backendUrl, json, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d(TAG, "License call failed due to connectivity issues", e);

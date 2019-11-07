@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+
+- Added Analytics AdAdapter for Bitmovin Player
+
+### Known Issues
+
+- tracking of metrics `percentageInViewport` and `timeInView` not possible in Android 
+
 ## v1.9.0
 ### Fixed
 - Error message contained too much data, so that grouping is not useful

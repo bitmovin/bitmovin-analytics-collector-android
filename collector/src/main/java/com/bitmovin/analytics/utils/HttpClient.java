@@ -19,15 +19,13 @@ public class HttpClient {
     private static final String TAG = "HttpClient";
     private OkHttpClient client = null;
     private Context context;
-    private String url;
 
-    public HttpClient(Context context, String url) {
-        this.url = url;
+    public HttpClient(Context context) {
         this.context = context;
     }
 
 
-    public void post(String postBody, final Callback callback) {
+    public void post(String url, String postBody, final Callback callback) {
         if (client == null) {
             client = new OkHttpClient();
         }

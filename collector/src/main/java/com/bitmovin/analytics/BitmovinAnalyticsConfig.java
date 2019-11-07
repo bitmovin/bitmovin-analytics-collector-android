@@ -23,6 +23,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private String playerKey;
     private PlayerType playerType;
     private String videoId;
+    private Boolean ads = true;
     private Context context;
     private CollectorConfig config = new CollectorConfig();
 
@@ -78,6 +79,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         playerType = in.readParcelable(PlayerType.class.getClassLoader());
         videoId = in.readString();
         config = in.readParcelable(CollectorConfig.class.getClassLoader());
+        ads = in.readInt() == 1;
     }
 
     public BitmovinAnalyticsConfig() {
@@ -101,6 +103,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         dest.writeParcelable(playerType, flags);
         dest.writeString(videoId);
         dest.writeParcelable(config, config.describeContents());
+        dest.writeInt(ads ? 1 : 0);
     }
 
     @Override
@@ -299,5 +302,22 @@ public class BitmovinAnalyticsConfig implements Parcelable {
      */
     public CollectorConfig getConfig() {
         return config;
+    }
+
+
+    /**
+     * Returns a value indicating if ads tracking is enabled
+     * @return
+     */
+    public Boolean getAds() {
+        return ads;
+    }
+
+    /**
+     * Enable or disable ads tracking
+     * @param ads
+     */
+    public void setAds(Boolean ads) {
+        this.ads = ads;
     }
 }
