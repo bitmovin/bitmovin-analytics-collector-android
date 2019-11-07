@@ -45,11 +45,4 @@ public class ExoUtil {
     }
     return com.google.android.exoplayer2.util.Util.getUserAgent(context, applicationName);
   }
-
-  public static boolean getIsLiveFromConfigOrPlayer(boolean isPlayerReady, CollectorConfig config, boolean isLiveFromPlayer) {
-    if (isPlayerReady || config == null || config.isLive() == null) {
-      return isLiveFromPlayer;
-    }
-    return config.isLive();
-  }
 }

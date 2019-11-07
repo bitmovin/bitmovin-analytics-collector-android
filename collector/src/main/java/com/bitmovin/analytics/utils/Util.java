@@ -8,6 +8,7 @@ import android.media.MediaCodecList;
 import android.provider.Settings;
 
 import com.bitmovin.analytics.BuildConfig;
+import com.bitmovin.analytics.CollectorConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,5 +87,12 @@ public class Util {
             }
         }
         return false;
+    }
+
+    public static boolean getIsLiveFromConfigOrPlayer(boolean isPlayerReady, boolean isLiveFromConfig, boolean isLiveFromPlayer) {
+        if (isPlayerReady) {
+            return isLiveFromPlayer;
+        }
+        return isLiveFromConfig;
     }
 }

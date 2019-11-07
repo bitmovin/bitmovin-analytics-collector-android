@@ -60,21 +60,21 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private final Context context;
     private PlayerStateMachine stateMachine;
     private int totalDroppedVideoFrames;
-    private boolean isReady;
+    private boolean playerIsReady;
 
     public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.totalDroppedVideoFrames = 0;
-        this.isReady = false;
+        this.playerIsReady = false;
         this.context = context;
         addPlayerListeners();
     }
 
     @Override
     public void release() {
-        isReady = false;
+        playerIsReady = false;
         if (bitmovinPlayer != null) {
             removePlayerListener();
         }
@@ -161,7 +161,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         }
 
         //isLive
-        data.setLive(BitmovinUtil.getIsLiveFromConfigOrPlayer(isReady, config.getConfig(), bitmovinPlayer.isLive()));
+        data.setLive(Util.getIsLiveFromConfigOrPlayer(playerIsReady, config.isLive(), bitmovinPlayer.isLive()));
 
         //version
         data.setVersion(PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.getPlayerVersion());
@@ -474,7 +474,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private OnReadyListener onReadyListener = new OnReadyListener() {
         @Override
         public void onReady(ReadyEvent readyEvent) {
-            isReady = true;
+            playerIsReady = true;
             Log.d(TAG, "On Ready Listener");
 
             if (bitmovinPlayer.isPlaying()) {

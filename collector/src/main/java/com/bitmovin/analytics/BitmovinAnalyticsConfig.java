@@ -24,6 +24,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private PlayerType playerType;
     private String videoId;
     private Context context;
+    private Boolean isLive;
     private CollectorConfig config = new CollectorConfig();
 
     public static final Creator<BitmovinAnalyticsConfig> CREATOR = new Creator<BitmovinAnalyticsConfig>() {
@@ -77,6 +78,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         playerKey = in.readString();
         playerType = in.readParcelable(PlayerType.class.getClassLoader());
         videoId = in.readString();
+        isLive = (Boolean) in.readSerializable();
         config = in.readParcelable(CollectorConfig.class.getClassLoader());
     }
 
@@ -100,6 +102,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         dest.writeString(playerKey);
         dest.writeParcelable(playerType, flags);
         dest.writeString(videoId);
+        dest.writeSerializable(isLive);
         dest.writeParcelable(config, config.describeContents());
     }
 
@@ -301,7 +304,19 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         return config;
     }
 
-    public void setConfig(CollectorConfig config) {
-        this.config = config;
+    /**
+     * Returns true if the stream is marked as live before stream metadata is available.
+     * @return
+     */
+    public Boolean isLive() {
+        return isLive;
+    }
+
+    /**
+     * Mark the stream as live before stream metadata is available.
+     * @param live
+     */
+    public void setIsLive(Boolean live) {
+        isLive = live;
     }
 }
