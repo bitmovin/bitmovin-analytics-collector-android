@@ -14,6 +14,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private String customData3;
     private String customData4;
     private String customData5;
+    private String customData6;
+    private String customData7;
     private String customUserId;
     private String experimentName;
     private int heartbeatInterval = 59700;
@@ -70,6 +72,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         customData3 = in.readString();
         customData4 = in.readString();
         customData5 = in.readString();
+        customData6 = in.readString();
+        customData7 = in.readString();
         customUserId = in.readString();
         experimentName = in.readString();
         heartbeatInterval = in.readInt();
@@ -95,6 +99,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         dest.writeString(customData3);
         dest.writeString(customData4);
         dest.writeString(customData5);
+        dest.writeString(customData6);
+        dest.writeString(customData7);
         dest.writeString(customUserId);
         dest.writeString(experimentName);
         dest.writeInt(heartbeatInterval);
@@ -226,9 +232,40 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         this.customData5 = customData5;
     }
 
+    public String getCustomData6() {
+        return customData6;
+    }
+
+    /**
+     * Optional free-form data
+     * Not enabled by default
+     * Must be activated for your organization
+     *
+     * @param customData6
+     */
+    public void setCustomData6(String customData6) {
+        this.customData6 = customData6;
+    }
+
+    public String getCustomData7() {
+        return customData7;
+    }
+
+    /**
+     * Optional free-form data
+     * Not enabled by default
+     * Must be activated for your organization
+     *
+     * @param customData7
+     */
+    public void setCustomData7(String customData7) {
+        this.customData7 = customData7;
+    }
+
     public String getExperimentName() {
         return experimentName;
     }
+
 
     /**
      * Human readable title of the video asset currently playing

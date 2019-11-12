@@ -18,6 +18,8 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Conte
     val customData3: String? = bitmovinAnalyticsConfig.getCustomData3()
     val customData4: String? = bitmovinAnalyticsConfig.getCustomData4()
     val customData5: String? = bitmovinAnalyticsConfig.getCustomData5()
+    val customData6: String? = bitmovinAnalyticsConfig.getCustomData6()
+    val customData7: String? = bitmovinAnalyticsConfig.getCustomData7()
     val path: String? = bitmovinAnalyticsConfig.getPath()
     val experimentName = bitmovinAnalyticsConfig.getExperimentName()
     val playerTech: String? = Util.getPlayerTech()
