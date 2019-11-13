@@ -60,7 +60,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final BitmovinPlayer bitmovinPlayer;
-    private final Context context;
+    private final EventDataFactory factory;
     private PlayerStateMachine stateMachine;
     private int totalDroppedVideoFrames;
     private boolean playerIsReady;
@@ -71,7 +71,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer = bitmovinPlayer;
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.context = context;
+        this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, getUserAgent(context)), new UserIdProvider(context));
         addPlayerListeners();
     }
 
@@ -147,7 +147,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
 
     @Override
     public EventData createEventData() {
-        EventDataFactory factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, getUserAgent(context)), new UserIdProvider(context));
         EventData data = factory.build(stateMachine.getImpressionId());
 
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);

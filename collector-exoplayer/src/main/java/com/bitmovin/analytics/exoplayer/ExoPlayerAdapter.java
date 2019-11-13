@@ -44,12 +44,12 @@ import java.io.IOException;
 public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener {
     private static final String TAG = "ExoPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
-    private final Context context;
     private ExoPlayer exoplayer;
     private PlayerStateMachine stateMachine;
     private int totalDroppedVideoFrames;
     private boolean playerIsReady;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
+    private final EventDataFactory factory;
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
@@ -58,7 +58,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.config = config;
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.context = context;
+        this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, ExoUtil.getUserAgent(context)), new UserIdProvider(context));
         attachAnalyticsListener();
 
     }
@@ -187,7 +187,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public EventData createEventData() {
-        EventDataFactory factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, ExoUtil.getUserAgent(context)), new UserIdProvider(context));
         EventData data = factory.build(stateMachine.getImpressionId());
 
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
