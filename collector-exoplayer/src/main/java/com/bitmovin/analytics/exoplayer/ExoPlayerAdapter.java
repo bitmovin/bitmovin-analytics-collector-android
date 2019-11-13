@@ -11,8 +11,11 @@ import android.util.Log;
 import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
+import com.bitmovin.analytics.data.EventDataFactory;
+import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.stateMachines.PlayerState;
@@ -184,7 +187,9 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public EventData createEventData() {
-        EventData data = new EventData(config, context, stateMachine.getImpressionId(), ExoUtil.getUserAgent(this.context));
+        EventDataFactory factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, ExoUtil.getUserAgent(context)), new UserIdProvider(context));
+        EventData data = factory.build(stateMachine.getImpressionId());
+
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
         data.setPlayer(PlayerType.EXOPLAYER.toString());
         decorateDataWithPlaybackInformation(data);

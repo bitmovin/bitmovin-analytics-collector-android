@@ -1,15 +1,14 @@
 package com.bitmovin.analytics.data
 
 
-
-import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.BuildConfig
 import com.bitmovin.analytics.utils.Util
-class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context?, val impressionId: String, val userAgent: String) {
-    val deviceInformation = DeviceInformation() //
-    val language: String? = Util.getLocale() //
-    val userId: String? = Util.getUserId(context) //
+
+class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impressionId: String, deviceInfo: DeviceInformation, val userId: String) {
+    val userAgent = deviceInfo.userAgent
+    val deviceInformation = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model)
+    val language: String = deviceInfo.locale //
     var analyticsVersion: String? = BuildConfig.VERSION_NAME
     val playerTech: String? = Util.PLAYER_TECH
     val key: String? = bitmovinAnalyticsConfig.getKey()
@@ -28,9 +27,9 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Conte
     val experimentName = bitmovinAnalyticsConfig.getExperimentName()
     val cdnProvider: String? = bitmovinAnalyticsConfig.getCdnProvider()
     var player: String? = bitmovinAnalyticsConfig.getPlayerType()?.toString()
-    val domain: String? = context?.packageName
-    val screenHeight: Int = context?.getResources()?.getDisplayMetrics()?.heightPixels ?: 0
-    val screenWidth: Int = context?.getResources()?.getDisplayMetrics()?.widthPixels ?: 0
+    val domain: String = deviceInfo.packageName
+    val screenHeight: Int = deviceInfo.screenHeight // context?.getResources()?.getDisplayMetrics()?.heightPixels ?: 0
+    val screenWidth: Int = deviceInfo.screenWidth // context?.getResources()?.getDisplayMetrics()?.widthPixels ?: 0
     var isLive: Boolean = false
     var isCasting: Boolean = false
     var videoDuration: Long = 0
