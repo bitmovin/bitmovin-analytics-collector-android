@@ -28,6 +28,7 @@ public class Util {
     public static final int MILLISECONDS_IN_SECONDS = 1000;
 
     private static final Map<String, String> VIDEO_FORMAT_MIME_TYPE_MAP;
+    public static final String PLAYER_TECH = "Android:Exoplayer";
 
     static {
         VIDEO_FORMAT_MIME_TYPE_MAP = new HashMap<>();
@@ -46,16 +47,8 @@ public class Util {
                 Settings.Secure.ANDROID_ID);
     }
 
-    public static String getVersion() {
-        return BuildConfig.VERSION_NAME;
-    }
-
     public static long getTimeStamp() {
         return System.currentTimeMillis();
-    }
-
-    public static String getPlayerTech() {
-        return "Android:Exoplayer";
     }
 
     public static String getLocale() {

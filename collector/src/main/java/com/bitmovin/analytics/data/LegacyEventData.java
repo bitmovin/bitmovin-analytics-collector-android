@@ -3,6 +3,7 @@ package com.bitmovin.analytics.data;
 import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BuildConfig;
 import com.bitmovin.analytics.utils.Util;
 
 import java.util.List;
@@ -76,7 +77,7 @@ public class LegacyEventData {
     private String audioLanguage = null;
 
     public LegacyEventData(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context, String impressionId, String userAgent) {
-        this.analyticsVersion = Util.getVersion();
+        this.analyticsVersion = BuildConfig.VERSION_NAME;
         this.key = bitmovinAnalyticsConfig.getKey();
         this.playerKey = bitmovinAnalyticsConfig.getPlayerKey();
         this.videoId = bitmovinAnalyticsConfig.getVideoId();
@@ -90,7 +91,7 @@ public class LegacyEventData {
         this.customData5 = bitmovinAnalyticsConfig.getCustomData5();
         this.path = bitmovinAnalyticsConfig.getPath();
         this.experimentName = bitmovinAnalyticsConfig.getExperimentName();
-        this.playerTech = Util.getPlayerTech();
+        this.playerTech = Util.PLAYER_TECH;
         this.setUserAgent(userAgent);
         this.impressionId = impressionId;
 
