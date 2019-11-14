@@ -1,32 +1,35 @@
 package com.bitmovin.analytics.data
 
-import android.content.Context
+
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.BuildConfig
 import com.bitmovin.analytics.utils.Util
 
-
-class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context?, val impressionId: String, val userAgent: String) {
-    var analyticsVersion: String? = Util.getVersion()
+class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impressionId: String, deviceInfo: DeviceInformation, val userId: String) {
+    val userAgent = deviceInfo.userAgent
+    val deviceInformation = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model)
+    val language: String = deviceInfo.locale //
+    var analyticsVersion: String? = BuildConfig.VERSION_NAME
+    val playerTech: String? = Util.PLAYER_TECH
     val key: String? = bitmovinAnalyticsConfig.getKey()
     val playerKey: String? = bitmovinAnalyticsConfig.getPlayerKey()
     val videoId: String? = bitmovinAnalyticsConfig.getVideoId()
     val videoTitle: String? = bitmovinAnalyticsConfig.getTitle()
-    val userId: String? = Util.getUserId(context)
     val customUserId: String? = bitmovinAnalyticsConfig.getCustomUserId()
     val customData1: String? = bitmovinAnalyticsConfig.getCustomData1()
     val customData2: String? = bitmovinAnalyticsConfig.getCustomData2()
     val customData3: String? = bitmovinAnalyticsConfig.getCustomData3()
     val customData4: String? = bitmovinAnalyticsConfig.getCustomData4()
     val customData5: String? = bitmovinAnalyticsConfig.getCustomData5()
+    val customData6: String? = bitmovinAnalyticsConfig.getCustomData6()
+    val customData7: String? = bitmovinAnalyticsConfig.customData7
     val path: String? = bitmovinAnalyticsConfig.getPath()
     val experimentName = bitmovinAnalyticsConfig.getExperimentName()
-    val playerTech: String? = Util.getPlayerTech()
     val cdnProvider: String? = bitmovinAnalyticsConfig.getCdnProvider()
     var player: String? = bitmovinAnalyticsConfig.getPlayerType()?.toString()
-    val domain: String? = context?.packageName
-    val screenHeight: Int = context?.getResources()?.getDisplayMetrics()?.heightPixels ?: 0
-    val screenWidth: Int = context?.getResources()?.getDisplayMetrics()?.widthPixels ?: 0
-    val language: String? = Util.getLocale()
+    val domain: String = deviceInfo.packageName
+    val screenHeight: Int = deviceInfo.screenHeight // context?.getResources()?.getDisplayMetrics()?.heightPixels ?: 0
+    val screenWidth: Int = deviceInfo.screenWidth // context?.getResources()?.getDisplayMetrics()?.widthPixels ?: 0
     var isLive: Boolean = false
     var isCasting: Boolean = false
     var videoDuration: Long = 0
@@ -66,7 +69,6 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Conte
     var videoCodec: String? = null
     var audioCodec: String? = null
     var supportedVideoCodecs: List<String>? = null
-    val deviceInformation = DeviceInformation()
     var subtitleEnabled: Boolean = false
     var subtitleLanguage: String? = null
     var audioLanguage: String? = null

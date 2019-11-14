@@ -199,7 +199,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 
         val eventData = AdEventData()
 
-        eventData.analyticsVersion = Util.getVersion()
+        eventData.analyticsVersion = BuildConfig.VERSION_NAME
         val moduleInfo = analytics.adAdapter?.moduleInformation
         if(moduleInfo != null) {
             eventData.adModule = moduleInfo.name

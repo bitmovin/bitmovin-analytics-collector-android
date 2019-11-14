@@ -84,6 +84,8 @@ data class AdEventData(
         var customData3: String? = null,
         var customData4: String? = null,
         var customData5: String? = null,
+        var customData6: String? = null,
+        var customData7: String? = null,
         var customUserId: String? = null,
         var domain: String? = null,
         var experimentName: String? = null,
@@ -120,6 +122,8 @@ data class AdEventData(
         this.customData3 = eventData.customData3
         this.customData4 = eventData.customData4
         this.customData5 = eventData.customData5
+        this.customData6 = eventData.customData6
+        this.customData7 = eventData.customData7
         this.customUserId = eventData.customUserId
         this.domain = eventData.domain
         this.experimentName = eventData.experimentName

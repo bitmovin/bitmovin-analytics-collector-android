@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.BuildConfig;
 import com.bitmovin.analytics.data.LicenseCallData;
 import com.bitmovin.analytics.data.LicenseResponse;
 import com.bitmovin.analytics.utils.DataSerializer;
@@ -35,7 +36,7 @@ public class LicenseCall {
     public void authenticate(final LicenseCallback callback) {
         final LicenseCallData data = new LicenseCallData();
         data.setKey(this.config.getKey());
-        data.setAnalyticsVersion(Util.getVersion());
+        data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
         data.setDomain(context.getPackageName());
         String json = DataSerializer.serialize(data);
         httpClient.post(this.backendUrl, json, new Callback() {

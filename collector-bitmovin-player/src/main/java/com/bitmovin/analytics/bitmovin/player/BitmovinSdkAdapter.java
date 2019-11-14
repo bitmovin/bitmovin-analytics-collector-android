@@ -8,8 +8,11 @@ import android.os.Build;
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
+import com.bitmovin.analytics.data.EventDataFactory;
+import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -57,7 +60,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final BitmovinPlayer bitmovinPlayer;
-    private final Context context;
+    private final EventDataFactory factory;
     private PlayerStateMachine stateMachine;
     private int totalDroppedVideoFrames;
     private boolean playerIsReady;
@@ -68,7 +71,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer = bitmovinPlayer;
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.context = context;
+        this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, getUserAgent(context)), new UserIdProvider(context));
         addPlayerListeners();
     }
 
@@ -144,8 +147,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
 
     @Override
     public EventData createEventData() {
+        EventData data = factory.build(stateMachine.getImpressionId());
 
-        EventData data = new EventData(config, context, stateMachine.getImpressionId(), getUserAgent(context));
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
         data.setPlayer(PlayerType.BITMOVIN.toString());
 

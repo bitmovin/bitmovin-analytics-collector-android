@@ -1,8 +1,4 @@
 package com.bitmovin.analytics.data
 
-import android.os.Build
+data class DeviceInformation(val manufacturer: String, val model: String, val userAgent: String, val locale: String, val packageName: String, val screenHeight: Int, val screenWidth: Int)
 
-class DeviceInformation {
-    val manufacturer: String = Build.MANUFACTURER
-    val model: String = Build.MODEL
-}

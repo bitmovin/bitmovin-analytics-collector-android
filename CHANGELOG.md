@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added 
+
+- added `customData6` and `customData7` to the EventData and AdEventData
+
 ## v1.10.0
 
 ### Added

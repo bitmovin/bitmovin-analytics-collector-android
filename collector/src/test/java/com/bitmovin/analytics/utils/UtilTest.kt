@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.utils;
 
+import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.CollectorConfig
 import org.junit.Test
 import java.lang.Exception
@@ -21,40 +22,40 @@ class UtilTest {
     @Test
     @Throws(Exception::class)
     fun testGetIsLiveFromConfigOrPlayer_ReturnsConfigValueTrueIfPlayerNotReady() {
-        val config = CollectorConfig()
+        val config = BitmovinAnalyticsConfig()
         config.setIsLive(true)
 
-        val isLive = Util.getIsLiveFromConfigOrPlayer(false, config, false)
+        val isLive = Util.getIsLiveFromConfigOrPlayer(false, config.isLive, false)
         assertThat(isLive).isTrue()
     }
 
     @Test
     @Throws(Exception::class)
     fun testGetIsLiveFromConfigOrPlayer_ReturnsConfigValueFalseIfPlayerNotReady() {
-        val config = CollectorConfig()
+        val config = BitmovinAnalyticsConfig()
         config.setIsLive(false)
 
-        val isLive = Util.getIsLiveFromConfigOrPlayer(false, config, false)
+        val isLive = Util.getIsLiveFromConfigOrPlayer(false, config.isLive, false)
         assertThat(isLive).isFalse()
     }
 
     @Test
     @Throws(Exception::class)
     fun testGetIsLiveFromConfigOrPlayer_ReturnsPlayerIsLiveTrueIfPlayerReady() {
-        val config = CollectorConfig()
+        val config = BitmovinAnalyticsConfig()
         config.setIsLive(true)
 
-        val isLive = Util.getIsLiveFromConfigOrPlayer(true, config, true)
+        val isLive = Util.getIsLiveFromConfigOrPlayer(true, config.isLive, true)
         assertThat(isLive).isTrue()
     }
 
     @Test
     @Throws(Exception::class)
     fun testGetIsLiveFromConfigOrPlayer_ReturnsPlayerIsLiveFalseIfPlayerReady() {
-        val config = CollectorConfig()
+        val config = BitmovinAnalyticsConfig()
         config.setIsLive(true)
 
-        val isLive = Util.getIsLiveFromConfigOrPlayer(true, config, false)
+        val isLive = Util.getIsLiveFromConfigOrPlayer(true, config.isLive, false)
         assertThat(isLive).isFalse()
     }
 }
