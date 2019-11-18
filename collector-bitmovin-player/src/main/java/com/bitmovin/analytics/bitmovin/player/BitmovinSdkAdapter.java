@@ -304,7 +304,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onSeek(SeekEvent seekEvent) {
             Log.d(TAG, "On Seek Listener");
-            if (stateMachine.getCurrentState() != PlayerState.SEEKING) {
+            if (stateMachine.getCurrentState() != PlayerState.SEEKING && stateMachine.getFirstReadyTimestamp() != 0) {
                 stateMachine.transitionState(PlayerState.SEEKING, getPosition());
             }
         }
@@ -314,10 +314,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onStallEnded(StallEndedEvent stallEndedEvent) {
             Log.d(TAG, "On Stall Ended: " + String.valueOf(bitmovinPlayer.isPlaying()));
-            if (bitmovinPlayer.isPlaying() && stateMachine.getCurrentState() != PlayerState.PLAYING) {
-                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-            } else if (bitmovinPlayer.isPaused() && stateMachine.getCurrentState() != PlayerState.PAUSE) {
-                stateMachine.transitionState(PlayerState.PAUSE, getPosition());
+            if(stateMachine.getFirstReadyTimestamp() != 0) {
+                if (bitmovinPlayer.isPlaying() && stateMachine.getCurrentState() != PlayerState.PLAYING) {
+                    stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                } else if (bitmovinPlayer.isPaused() && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                    stateMachine.transitionState(PlayerState.PAUSE, getPosition());
+                }
             }
         }
     };
@@ -326,7 +328,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onAudioChanged(AudioChangedEvent audioChangedEvent) {
             Log.d(TAG, "On AudioChanged: " + bitmovinPlayer.getAudio().getId());
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getFirstReadyTimestamp() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.AUDIOTRACKCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
@@ -338,7 +340,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onSubtitleChanged(SubtitleChangedEvent event) {
             Log.d(TAG, "On SubtitleChanged: " + bitmovinPlayer.getSubtitle().getId());
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getFirstReadyTimestamp() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
@@ -361,7 +363,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onVideoPlaybackQualityChanged(
             VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Video Quality Changed");
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getFirstReadyTimestamp() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
@@ -381,7 +383,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onAudioPlaybackQualityChanged(
             AudioPlaybackQualityChangedEvent audioPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Audio Quality Changed");
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getFirstReadyTimestamp() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
