@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - player started state transition before the player was ready
+- pause state activated heartbeat and sent out unnecessary payload 
 
 ## v1.10.0
 
