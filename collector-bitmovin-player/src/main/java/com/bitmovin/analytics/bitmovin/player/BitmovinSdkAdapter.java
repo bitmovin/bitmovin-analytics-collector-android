@@ -328,7 +328,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onAudioChanged(AudioChangedEvent audioChangedEvent) {
             Log.d(TAG, "On AudioChanged: " + bitmovinPlayer.getAudio().getId());
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING) || (stateMachine.getCurrentState() == PlayerState.PAUSE)) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getFirstReadyTimestamp() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.AUDIOTRACKCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
