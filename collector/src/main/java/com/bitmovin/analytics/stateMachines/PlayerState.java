@@ -75,7 +75,7 @@ public enum PlayerState {
                 }
             }
 
-            machine.enableHeartbeat();
+//            machine.enableHeartbeat();
 
         }
 
@@ -86,7 +86,7 @@ public enum PlayerState {
                 listener.onPauseExit(timeStamp - enterTimestamp);
             }
 
-            machine.disableHeartbeat();
+//            machine.disableHeartbeat();
         }
     },
     QUALITYCHANGE {
