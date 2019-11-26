@@ -10,21 +10,20 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     private var activeAdSample: AdSample? = null
     private var adPodPosition: Int = 0
     private var adStartupTimestamp: Long? = null
-    private var _currentTime: Long? = null
     private var beginPlayingTimestamp: Long? = null
     private var isPlaying: Boolean = false
     private val adManifestDownloadTimes: HashMap<String, Long> = hashMapOf()
 
-    private val currentTime: Long?
+    private var currentTime: Long? = null
         get() = if(this.isPlaying) {
-            if(this._currentTime == null || this.beginPlayingTimestamp == null) {
+            if(field == null || this.beginPlayingTimestamp == null) {
                 null
             } else {
-                this._currentTime!! + Util.getTimeStamp() - this.beginPlayingTimestamp!!
+                field!! + Util.getTimeStamp() - this.beginPlayingTimestamp!!
             }
 
         } else {
-            _currentTime
+            field
         }
 
     fun onAdStarted(ad: Ad) {
@@ -33,10 +32,13 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         }
 
         this.resetActiveAd()
-        this.activeAdSample = AdSample(ad = ad)
-        this.activeAdSample!!.adStartupTime = if (this.adStartupTimestamp != null) Util.getTimeStamp() - this.adStartupTimestamp!! else null
+        val adSample = AdSample(ad = ad)
+        val adStartupTimestamp = this.adStartupTimestamp
+        adSample.adStartupTime = if (adStartupTimestamp != null) Util.getTimeStamp() - adStartupTimestamp else null
 
-        this.startAd(activeAdSample!!)
+        this.activeAdSample = adSample
+
+        this.startAd(adSample)
     }
 
     fun onAdFinished() {
@@ -99,8 +101,8 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 
     fun onPause() {
         if (this.analytics.adAdapter != null && this.analytics.adAdapter.isLinearAdActive && this.activeAdSample != null) {
-            if(this._currentTime != null && this.beginPlayingTimestamp != null) {
-                this._currentTime = this._currentTime!! + Util.getTimeStamp() - this.beginPlayingTimestamp!!
+            if(this.currentTime != null) {
+                this.currentTime = this.currentTime
             }
             this.isPlaying = false
         }
@@ -134,7 +136,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         adSample.adPodPosition = this.adPodPosition
         this.beginPlayingTimestamp = Util.getTimeStamp()
         this.isPlaying = true
-        this._currentTime = 0
+        this.currentTime = 0
         this.adPodPosition++
     }
 
@@ -150,7 +152,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     }
 
     private fun resetActiveAd() {
-        this._currentTime = null
+        this.currentTime = null
         this.activeAdSample = null
     }
 
