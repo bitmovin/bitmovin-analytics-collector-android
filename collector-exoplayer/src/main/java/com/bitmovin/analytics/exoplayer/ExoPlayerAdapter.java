@@ -23,6 +23,7 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -40,6 +41,7 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener {
     private static final String TAG = "ExoPlayerAdapter";
@@ -50,6 +52,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private boolean playerIsReady;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
     private final EventDataFactory factory;
+    private ArrayList<ExoPlayerModule> registeredExoPlayerModules;
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
@@ -59,8 +62,23 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
         this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, ExoUtil.getUserAgent(context)), new UserIdProvider(context));
+        this.registeredExoPlayerModules = new ArrayList<>();
         attachAnalyticsListener();
+    }
 
+
+    private void updateLoadedModules() {
+        this.registeredExoPlayerModules = new ArrayList<>();
+        String registeredModules = ExoPlayerLibraryInfo.registeredModules();
+        for (ExoPlayerModule module : ExoPlayerModule.values()) {
+            if (registeredModules.indexOf(module.getModuleName()) > 0) {
+                this.registeredExoPlayerModules.add(module);
+            }
+        }
+    }
+
+    private boolean isModuleLoaded(ExoPlayerModule module) {
+        return this.registeredExoPlayerModules.contains(module);
     }
 
     private void attachAnalyticsListener() {
@@ -104,6 +122,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
         Log.d(TAG, "onTimelineChanged");
+        updateLoadedModules();
     }
 
     @Override
@@ -167,7 +186,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
 
-
     @Override
     public void onPositionDiscontinuity(int reason) {
         Log.d(TAG, "onPositionDiscontinuity");
@@ -220,14 +238,14 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
         //streamFormat, mpdUrl, and m3u8Url
         Object manifest = exoplayer.getCurrentManifest();
-        if (manifest instanceof DashManifest) {
+        if (isModuleLoaded(ExoPlayerModule.DASH) && manifest instanceof DashManifest) {
             DashManifest dashManifest;
             dashManifest = (DashManifest) manifest;
             data.setStreamFormat(Util.DASH_STREAM_FORMAT);
             if (dashManifest.location != null) {
                 data.setMpdUrl(dashManifest.location.toString());
             }
-        } else if (manifest instanceof HlsManifest) {
+        } else if (isModuleLoaded(ExoPlayerModule.HLS) && manifest instanceof HlsManifest) {
             HlsMasterPlaylist masterPlaylist = ((HlsManifest) manifest).masterPlaylist;
             HlsMediaPlaylist mediaPlaylist = ((HlsManifest) manifest).mediaPlaylist;
             data.setStreamFormat(Util.HLS_STREAM_FORMAT);
