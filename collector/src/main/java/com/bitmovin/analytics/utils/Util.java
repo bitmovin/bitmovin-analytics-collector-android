@@ -86,11 +86,12 @@ public class Util {
         return false;
     }
 
-    public static Integer calculatePercentage(Long numerator, Long denominator) {
+    public static Integer calculatePercentage(Long numerator, Long denominator, Boolean clamp) {
         if (denominator == null || denominator == 0 || numerator == null) {
             return null;
         }
-        return Math.round((numerator.floatValue() / denominator.floatValue()) * 100);
+        int result = Math.round((numerator.floatValue() / denominator.floatValue()) * 100);
+        return clamp ? Math.min(result, 100) : result;
     }
 
     public static Pair<String, String> getHostnameAndPath(String uriString) {
