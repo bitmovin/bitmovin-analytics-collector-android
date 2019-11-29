@@ -265,7 +265,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onPlaybackFinished(PlaybackFinishedEvent playbackFinishedEvent) {
             Log.d(TAG, "On Playback Finished Listener");
-            stateMachine.transitionState(PlayerState.PAUSE, getPosition());
+
+            long position = (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY) ? (long) bitmovinPlayer.getDuration() * Util.MILLISECONDS_IN_SECONDS : getPosition();
+            stateMachine.transitionState(PlayerState.PAUSE, position);
             stateMachine.disableHeartbeat();
 
         }
