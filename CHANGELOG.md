@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.11.1
+
 ### Changed
 
 - `PlaybackFinished` event will set the `videoTimeEnd` to `videoDuration`, as `currentTime` might not be accurate due to rounding errors
