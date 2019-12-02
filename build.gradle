@@ -37,8 +37,8 @@ allprojects {
 
 ext {
     developLocal = true
-    version = "1.11.0"
-    versionCode = 111000
+    version = "1.11.1"
+    versionCode = 111100
 }
 
 task clean(type: Delete) {
