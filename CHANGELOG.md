@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - `PlaybackFinished` event will set the `videoTimeEnd` to `videoDuration`, as `currentTime` might not be accurate due to rounding errors
 
+### Fixed
+
+- exoplayer collector crashes when specific exoplayer modules have not been loaded (AN-966)
+
 ## v1.11.0
 
 ### Added 

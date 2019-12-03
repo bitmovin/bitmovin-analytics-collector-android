@@ -39,10 +39,17 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+
 import java.io.IOException;
 
 public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener {
     private static final String TAG = "ExoPlayerAdapter";
+    private static final String DASH_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.dash.manifest.DashManifest";
+    private static final String HLS_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.hls.HlsManifest";
+
+    private Boolean _isDashManifestClassLoaded;
+    private Boolean _isHlsManifestClassLoaded;
+
     private final BitmovinAnalyticsConfig config;
     private ExoPlayer exoplayer;
     private PlayerStateMachine stateMachine;
@@ -60,7 +67,20 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.playerIsReady = false;
         this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, ExoUtil.getUserAgent(context)), new UserIdProvider(context));
         attachAnalyticsListener();
+    }
 
+    private boolean isHlsManifestClassLoaded(){
+        if (this._isHlsManifestClassLoaded == null) {
+            this._isHlsManifestClassLoaded = Util.isClassLoaded(HLS_MANIFEST_CLASSNAME);
+        }
+        return this._isHlsManifestClassLoaded;
+    }
+
+    private boolean isDashManifestClassLoaded(){
+        if (this._isDashManifestClassLoaded == null) {
+            this._isDashManifestClassLoaded = Util.isClassLoaded(DASH_MANIFEST_CLASSNAME);
+        }
+        return this._isDashManifestClassLoaded;
     }
 
     private void attachAnalyticsListener() {
@@ -167,7 +187,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
 
-
     @Override
     public void onPositionDiscontinuity(int reason) {
         Log.d(TAG, "onPositionDiscontinuity");
@@ -220,14 +239,14 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
         //streamFormat, mpdUrl, and m3u8Url
         Object manifest = exoplayer.getCurrentManifest();
-        if (manifest instanceof DashManifest) {
+        if (isDashManifestClassLoaded() && manifest instanceof DashManifest) {
             DashManifest dashManifest;
             dashManifest = (DashManifest) manifest;
             data.setStreamFormat(Util.DASH_STREAM_FORMAT);
             if (dashManifest.location != null) {
                 data.setMpdUrl(dashManifest.location.toString());
             }
-        } else if (manifest instanceof HlsManifest) {
+        } else if (isHlsManifestClassLoaded() && manifest instanceof HlsManifest) {
             HlsMasterPlaylist masterPlaylist = ((HlsManifest) manifest).masterPlaylist;
             HlsMediaPlaylist mediaPlaylist = ((HlsManifest) manifest).mediaPlaylist;
             data.setStreamFormat(Util.HLS_STREAM_FORMAT);

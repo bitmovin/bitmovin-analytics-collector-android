@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalytics.attachPlayer(player);
 
 
-            //Step 5: Create, prepeare, and play media source
+            //Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);
 
             Uri dashStatic = Uri.parse("http://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd");
