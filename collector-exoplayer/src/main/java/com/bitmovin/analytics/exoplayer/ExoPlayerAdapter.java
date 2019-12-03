@@ -69,25 +69,16 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         attachAnalyticsListener();
     }
 
-    private boolean isClassLoaded(String className) {
-        try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
-
     private boolean isHlsManifestClassLoaded(){
         if (this._isHlsManifestClassLoaded == null) {
-            this._isHlsManifestClassLoaded = this.isClassLoaded(HLS_MANIFEST_CLASSNAME);
+            this._isHlsManifestClassLoaded = Util.isClassLoaded(HLS_MANIFEST_CLASSNAME);
         }
         return this._isHlsManifestClassLoaded;
     }
 
     private boolean isDashManifestClassLoaded(){
         if (this._isDashManifestClassLoaded == null) {
-            this._isDashManifestClassLoaded = this.isClassLoaded(DASH_MANIFEST_CLASSNAME);
+            this._isDashManifestClassLoaded = Util.isClassLoaded(DASH_MANIFEST_CLASSNAME);
         }
         return this._isDashManifestClassLoaded;
     }

@@ -110,4 +110,13 @@ public class Util {
         }
         return isLiveFromConfig;
     }
+
+    public static boolean isClassLoaded(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
 }
