@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //Step 3: Create Analytics Collector
             ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
+            this.bitmovinAnalytics = bitmovinAnalytics;
 
             //Step 4: Attach ExoPlayer
             bitmovinAnalytics.attachPlayer(player);
