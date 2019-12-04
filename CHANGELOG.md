@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+
+- empty MPD URL when manifest location is null (AN-1068)
+- exoplayer demo crash when calling `releasePlayer()`
+
 ## v1.11.1
 
 ### Changed
