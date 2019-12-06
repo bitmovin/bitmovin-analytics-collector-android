@@ -308,7 +308,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     public void removeDebugListener(DebugListener listener) {
-        debugListeners.remove(listener);debug
+        debugListeners.remove(listener);
     }
 
     public interface DebugListener {
