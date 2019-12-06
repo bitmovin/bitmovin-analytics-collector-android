@@ -4,10 +4,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.bitmovin.analytics.data.AdEventData;
+import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
@@ -31,7 +34,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, BitmovinAnalytics.DebugListener {
     private SimpleExoPlayer player;
     private PlayerView playerView;
     private Button releaseButton;
@@ -56,15 +59,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         createPlayer();
 
-        automationHandler = new Handler();
-
-        automationHandler.postDelayed(new Runnable() {
-            public void run() {
-                releasePlayer();
-                createPlayer();
-                automationHandler.postDelayed(this, automationDelay);
-            }
-        }, automationDelay);
+//        automationHandler = new Handler();
+//
+//        automationHandler.postDelayed(new Runnable() {
+//            public void run() {
+//                releasePlayer();
+//                createPlayer();
+//                automationHandler.postDelayed(this, automationDelay);
+//            }
+//        }, automationDelay);
 
     }
 
@@ -79,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     buildHttpDataSourceFactory(bandwidthMeter));
 
             //Step 1: Create your analytics config object
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<YOUR_ANALYTICS_KEY>");
+            BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("e73a3577-d91c-4214-9e6d-938fb936818a");
 
             //Step 2: Add optional parameters
             bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
@@ -101,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             eventLogView.setText("");
             //Step 3: Create Analytics Collector
             ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
+            bitmovinAnalytics.addDebugListener(this);
             this.bitmovinAnalytics = bitmovinAnalytics;
 
             //Step 4: Attach ExoPlayer
@@ -141,5 +145,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == createButton) {
             createPlayer();
         }
+    }
+
+    @Override
+    public void onDispatchEventData(EventData data)
+    {
+        eventLogView.append(String.format("state: %s, duration: %s, time: %s\n", data.getState(), data.getDuration(), data.getTime()));
+    }
+
+    @Override
+    public void onDispatchAdEventData(AdEventData data)
+    {
+
+    }
+
+    @Override
+    public void onMessage(String message)
+    {
+
     }
 }
