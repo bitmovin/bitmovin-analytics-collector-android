@@ -3,6 +3,7 @@ package com.bitmovin.analytics.data;
 import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.DebugCallback;
 import com.bitmovin.analytics.license.LicenseCall;
 import com.bitmovin.analytics.license.LicenseCallback;
 
@@ -20,15 +21,17 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     private boolean enabled = false;
     private BitmovinAnalyticsConfig config;
     private final LicenseCallback callback;
+    private final DebugCallback debugCallback;
     private Context context;
 
     private int sampleSequenceNumber = 0;
 
-    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, LicenseCallback callback) {
+    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, LicenseCallback callback, DebugCallback debugCallback) {
         this.data = new ConcurrentLinkedQueue<>();
         this.adData = new ConcurrentLinkedQueue<>();
         this.config = config;
         this.callback = callback;
+        this.debugCallback = debugCallback;
         this.context = context;
         this.backend = new BackendFactory().createBackend(config, context);
     }
@@ -73,6 +76,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     @Override
     public void add(EventData eventData) {
         eventData.setSequenceNumber(this.sampleSequenceNumber++);
+        debugCallback.dispatchEventData(eventData);
         if (enabled) {
             this.backend.send(eventData);
         } else {
@@ -82,6 +86,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
 
     @Override
     public void addAd(AdEventData eventData) {
+        debugCallback.dispatchAdEventData(eventData);
         if (enabled) {
             this.backend.sendAd(eventData);
         } else {

@@ -15,8 +15,12 @@ import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.license.LicenseCallback;
-import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.Util;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
@@ -25,6 +29,8 @@ import com.bitmovin.analytics.utils.Util;
 public class BitmovinAnalytics implements StateMachineListener, LicenseCallback {
 
     private static final String TAG = "BitmovinAnalytics";
+
+    private List<DebugListener> debugListeners = new ArrayList<>();
 
     protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
     protected PlayerAdapter playerAdapter;
@@ -49,7 +55,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
         this.playerStateMachine.addListener(this);
-        this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this);
+        this.eventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this, debugCallback);
         if(this.bitmovinAnalyticsConfig.getAds()) {
             this.adAnalytics = new BitmovinAdAnalytics(this);
         }
@@ -57,7 +63,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
     /**
      * Bitmovin Analytics
-     * 
+     *
      * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass {@link Context} seperately.
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
@@ -296,4 +302,44 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             detachPlayer();
         }
     }
+
+    public void addDebugListener(DebugListener listener) {
+        debugListeners.add(listener);
+    }
+
+    public interface DebugListener {
+        void onDispatchEventData(EventData data);
+        void onDispatchAdEventData(AdEventData data);
+        void onMessage(String message);
+    }
+
+    private DebugCallback debugCallback = new DebugCallback()
+    {
+        @Override
+        public void dispatchEventData(@NotNull EventData data)
+        {
+            for(DebugListener listener : BitmovinAnalytics.this.debugListeners)
+            {
+                listener.onDispatchEventData(data);
+            }
+        }
+
+        @Override
+        public void dispatchAdEventData(@NotNull AdEventData data)
+        {
+            for(DebugListener listener : BitmovinAnalytics.this.debugListeners)
+            {
+                listener.onDispatchAdEventData(data);
+            }
+        }
+
+        @Override
+        public void message(@NotNull String message)
+        {
+            for(DebugListener listener : BitmovinAnalytics.this.debugListeners)
+            {
+                listener.onMessage(message);
+            }
+        }
+    };
 }
