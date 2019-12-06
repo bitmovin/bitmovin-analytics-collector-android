@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
 import com.bitmovin.analytics.BitmovinAnalytics;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PlayerView playerView;
     private Button releaseButton;
     private Button createButton;
+    private TextView eventLogView;
     private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
     private BitmovinAnalytics bitmovinAnalytics;
     private Handler automationHandler;
@@ -50,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         releaseButton.setOnClickListener(this);
         createButton = findViewById(R.id.create_button);
         createButton.setOnClickListener(this);
+        eventLogView = findViewById(R.id.eventLog);
 
         createPlayer();
 
@@ -95,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
             bitmovinAnalyticsConfig.setIsLive(false);
 
+            eventLogView.setText("");
             //Step 3: Create Analytics Collector
             ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
             this.bitmovinAnalytics = bitmovinAnalytics;
