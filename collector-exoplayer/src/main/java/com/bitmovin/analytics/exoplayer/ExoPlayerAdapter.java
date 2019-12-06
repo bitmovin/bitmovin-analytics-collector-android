@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.exoplayer;
 
+import static com.google.android.exoplayer2.C.DATA_TYPE_MANIFEST;
 import static com.google.android.exoplayer2.C.TIME_UNSET;
 import static com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO;
 import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
@@ -55,6 +56,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private PlayerStateMachine stateMachine;
     private int totalDroppedVideoFrames;
     private boolean playerIsReady;
+    private String manifestUrl;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
     private final EventDataFactory factory;
 
@@ -92,6 +94,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     public void release() {
         playerIsReady = false;
+        manifestUrl = null;
         if (this.exoplayer != null) {
             this.exoplayer.removeListener(this);
         }
@@ -243,7 +246,9 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             DashManifest dashManifest;
             dashManifest = (DashManifest) manifest;
             data.setStreamFormat(Util.DASH_STREAM_FORMAT);
-            if (dashManifest.location != null) {
+            if (dashManifest.location == null) {
+                data.setMpdUrl(this.manifestUrl);
+            } else {
                 data.setMpdUrl(dashManifest.location.toString());
             }
         } else if (isHlsManifestClassLoaded() && manifest instanceof HlsManifest) {
@@ -343,7 +348,9 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public void onLoadCompleted(EventTime eventTime, MediaSourceEventListener.LoadEventInfo loadEventInfo, MediaSourceEventListener.MediaLoadData mediaLoadData) {
-
+        if (mediaLoadData.dataType == DATA_TYPE_MANIFEST) {
+            this.manifestUrl = loadEventInfo.dataSpec.uri.toString();
+        }
     }
 
     @Override
