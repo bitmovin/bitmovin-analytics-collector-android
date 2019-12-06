@@ -38,7 +38,7 @@ public class PlayerStateMachine {
     public void enableHeartbeat() {
         heartbeatHandler.postDelayed(new Runnable() {
             public void run() {
-                long currentTimestamp = Util.getTimeStamp();
+                long currentTimestamp = Util.getElapsedTimestamp();
                 long enterTimestamp = getOnEnterStateTimeStamp();
                 videoTimeEnd = analytics.getPosition();
                 for (StateMachineListener listener : getListeners()) {
@@ -58,13 +58,13 @@ public class PlayerStateMachine {
     public void resetStateMachine() {
         disableHeartbeat();
         this.impressionId = Util.getUUID();
-        this.initialTimestamp = Util.getTimeStamp();
+        this.initialTimestamp = Util.getElapsedTimestamp();
         this.firstReadyTimestamp = 0;
         setCurrentState(PlayerState.SETUP);
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
-        long timeStamp = Util.getTimeStamp();
+        long timeStamp = Util.getElapsedTimestamp();
         videoTimeEnd = videoTime;
 
         Log.d(TAG, "Transitioning from " + currentState.toString() + " to " + destinationPlayerState.toString());

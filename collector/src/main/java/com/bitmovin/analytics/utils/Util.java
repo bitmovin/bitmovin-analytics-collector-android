@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Pair;
 
@@ -47,7 +48,11 @@ public class Util {
                 Settings.Secure.ANDROID_ID);
     }
 
-    public static long getTimeStamp() {
+    public static long getElapsedTimestamp() {
+        return SystemClock.elapsedRealtime();
+    }
+
+    public static long getTimestamp() {
         return System.currentTimeMillis();
     }
 

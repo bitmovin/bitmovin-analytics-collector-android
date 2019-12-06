@@ -45,7 +45,7 @@ public enum PlayerState {
         @Override
         void onEnterState(PlayerStateMachine machine) {
             if (machine.getFirstReadyTimestamp() == 0) {
-                machine.setFirstReadyTimestamp(Util.getTimeStamp());
+                machine.setFirstReadyTimestamp(Util.getElapsedTimestamp());
                 for (StateMachineListener listener : machine.getListeners()) {
                     listener.onStartup(machine.getStartupTime());
                 }
@@ -69,7 +69,7 @@ public enum PlayerState {
         @Override
         void onEnterState(PlayerStateMachine machine) {
             if (machine.getFirstReadyTimestamp() == 0) {
-                machine.setFirstReadyTimestamp(Util.getTimeStamp());
+                machine.setFirstReadyTimestamp(Util.getElapsedTimestamp());
                 for (StateMachineListener listener : machine.getListeners()) {
                     listener.onStartup(machine.getStartupTime());
                 }
