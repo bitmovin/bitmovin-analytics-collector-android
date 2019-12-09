@@ -1,13 +1,8 @@
 package com.bitmovin.analytics.data
 
-import android.content.Context
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DebugCallback
-import com.bitmovin.analytics.license.LicenseCallback
 
-class DebuggingEventDataDispatcher(config: BitmovinAnalyticsConfig, context: Context, callback: LicenseCallback, private val debugCallback: DebugCallback) : IEventDataDispatcher {
-
-    private val innerEventDataDispatcher = SimpleEventDataDispatcher(config, context, callback)
+class DebuggingEventDataDispatcher(private val innerEventDataDispatcher: IEventDataDispatcher, private val debugCallback: DebugCallback) : IEventDataDispatcher {
 
     override fun add(data: EventData) {
         debugCallback.dispatchEventData(data)
