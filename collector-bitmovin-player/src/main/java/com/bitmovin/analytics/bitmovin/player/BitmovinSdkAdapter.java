@@ -278,7 +278,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onPaused(PausedEvent pausedEvent) {
             Log.d(TAG, "On Pause Listener");
             //Do not transition to a paused state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times
-            if (stateMachine.getFirstReadyTimestamp() != 0) {
+            if (stateMachine.getElapsedTimeFirstReady() != 0) {
                 stateMachine.transitionState(PlayerState.PAUSE, getPosition());
             }
         }
@@ -289,7 +289,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onPlay(PlayEvent playEvent) {
             Log.d(TAG, "On Play Listener");
             //Do not transition to a playing state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times when autopplay is enabled
-            if (stateMachine.getFirstReadyTimestamp() != 0) {
+            if (stateMachine.getElapsedTimeFirstReady() != 0) {
                 stateMachine.transitionState(PlayerState.PLAYING, getPosition());
             }
         }
@@ -306,7 +306,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onSeek(SeekEvent seekEvent) {
             Log.d(TAG, "On Seek Listener");
-            if (stateMachine.getCurrentState() != PlayerState.SEEKING && stateMachine.getFirstReadyTimestamp() != 0) {
+            if (stateMachine.getCurrentState() != PlayerState.SEEKING && stateMachine.getElapsedTimeFirstReady() != 0) {
                 stateMachine.transitionState(PlayerState.SEEKING, getPosition());
             }
         }
@@ -316,7 +316,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onStallEnded(StallEndedEvent stallEndedEvent) {
             Log.d(TAG, "On Stall Ended: " + String.valueOf(bitmovinPlayer.isPlaying()));
-            if(stateMachine.getFirstReadyTimestamp() != 0) {
+            if(stateMachine.getElapsedTimeFirstReady() != 0) {
                 if (bitmovinPlayer.isPlaying() && stateMachine.getCurrentState() != PlayerState.PLAYING) {
                     stateMachine.transitionState(PlayerState.PLAYING, getPosition());
                 } else if (bitmovinPlayer.isPaused() && stateMachine.getCurrentState() != PlayerState.PAUSE) {
@@ -330,7 +330,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onAudioChanged(AudioChangedEvent audioChangedEvent) {
             Log.d(TAG, "On AudioChanged: " + bitmovinPlayer.getAudio().getId());
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getFirstReadyTimestamp() != 0) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getElapsedTimeFirstReady() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.AUDIOTRACKCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
@@ -342,7 +342,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onSubtitleChanged(SubtitleChangedEvent event) {
             Log.d(TAG, "On SubtitleChanged: " + bitmovinPlayer.getSubtitle().getId());
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getFirstReadyTimestamp() != 0) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getElapsedTimeFirstReady() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
@@ -354,7 +354,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onStallStarted(StallStartedEvent stallStartedEvent) {
             Log.d(TAG, "On Stall Started Listener");
-            if (stateMachine.getCurrentState() != PlayerState.SEEKING && stateMachine.getFirstReadyTimestamp() != 0) {
+            if (stateMachine.getCurrentState() != PlayerState.SEEKING && stateMachine.getElapsedTimeFirstReady() != 0) {
                 stateMachine.transitionState(PlayerState.BUFFERING, getPosition());
             }
         }
@@ -365,7 +365,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onVideoPlaybackQualityChanged(
             VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Video Quality Changed");
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getFirstReadyTimestamp() != 0) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getElapsedTimeFirstReady() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
@@ -385,7 +385,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onAudioPlaybackQualityChanged(
             AudioPlaybackQualityChangedEvent audioPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Audio Quality Changed");
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getFirstReadyTimestamp() != 0) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getElapsedTimeFirstReady() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
