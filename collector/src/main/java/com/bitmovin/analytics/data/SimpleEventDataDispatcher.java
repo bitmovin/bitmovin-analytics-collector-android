@@ -3,6 +3,7 @@ package com.bitmovin.analytics.data;
 import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.DebugCallback;
 import com.bitmovin.analytics.license.LicenseCall;
 import com.bitmovin.analytics.license.LicenseCallback;
 

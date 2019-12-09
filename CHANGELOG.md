@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+
+- `BitmovinAnalytics.addDebugListener` adds the possibility to listen to debug events
+
 ### Fixed
 
 - empty MPD URL when manifest location is null (AN-1068)
