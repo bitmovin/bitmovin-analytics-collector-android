@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Pair;
 
@@ -47,7 +48,16 @@ public class Util {
                 Settings.Secure.ANDROID_ID);
     }
 
-    public static long getTimeStamp() {
+    /**
+     * Returns the time in ms since the system was booted, and guaranteed to be monotonic
+     * Details here: https://developer.android.com/reference/android/os/SystemClock
+     * @return The time in ms since the system was booted, and guaranteed to be monotonic.
+     */
+    public static long getElapsedTime() {
+        return SystemClock.elapsedRealtime();
+    }
+
+    public static long getTimestamp() {
         return System.currentTimeMillis();
     }
 

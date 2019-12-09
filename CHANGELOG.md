@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - empty MPD URL when manifest location is null (AN-1068)
 - exoplayer demo crash when calling `releasePlayer()`
+- Time difference calculation now uses `SystemClock.elapsedRealtime()` to be immune to changes of the phone's date
 
 ## v1.11.1
 

@@ -16,10 +16,10 @@ public class PlayerStateMachine {
     private final BitmovinAnalyticsConfig config;
     private List<StateMachineListener> listeners = new ArrayList<StateMachineListener>();
     private PlayerState currentState;
-    private long initialTimestamp = 0;
-    private long firstReadyTimestamp = 0;
-    private long onEnterStateTimeStamp = 0;
-    private long seekTimeStamp = 0;
+    private long elaspedTimeInitial = 0;
+    private long elapsedTimeFirstReady = 0;
+    private long elapsedTimeOnEnter = 0;
+    private long elapsedTimeSeekStart = 0;
     private long videoTimeStart;
     private long videoTimeEnd;
     private ErrorCode errorCode;
@@ -38,13 +38,13 @@ public class PlayerStateMachine {
     public void enableHeartbeat() {
         heartbeatHandler.postDelayed(new Runnable() {
             public void run() {
-                long currentTimestamp = Util.getTimeStamp();
-                long enterTimestamp = getOnEnterStateTimeStamp();
+                long elapsedTime = Util.getElapsedTime();
+                long elapsedTimeOnEnter = getElapsedTimeOnEnter();
                 videoTimeEnd = analytics.getPosition();
                 for (StateMachineListener listener : getListeners()) {
-                    listener.onHeartbeat(currentTimestamp - enterTimestamp);
+                    listener.onHeartbeat(elapsedTime - elapsedTimeOnEnter);
                 }
-                onEnterStateTimeStamp = currentTimestamp;
+                PlayerStateMachine.this.elapsedTimeOnEnter = elapsedTime;
                 videoTimeStart = videoTimeEnd;
                 heartbeatHandler.postDelayed(this, heartbeatDelay);
             }
@@ -58,30 +58,30 @@ public class PlayerStateMachine {
     public void resetStateMachine() {
         disableHeartbeat();
         this.impressionId = Util.getUUID();
-        this.initialTimestamp = Util.getTimeStamp();
-        this.firstReadyTimestamp = 0;
+        this.elaspedTimeInitial = Util.getElapsedTime();
+        this.elapsedTimeFirstReady = 0;
         setCurrentState(PlayerState.SETUP);
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
-        long timeStamp = Util.getTimeStamp();
+        long elapsedTime = Util.getElapsedTime();
         videoTimeEnd = videoTime;
 
         Log.d(TAG, "Transitioning from " + currentState.toString() + " to " + destinationPlayerState.toString());
 
-        currentState.onExitState(this, timeStamp, destinationPlayerState);
-        this.onEnterStateTimeStamp = timeStamp;
+        currentState.onExitState(this, elapsedTime, destinationPlayerState);
+        this.elapsedTimeOnEnter = elapsedTime;
         videoTimeStart = videoTimeEnd;
         destinationPlayerState.onEnterState(this);
         setCurrentState(destinationPlayerState);
     }
 
-    public long getFirstReadyTimestamp() {
-        return firstReadyTimestamp;
+    public long getElapsedTimeFirstReady() {
+        return elapsedTimeFirstReady;
     }
 
-    public void setFirstReadyTimestamp(long firstReadyTimestamp) {
-        this.firstReadyTimestamp = firstReadyTimestamp;
+    public void setElapsedTimeFirstReady(long elapsedTime) {
+        this.elapsedTimeFirstReady = elapsedTime;
     }
 
     public void addListener(StateMachineListener toAdd) {
@@ -105,7 +105,7 @@ public class PlayerStateMachine {
     }
 
     public long getStartupTime() {
-        return firstReadyTimestamp - initialTimestamp;
+        return elapsedTimeFirstReady - elaspedTimeInitial;
     }
 
     public String getImpressionId() {
@@ -120,16 +120,16 @@ public class PlayerStateMachine {
         return videoTimeEnd;
     }
 
-    public long getOnEnterStateTimeStamp() {
-        return onEnterStateTimeStamp;
+    public long getElapsedTimeOnEnter() {
+        return elapsedTimeOnEnter;
     }
 
-    public long getSeekTimeStamp() {
-        return seekTimeStamp;
+    public long getElapsedTimeSeekStart() {
+        return elapsedTimeSeekStart;
     }
 
-    public void setSeekTimeStamp(long seekTimeStamp) {
-        this.seekTimeStamp = seekTimeStamp;
+    public void setElapsedTimeSeekStart(long elapsedTimeSeekStart) {
+        this.elapsedTimeSeekStart = elapsedTimeSeekStart;
     }
 
     public ErrorCode getErrorCode() {

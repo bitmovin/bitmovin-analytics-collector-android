@@ -33,7 +33,7 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impression
     var isLive: Boolean = false
     var isCasting: Boolean = false
     var videoDuration: Long = 0
-    var time: Long = Util.getTimeStamp()
+    var time: Long = Util.getTimestamp()
     var videoWindowWidth: Int = 0
     var videoWindowHeight: Int = 0
     var droppedFrames: Int = 0
