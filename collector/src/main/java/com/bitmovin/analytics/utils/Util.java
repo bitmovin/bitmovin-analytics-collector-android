@@ -48,7 +48,7 @@ public class Util {
                 Settings.Secure.ANDROID_ID);
     }
 
-    public static long getElapsedTimestamp() {
+    public static long getElapsedTime() {
         return SystemClock.elapsedRealtime();
     }
 
