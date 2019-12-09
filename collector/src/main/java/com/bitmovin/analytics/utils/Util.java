@@ -48,6 +48,11 @@ public class Util {
                 Settings.Secure.ANDROID_ID);
     }
 
+    /**
+     * Returns the time in ms since the system was booted, and guaranteed to be monotonic
+     * Details here: https://developer.android.com/reference/android/os/SystemClock
+     * @return The time in ms since the system was booted, and guaranteed to be monotonic.
+     */
     public static long getElapsedTime() {
         return SystemClock.elapsedRealtime();
     }
