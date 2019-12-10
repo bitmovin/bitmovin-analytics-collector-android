@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.11.2
+
 ### Added
 
 - `BitmovinAnalytics.addDebugListener` adds the possibility to listen to debug events
