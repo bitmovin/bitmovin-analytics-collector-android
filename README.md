@@ -101,6 +101,7 @@ bitmovinAnalyticsConfig.setCustomData4("customData4");
 bitmovinAnalyticsConfig.setCustomData5("customData5");
 bitmovinAnalyticsConfig.setCustomData6("customData6");
 bitmovinAnalyticsConfig.setCustomData7("customData7");
+bitmovinAnalyticsConfig.setIsLive(false);
 bitmovinAnalyticsConfig.setHeartbeatInterval(59700); // value is in ms 
 
 ```
