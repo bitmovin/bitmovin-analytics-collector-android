@@ -114,11 +114,11 @@ public class Util {
         return new Pair<>(null, null);
     }
     
-    public static boolean getIsLiveFromConfigOrPlayer(boolean isPlayerReady, boolean isLiveFromConfig, boolean isLiveFromPlayer) {
+    public static boolean getIsLiveFromConfigOrPlayer(boolean isPlayerReady, Boolean isLiveFromConfig, boolean isLiveFromPlayer) {
         if (isPlayerReady) {
             return isLiveFromPlayer;
         }
-        return isLiveFromConfig;
+        return isLiveFromConfig != null ? isLiveFromConfig : false;
     }
 
     public static boolean isClassLoaded(String className) {

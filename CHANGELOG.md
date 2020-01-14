@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+
+- collector crash when `isLive` was not set in the analytics config (AN-1092)
+
 ## v1.11.2
 
 ### Added
