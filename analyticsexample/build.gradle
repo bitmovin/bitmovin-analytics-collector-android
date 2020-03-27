@@ -3,31 +3,27 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion project.compileSdkVersion
 
     defaultConfig {
         applicationId "com.bitmovin.exoplayeranalyticsexample"
-        minSdkVersion 16
-        targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        minSdkVersion project.minSdkVersion
+        targetSdkVersion project.targetSdkVersion
+        versionCode project.versionCode
+        versionName project.version
 
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
 
-
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility project.sourceCompatibility
+        targetCompatibility project.targetCompatibility
     }
 
     buildTypes {
-        debug {
-            multiDexEnabled true
-        }
         release {
             minifyEnabled false
-            multiDexEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -39,24 +35,21 @@ configurations {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${project.kotlin_version}"
+    implementation "com.android.support:appcompat-v7:${project.compileSdkVersion}.1.1"
+    implementation "com.android.support.constraint:constraint-layout:${project.constraintLayoutVersion}"
+    testImplementation "junit:junit:${project.junitVersion}"
+    androidTestImplementation "com.android.support.test:runner:${project.testRunnerVersion}"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:${project.espressoCoreVersion}"
 
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+
     implementation 'com.android.support:multidex:1.0.3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
-    implementation 'com.google.android.exoplayer:exoplayer:2.8.1'
+    implementation "com.google.android.exoplayer:exoplayer:${project.exoplayerVersion}"
 
     // Pull from Maven Repo
-    if (rootProject.ext.developLocal == true) {
+    if (project.developLocal) {
         implementation project(':collector-exoplayer')
     } else {
-        implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
+        implementation "com.bitmovin.analytics:collector-exoplayer:${project.version}"
     }
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-}
-repositories {
-    mavenCentral()
 }
