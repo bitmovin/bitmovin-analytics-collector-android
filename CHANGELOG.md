@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Clean build.gradle files, fix bitmovinanalyticsexample build error and use project ext props for deps version sharing
 
+### Added
+
+- add `screenOrientation` prop to `AdEventData` and `EventData`
+
 ## v1.11.3
 
 ### Fixed

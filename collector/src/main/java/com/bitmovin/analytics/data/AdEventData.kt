@@ -96,6 +96,7 @@ data class AdEventData(
         var playerTech: String? = null,
         var screenHeight: Int? = null,
         var screenWidth: Int? = null,
+        var screenOrientation: String? = null, // SVARGA: find how it is serialized and sent
         var version: String? = null,
         // TODO var size: String? = null,
         var userId: String? = null,
@@ -134,6 +135,7 @@ data class AdEventData(
         this.playerTech = eventData.playerTech
         this.screenHeight = eventData.screenHeight
         this.screenWidth = eventData.screenWidth
+        screenOrientation = eventData.screenOrientation
         this.version = eventData.version
         // TODO missing
         // this.size = eventData.size

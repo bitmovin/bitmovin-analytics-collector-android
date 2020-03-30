@@ -4,6 +4,7 @@ import static com.bitmovin.analytics.utils.DataSerializer.serialize;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.OrientationEventListener;
 
 import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
@@ -41,6 +42,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     protected IEventDataDispatcher eventDataDispatcher;
     protected Context context;
 
+    private final OrientationEventListener orientationEventListener;
+
     /**
      * Bitmovin Analytics
      *
@@ -61,6 +64,17 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         if(this.bitmovinAnalyticsConfig.getAds()) {
             this.adAnalytics = new BitmovinAdAnalytics(this);
         }
+
+
+        orientationEventListener = new OrientationEventListener(context) {
+            public void onOrientationChanged(int orientation) {
+                EventData data = playerAdapter.createEventData();
+                data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+                Log.d(TAG, String.format("onOrientationChanged impressionId '%s' screenOrientation '%s'", playerStateMachine.getImpressionId(), data.getScreenOrientation()));
+
+                sendEventData(data);
+            }
+        };
     }
 
     /**
@@ -85,6 +99,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         detachPlayer();
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
+
+        orientationEventListener.enable();
     }
 
     protected void attachAd(AdAdapter adapter) {
@@ -97,6 +113,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
      */
     public void detachPlayer() {
         detachAd();
+
+        orientationEventListener.disable();
 
         if (playerAdapter != null) {
             playerAdapter.release();

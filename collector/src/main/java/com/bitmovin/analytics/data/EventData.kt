@@ -30,6 +30,7 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impression
     val domain: String = deviceInfo.packageName
     val screenHeight: Int = deviceInfo.screenHeight // context?.getResources()?.getDisplayMetrics()?.heightPixels ?: 0
     val screenWidth: Int = deviceInfo.screenWidth // context?.getResources()?.getDisplayMetrics()?.widthPixels ?: 0
+    val screenOrientation: String? = deviceInfo.screenOrientation.value
     var isLive: Boolean = false
     var isCasting: Boolean = false
     var videoDuration: Long = 0

@@ -21,7 +21,7 @@ class EventDataFactoryTest {
     @Test
     fun testRetrievesDeviceInformationAndSetsItOnEventData() {
 
-        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
+        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200, DeviceInformation.ScreenOrientation.Portrait)
 
 
         val myMock = Mockito.mock(DeviceInformationProvider::class.java)
@@ -34,13 +34,13 @@ class EventDataFactoryTest {
         assertThat(eventData.userAgent).isEqualTo(deviceInfo.userAgent)
         assertThat(eventData.screenHeight).isEqualTo(deviceInfo.screenHeight)
         assertThat(eventData.screenWidth).isEqualTo(deviceInfo.screenWidth)
-
+        assertThat(eventData.screenOrientation).isEqualTo(deviceInfo.screenOrientation.value)
     }
 
     @Test
     fun testAssignsDeviceInformationPackageNameAsDomainToEventData() {
 
-        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
+        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200, DeviceInformation.ScreenOrientation.Portrait)
 
 
         val myMock = Mockito.mock(DeviceInformationProvider::class.java)
@@ -53,7 +53,7 @@ class EventDataFactoryTest {
 
     @Test
     fun testRetrievesUserIdFromUserIdProviderAndAssignsToEventData() {
-        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
+        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200, DeviceInformation.ScreenOrientation.Portrait)
 
 
         val deviceInfoMock = Mockito.mock(DeviceInformationProvider::class.java)
@@ -67,7 +67,7 @@ class EventDataFactoryTest {
 
     @Test
     fun testAssignsCorrectImpressionId() {
-        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
+        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200, DeviceInformation.ScreenOrientation.Portrait)
 
 
         val deviceInfoMock = Mockito.mock(DeviceInformationProvider::class.java)
@@ -78,5 +78,20 @@ class EventDataFactoryTest {
         val eventData: EventData = EventDataFactory(BitmovinAnalyticsConfig(), mockContext, deviceInfoMock, userIdProvider).build(impressionId)
 
         assertThat(eventData.impressionId).isEqualTo(impressionId)
+    }
+
+    @Test
+    fun `assign EventData screenOrientation Portrait`() {
+        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200, DeviceInformation.ScreenOrientation.Portrait)
+    }
+
+    @Test
+    fun `assign EventData screenOrientation Landscape`(){
+        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200, DeviceInformation.ScreenOrientation.Landscape)
+    }
+
+    @Test
+    fun `assign EventData screenOrientation Undefined`(){
+        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200, DeviceInformation.ScreenOrientation.Undefined)
     }
 }
