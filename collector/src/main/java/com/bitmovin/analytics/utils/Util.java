@@ -3,6 +3,7 @@ package com.bitmovin.analytics.utils;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
+import android.media.AudioManager;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.SystemClock;
@@ -128,5 +129,11 @@ public class Util {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    public static int getDeviceVolume(Context context){
+        AudioManager audioManager;
+        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
     }
 }

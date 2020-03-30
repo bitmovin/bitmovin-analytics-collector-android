@@ -3,6 +3,7 @@ package com.bitmovin.analytics;
 import static com.bitmovin.analytics.utils.DataSerializer.serialize;
 
 import android.content.Context;
+import android.database.ContentObserver;
 import android.util.Log;
 
 import com.bitmovin.analytics.adapters.AdAdapter;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.os.Handler;
 
 /**
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
@@ -85,6 +87,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         detachPlayer();
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
+
+       context.getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, observer );
     }
 
     protected void attachAd(AdAdapter adapter) {
@@ -106,6 +110,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             playerStateMachine.resetStateMachine();
         }
         eventDataDispatcher.disable();
+        context.getContentResolver().unregisterContentObserver(observer);
     }
 
     private void detachAd() {
@@ -134,6 +139,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+        data.setVolume(Util.getDeviceVolume(context));
         sendEventData(data);
     }
 
@@ -146,6 +152,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setPaused(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+        data.setVolume(Util.getDeviceVolume(context));
         sendEventData(data);
     }
 
@@ -158,6 +165,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setPlayed(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+        data.setVolume(Util.getDeviceVolume(context));
         sendEventData(data);
     }
 
@@ -170,6 +178,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setBuffered(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+        data.setVolume(Util.getDeviceVolume(context));
         sendEventData(data);
     }
 
@@ -183,6 +192,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setErrorCode(errorCode.getErrorCode());
         data.setErrorMessage(errorCode.getDescription());
         data.setErrorData(serialize(errorCode.getErrorData()));
+        data.setVolume(Util.getDeviceVolume(context));
         sendEventData(data);
     }
 
@@ -195,6 +205,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setDuration(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+        data.setVolume(Util.getDeviceVolume(context));
         sendEventData(data);
     }
 
@@ -206,6 +217,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
+        data.setVolume(Util.getDeviceVolume(context));
 
         switch (playerStateMachine.getCurrentState()) {
             case PLAYING:
@@ -251,6 +263,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(0);
+        data.setVolume(Util.getDeviceVolume(context));
         sendEventData(data);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
@@ -267,6 +280,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     EventData data = playerAdapter.createEventData();
     data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
     data.setDuration(0);
+    data.setVolume(Util.getDeviceVolume(context));
     sendEventData(data);
     data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
     data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
@@ -278,10 +292,21 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     EventData data = playerAdapter.createEventData();
     data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
     data.setDuration(0);
+    data.setVolume(Util.getDeviceVolume(context));
     sendEventData(data);
     data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
     data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
   }
+
+  public ContentObserver observer = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+            EventData data = playerAdapter.createEventData();
+            data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+            data.setVolume(Util.getDeviceVolume(context));
+            sendEventData(data);
+        }
+    };
 
     public void sendEventData(EventData data) {
         this.eventDataDispatcher.add(data);
