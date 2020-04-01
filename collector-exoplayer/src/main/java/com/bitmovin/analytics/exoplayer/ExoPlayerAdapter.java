@@ -59,6 +59,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private String manifestUrl;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
     private final EventDataFactory factory;
+    private long drmLoadingTime = 0;
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
@@ -393,16 +394,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
-    public void onViewportSizeChange(EventTime eventTime, int width, int height) {
-
-    }
-
-    @Override
-    public void onNetworkTypeChanged(EventTime eventTime, @Nullable NetworkInfo networkInfo) {
-
-    }
-
-    @Override
     public void onMetadata(EventTime eventTime, Metadata metadata) {
 
     }
@@ -459,8 +450,13 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
-    public void onDrmKeysLoaded(EventTime eventTime) {
+    public void onDrmSessionAcquired(EventTime eventTime) {
+        Log.d(TAG, String.format("DRM Session aquired %d", eventTime.realtimeMs));
+    }
 
+    @Override
+    public void onDrmKeysLoaded(EventTime eventTime) {
+        Log.d(TAG, String.format("DRM Keys loaded %d", eventTime.realtimeMs));
     }
 
     @Override
@@ -470,6 +466,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public void onDrmKeysRestored(EventTime eventTime) {
+        Log.d(TAG, String.format("DRM Keys restored %d", eventTime.realtimeMs));
 
     }
 
