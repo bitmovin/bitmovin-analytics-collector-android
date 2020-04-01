@@ -4,30 +4,23 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
-
-def packageName = 'com.bitmovin.analytics'
-def libraryVersion = rootProject.ext.version
+apply from: '../bitmovinpropertiesloader.gradle'
 
 android {
-
-    compileSdkVersion 27
+    compileSdkVersion project.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 27
-        versionCode rootProject.ext.versionCode
-        versionName rootProject.ext.version
+        minSdkVersion project.minSdkVersion
+        targetSdkVersion project.targetSdkVersion
+        versionCode project.versionCode
+        versionName project.version
 
-        testOptions {
-            multiDexEnabled true
-        }
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility project.sourceCompatibility
+        targetCompatibility project.targetCompatibility
     }
 
     buildTypes {
@@ -38,30 +31,28 @@ android {
     }
 }
 
-apply from: '../bitmovinpropertiesloader.gradle'
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${project.kotlin_version}"
+    implementation "com.android.support:appcompat-v7:${project.compileSdkVersion}.1.1"
+    testImplementation "junit:junit:${project.junitVersion}"
+    androidTestImplementation "com.android.support.test:runner:${project.testRunnerVersion}"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:${project.espressoCoreVersion}"
 
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    testImplementation 'junit:junit:4.12'
-    testImplementation "org.assertj:assertj-core:3.11.1"
-    testImplementation 'org.mockito:mockito-core:2.7.5'
+
+    testImplementation "org.assertj:assertj-core:${project.assertjCoreVersion}"
+    androidTestImplementation "org.assertj:assertj-core:${project.assertjCoreVersion}"
+    testImplementation "org.mockito:mockito-core:${project.mockitoCoreVersion}"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    androidTestImplementation "org.assertj:assertj-core:3.11.1"
-
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.google.code.gson:gson:2.8.2'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
 publishing {
     publications {
         aar(MavenPublication) {
-            groupId packageName
-            version = libraryVersion
+            groupId project.packageGroupId
+            version = project.version
             artifactId project.getName()
 
             // Tell maven to prepare the generated "*.aar" file for publishing
@@ -106,9 +97,10 @@ artifactory {
     publish {
         repository {
             // The Artifactory repository key to publish to
-            repoKey = libraryVersion.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
+            repoKey = project.version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
             username = bitmovinProperties.getProperty('artifactoryUser') // The publisher user name
-            password = bitmovinProperties.getProperty('artifactoryPassword') // The publisher password
+            password = bitmovinProperties.getProperty('artifactoryPassword')
+            // The publisher password
             maven = true
         }
         defaults {
@@ -122,7 +114,4 @@ artifactory {
             publishPom = true
         }
     }
-}
-repositories {
-    mavenCentral()
 }
