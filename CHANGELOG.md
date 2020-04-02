@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## Added
+
+- `drmLoadTime` and `drmTime` to Sample (ExoPlayer, BitmovinPlayer)
+
 ### Fixed
 
 - Clean build.gradle files, fix bitmovinanalyticsexample build error and use project ext props for deps version sharing
