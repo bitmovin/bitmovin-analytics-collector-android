@@ -50,6 +50,7 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -137,7 +138,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         return 0;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public DRMInformation getDRMInformation() {
         return drmInformation;
@@ -495,7 +496,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public void onDrmSessionAcquired(EventTime eventTime) {
-        drmInformation.setDrmEnable(true);
         drmLoadStartTime = eventTime.realtimeMs;
         Log.d(TAG, String.format("DRM Session aquired %d", eventTime.realtimeMs));
     }

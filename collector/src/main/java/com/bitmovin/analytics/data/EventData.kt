@@ -72,4 +72,6 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impression
     var subtitleEnabled: Boolean = false
     var subtitleLanguage: String? = null
     var audioLanguage: String? = null
+    var drmType: String? = null
+    var drmLoadTime: Long? = null
 }
