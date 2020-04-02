@@ -10,6 +10,5 @@ public interface PlayerAdapter {
 
     void release();
     long getPosition();
-    @Nullable
     DRMInformation getDRMInformation();
 }
