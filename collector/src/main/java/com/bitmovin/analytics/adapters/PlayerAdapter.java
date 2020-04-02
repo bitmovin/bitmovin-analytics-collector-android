@@ -6,5 +6,6 @@ public interface PlayerAdapter {
     EventData createEventData();
 
     void release();
+
     long getPosition();
 }

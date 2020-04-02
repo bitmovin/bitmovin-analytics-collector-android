@@ -5,9 +5,10 @@ import com.bitmovin.analytics.data.ErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.utils.topOfStacktrace
 import com.google.android.exoplayer2.ExoPlaybackException
-import com.google.android.exoplayer2.ExoPlaybackException.*
+import com.google.android.exoplayer2.ExoPlaybackException.TYPE_RENDERER
+import com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE
+import com.google.android.exoplayer2.ExoPlaybackException.TYPE_UNEXPECTED
 import com.google.android.exoplayer2.upstream.HttpDataSource
-
 
 class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
     private fun doMap(error: ExoPlaybackException): ErrorCode {

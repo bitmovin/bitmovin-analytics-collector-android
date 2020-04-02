@@ -28,7 +28,7 @@ class AdMapperTest {
     private var adMapper = AdMapper()
 
     @Before
-    fun setup(){
+    fun setup() {
         MockitoAnnotations.initMocks(this)
     }
 
@@ -53,7 +53,7 @@ class AdMapperTest {
     }
 
     @Test
-    fun FromPlayerAdWithVastAdDataShouldSetVastAdDataValues(){
+    fun FromPlayerAdWithVastAdDataShouldSetVastAdDataValues() {
         val TITLE = "Title"
         `when`(playerAd.data).thenReturn(vastAdData)
         `when`((playerAd.data as VastAdData).adTitle).thenReturn(TITLE)
@@ -63,7 +63,7 @@ class AdMapperTest {
     }
 
     @Test
-    fun FromPlayerAdWithImaAdDataShouldSetImaAdDataValues(){
+    fun FromPlayerAdWithImaAdDataShouldSetImaAdDataValues() {
         val DEALID = "dealid"
         `when`(playerAd.data).thenReturn(imaAdData)
         `when`((playerAd.data as ImaAdData).dealId).thenReturn(DEALID)

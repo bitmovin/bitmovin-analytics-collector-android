@@ -347,6 +347,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
 
     /**
      * Returns a value indicating if ads tracking is enabled
+     *
      * @return
      */
     public Boolean getAds() {
@@ -355,14 +356,16 @@ public class BitmovinAnalyticsConfig implements Parcelable {
 
     /**
      * Enable or disable ads tracking
+     *
      * @param ads
      */
     public void setAds(Boolean ads) {
         this.ads = ads;
     }
-    
+
     /**
      * Returns true if the stream is marked as live before stream metadata is available.
+     *
      * @return
      */
     public Boolean isLive() {
@@ -371,6 +374,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
 
     /**
      * Mark the stream as live before stream metadata is available.
+     *
      * @param live
      */
     public void setIsLive(Boolean live) {

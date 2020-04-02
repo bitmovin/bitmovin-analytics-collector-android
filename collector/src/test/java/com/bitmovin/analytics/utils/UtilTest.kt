@@ -1,10 +1,9 @@
-package com.bitmovin.analytics.utils;
+package com.bitmovin.analytics.utils
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.CollectorConfig
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
 import java.lang.Exception
-import org.assertj.core.api.Assertions.*
+import org.junit.Test
 
 class UtilTest {
 
@@ -12,10 +11,10 @@ class UtilTest {
     fun testTopOfStacktrace() {
         try {
             throw RuntimeException("RUNTIMEEXCEPTION")
-        } catch (e : Exception){
+        } catch (e: Exception) {
             val top = e.topOfStacktrace
             assertThat(top).hasSize(10)
-            assertThat(top).anySatisfy{ element -> assertThat(element).contains("testTopOfStacktrace")}
+            assertThat(top).anySatisfy { element -> assertThat(element).contains("testTopOfStacktrace") }
         }
     }
 

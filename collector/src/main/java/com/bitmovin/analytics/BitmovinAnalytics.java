@@ -45,10 +45,10 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
      * Bitmovin Analytics
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
-     * @param context {@link Context}
+     * @param context                 {@link Context}
      */
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
-        if (context == null){
+        if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }
         Log.d(TAG, "Initializing Bitmovin Analytics with Key: " + bitmovinAnalyticsConfig.getKey());
@@ -58,7 +58,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         this.playerStateMachine.addListener(this);
         IEventDataDispatcher innerEventDataDispatcher = new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this);
         this.eventDataDispatcher = new DebuggingEventDataDispatcher(innerEventDataDispatcher, debugCallback);
-        if(this.bitmovinAnalyticsConfig.getAds()) {
+        if (this.bitmovinAnalyticsConfig.getAds()) {
             this.adAnalytics = new BitmovinAdAnalytics(this);
         }
     }
@@ -66,9 +66,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     /**
      * Bitmovin Analytics
      *
-     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass {@link Context} seperately.
-     *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
+     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass {@link Context} seperately.
      */
     @Deprecated
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
@@ -109,7 +108,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     private void detachAd() {
-        if(adAdapter != null) {
+        if (adAdapter != null) {
             adAdapter.release();
         }
     }
@@ -261,27 +260,27 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         Log.d(TAG, "onVideoChange");
     }
 
-  @Override
-  public void onSubtitleChange() {
-    Log.d(TAG, String.format("onSubtitleChange %s", playerStateMachine.getImpressionId()));
-    EventData data = playerAdapter.createEventData();
-    data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
-    data.setDuration(0);
-    sendEventData(data);
-    data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-    data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-  }
+    @Override
+    public void onSubtitleChange() {
+        Log.d(TAG, String.format("onSubtitleChange %s", playerStateMachine.getImpressionId()));
+        EventData data = playerAdapter.createEventData();
+        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setDuration(0);
+        sendEventData(data);
+        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
+        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+    }
 
-  @Override
-  public void onAudioTrackChange() {
-    Log.d(TAG, String.format("onAudioTrackChange %s", playerStateMachine.getImpressionId()));
-    EventData data = playerAdapter.createEventData();
-    data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
-    data.setDuration(0);
-    sendEventData(data);
-    data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-    data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-  }
+    @Override
+    public void onAudioTrackChange() {
+        Log.d(TAG, String.format("onAudioTrackChange %s", playerStateMachine.getImpressionId()));
+        EventData data = playerAdapter.createEventData();
+        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setDuration(0);
+        sendEventData(data);
+        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
+        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+    }
 
     public void sendEventData(EventData data) {
         this.eventDataDispatcher.add(data);
@@ -315,35 +314,30 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
     public interface DebugListener {
         void onDispatchEventData(EventData data);
+
         void onDispatchAdEventData(AdEventData data);
+
         void onMessage(String message);
     }
 
-    private DebugCallback debugCallback = new DebugCallback()
-    {
+    private DebugCallback debugCallback = new DebugCallback() {
         @Override
-        public void dispatchEventData(@NotNull EventData data)
-        {
-            for(DebugListener listener : BitmovinAnalytics.this.debugListeners)
-            {
+        public void dispatchEventData(@NotNull EventData data) {
+            for (DebugListener listener : BitmovinAnalytics.this.debugListeners) {
                 listener.onDispatchEventData(data);
             }
         }
 
         @Override
-        public void dispatchAdEventData(@NotNull AdEventData data)
-        {
-            for(DebugListener listener : BitmovinAnalytics.this.debugListeners)
-            {
+        public void dispatchAdEventData(@NotNull AdEventData data) {
+            for (DebugListener listener : BitmovinAnalytics.this.debugListeners) {
                 listener.onDispatchAdEventData(data);
             }
         }
 
         @Override
-        public void message(@NotNull String message)
-        {
-            for(DebugListener listener : BitmovinAnalytics.this.debugListeners)
-            {
+        public void message(@NotNull String message) {
+            for (DebugListener listener : BitmovinAnalytics.this.debugListeners) {
                 listener.onMessage(message);
             }
         }
