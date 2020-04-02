@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.data
 
-
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.BuildConfig
 import com.bitmovin.analytics.utils.Util

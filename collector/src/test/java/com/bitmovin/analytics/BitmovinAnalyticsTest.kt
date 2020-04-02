@@ -1,8 +1,6 @@
 package com.bitmovin.analytics
 
 import android.test.mock.MockContext
-import com.bitmovin.analytics.data.EventData
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,13 +14,10 @@ class BitmovinAnalyticsTest {
     @Mock
     private lateinit var context: MockContext
 
-
     private lateinit var bitmovinAnalyticsConfig: BitmovinAnalyticsConfig
 
-
-
     @Before
-    fun setup(){
+    fun setup() {
         MockitoAnnotations.initMocks(this)
         bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("<ANALYTICS_KEY>")
         bitmovinAnalyticsConfig.customData1 = "customData1"
@@ -33,7 +28,6 @@ class BitmovinAnalyticsTest {
         bitmovinAnalyticsConfig.customData6 = "customData6"
         bitmovinAnalyticsConfig.customData7 = "customData7"
     }
-
 
     @Test(expected = IllegalArgumentException::class)
     fun testDeprecatedConstructorChecksForNullInConfiguration() {

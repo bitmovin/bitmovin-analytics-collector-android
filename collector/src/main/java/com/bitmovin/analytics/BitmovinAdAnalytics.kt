@@ -1,8 +1,11 @@
 package com.bitmovin.analytics
 
-import com.bitmovin.analytics.ads.*
-import com.bitmovin.analytics.data.AdSample
+import com.bitmovin.analytics.ads.Ad
+import com.bitmovin.analytics.ads.AdBreak
+import com.bitmovin.analytics.ads.AdQuartile
+import com.bitmovin.analytics.ads.AdTagType
 import com.bitmovin.analytics.data.AdEventData
+import com.bitmovin.analytics.data.AdSample
 import com.bitmovin.analytics.utils.Util
 
 class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
@@ -15,13 +18,12 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     private val adManifestDownloadTimes: HashMap<String, Long> = hashMapOf()
 
     private var currentTime: Long? = null
-        get() = if(this.isPlaying) {
-            if(field == null || this.elapsedTimeBeginPlaying == null) {
+        get() = if (this.isPlaying) {
+            if (field == null || this.elapsedTimeBeginPlaying == null) {
                 null
             } else {
                 field!! + Util.getElapsedTime() - this.elapsedTimeBeginPlaying!!
             }
-
         } else {
             field
         }
@@ -101,7 +103,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 
     fun onPause() {
         if (this.analytics.adAdapter != null && this.analytics.adAdapter.isLinearAdActive && this.activeAdSample != null) {
-            if(this.currentTime != null) {
+            if (this.currentTime != null) {
                 this.currentTime = this.currentTime
             }
             this.isPlaying = false
@@ -157,14 +159,14 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     }
 
     private fun getAdManifestDownloadTime(adBreak: AdBreak?): Long? {
-        if(adBreak == null || !adManifestDownloadTimes.containsKey(adBreak.id)) {
+        if (adBreak == null || !adManifestDownloadTimes.containsKey(adBreak.id)) {
             return null
         }
         return adManifestDownloadTimes[adBreak.id]
     }
 
     private fun sendAnalyticsRequest(adBreak: AdBreak, adSample: AdSample? = null) {
-        if(analytics.playerAdapter == null) {
+        if (analytics.playerAdapter == null) {
             return
         }
 
@@ -172,7 +174,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
 
         eventData.analyticsVersion = BuildConfig.VERSION_NAME
         val moduleInfo = analytics.adAdapter?.moduleInformation
-        if(moduleInfo != null) {
+        if (moduleInfo != null) {
             eventData.adModule = moduleInfo.name
             eventData.adModuleVersion = moduleInfo.version
         }
