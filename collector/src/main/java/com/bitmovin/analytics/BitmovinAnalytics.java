@@ -130,8 +130,10 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setVideoStartupTime(duration);
 
         DRMInformation drmInfo = playerAdapter.getDRMInformation();
-        data.setDrmType(drmInfo.getType());
-        data.setDrmLoadTime(drmInfo.getLoadTime());
+        if (drmInfo != null) {
+            data.setDrmType(drmInfo.getType());
+            data.setDrmLoadTime(drmInfo.getLoadTime());
+        }
 
         //Setting a startup time of 1 to workaround dashboard issue
         data.setPlayerStartupTime(1);

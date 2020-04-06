@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
+
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
@@ -53,19 +54,13 @@ import com.bitmovin.player.api.event.listener.OnStallEndedListener;
 import com.bitmovin.player.api.event.listener.OnStallStartedListener;
 import com.bitmovin.player.api.event.listener.OnSubtitleChangedListener;
 import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener;
-import com.bitmovin.player.config.drm.DRMConfiguration;
-import com.bitmovin.player.config.drm.DRMSystems;
 import com.bitmovin.player.config.media.SourceItem;
-import com.bitmovin.player.config.network.HttpRequestType;
 import com.bitmovin.player.config.quality.AudioQuality;
 import com.bitmovin.player.config.quality.VideoQuality;
 import com.bitmovin.player.config.track.AudioTrack;
 import com.bitmovin.player.config.track.SubtitleTrack;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import org.jetbrains.annotations.Nullable;
 
 public class BitmovinSdkAdapter implements PlayerAdapter {
     private static final String TAG = "BitmovinPlayerAdapter";
@@ -75,7 +70,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private PlayerStateMachine stateMachine;
     private int totalDroppedVideoFrames;
     private boolean playerIsReady;
-    private DRMInformation drmInformation;
+    private DRMInformation drmInformation = null;
 
     public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.config = config;
@@ -83,7 +78,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer = bitmovinPlayer;
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.drmInformation = new DRMInformation();
         this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, getUserAgent(context)), new UserIdProvider(context));
         addPlayerListeners();
     }
@@ -257,7 +251,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
     }
 
-    @NotNull
+    @Nullable
     @Override
     public DRMInformation getDRMInformation() {
         return drmInformation;
@@ -418,9 +412,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onDownloadFinished(DownloadFinishedEvent downloadFinishedEvent) {
             if (downloadFinishedEvent.getDownloadType().toString().contains("drm/license")) {
-                String drmType = downloadFinishedEvent.getDownloadType().toString().replace("drm/license/", "");
-                drmInformation.setType(drmType);
-                drmInformation.setLoadTime(Double.valueOf(downloadFinishedEvent.getDownloadTime() * 1000).longValue());
+                drmInformation = new DRMInformation(Double.valueOf(downloadFinishedEvent.getDownloadTime() * 1000).longValue(),
+                        downloadFinishedEvent.getDownloadType().toString().replace("drm/license/", ""));
             }
         }
     };

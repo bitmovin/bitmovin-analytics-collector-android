@@ -1,20 +1,9 @@
 package com.bitmovin.analytics.exoplayer;
 
-import static com.google.android.exoplayer2.C.CLEARKEY_UUID;
-import static com.google.android.exoplayer2.C.COMMON_PSSH_UUID;
-import static com.google.android.exoplayer2.C.DATA_TYPE_DRM;
-import static com.google.android.exoplayer2.C.DATA_TYPE_MANIFEST;
-import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
-import static com.google.android.exoplayer2.C.PLAYREADY_UUID;
-import static com.google.android.exoplayer2.C.TIME_UNSET;
-import static com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO;
-import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
-import static com.google.android.exoplayer2.C.WIDEVINE_UUID;
-
 import android.content.Context;
-import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.Surface;
+
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
@@ -29,7 +18,6 @@ import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
@@ -51,9 +39,17 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+
+import static com.google.android.exoplayer2.C.CLEARKEY_UUID;
+import static com.google.android.exoplayer2.C.DATA_TYPE_MANIFEST;
+import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
+import static com.google.android.exoplayer2.C.PLAYREADY_UUID;
+import static com.google.android.exoplayer2.C.TIME_UNSET;
+import static com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO;
+import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
+import static com.google.android.exoplayer2.C.WIDEVINE_UUID;
 
 public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener {
     private static final String TAG = "ExoPlayerAdapter";
@@ -72,7 +68,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
     private final EventDataFactory factory;
     private long drmLoadStartTime = 0;
-    private DRMInformation drmInformation = new DRMInformation();
+    private String drmType = null;
+    private DRMInformation drmInformation = null;
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
@@ -369,17 +366,17 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         if (mediaLoadData.dataType == DATA_TYPE_MANIFEST) {
             this.manifestUrl = loadEventInfo.dataSpec.uri.toString();
         }
-        if (mediaLoadData.dataType == DATA_TYPE_MEDIA &&
+        else if (mediaLoadData.dataType == DATA_TYPE_MEDIA &&
                 mediaLoadData.trackFormat != null &&
                 mediaLoadData.trackFormat.drmInitData != null &&
-                drmInformation.getType() == null)
+                drmType == null)
         {
             String drmType = null;
             for (int i = 0; drmType == null && i < mediaLoadData.trackFormat.drmInitData.schemeDataCount; i++) {
                 DrmInitData.SchemeData data = mediaLoadData.trackFormat.drmInitData.get(i);
                 drmType = getDrmTypeFromSchemeData(data);
             }
-            drmInformation.setType(drmType);
+            this.drmType = drmType;
         }
 
     }
@@ -502,7 +499,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public void onDrmKeysLoaded(EventTime eventTime) {
-        drmInformation.setLoadTime(eventTime.realtimeMs - drmLoadStartTime);
+        drmInformation = new DRMInformation(eventTime.realtimeMs - drmLoadStartTime, drmType);
         Log.d(TAG, String.format("DRM Keys loaded %d", eventTime.realtimeMs));
     }
 
