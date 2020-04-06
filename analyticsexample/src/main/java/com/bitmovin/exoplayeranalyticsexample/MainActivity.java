@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     = new AdaptiveTrackSelection.Factory();
             RenderersFactory renderersFactory = new DefaultRenderersFactory(this);
             player = ExoPlayerFactory.newSimpleInstance(this, renderersFactory,
-                    new DefaultTrackSelector(videoTrackSelectionFactory), getDrmSession("https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID));
+                    new DefaultTrackSelector(videoTrackSelectionFactory), getDrmSession("https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID, Util.getUserAgent(this, "ExoPlayerExample")));
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, bandwidthMeter,
                     buildHttpDataSourceFactory(bandwidthMeter));
 
@@ -131,12 +131,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private DrmSessionManager<FrameworkMediaCrypto> getDrmSession(String drmLicenseUrl, UUID drmScheme) {
+    protected static DrmSessionManager<FrameworkMediaCrypto> getDrmSession(String drmLicenseUrl, UUID drmScheme, String userAgent) {
 
         if(drmLicenseUrl != null && drmScheme != null) {
             try{
                 MediaDrmCallback mediaDrmCallback =
-                        createMediaDrmCallback(drmLicenseUrl, null);
+                        createMediaDrmCallback(drmLicenseUrl, userAgent);
                 return DefaultDrmSessionManager.newFrameworkInstance(drmScheme, mediaDrmCallback, null);
             } catch (Exception e ){
                 Log.e("Main Application", e.getMessage());
@@ -145,25 +145,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return null;
     }
 
-    private DashMediaSource getMediaSource(Uri dashStatic, DataSource.Factory dataSourceFactory) {
+    protected static DashMediaSource getMediaSource(Uri dashStatic, DataSource.Factory dataSourceFactory) {
         DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
         DashMediaSource.Factory sourceFactory = new DashMediaSource.Factory(source, dataSourceFactory);
 
         return sourceFactory.createMediaSource(dashStatic);
     }
 
-    private HttpMediaDrmCallback createMediaDrmCallback(
-            String licenseUrl, String[] keyRequestPropertiesArray) {
+    protected static HttpMediaDrmCallback createMediaDrmCallback(
+            String licenseUrl, String userAgent) {
         HttpDataSource.Factory licenseDataSourceFactory =
-                new DefaultHttpDataSourceFactory(Util.getUserAgent(this, "ExoPlayerExample"));
+                new DefaultHttpDataSourceFactory(userAgent);
         HttpMediaDrmCallback drmCallback =
                 new HttpMediaDrmCallback(licenseUrl, licenseDataSourceFactory);
-        if (keyRequestPropertiesArray != null) {
-            for (int i = 0; i < keyRequestPropertiesArray.length - 1; i += 2) {
-                drmCallback.setKeyRequestProperty(keyRequestPropertiesArray[i],
-                        keyRequestPropertiesArray[i + 1]);
-            }
-        }
+
         return drmCallback;
     }
 

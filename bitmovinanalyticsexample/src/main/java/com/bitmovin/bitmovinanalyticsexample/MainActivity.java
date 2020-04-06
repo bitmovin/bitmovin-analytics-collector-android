@@ -67,8 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SourceConfiguration source = this.createDRMSource();
         config.setSourceConfiguration(source);
 
-//        AdvertisingConfiguration adConfig = initializeAds(config);
-//        config.setAdvertisingConfiguration(adConfig);
+//        config.setAdvertisingConfiguration(initializeAds(config));
 
         PlaybackConfiguration playbackConfiguration = config.getPlaybackConfiguration();
         playbackConfiguration.setMuted(true);
@@ -109,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    protected SourceConfiguration createSource() {
+    protected static SourceConfiguration createSource() {
         // Create a new source configuration
         SourceConfiguration sourceConfiguration = new SourceConfiguration();
         SourceItem sourceItem = new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
@@ -120,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return sourceConfiguration;
     }
 
-    protected SourceConfiguration createDRMSource() {
+    protected static SourceConfiguration createDRMSource() {
         // Create a new source configuration
         SourceConfiguration sourceConfiguration = new SourceConfiguration();
         SourceItem sourceItem = new SourceItem("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
