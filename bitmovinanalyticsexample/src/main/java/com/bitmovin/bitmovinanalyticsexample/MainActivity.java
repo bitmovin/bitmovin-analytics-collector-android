@@ -13,16 +13,19 @@ import com.bitmovin.player.BitmovinPlayer;
 import com.bitmovin.player.BitmovinPlayerView;
 import com.bitmovin.player.config.PlaybackConfiguration;
 import com.bitmovin.player.config.PlayerConfiguration;
+import com.bitmovin.player.config.drm.DRMSystems;
 import com.bitmovin.player.config.media.SourceConfiguration;
 import com.bitmovin.player.config.advertising.AdItem;
 import com.bitmovin.player.config.advertising.AdSource;
 import com.bitmovin.player.config.advertising.AdSourceType;
 import com.bitmovin.player.config.advertising.AdvertisingConfiguration;
+import com.bitmovin.player.config.media.SourceItem;
 import com.bitmovin.player.config.track.AudioTrack;
 
 import com.bitmovin.player.config.track.SubtitleTrack;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -60,15 +63,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void initializeBitmovinPlayer(){
         PlayerConfiguration config = new PlayerConfiguration();
 
-        SourceConfiguration source = this.createSource();
+//        SourceConfiguration source = this.createSource();
+        SourceConfiguration source = this.createDRMSource();
         config.setSourceConfiguration(source);
 
-        AdvertisingConfiguration adConfig = initializeAds(config);
-        config.setAdvertisingConfiguration(adConfig);
+//        config.setAdvertisingConfiguration(initializeAds(config));
 
         PlaybackConfiguration playbackConfiguration = config.getPlaybackConfiguration();
         playbackConfiguration.setMuted(true);
-        playbackConfiguration.setAutoplayEnabled(false);
+        playbackConfiguration.setAutoplayEnabled(true);
 
         this.bitmovinPlayer = new BitmovinPlayer(getApplicationContext(), config);
 
@@ -105,12 +108,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    protected SourceConfiguration createSource() {
+    protected static SourceConfiguration createSource() {
         // Create a new source configuration
         SourceConfiguration sourceConfiguration = new SourceConfiguration();
+        SourceItem sourceItem = new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
 
         // Add a new source item
-        sourceConfiguration.addSourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
+        sourceConfiguration.addSourceItem(sourceItem);
+
+        return sourceConfiguration;
+    }
+
+    protected static SourceConfiguration createDRMSource() {
+        // Create a new source configuration
+        SourceConfiguration sourceConfiguration = new SourceConfiguration();
+        SourceItem sourceItem = new SourceItem("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
+
+        // setup DRM handling
+        String drmLicenseUrl = "https://widevine-proxy.appspot.com/proxy";
+        UUID drmSchemeUuid = DRMSystems.WIDEVINE_UUID;
+        sourceItem.addDRMConfiguration(drmSchemeUuid, drmLicenseUrl);
+
+        // Add a new source item
+        sourceConfiguration.addSourceItem(sourceItem);
 
         return sourceConfiguration;
     }
