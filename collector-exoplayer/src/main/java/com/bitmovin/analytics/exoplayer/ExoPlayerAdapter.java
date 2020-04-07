@@ -38,7 +38,7 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -135,7 +135,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         return 0;
     }
 
-    @NotNull
+    @Nullable
     @Override
     public DRMInformation getDRMInformation() {
         return drmInformation;
