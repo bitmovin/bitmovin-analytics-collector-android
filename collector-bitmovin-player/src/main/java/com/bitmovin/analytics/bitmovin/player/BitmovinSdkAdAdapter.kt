@@ -7,7 +7,17 @@ import com.bitmovin.analytics.bitmovin.player.utils.AdMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdQuartileFactory
 import com.bitmovin.analytics.data.AdModuleInformation
 import com.bitmovin.player.BitmovinPlayer
-import com.bitmovin.player.api.event.listener.*
+import com.bitmovin.player.api.event.listener.OnAdBreakFinishedListener
+import com.bitmovin.player.api.event.listener.OnAdBreakStartedListener
+import com.bitmovin.player.api.event.listener.OnAdClickedListener
+import com.bitmovin.player.api.event.listener.OnAdErrorListener
+import com.bitmovin.player.api.event.listener.OnAdFinishedListener
+import com.bitmovin.player.api.event.listener.OnAdManifestLoadedListener
+import com.bitmovin.player.api.event.listener.OnAdQuartileListener
+import com.bitmovin.player.api.event.listener.OnAdSkippedListener
+import com.bitmovin.player.api.event.listener.OnAdStartedListener
+import com.bitmovin.player.api.event.listener.OnPausedListener
+import com.bitmovin.player.api.event.listener.OnPlayListener
 
 /**
  * An adapter that maps the Ad Events to the BitmovinAdAnalytics class
@@ -17,7 +27,6 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     private val adMapper: AdMapper = AdMapper()
     private val adBreakMapper: AdBreakMapper = AdBreakMapper()
     private val adQuartileFactory: AdQuartileFactory = AdQuartileFactory()
-
 
     private val onAdStartedListener = OnAdStartedListener {
         val ad = it.ad ?: return@OnAdStartedListener

@@ -27,32 +27,32 @@ class AdBreakMapperTest {
     private var adBreakMapper = AdBreakMapper()
 
     private val TEN_SECONDS = 10.0
-    private val TEN_SECONDS_IN_MS: Long = TEN_SECONDS.toLong() *  1000
+    private val TEN_SECONDS_IN_MS: Long = TEN_SECONDS.toLong() * 1000
     private val ID = "id"
     private val PRE = "pre"
 
     @Before
-    fun setup(){
+    fun setup() {
         MockitoAnnotations.initMocks(this)
         `when`(adConfiguration.replaceContentDuration).thenReturn(TEN_SECONDS)
 
-        `when`(adBreak.id).thenReturn(ID )
+        `when`(adBreak.id).thenReturn(ID)
         `when`(adBreak.scheduleTime).thenReturn(TEN_SECONDS)
 
-        `when`(imaAdBreak.id).thenReturn(ID )
+        `when`(imaAdBreak.id).thenReturn(ID)
         `when`(imaAdBreak.tag).thenReturn(AdTag("", AdTagType.VMAP))
         `when`(imaAdBreak.position).thenReturn(PRE)
     }
 
     @Test
-    fun FromPlayerAdConfigurationWithAdConfigurationShouldSetValuesOfAdConfiguration(){
+    fun FromPlayerAdConfigurationWithAdConfigurationShouldSetValuesOfAdConfiguration() {
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(adConfiguration)
 
         assertThat(collectorAdBreak.replaceContentDuration).isEqualTo(TEN_SECONDS_IN_MS)
     }
 
     @Test
-    fun FromPlayerAdConfigurationWithAdConfigurationShouldNotSetValuesOfAdBreak(){
+    fun FromPlayerAdConfigurationWithAdConfigurationShouldNotSetValuesOfAdBreak() {
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(adConfiguration)
 
         assertThat(collectorAdBreak.scheduleTime).isNull()
@@ -73,7 +73,7 @@ class AdBreakMapperTest {
     }
 
     @Test
-    fun FromPlayerAdConfigurationWithImaAdBreakShouldSetValuesOfImaAdBreak(){
+    fun FromPlayerAdConfigurationWithImaAdBreakShouldSetValuesOfImaAdBreak() {
         `when`(imaAdBreak.currentFallbackIndex).thenReturn(1)
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
 
@@ -81,7 +81,7 @@ class AdBreakMapperTest {
     }
 
     @Test
-    fun FromPlayerAdConfigurationPlayerPositionPREShouldSetPREPlayerPosition(){
+    fun FromPlayerAdConfigurationPlayerPositionPREShouldSetPREPlayerPosition() {
         `when`(imaAdBreak.position).thenReturn("pre")
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
 
@@ -89,7 +89,7 @@ class AdBreakMapperTest {
     }
 
     @Test
-    fun FromPlayerAdConfigurationPlayerPositionPOSTShouldSetPOSTPlayerPosition(){
+    fun FromPlayerAdConfigurationPlayerPositionPOSTShouldSetPOSTPlayerPosition() {
         `when`(imaAdBreak.position).thenReturn("post")
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
 
@@ -97,7 +97,7 @@ class AdBreakMapperTest {
     }
 
     @Test
-    fun FromPlayerAdConfigurationPlayerPositionMIDShouldSetMIDPlayerPosition(){
+    fun FromPlayerAdConfigurationPlayerPositionMIDShouldSetMIDPlayerPosition() {
         `when`(imaAdBreak.position).thenReturn("10")
         var collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
         assertThat(collectorAdBreak.position).isEqualTo(AdPosition.mid)

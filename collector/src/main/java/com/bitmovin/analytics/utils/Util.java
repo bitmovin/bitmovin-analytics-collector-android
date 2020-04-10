@@ -52,6 +52,7 @@ public class Util {
     /**
      * Returns the time in ms since the system was booted, and guaranteed to be monotonic
      * Details here: https://developer.android.com/reference/android/os/SystemClock
+     *
      * @return The time in ms since the system was booted, and guaranteed to be monotonic.
      */
     public static long getElapsedTime() {
@@ -68,9 +69,9 @@ public class Util {
 
     public static List<String> getSupportedVideoFormats() {
         List<String> codecs = new ArrayList<>();
-        for (String format:
-             VIDEO_FORMAT_MIME_TYPE_MAP.keySet()) {
-            if(isMimeTypeSupported(VIDEO_FORMAT_MIME_TYPE_MAP.get(format))) {
+        for (String format :
+                VIDEO_FORMAT_MIME_TYPE_MAP.keySet()) {
+            if (isMimeTypeSupported(VIDEO_FORMAT_MIME_TYPE_MAP.get(format))) {
                 codecs.add(format);
             }
         }
@@ -109,12 +110,12 @@ public class Util {
         try {
             URI uri = new URI(uriString);
             return new Pair<>(uri.getHost(), uri.getPath());
-        } catch(URISyntaxException ignored) {
+        } catch (URISyntaxException ignored) {
 
         }
         return new Pair<>(null, null);
     }
-    
+
     public static boolean getIsLiveFromConfigOrPlayer(boolean isPlayerReady, Boolean isLiveFromConfig, boolean isLiveFromPlayer) {
         if (isPlayerReady) {
             return isLiveFromPlayer;

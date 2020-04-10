@@ -7,8 +7,10 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.util.Log;
+
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -22,6 +24,7 @@ import com.bitmovin.analytics.utils.Util;
 import com.bitmovin.player.BitmovinPlayer;
 import com.bitmovin.player.api.event.data.AudioChangedEvent;
 import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent;
+import com.bitmovin.player.api.event.data.DownloadFinishedEvent;
 import com.bitmovin.player.api.event.data.DroppedVideoFramesEvent;
 import com.bitmovin.player.api.event.data.ErrorEvent;
 import com.bitmovin.player.api.event.data.PausedEvent;
@@ -39,6 +42,7 @@ import com.bitmovin.player.api.event.data.SubtitleChangedEvent;
 import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
 import com.bitmovin.player.api.event.listener.OnAudioChangedListener;
 import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener;
+import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener;
 import com.bitmovin.player.api.event.listener.OnDroppedVideoFramesListener;
 import com.bitmovin.player.api.event.listener.OnErrorListener;
 import com.bitmovin.player.api.event.listener.OnPausedListener;
@@ -60,6 +64,8 @@ import com.bitmovin.player.config.quality.VideoQuality;
 import com.bitmovin.player.config.track.AudioTrack;
 import com.bitmovin.player.config.track.SubtitleTrack;
 
+import org.jetbrains.annotations.Nullable;
+
 public class BitmovinSdkAdapter implements PlayerAdapter {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
@@ -70,6 +76,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private boolean playerIsReady;
     private boolean isVideoPlayed = false;
     private boolean isVideoAttemptedPlay = false;
+    private DRMInformation drmInformation = null;
 
     public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.config = config;
@@ -108,6 +115,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.addEventListener(onDroppedVideoFramesListener);
         this.bitmovinPlayer.addEventListener(onSubtitleChangedListener);
         this.bitmovinPlayer.addEventListener(onAudioChangedListener);
+        this.bitmovinPlayer.addEventListener(onDownloadFinishedListener);
 
         this.bitmovinPlayer.addEventListener(onErrorListener);
     }
@@ -132,6 +140,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.removeEventListener(onErrorListener);
         this.bitmovinPlayer.removeEventListener(onSubtitleChangedListener);
         this.bitmovinPlayer.removeEventListener(onAudioChangedListener);
+        this.bitmovinPlayer.removeEventListener(onDownloadFinishedListener);
     }
 
     private String getUserAgent(Context context) {
@@ -185,32 +194,31 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.totalDroppedVideoFrames = 0;
 
         //streamFormat, mpdUrl, and m3u8Url
-        if (bitmovinPlayer.getConfig() != null && bitmovinPlayer.getConfig().getSourceItem() != null)
-        {
-             SourceItem sourceItem = bitmovinPlayer.getConfig().getSourceItem();
-             switch (sourceItem.getType()) {
-                 case HLS:
-                     if(sourceItem.getHlsSource() != null) {
-                         data.setM3u8Url(sourceItem.getHlsSource().getUrl());
-                     }
-                     data.setStreamFormat(Util.HLS_STREAM_FORMAT);
-                     break;
-                 case DASH:
-                     if(sourceItem.getDashSource() != null) {
-                         data.setMpdUrl(sourceItem.getDashSource().getUrl());
-                     }
-                     data.setStreamFormat(Util.DASH_STREAM_FORMAT);
-                     break;
-                 case PROGRESSIVE:
-                     if(sourceItem.getProgressiveSources() != null && sourceItem.getProgressiveSources().size() > 0) {
-                         data.setM3u8Url(sourceItem.getProgressiveSources().get(0).getUrl());
-                     }
-                     data.setStreamFormat(Util.PROGRESSIVE_STREAM_FORMAT);
-                     break;
-                 case SMOOTH:
-                     data.setStreamFormat(Util.SMOOTH_STREAM_FORMAT);
-                     break;
-             }
+        if (bitmovinPlayer.getConfig() != null && bitmovinPlayer.getConfig().getSourceItem() != null) {
+            SourceItem sourceItem = bitmovinPlayer.getConfig().getSourceItem();
+            switch (sourceItem.getType()) {
+                case HLS:
+                    if (sourceItem.getHlsSource() != null) {
+                        data.setM3u8Url(sourceItem.getHlsSource().getUrl());
+                    }
+                    data.setStreamFormat(Util.HLS_STREAM_FORMAT);
+                    break;
+                case DASH:
+                    if (sourceItem.getDashSource() != null) {
+                        data.setMpdUrl(sourceItem.getDashSource().getUrl());
+                    }
+                    data.setStreamFormat(Util.DASH_STREAM_FORMAT);
+                    break;
+                case PROGRESSIVE:
+                    if (sourceItem.getProgressiveSources() != null && sourceItem.getProgressiveSources().size() > 0) {
+                        data.setM3u8Url(sourceItem.getProgressiveSources().get(0).getUrl());
+                    }
+                    data.setStreamFormat(Util.PROGRESSIVE_STREAM_FORMAT);
+                    break;
+                case SMOOTH:
+                    data.setStreamFormat(Util.SMOOTH_STREAM_FORMAT);
+                    break;
+            }
         }
 
         //video quality
@@ -248,6 +256,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
 
     public long getPosition() {
         return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
+    }
+
+    @Nullable
+    @Override
+    public DRMInformation getDRMInformation() {
+        return drmInformation;
     }
 
     /**
@@ -345,7 +359,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onStallEnded(StallEndedEvent stallEndedEvent) {
             Log.d(TAG, "On Stall Ended: " + String.valueOf(bitmovinPlayer.isPlaying()));
-            if(stateMachine.getElapsedTimeFirstReady() != 0) {
+            if (stateMachine.getElapsedTimeFirstReady() != 0) {
                 if (bitmovinPlayer.isPlaying() && stateMachine.getCurrentState() != PlayerState.PLAYING) {
                     stateMachine.transitionState(PlayerState.PLAYING, getPosition());
                 } else if (bitmovinPlayer.isPaused() && stateMachine.getCurrentState() != PlayerState.PAUSE) {
@@ -392,7 +406,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private OnVideoPlaybackQualityChangedListener onVideoPlaybackQualityChangedListener = new OnVideoPlaybackQualityChangedListener() {
         @Override
         public void onVideoPlaybackQualityChanged(
-            VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
+                VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Video Quality Changed");
             if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getElapsedTimeFirstReady() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
@@ -412,7 +426,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private OnAudioPlaybackQualityChangedListener onAudioPlaybackQualityChangedListener = new OnAudioPlaybackQualityChangedListener() {
         @Override
         public void onAudioPlaybackQualityChanged(
-            AudioPlaybackQualityChangedEvent audioPlaybackQualityChangedEvent) {
+                AudioPlaybackQualityChangedEvent audioPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Audio Quality Changed");
             if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getElapsedTimeFirstReady() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
@@ -422,6 +436,15 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         }
     };
 
+    private OnDownloadFinishedListener onDownloadFinishedListener = new OnDownloadFinishedListener() {
+        @Override
+        public void onDownloadFinished(DownloadFinishedEvent downloadFinishedEvent) {
+            if (downloadFinishedEvent.getDownloadType().toString().contains("drm/license")) {
+                drmInformation = new DRMInformation(Double.valueOf(downloadFinishedEvent.getDownloadTime() * 1000).longValue(),
+                        downloadFinishedEvent.getDownloadType().toString().replace("drm/license/", ""));
+            }
+        }
+    };
 
     private OnErrorListener onErrorListener = new OnErrorListener() {
         @Override

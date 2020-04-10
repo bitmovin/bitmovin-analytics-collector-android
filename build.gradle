@@ -54,7 +54,7 @@ ext {
     testRunnerVersion = '1.0.1'
     espressoCoreVersion = '3.0.1'
     playercoreVersion = '2.35.0'
-    exoplayerVersion = '2.8.1'
+    exoplayerVersion = '2.9.0'
     assertjCoreVersion = '3.11.1'
     mockitoCoreVersion = '2.7.22'
 }

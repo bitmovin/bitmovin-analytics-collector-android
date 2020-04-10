@@ -1,7 +1,11 @@
 package com.bitmovin.analytics
 
 import android.test.mock.MockContext
-import com.bitmovin.analytics.data.*
+import com.bitmovin.analytics.data.DeviceInformation
+import com.bitmovin.analytics.data.DeviceInformationProvider
+import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.UserIdProvider
 import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
@@ -9,10 +13,8 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
 class EventDataFactoryTest {
-
 
     val userIdProvider = mock<UserIdProvider>() {
         on { userId() }.thenReturn("my-user-id")
@@ -22,7 +24,6 @@ class EventDataFactoryTest {
     fun testRetrievesDeviceInformationAndSetsItOnEventData() {
 
         val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
-
 
         val myMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(myMock.getDeviceInformation()).thenReturn(deviceInfo)
@@ -34,14 +35,12 @@ class EventDataFactoryTest {
         assertThat(eventData.userAgent).isEqualTo(deviceInfo.userAgent)
         assertThat(eventData.screenHeight).isEqualTo(deviceInfo.screenHeight)
         assertThat(eventData.screenWidth).isEqualTo(deviceInfo.screenWidth)
-
     }
 
     @Test
     fun testAssignsDeviceInformationPackageNameAsDomainToEventData() {
 
         val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
-
 
         val myMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(myMock.getDeviceInformation()).thenReturn(deviceInfo)
@@ -55,7 +54,6 @@ class EventDataFactoryTest {
     fun testRetrievesUserIdFromUserIdProviderAndAssignsToEventData() {
         val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
 
-
         val deviceInfoMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(deviceInfoMock.getDeviceInformation()).thenReturn(deviceInfo)
 
@@ -68,7 +66,6 @@ class EventDataFactoryTest {
     @Test
     fun testAssignsCorrectImpressionId() {
         val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
-
 
         val deviceInfoMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(deviceInfoMock.getDeviceInformation()).thenReturn(deviceInfo)

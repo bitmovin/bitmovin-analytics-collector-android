@@ -1,17 +1,17 @@
 package com.bitmovin.analytics.bitmovin.player.utils
 
-import com.bitmovin.analytics.ads.*
+import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.player.model.advertising.LinearAd
 import com.bitmovin.player.model.advertising.VastAdData
 import com.bitmovin.player.model.advertising.ima.ImaAdData
 
 class AdMapper {
 
-    fun fromPlayerAd(playerAd: com.bitmovin.player.model.advertising.Ad): Ad{
+    fun fromPlayerAd(playerAd: com.bitmovin.player.model.advertising.Ad): Ad {
         return fromPlayerAd(Ad(), playerAd)
     }
 
-    fun fromPlayerAd(collectorAd : Ad, playerAd: com.bitmovin.player.model.advertising.Ad): Ad{
+    fun fromPlayerAd(collectorAd: Ad, playerAd: com.bitmovin.player.model.advertising.Ad): Ad {
 
         collectorAd.isLinear = playerAd.isLinear
         collectorAd.width = playerAd.width
@@ -36,14 +36,14 @@ class AdMapper {
         return collectorAd
     }
 
-    private fun fromLinearAd(collectorAd : Ad, linearAd: LinearAd) {
+    private fun fromLinearAd(collectorAd: Ad, linearAd: LinearAd) {
 
         collectorAd.duration = linearAd.duration?.toLong()?.times(1000)
         collectorAd.skippable = linearAd.skippable
         collectorAd.skippableAfter = linearAd.skippableAfter?.toLong()?.times(1000)
     }
 
-    private fun fromVastAdData(collectorAd: Ad, vastData: VastAdData){
+    private fun fromVastAdData(collectorAd: Ad, vastData: VastAdData) {
 
         collectorAd.title = vastData.adTitle
         collectorAd.adSystemName = vastData.adSystem?.name

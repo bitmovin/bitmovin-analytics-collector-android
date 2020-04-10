@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.data
 
-
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.BuildConfig
 import com.bitmovin.analytics.utils.Util
@@ -72,6 +71,8 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impression
     var subtitleEnabled: Boolean = false
     var subtitleLanguage: String? = null
     var audioLanguage: String? = null
+    var drmType: String? = null
+    var drmLoadTime: Long? = null
     var videoStartFailed: Boolean? = false
     var videostartFailedReason: String? = null
 }
