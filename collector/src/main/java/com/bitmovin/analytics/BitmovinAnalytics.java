@@ -190,10 +190,9 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         if (playerStateMachine.getCurrentState() == PlayerState.SETUP) {
             data.setVideoStartFailed(true);
             data.setVideostartFailedReason(VideoStartFailedReason.PLAYER_ERROR.toString().toLowerCase());
-        } else {
-            data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
-            data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
         }
+        data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
+        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
 
         data.setErrorCode(errorCode.getErrorCode());
         data.setErrorMessage(errorCode.getDescription());

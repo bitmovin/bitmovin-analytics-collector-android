@@ -527,10 +527,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             stateMachine.setErrorCode(errorCode);
             if (!isVideoPlayed) {
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
-                stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
-            } else {
-                stateMachine.transitionState(PlayerState.ERROR, getPosition());
             }
+            stateMachine.transitionState(PlayerState.ERROR, getPosition());
         }
     };
 
