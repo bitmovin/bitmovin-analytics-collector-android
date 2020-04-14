@@ -6,15 +6,16 @@ apply plugin: 'maven-publish'
 apply from: '../bitmovinpropertiesloader.gradle'
 
 android {
-    compileSdkVersion project.compileSdkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion project.minSdkVersion
-        targetSdkVersion project.targetSdkVersion
-        versionCode project.versionCode
-        versionName project.version
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.version
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
 
     lintOptions {
@@ -22,8 +23,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility project.sourceCompatibility
-        targetCompatibility project.targetCompatibility
+        sourceCompatibility rootProject.ext.sourceCompatibility
+        targetCompatibility rootProject.ext.targetCompatibility
     }
 
     buildTypes {
@@ -36,29 +37,29 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${project.kotlin_version}"
-    implementation "com.android.support:appcompat-v7:${project.compileSdkVersion}.1.1"
-    testImplementation "junit:junit:${project.junitVersion}"
-    androidTestImplementation "com.android.support.test:runner:${project.testRunnerVersion}"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:${project.espressoCoreVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.compileSdkVersion}.1.1"
+    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+    androidTestImplementation "com.android.support.test:runner:${rootProject.ext.testRunnerVersion}"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
 
 
-    testImplementation "org.assertj:assertj-core:${project.assertjCoreVersion}"
-    testImplementation "org.mockito:mockito-core:${project.mockitoCoreVersion}"
+    testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
 
-    if (project.developLocal) {
+    if (rootProject.ext.developLocal) {
         api project(':collector')
     } else {
-        api "com.bitmovin.analytics:collector:${project.version}"
+        api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
     }
-    implementation "com.bitmovin.player:playercore:${project.playercoreVersion}"
+    implementation "com.bitmovin.player:playercore:${rootProject.ext.playercoreVersion}"
 }
 
 publishing {
     publications {
         aar(MavenPublication) {
-            groupId project.packageGroupId
-            version = project.version
+            groupId rootProject.ext.packageGroupId
+            version = rootProject.ext.version
             artifactId project.getName()
 
             // Tell maven to prepare the generated "*.aar" file for publishing
@@ -104,7 +105,7 @@ artifactory {
     publish {
         repository {
             // The Artifactory repository key to publish to
-            repoKey = project.version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
+            repoKey = rootProject.ext.version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
             username = bitmovinProperties.getProperty('artifactoryUser') // The publisher user name
             password = bitmovinProperties.getProperty('artifactoryPassword')
             // The publisher password
