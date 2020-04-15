@@ -316,10 +316,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onPlay(PlayEvent playEvent) {
             Log.d(TAG, "On Play Listener");
-            //Do not transition to a playing state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times when autopplay is enabled
-            if (stateMachine.getElapsedTimeFirstReady() != 0) {
-                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-            }
             if (!isVideoPlayed && !bitmovinPlayer.isAd()) {
                 videoStartTimeout.start();
                 isVideoAttemptedPlay = true;
@@ -331,9 +327,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onPlaying(PlayingEvent playingEvent) {
             Log.d(TAG, "On Playing Listener " + stateMachine.getCurrentState().toString());
-            if (!isVideoPlayed && !bitmovinPlayer.isAd()) {
-                isVideoPlayed = true;
-                videoStartTimeout.cancel();
+            //Do not transition to a playing state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times when autoplay is enabled
+            if (stateMachine.getElapsedTimeFirstReady() != 0) {
+                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                if (!isVideoPlayed && !bitmovinPlayer.isAd()) {
+                    isVideoPlayed = true;
+                    videoStartTimeout.cancel();
+                }
             }
         }
     };
@@ -525,7 +525,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     break;
             }
             stateMachine.setErrorCode(errorCode);
-            if (!isVideoPlayed && isVideoAttemptedPlay) {
+            if (!isVideoPlayed && isVideoAttemptedPlay){
                 videoStartTimeout.cancel();
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
@@ -541,6 +541,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
 
             if (bitmovinPlayer.isPlaying()) {
                 stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                // autoplay
+                isVideoAttemptedPlay = true;
             } else {
                 stateMachine.transitionState(PlayerState.PAUSE, getPosition());
             }
