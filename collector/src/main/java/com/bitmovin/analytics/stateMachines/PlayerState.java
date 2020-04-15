@@ -39,6 +39,7 @@ public enum PlayerState {
 
         @Override
         void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
+            machine.setVideoStartFailedReason(null);
         }
     },
     EXITBEFOREVIDEOSTART {
@@ -51,6 +52,7 @@ public enum PlayerState {
 
         @Override
         void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
+            machine.setVideoStartFailedReason(null);
         }
     },
     PLAYING {

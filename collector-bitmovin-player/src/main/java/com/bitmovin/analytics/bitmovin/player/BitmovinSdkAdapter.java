@@ -321,7 +321,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 stateMachine.transitionState(PlayerState.PLAYING, getPosition());
             }
             if (!isVideoPlayed && !bitmovinPlayer.isAd()) {
-                VideoStartTimeout.start();
+                videoStartTimeout.start();
                 isVideoAttemptedPlay = true;
             }
         }
@@ -333,7 +333,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             Log.d(TAG, "On Playing Listener " + stateMachine.getCurrentState().toString());
             if (!isVideoPlayed && !bitmovinPlayer.isAd()) {
                 isVideoPlayed = true;
-                VideoStartTimeout.cancel();
+                videoStartTimeout.cancel();
             }
         }
     };
@@ -525,7 +525,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     break;
             }
             stateMachine.setErrorCode(errorCode);
-            if (!isVideoPlayed) {
+            if (!isVideoPlayed && isVideoAttemptedPlay) {
+                videoStartTimeout.cancel();
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
             stateMachine.transitionState(PlayerState.ERROR, getPosition());
@@ -547,7 +548,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         }
     };
 
-    private CountDownTimer VideoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
+    private CountDownTimer videoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
         @Override
         public void onTick(long millisUntilFinished) {
         }

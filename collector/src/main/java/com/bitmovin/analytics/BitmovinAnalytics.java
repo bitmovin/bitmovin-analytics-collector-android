@@ -186,13 +186,13 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         Log.d(TAG, String.format("onError %s", playerStateMachine.getImpressionId()));
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
-
-        if (playerStateMachine.getCurrentState() == PlayerState.SETUP) {
-            data.setVideoStartFailed(true);
-            data.setVideostartFailedReason(VideoStartFailedReason.PLAYER_ERROR.toString().toLowerCase());
-        }
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+
+        if(playerStateMachine.getVideoStartFailedReason() != null) {
+            data.setVideoStartFailedReason(playerStateMachine.getVideoStartFailedReason().getReason());
+            data.setVideoStartFailed(true);
+        }
 
         data.setErrorCode(errorCode.getErrorCode());
         data.setErrorMessage(errorCode.getDescription());
@@ -300,14 +300,14 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     @Override
     public void onVideoStartFailed() {
         String videoStartFailedReason = playerStateMachine.getVideoStartFailedReason() != null
-                ? playerStateMachine.getVideoStartFailedReason().toString().toLowerCase()
-                : VideoStartFailedReason.UNKNOWN.toString().toLowerCase();
+                ? playerStateMachine.getVideoStartFailedReason().getReason()
+                : VideoStartFailedReason.UNKNOWN.getReason();
 
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setVideoStartFailed(true);
 
-        data.setVideostartFailedReason(videoStartFailedReason);
+        data.setVideoStartFailedReason(videoStartFailedReason);
         sendEventData(data);
     }
 
