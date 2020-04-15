@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
-## Added
+## v1.12.1
+
+### Fixed
+
+- root Project extension references in gradle files
+
+## v1.12.0
+
+### Added
 
 - `drmLoadTime` and `drmTime` to Sample (ExoPlayer, BitmovinPlayer)
 
