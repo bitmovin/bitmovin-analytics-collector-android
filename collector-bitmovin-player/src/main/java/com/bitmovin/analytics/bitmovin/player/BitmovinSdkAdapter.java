@@ -281,11 +281,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onSourceUnloaded(SourceUnloadedEvent sourceUnloadedEvent) {
             Log.d(TAG, "On Source Unloaded");
-            stateMachine.resetStateMachine();
             if (!isVideoPlayed && isVideoAttemptedPlay) {
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PAGE_CLOSED);
                 stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
             }
+            stateMachine.resetStateMachine();
         }
     };
 
