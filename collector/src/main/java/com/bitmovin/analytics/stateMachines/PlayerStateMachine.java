@@ -69,12 +69,11 @@ public class PlayerStateMachine {
 
     private void triggerHeartbeat() {
         long elapsedTime = Util.getElapsedTime();
-        long elapsedTimeOnEnter = getElapsedTimeOnEnter();
         videoTimeEnd = analytics.getPosition();
         for (StateMachineListener listener : getListeners()) {
             listener.onHeartbeat(elapsedTime - elapsedTimeOnEnter);
         }
-        PlayerStateMachine.this.elapsedTimeOnEnter = elapsedTime;
+        elapsedTimeOnEnter = elapsedTime;
         videoTimeStart = videoTimeEnd;
     }
 
