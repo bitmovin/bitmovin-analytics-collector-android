@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+
+- heartbeat to Rebuffering state
+
 ## v1.12.1
 
 ### Fixed
