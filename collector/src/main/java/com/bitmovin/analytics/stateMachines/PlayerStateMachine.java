@@ -80,6 +80,7 @@ public class PlayerStateMachine {
 
     public void resetStateMachine() {
         disableHeartbeat();
+        disableRebufferHeartbeat();
         this.impressionId = Util.getUUID();
         this.elaspedTimeInitial = Util.getElapsedTime();
         this.elapsedTimeFirstReady = 0;
