@@ -11,12 +11,14 @@ import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
+import com.bitmovin.analytics.data.SpeedMeasurement;
 import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
+import com.bitmovin.analytics.utils.DownloadSpeedMeter;
 import com.bitmovin.analytics.utils.Util;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -41,6 +43,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static com.google.android.exoplayer2.C.CLEARKEY_UUID;
 import static com.google.android.exoplayer2.C.DATA_TYPE_MANIFEST;
@@ -70,6 +73,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private long drmLoadStartTime = 0;
     private String drmType = null;
     private DRMInformation drmInformation = null;
+    private DownloadSpeedMeter meter = new DownloadSpeedMeter();
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
@@ -113,6 +117,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
             simpleExoPlayer.removeAnalyticsListener(this);
         }
+        meter.reset();
     }
 
     public long getPosition() {
@@ -231,6 +236,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
         data.setPlayer(PlayerType.EXOPLAYER.toString());
         decorateDataWithPlaybackInformation(data);
+        data.setDownloadSpeedInfo(meter.getInfo());
         return data;
     }
 
@@ -379,6 +385,16 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             this.drmType = drmType;
         }
 
+        if(mediaLoadData.trackFormat != null
+                && mediaLoadData.trackFormat.containerMimeType != null
+                && mediaLoadData.trackFormat.containerMimeType.startsWith("video")){
+
+            SpeedMeasurement measurement = new SpeedMeasurement();
+            measurement.setTimestamp(new Date());
+            measurement.setDuration(loadEventInfo.loadDurationMs);
+            measurement.setSize(loadEventInfo.bytesLoaded);
+            meter.addMeasurement(measurement);
+        }
     }
 
     private String getDrmTypeFromSchemeData(DrmInitData.SchemeData data){
