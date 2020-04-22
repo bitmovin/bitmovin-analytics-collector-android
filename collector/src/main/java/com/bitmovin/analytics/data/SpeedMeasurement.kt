@@ -2,7 +2,7 @@ package com.bitmovin.analytics.data;
 
 import java.util.*
 
-class SpeedMeasurement {
+class SpeedMeasurement() {
 
     // Download time in milliseconds
     var duration: Long = 0
@@ -18,4 +18,9 @@ class SpeedMeasurement {
 
     // HTTP Status of the download measurement
     var httpStatus: Int = 0;
+
+    constructor(duration: Long, size: Long) : this() {
+        this.duration = duration;
+        this.size = size;
+    }
 }
