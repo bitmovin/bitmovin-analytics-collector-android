@@ -73,5 +73,7 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impression
     var audioLanguage: String? = null
     var drmType: String? = null
     var drmLoadTime: Long? = null
+    var videoStartFailed: Boolean = false
+    var videoStartFailedReason: String? = null
     var downloadSpeedInfo: DownloadSpeedInfo? = null
 }

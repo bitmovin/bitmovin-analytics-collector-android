@@ -19,10 +19,12 @@ public enum PlayerState {
     BUFFERING {
         @Override
         void onEnterState(PlayerStateMachine machine) {
+            machine.enableRebufferHeartbeat();
         }
 
         @Override
         void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
+            machine.disableRebufferHeartbeat();
             for (StateMachineListener listener : machine.getListeners()) {
                 long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
                 listener.onRebuffering(elapsedTime - elapsedTimeOnEnter);
@@ -39,6 +41,20 @@ public enum PlayerState {
 
         @Override
         void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
+            machine.setVideoStartFailedReason(null);
+        }
+    },
+    EXITBEFOREVIDEOSTART {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+            for (StateMachineListener listener : machine.getListeners()) {
+                listener.onVideoStartFailed();
+            }
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
+            machine.setVideoStartFailedReason(null);
         }
     },
     PLAYING {

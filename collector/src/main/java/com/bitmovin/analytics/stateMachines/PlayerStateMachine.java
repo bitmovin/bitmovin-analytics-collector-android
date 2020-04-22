@@ -6,9 +6,12 @@ import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
+import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.utils.Util;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PlayerStateMachine {
@@ -25,8 +28,11 @@ public class PlayerStateMachine {
     private ErrorCode errorCode;
     private String impressionId;
     private Handler heartbeatHandler = new Handler();
+    private int currentRebufferingIntervalIndex = 0;
+    private static List<Integer> rebufferingIntervals = Arrays.asList(3000, 5000, 10000, 30000, 59700);
     private int heartbeatDelay = 59700; // default to 60 seconds
     private final BitmovinAnalytics analytics;
+    private VideoStartFailedReason videoStartFailedReason;
 
     public PlayerStateMachine(BitmovinAnalyticsConfig config, BitmovinAnalytics analytics) {
         this.config = config;
@@ -38,14 +44,7 @@ public class PlayerStateMachine {
     public void enableHeartbeat() {
         heartbeatHandler.postDelayed(new Runnable() {
             public void run() {
-                long elapsedTime = Util.getElapsedTime();
-                long elapsedTimeOnEnter = getElapsedTimeOnEnter();
-                videoTimeEnd = analytics.getPosition();
-                for (StateMachineListener listener : getListeners()) {
-                    listener.onHeartbeat(elapsedTime - elapsedTimeOnEnter);
-                }
-                PlayerStateMachine.this.elapsedTimeOnEnter = elapsedTime;
-                videoTimeStart = videoTimeEnd;
+                triggerHeartbeat();
                 heartbeatHandler.postDelayed(this, heartbeatDelay);
             }
         }, heartbeatDelay);
@@ -55,11 +54,38 @@ public class PlayerStateMachine {
         heartbeatHandler.removeCallbacksAndMessages(null);
     }
 
+    public void enableRebufferHeartbeat() {
+        heartbeatHandler.postDelayed(new Runnable() {
+            public void run() {
+                triggerHeartbeat();
+                currentRebufferingIntervalIndex = Math.min(currentRebufferingIntervalIndex + 1, rebufferingIntervals.size() - 1);
+                heartbeatHandler.postDelayed(this, rebufferingIntervals.get(currentRebufferingIntervalIndex));
+            }
+        }, rebufferingIntervals.get(currentRebufferingIntervalIndex));
+    }
+
+    public void disableRebufferHeartbeat() {
+        currentRebufferingIntervalIndex = 0;
+        heartbeatHandler.removeCallbacksAndMessages(null);
+    }
+
+    private void triggerHeartbeat() {
+        long elapsedTime = Util.getElapsedTime();
+        videoTimeEnd = analytics.getPosition();
+        for (StateMachineListener listener : getListeners()) {
+            listener.onHeartbeat(elapsedTime - elapsedTimeOnEnter);
+        }
+        elapsedTimeOnEnter = elapsedTime;
+        videoTimeStart = videoTimeEnd;
+    }
+
     public void resetStateMachine() {
         disableHeartbeat();
+        disableRebufferHeartbeat();
         this.impressionId = Util.getUUID();
         this.elaspedTimeInitial = Util.getElapsedTime();
         this.elapsedTimeFirstReady = 0;
+        this.videoStartFailedReason = null;
         setCurrentState(PlayerState.SETUP);
     }
 
@@ -138,6 +164,14 @@ public class PlayerStateMachine {
 
     public void setErrorCode(ErrorCode errorCode) {
         this.errorCode = errorCode;
+    }
+
+    public VideoStartFailedReason getVideoStartFailedReason() {
+        return videoStartFailedReason;
+    }
+
+    public void setVideoStartFailedReason(VideoStartFailedReason videoStartFailedReason) {
+        this.videoStartFailedReason = videoStartFailedReason;
     }
 
 }
