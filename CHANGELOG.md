@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+- Data downloaded metrics to ExoPlayer
+
 ## v1.12.1
 
 ### Fixed

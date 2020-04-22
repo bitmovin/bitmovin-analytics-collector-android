@@ -56,7 +56,4 @@ class DownloadSpeedMeterTest {
         Assertions.assertThat(info.avgDownloadSpeed).isEqualTo(504.0f);
     }
 
-
-
-
 }
