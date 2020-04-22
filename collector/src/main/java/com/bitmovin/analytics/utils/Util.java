@@ -27,6 +27,7 @@ public class Util {
     public static final String PROGRESSIVE_STREAM_FORMAT = "progressive";
     public static final String SMOOTH_STREAM_FORMAT = "smooth";
     public static final int MILLISECONDS_IN_SECONDS = 1000;
+    public static final int VIDEOSTART_TIMEOUT = 1000 * 60; // in milliseconds
 
     private static final Map<String, String> VIDEO_FORMAT_MIME_TYPE_MAP;
     public static final String PLAYER_TECH = "Android:Exoplayer";

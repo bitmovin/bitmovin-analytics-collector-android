@@ -14,6 +14,8 @@ import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
+import com.bitmovin.analytics.enums.VideoStartFailedReason;
+import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.license.LicenseCallback;
@@ -186,6 +188,12 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+
+        if(playerStateMachine.getVideoStartFailedReason() != null) {
+            data.setVideoStartFailedReason(playerStateMachine.getVideoStartFailedReason().getReason());
+            data.setVideoStartFailed(true);
+        }
+
         data.setErrorCode(errorCode.getErrorCode());
         data.setErrorMessage(errorCode.getDescription());
         data.setErrorData(serialize(errorCode.getErrorData()));
@@ -288,6 +296,21 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
     }
+
+    @Override
+    public void onVideoStartFailed() {
+        String videoStartFailedReason = playerStateMachine.getVideoStartFailedReason() != null
+                ? playerStateMachine.getVideoStartFailedReason().getReason()
+                : VideoStartFailedReason.UNKNOWN.getReason();
+
+        EventData data = playerAdapter.createEventData();
+        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setVideoStartFailed(true);
+
+        data.setVideoStartFailedReason(videoStartFailedReason);
+        sendEventData(data);
+    }
+
 
     public void sendEventData(EventData data) {
         this.eventDataDispatcher.add(data);

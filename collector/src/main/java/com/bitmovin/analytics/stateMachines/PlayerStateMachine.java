@@ -6,6 +6,7 @@ import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
+import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.utils.Util;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class PlayerStateMachine {
     private Handler heartbeatHandler = new Handler();
     private int heartbeatDelay = 59700; // default to 60 seconds
     private final BitmovinAnalytics analytics;
+    private VideoStartFailedReason videoStartFailedReason;
 
     public PlayerStateMachine(BitmovinAnalyticsConfig config, BitmovinAnalytics analytics) {
         this.config = config;
@@ -60,6 +62,7 @@ public class PlayerStateMachine {
         this.impressionId = Util.getUUID();
         this.elaspedTimeInitial = Util.getElapsedTime();
         this.elapsedTimeFirstReady = 0;
+        this.videoStartFailedReason = null;
         setCurrentState(PlayerState.SETUP);
     }
 
@@ -138,6 +141,14 @@ public class PlayerStateMachine {
 
     public void setErrorCode(ErrorCode errorCode) {
         this.errorCode = errorCode;
+    }
+
+    public VideoStartFailedReason getVideoStartFailedReason() {
+        return videoStartFailedReason;
+    }
+
+    public void setVideoStartFailedReason(VideoStartFailedReason videoStartFailedReason) {
+        this.videoStartFailedReason = videoStartFailedReason;
     }
 
 }

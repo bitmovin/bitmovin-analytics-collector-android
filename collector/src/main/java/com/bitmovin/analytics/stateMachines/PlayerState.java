@@ -39,6 +39,20 @@ public enum PlayerState {
 
         @Override
         void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
+            machine.setVideoStartFailedReason(null);
+        }
+    },
+    EXITBEFOREVIDEOSTART {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+            for (StateMachineListener listener : machine.getListeners()) {
+                listener.onVideoStartFailed();
+            }
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
+            machine.setVideoStartFailedReason(null);
         }
     },
     PLAYING {
