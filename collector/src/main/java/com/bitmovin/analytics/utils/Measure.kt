@@ -4,23 +4,28 @@ import com.bitmovin.analytics.data.SpeedMeasurement
 
 class Measure(private val download: SpeedMeasurement) {
 
-    fun getSpeed(): Float {
-        return download.size.toFloat().div(download.duration) //bytes per millisecond
-    }
+    var speed: Float = 0.0f
+        get() {
+            return download.size.toFloat().div(download.duration) //bytes per millisecond
+        }
 
-    fun getDuration(): Long {
-        return download.duration
-    }
+    var duration: Long = 0
+        get() {
+            return download.duration
+        }
 
-    fun getSize(): Long {
-        return download.size
-    }
+    var downloadSize: Long = 0
+        get() {
+            return download.size
+        }
 
-    fun getTimeToFirstByte(): Float {
-        return download.timeToFirstByte
-    }
+    var timeToFirstByte: Float = 0.0f
+        get() {
+            return download.timeToFirstByte
+        }
 
-    fun getHttpStatus(): Int {
-        return download.httpStatus;
-    }
+    var httpStatus: Int = 0
+        get() {
+            return download.httpStatus;
+        }
 }

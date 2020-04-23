@@ -377,24 +377,32 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                 mediaLoadData.trackFormat.drmInitData != null &&
                 drmType == null)
         {
-            String drmType = null;
-            for (int i = 0; drmType == null && i < mediaLoadData.trackFormat.drmInitData.schemeDataCount; i++) {
-                DrmInitData.SchemeData data = mediaLoadData.trackFormat.drmInitData.get(i);
-                drmType = getDrmTypeFromSchemeData(data);
-            }
-            this.drmType = drmType;
+            addDrmType(mediaLoadData);
         }
 
-        if(mediaLoadData.trackFormat != null
-                && mediaLoadData.trackFormat.containerMimeType != null
-                && mediaLoadData.trackFormat.containerMimeType.startsWith("video")){
-
-            SpeedMeasurement measurement = new SpeedMeasurement();
-            measurement.setTimestamp(new Date());
-            measurement.setDuration(loadEventInfo.loadDurationMs);
-            measurement.setSize(loadEventInfo.bytesLoaded);
-            meter.addMeasurement(measurement);
+        if(mediaLoadData.trackFormat != null &&
+           mediaLoadData.trackFormat.containerMimeType != null &&
+           mediaLoadData.trackFormat.containerMimeType.startsWith("video"))
+        {
+                addSpeedMeasurement(loadEventInfo);
         }
+    }
+
+    private void addDrmType(MediaSourceEventListener.MediaLoadData mediaLoadData){
+        String drmType = null;
+        for (int i = 0; drmType == null && i < mediaLoadData.trackFormat.drmInitData.schemeDataCount; i++) {
+            DrmInitData.SchemeData data = mediaLoadData.trackFormat.drmInitData.get(i);
+            drmType = getDrmTypeFromSchemeData(data);
+        }
+        this.drmType = drmType;
+    }
+
+    private void addSpeedMeasurement(MediaSourceEventListener.LoadEventInfo loadEventInfo){
+        SpeedMeasurement measurement = new SpeedMeasurement();
+        measurement.setTimestamp(new Date());
+        measurement.setDuration(loadEventInfo.loadDurationMs);
+        measurement.setSize(loadEventInfo.bytesLoaded);
+        meter.addMeasurement(measurement);
     }
 
     private String getDrmTypeFromSchemeData(DrmInitData.SchemeData data){

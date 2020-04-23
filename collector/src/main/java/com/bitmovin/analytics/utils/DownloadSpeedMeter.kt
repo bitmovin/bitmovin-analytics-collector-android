@@ -19,7 +19,7 @@ class DownloadSpeedMeter {
 
         val measure = Measure(measurement);
 
-        if (measure.getSpeed() >= thresholdBytes) {
+        if (measure.speed >= thresholdBytes) {
             return;
         }
 
@@ -29,7 +29,7 @@ class DownloadSpeedMeter {
     fun getInfo(): DownloadSpeedInfo {
         var info = DownloadSpeedInfo();
         info.segmentsDownloadCount = measures.size;
-        info.segmentsDownloadSize = measures.map { it.getSize() }.sum();
+        info.segmentsDownloadSize = measures.map { it.downloadSize }.sum();
         info.segmentsDownloadTime = totalTime();
         info.avgDownloadSpeed = avgSpeed();
         info.minDownloadSpeed = minSpeed();
@@ -43,7 +43,7 @@ class DownloadSpeedMeter {
         if (measures.size === 0) {
             return 0.0f;
         }
-        val totalSpeed = measures.map {it.getSpeed()}.sum();
+        val totalSpeed = measures.map {it.speed}.sum();
 
         return totalSpeed.div(measures.size).times(8); // bytes per millisecond to kbps
     }
@@ -53,7 +53,7 @@ class DownloadSpeedMeter {
             return 0.0f;
         }
         // the slowest one to download
-        return measures.map {it.getSpeed()}.max()?.times(8) // bytes per millisecond to kbps
+        return measures.map {it.speed}.max()?.times(8) // bytes per millisecond to kbps
     }
 
     private fun maxSpeed(): Float? {
@@ -61,14 +61,14 @@ class DownloadSpeedMeter {
             return 0.0f;
         }
         // the fastest one to download
-        return measures.map {it.getSpeed()}.min()?.times(8); // bytes per millisecond to kbps
+        return measures.map {it.speed}.min()?.times(8); // bytes per millisecond to kbps
     }
 
     private fun totalTime(): Long {
         if (this.measures.size === 0) {
             return 0;
         }
-        return this.measures.map{it.getDuration()}.sum();
+        return this.measures.map{it.duration}.sum();
     }
 
     private fun avgTimeToFirstByte(): Float {
@@ -76,6 +76,6 @@ class DownloadSpeedMeter {
             return 0.0f;
         }
 
-        return measures.map {it.getTimeToFirstByte()}.sum().div(measures.size);
+        return measures.map {it.timeToFirstByte}.sum().div(measures.size);
     }
 }
