@@ -75,4 +75,5 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impression
     var drmLoadTime: Long? = null
     var videoStartFailed: Boolean = false
     var videoStartFailedReason: String? = null
+    var downloadSpeedInfo: DownloadSpeedInfo? = null
 }
