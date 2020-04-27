@@ -169,7 +169,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                 }
                 break;
             case Player.STATE_BUFFERING:
-                if (this.stateMachine.getCurrentState() != PlayerState.SEEKING && this.stateMachine.getElapsedTimeFirstReady() != 0) {
+                if (this.stateMachine.getElapsedTimeFirstReady() != 0) {
                     this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
                 }
                 break;
@@ -210,8 +210,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public void onPositionDiscontinuity(int reason) {
         Log.d(TAG, "onPositionDiscontinuity");
-        long videoTime = getPosition();
-        this.stateMachine.transitionState(PlayerState.SEEKING, videoTime);
     }
 
     @Override
@@ -320,7 +318,9 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public void onSeekStarted(EventTime eventTime) {
-
+        Log.d(TAG, "onSeekStarted on position: " + eventTime.currentPlaybackPositionMs);
+        long videoTime = getPosition();
+        this.stateMachine.transitionState(PlayerState.SEEKING, videoTime);
     }
 
     @Override
