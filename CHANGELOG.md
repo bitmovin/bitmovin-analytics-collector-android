@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - heartbeat to Rebuffering state (AN-1281)
 - Data downloaded metrics to ExoPlayer
 
+### Fixed
+
+- no rebuffering state after seeking 
+
 ## v1.12.1
 
 ### Fixed
