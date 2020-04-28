@@ -174,7 +174,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                 }
                 break;
             case Player.STATE_BUFFERING:
-                if (this.stateMachine.getElapsedTimeFirstReady() != 0) {
+                if (stateMachine.getCurrentState() != PlayerState.SEEKING && this.stateMachine.getElapsedTimeFirstReady() != 0) {
                     this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
                 }
                 break;

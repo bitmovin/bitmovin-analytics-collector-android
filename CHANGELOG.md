@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- no rebuffering state after seeking 
+- ExoPlayer: seeking transitioned to rebuffering although no rebuffering state allowed
 
 ## v1.12.1
 
