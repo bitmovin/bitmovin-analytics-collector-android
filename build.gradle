@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.1'
+        classpath 'com.android.tools.build:gradle:3.6.2'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.8"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
@@ -42,9 +42,9 @@ ext {
     version = '1.13.0'
     versionCode = 113000
 
-    compileSdkVersion = 27
+    compileSdkVersion = 28
     minSdkVersion = 16
-    targetSdkVersion = 27
+    targetSdkVersion = 28
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8

@@ -40,7 +40,7 @@ configurations {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.compileSdkVersion}.1.1"
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.compileSdkVersion}.0.0"
     implementation "com.android.support.constraint:constraint-layout:${rootProject.ext.constraintLayoutVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     androidTestImplementation "com.android.support.test:runner:${rootProject.ext.testRunnerVersion}"
@@ -51,11 +51,11 @@ dependencies {
     implementation "com.bitmovin.player:playercore:${rootProject.ext.playercoreVersion}"
 
     // only needed if ads are used
-    implementation "com.android.support:support-v4:${rootProject.ext.compileSdkVersion}.1.1"
+    implementation "com.android.support:support-v4:${rootProject.ext.compileSdkVersion}.0.0"
     implementation "com.google.ads.interactivemedia.v3:interactivemedia:3.11.3"
     implementation "com.google.android.gms:play-services-ads:17.1.2"
     /** required because of play-services-ads:17.1.2 SDK 26 dependencies */
-    implementation "com.android.support:customtabs:${rootProject.ext.compileSdkVersion}.1.1"
+    implementation "com.android.support:customtabs:${rootProject.ext.compileSdkVersion}.0.0"
 
     // Pull from Maven Repo
     if (rootProject.ext.developLocal) {

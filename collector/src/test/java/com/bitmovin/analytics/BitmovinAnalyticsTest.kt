@@ -1,6 +1,5 @@
 package com.bitmovin.analytics
 
-import android.test.mock.MockContext
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -10,9 +9,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class BitmovinAnalyticsTest {
-
-    @Mock
-    private lateinit var context: MockContext
 
     private lateinit var bitmovinAnalyticsConfig: BitmovinAnalyticsConfig
 
