@@ -47,7 +47,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
 
 
-    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation "com.bitmovin.player:playercore:${rootProject.ext.playercoreVersion}"
 
     // only needed if ads are used

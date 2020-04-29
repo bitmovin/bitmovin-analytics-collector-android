@@ -47,7 +47,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
 
 
-    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
 
     // Pull from Maven Repo

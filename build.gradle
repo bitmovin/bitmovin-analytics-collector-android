@@ -52,12 +52,12 @@ ext {
     constraintLayoutVersion = '1.0.2'
     junitVersion = '4.12'
     testRunnerVersion = '1.0.1'
-    espressoCoreVersion = '3.1.0'
+    espressoCoreVersion = '3.2.0'
     playercoreVersion = '2.35.0'
     exoplayerVersion = '2.9.0'
     assertjCoreVersion = '3.11.1'
     mockitoCoreVersion = '2.7.22'
-    androidXVersion = '1.0.0'
+    androidXVersion = '1.1.0'
 }
 
 task clean(type: Delete) {
