@@ -15,7 +15,7 @@ android {
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.version
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
 
@@ -39,10 +39,10 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.compileSdkVersion}.0.0"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
-    androidTestImplementation "com.android.support.test:runner:${rootProject.ext.testRunnerVersion}"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
 
 
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
