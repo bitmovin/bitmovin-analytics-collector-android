@@ -82,7 +82,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.config = config;
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, ExoUtil.getUserAgent(context)), new UserIdProvider(context));
+        this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, ExoUtil.getUserAgent(context), Util.isTVDevice(context)), new UserIdProvider(context));
         attachAnalyticsListener();
     }
 

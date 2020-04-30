@@ -1,7 +1,9 @@
 package com.bitmovin.analytics.utils;
 
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -20,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import static android.content.Context.UI_MODE_SERVICE;
 
 public class Util {
     public static final String DASH_STREAM_FORMAT = "dash";
@@ -130,5 +134,10 @@ public class Util {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    public static boolean isTVDevice(Context context) {
+        UiModeManager uiModeManager = (UiModeManager) context.getSystemService(UI_MODE_SERVICE);
+        return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
     }
 }
