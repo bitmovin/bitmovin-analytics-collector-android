@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.utils;
+package com.bitmovin.analytics.utils
 
 import com.bitmovin.analytics.data.SpeedMeasurement
 
@@ -6,7 +6,7 @@ class Measure(private val download: SpeedMeasurement) {
 
     var speed: Float = 0.0f
         get() {
-            return download.size.toFloat().div(download.duration) //bytes per millisecond
+            return download.size.toFloat().div(download.duration) // bytes per millisecond
         }
 
     var duration: Long = 0
@@ -26,6 +26,6 @@ class Measure(private val download: SpeedMeasurement) {
 
     var httpStatus: Int = 0
         get() {
-            return download.httpStatus;
+            return download.httpStatus
         }
 }
