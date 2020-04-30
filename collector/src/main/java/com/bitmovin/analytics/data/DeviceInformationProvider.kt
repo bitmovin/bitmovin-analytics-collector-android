@@ -4,11 +4,12 @@ import android.content.Context
 import android.os.Build
 import com.bitmovin.analytics.utils.Util
 
-open class DeviceInformationProvider(val context: Context, val userAgent: String) {
+open class DeviceInformationProvider(val context: Context, val userAgent: String, val isTV: Boolean) {
     fun getDeviceInformation(): DeviceInformation {
         return DeviceInformation(
                 manufacturer = Build.MANUFACTURER,
                 model = Build.MODEL,
+                isTV = isTV,
                 locale = Util.getLocale(),
                 packageName = context.packageName,
                 screenWidth = context?.getResources()?.getDisplayMetrics()?.widthPixels ?: 0,
