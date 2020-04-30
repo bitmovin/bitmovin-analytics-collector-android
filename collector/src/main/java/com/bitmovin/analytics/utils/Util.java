@@ -135,9 +135,4 @@ public class Util {
             return false;
         }
     }
-
-    public static boolean isTVDevice(Context context) {
-        UiModeManager uiModeManager = (UiModeManager) context.getSystemService(UI_MODE_SERVICE);
-        return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
-    }
 }
