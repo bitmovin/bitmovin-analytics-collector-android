@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Change
+
+- support libraries changed to androidX libraries
+
 ## v1.13.0
 
 ### Added
