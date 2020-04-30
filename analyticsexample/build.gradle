@@ -41,13 +41,13 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
 
 
-    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
     implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
 
     // Pull from Maven Repo
