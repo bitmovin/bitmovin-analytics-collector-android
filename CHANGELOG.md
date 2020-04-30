@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+
+- `isTV` to sample to distinguish androidTVs from android mobiles
+
 ### Change
 
 - support libraries changed to androidX libraries
