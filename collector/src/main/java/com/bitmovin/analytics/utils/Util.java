@@ -1,9 +1,6 @@
 package com.bitmovin.analytics.utils;
 
-import android.app.UiModeManager;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -11,19 +8,13 @@ import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Pair;
 
-import com.bitmovin.analytics.BuildConfig;
-import com.bitmovin.analytics.CollectorConfig;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
-
-import static android.content.Context.UI_MODE_SERVICE;
 
 public class Util {
     public static final String DASH_STREAM_FORMAT = "dash";
