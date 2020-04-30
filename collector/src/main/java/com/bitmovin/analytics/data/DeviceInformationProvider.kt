@@ -7,10 +7,8 @@ import android.os.Build
 import com.bitmovin.analytics.utils.Util
 
 open class DeviceInformationProvider(val context: Context, val userAgent: String) {
-    private var isTV: Boolean = false
-    init {
-        isTV = Util.isTVDevice(context)
-    }
+    var isTV: Boolean = isTVDevice()
+
     fun getDeviceInformation(): DeviceInformation {
         return DeviceInformation(
                 manufacturer = Build.MANUFACTURER,
@@ -22,5 +20,10 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
                 screenHeight = context?.getResources()?.getDisplayMetrics()?.heightPixels ?: 0,
                 userAgent = userAgent
         )
+    }
+
+    private fun isTVDevice(): Boolean {
+        val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+        return uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
     }
 }
