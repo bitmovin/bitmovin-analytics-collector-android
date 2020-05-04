@@ -16,22 +16,11 @@ import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
-import com.google.android.exoplayer2.drm.DrmSessionManager;
-import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
 import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
-import com.google.android.exoplayer2.drm.MediaDrmCallback;
 import com.google.android.exoplayer2.source.dash.DashChunkSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
@@ -80,12 +69,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void createPlayer() {
+
         if (player == null) {
-            TrackSelection.Factory videoTrackSelectionFactory
-                    = new AdaptiveTrackSelection.Factory();
-            RenderersFactory renderersFactory = new DefaultRenderersFactory(this);
-            player = ExoPlayerFactory.newSimpleInstance(this, renderersFactory,
-                    new DefaultTrackSelector(videoTrackSelectionFactory), getDrmSession("https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID, Util.getUserAgent(this, "ExoPlayerExample")));
+
+            player = new SimpleExoPlayer.Builder(getApplicationContext()).build();
+//                    ExoPlayerFactory.newSimpleInstance(this, renderersFactory,
+//                    new DefaultTrackSelector(videoTrackSelectionFactory), getDrmSession("https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID, Util.getUserAgent(this, "ExoPlayerExample")));
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, bandwidthMeter,
                     buildHttpDataSourceFactory(bandwidthMeter));
 
@@ -122,29 +111,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);
 
-            Uri dashStatic = Uri.parse("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
+           Uri dashStatic = Uri.parse("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
+//           Uri dashStatic = Uri.parse("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd");
 
             //DASH example
             DashMediaSource dashMediaSource = getMediaSource(dashStatic, dataSourceFactory);
             player.prepare(dashMediaSource);
-            player.setPlayWhenReady(true);
+            player.setPlayWhenReady(false);
 
         }
     }
 
-    protected static DrmSessionManager<FrameworkMediaCrypto> getDrmSession(String drmLicenseUrl, UUID drmScheme, String userAgent) {
-
-        if(drmLicenseUrl != null && drmScheme != null) {
-            try{
-                MediaDrmCallback mediaDrmCallback =
-                        createMediaDrmCallback(drmLicenseUrl, userAgent);
-                return DefaultDrmSessionManager.newFrameworkInstance(drmScheme, mediaDrmCallback, null);
-            } catch (Exception e ){
-                Log.e("Main Application", e.getMessage());
-            }
-        }
-        return null;
-    }
+//    protected static DrmSessionManager<FrameworkMediaCrypto> getDrmSession(String drmLicenseUrl, UUID drmScheme, String userAgent) {
+//
+//        if(drmLicenseUrl != null && drmScheme != null) {
+//            try{
+//                MediaDrmCallback mediaDrmCallback =
+//                        createMediaDrmCallback(drmLicenseUrl, userAgent);
+//                return DefaultDrmSessionManager.newFrameworkInstance(drmScheme, mediaDrmCallback, null);
+//            } catch (Exception e ){
+//                Log.e("Main Application", e.getMessage());
+//            }
+//        }
+//        return null;
+//    }
 
     protected static DashMediaSource getMediaSource(Uri dashStatic, DataSource.Factory dataSourceFactory) {
         DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
