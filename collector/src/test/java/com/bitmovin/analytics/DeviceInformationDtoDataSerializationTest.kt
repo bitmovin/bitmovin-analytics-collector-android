@@ -12,7 +12,7 @@ class DeviceInformationDtoDataSerializationTest {
         val config = BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2")
         val model = "Pixel 3"
         val manufacturer = "Google"
-        val data = EventData(config, "1234", DeviceInformation(manufacturer, model, "user-agent", "de", "my.package", 100, 200), "user-id")
+        val data = EventData(config, "1234", DeviceInformation(manufacturer, model, false, "user-agent", "de", "my.package", 100, 200), "user-id")
         val serialized = DataSerializer.serialize(data)
 
         assertThat(serialized).contains("\"deviceInformation\":{")
