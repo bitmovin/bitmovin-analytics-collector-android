@@ -33,7 +33,7 @@ public class HttpClient {
         Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody));
         Request request = new Request.Builder()
                 .url(url)
-                .header("Origin", String.format("http://%s", "localhost"))
+                .header("Origin", String.format("http://%s", context.getPackageName()))
                 .post(RequestBody.create(JSON, postBody))
                 .build();
 

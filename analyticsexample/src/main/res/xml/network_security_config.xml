@@ -5,8 +5,4 @@
             <certificates src="user" />
         </trust-anchors>
     </debug-overrides>
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">10.0.0.9</domain>
-        <domain includeSubdomains="true">bitmovin-a.akamaihd.net</domain>
-    </domain-config>
 </network-security-config>
