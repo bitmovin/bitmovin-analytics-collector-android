@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+- Playback start failure metrics to ExoPlayer
+
 ### Change
 
 - support libraries changed to androidX libraries

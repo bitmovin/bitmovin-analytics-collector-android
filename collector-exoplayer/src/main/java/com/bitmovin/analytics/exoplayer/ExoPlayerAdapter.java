@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.exoplayer;
 
 import android.content.Context;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.Surface;
 
@@ -15,6 +16,7 @@ import com.bitmovin.analytics.data.SpeedMeasurement;
 import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
+import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -28,6 +30,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.analytics.AnalyticsListener;
+import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.drm.DrmInitData;
 import com.google.android.exoplayer2.metadata.Metadata;
@@ -74,6 +77,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private String drmType = null;
     private DRMInformation drmInformation = null;
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
+    private boolean isVideoPlayed = false;
+    private boolean isVideoAttemptedPlay = false;
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
@@ -147,7 +152,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+    public void onTimelineChanged(Timeline timeline, int reason) {
         Log.d(TAG, "onTimelineChanged");
     }
 
@@ -169,6 +174,17 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             case Player.STATE_READY:
                 if (playWhenReady) {
                     this.stateMachine.transitionState(PlayerState.PLAYING, videoTime);
+                    if(!isVideoPlayed && !exoplayer.isPlayingAd()) {
+                        if (isVideoAttemptedPlay) {
+                            isVideoPlayed = true;
+                            videoStartTimeout.cancel();
+                        }
+                        //autoplay
+                        else {
+                            isVideoAttemptedPlay = true;
+                            videoStartTimeout.start();
+                        }
+                    }
                 } else {
                     this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                 }
@@ -306,10 +322,41 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
     }
 
+    @Override
+    public void onPlaybackSuppressionReasonChanged(int playbackSuppressionReason) {
+        Log.d(TAG, "onPlaybackSuppressionReasonChanged " + playbackSuppressionReason);
+    }
+
+    @Override
+    public void onIsPlayingChanged(boolean isPlaying) {
+
+    }
 
     @Override
     public void onPlayerStateChanged(EventTime eventTime, boolean playWhenReady, int playbackState) {
 
+    }
+
+    @Override
+    public void onPlaybackSuppressionReasonChanged(EventTime eventTime, int playbackSuppressionReason) {
+        Log.d(TAG, "onPlaybackSuppressionReasonChanged");
+    }
+
+    @Override
+    public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
+        Log.d(TAG, "onIsPlayingChanged " + isPlaying);
+
+        if(!exoplayer.isPlayingAd() && isPlaying && !isVideoPlayed) {
+            //autoplay
+           if(isVideoAttemptedPlay && exoplayer.getPlayWhenReady()) {
+               videoStartTimeout.cancel();
+               isVideoPlayed = true;
+           }
+           else {
+                videoStartTimeout.start();
+                isVideoAttemptedPlay = true;
+            }
+        }
     }
 
     @Override
@@ -461,6 +508,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
+    public void onSurfaceSizeChanged(EventTime eventTime, int width, int height) {
+        Log.d(TAG, "onSurfaceSizeChanged");
+    }
+
+    @Override
     public void onMetadata(EventTime eventTime, Metadata metadata) {
         Log.d(TAG, String.format("DRM Session aquired %d", eventTime.realtimeMs));
     }
@@ -496,6 +548,16 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
+    public void onAudioAttributesChanged(EventTime eventTime, AudioAttributes audioAttributes) {
+        Log.d(TAG, "onAudioAttributesChanged");
+    }
+
+    @Override
+    public void onVolumeChanged(EventTime eventTime, float volume) {
+        Log.d(TAG, "onVolumeChanged");
+    }
+
+    @Override
     public void onAudioUnderrun(EventTime eventTime, int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
 
     }
@@ -511,7 +573,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
-    public void onRenderedFirstFrame(EventTime eventTime, Surface surface) {
+    public void onRenderedFirstFrame(EventTime eventTime, @androidx.annotation.Nullable Surface surface) {
         playerIsReady = true;
     }
 
@@ -542,6 +604,24 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onDrmKeysRemoved(EventTime eventTime) {
 
     }
+
+    @Override
+    public void onDrmSessionReleased(EventTime eventTime) {
+        Log.d(TAG, "onDrmSessionReleased");
+    }
+
+    private CountDownTimer videoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+
+        @Override
+        public void onFinish() {
+            Log.d(TAG, "VideoStartTimeout finish");
+            stateMachine.setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
+            stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
+        }
+    };
 }
 
 
