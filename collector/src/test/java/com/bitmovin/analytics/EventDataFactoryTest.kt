@@ -23,7 +23,7 @@ class EventDataFactoryTest {
     @Test
     fun testRetrievesDeviceInformationAndSetsItOnEventData() {
 
-        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
+        val deviceInfo = DeviceInformation("Foo", "Bar", false, "user-agent", "de", "package", 100, 200)
 
         val myMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(myMock.getDeviceInformation()).thenReturn(deviceInfo)
@@ -35,12 +35,25 @@ class EventDataFactoryTest {
         assertThat(eventData.userAgent).isEqualTo(deviceInfo.userAgent)
         assertThat(eventData.screenHeight).isEqualTo(deviceInfo.screenHeight)
         assertThat(eventData.screenWidth).isEqualTo(deviceInfo.screenWidth)
+        assertThat(eventData.platform).isEqualTo("android")
+    }
+    @Test
+    fun testAssignsDeviceInformationAndroidTVToEventData() {
+
+        val deviceInfo = DeviceInformation("Foo", "Bar", true, "user-agent", "de", "package", 100, 200)
+
+        val myMock = Mockito.mock(DeviceInformationProvider::class.java)
+        Mockito.`when`(myMock.getDeviceInformation()).thenReturn(deviceInfo)
+        val mockContext = Mockito.mock(Context::class.java)
+        val eventData: EventData = EventDataFactory(BitmovinAnalyticsConfig(), mockContext, myMock, userIdProvider).build("impression-id")
+
+        assertThat(eventData.platform).isEqualTo("androidTV")
     }
 
     @Test
     fun testAssignsDeviceInformationPackageNameAsDomainToEventData() {
 
-        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
+        val deviceInfo = DeviceInformation("Foo", "Bar", false, "user-agent", "de", "package", 100, 200)
 
         val myMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(myMock.getDeviceInformation()).thenReturn(deviceInfo)
@@ -52,7 +65,7 @@ class EventDataFactoryTest {
 
     @Test
     fun testRetrievesUserIdFromUserIdProviderAndAssignsToEventData() {
-        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
+        val deviceInfo = DeviceInformation("Foo", "Bar", false, "user-agent", "de", "package", 100, 200)
 
         val deviceInfoMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(deviceInfoMock.getDeviceInformation()).thenReturn(deviceInfo)
@@ -65,7 +78,7 @@ class EventDataFactoryTest {
 
     @Test
     fun testAssignsCorrectImpressionId() {
-        val deviceInfo = DeviceInformation("Foo", "Bar", "user-agent", "de", "package", 100, 200)
+        val deviceInfo = DeviceInformation("Foo", "Bar", false, "user-agent", "de", "package", 100, 200)
 
         val deviceInfoMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(deviceInfoMock.getDeviceInformation()).thenReturn(deviceInfo)

@@ -6,7 +6,7 @@ import com.bitmovin.analytics.utils.Util
 
 class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impressionId: String, deviceInfo: DeviceInformation, val userId: String) {
     val userAgent = deviceInfo.userAgent
-    val deviceInformation = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model)
+    val deviceInformation = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV)
     val language: String = deviceInfo.locale //
     var analyticsVersion: String? = BuildConfig.VERSION_NAME
     val playerTech: String? = Util.PLAYER_TECH
@@ -64,7 +64,7 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impression
     var progUrl: String? = null
     var isMuted = false
     var sequenceNumber: Int = 0
-    val platform: String = "android"
+    val platform: String = if(deviceInfo.isTV) "androidTV" else "android"
     var videoCodec: String? = null
     var audioCodec: String? = null
     var supportedVideoCodecs: List<String>? = null
