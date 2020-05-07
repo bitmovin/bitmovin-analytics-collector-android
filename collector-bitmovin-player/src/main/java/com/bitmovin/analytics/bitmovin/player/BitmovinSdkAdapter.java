@@ -235,8 +235,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         }
 
         //audio quality
-        //TODO change getAudioQuality to getAudioPlaybackData once available
-        AudioQuality audioQuality = bitmovinPlayer.getAudioQuality();
+        AudioQuality audioQuality = bitmovinPlayer.getPlaybackAudioData();
         if (audioQuality != null) {
             data.setAudioBitrate(audioQuality.getBitrate());
             data.setAudioCodec(audioQuality.getCodec());
