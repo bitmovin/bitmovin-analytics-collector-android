@@ -267,6 +267,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         return drmInformation;
     }
 
+    @Override
+    public void clearValues() {
+
+    }
+
     /**
      * Player Listeners
      */

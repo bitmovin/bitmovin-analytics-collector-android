@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - support libraries changed to androidX libraries
 - getting audio codec data on BitmovinPlayer
+- download speed metric reset
 
 ## v1.13.0
 

@@ -13,4 +13,6 @@ public interface PlayerAdapter {
     long getPosition();
     @Nullable
     DRMInformation getDRMInformation();
+
+    void clearValues();
 }
