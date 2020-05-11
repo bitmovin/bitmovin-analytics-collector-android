@@ -6,7 +6,7 @@ import com.bitmovin.analytics.data.SpeedMeasurement
 class DownloadSpeedMeter {
 
     private var measures = ArrayList<Measure>()
-    private val thresholdBytes = 37500000; // 300 Megabit per second in bytes per second
+    private val thresholdBytes = 37500; // 300 Megabit per second in bytes per millisecond
 
     fun reset() {
         measures.clear()
