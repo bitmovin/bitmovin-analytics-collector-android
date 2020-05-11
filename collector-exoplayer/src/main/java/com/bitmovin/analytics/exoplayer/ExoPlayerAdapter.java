@@ -120,6 +120,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         meter.reset();
     }
 
+    @Override
+    public void clearValues(){
+        meter.reset();
+    }
+
     public long getPosition() {
         Timeline timeline = this.exoplayer.getCurrentTimeline();
         int currentWindowIndex = this.exoplayer.getCurrentWindowIndex();

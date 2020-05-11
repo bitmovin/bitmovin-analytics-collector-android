@@ -314,6 +314,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
     public void sendEventData(EventData data) {
         this.eventDataDispatcher.add(data);
+        this.playerAdapter.clearValues();
     }
 
     public void sendAdEventData(AdEventData data) {
