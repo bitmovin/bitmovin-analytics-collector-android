@@ -10,7 +10,7 @@ import com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE
 import com.google.android.exoplayer2.ExoPlaybackException.TYPE_UNEXPECTED
 import com.google.android.exoplayer2.upstream.HttpDataSource
 
-class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
+class ExoPlayerExceptionMapper : ExceptionMapper
     private fun doMap(error: ExoPlaybackException): ErrorCode {
         var errorCode = ErrorCode.UNKNOWN_ERROR
         when (error.type) {
