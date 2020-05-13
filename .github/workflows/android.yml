@@ -9,6 +9,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: pinterest/ktlint@latest
       - name: set up JDK 1.8
         uses: actions/setup-java@v1
         with:
@@ -18,3 +19,8 @@ jobs:
 
       - name: Test with Gradle
         run: ./gradlew test
+
+      - name: Check format with Ktlint
+        run: ktlint
+
+
