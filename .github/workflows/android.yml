@@ -19,7 +19,8 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew test
 
-      - name: Check format with Ktlint
-        run: vroy/gha-kotlin-linter@v1
+      - name: Kotlin Linter
+        uses: vroy/gha-kotlin-linter@v2
+
 
 
