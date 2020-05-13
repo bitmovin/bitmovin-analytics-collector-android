@@ -64,7 +64,7 @@ class EventData(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, val impression
     var progUrl: String? = null
     var isMuted = false
     var sequenceNumber: Int = 0
-    val platform: String = if(deviceInfo.isTV) "androidTV" else "android"
+    val platform: String = if (deviceInfo.isTV) "androidTV" else "android"
     var videoCodec: String? = null
     var audioCodec: String? = null
     var supportedVideoCodecs: List<String>? = null
