@@ -2,7 +2,6 @@ package com.bitmovin.analytics.data
 
 import java.util.Date
 
-
 class SpeedMeasurement() {
 
     // Download time in milliseconds

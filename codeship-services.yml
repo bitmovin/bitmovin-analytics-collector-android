@@ -1,0 +1,6 @@
+build:
+  image: cangol/android-gradle
+  cache: true
+  add_docker: true
+  volumes:
+    - ./:/project
