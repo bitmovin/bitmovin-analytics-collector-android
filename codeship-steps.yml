@@ -3,6 +3,5 @@
   #tag: ^(master|develop)
   steps:
     - command: chmod a+x /project/gradlew
-    - command: cd project
-    - command: /project/gradlew build
-    - command: /project/gradlew test
+    - command: cd project; /project/gradlew build
+    - command: cd project; /project/gradlew test
