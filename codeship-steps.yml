@@ -2,6 +2,6 @@
   service: build
   #tag: ^(master|develop)
   steps:
-    - command: chmod a+x ./gradlew
-    - command: ./gradlew build
-    - command: ./gradlew test
+    - command: chmod a+x /project/gradlew
+    - command: /project/gradlew build
+    - command: /project/gradlew test
