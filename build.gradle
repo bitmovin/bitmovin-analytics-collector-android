@@ -6,6 +6,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
     }
 
     dependencies {
@@ -13,6 +14,7 @@ buildscript {
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.8"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
+        classpath "org.jlleitschuh.gradle:ktlint-gradle:9.2.1"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -66,3 +68,5 @@ ext {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+apply { plugin "org.jlleitschuh.gradle.ktlint" }
