@@ -1,0 +1,8 @@
+build:
+  image: cangol/android-gradle
+  #encrypted_dockercfg_path: dockercfg.encrypted
+  cache: true
+  add_docker: true
+  #encrypted_env_file: settings.env.encrypted
+  volumes:
+    - ./:/project

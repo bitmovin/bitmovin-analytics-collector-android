@@ -1,0 +1,7 @@
+- type: serial
+  service: build
+  #tag: ^(master|develop)
+  steps:
+    - command: chmod a+x ./gradlew
+    - command: ./gradlew build
+    - command: ./gradlew test
