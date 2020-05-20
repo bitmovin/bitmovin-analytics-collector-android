@@ -18,6 +18,7 @@ import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
+import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
@@ -74,6 +75,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private final BitmovinPlayer bitmovinPlayer;
     private final EventDataFactory factory;
     private PlayerStateMachine stateMachine;
+    private ExceptionMapper<ErrorEvent> exceptionMapper = new BitmovinPlayerExceptionMapper();
     private int totalDroppedVideoFrames;
     private boolean playerIsReady;
     private boolean isVideoPlayed = false;
@@ -464,87 +466,16 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private OnErrorListener onErrorListener = new OnErrorListener() {
         @Override
         public void onError(ErrorEvent errorEvent) {
-            ErrorCode errorCode;
+            Log.d(TAG, "onPlayerError");
+            long videoTime = getPosition();
+            ErrorCode errorCode = exceptionMapper.map(errorEvent);
 
-            switch (errorEvent.getCode()) {
-                case 1016:
-                    errorCode = ErrorCode.LICENSE_ERROR;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 1017:
-                    errorCode = ErrorCode.LICENSE_ERROR_INVALID_DOMAIN;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 1018:
-                    errorCode = ErrorCode.LICENSE_ERROR_INVALID_SERVER_URL;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 1020:
-                    errorCode = ErrorCode.SOURCE_ERROR;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 3011:
-                    errorCode = ErrorCode.DRM_REQUEST_HTTP_STATUS;
-                    errorCode.setDescription(errorEvent.getMessage());
-                case 3019:
-                    errorCode = ErrorCode.DRM_REQUEST_ERROR;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 3021:
-                    errorCode = ErrorCode.DRM_UNSUPPORTED;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 4000:
-                    errorCode = ErrorCode.DRM_SESSION_ERROR;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 4001:
-                    errorCode = ErrorCode.FILE_ACCESS;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 4002:
-                    errorCode = ErrorCode.LOCKED_FOLDER;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 4003:
-                    errorCode = ErrorCode.DEAD_LOCK;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 4004:
-                    errorCode = ErrorCode.DRM_KEY_EXPIRED;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 4005:
-                    errorCode = ErrorCode.PLAYER_SETUP_ERROR;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 3006:
-                    errorCode = ErrorCode.DATASOURCE_HTTP_FAILURE;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 1000001:
-                    errorCode = ErrorCode.DATASOURCE_INVALID_CONTENT_TYPE;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 1000002:
-                    errorCode = ErrorCode.DATASOURCE_UNABLE_TO_CONNECT;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                case 1000003:
-                    errorCode = ErrorCode.EXOPLAYER_RENDERER_ERROR;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-                default:
-                    errorCode = ErrorCode.UNKNOWN_ERROR;
-                    errorCode.setDescription(errorEvent.getMessage());
-                    break;
-            }
             stateMachine.setErrorCode(errorCode);
             if (!isVideoPlayed && isVideoAttemptedPlay){
                 videoStartTimeout.cancel();
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
-            stateMachine.transitionState(PlayerState.ERROR, getPosition());
+            stateMachine.transitionState(PlayerState.ERROR, videoTime);
         }
     };
 
