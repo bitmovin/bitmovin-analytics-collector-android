@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.15.0
+
+### Added
+
+- `errorData` to samples for bitmovin player (AN-1456)
+
 ## v1.14.0
 
 ### Added

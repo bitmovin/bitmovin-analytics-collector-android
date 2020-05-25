@@ -1,0 +1,8 @@
+- type: serial
+  service: build
+  #tag: ^(master|develop)
+  steps:
+    - command: chmod a+x /project/gradlew
+    - command: /project/gradlew ktlintCheck -p project/
+    - command: /project/gradlew build -p project/
+    - command: /project/gradlew test -p project/
