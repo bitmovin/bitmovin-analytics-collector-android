@@ -92,14 +92,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         addPlayerListeners();
     }
 
-    @Override
-    public void release() {
-        playerIsReady = false;
-        if (bitmovinPlayer != null) {
-            removePlayerListener();
-        }
-    }
-
     private void addPlayerListeners() {
         Log.d(TAG, "Adding Player Listeners");
         this.bitmovinPlayer.addEventListener(onSourceLoadedListener);
@@ -256,17 +248,26 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             data.setAudioLanguage(audioTrack.getLanguage());
         }
 
+        // DRM Information
+        if (drmInformation != null) {
+            data.setDrmType(drmInformation.getType());
+            data.setDrmLoadTime(drmInformation.getLoadTime());
+        }
+
         return data;
     }
 
-    public long getPosition() {
-        return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
+    @Override
+    public void release() {
+        playerIsReady = false;
+        if (bitmovinPlayer != null) {
+            removePlayerListener();
+        }
     }
 
-    @Nullable
     @Override
-    public DRMInformation getDRMInformation() {
-        return drmInformation;
+    public long getPosition() {
+        return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
     }
 
     @Override
@@ -471,7 +472,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             ErrorCode errorCode = exceptionMapper.map(errorEvent);
 
             stateMachine.setErrorCode(errorCode);
-            if (!isVideoPlayed && isVideoAttemptedPlay){
+            if (!isVideoPlayed && isVideoAttemptedPlay) {
                 videoStartTimeout.cancel();
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
