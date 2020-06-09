@@ -8,6 +8,7 @@ import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.ExoPlaybackException.TYPE_RENDERER
 import com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE
 import com.google.android.exoplayer2.ExoPlaybackException.TYPE_UNEXPECTED
+import com.google.android.exoplayer2.source.BehindLiveWindowException
 import com.google.android.exoplayer2.upstream.HttpDataSource
 
 class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
@@ -25,6 +26,14 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
                 } else if (exception is HttpDataSource.HttpDataSourceException) {
                     errorCode = ErrorCode.DATASOURCE_UNABLE_TO_CONNECT
                     errorCode.errorData = ErrorData("Unable to connect: " + exception.dataSpec.uri)
+                } else if (exception is BehindLiveWindowException) {
+                    errorCode = ErrorCode.BEHIND_LIVE_WINDOW
+                    errorCode.errorData = ErrorData("Behind live window: required segments not available")
+                }
+
+                if (errorCode.errorData == null) {
+                    errorCode.errorData = ErrorData(exception::class.java.toString() + ": " + (exception.message
+                            ?: ""), exception.topOfStacktrace)
                 }
             }
             TYPE_RENDERER -> {

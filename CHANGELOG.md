@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## Added
+
+- ExoPlayer: 4006 `BEHIND_LIVE_WINDOW` error when player is out of the available live window and required segments are not available (AN-1507)
+
 ## v1.15.0
 
 ### Added
