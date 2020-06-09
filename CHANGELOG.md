@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Change
+
+- set DRM information for each event data sent to server
+
 ## v1.15.0
 
 ### Added
