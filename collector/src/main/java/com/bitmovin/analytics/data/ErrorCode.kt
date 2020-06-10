@@ -21,6 +21,7 @@ enum class ErrorCode(val errorCode: Int, var description: String, var errorData:
     DATASOURCE_HTTP_FAILURE(3006, "Data Source request failed"),
     DATASOURCE_INVALID_CONTENT_TYPE(1000001, "Invalid content type"),
     DATASOURCE_UNABLE_TO_CONNECT(1000002, "Unable to connect"),
+    BEHIND_LIVE_WINDOW(4006, "Behind Live Window Error"),
     EXOPLAYER_RENDERER_ERROR(1000003, "ExoPlayer Renderer Error");
 
     @Override
