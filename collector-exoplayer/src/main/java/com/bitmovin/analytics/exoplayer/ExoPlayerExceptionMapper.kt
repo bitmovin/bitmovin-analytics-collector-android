@@ -5,6 +5,8 @@ import com.bitmovin.analytics.data.ErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.utils.topOfStacktrace
 import com.google.android.exoplayer2.ExoPlaybackException
+import com.google.android.exoplayer2.ExoPlaybackException.TYPE_OUT_OF_MEMORY
+import com.google.android.exoplayer2.ExoPlaybackException.TYPE_REMOTE
 import com.google.android.exoplayer2.ExoPlaybackException.TYPE_RENDERER
 import com.google.android.exoplayer2.ExoPlaybackException.TYPE_SOURCE
 import com.google.android.exoplayer2.ExoPlaybackException.TYPE_UNEXPECTED
@@ -13,9 +15,10 @@ import com.google.android.exoplayer2.upstream.HttpDataSource
 
 class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
     private fun doMap(error: ExoPlaybackException): ErrorCode {
-        var errorCode = ErrorCode.UNKNOWN_ERROR
+        var errorCode: ErrorCode
         when (error.type) {
             TYPE_SOURCE -> {
+                errorCode = ErrorCode.DATASOURCE_ERROR
                 val exception = error.sourceException
                 if (exception is HttpDataSource.InvalidResponseCodeException) {
                     errorCode = ErrorCode.DATASOURCE_HTTP_FAILURE
@@ -38,13 +41,22 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
             }
             TYPE_RENDERER -> {
                 errorCode = ErrorCode.EXOPLAYER_RENDERER_ERROR
-                errorCode.errorData = ErrorData(error.rendererException.message
-                        ?: "", error.rendererException.topOfStacktrace)
+                errorCode.errorData = ErrorData(error.rendererException::class.java.toString() + ": " + (error.rendererException.message
+                        ?: ""), error.rendererException.topOfStacktrace)
             }
             TYPE_UNEXPECTED -> {
-                errorCode = ErrorCode.UNKNOWN_ERROR
-                errorCode.errorData = ErrorData(error.unexpectedException.message
-                        ?: "", error.unexpectedException.topOfStacktrace)
+                errorCode = ErrorCode.UNEXPECTED_ERROR
+                errorCode.errorData = ErrorData(error.unexpectedException::class.java.toString() + ": " + (error.unexpectedException.message
+                        ?: ""), error.unexpectedException.topOfStacktrace)
+            }
+            TYPE_REMOTE -> {
+                errorCode = ErrorCode.REMOTE_ERROR
+                errorCode.errorData = ErrorData(error.message ?: "")
+            }
+            TYPE_OUT_OF_MEMORY -> {
+                errorCode = ErrorCode.OUT_OF_MEMORY_ERROR
+                errorCode.errorData = ErrorData(error.outOfMemoryError.message
+                        ?: "", error.outOfMemoryError.topOfStacktrace)
             }
             else -> {
                 errorCode = ErrorCode.UNKNOWN_ERROR
@@ -60,8 +72,8 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
             is ExoPlaybackException -> doMap(throwable)
             else -> {
                 val errorCode = ErrorCode.UNKNOWN_ERROR
-                errorCode.errorData = ErrorData(throwable.message
-                        ?: "", throwable.topOfStacktrace)
+                errorCode.errorData = ErrorData(throwable::class.java.toString() + ": " + (throwable.message
+                        ?: ""), throwable.topOfStacktrace)
                 return errorCode
             }
         }
