@@ -130,12 +130,6 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setDuration(duration);
         data.setVideoStartupTime(duration);
 
-        DRMInformation drmInfo = playerAdapter.getDRMInformation();
-        if (drmInfo != null) {
-            data.setDrmType(drmInfo.getType());
-            data.setDrmLoadTime(drmInfo.getLoadTime());
-        }
-
         //Setting a startup time of 1 to workaround dashboard issue
         data.setPlayerStartupTime(1);
         data.setStartupTime(duration + 1);
@@ -189,7 +183,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
 
-        if(playerStateMachine.getVideoStartFailedReason() != null) {
+        if (playerStateMachine.getVideoStartFailedReason() != null) {
             data.setVideoStartFailedReason(playerStateMachine.getVideoStartFailedReason().getReason());
             data.setVideoStartFailed(true);
         }

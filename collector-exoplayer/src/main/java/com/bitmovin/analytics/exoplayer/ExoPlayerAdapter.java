@@ -112,6 +112,25 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
     }
 
+    @Override
+    public EventData createEventData() {
+        EventData data = factory.build(stateMachine.getImpressionId());
+
+        data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
+        data.setPlayer(PlayerType.EXOPLAYER.toString());
+        decorateDataWithPlaybackInformation(data);
+        data.setDownloadSpeedInfo(meter.getInfo());
+
+        // DRM Information
+        if (drmInformation != null) {
+            data.setDrmType(drmInformation.getType());
+            data.setDrmLoadTime(drmInformation.getLoadTime());
+        }
+
+        return data;
+    }
+
+    @Override
     public void release() {
         playerIsReady = false;
         manifestUrl = null;
@@ -126,10 +145,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
-    public void clearValues(){
-        meter.reset();
-    }
-
     public long getPosition() {
         Timeline timeline = this.exoplayer.getCurrentTimeline();
         int currentWindowIndex = this.exoplayer.getCurrentWindowIndex();
@@ -150,10 +165,9 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         return 0;
     }
 
-    @Nullable
     @Override
-    public DRMInformation getDRMInformation() {
-        return drmInformation;
+    public void clearValues() {
+        meter.reset();
     }
 
     @Override
@@ -179,7 +193,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             case Player.STATE_READY:
                 if (playWhenReady) {
                     this.stateMachine.transitionState(PlayerState.PLAYING, videoTime);
-                    if(!isVideoPlayed && !exoplayer.isPlayingAd()) {
+                    if (!isVideoPlayed && !exoplayer.isPlayingAd()) {
                         if (isVideoAttemptedPlay) {
                             isVideoPlayed = true;
                             videoStartTimeout.cancel();
@@ -228,7 +242,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         long videoTime = getPosition();
         error.printStackTrace();
         ErrorCode errorCode = exceptionMapper.map(error);
-        if (!isVideoPlayed && isVideoAttemptedPlay){
+        if (!isVideoPlayed && isVideoAttemptedPlay) {
             videoStartTimeout.cancel();
             stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
         }
@@ -250,17 +264,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public void onSeekProcessed() {
         Log.d(TAG, "onSeekProcessed");
-    }
-
-    @Override
-    public EventData createEventData() {
-        EventData data = factory.build(stateMachine.getImpressionId());
-
-        data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
-        data.setPlayer(PlayerType.EXOPLAYER.toString());
-        decorateDataWithPlaybackInformation(data);
-        data.setDownloadSpeedInfo(meter.getInfo());
-        return data;
     }
 
     private void decorateDataWithPlaybackInformation(EventData data) {
@@ -355,13 +358,12 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
         Log.d(TAG, "onIsPlayingChanged " + isPlaying);
 
-        if(!exoplayer.isPlayingAd() && isPlaying && !isVideoPlayed) {
+        if (!exoplayer.isPlayingAd() && isPlaying && !isVideoPlayed) {
             //autoplay
-           if(isVideoAttemptedPlay && exoplayer.getPlayWhenReady()) {
-               videoStartTimeout.cancel();
-               isVideoPlayed = true;
-           }
-           else {
+            if (isVideoAttemptedPlay && exoplayer.getPlayWhenReady()) {
+                videoStartTimeout.cancel();
+                isVideoPlayed = true;
+            } else {
                 videoStartTimeout.start();
                 isVideoAttemptedPlay = true;
             }
@@ -427,24 +429,21 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onLoadCompleted(EventTime eventTime, MediaSourceEventListener.LoadEventInfo loadEventInfo, MediaSourceEventListener.MediaLoadData mediaLoadData) {
         if (mediaLoadData.dataType == DATA_TYPE_MANIFEST) {
             this.manifestUrl = loadEventInfo.dataSpec.uri.toString();
-        }
-        else if (mediaLoadData.dataType == DATA_TYPE_MEDIA &&
+        } else if (mediaLoadData.dataType == DATA_TYPE_MEDIA &&
                 mediaLoadData.trackFormat != null &&
                 mediaLoadData.trackFormat.drmInitData != null &&
-                drmType == null)
-        {
+                drmType == null) {
             addDrmType(mediaLoadData);
         }
 
-        if(mediaLoadData.trackFormat != null &&
-           mediaLoadData.trackFormat.containerMimeType != null &&
-           mediaLoadData.trackFormat.containerMimeType.startsWith("video"))
-        {
-                addSpeedMeasurement(loadEventInfo);
+        if (mediaLoadData.trackFormat != null &&
+                mediaLoadData.trackFormat.containerMimeType != null &&
+                mediaLoadData.trackFormat.containerMimeType.startsWith("video")) {
+            addSpeedMeasurement(loadEventInfo);
         }
     }
 
-    private void addDrmType(MediaSourceEventListener.MediaLoadData mediaLoadData){
+    private void addDrmType(MediaSourceEventListener.MediaLoadData mediaLoadData) {
         String drmType = null;
         for (int i = 0; drmType == null && i < mediaLoadData.trackFormat.drmInitData.schemeDataCount; i++) {
             DrmInitData.SchemeData data = mediaLoadData.trackFormat.drmInitData.get(i);
@@ -453,7 +452,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.drmType = drmType;
     }
 
-    private void addSpeedMeasurement(MediaSourceEventListener.LoadEventInfo loadEventInfo){
+    private void addSpeedMeasurement(MediaSourceEventListener.LoadEventInfo loadEventInfo) {
         SpeedMeasurement measurement = new SpeedMeasurement();
         measurement.setTimestamp(new Date());
         measurement.setDuration(loadEventInfo.loadDurationMs);
@@ -461,17 +460,17 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         meter.addMeasurement(measurement);
     }
 
-    private String getDrmTypeFromSchemeData(DrmInitData.SchemeData data){
-        if(data == null){
+    private String getDrmTypeFromSchemeData(DrmInitData.SchemeData data) {
+        if (data == null) {
             return null;
         }
 
         String drmType = null;
-        if(data.matches(WIDEVINE_UUID)){
+        if (data.matches(WIDEVINE_UUID)) {
             drmType = DRMType.WIDEVINE.getValue();
-        } else if(data.matches(CLEARKEY_UUID)){
+        } else if (data.matches(CLEARKEY_UUID)) {
             drmType = DRMType.CLEARKEY.getValue();
-        } else if(data.matches(PLAYREADY_UUID)){
+        } else if (data.matches(PLAYREADY_UUID)) {
             drmType = DRMType.PLAYREADY.getValue();
         }
         return drmType;
