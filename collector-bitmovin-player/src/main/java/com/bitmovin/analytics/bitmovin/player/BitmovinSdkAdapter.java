@@ -82,13 +82,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private boolean isVideoAttemptedPlay = false;
     private DRMInformation drmInformation = null;
 
-    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
+    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine) {
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, getUserAgent(context)), new UserIdProvider(context));
+        this.factory = factory;
         addPlayerListeners();
     }
 
@@ -139,25 +139,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.removeEventListener(onAudioChangedListener);
         this.bitmovinPlayer.removeEventListener(onDownloadFinishedListener);
         this.bitmovinPlayer.removeEventListener(onDestroyedListener);
-    }
-
-    private String getUserAgent(Context context) {
-        ApplicationInfo applicationInfo = context.getApplicationInfo();
-        int stringId = applicationInfo.labelRes;
-        String applicationName = "Unknown";
-        if (stringId == 0 && applicationInfo.nonLocalizedLabel != null) {
-            applicationInfo.nonLocalizedLabel.toString();
-        }
-        String versionName;
-        try {
-            String packageName = context.getPackageName();
-            PackageInfo info = context.getPackageManager().getPackageInfo(packageName, 0);
-            versionName = info.versionName;
-        } catch (PackageManager.NameNotFoundException var5) {
-            versionName = "?";
-        }
-
-        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") " + "BitmovinPlayer/" + BitmovinUtil.getPlayerVersion();
     }
 
     @Override
