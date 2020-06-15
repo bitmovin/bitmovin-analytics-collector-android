@@ -1,6 +1,5 @@
 package com.bitmovin.analytics
 
-import android.content.Context
 import com.bitmovin.analytics.bitmovin.player.BitmovinSdkAdapter
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.stateMachines.PlayerState
@@ -19,11 +18,8 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.any
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.spy
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
-import org.mockito.Mockito.verifyNoMoreInteractions
-import org.mockito.Spy
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -31,7 +27,7 @@ class BitomvinSdkAdapterTest {
 
     val eventListener = mutableListOf<EventListener<*>>()
     inline fun <reified T> getListenerWithType(): T? {
-        return eventListener.find {it is T} as? T
+        return eventListener.find { it is T } as? T
     }
 
     @Mock
@@ -42,8 +38,8 @@ class BitomvinSdkAdapterTest {
 
     @Before
     fun setup() {
-        `when`(fakePlayer.addEventListener(ArgumentMatchers.any())).then { invocation ->  eventListener.add(invocation.getArgument(0)) }
-        adapter = BitmovinSdkAdapter(fakePlayer, mock(BitmovinAnalyticsConfig::class.java), mock(EventDataFactory::class.java), stateMachine )
+        `when`(fakePlayer.addEventListener(ArgumentMatchers.any())).then { invocation -> eventListener.add(invocation.getArgument(0)) }
+        adapter = BitmovinSdkAdapter(fakePlayer, mock(BitmovinAnalyticsConfig::class.java), mock(EventDataFactory::class.java), stateMachine)
     }
 
     @Test
