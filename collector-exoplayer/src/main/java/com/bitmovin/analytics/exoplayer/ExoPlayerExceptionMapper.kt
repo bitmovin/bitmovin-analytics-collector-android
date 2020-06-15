@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.exoplayer
 
-import com.bitmovin.analytics.data.ErrorData
 import com.bitmovin.analytics.data.ErrorCode
+import com.bitmovin.analytics.data.ErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.utils.topOfStacktrace
 import com.google.android.exoplayer2.ExoPlaybackException
