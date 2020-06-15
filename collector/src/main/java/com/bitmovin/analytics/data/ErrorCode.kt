@@ -22,12 +22,11 @@ enum class ErrorCode(val errorCode: Int, var description: String, var errorData:
     DATASOURCE_HTTP_FAILURE(3006, "Data Source request failed"),
     DATASOURCE_INVALID_CONTENT_TYPE(1000001, "Invalid content type"),
     DATASOURCE_UNABLE_TO_CONNECT(1000002, "Unable to connect"),
-    BEHIND_LIVE_WINDOW(4006, "Behind Live Window Error"),
     EXOPLAYER_RENDERER_ERROR(1000003, "ExoPlayer Renderer Error"),
-
-    REMOTE_ERROR(5000, "Remote Component Error"),
-    OUT_OF_MEMORY_ERROR(6000, "Out of memory Error"),
-    UNEXPECTED_ERROR(7000, "Unexpected Errors");
+    BEHIND_LIVE_WINDOW(1000004, "Behind Live Window Error"),
+    REMOTE_ERROR(1000005, "Remote Component Error"),
+    OUT_OF_MEMORY_ERROR(1000006, "Out of memory Error"),
+    UNEXPECTED_ERROR(1000007, "Unexpected Errors");
 
     @Override
     override fun toString(): String {
