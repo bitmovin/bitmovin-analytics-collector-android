@@ -43,7 +43,7 @@ class BitomvinSdkAdapterTest {
     }
 
     @Test
-    fun test() {
+    fun testNoStateTransitionToQualityChangeIfBitrateDidNotChange() {
         `when`(stateMachine.elapsedTimeFirstReady).thenReturn(20)
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         val event = getListenerWithType<OnAudioPlaybackQualityChangedListener>()

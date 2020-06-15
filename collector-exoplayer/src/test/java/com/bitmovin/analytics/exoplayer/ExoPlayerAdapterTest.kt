@@ -6,6 +6,7 @@ import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import org.junit.Before
 import org.junit.Test
@@ -35,9 +36,13 @@ class ExoPlayerAdapterTest {
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         adapter.fakePosition = 20
-        adapter.onDecoderInputFormatChanged(mock(AnalyticsListener.EventTime::class.java), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
+        adapter.onDecoderInputFormatChanged(getEventTime(20L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
         verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
-        adapter.onDecoderInputFormatChanged(mock(AnalyticsListener.EventTime::class.java), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
+        adapter.onDecoderInputFormatChanged(getEventTime(30L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
         verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+    }
+
+    private fun getEventTime(realTime: Long): AnalyticsListener.EventTime {
+        return AnalyticsListener.EventTime(realTime, Timeline.EMPTY, 0, null, 0, 0, 0)
     }
 }
