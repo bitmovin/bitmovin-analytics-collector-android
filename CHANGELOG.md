@@ -7,12 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
-### Added
-
-- ExoPlayer: 4006 `BEHIND_LIVE_WINDOW` error when player is out of the available live window and required segments are not available (AN-1507)
-
 ### Change
 
+- Bitmovin, ExoPlayer: changed player error mapping to improve transparency (AN-1507)
 - set DRM information for each event data sent to server
 
 ## v1.15.0
