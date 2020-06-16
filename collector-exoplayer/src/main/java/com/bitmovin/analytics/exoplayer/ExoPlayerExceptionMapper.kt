@@ -24,31 +24,24 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
         var message = errorMessages[type] ?: "Unknown Error"
         var errorData: ErrorData? = null
 
-        val cause = throwable.cause
-        if (cause != null) {
-            when (cause) {
-                is HttpDataSource.InvalidResponseCodeException -> {
-                    message += ": InvalidResponseCodeException"
-                    errorData = ErrorData("Data Source request failed with HTTP status: " + cause.responseCode + " - " + cause.dataSpec.uri, cause.topOfStacktrace)
-                }
-                is HttpDataSource.InvalidContentTypeException -> {
-                    message += ": InvalidContentTypeException"
-                    errorData = ErrorData("Invalid Content Type: " + cause.contentType, cause.topOfStacktrace)
-                }
-                is HttpDataSource.HttpDataSourceException -> {
-                    message += ": HttpDataSourceException"
-                    errorData = ErrorData("Unable to connect: " + cause.dataSpec.uri, cause.topOfStacktrace)
-                }
-                is BehindLiveWindowException -> {
-                    message += ": BehindLiveWindowException"
-                    errorData = ErrorData("Behind live window: required segments not available", cause.topOfStacktrace)
-                }
-                else -> errorData = null
+        when (val exception = throwable.cause ?: throwable) {
+            is HttpDataSource.InvalidResponseCodeException -> {
+                message += ": InvalidResponseCodeException"
+                errorData = ErrorData("Data Source request failed with HTTP status: " + exception.responseCode + " - " + exception.dataSpec.uri, exception.topOfStacktrace)
             }
-            if (errorData == null) {
-                errorData = ErrorData(cause.message
-                        ?: "", cause.topOfStacktrace)
+            is HttpDataSource.InvalidContentTypeException -> {
+                message += ": InvalidContentTypeException"
+                errorData = ErrorData("Invalid Content Type: " + exception.contentType, exception.topOfStacktrace)
             }
+            is HttpDataSource.HttpDataSourceException -> {
+                message += ": HttpDataSourceException"
+                errorData = ErrorData("Unable to connect: " + exception.dataSpec.uri, exception.topOfStacktrace)
+            }
+            is BehindLiveWindowException -> {
+                message += ": BehindLiveWindowException"
+                errorData = ErrorData("Behind live window: required segments not available", exception.topOfStacktrace)
+            }
+            else -> errorData = ErrorData(exception.message ?: "", exception.topOfStacktrace)
         }
 
         return ErrorCode(type, message, errorData)
