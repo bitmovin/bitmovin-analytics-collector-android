@@ -43,8 +43,6 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.util.Date;
 
