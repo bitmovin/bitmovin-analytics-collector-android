@@ -1,21 +1,14 @@
 package com.bitmovin.analytics.bitmovin.player;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
-import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
@@ -44,13 +37,14 @@ import com.bitmovin.player.api.event.data.SubtitleChangedEvent;
 import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
 import com.bitmovin.player.api.event.listener.OnAudioChangedListener;
 import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener;
+import com.bitmovin.player.api.event.listener.OnDestroyListener;
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener;
 import com.bitmovin.player.api.event.listener.OnDroppedVideoFramesListener;
 import com.bitmovin.player.api.event.listener.OnErrorListener;
 import com.bitmovin.player.api.event.listener.OnPausedListener;
 import com.bitmovin.player.api.event.listener.OnPlayListener;
-import com.bitmovin.player.api.event.listener.OnPlayingListener;
 import com.bitmovin.player.api.event.listener.OnPlaybackFinishedListener;
+import com.bitmovin.player.api.event.listener.OnPlayingListener;
 import com.bitmovin.player.api.event.listener.OnReadyListener;
 import com.bitmovin.player.api.event.listener.OnSeekListener;
 import com.bitmovin.player.api.event.listener.OnSeekedListener;
@@ -60,14 +54,11 @@ import com.bitmovin.player.api.event.listener.OnStallEndedListener;
 import com.bitmovin.player.api.event.listener.OnStallStartedListener;
 import com.bitmovin.player.api.event.listener.OnSubtitleChangedListener;
 import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener;
-import com.bitmovin.player.api.event.listener.OnDestroyListener;
 import com.bitmovin.player.config.media.SourceItem;
 import com.bitmovin.player.config.quality.AudioQuality;
 import com.bitmovin.player.config.quality.VideoQuality;
 import com.bitmovin.player.config.track.AudioTrack;
 import com.bitmovin.player.config.track.SubtitleTrack;
-
-import org.jetbrains.annotations.Nullable;
 
 public class BitmovinSdkAdapter implements PlayerAdapter {
     private static final String TAG = "BitmovinPlayerAdapter";
