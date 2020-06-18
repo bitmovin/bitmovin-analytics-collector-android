@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.exoplayer;
 
-import android.content.Context;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.Surface;
@@ -8,12 +7,10 @@ import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.SpeedMeasurement;
-import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
@@ -77,15 +74,16 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private boolean isVideoPlayed = false;
     private boolean isVideoAttemptedPlay = false;
+    private long previousQualityChangeBitrate = 0;
 
-    public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
+    public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
         this.config = config;
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, ExoUtil.getUserAgent(context)), new UserIdProvider(context));
+        this.factory = factory;
         attachAnalyticsListener();
     }
 
@@ -536,6 +534,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onDecoderInputFormatChanged(EventTime eventTime, int trackType, Format format) {
         if ((this.stateMachine.getCurrentState() == PlayerState.PLAYING) || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)) {
             Log.d(TAG, String.format("onDecoderInputFormatChanged: Bitrate: %d Resolution: %d x %d", format.bitrate, format.width, format.height));
+            if (format.bitrate == this.previousQualityChangeBitrate) {
+                Log.d(TAG, "onDecoderInputFormatChanged: Skipping sample sending");
+                return;
+            }
+            this.previousQualityChangeBitrate = format.bitrate;
             long videoTime = getPosition();
             PlayerState originalState = this.stateMachine.getCurrentState();
             this.stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);

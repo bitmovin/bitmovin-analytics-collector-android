@@ -1,7 +1,5 @@
 package com.bitmovin.analytics;
 
-import static com.bitmovin.analytics.utils.DataSerializer.serialize;
-
 import android.content.Context;
 import android.util.Log;
 
@@ -14,15 +12,18 @@ import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
+import com.bitmovin.analytics.license.LicenseCallback;
+
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
-import com.bitmovin.analytics.license.LicenseCallback;
 import com.bitmovin.analytics.utils.Util;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.bitmovin.analytics.utils.DataSerializer.serialize;
 
 /**
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently

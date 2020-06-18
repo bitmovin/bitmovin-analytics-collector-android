@@ -1,21 +1,14 @@
 package com.bitmovin.analytics.bitmovin.player;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
-import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
@@ -44,13 +37,14 @@ import com.bitmovin.player.api.event.data.SubtitleChangedEvent;
 import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
 import com.bitmovin.player.api.event.listener.OnAudioChangedListener;
 import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener;
+import com.bitmovin.player.api.event.listener.OnDestroyListener;
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener;
 import com.bitmovin.player.api.event.listener.OnDroppedVideoFramesListener;
 import com.bitmovin.player.api.event.listener.OnErrorListener;
 import com.bitmovin.player.api.event.listener.OnPausedListener;
 import com.bitmovin.player.api.event.listener.OnPlayListener;
-import com.bitmovin.player.api.event.listener.OnPlayingListener;
 import com.bitmovin.player.api.event.listener.OnPlaybackFinishedListener;
+import com.bitmovin.player.api.event.listener.OnPlayingListener;
 import com.bitmovin.player.api.event.listener.OnReadyListener;
 import com.bitmovin.player.api.event.listener.OnSeekListener;
 import com.bitmovin.player.api.event.listener.OnSeekedListener;
@@ -60,7 +54,6 @@ import com.bitmovin.player.api.event.listener.OnStallEndedListener;
 import com.bitmovin.player.api.event.listener.OnStallStartedListener;
 import com.bitmovin.player.api.event.listener.OnSubtitleChangedListener;
 import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener;
-import com.bitmovin.player.api.event.listener.OnDestroyListener;
 import com.bitmovin.player.config.media.SourceItem;
 import com.bitmovin.player.config.quality.AudioQuality;
 import com.bitmovin.player.config.quality.VideoQuality;
@@ -80,13 +73,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private boolean isVideoAttemptedPlay = false;
     private DRMInformation drmInformation = null;
 
-    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
+    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine) {
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, getUserAgent(context)), new UserIdProvider(context));
+        this.factory = factory;
         addPlayerListeners();
     }
 
@@ -137,25 +130,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.removeEventListener(onAudioChangedListener);
         this.bitmovinPlayer.removeEventListener(onDownloadFinishedListener);
         this.bitmovinPlayer.removeEventListener(onDestroyedListener);
-    }
-
-    private String getUserAgent(Context context) {
-        ApplicationInfo applicationInfo = context.getApplicationInfo();
-        int stringId = applicationInfo.labelRes;
-        String applicationName = "Unknown";
-        if (stringId == 0 && applicationInfo.nonLocalizedLabel != null) {
-            applicationInfo.nonLocalizedLabel.toString();
-        }
-        String versionName;
-        try {
-            String packageName = context.getPackageName();
-            PackageInfo info = context.getPackageManager().getPackageInfo(packageName, 0);
-            versionName = info.versionName;
-        } catch (PackageManager.NameNotFoundException var5) {
-            versionName = "?";
-        }
-
-        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") " + "BitmovinPlayer/" + BitmovinUtil.getPlayerVersion();
     }
 
     @Override
@@ -446,6 +420,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             Log.d(TAG, "On Audio Quality Changed");
             if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getElapsedTimeFirstReady() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
+                if (audioPlaybackQualityChangedEvent.getOldAudioQuality().getBitrate() == audioPlaybackQualityChangedEvent.getNewAudioQuality().getBitrate()) {
+                    return;
+                }
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
             }

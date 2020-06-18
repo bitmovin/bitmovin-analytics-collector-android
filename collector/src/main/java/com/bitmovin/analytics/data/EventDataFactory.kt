@@ -3,7 +3,7 @@ package com.bitmovin.analytics.data
 import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 
-class EventDataFactory(
+open class EventDataFactory(
     val config: BitmovinAnalyticsConfig,
     val context: Context,
     private val deviceInformationProvider: DeviceInformationProvider,
