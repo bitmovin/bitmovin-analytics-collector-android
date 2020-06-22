@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+
+- bitmovin player crashed when `onAdError` was fired with empty ad tag url (AN-1572)
+
 ## v1.16.0
 
 ### Change
