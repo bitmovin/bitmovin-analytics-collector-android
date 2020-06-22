@@ -105,7 +105,7 @@ public class Util {
         try {
             URI uri = new URI(uriString);
             return new Pair<>(uri.getHost(), uri.getPath());
-        } catch (URISyntaxException ignored) {
+        } catch (Exception ignored) {
 
         }
         return new Pair<>(null, null);
