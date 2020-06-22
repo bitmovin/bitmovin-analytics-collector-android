@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Changed
+
+- do not send `drmLoadTime` with each sample, only at startup
+
 ## v1.16.0
 
 ### Change

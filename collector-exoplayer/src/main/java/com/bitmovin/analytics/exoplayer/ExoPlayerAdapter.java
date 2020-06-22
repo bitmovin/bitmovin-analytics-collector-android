@@ -40,6 +40,8 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.util.Date;
 
@@ -120,7 +122,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         // DRM Information
         if (drmInformation != null) {
             data.setDrmType(drmInformation.getType());
-            data.setDrmLoadTime(drmInformation.getLoadTime());
         }
 
         return data;
@@ -159,6 +160,12 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             }
         }
         return 0;
+    }
+
+    @Nullable
+    @Override
+    public DRMInformation getDRMInformation() {
+        return drmInformation;
     }
 
     @Override

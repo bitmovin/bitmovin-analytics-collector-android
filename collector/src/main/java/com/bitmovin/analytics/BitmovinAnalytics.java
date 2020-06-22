@@ -6,6 +6,7 @@ import android.util.Log;
 import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.AdEventData;
+import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -128,6 +129,12 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setState("startup");
         data.setDuration(duration);
         data.setVideoStartupTime(duration);
+
+        DRMInformation drmInfo = playerAdapter.getDRMInformation();
+        if (drmInfo != null) {
+            data.setDrmType(drmInfo.getType());
+            data.setDrmLoadTime(drmInfo.getLoadTime());
+        }
 
         //Setting a startup time of 1 to workaround dashboard issue
         data.setPlayerStartupTime(1);
