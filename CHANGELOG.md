@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.16.0
+
 ### Change
 
 - don't send quality change sample if the quality did not change
