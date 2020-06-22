@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.exoplayer;
 
-import android.content.Context;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.Surface;
@@ -8,12 +7,10 @@ import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.SpeedMeasurement;
-import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
@@ -42,8 +39,6 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Date;
@@ -79,15 +74,16 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private boolean isVideoPlayed = false;
     private boolean isVideoAttemptedPlay = false;
+    private long previousQualityChangeBitrate = 0;
 
-    public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, Context context, PlayerStateMachine stateMachine) {
+    public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
         this.config = config;
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.factory = new EventDataFactory(config, context, new DeviceInformationProvider(context, ExoUtil.getUserAgent(context)), new UserIdProvider(context));
+        this.factory = factory;
         attachAnalyticsListener();
     }
 
@@ -112,6 +108,25 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
     }
 
+    @Override
+    public EventData createEventData() {
+        EventData data = factory.build(stateMachine.getImpressionId());
+
+        data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
+        data.setPlayer(PlayerType.EXOPLAYER.toString());
+        decorateDataWithPlaybackInformation(data);
+        data.setDownloadSpeedInfo(meter.getInfo());
+
+        // DRM Information
+        if (drmInformation != null) {
+            data.setDrmType(drmInformation.getType());
+            data.setDrmLoadTime(drmInformation.getLoadTime());
+        }
+
+        return data;
+    }
+
+    @Override
     public void release() {
         playerIsReady = false;
         manifestUrl = null;
@@ -126,10 +141,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
-    public void clearValues(){
-        meter.reset();
-    }
-
     public long getPosition() {
         Timeline timeline = this.exoplayer.getCurrentTimeline();
         int currentWindowIndex = this.exoplayer.getCurrentWindowIndex();
@@ -150,10 +161,9 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         return 0;
     }
 
-    @Nullable
     @Override
-    public DRMInformation getDRMInformation() {
-        return drmInformation;
+    public void clearValues() {
+        meter.reset();
     }
 
     @Override
@@ -179,7 +189,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             case Player.STATE_READY:
                 if (playWhenReady) {
                     this.stateMachine.transitionState(PlayerState.PLAYING, videoTime);
-                    if(!isVideoPlayed && !exoplayer.isPlayingAd()) {
+                    if (!isVideoPlayed && !exoplayer.isPlayingAd()) {
                         if (isVideoAttemptedPlay) {
                             isVideoPlayed = true;
                             videoStartTimeout.cancel();
@@ -228,7 +238,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         long videoTime = getPosition();
         error.printStackTrace();
         ErrorCode errorCode = exceptionMapper.map(error);
-        if (!isVideoPlayed && isVideoAttemptedPlay){
+        if (!isVideoPlayed && isVideoAttemptedPlay) {
             videoStartTimeout.cancel();
             stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
         }
@@ -250,17 +260,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public void onSeekProcessed() {
         Log.d(TAG, "onSeekProcessed");
-    }
-
-    @Override
-    public EventData createEventData() {
-        EventData data = factory.build(stateMachine.getImpressionId());
-
-        data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
-        data.setPlayer(PlayerType.EXOPLAYER.toString());
-        decorateDataWithPlaybackInformation(data);
-        data.setDownloadSpeedInfo(meter.getInfo());
-        return data;
     }
 
     private void decorateDataWithPlaybackInformation(EventData data) {
@@ -355,13 +354,12 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
         Log.d(TAG, "onIsPlayingChanged " + isPlaying);
 
-        if(!exoplayer.isPlayingAd() && isPlaying && !isVideoPlayed) {
+        if (!exoplayer.isPlayingAd() && isPlaying && !isVideoPlayed) {
             //autoplay
-           if(isVideoAttemptedPlay && exoplayer.getPlayWhenReady()) {
-               videoStartTimeout.cancel();
-               isVideoPlayed = true;
-           }
-           else {
+            if (isVideoAttemptedPlay && exoplayer.getPlayWhenReady()) {
+                videoStartTimeout.cancel();
+                isVideoPlayed = true;
+            } else {
                 videoStartTimeout.start();
                 isVideoAttemptedPlay = true;
             }
@@ -427,24 +425,21 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onLoadCompleted(EventTime eventTime, MediaSourceEventListener.LoadEventInfo loadEventInfo, MediaSourceEventListener.MediaLoadData mediaLoadData) {
         if (mediaLoadData.dataType == DATA_TYPE_MANIFEST) {
             this.manifestUrl = loadEventInfo.dataSpec.uri.toString();
-        }
-        else if (mediaLoadData.dataType == DATA_TYPE_MEDIA &&
+        } else if (mediaLoadData.dataType == DATA_TYPE_MEDIA &&
                 mediaLoadData.trackFormat != null &&
                 mediaLoadData.trackFormat.drmInitData != null &&
-                drmType == null)
-        {
+                drmType == null) {
             addDrmType(mediaLoadData);
         }
 
-        if(mediaLoadData.trackFormat != null &&
-           mediaLoadData.trackFormat.containerMimeType != null &&
-           mediaLoadData.trackFormat.containerMimeType.startsWith("video"))
-        {
-                addSpeedMeasurement(loadEventInfo);
+        if (mediaLoadData.trackFormat != null &&
+                mediaLoadData.trackFormat.containerMimeType != null &&
+                mediaLoadData.trackFormat.containerMimeType.startsWith("video")) {
+            addSpeedMeasurement(loadEventInfo);
         }
     }
 
-    private void addDrmType(MediaSourceEventListener.MediaLoadData mediaLoadData){
+    private void addDrmType(MediaSourceEventListener.MediaLoadData mediaLoadData) {
         String drmType = null;
         for (int i = 0; drmType == null && i < mediaLoadData.trackFormat.drmInitData.schemeDataCount; i++) {
             DrmInitData.SchemeData data = mediaLoadData.trackFormat.drmInitData.get(i);
@@ -453,7 +448,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.drmType = drmType;
     }
 
-    private void addSpeedMeasurement(MediaSourceEventListener.LoadEventInfo loadEventInfo){
+    private void addSpeedMeasurement(MediaSourceEventListener.LoadEventInfo loadEventInfo) {
         SpeedMeasurement measurement = new SpeedMeasurement();
         measurement.setTimestamp(new Date());
         measurement.setDuration(loadEventInfo.loadDurationMs);
@@ -461,17 +456,17 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         meter.addMeasurement(measurement);
     }
 
-    private String getDrmTypeFromSchemeData(DrmInitData.SchemeData data){
-        if(data == null){
+    private String getDrmTypeFromSchemeData(DrmInitData.SchemeData data) {
+        if (data == null) {
             return null;
         }
 
         String drmType = null;
-        if(data.matches(WIDEVINE_UUID)){
+        if (data.matches(WIDEVINE_UUID)) {
             drmType = DRMType.WIDEVINE.getValue();
-        } else if(data.matches(CLEARKEY_UUID)){
+        } else if (data.matches(CLEARKEY_UUID)) {
             drmType = DRMType.CLEARKEY.getValue();
-        } else if(data.matches(PLAYREADY_UUID)){
+        } else if (data.matches(PLAYREADY_UUID)) {
             drmType = DRMType.PLAYREADY.getValue();
         }
         return drmType;
@@ -539,6 +534,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onDecoderInputFormatChanged(EventTime eventTime, int trackType, Format format) {
         if ((this.stateMachine.getCurrentState() == PlayerState.PLAYING) || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)) {
             Log.d(TAG, String.format("onDecoderInputFormatChanged: Bitrate: %d Resolution: %d x %d", format.bitrate, format.width, format.height));
+            if (format.bitrate == this.previousQualityChangeBitrate) {
+                Log.d(TAG, "onDecoderInputFormatChanged: Skipping sample sending");
+                return;
+            }
+            this.previousQualityChangeBitrate = format.bitrate;
             long videoTime = getPosition();
             PlayerState originalState = this.stateMachine.getCurrentState();
             this.stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);

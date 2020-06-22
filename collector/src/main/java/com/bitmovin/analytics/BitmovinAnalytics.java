@@ -1,30 +1,29 @@
 package com.bitmovin.analytics;
 
-import static com.bitmovin.analytics.utils.DataSerializer.serialize;
-
 import android.content.Context;
 import android.util.Log;
 
 import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.AdEventData;
-import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
-import com.bitmovin.analytics.stateMachines.PlayerState;
+import com.bitmovin.analytics.license.LicenseCallback;
+
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
-import com.bitmovin.analytics.license.LicenseCallback;
 import com.bitmovin.analytics.utils.Util;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.bitmovin.analytics.utils.DataSerializer.serialize;
 
 /**
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
@@ -130,12 +129,6 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setDuration(duration);
         data.setVideoStartupTime(duration);
 
-        DRMInformation drmInfo = playerAdapter.getDRMInformation();
-        if (drmInfo != null) {
-            data.setDrmType(drmInfo.getType());
-            data.setDrmLoadTime(drmInfo.getLoadTime());
-        }
-
         //Setting a startup time of 1 to workaround dashboard issue
         data.setPlayerStartupTime(1);
         data.setStartupTime(duration + 1);
@@ -189,7 +182,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
 
-        if(playerStateMachine.getVideoStartFailedReason() != null) {
+        if (playerStateMachine.getVideoStartFailedReason() != null) {
             data.setVideoStartFailedReason(playerStateMachine.getVideoStartFailedReason().getReason());
             data.setVideoStartFailed(true);
         }

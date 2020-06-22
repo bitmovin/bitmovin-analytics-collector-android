@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.16.0
+
+### Change
+
+- don't send quality change sample if the quality did not change
+- Bitmovin, ExoPlayer: changed player error mapping to improve transparency (AN-1507)
+- set DRM information for each event data sent to server
+
 ## v1.15.0
 
 ### Added
