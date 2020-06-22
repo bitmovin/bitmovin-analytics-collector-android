@@ -7,21 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
-### Changed
-
-- do not send `drmLoadTime` with each sample, only at startup
-
-### Fixed
-
-- bitmovin player crashed when `onAdError` was fired with empty ad tag url (AN-1572)
-
 ## v1.16.0
 
 ### Change
 
 - don't send quality change sample if the quality did not change
 - Bitmovin, ExoPlayer: changed player error mapping to improve transparency (AN-1507)
-- set DRM information for each event data sent to server
+- persist `drmType` in every sample
+
+### Fixed
+
+- bitmovin player crashed when `onAdError` was fired with empty ad tag url (AN-1572)
 
 ## v1.15.0
 
