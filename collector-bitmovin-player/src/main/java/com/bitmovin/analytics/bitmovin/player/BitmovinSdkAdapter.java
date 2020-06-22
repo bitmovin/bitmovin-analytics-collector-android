@@ -60,6 +60,8 @@ import com.bitmovin.player.config.quality.VideoQuality;
 import com.bitmovin.player.config.track.AudioTrack;
 import com.bitmovin.player.config.track.SubtitleTrack;
 
+import org.jetbrains.annotations.Nullable;
+
 public class BitmovinSdkAdapter implements PlayerAdapter {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
@@ -223,7 +225,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         // DRM Information
         if (drmInformation != null) {
             data.setDrmType(drmInformation.getType());
-            data.setDrmLoadTime(drmInformation.getLoadTime());
         }
 
         return data;
@@ -240,6 +241,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     @Override
     public long getPosition() {
         return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
+    }
+
+    @Nullable
+    @Override
+    public DRMInformation getDRMInformation() {
+        return drmInformation;
     }
 
     @Override

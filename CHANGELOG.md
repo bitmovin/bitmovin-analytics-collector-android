@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Changed
+
+- do not send `drmLoadTime` with each sample, only at startup
+
 ### Fixed
 
 - bitmovin player crashed when `onAdError` was fired with empty ad tag url (AN-1572)
