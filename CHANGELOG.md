@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Bitmovin, ExoPlayer: changed player error mapping to improve transparency (AN-1507)
 - set DRM information for each event data sent to server
 
+### Fixed
+
+- bitmovin player crashed when `onAdError` was fired with empty ad tag url (AN-1572)
+
 ## v1.15.0
 
 ### Added
