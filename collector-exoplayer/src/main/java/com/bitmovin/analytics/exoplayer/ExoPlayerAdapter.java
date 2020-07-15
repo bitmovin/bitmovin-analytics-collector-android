@@ -233,6 +233,16 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
+    public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
+        Log.d(TAG, "onIsPlayingChanged " + isPlaying);
+
+        if (!stateMachine.isStartupFinished() && isPlaying) {
+            startup(getPosition());
+        }
+
+    }
+
+    @Override
     public void onRepeatModeChanged(int repeatMode) {
         Log.d(TAG, "onRepeatModeChanged");
 
@@ -262,6 +272,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public void onPositionDiscontinuity(int reason) {
         Log.d(TAG, "onPositionDiscontinuity");
+    }
+
+    @Override
+    public void onPositionDiscontinuity(EventTime eventTime, int reason) {
+
     }
 
     @Override
@@ -348,44 +363,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
-    public void onIsPlayingChanged(boolean isPlaying) {
-
-    }
-
-    @Override
-    public void onPlayerStateChanged(EventTime eventTime, boolean playWhenReady, int playbackState) {
-
-    }
-
-    @Override
-    public void onPlaybackSuppressionReasonChanged(EventTime eventTime, int playbackSuppressionReason) {
-        Log.d(TAG, "onPlaybackSuppressionReasonChanged");
-    }
-
-    @Override
-    public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
-        Log.d(TAG, "onIsPlayingChanged " + isPlaying);
-
-        if (!exoplayer.isPlayingAd() && isPlaying && !isVideoPlayed) {
-            //autoplay
-            if (isVideoAttemptedPlay && exoplayer.getPlayWhenReady()) {
-                videoStartTimeout.cancel();
-                isVideoPlayed = true;
-            } else {
-                videoStartTimeout.start();
-                isVideoAttemptedPlay = true;
-            }
-        }
-    }
+    public void onPlaybackSuppressionReasonChanged(EventTime eventTime, int playbackSuppressionReason) { }
 
     @Override
     public void onTimelineChanged(EventTime eventTime, int reason) {
-
-    }
-
-    @Override
-    public void onPositionDiscontinuity(EventTime eventTime, int reason) {
-
+        Log.d(TAG, "onTimelineChanged");
     }
 
     @Override
