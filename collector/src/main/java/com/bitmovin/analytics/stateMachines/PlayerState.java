@@ -11,6 +11,22 @@ public enum PlayerState {
 
         @Override
         void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
+        }
+    },
+    STARTUP {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState destinationPlayerState) {
+            long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
+            machine.addStartupTime(elapsedTime - elapsedTimeOnEnter);
+            if (destinationPlayerState == PlayerState.PLAYING) {
+                for (StateMachineListener listener : machine.getListeners()) {
+                    listener.onStartup(machine.getStartupTime());
+                }
+                machine.setStartupFinished(true);
             }
         }
     },
@@ -58,13 +74,6 @@ public enum PlayerState {
     PLAYING {
         @Override
         void onEnterState(PlayerStateMachine machine) {
-            if (machine.getElapsedTimeFirstReady() == 0) {
-                machine.setElapsedTimeFirstReady(Util.getElapsedTime());
-                for (StateMachineListener listener : machine.getListeners()) {
-                    listener.onStartup(machine.getStartupTime());
-                }
-            }
-
             machine.enableHeartbeat();
         }
 
@@ -82,15 +91,6 @@ public enum PlayerState {
     PAUSE {
         @Override
         void onEnterState(PlayerStateMachine machine) {
-            if (machine.getElapsedTimeFirstReady() == 0) {
-                machine.setElapsedTimeFirstReady(Util.getElapsedTime());
-                for (StateMachineListener listener : machine.getListeners()) {
-                    listener.onStartup(machine.getStartupTime());
-                }
-            }
-
-//            machine.enableHeartbeat();
-
         }
 
         @Override
@@ -99,8 +99,6 @@ public enum PlayerState {
                 long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
                 listener.onPauseExit(elapsedTime - elapsedTimeOnEnter);
             }
-
-//            machine.disableHeartbeat();
         }
     },
     QUALITYCHANGE {
