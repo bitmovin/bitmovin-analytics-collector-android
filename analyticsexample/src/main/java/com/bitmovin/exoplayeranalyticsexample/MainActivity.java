@@ -116,15 +116,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);
 
-            DefaultDrmSessionManager<ExoMediaCrypto> drmSesssionManager = getDrmSession("https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID, Util.getUserAgent(this, "ExoPlayerExample")) ;
-            Uri dashStatic = Uri.parse("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
-
             //DASH example
-            DashMediaSource dashMediaSource = getMediaSource(dashStatic, dataSourceFactory, drmSesssionManager);
+//            DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
+            DashMediaSource dashMediaSource = getSource("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd", dataSourceFactory);
+
             player.prepare(dashMediaSource);
             player.setPlayWhenReady(true);
 
         }
+    }
+
+    protected DashMediaSource getDRMSource(DataSource.Factory dataSourceFactory){
+        DefaultDrmSessionManager<ExoMediaCrypto> drmSesssionManager = getDrmSession("https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID, Util.getUserAgent(this, "ExoPlayerExample")) ;
+        Uri dashStatic = Uri.parse("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
+
+        //DASH example
+        return getMediaSource(dashStatic, dataSourceFactory, drmSesssionManager);
+    }
+
+    protected DashMediaSource getSource(String url, DataSource.Factory dataSourceFactory) {
+        Uri dashStatic = Uri.parse(url);
+        //DASH example
+        return getMediaSource(dashStatic, dataSourceFactory, null);
     }
 
     protected static DefaultDrmSessionManager<ExoMediaCrypto> getDrmSession(String drmLicenseUrl, UUID drmScheme, String userAgent) {
@@ -145,7 +158,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected static DashMediaSource getMediaSource(Uri dashStatic, DataSource.Factory dataSourceFactory, DefaultDrmSessionManager<ExoMediaCrypto> drmSession) {
         DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
         DashMediaSource.Factory sourceFactory = new DashMediaSource.Factory(source, dataSourceFactory);
-        sourceFactory.setDrmSessionManager(drmSession);
+        if (drmSession != null) {
+            sourceFactory.setDrmSessionManager(drmSession);
+        }
         return sourceFactory.createMediaSource(dashStatic);
     }
 
