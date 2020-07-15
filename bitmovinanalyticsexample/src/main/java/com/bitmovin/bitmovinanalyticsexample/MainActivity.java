@@ -38,6 +38,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button changeSource;
     private Button changeAudio;
     private Button changeSubtitle;
+    private PlayerConfiguration config;
+
+    private SourceItem redbullSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
+    private SourceItem sintelSource = new SourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
+    private SourceItem corupptedSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,17 +67,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected void initializeBitmovinPlayer(){
-        PlayerConfiguration config = new PlayerConfiguration();
+        config = new PlayerConfiguration();
 
-//        SourceConfiguration source = this.createSource();
-        SourceConfiguration source = this.createDRMSource();
+        SourceConfiguration source = this.createSourceConfig(redbullSource);
+//        SourceConfiguration source = this.createDRMSource();
         config.setSourceConfiguration(source);
 
 //        config.setAdvertisingConfiguration(initializeAds(config));
 
         PlaybackConfiguration playbackConfiguration = config.getPlaybackConfiguration();
         playbackConfiguration.setMuted(true);
-        playbackConfiguration.setAutoplayEnabled(true);
+        playbackConfiguration.setAutoplayEnabled(false);
 
         this.bitmovinPlayer = new BitmovinPlayer(getApplicationContext(), config);
 
@@ -101,19 +106,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmovinAnalyticsConfig.setCustomData7("customData7");
         bitmovinAnalyticsConfig.setPath("/vod/new/");
         bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
-        bitmovinAnalyticsConfig.setAds(true);
-        bitmovinAnalyticsConfig.setIsLive(false);
+        bitmovinAnalyticsConfig.setAds(false);
+        bitmovinAnalyticsConfig.setIsLive(true);
 
         //Step 3: Create Analytics Collector
         return new BitmovinPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
     }
 
 
-    protected static SourceConfiguration createSource() {
+    protected static SourceConfiguration createSourceConfig(SourceItem sourceItem) {
         // Create a new source configuration
         SourceConfiguration sourceConfiguration = new SourceConfiguration();
-        SourceItem sourceItem = new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
-
         // Add a new source item
         sourceConfiguration.addSourceItem(sourceItem);
 
@@ -177,10 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onPlayerChangeSource() {
-        SourceConfiguration config = new SourceConfiguration();
-        config.addSourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
-        bitmovinPlayer.load(config);
-
+        bitmovinPlayer.load(createDRMSource());
     }
 
     private void onAudioTrackChange() {
