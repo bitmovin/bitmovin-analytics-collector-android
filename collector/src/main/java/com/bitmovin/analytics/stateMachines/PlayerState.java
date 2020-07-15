@@ -3,7 +3,7 @@ package com.bitmovin.analytics.stateMachines;
 import com.bitmovin.analytics.utils.Util;
 
 public enum PlayerState {
-    SETUP {
+    READY {
         @Override
         void onEnterState(PlayerStateMachine machine) {
 
@@ -11,8 +11,6 @@ public enum PlayerState {
 
         @Override
         void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
-            for (StateMachineListener listener : machine.getListeners()) {
-                listener.onSetup();
             }
         }
     },

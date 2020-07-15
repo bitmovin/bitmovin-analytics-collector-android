@@ -85,7 +85,7 @@ public class PlayerStateMachine {
         this.elaspedTimeInitial = Util.getElapsedTime();
         this.elapsedTimeFirstReady = 0;
         this.videoStartFailedReason = null;
-        setCurrentState(PlayerState.SETUP);
+        setCurrentState(PlayerState.READY);
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
