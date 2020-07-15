@@ -439,7 +439,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             Log.d(TAG, "On Audio Quality Changed");
             if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.getElapsedTimeFirstReady() != 0) {
                 PlayerState originalState = stateMachine.getCurrentState();
-                if (audioPlaybackQualityChangedEvent.getOldAudioQuality().getBitrate() == audioPlaybackQualityChangedEvent.getNewAudioQuality().getBitrate()) {
+                AudioQuality oldQuality = audioPlaybackQualityChangedEvent.getOldAudioQuality();
+                AudioQuality newQuality = audioPlaybackQualityChangedEvent.getNewAudioQuality();
+                if (oldQuality != null && newQuality != null && oldQuality.getBitrate() == newQuality.getBitrate()) {
                     return;
                 }
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
