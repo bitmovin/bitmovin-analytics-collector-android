@@ -87,6 +87,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         detachPlayer();
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
+        this.playerAdapter.init();
     }
 
     protected void attachAd(AdAdapter adapter) {
@@ -116,10 +117,6 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         }
     }
 
-    @Override
-    public void onSetup() {
-        Log.d(TAG, String.format("onSetup %s", playerStateMachine.getImpressionId()));
-    }
 
     @Override
     public void onStartup(long duration) {

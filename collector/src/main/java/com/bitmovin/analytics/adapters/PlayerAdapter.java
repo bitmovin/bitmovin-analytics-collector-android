@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Nullable;
 public interface PlayerAdapter {
     EventData createEventData();
 
+    void init();
+
     void release();
 
     long getPosition();

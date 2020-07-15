@@ -79,10 +79,14 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
+        this.factory = factory;
+    }
+
+    public void init() {
+        addPlayerListeners();
+        checkAutoplayStartup();
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.factory = factory;
-        addPlayerListeners();
     }
 
     private void addPlayerListeners() {

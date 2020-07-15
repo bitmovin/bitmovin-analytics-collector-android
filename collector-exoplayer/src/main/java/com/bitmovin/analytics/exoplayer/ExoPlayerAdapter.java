@@ -83,8 +83,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
         this.config = config;
-        this.totalDroppedVideoFrames = 0;
-        this.playerIsReady = false;
         this.factory = factory;
         attachAnalyticsListener();
     }
@@ -125,6 +123,13 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
 
         return data;
+    }
+
+    @Override
+    public void init() {
+        this.totalDroppedVideoFrames = 0;
+        this.playerIsReady = false;
+        this.isVideoAttemptedPlay = false;
     }
 
     @Override
