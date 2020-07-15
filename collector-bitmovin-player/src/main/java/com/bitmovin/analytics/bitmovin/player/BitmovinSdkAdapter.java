@@ -302,6 +302,14 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         }
     };
 
+    private OnReadyListener onReadyListener = new OnReadyListener() {
+        @Override
+        public void onReady(ReadyEvent readyEvent) {
+            Log.d(TAG, "On Ready Listener");
+            playerIsReady = true;
+        }
+    };
+
     private OnPausedListener onPausedListener = new OnPausedListener() {
         @Override
         public void onPaused(PausedEvent pausedEvent) {
@@ -463,24 +471,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
             stateMachine.transitionState(PlayerState.ERROR, videoTime);
-        }
-    };
-
-    private OnReadyListener onReadyListener = new OnReadyListener() {
-        @Override
-        public void onReady(ReadyEvent readyEvent) {
-            playerIsReady = true;
-            Log.d(TAG, "On Ready Listener");
-
-            if (bitmovinPlayer.isPlaying()) {
-                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-                // autoplay
-                isVideoAttemptedPlay = true;
-                videoStartTimeout.start();
-            } else {
-                stateMachine.transitionState(PlayerState.PAUSE, getPosition());
-            }
-
         }
     };
 
