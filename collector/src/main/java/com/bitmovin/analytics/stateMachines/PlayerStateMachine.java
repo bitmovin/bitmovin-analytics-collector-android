@@ -18,9 +18,9 @@ public class PlayerStateMachine {
     private final BitmovinAnalyticsConfig config;
     private List<StateMachineListener> listeners = new ArrayList<StateMachineListener>();
     private PlayerState currentState;
-    private long elaspedTimeInitial = 0;
-    private long elapsedTimeFirstReady = 0;
     private long elapsedTimeOnEnter = 0;
+    private long startupTime = 0;
+    private boolean startupFinished = false;
     private long elapsedTimeSeekStart = 0;
     private long videoTimeStart;
     private long videoTimeEnd;
@@ -82,13 +82,17 @@ public class PlayerStateMachine {
         disableHeartbeat();
         disableRebufferHeartbeat();
         this.impressionId = Util.getUUID();
-        this.elaspedTimeInitial = Util.getElapsedTime();
-        this.elapsedTimeFirstReady = 0;
         this.videoStartFailedReason = null;
+        startupTime = 0;
+        startupFinished = false;
         setCurrentState(PlayerState.READY);
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
+        if (destinationPlayerState == this.currentState) {
+            return;
+        }
+
         long elapsedTime = Util.getElapsedTime();
         videoTimeEnd = videoTime;
 
@@ -101,12 +105,12 @@ public class PlayerStateMachine {
         setCurrentState(destinationPlayerState);
     }
 
-    public long getElapsedTimeFirstReady() {
-        return elapsedTimeFirstReady;
+    public boolean isStartupFinished() {
+        return startupFinished;
     }
 
-    public void setElapsedTimeFirstReady(long elapsedTime) {
-        this.elapsedTimeFirstReady = elapsedTime;
+    public void setStartupFinished(boolean startupFinished) {
+        this.startupFinished = startupFinished;
     }
 
     public void addListener(StateMachineListener toAdd) {
@@ -130,7 +134,11 @@ public class PlayerStateMachine {
     }
 
     public long getStartupTime() {
-        return elapsedTimeFirstReady - elaspedTimeInitial;
+        return startupTime;
+    }
+
+    public void addStartupTime(long elapsedTime) {
+        this.startupTime =+ elapsedTime;
     }
 
     public String getImpressionId() {
@@ -173,6 +181,14 @@ public class PlayerStateMachine {
         this.videoStartFailedReason = videoStartFailedReason;
     }
 
+    public void pause(long position) {
+        if (isStartupFinished()) {
+            transitionState(PlayerState.PAUSE, position);
+        }
+        else {
+            transitionState(PlayerState.READY, position);
+        }
+    }
 }
 
 

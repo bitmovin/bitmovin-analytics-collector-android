@@ -74,7 +74,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private String drmType = null;
     private DRMInformation drmInformation = null;
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
-    private boolean isVideoPlayed = false;
     private boolean isVideoAttemptedPlay = false;
     private long previousQualityChangeBitrate = 0;
 
@@ -108,6 +107,24 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
     }
 
+    private void startup(long position) {
+        stateMachine.transitionState(PlayerState.STARTUP, position);
+        videoStartTimeout.start();
+        isVideoAttemptedPlay = true;
+    }
+
+    private void startupEnd(long position) {
+        stateMachine.transitionState(PlayerState.PLAYING, position);
+        videoStartTimeout.cancel();
+    }
+
+    @Override
+    public void init() {
+        this.totalDroppedVideoFrames = 0;
+        this.playerIsReady = false;
+        this.isVideoAttemptedPlay = false;
+    }
+
     @Override
     public EventData createEventData() {
         EventData data = factory.build(stateMachine.getImpressionId());
@@ -123,13 +140,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
 
         return data;
-    }
-
-    @Override
-    public void init() {
-        this.totalDroppedVideoFrames = 0;
-        this.playerIsReady = false;
-        this.isVideoAttemptedPlay = false;
     }
 
     @Override
@@ -197,32 +207,39 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         long videoTime = getPosition();
         Log.d(TAG, String.format("onPlayerStateChanged: %b, %s", playWhenReady, ExoUtil.exoStateToString(playbackState)));
+
         switch (playbackState) {
             case Player.STATE_READY:
                 if (playWhenReady) {
-                    this.stateMachine.transitionState(PlayerState.PLAYING, videoTime);
-                    if (!isVideoPlayed && !exoplayer.isPlayingAd()) {
-                        if (isVideoAttemptedPlay) {
-                            isVideoPlayed = true;
-                            videoStartTimeout.cancel();
-                        }
-                        //autoplay
-                        else {
-                            isVideoAttemptedPlay = true;
-                            videoStartTimeout.start();
-                        }
+                    if (!stateMachine.isStartupFinished()) {
+                        startupEnd(videoTime);
+                    } else {
+                        stateMachine.transitionState(PlayerState.PLAYING, getPosition());
                     }
                 } else {
-                    this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
+                    stateMachine.pause(videoTime);
                 }
                 break;
             case Player.STATE_BUFFERING:
-                if (stateMachine.getCurrentState() != PlayerState.SEEKING && this.stateMachine.getElapsedTimeFirstReady() != 0) {
-                    this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
+                if (!stateMachine.isStartupFinished() ){
+                    if(playWhenReady){
+                        // TODO TSA check if this is really entry when auto play in enabled
+                        //  think of solution like the one in Bitmovin adapter checkAutoPlayStartup
+                        
+                        // with autoplay enabled the player first enter here and start buffering for the video with playWhenReady = true
+                        startup(videoTime);
+                    } else {
+                        stateMachine.transitionState(PlayerState.READY, videoTime);
+                        videoStartTimeout.cancel();
+                    }
+                } else {
+                    if (stateMachine.getCurrentState() != PlayerState.SEEKING) {
+                        this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
+                    }
                 }
                 break;
             case Player.STATE_IDLE:
-                this.stateMachine.transitionState(PlayerState.SETUP, videoTime);
+                this.stateMachine.transitionState(PlayerState.READY, videoTime);
                 break;
             case Player.STATE_ENDED:
                 this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
@@ -235,11 +252,9 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
         Log.d(TAG, "onIsPlayingChanged " + isPlaying);
-
         if (!stateMachine.isStartupFinished() && isPlaying) {
             startup(getPosition());
         }
-
     }
 
     @Override
@@ -260,7 +275,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         long videoTime = getPosition();
         error.printStackTrace();
         ErrorCode errorCode = exceptionMapper.map(error);
-        if (!isVideoPlayed && isVideoAttemptedPlay) {
+        if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
             videoStartTimeout.cancel();
             stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
         }
@@ -623,6 +638,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             Log.d(TAG, "VideoStartTimeout finish");
             stateMachine.setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
             stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
+            videoStartTimeout.cancel();
         }
     };
 }
