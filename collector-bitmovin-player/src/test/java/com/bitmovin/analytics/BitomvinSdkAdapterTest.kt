@@ -8,15 +8,14 @@ import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent
 import com.bitmovin.player.api.event.listener.EventListener
 import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener
+import com.bitmovin.player.config.PlayerConfiguration
 import com.bitmovin.player.config.quality.AudioQuality
-import org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.any
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.any
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -39,12 +38,13 @@ class BitomvinSdkAdapterTest {
     @Before
     fun setup() {
         `when`(fakePlayer.addEventListener(ArgumentMatchers.any())).then { invocation -> eventListener.add(invocation.getArgument(0)) }
+        `when`(fakePlayer.getConfig()).thenReturn(mock(PlayerConfiguration::class.java))
         adapter = BitmovinSdkAdapter(fakePlayer, mock(BitmovinAnalyticsConfig::class.java), mock(EventDataFactory::class.java), stateMachine)
+        adapter.init()
     }
 
     @Test
     fun testNoStateTransitionToQualityChangeIfBitrateDidNotChange() {
-        `when`(stateMachine.elapsedTimeFirstReady).thenReturn(20)
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         val event = getListenerWithType<OnAudioPlaybackQualityChangedListener>()
         assert(event != null)
