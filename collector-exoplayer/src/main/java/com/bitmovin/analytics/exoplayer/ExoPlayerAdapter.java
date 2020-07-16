@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.exoplayer;
 
-import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.Surface;
 
@@ -111,13 +110,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     private void startup(long position) {
         stateMachine.transitionState(PlayerState.STARTUP, position);
-        videoStartTimeout.start();
         isVideoAttemptedPlay = true;
-    }
-
-    private void startupEnd(long position) {
-        stateMachine.transitionState(PlayerState.PLAYING, position);
-        videoStartTimeout.cancel();
     }
 
     @Override
@@ -285,7 +278,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         error.printStackTrace();
         ErrorCode errorCode = exceptionMapper.map(error);
         if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-            videoStartTimeout.cancel();
+            stateMachine.videoStartTimeout.cancel();
             stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
         }
         this.stateMachine.setErrorCode(errorCode);
@@ -636,20 +629,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onDrmSessionReleased(EventTime eventTime) {
         Log.d(TAG, "onDrmSessionReleased");
     }
-
-    private CountDownTimer videoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
-
-        @Override
-        public void onFinish() {
-            Log.d(TAG, "VideoStartTimeout finish");
-            stateMachine.setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
-            stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
-            videoStartTimeout.cancel();
-        }
-    };
 }
 
 

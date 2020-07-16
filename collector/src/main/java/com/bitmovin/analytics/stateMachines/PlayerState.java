@@ -6,7 +6,6 @@ public enum PlayerState {
     READY {
         @Override
         void onEnterState(PlayerStateMachine machine) {
-
         }
 
         @Override
@@ -16,10 +15,12 @@ public enum PlayerState {
     STARTUP {
         @Override
         void onEnterState(PlayerStateMachine machine) {
+            machine.videoStartTimeout.start();
         }
 
         @Override
         void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState destinationPlayerState) {
+            machine.videoStartTimeout.cancel();
             long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
             machine.addStartupTime(elapsedTime - elapsedTimeOnEnter);
             if (destinationPlayerState == PlayerState.PLAYING) {

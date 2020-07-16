@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.stateMachines;
 
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 
@@ -180,6 +181,19 @@ public class PlayerStateMachine {
     public void setVideoStartFailedReason(VideoStartFailedReason videoStartFailedReason) {
         this.videoStartFailedReason = videoStartFailedReason;
     }
+
+    public CountDownTimer videoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+
+        @Override
+        public void onFinish() {
+            Log.d(TAG, "VideoStartTimeout finish");
+            setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
+            transitionState(PlayerState.EXITBEFOREVIDEOSTART, 0);
+        }
+    };
 
     public void pause(long position) {
         if (isStartupFinished()) {

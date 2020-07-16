@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.bitmovin.player;
 
-import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
@@ -275,17 +274,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         stateMachine.transitionState(PlayerState.STARTUP, getPosition());
         if (!bitmovinPlayer.isAd()) {
             isVideoAttemptedPlay = true;
-            videoStartTimeout.start();
         }
     }
-
-
+    
     private void startupEnd() {
         stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-        if (!bitmovinPlayer.isAd()) {
-            videoStartTimeout.cancel();
-        }
     }
+
     /**
      * Player Listeners
      */
@@ -342,9 +337,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onPaused(PausedEvent pausedEvent) {
             Log.d(TAG, "On Pause Listener");
             stateMachine.pause(getPosition());
-            if (!stateMachine.isStartupFinished()) {
-                videoStartTimeout.cancel();
-            }
         }
     };
 
@@ -501,23 +493,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
 
             stateMachine.setErrorCode(errorCode);
             if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-                videoStartTimeout.cancel();
+                stateMachine.videoStartTimeout.cancel();
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
             stateMachine.transitionState(PlayerState.ERROR, videoTime);
-        }
-    };
-
-    private CountDownTimer videoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
-
-        @Override
-        public void onFinish() {
-            Log.d(TAG, "VideoStartTimeout finish");
-            stateMachine.setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
-            stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
         }
     };
 }
