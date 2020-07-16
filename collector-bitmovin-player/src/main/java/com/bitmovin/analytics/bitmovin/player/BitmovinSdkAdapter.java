@@ -276,10 +276,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             isVideoAttemptedPlay = true;
         }
     }
-    
-    private void startupEnd() {
-        stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-    }
 
     /**
      * Player Listeners
@@ -354,20 +350,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onPlaying(PlayingEvent playingEvent) {
             Log.d(TAG, "On Playing Listener " + stateMachine.getCurrentState().toString());
-            //Do not transition to a playing state unless a firstReadyTimestamp has been set. This will be set by the onReadyListener and prevents the player from showing inaccurate startup times when autoplay is enabled
-            if (stateMachine.isStartupFinished()) {
-                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-            }
-        }
-    };
-
-    private OnTimeChangedListener onTimeChangedListener = new OnTimeChangedListener() {
-        @Override
-        public void onTimeChanged(TimeChangedEvent timeChangedEvent) {
-            Log.d(TAG, "On Time Changed");
-            if (!stateMachine.isStartupFinished()) {
-                startupEnd();
-            }
+            stateMachine.transitionState(PlayerState.PLAYING, getPosition());
         }
     };
 
