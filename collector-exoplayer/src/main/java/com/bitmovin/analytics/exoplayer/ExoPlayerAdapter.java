@@ -239,7 +239,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                 break;
             case Player.STATE_IDLE:
                 // TODO check what this state could mean for analytics?
-//                this.stateMachine.transitionState(PlayerState.READY, videoTime);
+                this.stateMachine.transitionState(PlayerState.READY, videoTime);
                 break;
             case Player.STATE_ENDED:
                 // TODO this is equivalent to BMPs PlaybackFinished Event
