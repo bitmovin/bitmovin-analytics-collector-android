@@ -76,6 +76,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private boolean isVideoAttemptedPlay = false;
     private long previousQualityChangeBitrate = 0;
+    private boolean isPlaying = false;
+    private boolean isPaused = false;
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
@@ -123,6 +125,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
         this.isVideoAttemptedPlay = false;
+        isPlaying = false;
+        isPaused = false;
     }
 
     @Override
@@ -208,29 +212,31 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         long videoTime = getPosition();
         Log.d(TAG, String.format("onPlayerStateChanged: %b, %s", playWhenReady, ExoUtil.exoStateToString(playbackState)));
 
+        boolean oldIsPlaying = this.isPlaying;
+        boolean oldIsPaused = this.isPaused;
+        this.isPlaying = playWhenReady;
+        this.isPaused = !this.isPlaying;
+
+
+        // Copied logic from BMP SDK
+        if (playbackState != Player.STATE_ENDED) {
+            if (this.isPaused != oldIsPaused && this.isPaused && oldIsPlaying) {
+                    Log.d(TAG, "PLAYER: onPause");
+                stateMachine.pause(getPosition());
+            }
+        }
         switch (playbackState) {
             case Player.STATE_READY:
-                if (playWhenReady) {
-                    if (!stateMachine.isStartupFinished()) {
-                        startupEnd(videoTime);
-                    } else {
-                        stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-                    }
-                } else {
-                    stateMachine.pause(videoTime);
+                if (this.isPlaying) {
+                    Log.d(TAG, "PLAYER: onPlaying");
+                    stateMachine.transitionState(PlayerState.PLAYING, getPosition());
                 }
                 break;
             case Player.STATE_BUFFERING:
-                if (!stateMachine.isStartupFinished() ){
-                    if(playWhenReady){
-                        // TODO TSA check if this is really entry when auto play in enabled
-                        //  think of solution like the one in Bitmovin adapter checkAutoPlayStartup
-                        
+                if (!stateMachine.isStartupFinished()){
+                    if(this.isPlaying != oldIsPlaying && this.isPlaying) {
                         // with autoplay enabled the player first enter here and start buffering for the video with playWhenReady = true
                         startup(videoTime);
-                    } else {
-                        stateMachine.transitionState(PlayerState.READY, videoTime);
-                        videoStartTimeout.cancel();
                     }
                 } else {
                     if (stateMachine.getCurrentState() != PlayerState.SEEKING) {
@@ -239,9 +245,12 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                 }
                 break;
             case Player.STATE_IDLE:
-                this.stateMachine.transitionState(PlayerState.READY, videoTime);
+                // TODO check what this state could mean for analytics?
+//                this.stateMachine.transitionState(PlayerState.READY, videoTime);
                 break;
             case Player.STATE_ENDED:
+                // TODO this is equivalent to BMPs PlaybackFinished Event
+                //  should we setup new impression here
                 this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                 break;
             default:
