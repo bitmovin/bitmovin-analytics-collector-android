@@ -203,6 +203,11 @@ public class PlayerStateMachine {
             transitionState(PlayerState.READY, position);
         }
     }
+
+    public void startAd(long position){
+        transitionState(PlayerState.AD, position);
+        startupTime = 0;
+    }
 }
 
 

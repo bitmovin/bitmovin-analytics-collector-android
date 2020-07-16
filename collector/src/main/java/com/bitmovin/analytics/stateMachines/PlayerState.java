@@ -31,6 +31,15 @@ public enum PlayerState {
             }
         }
     },
+    AD {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
+        }
+    },
     BUFFERING {
         @Override
         void onEnterState(PlayerStateMachine machine) {

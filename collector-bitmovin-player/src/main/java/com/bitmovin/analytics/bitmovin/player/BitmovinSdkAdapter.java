@@ -15,6 +15,7 @@ import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
 import com.bitmovin.player.BitmovinPlayer;
+import com.bitmovin.player.api.event.data.AdBreakStartedEvent;
 import com.bitmovin.player.api.event.data.AudioChangedEvent;
 import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent;
 import com.bitmovin.player.api.event.data.DestroyEvent;
@@ -35,6 +36,7 @@ import com.bitmovin.player.api.event.data.StallStartedEvent;
 import com.bitmovin.player.api.event.data.SubtitleChangedEvent;
 import com.bitmovin.player.api.event.data.TimeChangedEvent;
 import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
+import com.bitmovin.player.api.event.listener.OnAdBreakStartedListener;
 import com.bitmovin.player.api.event.listener.OnAudioChangedListener;
 import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener;
 import com.bitmovin.player.api.event.listener.OnDestroyListener;
@@ -114,7 +116,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.addEventListener(onDestroyedListener);
 
         this.bitmovinPlayer.addEventListener(onErrorListener);
-        this.bitmovinPlayer.addEventListener(onTimeChangedListener);
+        this.bitmovinPlayer.addEventListener(onAdBreakStartedListener);
     }
 
     private void removePlayerListener() {
@@ -139,7 +141,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.removeEventListener(onAudioChangedListener);
         this.bitmovinPlayer.removeEventListener(onDownloadFinishedListener);
         this.bitmovinPlayer.removeEventListener(onDestroyedListener);
-        this.bitmovinPlayer.removeEventListener(onTimeChangedListener);
+        this.bitmovinPlayer.removeEventListener(onAdBreakStartedListener);
     }
 
     @Override
@@ -480,6 +482,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
             stateMachine.transitionState(PlayerState.ERROR, videoTime);
+        }
+    };
+
+    private OnAdBreakStartedListener onAdBreakStartedListener = new OnAdBreakStartedListener() {
+        @Override
+        public void onAdBreakStarted(AdBreakStartedEvent adBreakStartedEvent) {
+            stateMachine.startAd(getPosition());
         }
     };
 }
