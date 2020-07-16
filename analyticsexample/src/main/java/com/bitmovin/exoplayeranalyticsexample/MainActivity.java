@@ -40,11 +40,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PlayerView playerView;
     private Button releaseButton;
     private Button createButton;
+    private Button sourceChangeButton;
     private TextView eventLogView;
     private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
     private BitmovinAnalytics bitmovinAnalytics;
     private Handler automationHandler;
     private int automationDelay = 90000;
+    private DataSource.Factory dataSourceFactory;
 
 
     @Override
@@ -56,8 +58,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         releaseButton.setOnClickListener(this);
         createButton = findViewById(R.id.create_button);
         createButton.setOnClickListener(this);
+        sourceChangeButton = findViewById(R.id.source_change_button);
+        sourceChangeButton.setOnClickListener(this);
         eventLogView = findViewById(R.id.eventLog);
 
+        dataSourceFactory = new DefaultDataSourceFactory(this, bandwidthMeter,
+                buildHttpDataSourceFactory(bandwidthMeter));
         createPlayer();
 
 //        automationHandler = new Handler();
@@ -74,8 +80,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void createPlayer() {
         if (player == null) {
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, bandwidthMeter,
-                    buildHttpDataSourceFactory(bandwidthMeter));
 
             SimpleExoPlayer.Builder exoBuilder= new SimpleExoPlayer.Builder(this);
             exoBuilder.setBandwidthMeter(bandwidthMeter);
@@ -121,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             DashMediaSource dashMediaSource = getSource("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd", dataSourceFactory);
 
             player.prepare(dashMediaSource);
-            player.setPlayWhenReady(true);
+            player.setPlayWhenReady(false);
 
         }
     }
@@ -193,7 +197,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             releasePlayer();
         } else if (v == createButton) {
             createPlayer();
+        } else if (v == sourceChangeButton) {
+            changeSource();
         }
+    }
+
+    private void changeSource() {
+        DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
+        player.prepare(dashMediaSource);
     }
 
     @Override
