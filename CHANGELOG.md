@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+
+- `CountDownTimer` potentially continues running after the player adapter is released (AN-1595) 
+
 ## v1.16.0
 
 ### Change
