@@ -478,7 +478,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
 
             stateMachine.setErrorCode(errorCode);
             if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-                stateMachine.videoStartTimeout.cancel();
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
             stateMachine.transitionState(PlayerState.ERROR, videoTime);

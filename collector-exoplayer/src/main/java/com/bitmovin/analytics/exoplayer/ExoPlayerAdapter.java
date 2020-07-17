@@ -278,7 +278,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         error.printStackTrace();
         ErrorCode errorCode = exceptionMapper.map(error);
         if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-            stateMachine.videoStartTimeout.cancel();
             stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
         }
         this.stateMachine.setErrorCode(errorCode);

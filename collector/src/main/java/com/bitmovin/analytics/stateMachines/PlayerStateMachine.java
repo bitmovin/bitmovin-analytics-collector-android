@@ -182,7 +182,7 @@ public class PlayerStateMachine {
         this.videoStartFailedReason = videoStartFailedReason;
     }
 
-    public CountDownTimer videoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
+    protected CountDownTimer videoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
         @Override
         public void onTick(long millisUntilFinished) {
         }

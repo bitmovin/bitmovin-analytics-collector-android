@@ -58,6 +58,7 @@ public enum PlayerState {
     ERROR {
         @Override
         void onEnterState(PlayerStateMachine machine) {
+            machine.videoStartTimeout.cancel();
             for (StateMachineListener listener : machine.getListeners()) {
                 listener.onError(machine.getErrorCode());
             }
