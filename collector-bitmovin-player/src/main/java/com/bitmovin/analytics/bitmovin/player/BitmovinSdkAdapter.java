@@ -250,7 +250,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         if (bitmovinPlayer != null) {
             removePlayerListener();
         }
-        videoStartTimeout.cancel();
     }
 
     @Override

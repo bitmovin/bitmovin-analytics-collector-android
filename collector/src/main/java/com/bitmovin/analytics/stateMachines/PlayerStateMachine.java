@@ -86,6 +86,7 @@ public class PlayerStateMachine {
         this.videoStartFailedReason = null;
         startupTime = 0;
         startupFinished = false;
+        videoStartTimeout.cancel();
         setCurrentState(PlayerState.READY);
     }
 
