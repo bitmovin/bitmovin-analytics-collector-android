@@ -1,6 +1,6 @@
-package com.bitmovin.analytics
+package com.bitmovin.analytics.bitmovin.player
 
-import com.bitmovin.analytics.bitmovin.player.BitmovinSdkAdapter
+import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
@@ -15,14 +15,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
+import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-class BitomvinSdkAdapterTest {
+class BitmovinSdkAdapterTest {
 
     val eventListener = mutableListOf<EventListener<*>>()
     inline fun <reified T> getListenerWithType(): T? {
@@ -37,19 +34,19 @@ class BitomvinSdkAdapterTest {
 
     @Before
     fun setup() {
-        `when`(fakePlayer.addEventListener(ArgumentMatchers.any())).then { invocation -> eventListener.add(invocation.getArgument(0)) }
-        `when`(fakePlayer.getConfig()).thenReturn(mock(PlayerConfiguration::class.java))
-        adapter = BitmovinSdkAdapter(fakePlayer, mock(BitmovinAnalyticsConfig::class.java), mock(EventDataFactory::class.java), stateMachine)
+        Mockito.`when`(fakePlayer.addEventListener(ArgumentMatchers.any())).then { invocation -> eventListener.add(invocation.getArgument(0)) }
+        Mockito.`when`(fakePlayer.getConfig()).thenReturn(Mockito.mock(PlayerConfiguration::class.java))
+        adapter = BitmovinSdkAdapter(fakePlayer, Mockito.mock(BitmovinAnalyticsConfig::class.java), Mockito.mock(EventDataFactory::class.java), stateMachine)
         adapter.init()
     }
 
     @Test
     fun testNoStateTransitionToQualityChangeIfBitrateDidNotChange() {
-        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
+        Mockito.`when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         val event = getListenerWithType<OnAudioPlaybackQualityChangedListener>()
         assert(event != null)
         event!!.onAudioPlaybackQualityChanged(getAudioPlaybackQualityChangedEvent(200, 200))
-        verify(stateMachine, times(0)).transitionState(ArgumentMatchers.eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+        Mockito.verify(stateMachine, Mockito.times(0)).transitionState(ArgumentMatchers.eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
     private fun getAudioPlaybackQualityChangedEvent(oldBitrate: Int, newBitrate: Int): AudioPlaybackQualityChangedEvent {
