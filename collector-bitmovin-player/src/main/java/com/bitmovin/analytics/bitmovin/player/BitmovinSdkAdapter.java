@@ -15,6 +15,7 @@ import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
 import com.bitmovin.player.BitmovinPlayer;
+import com.bitmovin.player.api.event.data.AdBreakFinishedEvent;
 import com.bitmovin.player.api.event.data.AdBreakStartedEvent;
 import com.bitmovin.player.api.event.data.AudioChangedEvent;
 import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent;
@@ -35,6 +36,7 @@ import com.bitmovin.player.api.event.data.StallEndedEvent;
 import com.bitmovin.player.api.event.data.StallStartedEvent;
 import com.bitmovin.player.api.event.data.SubtitleChangedEvent;
 import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
+import com.bitmovin.player.api.event.listener.OnAdBreakFinishedListener;
 import com.bitmovin.player.api.event.listener.OnAdBreakStartedListener;
 import com.bitmovin.player.api.event.listener.OnAudioChangedListener;
 import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener;
@@ -114,7 +116,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.addEventListener(onDestroyedListener);
 
         this.bitmovinPlayer.addEventListener(onErrorListener);
+
         this.bitmovinPlayer.addEventListener(onAdBreakStartedListener);
+        this.bitmovinPlayer.addEventListener(onAdBreakFinishedListener);
     }
 
     private void removePlayerListener() {
@@ -139,7 +143,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.removeEventListener(onAudioChangedListener);
         this.bitmovinPlayer.removeEventListener(onDownloadFinishedListener);
         this.bitmovinPlayer.removeEventListener(onDestroyedListener);
+
         this.bitmovinPlayer.removeEventListener(onAdBreakStartedListener);
+        this.bitmovinPlayer.removeEventListener(onAdBreakFinishedListener);
     }
 
     @Override
@@ -490,6 +496,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         @Override
         public void onAdBreakStarted(AdBreakStartedEvent adBreakStartedEvent) {
             stateMachine.startAd(getPosition());
+        }
+    };
+
+    private OnAdBreakFinishedListener onAdBreakFinishedListener = new OnAdBreakFinishedListener() {
+        @Override
+        public void onAdBreakFinished(AdBreakFinishedEvent adBreakFinishedEvent) {
+            stateMachine.transitionState(PlayerState.ADFINISHED, getPosition());
         }
     };
 }

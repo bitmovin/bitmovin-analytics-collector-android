@@ -90,7 +90,7 @@ public class PlayerStateMachine {
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
-        if (destinationPlayerState == this.currentState) {
+        if (!this.isTransitionAllowed(currentState, destinationPlayerState)) {
             return;
         }
 
@@ -104,6 +104,18 @@ public class PlayerStateMachine {
         videoTimeStart = videoTimeEnd;
         destinationPlayerState.onEnterState(this);
         setCurrentState(destinationPlayerState);
+    }
+
+    private boolean isTransitionAllowed(PlayerState currentState, PlayerState destination) {
+        if (destination == this.currentState) {
+            return false;
+        }
+        // no state transitions like PLAYING or PAUSE during AD
+        else if (currentState == PlayerState.AD && (destination != PlayerState.ERROR && destination != PlayerState.ADFINISHED )) {
+            return false;
+        }
+
+        return true;
     }
 
     public boolean isStartupFinished() {
