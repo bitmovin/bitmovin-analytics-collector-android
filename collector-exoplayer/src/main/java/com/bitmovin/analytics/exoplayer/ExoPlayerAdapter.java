@@ -151,6 +151,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             simpleExoPlayer.removeAnalyticsListener(this);
         }
         meter.reset();
+        videoStartTimeout.cancel();
     }
 
     @Override
