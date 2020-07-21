@@ -151,7 +151,7 @@ public class PlayerStateMachine {
     }
 
     public void addStartupTime(long elapsedTime) {
-        this.startupTime =+ elapsedTime;
+        this.startupTime += elapsedTime;
     }
 
     public String getImpressionId() {
