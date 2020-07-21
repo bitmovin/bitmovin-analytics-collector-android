@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private SourceItem redbullSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
     private SourceItem sintelSource = new SourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
-    private SourceItem corupptedSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd");
+    private SourceItem corruptedSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmovinAnalyticsConfig.setPath("/vod/new/");
         bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
         bitmovinAnalyticsConfig.setAds(false);
-        bitmovinAnalyticsConfig.setIsLive(true);
+        bitmovinAnalyticsConfig.setIsLive(false);
 
         //Step 3: Create Analytics Collector
         return new BitmovinPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
@@ -180,7 +180,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onPlayerChangeSource() {
-        bitmovinPlayer.load(createDRMSource());
+        SourceConfiguration config = createDRMSource();
+        bitmovinPlayer.load(config);
     }
 
     private void onAudioTrackChange() {
