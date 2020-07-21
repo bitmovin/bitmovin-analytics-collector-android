@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
-## Changed
+## v1.17.0
+
+### Changed
 - tracking of video startup times when having autoplay enabled to be consistent with web platform 
 
 ### Fixed

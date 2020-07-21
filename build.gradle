@@ -41,8 +41,8 @@ allprojects {
 ext {
     developLocal = true
     packageGroupId = 'com.bitmovin.analytics'
-    version = '1.16.0'
-    versionCode = 116000
+    version = '1.17.0'
+    versionCode = 117000
 
     compileSdkVersion = 28
     minSdkVersion = 16
