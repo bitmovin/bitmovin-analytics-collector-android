@@ -40,11 +40,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PlayerView playerView;
     private Button releaseButton;
     private Button createButton;
+    private Button sourceChangeButton;
     private TextView eventLogView;
     private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
     private BitmovinAnalytics bitmovinAnalytics;
     private Handler automationHandler;
     private int automationDelay = 90000;
+    private DataSource.Factory dataSourceFactory;
 
 
     @Override
@@ -56,8 +58,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         releaseButton.setOnClickListener(this);
         createButton = findViewById(R.id.create_button);
         createButton.setOnClickListener(this);
+        sourceChangeButton = findViewById(R.id.source_change_button);
+        sourceChangeButton.setOnClickListener(this);
         eventLogView = findViewById(R.id.eventLog);
 
+        dataSourceFactory = new DefaultDataSourceFactory(this, bandwidthMeter,
+                buildHttpDataSourceFactory(bandwidthMeter));
         createPlayer();
 
 //        automationHandler = new Handler();
@@ -74,8 +80,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void createPlayer() {
         if (player == null) {
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, bandwidthMeter,
-                    buildHttpDataSourceFactory(bandwidthMeter));
 
             SimpleExoPlayer.Builder exoBuilder= new SimpleExoPlayer.Builder(this);
             exoBuilder.setBandwidthMeter(bandwidthMeter);
@@ -116,15 +120,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);
 
-            DefaultDrmSessionManager<ExoMediaCrypto> drmSesssionManager = getDrmSession("https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID, Util.getUserAgent(this, "ExoPlayerExample")) ;
-            Uri dashStatic = Uri.parse("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
-
             //DASH example
-            DashMediaSource dashMediaSource = getMediaSource(dashStatic, dataSourceFactory, drmSesssionManager);
+//            DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
+            DashMediaSource dashMediaSource = getSource("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd", dataSourceFactory);
+
             player.prepare(dashMediaSource);
-            player.setPlayWhenReady(true);
+            player.setPlayWhenReady(false);
 
         }
+    }
+
+    protected DashMediaSource getDRMSource(DataSource.Factory dataSourceFactory){
+        DefaultDrmSessionManager<ExoMediaCrypto> drmSesssionManager = getDrmSession("https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID, Util.getUserAgent(this, "ExoPlayerExample")) ;
+        Uri dashStatic = Uri.parse("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
+
+        //DASH example
+        return getMediaSource(dashStatic, dataSourceFactory, drmSesssionManager);
+    }
+
+    protected DashMediaSource getSource(String url, DataSource.Factory dataSourceFactory) {
+        Uri dashStatic = Uri.parse(url);
+        //DASH example
+        return getMediaSource(dashStatic, dataSourceFactory, null);
     }
 
     protected static DefaultDrmSessionManager<ExoMediaCrypto> getDrmSession(String drmLicenseUrl, UUID drmScheme, String userAgent) {
@@ -145,7 +162,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected static DashMediaSource getMediaSource(Uri dashStatic, DataSource.Factory dataSourceFactory, DefaultDrmSessionManager<ExoMediaCrypto> drmSession) {
         DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
         DashMediaSource.Factory sourceFactory = new DashMediaSource.Factory(source, dataSourceFactory);
-        sourceFactory.setDrmSessionManager(drmSession);
+        if (drmSession != null) {
+            sourceFactory.setDrmSessionManager(drmSession);
+        }
         return sourceFactory.createMediaSource(dashStatic);
     }
 
@@ -178,7 +197,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             releasePlayer();
         } else if (v == createButton) {
             createPlayer();
+        } else if (v == sourceChangeButton) {
+            changeSource();
         }
+    }
+
+    private void changeSource() {
+        DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
+        player.prepare(dashMediaSource);
     }
 
     @Override

@@ -4,8 +4,6 @@ import com.bitmovin.analytics.data.ErrorCode;
 
 public interface StateMachineListener {
 
-    void onSetup();
-
     void onStartup(long duration);
 
     void onPauseExit(long duration);

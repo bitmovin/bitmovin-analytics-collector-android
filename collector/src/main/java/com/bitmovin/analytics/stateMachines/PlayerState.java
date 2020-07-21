@@ -3,17 +3,50 @@ package com.bitmovin.analytics.stateMachines;
 import com.bitmovin.analytics.utils.Util;
 
 public enum PlayerState {
-    SETUP {
+    READY {
         @Override
         void onEnterState(PlayerStateMachine machine) {
-
         }
 
         @Override
         void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {
-            for (StateMachineListener listener : machine.getListeners()) {
-                listener.onSetup();
+        }
+    },
+    STARTUP {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+            machine.videoStartTimeout.start();
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState destinationPlayerState) {
+            machine.videoStartTimeout.cancel();
+            long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
+            machine.addStartupTime(elapsedTime - elapsedTimeOnEnter);
+            if (destinationPlayerState == PlayerState.PLAYING) {
+                for (StateMachineListener listener : machine.getListeners()) {
+                    listener.onStartup(machine.getStartupTime());
+                }
+                machine.setStartupFinished(true);
             }
+        }
+    },
+    AD {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState destinationPlayerState) {
+        }
+    },
+    ADFINISHED {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+        }
+
+        @Override
+        void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState destinationPlayerState) {
         }
     },
     BUFFERING {
@@ -34,6 +67,7 @@ public enum PlayerState {
     ERROR {
         @Override
         void onEnterState(PlayerStateMachine machine) {
+            machine.videoStartTimeout.cancel();
             for (StateMachineListener listener : machine.getListeners()) {
                 listener.onError(machine.getErrorCode());
             }
@@ -60,13 +94,6 @@ public enum PlayerState {
     PLAYING {
         @Override
         void onEnterState(PlayerStateMachine machine) {
-            if (machine.getElapsedTimeFirstReady() == 0) {
-                machine.setElapsedTimeFirstReady(Util.getElapsedTime());
-                for (StateMachineListener listener : machine.getListeners()) {
-                    listener.onStartup(machine.getStartupTime());
-                }
-            }
-
             machine.enableHeartbeat();
         }
 
@@ -84,15 +111,6 @@ public enum PlayerState {
     PAUSE {
         @Override
         void onEnterState(PlayerStateMachine machine) {
-            if (machine.getElapsedTimeFirstReady() == 0) {
-                machine.setElapsedTimeFirstReady(Util.getElapsedTime());
-                for (StateMachineListener listener : machine.getListeners()) {
-                    listener.onStartup(machine.getStartupTime());
-                }
-            }
-
-//            machine.enableHeartbeat();
-
         }
 
         @Override
@@ -101,8 +119,6 @@ public enum PlayerState {
                 long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
                 listener.onPauseExit(elapsedTime - elapsedTimeOnEnter);
             }
-
-//            machine.disableHeartbeat();
         }
     },
     QUALITYCHANGE {

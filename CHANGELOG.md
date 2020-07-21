@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
-### Fixed
+## Changed
+- tracking of video startup times when having autoplay enabled to be consistent with web platform 
 
+### Fixed
 - `CountDownTimer` potentially continues running after the player adapter is released (AN-1595) 
 
 ## v1.16.0

@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.exoplayer;
 
-import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.Surface;
 
@@ -74,17 +73,16 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private String drmType = null;
     private DRMInformation drmInformation = null;
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
-    private boolean isVideoPlayed = false;
     private boolean isVideoAttemptedPlay = false;
     private long previousQualityChangeBitrate = 0;
+    private boolean isPlaying = false;
+    private boolean isPaused = false;
 
     public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
         this.config = config;
-        this.totalDroppedVideoFrames = 0;
-        this.playerIsReady = false;
         this.factory = factory;
         attachAnalyticsListener();
     }
@@ -108,6 +106,20 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
             simpleExoPlayer.addAnalyticsListener(this);
         }
+    }
+
+    private void startup(long position) {
+        stateMachine.transitionState(PlayerState.STARTUP, position);
+        isVideoAttemptedPlay = true;
+    }
+
+    @Override
+    public void init() {
+        this.totalDroppedVideoFrames = 0;
+        this.playerIsReady = false;
+        this.isVideoAttemptedPlay = false;
+        isPlaying = false;
+        isPaused = false;
     }
 
     @Override
@@ -139,7 +151,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             simpleExoPlayer.removeAnalyticsListener(this);
         }
         meter.reset();
-        videoStartTimeout.cancel();
     }
 
     @Override
@@ -193,38 +204,56 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         long videoTime = getPosition();
         Log.d(TAG, String.format("onPlayerStateChanged: %b, %s", playWhenReady, ExoUtil.exoStateToString(playbackState)));
+
+        boolean oldIsPlaying = this.isPlaying;
+        boolean oldIsPaused = this.isPaused;
+        this.isPlaying = playWhenReady;
+        this.isPaused = !this.isPlaying;
+
+
+        // original logic copied from BMP SDK
+        if (playbackState != Player.STATE_ENDED) {
+            if (this.isPaused != oldIsPaused && this.isPaused && oldIsPlaying) {
+                stateMachine.pause(getPosition());
+            }
+        }
         switch (playbackState) {
             case Player.STATE_READY:
-                if (playWhenReady) {
-                    this.stateMachine.transitionState(PlayerState.PLAYING, videoTime);
-                    if (!isVideoPlayed && !exoplayer.isPlayingAd()) {
-                        if (isVideoAttemptedPlay) {
-                            isVideoPlayed = true;
-                            videoStartTimeout.cancel();
-                        }
-                        //autoplay
-                        else {
-                            isVideoAttemptedPlay = true;
-                            videoStartTimeout.start();
-                        }
-                    }
-                } else {
-                    this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
+                if (this.isPlaying) {
+                    stateMachine.transitionState(PlayerState.PLAYING, getPosition());
                 }
                 break;
             case Player.STATE_BUFFERING:
-                if (stateMachine.getCurrentState() != PlayerState.SEEKING && this.stateMachine.getElapsedTimeFirstReady() != 0) {
-                    this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
+                if (!stateMachine.isStartupFinished()){
+                    if(this.isPlaying != oldIsPlaying && this.isPlaying) {
+                        // with autoplay enabled the player first enter here and start buffering for the video with playWhenReady = true
+                        startup(videoTime);
+                    }
+                } else {
+                    if (!this.isPaused && stateMachine.getCurrentState() != PlayerState.SEEKING) {
+                        this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
+                    }
                 }
                 break;
             case Player.STATE_IDLE:
-                this.stateMachine.transitionState(PlayerState.SETUP, videoTime);
+                // TODO check what this state could mean for analytics?
+                this.stateMachine.transitionState(PlayerState.READY, videoTime);
                 break;
             case Player.STATE_ENDED:
+                // TODO this is equivalent to BMPs PlaybackFinished Event
+                //  should we setup new impression here
                 this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                 break;
             default:
                 Log.d(TAG, "Unknown Player PlayerState encountered");
+        }
+    }
+
+    @Override
+    public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
+        Log.d(TAG, "onIsPlayingChanged " + isPlaying);
+        if (!stateMachine.isStartupFinished() && isPlaying) {
+            startup(getPosition());
         }
     }
 
@@ -246,8 +275,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         long videoTime = getPosition();
         error.printStackTrace();
         ErrorCode errorCode = exceptionMapper.map(error);
-        if (!isVideoPlayed && isVideoAttemptedPlay) {
-            videoStartTimeout.cancel();
+        if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
             stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
         }
         this.stateMachine.setErrorCode(errorCode);
@@ -258,6 +286,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public void onPositionDiscontinuity(int reason) {
         Log.d(TAG, "onPositionDiscontinuity");
+    }
+
+    @Override
+    public void onPositionDiscontinuity(EventTime eventTime, int reason) {
+
     }
 
     @Override
@@ -344,44 +377,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
-    public void onIsPlayingChanged(boolean isPlaying) {
-
-    }
-
-    @Override
-    public void onPlayerStateChanged(EventTime eventTime, boolean playWhenReady, int playbackState) {
-
-    }
-
-    @Override
-    public void onPlaybackSuppressionReasonChanged(EventTime eventTime, int playbackSuppressionReason) {
-        Log.d(TAG, "onPlaybackSuppressionReasonChanged");
-    }
-
-    @Override
-    public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
-        Log.d(TAG, "onIsPlayingChanged " + isPlaying);
-
-        if (!exoplayer.isPlayingAd() && isPlaying && !isVideoPlayed) {
-            //autoplay
-            if (isVideoAttemptedPlay && exoplayer.getPlayWhenReady()) {
-                videoStartTimeout.cancel();
-                isVideoPlayed = true;
-            } else {
-                videoStartTimeout.start();
-                isVideoAttemptedPlay = true;
-            }
-        }
-    }
+    public void onPlaybackSuppressionReasonChanged(EventTime eventTime, int playbackSuppressionReason) { }
 
     @Override
     public void onTimelineChanged(EventTime eventTime, int reason) {
-
-    }
-
-    @Override
-    public void onPositionDiscontinuity(EventTime eventTime, int reason) {
-
+        Log.d(TAG, "onTimelineChanged");
     }
 
     @Override
@@ -626,19 +626,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     public void onDrmSessionReleased(EventTime eventTime) {
         Log.d(TAG, "onDrmSessionReleased");
     }
-
-    private CountDownTimer videoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
-
-        @Override
-        public void onFinish() {
-            Log.d(TAG, "VideoStartTimeout finish");
-            stateMachine.setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
-            stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
-        }
-    };
 }
 
 

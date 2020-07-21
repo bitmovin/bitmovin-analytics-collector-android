@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.stateMachines;
 
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 
@@ -18,9 +19,9 @@ public class PlayerStateMachine {
     private final BitmovinAnalyticsConfig config;
     private List<StateMachineListener> listeners = new ArrayList<StateMachineListener>();
     private PlayerState currentState;
-    private long elaspedTimeInitial = 0;
-    private long elapsedTimeFirstReady = 0;
     private long elapsedTimeOnEnter = 0;
+    private long startupTime = 0;
+    private boolean startupFinished = false;
     private long elapsedTimeSeekStart = 0;
     private long videoTimeStart;
     private long videoTimeEnd;
@@ -82,13 +83,18 @@ public class PlayerStateMachine {
         disableHeartbeat();
         disableRebufferHeartbeat();
         this.impressionId = Util.getUUID();
-        this.elaspedTimeInitial = Util.getElapsedTime();
-        this.elapsedTimeFirstReady = 0;
         this.videoStartFailedReason = null;
-        setCurrentState(PlayerState.SETUP);
+        startupTime = 0;
+        startupFinished = false;
+        videoStartTimeout.cancel();
+        setCurrentState(PlayerState.READY);
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
+        if (!this.isTransitionAllowed(currentState, destinationPlayerState)) {
+            return;
+        }
+
         long elapsedTime = Util.getElapsedTime();
         videoTimeEnd = videoTime;
 
@@ -101,12 +107,24 @@ public class PlayerStateMachine {
         setCurrentState(destinationPlayerState);
     }
 
-    public long getElapsedTimeFirstReady() {
-        return elapsedTimeFirstReady;
+    private boolean isTransitionAllowed(PlayerState currentState, PlayerState destination) {
+        if (destination == this.currentState) {
+            return false;
+        }
+        // no state transitions like PLAYING or PAUSE during AD
+        else if (currentState == PlayerState.AD && (destination != PlayerState.ERROR && destination != PlayerState.ADFINISHED )) {
+            return false;
+        }
+
+        return true;
     }
 
-    public void setElapsedTimeFirstReady(long elapsedTime) {
-        this.elapsedTimeFirstReady = elapsedTime;
+    public boolean isStartupFinished() {
+        return startupFinished;
+    }
+
+    public void setStartupFinished(boolean startupFinished) {
+        this.startupFinished = startupFinished;
     }
 
     public void addListener(StateMachineListener toAdd) {
@@ -130,7 +148,11 @@ public class PlayerStateMachine {
     }
 
     public long getStartupTime() {
-        return elapsedTimeFirstReady - elaspedTimeInitial;
+        return startupTime;
+    }
+
+    public void addStartupTime(long elapsedTime) {
+        this.startupTime += elapsedTime;
     }
 
     public String getImpressionId() {
@@ -173,6 +195,32 @@ public class PlayerStateMachine {
         this.videoStartFailedReason = videoStartFailedReason;
     }
 
+    protected CountDownTimer videoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+
+        @Override
+        public void onFinish() {
+            Log.d(TAG, "VideoStartTimeout finish");
+            setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
+            transitionState(PlayerState.EXITBEFOREVIDEOSTART, 0);
+        }
+    };
+
+    public void pause(long position) {
+        if (isStartupFinished()) {
+            transitionState(PlayerState.PAUSE, position);
+        }
+        else {
+            transitionState(PlayerState.READY, position);
+        }
+    }
+
+    public void startAd(long position){
+        transitionState(PlayerState.AD, position);
+        startupTime = 0;
+    }
 }
 
 
