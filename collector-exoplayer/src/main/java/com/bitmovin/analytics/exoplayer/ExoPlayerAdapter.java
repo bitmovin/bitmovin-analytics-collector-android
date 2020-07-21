@@ -211,17 +211,15 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         this.isPaused = !this.isPlaying;
 
 
-        // Copied logic from BMP SDK
+        // original logic copied from BMP SDK
         if (playbackState != Player.STATE_ENDED) {
             if (this.isPaused != oldIsPaused && this.isPaused && oldIsPlaying) {
-                    Log.d(TAG, "PLAYER: onPause");
                 stateMachine.pause(getPosition());
             }
         }
         switch (playbackState) {
             case Player.STATE_READY:
                 if (this.isPlaying) {
-                    Log.d(TAG, "PLAYER: onPlaying");
                     stateMachine.transitionState(PlayerState.PLAYING, getPosition());
                 }
                 break;

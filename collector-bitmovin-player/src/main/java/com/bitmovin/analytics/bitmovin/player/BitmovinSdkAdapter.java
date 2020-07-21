@@ -34,7 +34,6 @@ import com.bitmovin.player.api.event.data.SourceUnloadedEvent;
 import com.bitmovin.player.api.event.data.StallEndedEvent;
 import com.bitmovin.player.api.event.data.StallStartedEvent;
 import com.bitmovin.player.api.event.data.SubtitleChangedEvent;
-import com.bitmovin.player.api.event.data.TimeChangedEvent;
 import com.bitmovin.player.api.event.data.VideoPlaybackQualityChangedEvent;
 import com.bitmovin.player.api.event.listener.OnAdBreakStartedListener;
 import com.bitmovin.player.api.event.listener.OnAudioChangedListener;
@@ -55,7 +54,6 @@ import com.bitmovin.player.api.event.listener.OnSourceUnloadedListener;
 import com.bitmovin.player.api.event.listener.OnStallEndedListener;
 import com.bitmovin.player.api.event.listener.OnStallStartedListener;
 import com.bitmovin.player.api.event.listener.OnSubtitleChangedListener;
-import com.bitmovin.player.api.event.listener.OnTimeChangedListener;
 import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener;
 import com.bitmovin.player.config.PlaybackConfiguration;
 import com.bitmovin.player.config.media.SourceConfiguration;
@@ -264,6 +262,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
 
     }
 
+    /*
+      Because of the late initialization of the Adapter we do not get the first couple of events
+      so in case the player starts a video due to autoplay=true we need to transition into startup state manually
+     */
     private void checkAutoplayStartup() {
         PlaybackConfiguration playbackConfiguration = bitmovinPlayer.getConfig().getPlaybackConfiguration();
         SourceConfiguration source = bitmovinPlayer.getConfig().getSourceConfiguration();
