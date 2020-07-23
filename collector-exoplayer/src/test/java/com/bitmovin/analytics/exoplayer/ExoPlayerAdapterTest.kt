@@ -35,11 +35,24 @@ class ExoPlayerAdapterTest {
     fun testNoStateTransitionToQualityChangeIfBitrateDidNotChange() {
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
+        `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
         adapter.fakePosition = 20
         adapter.onDecoderInputFormatChanged(getEventTime(20L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
         verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+
         adapter.onDecoderInputFormatChanged(getEventTime(30L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
         verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+    }
+
+    @Test
+    fun testNoStateTransitionToQualityChangeIfQualityChangeLimit() {
+        val bitrate = 3000
+        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
+        `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
+        adapter.fakePosition = 20
+        adapter.onDecoderInputFormatChanged(getEventTime(20L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
+        verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+
     }
 
     private fun getEventTime(realTime: Long): AnalyticsListener.EventTime {
