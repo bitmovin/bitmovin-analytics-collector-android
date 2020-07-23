@@ -230,7 +230,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                         startup(videoTime);
                     }
                 } else {
-                    if (!this.isPaused && stateMachine.getCurrentState() != PlayerState.SEEKING) {
+                    if (stateMachine.getCurrentState() != PlayerState.SEEKING) {
                         this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
                     }
                 }
@@ -547,10 +547,13 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                 return;
             }
             this.previousQualityChangeBitrate = format.bitrate;
-            long videoTime = getPosition();
-            PlayerState originalState = this.stateMachine.getCurrentState();
-            this.stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
-            this.stateMachine.transitionState(originalState, videoTime);
+            if(this.stateMachine.isQualityChangeEventEnabled()) {
+                long videoTime = getPosition();
+                PlayerState originalState = this.stateMachine.getCurrentState();
+                this.stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
+                this.stateMachine.transitionState(originalState, videoTime);
+                this.stateMachine.increaseQualityChangeCount(videoTime);
+            }
         }
     }
 

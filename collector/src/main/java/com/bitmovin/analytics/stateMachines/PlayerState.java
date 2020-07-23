@@ -124,6 +124,9 @@ public enum PlayerState {
     QUALITYCHANGE {
         @Override
         void onEnterState(PlayerStateMachine machine) {
+            if(!machine.isQualityChangeTimerRunning){
+                machine.qualityChangeResetTimeout.start();
+            }
         }
 
         @Override

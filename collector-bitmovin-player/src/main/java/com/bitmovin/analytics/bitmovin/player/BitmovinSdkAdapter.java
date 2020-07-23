@@ -116,9 +116,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.addEventListener(onDestroyedListener);
 
         this.bitmovinPlayer.addEventListener(onErrorListener);
-
         this.bitmovinPlayer.addEventListener(onAdBreakStartedListener);
-        this.bitmovinPlayer.addEventListener(onAdBreakFinishedListener);
     }
 
     private void removePlayerListener() {
@@ -434,10 +432,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onVideoPlaybackQualityChanged(
                 VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Video Quality Changed");
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.isStartupFinished()) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE)
+                    && stateMachine.isStartupFinished() && stateMachine.isQualityChangeEventEnabled()) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
+                stateMachine.increaseQualityChangeCount(getPosition());
             }
         }
     };
@@ -454,7 +454,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onAudioPlaybackQualityChanged(
                 AudioPlaybackQualityChangedEvent audioPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Audio Quality Changed");
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.isStartupFinished()) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE)
+                    && stateMachine.isStartupFinished() && stateMachine.isQualityChangeEventEnabled()) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 AudioQuality oldQuality = audioPlaybackQualityChangedEvent.getOldAudioQuality();
                 AudioQuality newQuality = audioPlaybackQualityChangedEvent.getNewAudioQuality();
@@ -463,6 +464,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 }
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
+                stateMachine.increaseQualityChangeCount(getPosition());
             }
         }
     };
