@@ -116,7 +116,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         this.bitmovinPlayer.addEventListener(onDestroyedListener);
 
         this.bitmovinPlayer.addEventListener(onErrorListener);
+
         this.bitmovinPlayer.addEventListener(onAdBreakStartedListener);
+        this.bitmovinPlayer.addEventListener(onAdBreakFinishedListener);
     }
 
     private void removePlayerListener() {
