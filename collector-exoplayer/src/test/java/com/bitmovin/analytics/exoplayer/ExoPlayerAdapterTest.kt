@@ -52,7 +52,6 @@ class ExoPlayerAdapterTest {
         adapter.fakePosition = 20
         adapter.onDecoderInputFormatChanged(getEventTime(20L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
         verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
-
     }
 
     private fun getEventTime(realTime: Long): AnalyticsListener.EventTime {
