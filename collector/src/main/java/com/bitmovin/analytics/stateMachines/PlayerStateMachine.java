@@ -227,16 +227,11 @@ public class PlayerStateMachine {
     }
 
     public boolean isQualityChangeEventEnabled(){
-        return this.qualityChangeCount < Util.ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD;
+        return this.qualityChangeCount <= Util.ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD;
     }
 
-    public void increaseQualityChangeCount(long position){
+    public void increaseQualityChangeCount(){
         this.qualityChangeCount++;
-
-        if(!isQualityChangeEventEnabled()){
-            errorCode = new ErrorCode(10000, "ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED", null );
-            transitionState(PlayerState.ERROR,position);
-        }
     }
 
     protected void resetQualityChangeCount(){

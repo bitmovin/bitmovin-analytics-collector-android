@@ -552,7 +552,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                 PlayerState originalState = this.stateMachine.getCurrentState();
                 this.stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
                 this.stateMachine.transitionState(originalState, videoTime);
-                this.stateMachine.increaseQualityChangeCount(videoTime);
             }
         }
     }

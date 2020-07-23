@@ -437,7 +437,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
-                stateMachine.increaseQualityChangeCount(getPosition());
             }
         }
     };
@@ -464,7 +463,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 }
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
-                stateMachine.increaseQualityChangeCount(getPosition());
             }
         }
     };
