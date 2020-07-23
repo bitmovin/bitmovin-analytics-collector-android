@@ -4,8 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class CollectorConfig implements Parcelable {
-   // private String backendUrl = "https://analytics-ingress-global.bitmovin.com/";
-     private String backendUrl = "http://10.0.0.4:8080/";
+    private String backendUrl = "https://analytics-ingress-global.bitmovin.com/";
 
     public CollectorConfig() {
     }

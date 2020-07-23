@@ -230,7 +230,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                         startup(videoTime);
                     }
                 } else {
-                    if (stateMachine.getCurrentState() != PlayerState.SEEKING) {
+                    if (!this.isPaused && stateMachine.getCurrentState() != PlayerState.SEEKING) {
                         this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
                     }
                 }
