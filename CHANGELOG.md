@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v1.17.0
 
+### Added
+
+- Timeout for rebuffering event (AN-1559)
+
 ### Changed
 - tracking of video startup times when having autoplay enabled to be consistent with web platform 
 
