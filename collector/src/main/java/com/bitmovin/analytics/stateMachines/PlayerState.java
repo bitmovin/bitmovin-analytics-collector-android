@@ -53,6 +53,7 @@ public enum PlayerState {
         @Override
         void onEnterState(PlayerStateMachine machine) {
             machine.enableRebufferHeartbeat();
+            machine.rebufferingTimeout.start();
         }
 
         @Override
@@ -62,6 +63,7 @@ public enum PlayerState {
                 long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
                 listener.onRebuffering(elapsedTime - elapsedTimeOnEnter);
             }
+            machine.rebufferingTimeout.cancel();
         }
     },
     ERROR {

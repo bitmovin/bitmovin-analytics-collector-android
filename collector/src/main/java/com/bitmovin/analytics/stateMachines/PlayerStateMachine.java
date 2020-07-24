@@ -7,6 +7,7 @@ import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
+import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.utils.Util;
 
@@ -87,6 +88,7 @@ public class PlayerStateMachine {
         startupTime = 0;
         startupFinished = false;
         videoStartTimeout.cancel();
+        rebufferingTimeout.cancel();
         setCurrentState(PlayerState.READY);
     }
 
@@ -221,6 +223,22 @@ public class PlayerStateMachine {
         transitionState(PlayerState.AD, position);
         startupTime = 0;
     }
+
+    protected CountDownTimer rebufferingTimeout = new CountDownTimer(Util.REBUFFERING_TIMEOUT, 1000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+
+        @Override
+        public void onFinish() {
+            Log.d(TAG, "rebufferingTimeout finish");
+            setErrorCode(AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.getErrorCode());
+            transitionState(PlayerState.ERROR, analytics.getPosition());
+            disableRebufferHeartbeat();
+        }
+
+    };
+
 }
 
 
