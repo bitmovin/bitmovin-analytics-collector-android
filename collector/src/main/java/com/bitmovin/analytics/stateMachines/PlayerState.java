@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.stateMachines;
 
 import com.bitmovin.analytics.data.ErrorCode;
+import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.utils.Util;
 
 public enum PlayerState {
@@ -139,7 +140,7 @@ public enum PlayerState {
                }
            }
            else {
-               ErrorCode errorCode = new ErrorCode(10000, "ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED", null );
+               ErrorCode errorCode = AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.getErrorCode();
 
                for (StateMachineListener listener : machine.getListeners()) {
                    listener.onError(errorCode);
