@@ -7,6 +7,7 @@ import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
+import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.utils.Util;
 
@@ -118,6 +119,10 @@ public class PlayerStateMachine {
         }
         // no state transitions like PLAYING or PAUSE during AD
         else if (currentState == PlayerState.AD && (destination != PlayerState.ERROR && destination != PlayerState.ADFINISHED )) {
+            return false;
+        }
+        else if(currentState == PlayerState.READY && (destination != PlayerState.ERROR && destination != PlayerState.EXITBEFOREVIDEOSTART &&
+                destination != PlayerState.STARTUP && destination != PlayerState.AD)){
             return false;
         }
 
@@ -265,6 +270,7 @@ public class PlayerStateMachine {
             setErrorCode(AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.getErrorCode());
             transitionState(PlayerState.ERROR, analytics.getPosition());
             disableRebufferHeartbeat();
+            resetStateMachine();
         }
 
     };
