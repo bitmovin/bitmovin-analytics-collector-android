@@ -250,6 +250,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         if (bitmovinPlayer != null) {
             removePlayerListener();
         }
+        stateMachine.resetStateMachine();
     }
 
     @Override
