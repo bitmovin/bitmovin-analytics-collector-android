@@ -33,6 +33,8 @@ public class PlayerStateMachine {
     private int heartbeatDelay = 59700; // default to 60 seconds
     private final BitmovinAnalytics analytics;
     private VideoStartFailedReason videoStartFailedReason;
+    private int qualityChangeCount = 0;
+    protected boolean isQualityChangeTimerRunning = false;
 
     public PlayerStateMachine(BitmovinAnalyticsConfig config, BitmovinAnalytics analytics) {
         this.config = config;
@@ -87,7 +89,9 @@ public class PlayerStateMachine {
         startupTime = 0;
         startupFinished = false;
         videoStartTimeout.cancel();
+        qualityChangeResetTimeout.cancel();
         setCurrentState(PlayerState.READY);
+        resetQualityChangeCount();
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
@@ -221,6 +225,33 @@ public class PlayerStateMachine {
         transitionState(PlayerState.AD, position);
         startupTime = 0;
     }
+
+    public boolean isQualityChangeEventEnabled(){
+        return this.qualityChangeCount <= Util.ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD;
+    }
+
+    public void increaseQualityChangeCount(){
+        this.qualityChangeCount++;
+    }
+
+    protected void resetQualityChangeCount(){
+        this.qualityChangeCount = 0;
+    }
+
+    protected CountDownTimer qualityChangeResetTimeout = new CountDownTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL, 1000) {
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            isQualityChangeTimerRunning = true;
+        }
+
+        @Override
+        public void onFinish() {
+            Log.d(TAG, "qualityChangeResetTimeout finish");
+            resetQualityChangeCount();
+            isQualityChangeTimerRunning = false;
+        }
+    };
 }
 
 

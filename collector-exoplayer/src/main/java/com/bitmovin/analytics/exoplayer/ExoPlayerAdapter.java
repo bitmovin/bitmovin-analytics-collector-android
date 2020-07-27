@@ -151,6 +151,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             simpleExoPlayer.removeAnalyticsListener(this);
         }
         meter.reset();
+        stateMachine.resetStateMachine();
     }
 
     @Override
@@ -547,10 +548,12 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                 return;
             }
             this.previousQualityChangeBitrate = format.bitrate;
-            long videoTime = getPosition();
-            PlayerState originalState = this.stateMachine.getCurrentState();
-            this.stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
-            this.stateMachine.transitionState(originalState, videoTime);
+            if(this.stateMachine.isQualityChangeEventEnabled()) {
+                long videoTime = getPosition();
+                PlayerState originalState = this.stateMachine.getCurrentState();
+                this.stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
+                this.stateMachine.transitionState(originalState, videoTime);
+            }
         }
     }
 
