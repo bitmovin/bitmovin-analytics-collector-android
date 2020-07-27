@@ -9,7 +9,6 @@ import android.provider.Settings;
 import android.util.Pair;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +22,8 @@ public class Util {
     public static final String SMOOTH_STREAM_FORMAT = "smooth";
     public static final int MILLISECONDS_IN_SECONDS = 1000;
     public static final int VIDEOSTART_TIMEOUT = 1000 * 60; // in milliseconds
+    public static final int ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD = 50;
+    public static final int ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL = 1000 * 60 * 60; // in milliseconds;
     public static final int REBUFFERING_TIMEOUT = 1000 * 60 * 2; // in milliseconds
 
     private static final Map<String, String> VIDEO_FORMAT_MIME_TYPE_MAP;
@@ -85,8 +86,8 @@ public class Util {
             }
 
             String[] types = codecInfo.getSupportedTypes();
-            for (int j = 0; j < types.length; j++) {
-                if (types[j].equalsIgnoreCase(mimeType)) {
+            for (String type : types) {
+                if (type.equalsIgnoreCase(mimeType)) {
                     return true;
                 }
             }

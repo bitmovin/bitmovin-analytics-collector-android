@@ -250,6 +250,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         if (bitmovinPlayer != null) {
             removePlayerListener();
         }
+        stateMachine.resetStateMachine();
     }
 
     @Override
@@ -434,7 +435,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onVideoPlaybackQualityChanged(
                 VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Video Quality Changed");
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.isStartupFinished()) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE)
+                    && stateMachine.isStartupFinished() && stateMachine.isQualityChangeEventEnabled()) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
                 stateMachine.transitionState(originalState, getPosition());
@@ -454,7 +456,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onAudioPlaybackQualityChanged(
                 AudioPlaybackQualityChangedEvent audioPlaybackQualityChangedEvent) {
             Log.d(TAG, "On Audio Quality Changed");
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.isStartupFinished()) {
+            if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE)
+                    && stateMachine.isStartupFinished() && stateMachine.isQualityChangeEventEnabled()) {
                 PlayerState originalState = stateMachine.getCurrentState();
                 AudioQuality oldQuality = audioPlaybackQualityChangedEvent.getOldAudioQuality();
                 AudioQuality newQuality = audioPlaybackQualityChangedEvent.getNewAudioQuality();

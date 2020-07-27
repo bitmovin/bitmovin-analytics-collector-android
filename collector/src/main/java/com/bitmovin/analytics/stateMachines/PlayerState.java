@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.stateMachines;
 
+import com.bitmovin.analytics.data.ErrorCode;
+import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.utils.Util;
 
 public enum PlayerState {
@@ -126,13 +128,27 @@ public enum PlayerState {
     QUALITYCHANGE {
         @Override
         void onEnterState(PlayerStateMachine machine) {
+            machine.increaseQualityChangeCount();
+            if(!machine.isQualityChangeTimerRunning){
+                machine.qualityChangeResetTimeout.start();
+            }
         }
 
         @Override
         void onExitState(PlayerStateMachine machine, long elapsedTime, PlayerState destinationPlayerState) {
-            for (StateMachineListener listener : machine.getListeners()) {
-                listener.onQualityChange();
-            }
+           if(machine.isQualityChangeEventEnabled()) {
+               for (StateMachineListener listener : machine.getListeners()) {
+                   listener.onQualityChange();
+               }
+           }
+           else {
+               ErrorCode errorCode = AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.getErrorCode();
+
+               for (StateMachineListener listener : machine.getListeners()) {
+                   listener.onError(errorCode);
+               }
+           }
+
         }
     },
     AUDIOTRACKCHANGE {

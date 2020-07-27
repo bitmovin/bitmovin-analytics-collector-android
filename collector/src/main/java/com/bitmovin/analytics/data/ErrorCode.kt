@@ -4,6 +4,6 @@ class ErrorCode(val errorCode: Int, var description: String, var errorData: Erro
 
     @Override
     override fun toString(): String {
-        return errorCode.toString() + ": " + description
+        return "$errorCode: $description"
     }
 }
