@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Restricted number of quality changes tracked per period of time (AN-1560)
+- Timeout for rebuffering event (AN-1559)
 
 ## v1.17.0
 

@@ -24,6 +24,7 @@ public class Util {
     public static final int VIDEOSTART_TIMEOUT = 1000 * 60; // in milliseconds
     public static final int ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD = 50;
     public static final int ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL = 1000 * 60 * 60; // in milliseconds;
+    public static final int REBUFFERING_TIMEOUT = 1000 * 60 * 2; // in milliseconds
 
     private static final Map<String, String> VIDEO_FORMAT_MIME_TYPE_MAP;
     public static final String PLAYER_TECH = "Android:Exoplayer";

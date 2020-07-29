@@ -7,6 +7,7 @@ import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.ErrorCode;
+import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.utils.Util;
 
@@ -90,6 +91,7 @@ public class PlayerStateMachine {
         startupFinished = false;
         videoStartTimeout.cancel();
         qualityChangeResetTimeout.cancel();
+        rebufferingTimeout.cancel();
         setCurrentState(PlayerState.READY);
         resetQualityChangeCount();
     }
@@ -117,6 +119,10 @@ public class PlayerStateMachine {
         }
         // no state transitions like PLAYING or PAUSE during AD
         else if (currentState == PlayerState.AD && (destination != PlayerState.ERROR && destination != PlayerState.ADFINISHED )) {
+            return false;
+        }
+        else if(currentState == PlayerState.READY && (destination != PlayerState.ERROR && destination != PlayerState.EXITBEFOREVIDEOSTART &&
+                destination != PlayerState.STARTUP && destination != PlayerState.AD)){
             return false;
         }
 
@@ -252,6 +258,23 @@ public class PlayerStateMachine {
             isQualityChangeTimerRunning = false;
         }
     };
+
+    protected CountDownTimer rebufferingTimeout = new CountDownTimer(Util.REBUFFERING_TIMEOUT, 1000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+
+        @Override
+        public void onFinish() {
+            Log.d(TAG, "rebufferingTimeout finish");
+            setErrorCode(AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.getErrorCode());
+            transitionState(PlayerState.ERROR, analytics.getPosition());
+            disableRebufferHeartbeat();
+            resetStateMachine();
+        }
+
+    };
+
 }
 
 
