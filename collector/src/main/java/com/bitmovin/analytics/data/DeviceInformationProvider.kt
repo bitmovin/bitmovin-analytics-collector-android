@@ -3,16 +3,14 @@ package com.bitmovin.analytics.data
 import android.app.UiModeManager
 import android.content.Context
 import android.content.res.Configuration
-
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import com.bitmovin.analytics.utils.Util
 import kotlin.math.roundToInt
 
-
 open class DeviceInformationProvider(val context: Context, val userAgent: String) {
-   var isTV: Boolean = isTVDevice()
+    var isTV: Boolean = isTVDevice()
 
     private val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val displayMetrics = DisplayMetrics()
@@ -22,7 +20,6 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
 
     val width = (configuration.screenWidthDp * displayMetrics.density).roundToInt()
     val height = (configuration.screenHeightDp * displayMetrics.density).roundToInt()
-
 
     fun getDeviceInformation(): DeviceInformation {
         return DeviceInformation(
