@@ -7,15 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Changed
+- Way of getting available screen width and height
+
 ## v1.18.0
 
 ### Added
 
 - Restricted number of quality changes tracked per period of time (AN-1560)
 - Timeout for rebuffering event (AN-1559)
-
-### Changed
-- Getting available screen dimensions
 
 ## v1.17.0
 
