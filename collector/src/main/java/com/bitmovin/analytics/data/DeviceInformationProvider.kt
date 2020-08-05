@@ -12,16 +12,16 @@ import kotlin.math.roundToInt
 open class DeviceInformationProvider(val context: Context, val userAgent: String) {
     var isTV: Boolean = isTVDevice()
 
-    private val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    private val displayMetrics = DisplayMetrics()
-
-    val res = windowManager.defaultDisplay.getMetrics(displayMetrics)
-    val configuration: Configuration = context.resources.configuration
-
-    val width = (configuration.screenWidthDp * displayMetrics.density).roundToInt()
-    val height = (configuration.screenHeightDp * displayMetrics.density).roundToInt()
-
     fun getDeviceInformation(): DeviceInformation {
+
+        val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val displayMetrics = DisplayMetrics()
+
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+
+        val width = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
+        val height = (displayMetrics.heightPixels / displayMetrics.density).roundToInt()
+
         return DeviceInformation(
                 manufacturer = Build.MANUFACTURER,
                 model = Build.MODEL,
