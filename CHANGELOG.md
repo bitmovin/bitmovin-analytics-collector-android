@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.18.0
+
 ### Added
 
 - Restricted number of quality changes tracked per period of time (AN-1560)
