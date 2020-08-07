@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
-- Way of getting available screen width and height
+- Calculations for available screen width and height to now include screen density and be more independent of physical pixel
 
 ## v1.18.0
 
