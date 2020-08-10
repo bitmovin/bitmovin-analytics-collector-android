@@ -16,11 +16,15 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
 
         val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val displayMetrics = DisplayMetrics()
+        var width: Int = 0
+        var height: Int = 0
 
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        if (windowManager != null) {
+            windowManager.defaultDisplay.getMetrics(displayMetrics)
 
-        val width = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
-        val height = (displayMetrics.heightPixels / displayMetrics.density).roundToInt()
+            width = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
+            height = (displayMetrics.heightPixels / displayMetrics.density).roundToInt()
+        }
 
         return DeviceInformation(
                 manufacturer = Build.MANUFACTURER,
