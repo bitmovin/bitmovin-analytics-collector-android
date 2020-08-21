@@ -94,182 +94,163 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     }
 
     private void addPlayerListeners() {
-        try {
-            Log.d(TAG, "Adding Player Listeners");
-            this.bitmovinPlayer.addEventListener(onSourceLoadedListener);
-            this.bitmovinPlayer.addEventListener(onSourceUnloadedListener);
+        Log.d(TAG, "Adding Player Listeners");
+        this.bitmovinPlayer.addEventListener(onSourceLoadedListener);
+        this.bitmovinPlayer.addEventListener(onSourceUnloadedListener);
 
-            this.bitmovinPlayer.addEventListener(onPlayListener);
-            this.bitmovinPlayer.addEventListener(onPlayingListener);
-            this.bitmovinPlayer.addEventListener(onPausedListener);
-            this.bitmovinPlayer.addEventListener(onStallEndedListener);
-            this.bitmovinPlayer.addEventListener(onSeekedListener);
-            this.bitmovinPlayer.addEventListener(onSeekListener);
-            this.bitmovinPlayer.addEventListener(onStallStartedListener);
-            this.bitmovinPlayer.addEventListener(onPlaybackFinishedListener);
-            this.bitmovinPlayer.addEventListener(onReadyListener);
-            this.bitmovinPlayer.addEventListener(onVideoPlaybackQualityChangedListener);
-            this.bitmovinPlayer.addEventListener(onAudioPlaybackQualityChangedListener);
-            this.bitmovinPlayer.addEventListener(onDroppedVideoFramesListener);
-            this.bitmovinPlayer.addEventListener(onSubtitleChangedListener);
-            this.bitmovinPlayer.addEventListener(onAudioChangedListener);
-            this.bitmovinPlayer.addEventListener(onDownloadFinishedListener);
-            this.bitmovinPlayer.addEventListener(onDestroyedListener);
+        this.bitmovinPlayer.addEventListener(onPlayListener);
+        this.bitmovinPlayer.addEventListener(onPlayingListener);
+        this.bitmovinPlayer.addEventListener(onPausedListener);
+        this.bitmovinPlayer.addEventListener(onStallEndedListener);
+        this.bitmovinPlayer.addEventListener(onSeekedListener);
+        this.bitmovinPlayer.addEventListener(onSeekListener);
+        this.bitmovinPlayer.addEventListener(onStallStartedListener);
+        this.bitmovinPlayer.addEventListener(onPlaybackFinishedListener);
+        this.bitmovinPlayer.addEventListener(onReadyListener);
+        this.bitmovinPlayer.addEventListener(onVideoPlaybackQualityChangedListener);
+        this.bitmovinPlayer.addEventListener(onAudioPlaybackQualityChangedListener);
+        this.bitmovinPlayer.addEventListener(onDroppedVideoFramesListener);
+        this.bitmovinPlayer.addEventListener(onSubtitleChangedListener);
+        this.bitmovinPlayer.addEventListener(onAudioChangedListener);
+        this.bitmovinPlayer.addEventListener(onDownloadFinishedListener);
+        this.bitmovinPlayer.addEventListener(onDestroyedListener);
 
-            this.bitmovinPlayer.addEventListener(onErrorListener);
+        this.bitmovinPlayer.addEventListener(onErrorListener);
 
-            this.bitmovinPlayer.addEventListener(onAdBreakStartedListener);
-            this.bitmovinPlayer.addEventListener(onAdBreakFinishedListener);
-        } catch (Exception e) {
-            Log.d(TAG, "On Adding Player Listeners", e);
-        }
+        this.bitmovinPlayer.addEventListener(onAdBreakStartedListener);
+        this.bitmovinPlayer.addEventListener(onAdBreakFinishedListener);
     }
 
     private void removePlayerListener() {
-        try {
-            Log.d(TAG, "Removing Player Listeners");
-            this.bitmovinPlayer.removeEventListener(onSourceLoadedListener);
-            this.bitmovinPlayer.removeEventListener(onSourceUnloadedListener);
+        Log.d(TAG, "Removing Player Listeners");
+        this.bitmovinPlayer.removeEventListener(onSourceLoadedListener);
+        this.bitmovinPlayer.removeEventListener(onSourceUnloadedListener);
 
-            this.bitmovinPlayer.removeEventListener(onPlayListener);
-            this.bitmovinPlayer.removeEventListener(onPlayingListener);
-            this.bitmovinPlayer.removeEventListener(onPausedListener);
-            this.bitmovinPlayer.removeEventListener(onStallEndedListener);
-            this.bitmovinPlayer.removeEventListener(onSeekedListener);
-            this.bitmovinPlayer.removeEventListener(onStallStartedListener);
-            this.bitmovinPlayer.removeEventListener(onSeekListener);
-            this.bitmovinPlayer.removeEventListener(onPlaybackFinishedListener);
-            this.bitmovinPlayer.removeEventListener(onReadyListener);
-            this.bitmovinPlayer.removeEventListener(onVideoPlaybackQualityChangedListener);
-            this.bitmovinPlayer.removeEventListener(onAudioPlaybackQualityChangedListener);
-            this.bitmovinPlayer.removeEventListener(onDroppedVideoFramesListener);
-            this.bitmovinPlayer.removeEventListener(onErrorListener);
-            this.bitmovinPlayer.removeEventListener(onSubtitleChangedListener);
-            this.bitmovinPlayer.removeEventListener(onAudioChangedListener);
-            this.bitmovinPlayer.removeEventListener(onDownloadFinishedListener);
-            this.bitmovinPlayer.removeEventListener(onDestroyedListener);
+        this.bitmovinPlayer.removeEventListener(onPlayListener);
+        this.bitmovinPlayer.removeEventListener(onPlayingListener);
+        this.bitmovinPlayer.removeEventListener(onPausedListener);
+        this.bitmovinPlayer.removeEventListener(onStallEndedListener);
+        this.bitmovinPlayer.removeEventListener(onSeekedListener);
+        this.bitmovinPlayer.removeEventListener(onStallStartedListener);
+        this.bitmovinPlayer.removeEventListener(onSeekListener);
+        this.bitmovinPlayer.removeEventListener(onPlaybackFinishedListener);
+        this.bitmovinPlayer.removeEventListener(onReadyListener);
+        this.bitmovinPlayer.removeEventListener(onVideoPlaybackQualityChangedListener);
+        this.bitmovinPlayer.removeEventListener(onAudioPlaybackQualityChangedListener);
+        this.bitmovinPlayer.removeEventListener(onDroppedVideoFramesListener);
+        this.bitmovinPlayer.removeEventListener(onErrorListener);
+        this.bitmovinPlayer.removeEventListener(onSubtitleChangedListener);
+        this.bitmovinPlayer.removeEventListener(onAudioChangedListener);
+        this.bitmovinPlayer.removeEventListener(onDownloadFinishedListener);
+        this.bitmovinPlayer.removeEventListener(onDestroyedListener);
 
-            this.bitmovinPlayer.removeEventListener(onAdBreakStartedListener);
-            this.bitmovinPlayer.removeEventListener(onAdBreakFinishedListener);
-        }
-        catch (Exception e) {
-            Log.d(TAG, "On Removing Player Listeners", e);
-        }
+        this.bitmovinPlayer.removeEventListener(onAdBreakStartedListener);
+        this.bitmovinPlayer.removeEventListener(onAdBreakFinishedListener);
     }
 
     @Override
     public EventData createEventData() {
-        try {
-            EventData data = factory.build(stateMachine.getImpressionId());
+        EventData data = factory.build(stateMachine.getImpressionId());
 
-            data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
-            data.setPlayer(PlayerType.BITMOVIN.toString());
+        data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
+        data.setPlayer(PlayerType.BITMOVIN.toString());
 
-            //duration
-            double duration = bitmovinPlayer.getDuration();
-            if (duration != Double.POSITIVE_INFINITY) {
-                data.setVideoDuration((long) duration * Util.MILLISECONDS_IN_SECONDS);
-            }
-
-            //ad
-            if (bitmovinPlayer.isAd()) {
-                data.setAd(1);
-            }
-
-            //isLive
-            data.setLive(Util.getIsLiveFromConfigOrPlayer(playerIsReady, config.isLive(), bitmovinPlayer.isLive()));
-
-            //version
-            data.setVersion(PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.getPlayerVersion());
-
-            //isCasting
-            data.setCasting(bitmovinPlayer.isCasting());
-
-            // DroppedVideoFrames
-            data.setDroppedFrames(this.totalDroppedVideoFrames);
-            this.totalDroppedVideoFrames = 0;
-
-            //streamFormat, mpdUrl, and m3u8Url
-            if (bitmovinPlayer.getConfig() != null && bitmovinPlayer.getConfig().getSourceItem() != null) {
-                SourceItem sourceItem = bitmovinPlayer.getConfig().getSourceItem();
-                switch (sourceItem.getType()) {
-                    case HLS:
-                        if (sourceItem.getHlsSource() != null) {
-                            data.setM3u8Url(sourceItem.getHlsSource().getUrl());
-                        }
-                        data.setStreamFormat(Util.HLS_STREAM_FORMAT);
-                        break;
-                    case DASH:
-                        if (sourceItem.getDashSource() != null) {
-                            data.setMpdUrl(sourceItem.getDashSource().getUrl());
-                        }
-                        data.setStreamFormat(Util.DASH_STREAM_FORMAT);
-                        break;
-                    case PROGRESSIVE:
-                        if (sourceItem.getProgressiveSources() != null && sourceItem.getProgressiveSources().size() > 0) {
-                            data.setM3u8Url(sourceItem.getProgressiveSources().get(0).getUrl());
-                        }
-                        data.setStreamFormat(Util.PROGRESSIVE_STREAM_FORMAT);
-                        break;
-                    case SMOOTH:
-                        data.setStreamFormat(Util.SMOOTH_STREAM_FORMAT);
-                        break;
-                }
-            }
-
-            //video quality
-            VideoQuality videoQuality = bitmovinPlayer.getPlaybackVideoData();
-            if (videoQuality != null) {
-                data.setVideoBitrate(videoQuality.getBitrate());
-                data.setVideoPlaybackHeight(videoQuality.getHeight());
-                data.setVideoPlaybackWidth(videoQuality.getWidth());
-                data.setVideoCodec(videoQuality.getCodec());
-            }
-
-            //audio quality
-            AudioQuality audioQuality = bitmovinPlayer.getPlaybackAudioData();
-            if (audioQuality != null) {
-                data.setAudioBitrate(audioQuality.getBitrate());
-                data.setAudioCodec(audioQuality.getCodec());
-            }
-
-            //Subtitle info
-            SubtitleTrack subtitle = bitmovinPlayer.getSubtitle();
-            if (subtitle != null && subtitle.getId() != null) {
-                data.setSubtitleLanguage(subtitle.getLanguage() != null ? subtitle.getLanguage() : subtitle.getLabel());
-                data.setSubtitleEnabled(true);
-            }
-
-            //Audio language
-            AudioTrack audioTrack = bitmovinPlayer.getAudio();
-            if (audioTrack != null && audioTrack.getId() != null) {
-                data.setAudioLanguage(audioTrack.getLanguage());
-            }
-
-            // DRM Information
-            if (drmInformation != null) {
-                data.setDrmType(drmInformation.getType());
-            }
-
-            return data;
-        } catch (Exception e) {
-            Log.d(TAG, "On Creating Event Data", e);
+        //duration
+        double duration = bitmovinPlayer.getDuration();
+        if (duration != Double.POSITIVE_INFINITY) {
+            data.setVideoDuration((long) duration * Util.MILLISECONDS_IN_SECONDS);
         }
-        return null;
+
+        //ad
+        if (bitmovinPlayer.isAd()) {
+            data.setAd(1);
+        }
+
+        //isLive
+        data.setLive(Util.getIsLiveFromConfigOrPlayer(playerIsReady, config.isLive(), bitmovinPlayer.isLive()));
+
+        //version
+        data.setVersion(PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.getPlayerVersion());
+
+        //isCasting
+        data.setCasting(bitmovinPlayer.isCasting());
+
+        // DroppedVideoFrames
+        data.setDroppedFrames(this.totalDroppedVideoFrames);
+        this.totalDroppedVideoFrames = 0;
+
+        //streamFormat, mpdUrl, and m3u8Url
+        if (bitmovinPlayer.getConfig() != null && bitmovinPlayer.getConfig().getSourceItem() != null) {
+            SourceItem sourceItem = bitmovinPlayer.getConfig().getSourceItem();
+            switch (sourceItem.getType()) {
+                case HLS:
+                    if (sourceItem.getHlsSource() != null) {
+                        data.setM3u8Url(sourceItem.getHlsSource().getUrl());
+                    }
+                    data.setStreamFormat(Util.HLS_STREAM_FORMAT);
+                    break;
+                case DASH:
+                    if (sourceItem.getDashSource() != null) {
+                        data.setMpdUrl(sourceItem.getDashSource().getUrl());
+                    }
+                    data.setStreamFormat(Util.DASH_STREAM_FORMAT);
+                    break;
+                case PROGRESSIVE:
+                    if (sourceItem.getProgressiveSources() != null && sourceItem.getProgressiveSources().size() > 0) {
+                        data.setM3u8Url(sourceItem.getProgressiveSources().get(0).getUrl());
+                    }
+                    data.setStreamFormat(Util.PROGRESSIVE_STREAM_FORMAT);
+                    break;
+                case SMOOTH:
+                    data.setStreamFormat(Util.SMOOTH_STREAM_FORMAT);
+                    break;
+            }
+        }
+
+        //video quality
+        VideoQuality videoQuality = bitmovinPlayer.getPlaybackVideoData();
+        if (videoQuality != null) {
+            data.setVideoBitrate(videoQuality.getBitrate());
+            data.setVideoPlaybackHeight(videoQuality.getHeight());
+            data.setVideoPlaybackWidth(videoQuality.getWidth());
+            data.setVideoCodec(videoQuality.getCodec());
+        }
+
+        //audio quality
+        AudioQuality audioQuality = bitmovinPlayer.getPlaybackAudioData();
+        if (audioQuality != null) {
+            data.setAudioBitrate(audioQuality.getBitrate());
+            data.setAudioCodec(audioQuality.getCodec());
+        }
+
+        //Subtitle info
+        SubtitleTrack subtitle = bitmovinPlayer.getSubtitle();
+        if (subtitle != null && subtitle.getId() != null) {
+            data.setSubtitleLanguage(subtitle.getLanguage() != null ? subtitle.getLanguage() : subtitle.getLabel());
+            data.setSubtitleEnabled(true);
+        }
+
+        //Audio language
+        AudioTrack audioTrack = bitmovinPlayer.getAudio();
+        if (audioTrack != null && audioTrack.getId() != null) {
+            data.setAudioLanguage(audioTrack.getLanguage());
+        }
+
+        // DRM Information
+        if (drmInformation != null) {
+            data.setDrmType(drmInformation.getType());
+        }
+
+        return data;
     }
 
     @Override
     public void release() {
-        try {
-            playerIsReady = false;
-            if (bitmovinPlayer != null) {
-                removePlayerListener();
-            }
-            stateMachine.resetStateMachine();
-        } catch (Exception e) {
-            Log.d(TAG, "Release", e);
+        playerIsReady = false;
+        if (bitmovinPlayer != null) {
+            removePlayerListener();
         }
-
+        stateMachine.resetStateMachine();
     }
 
     @Override
@@ -293,27 +274,20 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
       so in case the player starts a video due to autoplay=true we need to transition into startup state manually
      */
     private void checkAutoplayStartup() {
-        try {
+        if (bitmovinPlayer.getConfig() != null) {
             PlaybackConfiguration playbackConfiguration = bitmovinPlayer.getConfig().getPlaybackConfiguration();
             SourceConfiguration source = bitmovinPlayer.getConfig().getSourceConfiguration();
             if (playbackConfiguration != null && source != null && source.getFirstSourceItem() != null && playbackConfiguration.isAutoplayEnabled()) {
                 startup();
             }
-        } catch (Exception e) {
-            Log.d(TAG, "On Check Autoplay Startup", e);
         }
     }
 
     private void startup() {
-        try {
-            stateMachine.transitionState(PlayerState.STARTUP, getPosition());
-            if (!bitmovinPlayer.isAd()) {
-                isVideoAttemptedPlay = true;
-            }
-        } catch (Exception e) {
-            Log.d(TAG, "On Startup", e);
+        stateMachine.transitionState(PlayerState.STARTUP, getPosition());
+        if (!bitmovinPlayer.isAd()) {
+            isVideoAttemptedPlay = true;
         }
-
     }
 
     /**
@@ -346,8 +320,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             try{
                 Log.d(TAG, "On Destroy");
                 if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-                    stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PAGE_CLOSED);
-                    stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
+                      stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PAGE_CLOSED);
+                      stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
                 }
             } catch (Exception e) {
                 Log.d(TAG, "On Destroyed", e);

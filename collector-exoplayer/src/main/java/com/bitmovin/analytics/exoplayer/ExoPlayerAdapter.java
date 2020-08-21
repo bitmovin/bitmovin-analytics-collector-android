@@ -124,43 +124,34 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public EventData createEventData() {
-        try {
-            EventData data = factory.build(stateMachine.getImpressionId());
+        EventData data = factory.build(stateMachine.getImpressionId());
 
-            data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
-            data.setPlayer(PlayerType.EXOPLAYER.toString());
-            decorateDataWithPlaybackInformation(data);
-            data.setDownloadSpeedInfo(meter.getInfo());
+        data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
+        data.setPlayer(PlayerType.EXOPLAYER.toString());
+        decorateDataWithPlaybackInformation(data);
+        data.setDownloadSpeedInfo(meter.getInfo());
 
-            // DRM Information
-            if (drmInformation != null) {
-                data.setDrmType(drmInformation.getType());
-            }
-
-            return data;
-        } catch (Exception e) {
-            Log.d(TAG, "On Create Event Data", e);
+        // DRM Information
+        if (drmInformation != null) {
+            data.setDrmType(drmInformation.getType());
         }
-        return null;
+
+        return data;
     }
 
     @Override
     public void release() {
-        try {
-            playerIsReady = false;
-            manifestUrl = null;
-            if (this.exoplayer != null) {
-                this.exoplayer.removeListener(this);
-            }
-            if (this.exoplayer instanceof SimpleExoPlayer) {
-                SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
-                simpleExoPlayer.removeAnalyticsListener(this);
-            }
-            meter.reset();
-            stateMachine.resetStateMachine();
-        } catch (Exception e) {
-            Log.d(TAG, "Release", e);
+        playerIsReady = false;
+        manifestUrl = null;
+        if (this.exoplayer != null) {
+            this.exoplayer.removeListener(this);
         }
+        if (this.exoplayer instanceof SimpleExoPlayer) {
+            SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
+            simpleExoPlayer.removeAnalyticsListener(this);
+        }
+        meter.reset();
+        stateMachine.resetStateMachine();
     }
 
     @Override

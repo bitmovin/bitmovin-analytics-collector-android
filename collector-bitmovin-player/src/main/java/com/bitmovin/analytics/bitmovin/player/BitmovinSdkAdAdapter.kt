@@ -28,7 +28,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     private val adMapper: AdMapper = AdMapper()
     private val adBreakMapper: AdBreakMapper = AdBreakMapper()
     private val adQuartileFactory: AdQuartileFactory = AdQuartileFactory()
-    private val TAG = "BitmovinADPlayerAdapter"
+    private val TAG = "BitmovinSdkAdAdapter"
 
     private val onAdStartedListener = OnAdStartedListener {
         try {
@@ -118,39 +118,31 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     }
 
     init {
-        try {
-            bitmovinPlayer.addEventListener(onAdStartedListener)
-            bitmovinPlayer.addEventListener(onAdFinishedListener)
-            bitmovinPlayer.addEventListener(onAdBreakStartedListener)
-            bitmovinPlayer.addEventListener(onAdBreakFinishedListener)
-            bitmovinPlayer.addEventListener(onAdClickedListener)
-            bitmovinPlayer.addEventListener(onAdErrorListener)
-            bitmovinPlayer.addEventListener(onAdSkippedListener)
-            bitmovinPlayer.addEventListener(onAdManifestLoadedListener)
-            bitmovinPlayer.addEventListener(onPlayListener)
-            bitmovinPlayer.addEventListener(onPausedListener)
-            bitmovinPlayer.addEventListener(onAdQuartileListener)
-        } catch (e: Exception) {
-            Log.d(TAG, "On Ad init", e)
-        }
+        bitmovinPlayer.addEventListener(onAdStartedListener)
+        bitmovinPlayer.addEventListener(onAdFinishedListener)
+        bitmovinPlayer.addEventListener(onAdBreakStartedListener)
+        bitmovinPlayer.addEventListener(onAdBreakFinishedListener)
+        bitmovinPlayer.addEventListener(onAdClickedListener)
+        bitmovinPlayer.addEventListener(onAdErrorListener)
+        bitmovinPlayer.addEventListener(onAdSkippedListener)
+        bitmovinPlayer.addEventListener(onAdManifestLoadedListener)
+        bitmovinPlayer.addEventListener(onPlayListener)
+        bitmovinPlayer.addEventListener(onPausedListener)
+        bitmovinPlayer.addEventListener(onAdQuartileListener)
     }
 
     override fun release() {
-        try {
-            bitmovinPlayer.removeEventListener(onAdStartedListener)
-            bitmovinPlayer.removeEventListener(onAdFinishedListener)
-            bitmovinPlayer.removeEventListener(onAdBreakStartedListener)
-            bitmovinPlayer.removeEventListener(onAdBreakFinishedListener)
-            bitmovinPlayer.removeEventListener(onAdClickedListener)
-            bitmovinPlayer.removeEventListener(onAdErrorListener)
-            bitmovinPlayer.removeEventListener(onAdSkippedListener)
-            bitmovinPlayer.removeEventListener(onAdManifestLoadedListener)
-            bitmovinPlayer.removeEventListener(onPlayListener)
-            bitmovinPlayer.removeEventListener(onPausedListener)
-            bitmovinPlayer.removeEventListener(onAdQuartileListener)
-        } catch (e: Exception) {
-            Log.d(TAG, "On Ad release", e)
-        }
+        bitmovinPlayer.removeEventListener(onAdStartedListener)
+        bitmovinPlayer.removeEventListener(onAdFinishedListener)
+        bitmovinPlayer.removeEventListener(onAdBreakStartedListener)
+        bitmovinPlayer.removeEventListener(onAdBreakFinishedListener)
+        bitmovinPlayer.removeEventListener(onAdClickedListener)
+        bitmovinPlayer.removeEventListener(onAdErrorListener)
+        bitmovinPlayer.removeEventListener(onAdSkippedListener)
+        bitmovinPlayer.removeEventListener(onAdManifestLoadedListener)
+        bitmovinPlayer.removeEventListener(onPlayListener)
+        bitmovinPlayer.removeEventListener(onPausedListener)
+        bitmovinPlayer.removeEventListener(onAdQuartileListener)
     }
 
     override val isLinearAdActive: Boolean
@@ -159,12 +151,5 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
         // TODO get actual module from player
         get() = AdModuleInformation("DefaultAdvertisingService", BitmovinUtil.getPlayerVersion())
     override val isAutoplayEnabled: Boolean?
-        get() {
-            return try {
-                bitmovinPlayer.config.playbackConfiguration?.isAutoplayEnabled
-            } catch (e: Exception) {
-                Log.d(TAG, "isAutoplayEnabled", e)
-                null
-            }
-        }
+        get() = bitmovinPlayer.config.playbackConfiguration?.isAutoplayEnabled
 }
