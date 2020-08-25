@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Calculations for available screen width and height to now include screen density and be more independent of physical pixel
-- Make collectors more resistant to exceptions
+- Make collectors more resilient to exceptions in event listeners
 
 ## v1.18.0
 
