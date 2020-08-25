@@ -250,7 +250,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                     Log.d(TAG, "Unknown Player PlayerState encountered");
             }
         } catch (Exception e) {
-            Log.d(TAG, "On Player State Change", e);
+            Log.d(TAG, e.getMessage(), e);
         }
     }
 
@@ -262,7 +262,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                 startup(getPosition());
             }
         } catch(Exception e) {
-            Log.d(TAG, "On Is Playing Changed", e);
+            Log.d(TAG, e.getMessage(), e);
         }
     }
 
@@ -291,7 +291,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             this.stateMachine.setErrorCode(errorCode);
             this.stateMachine.transitionState(PlayerState.ERROR, videoTime);
         } catch (Exception e) {
-            Log.d(TAG, "On Player Error", e);
+            Log.d(TAG, e.getMessage(), e);
         }
     }
 
@@ -404,7 +404,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             long videoTime = getPosition();
             this.stateMachine.transitionState(PlayerState.SEEKING, videoTime);
         } catch (Exception e) {
-            Log.d(TAG, "On Seek Started", e);
+            Log.d(TAG, e.getMessage(), e);
         }
 
     }
@@ -465,7 +465,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                addSpeedMeasurement(loadEventInfo);
            }
        } catch (Exception e) {
-           Log.d(TAG, "On Load Completed", e);
+           Log.d(TAG, e.getMessage(), e);
        }
     }
 
@@ -578,7 +578,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                 }
             }
         } catch (Exception e) {
-            Log.d(TAG, "On Decoder Input Format Changed", e);
+            Log.d(TAG, e.getMessage(), e);
         }
     }
 
@@ -612,7 +612,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         try {
             this.totalDroppedVideoFrames += droppedFrames;
         } catch (Exception e) {
-            Log.d(TAG, "On Dropped Video Frames", e);
+            Log.d(TAG, e.getMessage(), e);
         }
     }
 
@@ -632,7 +632,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             drmLoadStartTime = eventTime.realtimeMs;
             Log.d(TAG, String.format("DRM Session aquired %d", eventTime.realtimeMs));
         } catch (Exception e) {
-            Log.d(TAG, "On DRM Session Acquired", e);
+            Log.d(TAG, e.getMessage(), e);
         }
     }
 
@@ -642,7 +642,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             drmInformation = new DRMInformation(eventTime.realtimeMs - drmLoadStartTime, drmType);
             Log.d(TAG, String.format("DRM Keys loaded %d", eventTime.realtimeMs));
         } catch (Exception e) {
-            Log.d(TAG, "On Drm Keys Loaded", e);
+            Log.d(TAG, e.getMessage(), e);
         }
     }
 

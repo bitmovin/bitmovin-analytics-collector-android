@@ -309,7 +309,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 Log.d(TAG, "On Source Unloaded");
                 stateMachine.resetStateMachine();
             } catch (Exception e) {
-                Log.d(TAG, "On Source Unloaded", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -324,7 +324,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                       stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
                 }
             } catch (Exception e) {
-                Log.d(TAG, "On Destroyed", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -339,7 +339,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 stateMachine.transitionState(PlayerState.PAUSE, position);
                 stateMachine.disableHeartbeat();
             } catch (Exception e) {
-                Log.d(TAG, "On Playback Finished", e);
+                Log.d(TAG, e.getMessage(), e);
             }
 
         }
@@ -360,7 +360,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 Log.d(TAG, "On Pause Listener");
                 stateMachine.pause(getPosition());
             } catch (Exception e) {
-                Log.d(TAG, "On Pause", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -374,7 +374,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     startup();
                 }
             } catch (Exception e) {
-                Log.d(TAG, "On Play", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -386,7 +386,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 Log.d(TAG, "On Playing Listener " + stateMachine.getCurrentState().toString());
                 stateMachine.transitionState(PlayerState.PLAYING, getPosition());
             } catch (Exception e) {
-                Log.d(TAG, "On Playing", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -407,7 +407,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     stateMachine.transitionState(PlayerState.SEEKING, getPosition());
                 }
             } catch (Exception e) {
-                Log.d(TAG, "On Seek", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -425,7 +425,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     }
                 }
             } catch (Exception e) {
-                Log.d(TAG, "On Stall Ended", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -441,7 +441,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     stateMachine.transitionState(originalState, getPosition());
                 }
             } catch (Exception e) {
-                Log.d(TAG, "On Audio Changed", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -457,7 +457,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     stateMachine.transitionState(originalState, getPosition());
                 }
             } catch (Exception e) {
-                Log.d(TAG, "On Subtitle Changed", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -471,7 +471,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     stateMachine.transitionState(PlayerState.BUFFERING, getPosition());
                 }
             } catch (Exception e) {
-                Log.d(TAG, "On Stall Started", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -489,7 +489,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     stateMachine.transitionState(originalState, getPosition());
                 }
             } catch (Exception e) {
-                Log.d(TAG, "On Video Playback Quality Changed", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -500,7 +500,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             try {
                 totalDroppedVideoFrames += droppedVideoFramesEvent.getDroppedFrames();
             } catch (Exception e) {
-                Log.d(TAG, "On Dropped Video Frames", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -523,7 +523,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                     stateMachine.transitionState(originalState, getPosition());
                 }
             } catch (Exception e) {
-                Log.d(TAG, "On Audio Quality Changed", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -537,7 +537,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                             downloadFinishedEvent.getDownloadType().toString().replace("drm/license/", ""));
                 }
             } catch (Exception e) {
-                Log.d(TAG, "On Download Finished", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -556,7 +556,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
                 }
                 stateMachine.transitionState(PlayerState.ERROR, videoTime);
             } catch (Exception e) {
-                Log.d(TAG, "On Error", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -567,7 +567,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             try {
                 stateMachine.startAd(getPosition());
             } catch (Exception e) {
-                Log.d(TAG, "On Ad Break Started", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
@@ -578,7 +578,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             try {
              stateMachine.transitionState(PlayerState.ADFINISHED, getPosition());
             } catch (Exception e) {
-                Log.d(TAG, "On Ad Break Finished", e);
+                Log.d(TAG, e.getMessage(), e);
             }
         }
     };
