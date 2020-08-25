@@ -317,7 +317,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private OnDestroyListener onDestroyedListener = new OnDestroyListener() {
         @Override
         public void onDestroy(DestroyEvent destroyEvent) {
-            try{
+            try {
                 Log.d(TAG, "On Destroy");
                 if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
                       stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PAGE_CLOSED);
@@ -433,7 +433,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private OnAudioChangedListener onAudioChangedListener = new OnAudioChangedListener() {
         @Override
         public void onAudioChanged(AudioChangedEvent audioChangedEvent) {
-            try{
+            try {
                 Log.d(TAG, "On AudioChanged: " + bitmovinPlayer.getAudio().getId());
                 if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.isStartupFinished()) {
                     PlayerState originalState = stateMachine.getCurrentState();
@@ -449,7 +449,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private OnSubtitleChangedListener onSubtitleChangedListener = new OnSubtitleChangedListener() {
         @Override
         public void onSubtitleChanged(SubtitleChangedEvent event) {
-            try{
+            try {
                 Log.d(TAG, "On SubtitleChanged: " + bitmovinPlayer.getSubtitle().getId());
                 if ((stateMachine.getCurrentState() == PlayerState.PLAYING || stateMachine.getCurrentState() == PlayerState.PAUSE) && stateMachine.isStartupFinished()) {
                     PlayerState originalState = stateMachine.getCurrentState();
@@ -577,7 +577,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         public void onAdBreakFinished(AdBreakFinishedEvent adBreakFinishedEvent) {
             try {
              stateMachine.transitionState(PlayerState.ADFINISHED, getPosition());
-            } catch (Exception e){
+            } catch (Exception e) {
                 Log.d(TAG, "On Ad Break Finished", e);
             }
         }
