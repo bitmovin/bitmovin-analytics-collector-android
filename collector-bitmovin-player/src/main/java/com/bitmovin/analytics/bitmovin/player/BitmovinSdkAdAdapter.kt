@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
+import android.util.Log
 import com.bitmovin.analytics.BitmovinAdAnalytics
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.bitmovin.player.utils.AdBreakMapper
@@ -27,44 +28,77 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     private val adMapper: AdMapper = AdMapper()
     private val adBreakMapper: AdBreakMapper = AdBreakMapper()
     private val adQuartileFactory: AdQuartileFactory = AdQuartileFactory()
+    private val TAG = "BitmovinSdkAdAdapter"
 
     private val onAdStartedListener = OnAdStartedListener {
-        val ad = it.ad ?: return@OnAdStartedListener
-        adAnalytics.onAdStarted(adMapper.fromPlayerAd(ad))
+        try {
+            val ad = it.ad ?: return@OnAdStartedListener
+            adAnalytics.onAdStarted(adMapper.fromPlayerAd(ad))
+        } catch (e: Exception) {
+            Log.d(TAG, "On Ad Started", e)
+        }
     }
 
     private val onAdFinishedListener = OnAdFinishedListener {
-        adAnalytics.onAdFinished()
+        try {
+            adAnalytics.onAdFinished()
+        } catch (e: Exception) {
+            Log.d(TAG, "On Ad Finished", e)
+        }
     }
 
     private val onAdBreakStartedListener = OnAdBreakStartedListener {
-        val adBreak = it.adBreak ?: return@OnAdBreakStartedListener
-        adAnalytics.onAdBreakStarted(adBreakMapper.fromPlayerAdConfiguration(adBreak))
+        try {
+            val adBreak = it.adBreak ?: return@OnAdBreakStartedListener
+            adAnalytics.onAdBreakStarted(adBreakMapper.fromPlayerAdConfiguration(adBreak))
+        } catch (e: Exception) {
+            Log.d(TAG, "On Ad Break Started", e)
+        }
     }
 
     private val onAdBreakFinishedListener = OnAdBreakFinishedListener {
-        adAnalytics.onAdBreakFinished()
+        try {
+            adAnalytics.onAdBreakFinished()
+        } catch (e: Exception) {
+            Log.d(TAG, "On Ad Break Finished", e)
+        }
     }
 
     private val onAdClickedListener = OnAdClickedListener {
-        adAnalytics.onAdClicked(it.clickThroughUrl)
+        try {
+            adAnalytics.onAdClicked(it.clickThroughUrl)
+        } catch (e: Exception) {
+            Log.d(TAG, "On Ad Clicked", e)
+        }
     }
 
     private val onAdErrorListener = OnAdErrorListener {
-        val adConf = it.adConfiguration ?: return@OnAdErrorListener
-        adAnalytics.onAdError(
-                adBreakMapper.fromPlayerAdConfiguration(adConf),
-                it.code,
-                it.message)
+        try {
+            val adConf = it.adConfiguration ?: return@OnAdErrorListener
+            adAnalytics.onAdError(
+                    adBreakMapper.fromPlayerAdConfiguration(adConf),
+                    it.code,
+                    it.message)
+        } catch (e: Exception) {
+            Log.d(TAG, "On Ad Error", e)
+        }
     }
 
     private val onAdSkippedListener = OnAdSkippedListener {
-        adAnalytics.onAdSkipped()
+        try {
+            adAnalytics.onAdSkipped()
+        } catch (e: Exception) {
+            Log.d(TAG, "On Ad Skipped", e)
+        }
     }
 
     private val onAdManifestLoadedListener = OnAdManifestLoadedListener {
-        val adBreak = it.adBreak ?: return@OnAdManifestLoadedListener
-        adAnalytics.onAdManifestLoaded(adBreakMapper.fromPlayerAdConfiguration(adBreak), it.downloadTime)
+        try {
+            val adBreak = it.adBreak ?: return@OnAdManifestLoadedListener
+            adAnalytics.onAdManifestLoaded(adBreakMapper.fromPlayerAdConfiguration(adBreak), it.downloadTime)
+        } catch (e: Exception) {
+            Log.d(TAG, "On Ad Manifest Loaded", e)
+        }
     }
 
     private val onPlayListener = OnPlayListener {
@@ -76,7 +110,11 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
     }
 
     private val onAdQuartileListener = OnAdQuartileListener {
-        adAnalytics.onAdQuartile(adQuartileFactory.FromPlayerAdQuartile(it.quartile))
+        try {
+            adAnalytics.onAdQuartile(adQuartileFactory.FromPlayerAdQuartile(it.quartile))
+        } catch (e: Exception) {
+            Log.d(TAG, "On Ad Quartile Listener ", e)
+        }
     }
 
     init {
