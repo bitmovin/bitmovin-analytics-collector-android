@@ -39,7 +39,7 @@ allprojects {
 }
 
 ext {
-    developLocal = true
+    developLocal = project.hasProperty('developLocal') ? project.getProperty('developLocal') : true
     packageGroupId = 'com.bitmovin.analytics'
     version = '1.18.0'
     versionCode = 118000
