@@ -58,7 +58,7 @@ ext {
     playercoreVersion = '2.44.0'
     exoplayerVersion = '2.11.4'
     assertjCoreVersion = '3.11.1'
-    mockitoCoreVersion = '2.7.22'
+    mockitoCoreVersion = '3.5.0'
     androidXVersion = '1.1.0'
     junitXVersion = '1.1.1'
     constraintlayoutVersion = '1.1.3'
