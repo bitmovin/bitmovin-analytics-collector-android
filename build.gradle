@@ -10,7 +10,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.2'
+        classpath 'com.android.tools.build:gradle:4.0.1'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.8"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
@@ -39,7 +39,7 @@ allprojects {
 }
 
 ext {
-    developLocal = true
+    developLocal = project.hasProperty('developLocal') ? project.getProperty('developLocal') : true
     packageGroupId = 'com.bitmovin.analytics'
     version = '1.18.0'
     versionCode = 118000
@@ -58,7 +58,7 @@ ext {
     playercoreVersion = '2.44.0'
     exoplayerVersion = '2.11.4'
     assertjCoreVersion = '3.11.1'
-    mockitoCoreVersion = '2.7.22'
+    mockitoCoreVersion = '3.5.0'
     androidXVersion = '1.1.0'
     junitXVersion = '1.1.1'
     constraintlayoutVersion = '1.1.3'
