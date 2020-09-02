@@ -59,7 +59,7 @@ git checkout main
 git pull
 git merge develop
 git tag -a v$VERSION -m "v$VERSION"
-git push origin main $VERSION
+git push origin main v$VERSION
 
 echo "Pushed \"main\" and \"$VERSION\" to repo."
 
