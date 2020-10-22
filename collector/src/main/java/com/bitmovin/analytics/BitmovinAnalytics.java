@@ -312,6 +312,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         }
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data);
+        this.detachPlayer();
     }
 
 
