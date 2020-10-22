@@ -296,15 +296,21 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
     @Override
     public void onVideoStartFailed() {
-        String videoStartFailedReason = playerStateMachine.getVideoStartFailedReason() != null
-                ? playerStateMachine.getVideoStartFailedReason().getReason()
-                : VideoStartFailedReason.UNKNOWN.getReason();
+        VideoStartFailedReason videoStartFailedReason = playerStateMachine.getVideoStartFailedReason();
+        if(videoStartFailedReason == null) {
+            videoStartFailedReason = VideoStartFailedReason.UNKNOWN;
+        }
 
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setVideoStartFailed(true);
-
-        data.setVideoStartFailedReason(videoStartFailedReason);
+        ErrorCode errorCode = videoStartFailedReason.getErrorCode();
+        if(errorCode != null) {
+            data.setErrorCode(errorCode.getErrorCode());
+            data.setErrorMessage(errorCode.getDescription());
+            data.setErrorData(serialize(errorCode.getErrorData()));
+        }
+        data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data);
     }
 
