@@ -117,6 +117,9 @@ public class PlayerStateMachine {
         if (destination == this.currentState) {
             return false;
         }
+        else if (this.currentState == PlayerState.EXITBEFOREVIDEOSTART) {
+            return false;
+        }
         // no state transitions like PLAYING or PAUSE during AD
         else if (currentState == PlayerState.AD && (destination != PlayerState.ERROR && destination != PlayerState.ADFINISHED )) {
             return false;
