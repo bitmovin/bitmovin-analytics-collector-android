@@ -47,7 +47,7 @@ BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<
 
 
 // Create a BitmovinPlayerCollector object using the BitmovinAnalyitcsConfig you just created
-BitmovinAnalytics analyticsCollector = new BitmovinPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
+BitmovinPlayerCollector analyticsCollector = new BitmovinPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
 
 // Attach your player instance
 analyticsCollector.attachPlayer(player);
