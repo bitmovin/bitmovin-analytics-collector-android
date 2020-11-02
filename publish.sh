@@ -73,24 +73,24 @@ curl \
 echo "Created release in public repo."
 
 echo "Creating and publishing :collector project..."
-./gradlew -PdevelopLocal=false :collector:clean
-./gradlew -PdevelopLocal=false :collector:build
-./gradlew -PdevelopLocal=false :collector:assembleRelease
-./gradlew -PdevelopLocal=false :collector:artifactoryPublish
+./gradlew -DdevelopLocal=false :collector:clean
+./gradlew -DdevelopLocal=false :collector:build
+./gradlew -DdevelopLocal=false :collector:assembleRelease
+./gradlew -DdevelopLocal=false :collector:artifactoryPublish
 echo "Created and published :collector project."
 
 echo "Creating and publishing :collector-bitmovin-player project..."
-./gradlew -PdevelopLocal=false :collector-bitmovin-player:clean
-./gradlew -PdevelopLocal=false :collector-bitmovin-player:build
-./gradlew -PdevelopLocal=false :collector-bitmovin-player:assembleRelease
-./gradlew -PdevelopLocal=false :collector-bitmovin-player:artifactoryPublish
+./gradlew -DdevelopLocal=false :collector-bitmovin-player:clean
+./gradlew -DdevelopLocal=false :collector-bitmovin-player:build
+./gradlew -DdevelopLocal=false :collector-bitmovin-player:assembleRelease
+./gradlew -DdevelopLocal=false :collector-bitmovin-player:artifactoryPublish
 echo "Created and published :collector-bitmovin-player project."
 
 echo "Creating and publishing :collector-exoplayer project..."
-./gradlew -PdevelopLocal=false :collector-exoplayer:clean
-./gradlew -PdevelopLocal=false :collector-exoplayer:build
-./gradlew -PdevelopLocal=false :collector-exoplayer:assembleRelease
-./gradlew -PdevelopLocal=false :collector-exoplayer:artifactoryPublish
+./gradlew -DdevelopLocal=false :collector-exoplayer:clean
+./gradlew -DdevelopLocal=false :collector-exoplayer:build
+./gradlew -DdevelopLocal=false :collector-exoplayer:assembleRelease
+./gradlew -DdevelopLocal=false :collector-exoplayer:artifactoryPublish
 echo "Created and published :collector-exoplayer project."
 
 file="./bitmovin.properties"
