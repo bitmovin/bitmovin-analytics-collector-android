@@ -50,7 +50,7 @@ if [ -z "$ANALYTICS_API_RELEASE_TOKEN" ]; then
     setEnvVariable "ANALYTICS_API_RELEASE_TOKEN" $ANALYTICS_API_RELEASE_TOKEN
 fi
 
-echo "Make sure to bump the libraryVersion and versionCode in the <root>/build.gradle file, README and CHANGELOG first and merge that PR into develop."
+echo "Make sure to bump the libraryVersion and versionCode in the <root>/build.gradle file, README and CHANGELOG first and merge that PR into develop. After releasing, change the \"developLocal\" to false manually and start both the examples and make sure that the outgoing payload doesn't include \"-local\" in the version string."
 echo "Version (without leading \"v\")":
 read VERSION
 git checkout develop
