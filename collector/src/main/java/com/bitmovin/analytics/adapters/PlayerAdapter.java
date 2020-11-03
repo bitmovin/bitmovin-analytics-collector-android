@@ -19,4 +19,6 @@ public interface PlayerAdapter {
     DRMInformation getDRMInformation();
 
     void clearValues();
+
+    <TAdapter> TAdapter getFeatureAdapter(Class<TAdapter> adapterClass);
 }
