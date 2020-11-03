@@ -1,9 +1,11 @@
 package com.bitmovin.analytics.features
 
+import android.util.Log
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.utils.DataSerializer
 
 class FeatureManager {
+    private val logTag = FeatureManager::class.java.name
     private val features: MutableList<Feature<*, *>> = mutableListOf()
 
     fun registerFeature(feature: Feature<*, *>) {
@@ -14,7 +16,7 @@ class FeatureManager {
     fun registerPlayerAdapter(playerAdapter: PlayerAdapter) {
         features.forEach {
             if(!it.registerPlayerAdapter(playerAdapter)) {
-                print("Disabling feature ${it.name} as the playerAdapter doesn't support the feature.")
+                Log.d(logTag, "Disabling feature ${it.name} as the playerAdapter doesn't support the feature.")
                 it.disable()
 //                features.remove(it)
             }
@@ -25,7 +27,7 @@ class FeatureManager {
         features.forEach {
             val config = it.configure(settings[it.name])
             if(config?.enabled != true) {
-                print("Disabling feature ${it.name} as it isn't enabled according to license callback.")
+                Log.d(logTag,"Disabling feature ${it.name} as it isn't enabled according to license callback.")
                 it.disable()
 //                features.remove(it)
             }
