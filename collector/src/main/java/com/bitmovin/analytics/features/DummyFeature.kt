@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.features
 
-data class DummyFeatureConfig(val test: String)
+data class DummyFeatureConfig(val test: String): FeatureConfig()
 
 data class DummyEvent(val test: String)
 interface DummyFeatureEventListener {
