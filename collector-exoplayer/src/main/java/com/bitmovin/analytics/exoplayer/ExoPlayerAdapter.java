@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.PlayerAdapterBase;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.ErrorCode;
@@ -53,7 +54,7 @@ import static com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO;
 import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
 import static com.google.android.exoplayer2.C.WIDEVINE_UUID;
 
-public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener {
+public class ExoPlayerAdapter extends PlayerAdapterBase implements PlayerAdapter, Player.EventListener, AnalyticsListener {
     private static final String TAG = "ExoPlayerAdapter";
     private static final String DASH_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.dash.manifest.DashManifest";
     private static final String HLS_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.hls.HlsManifest";
