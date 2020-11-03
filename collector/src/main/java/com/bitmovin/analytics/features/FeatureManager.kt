@@ -14,7 +14,7 @@ class FeatureManager {
         features.forEach {
             if(!it.registerPlayerAdapter(playerAdapter)) {
                 it.disable()
-                features.remove(it)
+//                features.remove(it)
             }
         }
     }
@@ -25,7 +25,7 @@ class FeatureManager {
                 it.configure(config[it.name])
             } else {
                 it.disable()
-                features.remove(it)
+//                features.remove(it)
             }
         }
     }
