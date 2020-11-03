@@ -7,6 +7,7 @@ class FeatureManager {
     private val features: MutableList<Feature<*, *>> = mutableListOf()
 
     fun registerFeature(feature: Feature<*, *>) {
+        // either we always re-register features or we have a `disable` and `enable`
         features.add(feature)
     }
 
