@@ -8,6 +8,7 @@ import com.bitmovin.analytics.license.LicenseCall;
 import com.bitmovin.analytics.license.LicenseCallback;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -35,7 +36,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     }
 
     @Override
-    synchronized public void authenticationCompleted(boolean success) {
+    synchronized public void authenticationCompleted(boolean success, Map<String, String> settings) {
         if (success) {
             enabled = true;
             Iterator<EventData> it = data.iterator();
@@ -53,7 +54,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
         }
 
         if(callback != null) {
-            callback.authenticationCompleted(success);
+            callback.authenticationCompleted(success, settings);
         }
     }
 

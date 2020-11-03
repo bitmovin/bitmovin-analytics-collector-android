@@ -43,14 +43,14 @@ public class LicenseCall {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d(TAG, "License call failed due to connectivity issues", e);
-                callback.authenticationCompleted(false);
+                callback.authenticationCompleted(false, null);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response == null || response.body() == null) {
                     Log.d(TAG, "License call was denied without providing a response body");
-                    callback.authenticationCompleted(false);
+                    callback.authenticationCompleted(false, null);
                     return;
                 }
 
@@ -58,23 +58,23 @@ public class LicenseCall {
                 LicenseResponse licenseResponse = DataSerializer.deserialize(licensingResponseBody, LicenseResponse.class);
                 if (licenseResponse == null) {
                     Log.d(TAG, "License call was denied without providing a response body");
-                    callback.authenticationCompleted(false);
+                    callback.authenticationCompleted(false, null);
                     return;
                 }
 
                 if (licenseResponse.getStatus() == null) {
                     Log.d(TAG, String.format("License response was denied without status"));
-                    callback.authenticationCompleted(false);
+                    callback.authenticationCompleted(false, null);
                     return;
                 }
 
                 if (!licenseResponse.getStatus().equals("granted")) {
                     Log.d(TAG, String.format("License response was denied: %s", licenseResponse.getMessage()));
-                    callback.authenticationCompleted(false);
+                    callback.authenticationCompleted(false, null);
                     return;
                 }
                 Log.d(TAG, "License response was granted");
-                callback.authenticationCompleted(true);
+                callback.authenticationCompleted(true, licenseResponse.getSettings());
             }
         });
 
