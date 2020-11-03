@@ -26,7 +26,7 @@ class FeatureManager {
             val config = it.configure(settings[it.name])
             if(config?.enabled != true) {
                 it.disable()
-                features.remove(it)
+//                features.remove(it)
             }
         }
     }
