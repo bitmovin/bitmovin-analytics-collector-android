@@ -5,27 +5,27 @@ import com.bitmovin.analytics.utils.DataSerializer
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-abstract class Feature<TConfig, TAdapter> {
+abstract class Feature<TConfig: FeatureConfig, TAdapter> {
     abstract val name: String
     abstract val configClass: Class<TConfig>
     abstract val adapterClass: Class<TAdapter>
     abstract fun disable()
     abstract fun configure(config: TConfig?)
     abstract fun registerAdapter(adapter: TAdapter)
+    var adapter: TAdapter? = null
+        private set
 
     fun registerPlayerAdapter(playerAdapter: PlayerAdapter): Boolean {
-        val adapter = playerAdapter.getFeatureAdapter(adapterClass)
+        adapter = playerAdapter.getFeatureAdapter(adapterClass)
         adapter ?: return false
-        registerAdapter(adapter)
+        registerAdapter(adapter!!)
         return true
     }
 
-    fun configure(configString: String?) {
-        if(configString == null) {
-            configure(null as TConfig?)
-        } else {
-            val config = DataSerializer.deserialize(configString, configClass)
-            configure(config)
-        }
+    fun configure(configString: String?): TConfig? {
+        configString ?: return null
+        val config = DataSerializer.deserialize(configString, configClass)
+        configure(config)
+        return config
     }
 }

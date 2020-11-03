@@ -14,19 +14,19 @@ class FeatureManager {
     fun registerPlayerAdapter(playerAdapter: PlayerAdapter) {
         features.forEach {
             if(!it.registerPlayerAdapter(playerAdapter)) {
+                print("Disabling ${it.name} as the playerAdapter doesn't support the feature.")
                 it.disable()
 //                features.remove(it)
             }
         }
     }
 
-    fun configureFeatures(config: Map<String, String>) {
+    fun configureFeatures(settings: Map<String, String>) {
         features.forEach {
-            if(config.containsKey(it.name)) {
-                it.configure(config[it.name])
-            } else {
+            val config = it.configure(settings[it.name])
+            if(config?.enabled != true) {
                 it.disable()
-//                features.remove(it)
+                features.remove(it)
             }
         }
     }
