@@ -14,7 +14,7 @@ class FeatureManager {
     fun registerPlayerAdapter(playerAdapter: PlayerAdapter) {
         features.forEach {
             if(!it.registerPlayerAdapter(playerAdapter)) {
-                print("Disabling ${it.name} as the playerAdapter doesn't support the feature.")
+                print("Disabling feature ${it.name} as the playerAdapter doesn't support the feature.")
                 it.disable()
 //                features.remove(it)
             }
@@ -25,6 +25,7 @@ class FeatureManager {
         features.forEach {
             val config = it.configure(settings[it.name])
             if(config?.enabled != true) {
+                print("Disabling feature ${it.name} as it isn't enabled according to license callback.")
                 it.disable()
 //                features.remove(it)
             }
