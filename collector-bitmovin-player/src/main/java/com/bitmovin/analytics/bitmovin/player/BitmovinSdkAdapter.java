@@ -3,6 +3,7 @@ package com.bitmovin.analytics.bitmovin.player;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.PlayerAdapterBase;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.ErrorCode;
@@ -67,7 +68,7 @@ import com.bitmovin.player.config.track.SubtitleTrack;
 
 import org.jetbrains.annotations.Nullable;
 
-public class BitmovinSdkAdapter implements PlayerAdapter {
+public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapter {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final BitmovinPlayer bitmovinPlayer;
