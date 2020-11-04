@@ -14,6 +14,7 @@ import com.bitmovin.analytics.utils.Util;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -75,7 +76,11 @@ public class LicenseCall {
                     return;
                 }
                 Log.d(TAG, "License response was granted");
-                callback.authenticationCompleted(true, licenseResponse.getSettings());
+                Map<String, String> settings = licenseResponse.getSettings();
+                if(settings == null) {
+                    settings = new HashMap<>();
+                }
+                callback.authenticationCompleted(true, settings);
             }
         });
 
