@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+- Internal: `FeatureManager` allows dynamically adding and disabling features based on player support.
+
 ## v1.20.0
 
 ### Added
