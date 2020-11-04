@@ -2,6 +2,8 @@ package com.bitmovin.analytics.features
 
 import android.util.Log
 import com.bitmovin.analytics.adapters.PlayerAdapter
+import com.bitmovin.analytics.data.AdEventData
+import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.utils.DataSerializer
 
 class FeatureManager {
@@ -23,12 +25,12 @@ class FeatureManager {
         }
     }
 
-    fun configureFeatures(settings: Map<String, String>) {
+    fun configureFeatures(settings: Map<String, String>, samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         features.forEach {
             val config = it.configure(settings[it.name])
             if(config?.enabled != true) {
                 Log.d(logTag,"Disabling feature ${it.name} as it isn't enabled according to license callback.")
-                it.disable()
+                it.disable(samples, adSamples)
 //                features.remove(it)
             }
         }
