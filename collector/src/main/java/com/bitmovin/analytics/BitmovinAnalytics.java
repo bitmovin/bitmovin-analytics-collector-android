@@ -40,7 +40,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     private static final String TAG = "BitmovinAnalytics";
 
     private List<DebugListener> debugListeners = new ArrayList<>();
-    private final FeatureManager featureManager = new FeatureManager();
+    private FeatureManager featureManager = new FeatureManager();
 
     protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
     protected PlayerAdapter playerAdapter;
@@ -70,8 +70,6 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         if (this.bitmovinAnalyticsConfig.getAds()) {
             this.adAnalytics = new BitmovinAdAnalytics(this);
         }
-
-        featureManager.registerFeature(new DummyFeature());
     }
 
     /**
@@ -93,6 +91,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
      */
     protected void attach(PlayerAdapter adapter) {
         detachPlayer();
+        registerFeatures();
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
         this.playerAdapter.init();
@@ -104,12 +103,17 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         this.adAdapter = adapter;
     }
 
+    private void registerFeatures() {
+        featureManager.registerFeature(new DummyFeature());
+    }
+
     /**
      * Detach the current player that is being used with Bitmovin Analytics.
      */
     public void detachPlayer() {
         detachAd();
 
+        featureManager.unregisterFeatures();
         if (playerAdapter != null) {
             playerAdapter.release();
         }
