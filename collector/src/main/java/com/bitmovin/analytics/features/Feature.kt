@@ -11,13 +11,16 @@ abstract class Feature<TConfig: FeatureConfig, TAdapter> {
     abstract val name: String
     abstract val configClass: Class<TConfig>
     abstract val adapterClass: Class<TAdapter>
-    abstract fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf())
     abstract fun configure(config: TConfig?)
     abstract fun registerAdapter(adapter: TAdapter)
     abstract fun decorateSample(sample: EventData)
 
     var adapter: TAdapter? = null
         private set
+
+    open fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf()) {
+        this.adapter = null
+    }
 
     fun registerPlayerAdapter(playerAdapter: PlayerAdapter): Boolean {
         adapter = playerAdapter.getFeatureAdapter(adapterClass)

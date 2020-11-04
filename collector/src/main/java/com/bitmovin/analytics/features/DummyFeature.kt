@@ -9,8 +9,8 @@ data class DummyEvent(val test: String)
 interface DummyFeatureEventListener {
     fun onDummyEvent(event: DummyEvent)
 }
-interface DummyFeatureAdapter {
-    fun addEventListener(listener: DummyFeatureEventListener)
+abstract class DummyFeatureAdapter: FeatureAdapter<DummyFeatureEventListener>() {
+    abstract fun twoWayCommunication()
 }
 
 class DummyFeature : Feature<DummyFeatureConfig, DummyFeatureAdapter>(), DummyFeatureEventListener {
@@ -22,6 +22,8 @@ class DummyFeature : Feature<DummyFeatureConfig, DummyFeatureAdapter>(), DummyFe
         print("disabling")
         // reset values or delete samples that have been created in the meantime
         samples.forEach { it.videoBitrate = 0 }
+        this.adapter?.removeEventListener(this)
+        super.disable(samples, adSamples)
     }
 
     override fun configure(config: DummyFeatureConfig?) {
@@ -36,5 +38,10 @@ class DummyFeature : Feature<DummyFeatureConfig, DummyFeatureAdapter>(), DummyFe
 
     override fun onDummyEvent(event: DummyEvent) {
         print("onDummyEvent")
+        adapter?.twoWayCommunication()
+    }
+
+    override fun decorateSample(sample: EventData) {
+        TODO("Not yet implemented")
     }
 }
