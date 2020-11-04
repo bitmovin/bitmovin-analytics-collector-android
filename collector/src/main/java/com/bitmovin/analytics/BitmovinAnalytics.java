@@ -13,7 +13,6 @@ import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
-import com.bitmovin.analytics.features.DummyFeature;
 import com.bitmovin.analytics.features.FeatureManager;
 import com.bitmovin.analytics.license.LicenseCallback;
 
@@ -25,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,20 +89,14 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
      */
     protected void attach(PlayerAdapter adapter) {
         detachPlayer();
-        registerFeatures();
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
         this.playerAdapter.init();
-        featureManager.registerPlayerAdapter(adapter);
     }
 
     protected void attachAd(AdAdapter adapter) {
         detachAd();
         this.adAdapter = adapter;
-    }
-
-    private void registerFeatures() {
-        featureManager.registerFeature(new DummyFeature());
     }
 
     /**

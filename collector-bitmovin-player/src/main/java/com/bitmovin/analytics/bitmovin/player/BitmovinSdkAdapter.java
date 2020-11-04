@@ -5,7 +5,6 @@ import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.PlayerAdapterBase;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
-import com.bitmovin.analytics.bitmovin.player.feature.BitmovinDummyFeatureAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -89,7 +88,8 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     }
 
     public void init() {
-        addFeatureAdapter(new BitmovinDummyFeatureAdapter(this.bitmovinPlayer));
+//        registerFeature(new SegmentTrackingFeature(this.segmentTrackingAdapter));
+
         addPlayerListeners();
         checkAutoplayStartup();
         this.totalDroppedVideoFrames = 0;
@@ -254,7 +254,7 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
             removePlayerListener();
         }
         stateMachine.resetStateMachine();
-        disposeFeatureAdapters();
+        //Dispose features here
     }
 
     @Override
