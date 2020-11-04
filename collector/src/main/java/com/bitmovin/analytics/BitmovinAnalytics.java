@@ -24,6 +24,7 @@ import com.bitmovin.analytics.utils.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -341,14 +342,16 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     @Override
-    public void authenticationCompleted(boolean success, Map<String, String> settings) {
+    public void configureFeatures(Map<String, String> settings, Collection<EventData> samples, Collection<AdEventData> adSamples)
+    {
+        featureManager.configureFeatures(settings, samples, adSamples);
+    }
+
+    @Override
+    public void authenticationCompleted(boolean success)
+    {
         if (!success) {
             detachPlayer();
-        } else {
-            if(settings == null) {
-                settings = new HashMap<>();
-            }
-            featureManager.configureFeatures(settings);
         }
     }
 

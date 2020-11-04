@@ -1,5 +1,8 @@
 package com.bitmovin.analytics.features
 
+import com.bitmovin.analytics.data.AdEventData
+import com.bitmovin.analytics.data.EventData
+
 data class DummyFeatureConfig(val test: String): FeatureConfig()
 
 data class DummyEvent(val test: String)
@@ -11,15 +14,14 @@ interface DummyFeatureAdapter {
 }
 
 class DummyFeature : Feature<DummyFeatureConfig, DummyFeatureAdapter>(), DummyFeatureEventListener {
-    override val name: String
-        get() = "dummyFeature"
-    override val configClass: Class<DummyFeatureConfig>
-        get() = DummyFeatureConfig::class.java
-    override val adapterClass: Class<DummyFeatureAdapter>
-        get() = DummyFeatureAdapter::class.java
+    override val name = "dummyFeature"
+    override val configClass = DummyFeatureConfig::class.java
+    override val adapterClass = DummyFeatureAdapter::class.java
 
-    override fun disable() {
+    override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         print("disabling")
+        // reset values or delete samples that have been created in the meantime
+        samples.forEach { it.videoBitrate = 0 }
     }
 
     override fun configure(config: DummyFeatureConfig?) {
