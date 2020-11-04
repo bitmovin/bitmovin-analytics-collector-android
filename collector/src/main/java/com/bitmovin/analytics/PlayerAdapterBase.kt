@@ -1,9 +1,11 @@
 package com.bitmovin.analytics
 
-open class PlayerAdapterBase {
-    private val featureAdapters = mutableListOf<Any>()
+import com.bitmovin.analytics.features.FeatureAdapter
 
-    fun addFeatureAdapter(adapter: Any) {
+open class PlayerAdapterBase {
+    private val featureAdapters = mutableListOf<FeatureAdapter<*>>()
+
+    fun addFeatureAdapter(adapter: FeatureAdapter<*>) {
         featureAdapters.add(adapter)
     }
 
@@ -15,5 +17,10 @@ open class PlayerAdapterBase {
             }
         }
         return null
+    }
+
+    fun disposeFeatureAdapters() {
+        featureAdapters.forEach { it.dispose() }
+        featureAdapters.clear()
     }
 }

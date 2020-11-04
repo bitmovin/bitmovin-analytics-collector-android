@@ -86,11 +86,10 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.factory = factory;
-
-        this.addFeatureAdapter(new BitmovinDummyFeatureAdapter(this.bitmovinPlayer));
     }
 
     public void init() {
+        addFeatureAdapter(new BitmovinDummyFeatureAdapter(this.bitmovinPlayer));
         addPlayerListeners();
         checkAutoplayStartup();
         this.totalDroppedVideoFrames = 0;
@@ -255,6 +254,7 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
             removePlayerListener();
         }
         stateMachine.resetStateMachine();
+        disposeFeatureAdapters();
     }
 
     @Override

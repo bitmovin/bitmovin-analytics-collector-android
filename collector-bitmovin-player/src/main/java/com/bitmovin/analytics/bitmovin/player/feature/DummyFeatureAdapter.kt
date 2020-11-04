@@ -9,7 +9,7 @@ import com.bitmovin.analytics.features.DummyFeatureEventListener
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 
-class BitmovinDummyFeatureAdapter(player: BitmovinPlayer): DummyFeatureAdapter() {
+class BitmovinDummyFeatureAdapter(val player: BitmovinPlayer): DummyFeatureAdapter() {
     private val onDownloadFinishedListener = OnDownloadFinishedListener { downloadFinishedEvent ->
         on {it.onDummyEvent(DummyEvent("test"))}
     }
@@ -18,6 +18,11 @@ class BitmovinDummyFeatureAdapter(player: BitmovinPlayer): DummyFeatureAdapter()
         player.addEventListener(onDownloadFinishedListener)
     }
 
-    // TODO removeEventListener
-    // TODO dispose
+    override fun twoWayCommunication() {
+        print("Two way communication test")
+    }
+
+    override fun dispose() {
+        player.removeEventListener(onDownloadFinishedListener)
+    }
 }

@@ -14,4 +14,12 @@ abstract class FeatureAdapter<TEventListener> {
     fun on(action: (listener: TEventListener) -> Unit) {
         listeners.forEach { action(it) }
     }
+
+    fun clearEventListeners() {
+        listeners.clear()
+    }
+
+    open fun dispose() {
+        clearEventListeners()
+    }
 }
