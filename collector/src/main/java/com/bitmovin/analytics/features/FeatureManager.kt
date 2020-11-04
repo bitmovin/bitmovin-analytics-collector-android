@@ -35,4 +35,8 @@ class FeatureManager {
             }
         }
     }
+
+    fun decorateSample(sample: EventData) {
+        features.forEach { it.decorateSample(sample) }
+    }
 }

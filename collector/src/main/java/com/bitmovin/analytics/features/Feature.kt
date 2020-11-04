@@ -14,6 +14,8 @@ abstract class Feature<TConfig: FeatureConfig, TAdapter> {
     abstract fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf())
     abstract fun configure(config: TConfig?)
     abstract fun registerAdapter(adapter: TAdapter)
+    abstract fun decorateSample(sample: EventData)
+
     var adapter: TAdapter? = null
         private set
 
