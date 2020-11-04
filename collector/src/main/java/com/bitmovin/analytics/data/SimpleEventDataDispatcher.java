@@ -4,15 +4,18 @@ import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.DebugCallback;
+import com.bitmovin.analytics.license.AuthenticationCallback;
 import com.bitmovin.analytics.license.LicenseCall;
 import com.bitmovin.analytics.license.LicenseCallback;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseCallback {
+public class SimpleEventDataDispatcher implements IEventDataDispatcher, AuthenticationCallback
+{
     private static final String TAG = "BitmovinAnalytics/SimpleDispatcher";
     private final Backend backend;
 
@@ -38,6 +41,9 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     @Override
     synchronized public void authenticationCompleted(boolean success, Map<String, String> settings) {
         if (success) {
+            if(callback != null) {
+                callback.configureFeatures(settings, data, adData);
+            }
             enabled = true;
             Iterator<EventData> it = data.iterator();
             while (it.hasNext()) {
@@ -54,7 +60,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
         }
 
         if(callback != null) {
-            callback.authenticationCompleted(success, settings);
+            callback.authenticationCompleted(success);
         }
     }
 
@@ -96,5 +102,4 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
         this.data.clear();
         this.adData.clear();
     }
-
 }

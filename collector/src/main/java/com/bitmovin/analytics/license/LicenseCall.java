@@ -13,6 +13,7 @@ import com.bitmovin.analytics.utils.HttpClient;
 import com.bitmovin.analytics.utils.Util;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -33,7 +34,7 @@ public class LicenseCall {
         this.httpClient = new HttpClient(context);
     }
 
-    public void authenticate(final LicenseCallback callback) {
+    public void authenticate(final AuthenticationCallback callback) {
         final LicenseCallData data = new LicenseCallData();
         data.setKey(this.config.getKey());
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
@@ -50,7 +51,7 @@ public class LicenseCall {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response == null || response.body() == null) {
                     Log.d(TAG, "License call was denied without providing a response body");
-                    callback.authenticationCompleted(false, null);
+                    callback.authenticationCompleted(false, new HashMap<>());
                     return;
                 }
 
@@ -58,19 +59,19 @@ public class LicenseCall {
                 LicenseResponse licenseResponse = DataSerializer.deserialize(licensingResponseBody, LicenseResponse.class);
                 if (licenseResponse == null) {
                     Log.d(TAG, "License call was denied without providing a response body");
-                    callback.authenticationCompleted(false, null);
+                    callback.authenticationCompleted(false, new HashMap<>());
                     return;
                 }
 
                 if (licenseResponse.getStatus() == null) {
                     Log.d(TAG, String.format("License response was denied without status"));
-                    callback.authenticationCompleted(false, null);
+                    callback.authenticationCompleted(false, new HashMap<>());
                     return;
                 }
 
                 if (!licenseResponse.getStatus().equals("granted")) {
                     Log.d(TAG, String.format("License response was denied: %s", licenseResponse.getMessage()));
-                    callback.authenticationCompleted(false, null);
+                    callback.authenticationCompleted(false, new HashMap<>());
                     return;
                 }
                 Log.d(TAG, "License response was granted");
