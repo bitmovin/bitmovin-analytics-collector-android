@@ -9,18 +9,13 @@ import com.bitmovin.analytics.features.DummyFeatureEventListener
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 
-class BitmovinDummyFeatureAdapter(player: BitmovinPlayer): DummyFeatureAdapter {
-    private val listeners = mutableListOf<DummyFeatureEventListener>()
+class BitmovinDummyFeatureAdapter(player: BitmovinPlayer): DummyFeatureAdapter() {
     private val onDownloadFinishedListener = OnDownloadFinishedListener { downloadFinishedEvent ->
-        listeners.forEach { it.onDummyEvent(DummyEvent("test")) }
+        on {it.onDummyEvent(DummyEvent("test"))}
     }
 
     init {
         player.addEventListener(onDownloadFinishedListener)
-    }
-
-    override fun addEventListener(listener: DummyFeatureEventListener) {
-        listeners.add(listener)
     }
 
     // TODO removeEventListener
