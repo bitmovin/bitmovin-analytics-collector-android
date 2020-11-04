@@ -31,8 +31,13 @@ abstract class Feature<TConfig: FeatureConfig, TAdapter> {
 
     fun configure(configString: String?): TConfig? {
         configString ?: return null
-        val config = DataSerializer.deserialize(configString, configClass)
-        configure(config)
-        return config
+        return try {
+            val config = DataSerializer.deserialize(configString, configClass)
+            configure(config)
+            config
+        }
+        catch(ignored: Throwable) {
+            null
+        }
     }
 }
