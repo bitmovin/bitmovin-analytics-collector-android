@@ -6,7 +6,9 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 
 class FeatureManager {
-    private val logTag = FeatureManager::class.java.name
+    companion object {
+        val TAG = FeatureManager::class.simpleName
+    }
     private val features: MutableList<Feature<*, *>> = mutableListOf()
 
     fun registerFeature(feature: Feature<*, *>) {
@@ -21,7 +23,7 @@ class FeatureManager {
     fun registerPlayerAdapter(playerAdapter: PlayerAdapter) {
         features.forEach {
             if(!it.registerPlayerAdapter(playerAdapter)) {
-                Log.d(logTag, "Disabling feature ${it.name} as the playerAdapter doesn't support the feature.")
+                Log.d(TAG, "Disabling feature ${it.name} as the playerAdapter doesn't support the feature.")
                 it.disable()
                 features.remove(it)
             }
@@ -32,7 +34,7 @@ class FeatureManager {
         features.forEach {
             val config = it.configure(settings[it.name])
             if(config?.enabled != true) {
-                Log.d(logTag,"Disabling feature ${it.name} as it isn't enabled according to license callback.")
+                Log.d(TAG,"Disabling feature ${it.name} as it isn't enabled according to license callback.")
                 it.disable(samples, adSamples)
                 features.remove(it)
             }
