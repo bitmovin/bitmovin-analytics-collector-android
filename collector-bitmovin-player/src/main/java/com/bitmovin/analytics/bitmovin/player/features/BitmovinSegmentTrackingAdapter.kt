@@ -9,14 +9,15 @@ import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 import com.bitmovin.player.config.network.HttpRequestType
 
 class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer): SegmentTrackingAdapter() {
-    init {
-        wireEvents()
-    }
 
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
         val segmentType = mapHttpRequestType(it.downloadType)
         val segmentInfo = SegmentInfo(it.timestamp, segmentType, it.url, it.lastRedirectLocation, it.httpStatus, it.downloadTime, it.size, it.isSuccess)
         on { listener -> listener.onDownloadFinished(DownloadFinishedEvent(segmentInfo)) }
+    }
+
+    init {
+        wireEvents()
     }
 
     private fun mapHttpRequestType(requestType: HttpRequestType?): SegmentType {

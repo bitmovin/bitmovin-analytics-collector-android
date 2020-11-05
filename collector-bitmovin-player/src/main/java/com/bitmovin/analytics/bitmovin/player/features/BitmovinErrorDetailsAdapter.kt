@@ -7,12 +7,12 @@ import com.bitmovin.player.api.event.listener.OnErrorListener
 import com.bitmovin.player.config.network.HttpRequestType
 
 class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer): ErrorDetailsAdapter() {
-    init {
-        wireEvents()
-    }
-
     private val onErrorListener = OnErrorListener {
         on { listener -> listener.onError(it.timestamp, it.code, it.message, it.data as? Throwable)}
+    }
+
+    init {
+        wireEvents()
     }
 
     private fun wireEvents() {
