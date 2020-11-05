@@ -7,11 +7,16 @@ import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.utils.DataSerializer
 
 abstract class Feature<TConfig: FeatureConfig> {
+    var isEnabled = true
+        private set
     abstract val name: String
     abstract val configClass: Class<TConfig>
-    abstract fun configure(config: TConfig?)
+    abstract fun configure(config: TConfig)
     abstract fun decorateSample(sample: EventData, from: PlayerState, event: PlayerEvent)
-    abstract fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf())
+
+    open fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf()) {
+        isEnabled = false
+    }
 
     fun configure(configString: String?): TConfig? {
         configString ?: return null
