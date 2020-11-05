@@ -22,8 +22,6 @@ class SegmentTrackingFeature(private val adapter: SegmentTrackingAdapter) : Feat
         maxSegments = config.maxSegments
     }
 
-    override fun decorateSample(sample: EventData, from: PlayerState, event: PlayerEvent) { }
-
     override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         super.disable(samples, adSamples)
         adapter.removeEventListener(this)

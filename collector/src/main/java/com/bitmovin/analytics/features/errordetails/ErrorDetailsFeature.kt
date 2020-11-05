@@ -21,8 +21,6 @@ class ErrorDetailsFeature(val context: Context, private val adapter: ErrorDetail
 
     override fun configure(config: ErrorDetailsFeatureConfig) { }
 
-    override fun decorateSample(sample: EventData, from: PlayerState, event: PlayerEvent) { }
-
     override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         super.disable(samples, adSamples)
         adapter.removeEventListener(this)

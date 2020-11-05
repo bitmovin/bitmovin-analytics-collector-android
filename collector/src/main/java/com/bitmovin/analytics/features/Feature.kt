@@ -11,8 +11,8 @@ abstract class Feature<TConfig: FeatureConfig> {
         private set
     abstract val name: String
     abstract val configClass: Class<TConfig>
-    abstract fun configure(config: TConfig)
-    abstract fun decorateSample(sample: EventData, from: PlayerState, event: PlayerEvent)
+    open fun configure(config: TConfig) {}
+    open fun decorateSample(sample: EventData, from: PlayerState, event: PlayerEvent) {}
 
     open fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf()) {
         isEnabled = false
