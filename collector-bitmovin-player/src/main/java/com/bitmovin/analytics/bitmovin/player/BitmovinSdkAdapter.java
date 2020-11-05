@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
@@ -85,12 +86,14 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     private DRMInformation drmInformation = null;
     private BitmovinSegmentTrackingAdapter segmentTrackingAdapter;
     private BitmovinErrorDetailsAdapter errorDetailsAdapter;
+    private Context context;
 
-    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine) {
+    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine, Context context) {
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.factory = factory;
+        this.context = context;
     }
 
     public void init() {
