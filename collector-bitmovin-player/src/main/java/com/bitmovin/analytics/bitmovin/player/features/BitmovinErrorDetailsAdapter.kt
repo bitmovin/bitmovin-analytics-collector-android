@@ -12,7 +12,7 @@ class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer): ErrorDeta
     }
 
     private val onErrorListener = OnErrorListener {
-        on { listener -> listener.onError()}
+        on { listener -> listener.onError(it.timestamp, it.code, it.message, it.data as? Throwable)}
     }
 
     private fun wireEvents() {
