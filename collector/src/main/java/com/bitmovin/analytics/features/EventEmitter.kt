@@ -1,9 +1,20 @@
 package com.bitmovin.analytics.features
 
+import kotlin.reflect.KClass
+
+interface OnEventEmitter<T> { fun onEmit(listener: T) }
+
 class EventEmitter {
     private val listeners = HashMap<Class<*>, MutableList<Any>>()
-    fun <TEventListener>emit(clazz: Class<TEventListener>, action: (listener: TEventListener) -> Unit) {
-        val listeners = listeners[clazz] ?: return
+
+    fun <TEventListener: Any>emit(clazz: Class<TEventListener>, action: OnEventEmitter<TEventListener>) {
+        this.emit(clazz.kotlin) {
+            action.onEmit(it)
+        }
+    }
+
+    fun <TEventListener: Any>emit(clazz: KClass<TEventListener>, action: (listener: TEventListener) -> Unit) {
+        val listeners = listeners[clazz.java] ?: return
         listeners.forEach {
             @Suppress("UNCHECKED_CAST")
             val listener = it as? TEventListener ?: return@forEach
