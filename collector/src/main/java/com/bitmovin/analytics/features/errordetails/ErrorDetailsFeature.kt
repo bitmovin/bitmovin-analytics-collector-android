@@ -10,7 +10,7 @@ import com.bitmovin.analytics.stateMachines.PlayerEvent
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.utils.topOfStacktrace
 
-class ErrorDetailsFeature(val context: Context, private val eventSources: Collection<EventSource<ErrorDetailsEventListener>>, private val segmentTracking: SegmentTrackingFeature?): Feature<ErrorDetailsFeatureConfig>(), ErrorDetailsEventListener {
+class ErrorDetailsFeature(val context: Context, private val segmentTracking: SegmentTrackingFeature?, private vararg val eventSources: EventSource<ErrorDetailsEventListener>): Feature<ErrorDetailsFeatureConfig>(), ErrorDetailsEventListener {
     override val name = "errorDetails"
     override val configClass = ErrorDetailsFeatureConfig::class.java
 

@@ -8,7 +8,7 @@ import com.bitmovin.analytics.stateMachines.PlayerEvent
 import com.bitmovin.analytics.stateMachines.PlayerState
 import java.util.*
 
-class SegmentTrackingFeature(private val eventSources: Collection<EventSource<SegmentTrackingEventListener>>) : Feature<SegmentTrackingFeatureConfig>(), SegmentTrackingEventListener {
+class SegmentTrackingFeature(private vararg val eventSources: EventSource<SegmentTrackingEventListener>) : Feature<SegmentTrackingFeatureConfig>(), SegmentTrackingEventListener {
     private var maxSegments = 20
     private val segmentQueue: Queue<SegmentInfo> = LinkedList()
 
