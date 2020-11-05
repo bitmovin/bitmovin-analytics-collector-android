@@ -19,7 +19,9 @@ class ErrorDetailsFeature(val context: Context, private val adapter: ErrorDetail
         adapter.addEventListener(this)
     }
 
-    override fun configure(config: ErrorDetailsFeatureConfig) { }
+    override fun configure(authenticated: Boolean, config: ErrorDetailsFeatureConfig) {
+        backend.enabled = authenticated
+    }
 
     override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         super.disable(samples, adSamples)
