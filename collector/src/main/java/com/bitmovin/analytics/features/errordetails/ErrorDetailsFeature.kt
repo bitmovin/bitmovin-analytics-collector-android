@@ -3,20 +3,21 @@ package com.bitmovin.analytics.features.errordetails
 import android.content.Context
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.segmenttracking.SegmentTrackingFeature
 import com.bitmovin.analytics.stateMachines.PlayerEvent
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.utils.topOfStacktrace
 
-class ErrorDetailsFeature(val context: Context, private val adapter: ErrorDetailsAdapter, private val segmentTracking: SegmentTrackingFeature?): Feature<ErrorDetailsFeatureConfig>(), ErrorDetailsEventListener {
+class ErrorDetailsFeature(val context: Context, private val eventSources: Collection<EventSource<ErrorDetailsEventListener>>, private val segmentTracking: SegmentTrackingFeature?): Feature<ErrorDetailsFeatureConfig>(), ErrorDetailsEventListener {
     override val name = "errorDetails"
     override val configClass = ErrorDetailsFeatureConfig::class.java
 
     private val backend = ErrorDetailsBackend(context)
 
     init {
-        adapter.addEventListener(this)
+        eventSources.forEach { it.addEventListener(this) }
     }
 
     override fun configure(authenticated: Boolean, config: ErrorDetailsFeatureConfig) {
@@ -25,7 +26,7 @@ class ErrorDetailsFeature(val context: Context, private val adapter: ErrorDetail
 
     override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         super.disable(samples, adSamples)
-        adapter.removeEventListener(this)
+        eventSources.forEach { it.removeEventListener(this) }
     }
 
     override fun onError(timestamp: Long, code: Int?, message: String?, throwable: Throwable?) {

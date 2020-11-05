@@ -2,7 +2,6 @@ package com.bitmovin.analytics.bitmovin.player.features
 
 import com.bitmovin.analytics.features.segmenttracking.DownloadFinishedEvent
 import com.bitmovin.analytics.features.segmenttracking.SegmentInfo
-import com.bitmovin.analytics.features.segmenttracking.SegmentTrackingAdapter
 import com.bitmovin.analytics.features.segmenttracking.SegmentType
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener

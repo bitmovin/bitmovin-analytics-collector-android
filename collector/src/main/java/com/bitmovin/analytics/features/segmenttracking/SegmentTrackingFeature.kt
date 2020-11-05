@@ -2,12 +2,13 @@ package com.bitmovin.analytics.features.segmenttracking
 
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.stateMachines.PlayerEvent
 import com.bitmovin.analytics.stateMachines.PlayerState
 import java.util.*
 
-class SegmentTrackingFeature(private val adapter: SegmentTrackingAdapter) : Feature<SegmentTrackingFeatureConfig>(), SegmentTrackingEventListener {
+class SegmentTrackingFeature(private val eventSources: Collection<EventSource<SegmentTrackingEventListener>>) : Feature<SegmentTrackingFeatureConfig>(), SegmentTrackingEventListener {
     private var maxSegments = 20
     private val segmentQueue: Queue<SegmentInfo> = LinkedList()
 
@@ -15,16 +16,16 @@ class SegmentTrackingFeature(private val adapter: SegmentTrackingAdapter) : Feat
     override val configClass = SegmentTrackingFeatureConfig::class.java
 
     init {
-        adapter.addEventListener(this)
+        eventSources.forEach { it.addEventListener(this) }
     }
 
-    override fun configure(config: SegmentTrackingFeatureConfig) {
+    override fun configure(authenticated: Boolean, config: SegmentTrackingFeatureConfig) {
         maxSegments = config.maxSegments
     }
 
     override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         super.disable(samples, adSamples)
-        adapter.removeEventListener(this)
+        eventSources.forEach { it.removeEventListener(this) }
         segmentQueue.clear()
     }
 
