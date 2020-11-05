@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.features
 
-abstract class FeatureAdapter<TEventListener> {
+abstract class EventTarget<TEventListener> {
     private val listeners = mutableListOf<TEventListener>()
 
     fun addEventListener(listener: TEventListener) {

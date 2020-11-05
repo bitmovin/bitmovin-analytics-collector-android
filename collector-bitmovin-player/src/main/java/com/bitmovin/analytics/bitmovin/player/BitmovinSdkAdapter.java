@@ -5,6 +5,8 @@ import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.PlayerAdapterBase;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.bitmovin.player.features.BitmovinErrorDetailsAdapter;
+import com.bitmovin.analytics.bitmovin.player.features.BitmovinSegmentTrackingAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -12,6 +14,8 @@ import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
+import com.bitmovin.analytics.features.errordetails.ErrorDetailsFeature;
+import com.bitmovin.analytics.features.segmenttracking.SegmentTrackingFeature;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
@@ -79,6 +83,8 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     private boolean playerIsReady;
     private boolean isVideoAttemptedPlay = false;
     private DRMInformation drmInformation = null;
+    private BitmovinSegmentTrackingAdapter segmentTrackingAdapter;
+    private BitmovinErrorDetailsAdapter errorDetailsAdapter;
 
     public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine) {
         this.config = config;
@@ -88,7 +94,11 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     }
 
     public void init() {
-//        registerFeature(new SegmentTrackingFeature(this.segmentTrackingAdapter));
+        this.segmentTrackingAdapter = new BitmovinSegmentTrackingAdapter(this.bitmovinPlayer);
+        SegmentTrackingFeature segmentTrackingFeature = new SegmentTrackingFeature(this.segmentTrackingAdapter);
+        this.errorDetailsAdapter = new BitmovinErrorDetailsAdapter(this.bitmovinPlayer);
+        registerFeature(segmentTrackingFeature);
+        registerFeature(new ErrorDetailsFeature(this.errorDetailsAdapter, segmentTrackingFeature));
 
         addPlayerListeners();
         checkAutoplayStartup();
@@ -250,6 +260,12 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     @Override
     public void release() {
         playerIsReady = false;
+        if(this.segmentTrackingAdapter != null) {
+            this.segmentTrackingAdapter.unwireEvents();
+        }
+        if(this.errorDetailsAdapter != null) {
+            this.errorDetailsAdapter.unwireEvents();
+        }
         if (bitmovinPlayer != null) {
             removePlayerListener();
         }
