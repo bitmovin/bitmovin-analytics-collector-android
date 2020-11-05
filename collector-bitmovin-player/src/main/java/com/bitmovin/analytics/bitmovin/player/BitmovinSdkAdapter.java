@@ -101,7 +101,7 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
         SegmentTrackingFeature segmentTrackingFeature = new SegmentTrackingFeature(this.segmentTrackingAdapter);
         this.errorDetailsAdapter = new BitmovinErrorDetailsAdapter(this.bitmovinPlayer);
         registerFeature(segmentTrackingFeature);
-        registerFeature(new ErrorDetailsFeature(this.errorDetailsAdapter, segmentTrackingFeature));
+        registerFeature(new ErrorDetailsFeature(context, this.errorDetailsAdapter, segmentTrackingFeature));
 
         addPlayerListeners();
         checkAutoplayStartup();
