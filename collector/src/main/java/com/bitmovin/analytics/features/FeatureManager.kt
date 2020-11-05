@@ -22,8 +22,6 @@ class FeatureManager {
     }
 
     fun configureFeatures(settings: Map<String, String>, samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
-        val settings = mapOf("dummyFeature" to "{\"enabled\": true, \"test\": \"asdf\"}")
-
         features.forEach {
             val config = it.configure(settings[it.name])
             if(config?.enabled != true) {
