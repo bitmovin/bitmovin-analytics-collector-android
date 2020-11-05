@@ -11,18 +11,18 @@ abstract class Feature<TConfig: FeatureConfig> {
         private set
     abstract val name: String
     abstract val configClass: Class<TConfig>
-    open fun configure(config: TConfig) {}
+    open fun configure(authenticated: Boolean, config: TConfig) {}
     open fun decorateSample(sample: EventData, from: PlayerState, event: PlayerEvent) {}
 
     open fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf()) {
         isEnabled = false
     }
 
-    fun configure(configString: String?): TConfig? {
+    fun configure(authenticated: Boolean, configString: String?): TConfig? {
         configString ?: return null
         return try {
             val config = DataSerializer.deserialize(configString, configClass)
-            configure(config)
+            configure(authenticated, config)
             config
         }
         catch(ignored: Throwable) {

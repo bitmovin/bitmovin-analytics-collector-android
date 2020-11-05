@@ -7,6 +7,6 @@ import java.util.Collection;
 import java.util.Map;
 
 public interface LicenseCallback {
-    void configureFeatures(Map<String, String> settings, Collection<EventData> samples, Collection<AdEventData> adSamples);
+    void configureFeatures(boolean authenticated, Map<String, String> settings, Collection<EventData> samples, Collection<AdEventData> adSamples);
     void authenticationCompleted(boolean success);
 }

@@ -40,10 +40,10 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, Authenti
 
     @Override
     synchronized public void authenticationCompleted(boolean success, Map<String, String> settings) {
+        if(callback != null) {
+            callback.configureFeatures(success, settings, data, adData);
+        }
         if (success) {
-            if(callback != null) {
-                callback.configureFeatures(settings, data, adData);
-            }
             enabled = true;
             Iterator<EventData> it = data.iterator();
             while (it.hasNext()) {

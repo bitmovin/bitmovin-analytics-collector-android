@@ -21,10 +21,10 @@ class FeatureManager {
         features.clear()
     }
 
-    fun configureFeatures(settings: Map<String, String>, samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
+    fun configureFeatures(authenticated: Boolean, settings: Map<String, String>, samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         features.forEach {
-            val config = it.configure(settings[it.name])
-            if(config?.enabled != true) {
+            val config = it.configure(authenticated, settings[it.name])
+            if(!authenticated || config?.enabled != true) {
                 Log.d(TAG,"Disabling feature ${it.name} as it isn't enabled according to license callback.")
                 it.disable(samples, adSamples)
                 features.remove(it)

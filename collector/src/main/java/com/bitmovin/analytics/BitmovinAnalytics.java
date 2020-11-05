@@ -341,9 +341,9 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     @Override
-    public void configureFeatures(Map<String, String> settings, Collection<EventData> samples, Collection<AdEventData> adSamples)
+    public void configureFeatures(boolean authenticated, Map<String, String> settings, Collection<EventData> samples, Collection<AdEventData> adSamples)
     {
-        featureManager.configureFeatures(settings, samples, adSamples);
+        featureManager.configureFeatures(authenticated, settings, samples, adSamples);
     }
 
     @Override
