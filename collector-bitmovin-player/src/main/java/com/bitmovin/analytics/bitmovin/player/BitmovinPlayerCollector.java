@@ -33,7 +33,7 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
 
     public void attachPlayer(BitmovinPlayer player) {
         EventDataFactory factory = new EventDataFactory(this.bitmovinAnalyticsConfig, context, new DeviceInformationProvider(context, getUserAgent(context)), new UserIdProvider(context));
-        BitmovinSdkAdapter adapter = new BitmovinSdkAdapter(player, this.bitmovinAnalyticsConfig, factory,
+        BitmovinSdkAdapter adapter = new BitmovinSdkAdapter(this, player, this.bitmovinAnalyticsConfig, factory,
                 this.playerStateMachine, context);
 
         this.attach(adapter);
