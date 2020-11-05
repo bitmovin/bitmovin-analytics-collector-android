@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Internal: `FeatureManager` allows dynamically adding and disabling features based on player support.
+- `SegmentTrackingFeature` to always track the latest `n` downloaded elements
+- `ErrorDetailsFeature` to track additional details in case an error occurs
 
 ## v1.20.0
 
