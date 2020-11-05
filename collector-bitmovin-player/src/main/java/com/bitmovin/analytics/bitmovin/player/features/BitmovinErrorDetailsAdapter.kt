@@ -9,7 +9,7 @@ import com.bitmovin.player.api.event.listener.OnErrorListener
 class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer): EventSource<ErrorDetailsEventListener> {
     private val eventEmitter: EventEmitter = EventEmitter()
     private val onErrorListener = OnErrorListener {
-        eventEmitter.emit<ErrorDetailsEventListener> { listener -> listener.onError(it.timestamp, it.code, it.message, it.data as? Throwable)}
+        eventEmitter.emit(ErrorDetailsEventListener::class.java) { listener -> listener.onError(it.timestamp, it.code, it.message, it.data as? Throwable)}
     }
 
     init {
