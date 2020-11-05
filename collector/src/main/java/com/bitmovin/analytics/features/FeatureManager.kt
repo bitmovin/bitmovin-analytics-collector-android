@@ -3,6 +3,8 @@ package com.bitmovin.analytics.features
 import android.util.Log
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.stateMachines.PlayerEvent
+import com.bitmovin.analytics.stateMachines.PlayerState
 
 class FeatureManager {
     companion object {
@@ -32,7 +34,7 @@ class FeatureManager {
         }
     }
 
-    fun decorateSample(sample: EventData) {
-        features.forEach { it.decorateSample(sample) }
+    fun decorateSample(sample: EventData, from: PlayerState, event: PlayerEvent) {
+        features.forEach { it.decorateSample(sample, from, event) }
     }
 }
