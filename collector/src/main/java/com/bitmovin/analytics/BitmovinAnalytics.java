@@ -13,7 +13,10 @@ import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
+import com.bitmovin.analytics.features.EventEmitter;
+import com.bitmovin.analytics.features.EventSource;
 import com.bitmovin.analytics.features.FeatureManager;
+import com.bitmovin.analytics.features.errordetails.ErrorDetailsEventListener;
 import com.bitmovin.analytics.license.LicenseCallback;
 
 import com.bitmovin.analytics.stateMachines.PlayerEvent;
@@ -35,12 +38,14 @@ import static com.bitmovin.analytics.utils.DataSerializer.serialize;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener, LicenseCallback {
+public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, EventSource<ErrorDetailsEventListener>
+{
 
     private static final String TAG = "BitmovinAnalytics";
 
-    private List<DebugListener> debugListeners = new ArrayList<>();
+//    private List<DebugListener> debugListeners = new ArrayList<>();
     private FeatureManager featureManager = new FeatureManager();
+    private EventEmitter eventEmitter = new EventEmitter();
 
     protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
     protected PlayerAdapter playerAdapter;
@@ -316,6 +321,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             data.setErrorCode(errorCode.getErrorCode());
             data.setErrorMessage(errorCode.getDescription());
             data.setErrorData(serialize(errorCode.getErrorData()));
+            eventEmitter.emit(ErrorDetailsEventListener.class,listener -> listener.onError(Util.getTimestamp(), errorCode.getErrorCode(), errorCode.getDescription(), null));
         }
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.ERROR);
@@ -355,11 +361,23 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     public void addDebugListener(DebugListener listener) {
-        debugListeners.add(listener);
+        eventEmitter.addEventListener(listener);
     }
 
     public void removeDebugListener(DebugListener listener) {
-        debugListeners.remove(listener);
+        eventEmitter.removeEventListener(listener);
+    }
+
+    @Override
+    public void addEventListener(ErrorDetailsEventListener errorDetailsEventListener)
+    {
+        eventEmitter.addEventListener(errorDetailsEventListener);
+    }
+
+    @Override
+    public void removeEventListener(ErrorDetailsEventListener errorDetailsEventListener)
+    {
+        eventEmitter.removeEventListener(errorDetailsEventListener);
     }
 
     public interface DebugListener {
@@ -373,23 +391,17 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     private DebugCallback debugCallback = new DebugCallback() {
         @Override
         public void dispatchEventData(@NotNull EventData data) {
-            for (DebugListener listener : BitmovinAnalytics.this.debugListeners) {
-                listener.onDispatchEventData(data);
-            }
+            eventEmitter.emit(DebugListener.class, listener -> listener.onDispatchEventData(data));
         }
 
         @Override
         public void dispatchAdEventData(@NotNull AdEventData data) {
-            for (DebugListener listener : BitmovinAnalytics.this.debugListeners) {
-                listener.onDispatchAdEventData(data);
-            }
+            eventEmitter.emit(DebugListener.class, listener -> listener.onDispatchAdEventData(data));
         }
 
         @Override
         public void message(@NotNull String message) {
-            for (DebugListener listener : BitmovinAnalytics.this.debugListeners) {
-                listener.onMessage(message);
-            }
+            eventEmitter.emit(DebugListener.class, listener -> listener.onMessage(message));
         }
     };
 }
