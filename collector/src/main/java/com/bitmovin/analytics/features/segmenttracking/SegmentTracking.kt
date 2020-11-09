@@ -7,7 +7,7 @@ import com.bitmovin.analytics.features.Feature
 import java.util.Queue
 import java.util.LinkedList
 
-class SegmentTracking(private vararg val eventSources: EventSource<DownloadFinishedEventListener>) : Feature<SegmentTrackingConfig>(), DownloadFinishedEventListener {
+class SegmentTracking(private vararg val eventSources: EventSource<OnDownloadFinishedEventListener>) : Feature<SegmentTrackingConfig>(), OnDownloadFinishedEventListener {
     private var maxSegments = 20
     private val segmentQueue: Queue<Segment> = LinkedList()
 

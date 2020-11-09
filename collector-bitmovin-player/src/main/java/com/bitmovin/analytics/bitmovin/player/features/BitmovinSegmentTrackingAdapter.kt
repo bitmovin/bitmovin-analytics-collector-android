@@ -4,18 +4,18 @@ import com.bitmovin.analytics.features.EventEmitter
 import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.segmenttracking.DownloadFinishedEvent
 import com.bitmovin.analytics.features.segmenttracking.Segment
-import com.bitmovin.analytics.features.segmenttracking.DownloadFinishedEventListener
+import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.features.segmenttracking.SegmentType
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 import com.bitmovin.player.config.network.HttpRequestType
 
-class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer) : EventSource<DownloadFinishedEventListener> {
+class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer) : EventSource<OnDownloadFinishedEventListener> {
     private val eventEmitter: EventEmitter = EventEmitter()
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
         val segmentType = mapHttpRequestType(it.downloadType)
         val segmentInfo = Segment(it.timestamp, segmentType, it.url, it.lastRedirectLocation, it.httpStatus, it.downloadTime, it.size, it.isSuccess)
-        eventEmitter.emit(DownloadFinishedEventListener::class) { listener -> listener.onDownloadFinished(DownloadFinishedEvent(segmentInfo)) }
+        eventEmitter.emit(OnDownloadFinishedEventListener::class) { listener -> listener.onDownloadFinished(DownloadFinishedEvent(segmentInfo)) }
     }
 
     init {
@@ -42,11 +42,11 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer) : Event
         player.removeEventListener(onDownloadFinishedListener)
     }
 
-    override fun addEventListener(listener: DownloadFinishedEventListener) {
+    override fun addEventListener(listener: OnDownloadFinishedEventListener) {
         eventEmitter.addEventListener(listener)
     }
 
-    override fun removeEventListener(listener: DownloadFinishedEventListener) {
+    override fun removeEventListener(listener: OnDownloadFinishedEventListener) {
         eventEmitter.removeEventListener(listener)
     }
 }

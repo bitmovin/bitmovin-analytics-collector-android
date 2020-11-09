@@ -1,5 +1,5 @@
 package com.bitmovin.analytics.features.segmenttracking
 
-interface DownloadFinishedEventListener {
+interface OnDownloadFinishedEventListener {
     fun onDownloadFinished(event: DownloadFinishedEvent)
 }
