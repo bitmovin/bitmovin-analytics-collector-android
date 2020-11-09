@@ -31,8 +31,4 @@ class FeatureManager {
             }
         }
     }
-
-    fun decorateSample(sample: EventData, from: PlayerState, event: PlayerEvent) {
-        features.forEach { it.decorateSample(sample, from, event) }
-    }
 }

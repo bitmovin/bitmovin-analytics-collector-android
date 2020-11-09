@@ -149,7 +149,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
 
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data, playerStateMachine.getCurrentState(),  PlayerEvent.STARTUP);
+        sendEventData(data);
     }
 
     @Override
@@ -161,7 +161,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         data.setPaused(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.PAUSED);
+        sendEventData(data);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         data.setPlayed(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.PLAYED);
+        sendEventData(data);
     }
 
     @Override
@@ -185,7 +185,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         data.setBuffered(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.BUFFERED);
+        sendEventData(data);
     }
 
     @Override
@@ -204,7 +204,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         data.setErrorCode(errorCode.getErrorCode());
         data.setErrorMessage(errorCode.getDescription());
         data.setErrorData(serialize(errorCode.getErrorData()));
-        sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.ERROR);
+        sendEventData(data);
     }
 
     @Override
@@ -216,7 +216,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         data.setDuration(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.SEEKED);
+        sendEventData(data);
     }
 
     @Override
@@ -243,7 +243,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
 
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.HEARTBEAT);
+        sendEventData(data);
     }
 
     @Override
@@ -272,7 +272,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(0);
-        sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.QUALITY_CHANGED);
+        sendEventData(data);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
     }
@@ -288,7 +288,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(0);
-        sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.SUBTITLE_CHANGED);
+        sendEventData(data);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
     }
@@ -299,7 +299,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         EventData data = playerAdapter.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(0);
-        sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.AUDIO_CHANGED);
+        sendEventData(data);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
     }
@@ -322,13 +322,12 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
             eventEmitter.emit(ErrorDetailEventListener.class, listener -> listener.onError(Util.getTimestamp(), errorCode.getErrorCode(), errorCode.getDescription(), null));
         }
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
-        sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.ERROR);
+        sendEventData(data);
         this.detachPlayer();
     }
 
 
-    public void sendEventData(EventData data, PlayerState from, PlayerEvent event) {
-        this.featureManager.decorateSample(data, from, event);
+    public void sendEventData(EventData data) {
         this.eventDataDispatcher.add(data);
         this.playerAdapter.clearValues();
     }
