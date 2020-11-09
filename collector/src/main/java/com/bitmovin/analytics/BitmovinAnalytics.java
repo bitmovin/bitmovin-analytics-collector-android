@@ -34,7 +34,7 @@ import static com.bitmovin.analytics.utils.DataSerializer.serialize;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, EventSource<OnErrorDetailEventListener>
+public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, EventSource<OnErrorDetailEventListener>, EventSource<OnAnalyticsReleasingEventListener>
 {
 
     private static final String TAG = "BitmovinAnalytics";
@@ -109,6 +109,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         detachAd();
 
         featureManager.unregisterFeatures();
+        eventEmitter.emit(OnAnalyticsReleasingEventListener.class, OnAnalyticsReleasingEventListener::onReleasing);
+
         if (playerAdapter != null) {
             playerAdapter.release();
         }
@@ -373,6 +375,18 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
     public void removeEventListener(OnErrorDetailEventListener errorDetailsEventListener)
     {
         eventEmitter.removeEventListener(errorDetailsEventListener);
+    }
+
+    @Override
+    public void addEventListener(OnAnalyticsReleasingEventListener listener)
+    {
+        eventEmitter.addEventListener(listener);
+    }
+
+    @Override
+    public void removeEventListener(OnAnalyticsReleasingEventListener listener)
+    {
+        eventEmitter.removeEventListener(listener);
     }
 
     public interface DebugListener {

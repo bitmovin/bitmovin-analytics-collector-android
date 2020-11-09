@@ -8,9 +8,11 @@ import android.os.Build;
 
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.UserIdProvider;
+import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.player.BitmovinPlayer;
 
 public class BitmovinPlayerCollector extends BitmovinAnalytics {
@@ -33,8 +35,9 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
 
     public void attachPlayer(BitmovinPlayer player) {
         EventDataFactory factory = new EventDataFactory(this.bitmovinAnalyticsConfig, context, new DeviceInformationProvider(context, getUserAgent(context)), new UserIdProvider(context));
-        BitmovinSdkAdapter adapter = new BitmovinSdkAdapter(this, player, this.bitmovinAnalyticsConfig, factory,
-                this.playerStateMachine, context);
+        FeatureFactory featureFactory = new BitmovinFeatureFactory(this, player, context);
+        BitmovinSdkAdapter adapter = new BitmovinSdkAdapter(player, this.bitmovinAnalyticsConfig, factory,
+                this.playerStateMachine, featureFactory);
 
         this.attach(adapter);
 

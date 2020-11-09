@@ -8,4 +8,8 @@ open class PlayerAdapterBase {
     fun registerFeature(feature: Feature<*>) {
         (features as MutableList<Feature<*>>).add(feature)
     }
+
+    fun registerFeatures(feature: Collection<Feature<*>>) {
+        (features as MutableList<Feature<*>>).addAll(feature)
+    }
 }

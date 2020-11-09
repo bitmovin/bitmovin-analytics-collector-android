@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.adapters;
 
+import com.bitmovin.analytics.OnAnalyticsReleasingEventListener;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.features.EventSource;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 
-public interface PlayerAdapter extends EventSource<OnPlayerAdapterReleasingEventListener>
+public interface PlayerAdapter
 {
     EventData createEventData();
 

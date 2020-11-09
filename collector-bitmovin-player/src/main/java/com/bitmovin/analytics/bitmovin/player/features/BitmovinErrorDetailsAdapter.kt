@@ -1,13 +1,13 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
-import com.bitmovin.analytics.adapters.OnPlayerAdapterReleasingEventListener
+import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.features.EventEmitter
 import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnErrorListener
 
-class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer, private val onPlayerAdapterReleasingEventSource: EventSource<OnPlayerAdapterReleasingEventListener>) : EventSource<OnErrorDetailEventListener>, OnPlayerAdapterReleasingEventListener {
+class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingEventSource: EventSource<OnAnalyticsReleasingEventListener>) : EventSource<OnErrorDetailEventListener>, OnAnalyticsReleasingEventListener {
     private val eventEmitter: EventEmitter = EventEmitter()
     private val onErrorListener = OnErrorListener {
         eventEmitter.emit(OnErrorDetailEventListener::class) { listener -> listener.onError(it.timestamp, it.code, it.message, it.data as? Throwable) }
@@ -18,12 +18,12 @@ class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer, private va
     }
 
     private fun wireEvents() {
-        onPlayerAdapterReleasingEventSource.addEventListener(this)
+        onAnalyticsReleasingEventSource.addEventListener(this)
         player.addEventListener(onErrorListener)
     }
 
     fun unwireEvents() {
-        onPlayerAdapterReleasingEventSource.removeEventListener(this)
+        onAnalyticsReleasingEventSource.removeEventListener(this)
         player.removeEventListener(onErrorListener)
     }
 

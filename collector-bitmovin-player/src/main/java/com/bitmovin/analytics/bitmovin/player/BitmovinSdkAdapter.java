@@ -1,15 +1,11 @@
 package com.bitmovin.analytics.bitmovin.player;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.PlayerAdapterBase;
-import com.bitmovin.analytics.adapters.OnPlayerAdapterReleasingEventListener;
+import com.bitmovin.analytics.OnAnalyticsReleasingEventListener;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
-import com.bitmovin.analytics.bitmovin.player.features.BitmovinErrorDetailsAdapter;
-import com.bitmovin.analytics.bitmovin.player.features.BitmovinSegmentTrackingAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -18,8 +14,8 @@ import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.features.EventEmitter;
-import com.bitmovin.analytics.features.errordetails.ErrorDetailTracking;
-import com.bitmovin.analytics.features.segmenttracking.SegmentTracking;
+import com.bitmovin.analytics.features.Feature;
+import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
@@ -76,6 +72,8 @@ import com.bitmovin.player.config.track.SubtitleTrack;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapter {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
@@ -87,28 +85,19 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     private boolean playerIsReady;
     private boolean isVideoAttemptedPlay = false;
     private DRMInformation drmInformation = null;
-    private BitmovinSegmentTrackingAdapter segmentTrackingAdapter;
-    private BitmovinErrorDetailsAdapter errorDetailsAdapter;
-    private Context context;
-    private BitmovinAnalytics analytics;
-    private EventEmitter eventEmitter = new EventEmitter();
+    private FeatureFactory featureFactory;
 
-    public BitmovinSdkAdapter(BitmovinAnalytics analytics, BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine, Context context) {
-        this.analytics = analytics;
+    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine, FeatureFactory featureFactory) {
+        this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.factory = factory;
-        this.context = context;
     }
 
     public void init() {
-        this.segmentTrackingAdapter = new BitmovinSegmentTrackingAdapter(this.bitmovinPlayer, this);
-        SegmentTracking segmentTracking = new SegmentTracking(this.segmentTrackingAdapter);
-        this.errorDetailsAdapter = new BitmovinErrorDetailsAdapter(this.bitmovinPlayer, this);
-        registerFeature(segmentTracking);
-        registerFeature(new ErrorDetailTracking(context, segmentTracking, this.errorDetailsAdapter, this.analytics));
-
+        Collection<Feature<?>> features = featureFactory.createFeatures();
+        registerFeatures(features);
         addPlayerListeners();
         checkAutoplayStartup();
         this.totalDroppedVideoFrames = 0;
@@ -269,7 +258,6 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     @Override
     public void release() {
         playerIsReady = false;
-        eventEmitter.emit(OnPlayerAdapterReleasingEventListener.class, OnPlayerAdapterReleasingEventListener::onReleasing);
         if (bitmovinPlayer != null) {
             removePlayerListener();
         }
@@ -606,16 +594,4 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
             }
         }
     };
-
-    @Override
-    public void addEventListener(OnPlayerAdapterReleasingEventListener listener)
-    {
-        eventEmitter.addEventListener(listener);
-    }
-
-    @Override
-    public void removeEventListener(OnPlayerAdapterReleasingEventListener listener)
-    {
-        eventEmitter.removeEventListener(listener);
-    }
 }
