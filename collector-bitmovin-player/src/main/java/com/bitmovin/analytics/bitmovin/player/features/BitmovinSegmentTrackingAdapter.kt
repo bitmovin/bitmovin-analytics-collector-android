@@ -4,14 +4,14 @@ import com.bitmovin.analytics.adapters.OnPlayerAdapterReleasingEventListener
 import com.bitmovin.analytics.features.EventEmitter
 import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.segmenttracking.DownloadFinishedEvent
-import com.bitmovin.analytics.features.segmenttracking.Segment
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.features.segmenttracking.Segment
 import com.bitmovin.analytics.features.segmenttracking.SegmentType
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 import com.bitmovin.player.config.network.HttpRequestType
 
-class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private val onPlayerAdapterReleasingEventSource: EventSource<OnPlayerAdapterReleasingEventListener>) : EventSource<OnDownloadFinishedEventListener>, OnPlayerAdapterReleasingEventListener{
+class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private val onPlayerAdapterReleasingEventSource: EventSource<OnPlayerAdapterReleasingEventListener>) : EventSource<OnDownloadFinishedEventListener>, OnPlayerAdapterReleasingEventListener {
     private val eventEmitter: EventEmitter = EventEmitter()
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
         val segmentType = mapHttpRequestType(it.downloadType)

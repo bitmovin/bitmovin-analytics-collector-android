@@ -3,8 +3,6 @@ package com.bitmovin.analytics.features
 import android.util.Log
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.stateMachines.PlayerEvent
-import com.bitmovin.analytics.stateMachines.PlayerState
 
 class FeatureManager {
     companion object {

@@ -4,8 +4,8 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.Feature
-import java.util.Queue
 import java.util.LinkedList
+import java.util.Queue
 
 class SegmentTracking(private vararg val eventSources: EventSource<OnDownloadFinishedEventListener>) : Feature<SegmentTrackingConfig>(), OnDownloadFinishedEventListener {
     private var maxSegments = 20
