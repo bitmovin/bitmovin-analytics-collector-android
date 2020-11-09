@@ -16,7 +16,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.features.EventEmitter;
 import com.bitmovin.analytics.features.EventSource;
 import com.bitmovin.analytics.features.FeatureManager;
-import com.bitmovin.analytics.features.errordetails.ErrorDetailsEventListener;
+import com.bitmovin.analytics.features.errordetails.ErrorDetailEventListener;
 import com.bitmovin.analytics.license.LicenseCallback;
 
 import com.bitmovin.analytics.stateMachines.PlayerEvent;
@@ -27,9 +27,7 @@ import com.bitmovin.analytics.utils.Util;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import static com.bitmovin.analytics.utils.DataSerializer.serialize;
@@ -38,7 +36,7 @@ import static com.bitmovin.analytics.utils.DataSerializer.serialize;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, EventSource<ErrorDetailsEventListener>
+public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, EventSource<ErrorDetailEventListener>
 {
 
     private static final String TAG = "BitmovinAnalytics";
@@ -321,7 +319,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
             data.setErrorCode(errorCode.getErrorCode());
             data.setErrorMessage(errorCode.getDescription());
             data.setErrorData(serialize(errorCode.getErrorData()));
-            eventEmitter.emit(ErrorDetailsEventListener.class,listener -> listener.onError(Util.getTimestamp(), errorCode.getErrorCode(), errorCode.getDescription(), null));
+            eventEmitter.emit(ErrorDetailEventListener.class, listener -> listener.onError(Util.getTimestamp(), errorCode.getErrorCode(), errorCode.getDescription(), null));
         }
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data, playerStateMachine.getCurrentState(), PlayerEvent.ERROR);
@@ -369,13 +367,13 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
     }
 
     @Override
-    public void addEventListener(ErrorDetailsEventListener errorDetailsEventListener)
+    public void addEventListener(ErrorDetailEventListener errorDetailsEventListener)
     {
         eventEmitter.addEventListener(errorDetailsEventListener);
     }
 
     @Override
-    public void removeEventListener(ErrorDetailsEventListener errorDetailsEventListener)
+    public void removeEventListener(ErrorDetailEventListener errorDetailsEventListener)
     {
         eventEmitter.removeEventListener(errorDetailsEventListener);
     }

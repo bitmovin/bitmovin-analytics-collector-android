@@ -5,10 +5,10 @@ import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.HttpClient
 import java.util.LinkedList
 
-class ErrorDetailsBackend(context: Context) {
+class ErrorDetailBackend(context: Context) {
     private val backendUrl = "https://analytics-ingress-global.bitmovin.com/errordetails"
     private val httpClient = HttpClient(context)
-    private val queue = LinkedList<ErrorDetails>()
+    private val queue = LinkedList<ErrorDetail>()
 
     var enabled: Boolean = false
         set(value) {
@@ -20,7 +20,7 @@ class ErrorDetailsBackend(context: Context) {
             }
         }
 
-    fun send(errorDetails: ErrorDetails) {
+    fun send(errorDetails: ErrorDetail) {
         if (enabled) {
             httpClient.post(backendUrl, DataSerializer.serialize(errorDetails), null)
         } else {

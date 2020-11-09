@@ -5,20 +5,20 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.features.segmenttracking.SegmentTrackingFeature
+import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
 import com.bitmovin.analytics.utils.topOfStacktrace
 
-class ErrorDetailsFeature(val context: Context, private val segmentTracking: SegmentTrackingFeature?, private vararg val eventSources: EventSource<ErrorDetailsEventListener>) : Feature<ErrorDetailsFeatureConfig>(), ErrorDetailsEventListener {
+class ErrorDetailTracking(val context: Context, private val segmentTracking: SegmentTracking?, private vararg val eventSources: EventSource<ErrorDetailEventListener>) : Feature<ErrorDetailTrackingConfig>(), ErrorDetailEventListener {
     override val name = "errorDetails"
-    override val configClass = ErrorDetailsFeatureConfig::class.java
+    override val configClass = ErrorDetailTrackingConfig::class.java
 
-    private val backend = ErrorDetailsBackend(context)
+    private val backend = ErrorDetailBackend(context)
 
     init {
         eventSources.forEach { it.addEventListener(this) }
     }
 
-    override fun configure(authenticated: Boolean, config: ErrorDetailsFeatureConfig) {
+    override fun configure(authenticated: Boolean, config: ErrorDetailTrackingConfig) {
         backend.enabled = authenticated
     }
 
@@ -32,7 +32,7 @@ class ErrorDetailsFeature(val context: Context, private val segmentTracking: Seg
             return
         }
         val segmentInfos = segmentTracking?.getSegments()
-        val errorDetails = ErrorDetails(timestamp, code, message, throwable?.topOfStacktrace, segmentInfos)
+        val errorDetails = ErrorDetail(timestamp, code, message, throwable?.topOfStacktrace, segmentInfos)
         backend.send(errorDetails)
     }
 }
