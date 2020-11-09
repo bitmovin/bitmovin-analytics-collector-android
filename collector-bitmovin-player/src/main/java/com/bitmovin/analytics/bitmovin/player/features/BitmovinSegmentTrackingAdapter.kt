@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
+import com.bitmovin.analytics.adapters.OnPlayerAdapterReleasingEventListener
 import com.bitmovin.analytics.features.EventEmitter
 import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.segmenttracking.DownloadFinishedEvent
@@ -10,7 +11,7 @@ import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 import com.bitmovin.player.config.network.HttpRequestType
 
-class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer) : EventSource<OnDownloadFinishedEventListener> {
+class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private val onPlayerAdapterReleasingEventSource: EventSource<OnPlayerAdapterReleasingEventListener>) : EventSource<OnDownloadFinishedEventListener>, OnPlayerAdapterReleasingEventListener{
     private val eventEmitter: EventEmitter = EventEmitter()
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
         val segmentType = mapHttpRequestType(it.downloadType)
@@ -35,10 +36,12 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer) : Event
     }
 
     private fun wireEvents() {
+        onPlayerAdapterReleasingEventSource.addEventListener(this)
         player.addEventListener(onDownloadFinishedListener)
     }
 
     fun unwireEvents() {
+        onPlayerAdapterReleasingEventSource.removeEventListener(this)
         player.removeEventListener(onDownloadFinishedListener)
     }
 
@@ -48,5 +51,9 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer) : Event
 
     override fun removeEventListener(listener: OnDownloadFinishedEventListener) {
         eventEmitter.removeEventListener(listener)
+    }
+
+    override fun onReleasing() {
+        unwireEvents()
     }
 }

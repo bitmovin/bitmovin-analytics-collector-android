@@ -6,6 +6,7 @@ import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.PlayerAdapterBase;
+import com.bitmovin.analytics.adapters.OnPlayerAdapterReleasingEventListener;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinErrorDetailsAdapter;
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinSegmentTrackingAdapter;
@@ -16,6 +17,7 @@ import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
+import com.bitmovin.analytics.features.EventEmitter;
 import com.bitmovin.analytics.features.errordetails.ErrorDetailTracking;
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking;
 import com.bitmovin.analytics.stateMachines.PlayerState;
@@ -89,6 +91,7 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     private BitmovinErrorDetailsAdapter errorDetailsAdapter;
     private Context context;
     private BitmovinAnalytics analytics;
+    private EventEmitter eventEmitter = new EventEmitter();
 
     public BitmovinSdkAdapter(BitmovinAnalytics analytics, BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine, Context context) {
         this.analytics = analytics;
@@ -100,9 +103,9 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     }
 
     public void init() {
-        this.segmentTrackingAdapter = new BitmovinSegmentTrackingAdapter(this.bitmovinPlayer);
+        this.segmentTrackingAdapter = new BitmovinSegmentTrackingAdapter(this.bitmovinPlayer, this);
         SegmentTracking segmentTracking = new SegmentTracking(this.segmentTrackingAdapter);
-        this.errorDetailsAdapter = new BitmovinErrorDetailsAdapter(this.bitmovinPlayer);
+        this.errorDetailsAdapter = new BitmovinErrorDetailsAdapter(this.bitmovinPlayer, this);
         registerFeature(segmentTracking);
         registerFeature(new ErrorDetailTracking(context, segmentTracking, this.errorDetailsAdapter, this.analytics));
 
@@ -266,12 +269,7 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     @Override
     public void release() {
         playerIsReady = false;
-        if(this.segmentTrackingAdapter != null) {
-            this.segmentTrackingAdapter.unwireEvents();
-        }
-        if(this.errorDetailsAdapter != null) {
-            this.errorDetailsAdapter.unwireEvents();
-        }
+        eventEmitter.emit(OnPlayerAdapterReleasingEventListener.class, OnPlayerAdapterReleasingEventListener::onReleasing);
         if (bitmovinPlayer != null) {
             removePlayerListener();
         }
@@ -608,4 +606,16 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
             }
         }
     };
+
+    @Override
+    public void addEventListener(OnPlayerAdapterReleasingEventListener listener)
+    {
+        eventEmitter.addEventListener(listener);
+    }
+
+    @Override
+    public void removeEventListener(OnPlayerAdapterReleasingEventListener listener)
+    {
+        eventEmitter.removeEventListener(listener);
+    }
 }
