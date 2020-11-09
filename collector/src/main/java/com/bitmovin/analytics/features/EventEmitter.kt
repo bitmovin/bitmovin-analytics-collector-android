@@ -7,13 +7,13 @@ interface OnEventEmitter<T> { fun onEmit(listener: T) }
 class EventEmitter {
     private val listeners = HashMap<Class<*>, MutableList<Any>>()
 
-    fun <TEventListener: Any>emit(clazz: Class<TEventListener>, action: OnEventEmitter<TEventListener>) {
+    fun <TEventListener : Any> emit(clazz: Class<TEventListener>, action: OnEventEmitter<TEventListener>) {
         this.emit(clazz.kotlin) {
             action.onEmit(it)
         }
     }
 
-    fun <TEventListener: Any>emit(clazz: KClass<TEventListener>, action: (listener: TEventListener) -> Unit) {
+    fun <TEventListener : Any> emit(clazz: KClass<TEventListener>, action: (listener: TEventListener) -> Unit) {
         val listeners = listeners[clazz.java] ?: return
         listeners.forEach {
             @Suppress("UNCHECKED_CAST")

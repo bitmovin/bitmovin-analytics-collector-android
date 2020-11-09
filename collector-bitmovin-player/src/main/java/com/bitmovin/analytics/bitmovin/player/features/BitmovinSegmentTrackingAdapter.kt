@@ -10,7 +10,7 @@ import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 import com.bitmovin.player.config.network.HttpRequestType
 
-class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer): EventSource<SegmentTrackingEventListener> {
+class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer) : EventSource<SegmentTrackingEventListener> {
     private val eventEmitter: EventEmitter = EventEmitter()
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
         val segmentType = mapHttpRequestType(it.downloadType)

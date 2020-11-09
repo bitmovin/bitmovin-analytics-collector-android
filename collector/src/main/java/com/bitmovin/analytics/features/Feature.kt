@@ -6,7 +6,7 @@ import com.bitmovin.analytics.stateMachines.PlayerEvent
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.utils.DataSerializer
 
-abstract class Feature<TConfig: FeatureConfig> {
+abstract class Feature<TConfig : FeatureConfig> {
     var isEnabled = true
         private set
     abstract val name: String
@@ -24,8 +24,7 @@ abstract class Feature<TConfig: FeatureConfig> {
             val config = DataSerializer.deserialize(configString, configClass)
             configure(authenticated, config)
             config
-        }
-        catch(ignored: Throwable) {
+        } catch (ignored: Throwable) {
             null
         }
     }

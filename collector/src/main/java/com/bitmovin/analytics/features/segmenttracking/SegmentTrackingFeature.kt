@@ -4,9 +4,8 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.stateMachines.PlayerEvent
-import com.bitmovin.analytics.stateMachines.PlayerState
-import java.util.*
+import java.util.LinkedList
+import java.util.Queue
 
 class SegmentTrackingFeature(private vararg val eventSources: EventSource<SegmentTrackingEventListener>) : Feature<SegmentTrackingFeatureConfig>(), SegmentTrackingEventListener {
     private var maxSegments = 20
@@ -39,7 +38,7 @@ class SegmentTrackingFeature(private vararg val eventSources: EventSource<Segmen
     }
 
     private fun limitQueue() {
-        while(segmentQueue.size > maxSegments) {
+        while (segmentQueue.size > maxSegments) {
             segmentQueue.remove()
         }
     }

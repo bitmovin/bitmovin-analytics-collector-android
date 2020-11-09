@@ -6,11 +6,9 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.segmenttracking.SegmentTrackingFeature
-import com.bitmovin.analytics.stateMachines.PlayerEvent
-import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.utils.topOfStacktrace
 
-class ErrorDetailsFeature(val context: Context, private val segmentTracking: SegmentTrackingFeature?, private vararg val eventSources: EventSource<ErrorDetailsEventListener>): Feature<ErrorDetailsFeatureConfig>(), ErrorDetailsEventListener {
+class ErrorDetailsFeature(val context: Context, private val segmentTracking: SegmentTrackingFeature?, private vararg val eventSources: EventSource<ErrorDetailsEventListener>) : Feature<ErrorDetailsFeatureConfig>(), ErrorDetailsEventListener {
     override val name = "errorDetails"
     override val configClass = ErrorDetailsFeatureConfig::class.java
 
@@ -30,7 +28,7 @@ class ErrorDetailsFeature(val context: Context, private val segmentTracking: Seg
     }
 
     override fun onError(timestamp: Long, code: Int?, message: String?, throwable: Throwable?) {
-        if(!isEnabled) {
+        if (!isEnabled) {
             return
         }
         val segmentInfos = segmentTracking?.getSegments()

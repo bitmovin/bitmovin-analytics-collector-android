@@ -3,7 +3,7 @@ package com.bitmovin.analytics.features.errordetails
 import android.content.Context
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.HttpClient
-import java.util.*
+import java.util.LinkedList
 
 class ErrorDetailsBackend(context: Context) {
     private val backendUrl = "https://analytics-ingress-global.bitmovin.com/errordetails"
@@ -13,7 +13,7 @@ class ErrorDetailsBackend(context: Context) {
     var enabled: Boolean = false
         set(value) {
             field = value
-            if(value) {
+            if (value) {
                 flush()
             } else {
                 queue.clear()
@@ -21,7 +21,7 @@ class ErrorDetailsBackend(context: Context) {
         }
 
     fun send(errorDetails: ErrorDetails) {
-        if(enabled) {
+        if (enabled) {
             httpClient.post(backendUrl, DataSerializer.serialize(errorDetails), null)
         } else {
             queue.add(errorDetails)

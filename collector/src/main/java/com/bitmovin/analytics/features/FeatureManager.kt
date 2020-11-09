@@ -24,8 +24,8 @@ class FeatureManager {
     fun configureFeatures(authenticated: Boolean, settings: Map<String, String>, samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         features.forEach {
             val config = it.configure(authenticated, settings[it.name])
-            if(!authenticated || config?.enabled != true) {
-                Log.d(TAG,"Disabling feature ${it.name} as it isn't enabled according to license callback.")
+            if (!authenticated || config?.enabled != true) {
+                Log.d(TAG, "Disabling feature ${it.name} as it isn't enabled according to license callback.")
                 it.disable(samples, adSamples)
                 features.remove(it)
             }
