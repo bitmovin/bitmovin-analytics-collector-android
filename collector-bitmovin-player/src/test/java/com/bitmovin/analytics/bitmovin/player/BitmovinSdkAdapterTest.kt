@@ -4,6 +4,7 @@ import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.player.BitmovinPlayer
@@ -38,7 +39,7 @@ class BitmovinSdkAdapterTest {
     fun setup() {
         Mockito.`when`(fakePlayer.addEventListener(ArgumentMatchers.any())).then { invocation -> eventListener.add(invocation.getArgument(0)) }
         Mockito.`when`(fakePlayer.getConfig()).thenReturn(Mockito.mock(PlayerConfiguration::class.java))
-        adapter = BitmovinSdkAdapter(Mockito.mock(BitmovinAnalytics::class.java), fakePlayer, Mockito.mock(BitmovinAnalyticsConfig::class.java), Mockito.mock(EventDataFactory::class.java), stateMachine, Mockito.mock(Context::class.java))
+        adapter = BitmovinSdkAdapter(fakePlayer, Mockito.mock(BitmovinAnalyticsConfig::class.java), Mockito.mock(EventDataFactory::class.java), stateMachine, Mockito.mock(FeatureFactory::class.java))
         adapter.init()
     }
 
