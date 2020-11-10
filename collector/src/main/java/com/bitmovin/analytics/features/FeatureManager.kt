@@ -6,7 +6,7 @@ import com.bitmovin.analytics.data.EventData
 
 class FeatureManager {
     companion object {
-        val TAG = FeatureManager::class.simpleName
+        val TAG = FeatureManager::class.java.name
     }
     private val features: MutableList<Feature<*>> = mutableListOf()
 
