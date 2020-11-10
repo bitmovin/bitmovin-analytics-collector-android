@@ -1,13 +1,14 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
+import com.bitmovin.analytics.OnAnalyticsReleasingEventSource
 import com.bitmovin.analytics.features.EventEmitter
-import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
+import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventSource
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnErrorListener
 
-class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingEventSource: EventSource<OnAnalyticsReleasingEventListener>) : EventSource<OnErrorDetailEventListener>, OnAnalyticsReleasingEventListener {
+class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingEventSource: OnAnalyticsReleasingEventSource) : OnErrorDetailEventSource, OnAnalyticsReleasingEventListener {
     private val eventEmitter: EventEmitter = EventEmitter()
     private val onErrorListener = OnErrorListener {
         eventEmitter.emit(OnErrorDetailEventListener::class) { listener -> listener.onError(it.timestamp, it.code, it.message, it.data as? Throwable) }

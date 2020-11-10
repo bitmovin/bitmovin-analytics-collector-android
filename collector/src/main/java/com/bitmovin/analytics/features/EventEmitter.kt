@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.features
 
+import com.bitmovin.analytics.EventListener
 import kotlin.reflect.KClass
 
 interface OnEventEmitter<T> { fun onEmit(listener: T) }
@@ -7,13 +8,13 @@ interface OnEventEmitter<T> { fun onEmit(listener: T) }
 class EventEmitter {
     private val listeners = HashMap<Class<*>, MutableList<Any>>()
 
-    fun <TEventListener : Any> emit(clazz: Class<TEventListener>, action: OnEventEmitter<TEventListener>) {
+    fun <TEventListener : EventListener> emit(clazz: Class<TEventListener>, action: OnEventEmitter<TEventListener>) {
         this.emit(clazz.kotlin) {
             action.onEmit(it)
         }
     }
 
-    fun <TEventListener : Any> emit(clazz: KClass<TEventListener>, action: (listener: TEventListener) -> Unit) {
+    fun <TEventListener : EventListener> emit(clazz: KClass<TEventListener>, action: (listener: TEventListener) -> Unit) {
         val listeners = listeners[clazz.java] ?: return
         listeners.forEach {
             @Suppress("UNCHECKED_CAST")
@@ -22,14 +23,14 @@ class EventEmitter {
         }
     }
 
-    fun addEventListener(listener: Any) {
+    fun addEventListener(listener: EventListener) {
         val clazz = listener.javaClass
         val existing = listeners[clazz] ?: mutableListOf()
         existing.add(listener)
         listeners[clazz] = existing
     }
 
-    fun removeEventListener(listener: Any) {
+    fun removeEventListener(listener: EventListener) {
         val clazz = listener.javaClass
         val existing = listeners[clazz] ?: mutableListOf()
         existing.remove(listener)

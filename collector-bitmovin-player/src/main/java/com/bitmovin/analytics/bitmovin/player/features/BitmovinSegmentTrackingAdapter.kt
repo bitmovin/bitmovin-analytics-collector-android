@@ -1,17 +1,18 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
+import com.bitmovin.analytics.OnAnalyticsReleasingEventSource
 import com.bitmovin.analytics.features.EventEmitter
-import com.bitmovin.analytics.features.EventSource
 import com.bitmovin.analytics.features.segmenttracking.DownloadFinishedEvent
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventSource
 import com.bitmovin.analytics.features.segmenttracking.Segment
 import com.bitmovin.analytics.features.segmenttracking.SegmentType
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 import com.bitmovin.player.config.network.HttpRequestType
 
-class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private val `onAnalyticsRel easingEventSource`: EventSource<OnAnalyticsReleasingEventListener>) : EventSource<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
+class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingEventSource: OnAnalyticsReleasingEventSource) : OnDownloadFinishedEventSource, OnAnalyticsReleasingEventListener {
     private val eventEmitter: EventEmitter = EventEmitter()
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
         val segmentType = mapHttpRequestType(it.downloadType)
@@ -36,12 +37,12 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
     }
 
     private fun wireEvents() {
-        `onAnalyticsRel easingEventSource`.addEventListener(this)
+        onAnalyticsReleasingEventSource.addEventListener(this)
         player.addEventListener(onDownloadFinishedListener)
     }
 
     fun unwireEvents() {
-        `onAnalyticsRel easingEventSource`.removeEventListener(this)
+        onAnalyticsReleasingEventSource.removeEventListener(this)
         player.removeEventListener(onDownloadFinishedListener)
     }
 

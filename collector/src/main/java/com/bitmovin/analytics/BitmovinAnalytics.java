@@ -14,9 +14,9 @@ import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.features.EventEmitter;
-import com.bitmovin.analytics.features.EventSource;
 import com.bitmovin.analytics.features.FeatureManager;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
+import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventSource;
 import com.bitmovin.analytics.license.LicenseCallback;
 
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -34,7 +34,7 @@ import static com.bitmovin.analytics.utils.DataSerializer.serialize;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, EventSource<OnErrorDetailEventListener>, EventSource<OnAnalyticsReleasingEventListener>
+public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, OnErrorDetailEventSource, OnAnalyticsReleasingEventSource
 {
 
     private static final String TAG = "BitmovinAnalytics";
@@ -366,30 +366,30 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
     }
 
     @Override
-    public void addEventListener(OnErrorDetailEventListener errorDetailsEventListener)
-    {
-        eventEmitter.addEventListener(errorDetailsEventListener);
-    }
-
-    @Override
-    public void removeEventListener(OnErrorDetailEventListener errorDetailsEventListener)
-    {
-        eventEmitter.removeEventListener(errorDetailsEventListener);
-    }
-
-    @Override
-    public void addEventListener(OnAnalyticsReleasingEventListener listener)
+    public void addEventListener(@NotNull OnErrorDetailEventListener listener)
     {
         eventEmitter.addEventListener(listener);
     }
 
     @Override
-    public void removeEventListener(OnAnalyticsReleasingEventListener listener)
+    public void removeEventListener(@NotNull OnErrorDetailEventListener listener)
     {
         eventEmitter.removeEventListener(listener);
     }
 
-    public interface DebugListener {
+    @Override
+    public void addEventListener(@NotNull OnAnalyticsReleasingEventListener listener)
+    {
+        eventEmitter.addEventListener(listener);
+    }
+
+    @Override
+    public void removeEventListener(@NotNull OnAnalyticsReleasingEventListener listener)
+    {
+        eventEmitter.removeEventListener(listener);
+    }
+
+    public interface DebugListener extends EventListener {
         void onDispatchEventData(EventData data);
 
         void onDispatchAdEventData(AdEventData data);

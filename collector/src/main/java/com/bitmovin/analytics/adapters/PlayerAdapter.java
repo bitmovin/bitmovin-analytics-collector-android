@@ -1,9 +1,7 @@
 package com.bitmovin.analytics.adapters;
 
-import com.bitmovin.analytics.OnAnalyticsReleasingEventListener;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.EventData;
-import com.bitmovin.analytics.features.EventSource;
 import com.bitmovin.analytics.features.Feature;
 
 import org.jetbrains.annotations.Nullable;
