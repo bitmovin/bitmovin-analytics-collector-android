@@ -1,7 +1,5 @@
 package com.bitmovin.analytics.bitmovin.player
 
-import android.content.Context
-import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
