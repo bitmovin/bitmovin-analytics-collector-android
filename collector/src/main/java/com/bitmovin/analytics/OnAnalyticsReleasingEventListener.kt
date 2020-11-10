@@ -5,6 +5,6 @@ interface OnAnalyticsReleasingEventSource {
     fun removeEventListener(listener: OnAnalyticsReleasingEventListener)
 }
 
-interface OnAnalyticsReleasingEventListener: EventListener {
+interface OnAnalyticsReleasingEventListener : EventListener {
     fun onReleasing()
 }

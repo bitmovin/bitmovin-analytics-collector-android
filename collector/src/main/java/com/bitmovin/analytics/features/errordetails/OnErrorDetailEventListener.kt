@@ -7,6 +7,6 @@ interface OnErrorDetailEventSource {
     fun removeEventListener(listener: OnErrorDetailEventListener)
 }
 
-interface OnErrorDetailEventListener: EventListener {
+interface OnErrorDetailEventListener : EventListener {
     fun onError(timestamp: Long, code: Int?, message: String?, throwable: Throwable?)
 }

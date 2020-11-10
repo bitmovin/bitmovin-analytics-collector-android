@@ -8,7 +8,7 @@ import com.bitmovin.analytics.features.errordetails.ErrorDetailTracking
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
 import com.bitmovin.player.BitmovinPlayer
 
-class BitmovinFeatureFactory(private val analytics: BitmovinAnalytics, private val player: BitmovinPlayer, private val context: Context): FeatureFactory {
+class BitmovinFeatureFactory(private val analytics: BitmovinAnalytics, private val player: BitmovinPlayer, private val context: Context) : FeatureFactory {
     override fun createFeatures(): Collection<Feature<*>> {
         val features = mutableListOf<Feature<*>>()
         val segmentTrackingAdapter = BitmovinSegmentTrackingAdapter(player, analytics)
