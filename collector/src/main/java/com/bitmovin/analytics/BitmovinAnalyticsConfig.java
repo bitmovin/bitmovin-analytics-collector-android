@@ -18,6 +18,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private String customData7;
     private String customUserId;
     private String experimentName;
+    private String mpdUrl;
+    private String m3u8Url;
     private int heartbeatInterval = 59700;
     private String key;
     private String title;
@@ -76,6 +78,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         customData7 = in.readString();
         customUserId = in.readString();
         experimentName = in.readString();
+        mpdUrl = in.readString();
+        m3u8Url = in.readString();
         heartbeatInterval = in.readInt();
         key = in.readString();
         title = in.readString();
@@ -103,6 +107,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         dest.writeString(customData7);
         dest.writeString(customUserId);
         dest.writeString(experimentName);
+        dest.writeString(mpdUrl);
+        dest.writeString(m3u8Url);
         dest.writeInt(heartbeatInterval);
         dest.writeString(key);
         dest.writeString(title);
@@ -290,6 +296,30 @@ public class BitmovinAnalyticsConfig implements Parcelable {
      */
     public void setExperimentName(String experimentName) {
         this.experimentName = experimentName;
+    }
+
+    /**
+     * MPD URL of the manifest. Usually auto-detected, but can be overwritten.
+     * @param mpdUrl
+     */
+    public void setMpdUrl(String mpdUrl) {
+        this.mpdUrl = mpdUrl;
+    }
+
+    public String getMpdUrl() {
+        return this.mpdUrl;
+    }
+
+    /**
+     * M3U8 URL of the manifest. Usually auto-detected, but can be overwritten.
+     * @param m3u8Url
+     */
+    public void setM3u8Url(String m3u8Url) {
+        this.m3u8Url = m3u8Url;
+    }
+
+    public String getM3u8Url() {
+        return this.m3u8Url;
     }
 
     public PlayerType getPlayerType() {
