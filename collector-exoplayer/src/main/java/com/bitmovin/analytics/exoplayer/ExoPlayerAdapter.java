@@ -4,11 +4,13 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.EventDataDecoratorPipeline;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
-import com.bitmovin.analytics.data.EventDataFactory;
+import com.bitmovin.analytics.data.DeviceInformationEventDataDecorator;
+import com.bitmovin.analytics.data.EventDataDecorator;
 import com.bitmovin.analytics.data.SpeedMeasurement;
 import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
@@ -39,6 +41,7 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -53,7 +56,7 @@ import static com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO;
 import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
 import static com.google.android.exoplayer2.C.WIDEVINE_UUID;
 
-public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener {
+public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener, EventDataDecorator {
     private static final String TAG = "ExoPlayerAdapter";
     private static final String DASH_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.dash.manifest.DashManifest";
     private static final String HLS_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.hls.HlsManifest";
@@ -68,7 +71,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private boolean playerIsReady;
     private String manifestUrl;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
-    private final EventDataFactory factory;
+    private final DeviceInformationEventDataDecorator deviceInformationEventDataDecorator;
     private long drmLoadStartTime = 0;
     private String drmType = null;
     private DRMInformation drmInformation = null;
@@ -78,12 +81,12 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private boolean isPlaying = false;
     private boolean isPaused = false;
 
-    public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine) {
+    public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, DeviceInformationEventDataDecorator deviceInformationEventDataDecorator, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
         this.config = config;
-        this.factory = factory;
+        this.deviceInformationEventDataDecorator = deviceInformationEventDataDecorator;
         attachAnalyticsListener();
     }
 
@@ -123,20 +126,89 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     }
 
     @Override
-    public EventData createEventData() {
-        EventData data = factory.build(stateMachine.getImpressionId());
-
+    public void decorate(@NotNull EventData data) {
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
         data.setPlayer(PlayerType.EXOPLAYER.toString());
-        decorateDataWithPlaybackInformation(data);
+
+        //duration
+        long duration = exoplayer.getDuration();
+        if (duration != TIME_UNSET) {
+            data.setVideoDuration(duration);
+        }
+
+        //ad
+        if (exoplayer.isPlayingAd()) {
+            data.setAd(1);
+        }
+
+        //isLive
+        data.setLive(Util.getIsLiveFromConfigOrPlayer(playerIsReady, config.isLive(), exoplayer.isCurrentWindowDynamic()));
+
+        //version
+        data.setVersion(PlayerType.EXOPLAYER.toString() + "-" + ExoUtil.getPlayerVersion());
+
+        // DroppedVideoFrames
+        data.setDroppedFrames(this.totalDroppedVideoFrames);
+        this.totalDroppedVideoFrames = 0;
+
+        //streamFormat, mpdUrl, and m3u8Url
+        Object manifest = exoplayer.getCurrentManifest();
+        if (isDashManifestClassLoaded() && manifest instanceof DashManifest) {
+            DashManifest dashManifest;
+            dashManifest = (DashManifest) manifest;
+            data.setStreamFormat(Util.DASH_STREAM_FORMAT);
+            if (dashManifest.location == null) {
+                data.setMpdUrl(this.manifestUrl);
+            } else {
+                data.setMpdUrl(dashManifest.location.toString());
+            }
+        } else if (isHlsManifestClassLoaded() && manifest instanceof HlsManifest) {
+            HlsMasterPlaylist masterPlaylist = ((HlsManifest) manifest).masterPlaylist;
+            HlsMediaPlaylist mediaPlaylist = ((HlsManifest) manifest).mediaPlaylist;
+            data.setStreamFormat(Util.HLS_STREAM_FORMAT);
+            if (masterPlaylist != null && masterPlaylist.baseUri != null) {
+                data.setM3u8Url(masterPlaylist.baseUri);
+            } else if (mediaPlaylist != null) {
+                data.setM3u8Url(mediaPlaylist.baseUri);
+            }
+        }
+
+        // Override mpdUrl and m3u8 url if they are set in the AnalyticsConfig
+        if (config.getMpdUrl() != null) {
+            data.setMpdUrl(config.getMpdUrl());
+        }
+        if (config.getM3u8Url() != null) {
+            data.setM3u8Url(config.getM3u8Url());
+        }
+
+        //Info on current tracks that are playing
+        if (exoplayer.getCurrentTrackSelections() != null) {
+            for (int i = 0; i < exoplayer.getCurrentTrackSelections().length; i++) {
+                TrackSelection trackSelection = exoplayer.getCurrentTrackSelections().get(i);
+                if (trackSelection != null) {
+                    Format format = trackSelection.getSelectedFormat();
+                    switch (exoplayer.getRendererType(i)) {
+                        case TRACK_TYPE_AUDIO:
+                            data.setAudioBitrate(format.sampleRate);
+                            break;
+                        case TRACK_TYPE_VIDEO:
+                            data.setVideoBitrate(format.bitrate);
+                            data.setVideoPlaybackHeight(format.height);
+                            data.setVideoPlaybackWidth(format.width);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
         data.setDownloadSpeedInfo(meter.getInfo());
 
         // DRM Information
         if (drmInformation != null) {
             data.setDrmType(drmInformation.getType());
         }
-
-        return data;
     }
 
     @Override
@@ -152,6 +224,12 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
         meter.reset();
         stateMachine.resetStateMachine();
+    }
+
+    @Override
+    public void registerEventDataDecorators(EventDataDecoratorPipeline pipeline) {
+        pipeline.registerEventDataDecorator(this.deviceInformationEventDataDecorator);
+        pipeline.registerEventDataDecorator(this);
     }
 
     @Override
@@ -295,7 +373,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
         }
     }
 
-
     @Override
     public void onPositionDiscontinuity(int reason) {
         Log.d(TAG, "onPositionDiscontinuity");
@@ -314,82 +391,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public void onSeekProcessed() {
         Log.d(TAG, "onSeekProcessed");
-    }
-
-    private void decorateDataWithPlaybackInformation(EventData data) {
-
-        //duration
-        long duration = exoplayer.getDuration();
-        if (duration != TIME_UNSET) {
-            data.setVideoDuration(duration);
-        }
-
-        //ad
-        if (exoplayer.isPlayingAd()) {
-            data.setAd(1);
-        }
-
-        //isLive
-        data.setLive(Util.getIsLiveFromConfigOrPlayer(playerIsReady, config.isLive(), exoplayer.isCurrentWindowDynamic()));
-
-        //version
-        data.setVersion(PlayerType.EXOPLAYER.toString() + "-" + ExoUtil.getPlayerVersion());
-
-        // DroppedVideoFrames
-        data.setDroppedFrames(this.totalDroppedVideoFrames);
-        this.totalDroppedVideoFrames = 0;
-
-        //streamFormat, mpdUrl, and m3u8Url
-        Object manifest = exoplayer.getCurrentManifest();
-        if (isDashManifestClassLoaded() && manifest instanceof DashManifest) {
-            DashManifest dashManifest;
-            dashManifest = (DashManifest) manifest;
-            data.setStreamFormat(Util.DASH_STREAM_FORMAT);
-            if (dashManifest.location == null) {
-                data.setMpdUrl(this.manifestUrl);
-            } else {
-                data.setMpdUrl(dashManifest.location.toString());
-            }
-        } else if (isHlsManifestClassLoaded() && manifest instanceof HlsManifest) {
-            HlsMasterPlaylist masterPlaylist = ((HlsManifest) manifest).masterPlaylist;
-            HlsMediaPlaylist mediaPlaylist = ((HlsManifest) manifest).mediaPlaylist;
-            data.setStreamFormat(Util.HLS_STREAM_FORMAT);
-            if (masterPlaylist != null && masterPlaylist.baseUri != null) {
-                data.setM3u8Url(masterPlaylist.baseUri);
-            } else if (mediaPlaylist != null) {
-                data.setM3u8Url(mediaPlaylist.baseUri);
-            }
-        }
-
-        // Override mpdUrl and m3u8 url if they are set in the AnalyticsConfig
-        if (config.getMpdUrl() != null) {
-            data.setMpdUrl(config.getMpdUrl());
-        }
-        if (config.getM3u8Url() != null) {
-            data.setM3u8Url(config.getM3u8Url());
-        }
-
-        //Info on current tracks that are playing
-        if (exoplayer.getCurrentTrackSelections() != null) {
-            for (int i = 0; i < exoplayer.getCurrentTrackSelections().length; i++) {
-                TrackSelection trackSelection = exoplayer.getCurrentTrackSelections().get(i);
-                if (trackSelection != null) {
-                    Format format = trackSelection.getSelectedFormat();
-                    switch (exoplayer.getRendererType(i)) {
-                        case TRACK_TYPE_AUDIO:
-                            data.setAudioBitrate(format.sampleRate);
-                            break;
-                        case TRACK_TYPE_VIDEO:
-                            data.setVideoBitrate(format.bitrate);
-                            data.setVideoPlaybackHeight(format.height);
-                            data.setVideoPlaybackWidth(format.width);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
     }
 
     @Override

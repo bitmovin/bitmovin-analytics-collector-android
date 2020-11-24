@@ -3,11 +3,13 @@ package com.bitmovin.analytics.bitmovin.player;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.EventDataDecoratorPipeline;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
-import com.bitmovin.analytics.data.EventDataFactory;
+import com.bitmovin.analytics.data.EventDataDecorator;
+import com.bitmovin.analytics.data.DeviceInformationEventDataDecorator;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
@@ -65,13 +67,14 @@ import com.bitmovin.player.config.quality.VideoQuality;
 import com.bitmovin.player.config.track.AudioTrack;
 import com.bitmovin.player.config.track.SubtitleTrack;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BitmovinSdkAdapter implements PlayerAdapter {
+public class BitmovinSdkAdapter implements PlayerAdapter, EventDataDecorator {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final BitmovinPlayer bitmovinPlayer;
-    private final EventDataFactory factory;
+    private final DeviceInformationEventDataDecorator deviceInformationEventDataDecorator;
     private PlayerStateMachine stateMachine;
     private ExceptionMapper<ErrorEvent> exceptionMapper = new BitmovinPlayerExceptionMapper();
     private int totalDroppedVideoFrames;
@@ -79,11 +82,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     private boolean isVideoAttemptedPlay = false;
     private DRMInformation drmInformation = null;
 
-    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, EventDataFactory factory, PlayerStateMachine stateMachine) {
+    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, DeviceInformationEventDataDecorator deviceInformationEventDataDecorator, PlayerStateMachine stateMachine) {
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
-        this.factory = factory;
+        this.deviceInformationEventDataDecorator = deviceInformationEventDataDecorator;
     }
 
     public void init() {
@@ -149,8 +152,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
     }
 
     @Override
-    public EventData createEventData() {
-        EventData data = factory.build(stateMachine.getImpressionId());
+    public void decorate(@NotNull EventData data) {
 
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
         data.setPlayer(PlayerType.BITMOVIN.toString());
@@ -247,8 +249,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
         if (drmInformation != null) {
             data.setDrmType(drmInformation.getType());
         }
-
-        return data;
     }
 
     @Override
@@ -258,6 +258,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter {
             removePlayerListener();
         }
         stateMachine.resetStateMachine();
+    }
+
+    @Override
+    public void registerEventDataDecorators(EventDataDecoratorPipeline pipeline) {
+        pipeline.registerEventDataDecorator(this.deviceInformationEventDataDecorator);
+        pipeline.registerEventDataDecorator(this);
     }
 
     @Override

@@ -7,14 +7,14 @@ import com.bitmovin.analytics.utils.Util
 class EventData(
     bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
     val impressionId: String,
-    deviceInfo: DeviceInformation,
     val userId: String
 ) {
-    val userAgent = deviceInfo.userAgent
-    val deviceInformation = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV)
-    val language: String = deviceInfo.locale //
+    var userAgent: String? = null
+    var deviceInformation: DeviceInformationDto? = null
+    var language: String? = null
     var analyticsVersion: String? = BuildConfig.VERSION_NAME
     val playerTech: String? = Util.PLAYER_TECH
+
     val key: String? = bitmovinAnalyticsConfig.getKey()
     val playerKey: String? = bitmovinAnalyticsConfig.getPlayerKey()
     val videoId: String? = bitmovinAnalyticsConfig.getVideoId()
@@ -28,12 +28,13 @@ class EventData(
     val customData6: String? = bitmovinAnalyticsConfig.getCustomData6()
     val customData7: String? = bitmovinAnalyticsConfig.customData7
     val path: String? = bitmovinAnalyticsConfig.getPath()
-    val experimentName = bitmovinAnalyticsConfig.getExperimentName()
+    val experimentName: String = bitmovinAnalyticsConfig.experimentName
     val cdnProvider: String? = bitmovinAnalyticsConfig.getCdnProvider()
     var player: String? = bitmovinAnalyticsConfig.getPlayerType()?.toString()
-    val domain: String = deviceInfo.packageName
-    val screenHeight: Int = deviceInfo.screenHeight // context?.getResources()?.getDisplayMetrics()?.heightPixels ?: 0
-    val screenWidth: Int = deviceInfo.screenWidth // context?.getResources()?.getDisplayMetrics()?.widthPixels ?: 0
+
+    var domain: String? = null
+    var screenHeight: Int? = null
+    var screenWidth: Int? = null
     var isLive: Boolean = false
     var isCasting: Boolean = false
     var videoDuration: Long = 0
@@ -69,7 +70,7 @@ class EventData(
     var progUrl: String? = null
     var isMuted = false
     var sequenceNumber: Int = 0
-    val platform: String = if (deviceInfo.isTV) "androidTV" else "android"
+    var platform: String? = null
     var videoCodec: String? = null
     var audioCodec: String? = null
     var supportedVideoCodecs: List<String>? = null

@@ -4,7 +4,7 @@ import android.content.Context
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.DeviceInformationEventDataDecorator
 import com.bitmovin.analytics.data.UserIdProvider
 import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
@@ -28,7 +28,7 @@ class EventDataFactoryTest {
         val myMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(myMock.getDeviceInformation()).thenReturn(deviceInfo)
         val mockContext = Mockito.mock(Context::class.java)
-        val eventData: EventData = EventDataFactory(BitmovinAnalyticsConfig(), mockContext, myMock, userIdProvider).build("impression-id")
+        val eventData: EventData = DeviceInformationEventDataDecorator(BitmovinAnalyticsConfig(), mockContext, myMock, userIdProvider).decorate("impression-id")
 
         assertThat(eventData.deviceInformation.manufacturer).isEqualTo(deviceInfo.manufacturer)
         assertThat(eventData.deviceInformation.model).isEqualTo(deviceInfo.model)
@@ -45,7 +45,7 @@ class EventDataFactoryTest {
         val myMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(myMock.getDeviceInformation()).thenReturn(deviceInfo)
         val mockContext = Mockito.mock(Context::class.java)
-        val eventData: EventData = EventDataFactory(BitmovinAnalyticsConfig(), mockContext, myMock, userIdProvider).build("impression-id")
+        val eventData: EventData = DeviceInformationEventDataDecorator(BitmovinAnalyticsConfig(), mockContext, myMock, userIdProvider).decorate("impression-id")
 
         assertThat(eventData.platform).isEqualTo("androidTV")
     }
@@ -58,7 +58,7 @@ class EventDataFactoryTest {
         val myMock = Mockito.mock(DeviceInformationProvider::class.java)
         Mockito.`when`(myMock.getDeviceInformation()).thenReturn(deviceInfo)
         val mockContext = Mockito.mock(Context::class.java)
-        val eventData: EventData = EventDataFactory(BitmovinAnalyticsConfig(), mockContext, myMock, userIdProvider).build("impression-id")
+        val eventData: EventData = DeviceInformationEventDataDecorator(BitmovinAnalyticsConfig(), mockContext, myMock, userIdProvider).decorate("impression-id")
 
         assertThat(eventData.domain).isEqualTo(deviceInfo.packageName)
     }
@@ -71,7 +71,7 @@ class EventDataFactoryTest {
         Mockito.`when`(deviceInfoMock.getDeviceInformation()).thenReturn(deviceInfo)
 
         val mockContext = Mockito.mock(Context::class.java)
-        val eventData: EventData = EventDataFactory(BitmovinAnalyticsConfig(), mockContext, deviceInfoMock, userIdProvider).build("impression-id")
+        val eventData: EventData = DeviceInformationEventDataDecorator(BitmovinAnalyticsConfig(), mockContext, deviceInfoMock, userIdProvider).decorate("impression-id")
 
         assertThat(eventData.userId).isEqualTo("my-user-id")
     }
@@ -85,7 +85,7 @@ class EventDataFactoryTest {
 
         val mockContext = Mockito.mock(Context::class.java)
         val impressionId = "impression-id"
-        val eventData: EventData = EventDataFactory(BitmovinAnalyticsConfig(), mockContext, deviceInfoMock, userIdProvider).build(impressionId)
+        val eventData: EventData = DeviceInformationEventDataDecorator(BitmovinAnalyticsConfig(), mockContext, deviceInfoMock, userIdProvider).decorate(impressionId)
 
         assertThat(eventData.impressionId).isEqualTo(impressionId)
     }
