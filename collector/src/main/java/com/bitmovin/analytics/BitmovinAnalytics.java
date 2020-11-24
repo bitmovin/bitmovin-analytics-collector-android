@@ -12,6 +12,7 @@ import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataDecorator;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
+import com.bitmovin.analytics.data.ManifestUrlEventDataDecorator;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
@@ -97,7 +98,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         this.eventDataDecorators.clear();
         // this.registerEventDataDecorators(prePipelineDecorator);
         this.playerAdapter.registerEventDataDecorators(this);
-        // TODO: Add ManifestUrlDecorator(M3u8/MpdUrl)
+        this.registerEventDataDecorator(new ManifestUrlEventDataDecorator(this.bitmovinAnalyticsConfig));
         // this.registerEventDataDecorators(postPipelineDecorator);
     }
 

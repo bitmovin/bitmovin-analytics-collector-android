@@ -208,13 +208,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataDecorator {
                     break;
             }
         }
-        // Override mpdUrl and m3u8 url if they are set in the AnalyticsConfig
-        if (config.getMpdUrl() != null) {
-            data.setMpdUrl(config.getMpdUrl());
-        }
-        if (config.getM3u8Url() != null) {
-            data.setM3u8Url(config.getM3u8Url());
-        }
 
         //video quality
         VideoQuality videoQuality = bitmovinPlayer.getPlaybackVideoData();

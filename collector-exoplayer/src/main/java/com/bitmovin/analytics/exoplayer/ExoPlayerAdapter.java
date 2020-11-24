@@ -173,14 +173,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
             }
         }
 
-        // Override mpdUrl and m3u8 url if they are set in the AnalyticsConfig
-        if (config.getMpdUrl() != null) {
-            data.setMpdUrl(config.getMpdUrl());
-        }
-        if (config.getM3u8Url() != null) {
-            data.setM3u8Url(config.getM3u8Url());
-        }
-
         //Info on current tracks that are playing
         if (exoplayer.getCurrentTrackSelections() != null) {
             for (int i = 0; i < exoplayer.getCurrentTrackSelections().length; i++) {
