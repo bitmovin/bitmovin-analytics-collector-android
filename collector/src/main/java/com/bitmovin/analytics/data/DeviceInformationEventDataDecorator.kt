@@ -2,7 +2,7 @@ package com.bitmovin.analytics.data
 
 open class DeviceInformationEventDataDecorator(
     private val deviceInformationProvider: DeviceInformationProvider
-): EventDataDecorator {
+) : EventDataDecorator {
     override fun decorate(data: EventData) {
         val deviceInfo = this.deviceInformationProvider.getDeviceInformation()
         data.userAgent = deviceInfo.userAgent

@@ -2,9 +2,9 @@ package com.bitmovin.analytics
 
 import android.content.Context
 import com.bitmovin.analytics.data.DeviceInformation
+import com.bitmovin.analytics.data.DeviceInformationEventDataDecorator
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.data.DeviceInformationEventDataDecorator
 import com.bitmovin.analytics.data.UserIdProvider
 import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
