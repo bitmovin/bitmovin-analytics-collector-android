@@ -10,6 +10,7 @@ import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
+import com.bitmovin.analytics.data.EventDataDecorator;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
@@ -43,6 +44,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     protected BitmovinAdAnalytics adAnalytics;
     protected IEventDataDispatcher eventDataDispatcher;
     protected Context context;
+    protected List<EventDataDecorator> eventDataDecorators = new ArrayList<>();
 
     /**
      * Bitmovin Analytics
@@ -117,11 +119,20 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         }
     }
 
+    public EventData createEventData() {
+        EventData eventData = new EventData();
+
+        for(EventDataDecorator decorator : this.eventDataDecorators) {
+            decorator.decorate(eventData);
+        }
+
+        return eventData;
+    }
 
     @Override
     public void onStartup(long duration) {
         Log.d(TAG, String.format("onStartup %s", playerStateMachine.getImpressionId()));
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setSupportedVideoCodecs(Util.getSupportedVideoFormats());
         data.setState("startup");
         data.setDuration(duration);
@@ -145,7 +156,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     @Override
     public void onPauseExit(long duration) {
         Log.d(TAG, String.format("onPauseExit %s", playerStateMachine.getImpressionId()));
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
         data.setPaused(duration);
@@ -157,7 +168,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     @Override
     public void onPlayExit(long duration) {
         Log.d(TAG, String.format("onPlayExit %s", playerStateMachine.getImpressionId()));
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
         data.setPlayed(duration);
@@ -169,7 +180,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     @Override
     public void onRebuffering(long duration) {
         Log.d(TAG, String.format("onRebuffering %s", playerStateMachine.getImpressionId()));
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
         data.setBuffered(duration);
@@ -181,7 +192,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     @Override
     public void onError(ErrorCode errorCode) {
         Log.d(TAG, String.format("onError %s", playerStateMachine.getImpressionId()));
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
@@ -200,7 +211,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     @Override
     public void onSeekComplete(long duration) {
         Log.d(TAG, String.format("onSeekComplete %s", playerStateMachine.getImpressionId()));
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setSeeked(duration);
         data.setDuration(duration);
@@ -214,7 +225,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         Log.d(TAG, String
                 .format("onHeartbeat %s %s", playerStateMachine.getCurrentState().toString().toLowerCase(),
                         playerStateMachine.getImpressionId()));
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
 
@@ -259,7 +270,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     @Override
     public void onQualityChange() {
         Log.d(TAG, String.format("onQualityChange %s", playerStateMachine.getImpressionId()));
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(0);
         sendEventData(data);
@@ -275,7 +286,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     @Override
     public void onSubtitleChange() {
         Log.d(TAG, String.format("onSubtitleChange %s", playerStateMachine.getImpressionId()));
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(0);
         sendEventData(data);
@@ -286,7 +297,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     @Override
     public void onAudioTrackChange() {
         Log.d(TAG, String.format("onAudioTrackChange %s", playerStateMachine.getImpressionId()));
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(0);
         sendEventData(data);
@@ -301,7 +312,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             videoStartFailedReason = VideoStartFailedReason.UNKNOWN;
         }
 
-        EventData data = playerAdapter.createEventData();
+        EventData data = createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setVideoStartFailed(true);
         ErrorCode errorCode = videoStartFailedReason.getErrorCode();
