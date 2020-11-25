@@ -272,6 +272,12 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         return experimentName;
     }
 
+    /**
+     * A/B Test Experiment Name
+     */
+    public void setExperimentName(String experimentName) {
+        this.experimentName = experimentName;
+    }
 
     /**
      * Human readable title of the video asset currently playing
@@ -289,13 +295,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
      */
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    /**
-     * A/B Test Experiment Name
-     */
-    public void setExperimentName(String experimentName) {
-        this.experimentName = experimentName;
     }
 
     /**

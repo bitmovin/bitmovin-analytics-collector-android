@@ -28,7 +28,7 @@ class EventData(
     val customData6: String? = bitmovinAnalyticsConfig.getCustomData6()
     val customData7: String? = bitmovinAnalyticsConfig.customData7
     val path: String? = bitmovinAnalyticsConfig.getPath()
-    val experimentName: String = bitmovinAnalyticsConfig.experimentName
+    val experimentName: String? = bitmovinAnalyticsConfig.experimentName
     val cdnProvider: String? = bitmovinAnalyticsConfig.getCdnProvider()
     var player: String? = bitmovinAnalyticsConfig.getPlayerType()?.toString()
 

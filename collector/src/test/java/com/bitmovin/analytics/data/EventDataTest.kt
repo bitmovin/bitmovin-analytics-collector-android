@@ -17,8 +17,6 @@ class EventDataTest {
     @Before
     fun setup() {
         bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2")
-        bitmovinAnalyticsConfig.cdnProvider = CDNProvider.AKAMAI
-        bitmovinAnalyticsConfig.videoId = "1234"
     }
 
     @Test

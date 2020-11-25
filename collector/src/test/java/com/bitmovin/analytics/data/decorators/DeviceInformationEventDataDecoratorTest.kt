@@ -22,7 +22,7 @@ class DeviceInformationEventDataDecoratorTest {
     @Test
     fun testDecorateSetsDeviceInformationOnEventData() {
         // #region Mocking
-        val bitmovinAnalyticsConfigMock = getDummyBitmovinAnalyticsConfig()
+        val bitmovinAnalyticsConfigMock = BitmovinAnalyticsConfig(licenseKey)
         val deviceInformationProviderMock = Mockito.mock(DeviceInformationProvider::class.java)
 
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", false, "user-agent", "de", "package-name", 100, 200)
@@ -48,7 +48,7 @@ class DeviceInformationEventDataDecoratorTest {
     @Test
     fun testDecorateSetsDeviceInformationOnEventDataForAndroidTV() {
         // #region Mocking
-        val bitmovinAnalyticsConfigMock = getDummyBitmovinAnalyticsConfig()
+        val bitmovinAnalyticsConfigMock = BitmovinAnalyticsConfig(licenseKey)
         val deviceInformationProviderMock = Mockito.mock(DeviceInformationProvider::class.java)
 
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", true, "user-agent", "de", "package-name", 100, 200)
@@ -66,7 +66,7 @@ class DeviceInformationEventDataDecoratorTest {
     @Test
     fun testDecorateDoesNotChangeImpressionID() {
         // #region Mocking
-        val bitmovinAnalyticsConfigMock = getDummyBitmovinAnalyticsConfig()
+        val bitmovinAnalyticsConfigMock = BitmovinAnalyticsConfig(licenseKey)
         val deviceInformationProviderMock = Mockito.mock(DeviceInformationProvider::class.java)
 
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", true, "user-agent", "de", "package-name", 100, 200)
@@ -84,7 +84,7 @@ class DeviceInformationEventDataDecoratorTest {
     @Test
     fun testDecorateDoesNotChangeUserID() {
         // #region Mocking
-        val bitmovinAnalyticsConfigMock = getDummyBitmovinAnalyticsConfig()
+        val bitmovinAnalyticsConfigMock = BitmovinAnalyticsConfig(licenseKey)
         val deviceInformationProviderMock = Mockito.mock(DeviceInformationProvider::class.java)
 
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", true, "user-agent", "de", "package-name", 100, 200)
@@ -97,11 +97,5 @@ class DeviceInformationEventDataDecoratorTest {
         decorator.decorate(eventData)
 
         assertThat(eventData.userId).isEqualTo(userId)
-    }
-
-    private fun getDummyBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {
-        val config = BitmovinAnalyticsConfig(licenseKey)
-        config.experimentName = "experimentName"
-        return config
     }
 }

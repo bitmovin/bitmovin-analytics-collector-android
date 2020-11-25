@@ -14,7 +14,6 @@ class DeviceInformationDtoDataSerializationTest {
     fun testSerializesEventDataDeviceInformationCorrectly() {
         //#region Mocking
         val config = BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2")
-        config.experimentName = "experimentName"
         val data = EventData(config, "1234", "user-id")
 
         val deviceInformationProviderMock = Mockito.mock(DeviceInformationProvider::class.java)
