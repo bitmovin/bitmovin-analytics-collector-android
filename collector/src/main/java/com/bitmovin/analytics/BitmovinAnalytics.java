@@ -129,7 +129,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         }
     }
 
-    public void registerEventDataDecorator(EventDataDecorator decorator) {
+    @Override
+    public void registerEventDataDecorator(@NotNull EventDataDecorator decorator) {
         this.eventDataDecorators.add(decorator);
     }
 

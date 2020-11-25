@@ -33,8 +33,8 @@ public class ExoPlayerCollector extends BitmovinAnalytics {
     }
 
     public void attachPlayer(ExoPlayer player) {
-        DeviceInformationEventDataDecorator factory = new DeviceInformationEventDataDecorator(new DeviceInformationProvider(context, ExoUtil.getUserAgent(context)));
-        ExoPlayerAdapter adapter = new ExoPlayerAdapter(player, this.bitmovinAnalyticsConfig, factory,
+        DeviceInformationEventDataDecorator deviceInfoEventDataDecorator = new DeviceInformationEventDataDecorator(new DeviceInformationProvider(context, ExoUtil.getUserAgent(context)));
+        ExoPlayerAdapter adapter = new ExoPlayerAdapter(player, this.bitmovinAnalyticsConfig, deviceInfoEventDataDecorator,
                 this.playerStateMachine);
 
         this.attach(adapter);
