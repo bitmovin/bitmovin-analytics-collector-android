@@ -12,7 +12,7 @@ import org.mockito.Mockito
 class DeviceInformationDtoDataSerializationTest {
     @Test
     fun testSerializesEventDataDeviceInformationCorrectly() {
-        //#region Mocking
+        // #region Mocking
         val config = BitmovinAnalyticsConfig("9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac", "18ca6ad5-9768-4129-bdf6-17685e0d14d2")
         val data = EventData(config, "1234", "user-id")
 
@@ -24,7 +24,7 @@ class DeviceInformationDtoDataSerializationTest {
         decorator.decorate(data)
 
         val serialized = DataSerializer.serialize(data)
-        //#endregion
+        // #endregion
 
         assertThat(serialized).contains("\"deviceInformation\":{")
         assertThat(serialized).contains(String.format("\"model\":\"%s\"", "myModel"))

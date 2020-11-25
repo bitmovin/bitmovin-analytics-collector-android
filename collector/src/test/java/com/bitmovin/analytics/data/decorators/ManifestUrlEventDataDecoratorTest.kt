@@ -2,11 +2,11 @@ package com.bitmovin.analytics.data.decorators
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.EventData
+import java.util.UUID
 import org.assertj.core.api.Assertions
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
-import java.util.UUID
 
 @RunWith(MockitoJUnitRunner::class)
 class ManifestUrlEventDataDecoratorTest {
