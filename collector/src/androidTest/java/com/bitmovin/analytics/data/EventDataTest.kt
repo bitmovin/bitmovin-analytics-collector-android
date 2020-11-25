@@ -1,8 +1,8 @@
 package com.bitmovin.analytics.data
 
 import android.os.Build
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
+import androidx.test.runner.AndroidJUnit4
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -20,7 +20,7 @@ class EventDataTest {
 
     @Test
     fun testEventDataContainsDeviceInformation() {
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val appContext = InstrumentationRegistry.getTargetContext()
         val deviceInformationProvider = DeviceInformationProvider(appContext, "user-agent")
         val deviceInfo = deviceInformationProvider.getDeviceInformation()
 
