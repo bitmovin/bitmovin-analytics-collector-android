@@ -13,7 +13,7 @@ class BitmovinAnalyticsTest {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("<ANALYTICS_KEY>")
         bitmovinAnalyticsConfig.customData1 = "customData1"
         bitmovinAnalyticsConfig.customData2 = "customData2"
