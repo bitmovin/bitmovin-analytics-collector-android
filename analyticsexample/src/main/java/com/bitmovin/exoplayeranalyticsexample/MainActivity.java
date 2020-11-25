@@ -2,7 +2,6 @@ package com.bitmovin.exoplayeranalyticsexample;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,11 +41,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button createButton;
     private Button sourceChangeButton;
     private TextView eventLogView;
-    private static final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-    private BitmovinAnalytics bitmovinAnalytics;
-    private Handler automationHandler;
-    private int automationDelay = 90000;
+    private final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
     private DataSource.Factory dataSourceFactory;
+
+    private ExoPlayerCollector bitmovinAnalytics;
+    private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
 
 
     @Override
@@ -65,17 +64,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dataSourceFactory = new DefaultDataSourceFactory(this, bandwidthMeter,
                 buildHttpDataSourceFactory(bandwidthMeter));
         createPlayer();
-
-//        automationHandler = new Handler();
-//
-//        automationHandler.postDelayed(new Runnable() {
-//            public void run() {
-//                releasePlayer();
-//                createPlayer();
-//                automationHandler.postDelayed(this, automationDelay);
-//            }
-//        }, automationDelay);
-
     }
 
     private void createPlayer() {
@@ -88,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
             //Step 1: Create your analytics config object
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("e73a3577-d91c-4214-9e6d-938fb936818a");
+            bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("e73a3577-d91c-4214-9e6d-938fb936818a");
 
             //Step 2: Add optional parameters
             bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
@@ -108,8 +96,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalyticsConfig.setIsLive(false);
 
             eventLogView.setText("");
+
             //Step 3: Create Analytics Collector
-            ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
+            bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
             bitmovinAnalytics.addDebugListener(this);
             this.bitmovinAnalytics = bitmovinAnalytics;
 
@@ -121,12 +110,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             playerView.setPlayer(player);
 
             //DASH example
-//            DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
+            // DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
             DashMediaSource dashMediaSource = getSource("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd", dataSourceFactory);
 
             player.prepare(dashMediaSource);
             player.setPlayWhenReady(false);
-
         }
     }
 
@@ -203,7 +191,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void changeSource() {
+        bitmovinAnalytics.detachPlayer();
+
         DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
+        bitmovinAnalyticsConfig.setVideoId("DRMVideo-id");
+        bitmovinAnalyticsConfig.setTitle("DRM Video Title");
+
+        bitmovinAnalytics.attachPlayer(player);
         player.prepare(dashMediaSource);
     }
 
