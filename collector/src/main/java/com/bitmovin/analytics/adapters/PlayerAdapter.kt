@@ -6,7 +6,7 @@ import com.bitmovin.analytics.data.DRMInformation
 interface PlayerAdapter {
     fun init()
     fun release()
-    fun registerEventDataDecorators(pipeline: EventDataDecoratorPipeline?)
+    fun registerEventDataDecorators(pipeline: EventDataDecoratorPipeline)
     val position: Long
     val dRMInformation: DRMInformation?
     fun clearValues()
