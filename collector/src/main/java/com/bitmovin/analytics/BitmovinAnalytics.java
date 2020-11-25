@@ -12,7 +12,7 @@ import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataDecorator;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
-import com.bitmovin.analytics.data.ManifestUrlEventDataDecorator;
+import com.bitmovin.analytics.data.decorators.ManifestUrlEventDataDecorator;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;

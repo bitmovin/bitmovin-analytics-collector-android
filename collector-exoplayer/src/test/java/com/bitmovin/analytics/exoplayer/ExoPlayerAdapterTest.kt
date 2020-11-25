@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.exoplayer
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.data.DeviceInformationEventDataDecorator
+import com.bitmovin.analytics.data.decorators.DeviceInformationEventDataDecorator
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.google.android.exoplayer2.ExoPlayer

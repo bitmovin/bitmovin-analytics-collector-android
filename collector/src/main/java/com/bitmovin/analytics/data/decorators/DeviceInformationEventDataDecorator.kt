@@ -1,4 +1,9 @@
-package com.bitmovin.analytics.data
+package com.bitmovin.analytics.data.decorators
+
+import com.bitmovin.analytics.data.DeviceInformationDto
+import com.bitmovin.analytics.data.DeviceInformationProvider
+import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.data.EventDataDecorator
 
 open class DeviceInformationEventDataDecorator(
     private val deviceInformationProvider: DeviceInformationProvider

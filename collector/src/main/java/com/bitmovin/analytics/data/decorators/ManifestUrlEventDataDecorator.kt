@@ -1,6 +1,8 @@
-package com.bitmovin.analytics.data
+package com.bitmovin.analytics.data.decorators
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.data.EventDataDecorator
 
 /**
  * Decorates the event data with the m3u8 and mpd url if they are set in the bitmovin analytics configuration.
