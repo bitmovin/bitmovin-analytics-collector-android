@@ -42,8 +42,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
-    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
-    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
+    testImplementation "androidx.test:core:${rootProject.ext.androidXVersion}"
+    testImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+    testImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
+    testImplementation "org.robolectric:robolectric:4.0"
 
 
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
