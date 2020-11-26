@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - ability to override `mpdUrl` and `m3u8Url` with the analytics configuration (AN-1919)
 
+### Changed
+
+- refactored `EventData` decoration to use an `EventDataDecorationPipeline` (AN-1919)
+
 ## v1.20.0
 
 ### Added
