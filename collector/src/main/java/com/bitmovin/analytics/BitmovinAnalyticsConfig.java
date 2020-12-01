@@ -298,7 +298,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * MPD URL of the manifest. Usually auto-detected, but can be overwritten.
+     * MPD URL of the manifest.
+     * If not set explicitly the collector will retrieve available information from the player.
      * @param mpdUrl
      */
     public void setMpdUrl(String mpdUrl) {
@@ -310,7 +311,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * M3U8 URL of the manifest. Usually auto-detected, but can be overwritten.
+     * M3U8 URL of the manifest.
+     * If not set explicitly the collector will retrieve available information from the player.
      * @param m3u8Url
      */
     public void setM3u8Url(String m3u8Url) {
