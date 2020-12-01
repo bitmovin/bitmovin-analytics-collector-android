@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- refactored `EventData` decoration to use an `EventDataDecorationPipeline` (AN-1919)
+- [internal] refactored `EventData` field population to use an `EventDataManipulationPipeline` (AN-1919)
 
 ## v1.20.0
 
