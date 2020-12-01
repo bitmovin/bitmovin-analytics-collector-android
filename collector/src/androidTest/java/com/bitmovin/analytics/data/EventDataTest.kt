@@ -2,11 +2,11 @@ package com.bitmovin.analytics.data
 
 import androidx.test.runner.AndroidJUnit4
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class EventDataTest {

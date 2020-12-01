@@ -1,12 +1,10 @@
 package com.bitmovin.analytics
 
 import com.bitmovin.analytics.data.DeviceInformation
-import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.utils.DataSerializer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import org.mockito.Mockito
 
 class DeviceInformationDtoDataSerializationTest {
     @Test

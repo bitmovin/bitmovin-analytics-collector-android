@@ -33,7 +33,7 @@ class EventData(
     val cdnProvider: String? = bitmovinAnalyticsConfig.getCdnProvider()
     var player: String? = bitmovinAnalyticsConfig.getPlayerType()?.toString()
 
-    val domain: String =  deviceInfo.packageName
+    val domain: String = deviceInfo.packageName
     val screenHeight: Int = deviceInfo.screenHeight
     val screenWidth: Int = deviceInfo.screenWidth
     var isLive: Boolean = false
