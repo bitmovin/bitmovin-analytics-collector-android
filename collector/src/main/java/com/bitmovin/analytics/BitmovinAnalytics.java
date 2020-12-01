@@ -8,16 +8,16 @@ import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
+import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataDecorator;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
-import com.bitmovin.analytics.data.decorators.ManifestUrlEventDataDecorator;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.data.UserIdProvider;
+import com.bitmovin.analytics.data.decorators.ManifestUrlEventDataDecorator;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.license.LicenseCallback;
-
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.Util;
@@ -135,7 +135,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
     }
 
     public EventData createEventData() {
-        EventData eventData = new EventData(this.bitmovinAnalyticsConfig, this.playerStateMachine.getImpressionId(), this.userIdProvider.userId());
+        DeviceInformationProvider deviceInformationProvider = this.playerAdapter.getDeviceInformationProvider();
+        EventData eventData = new EventData(this.bitmovinAnalyticsConfig, deviceInformationProvider.getDeviceInformation(), this.playerStateMachine.getImpressionId(), this.userIdProvider.userId());
 
         for(EventDataDecorator decorator : this.eventDataDecorators) {
             decorator.decorate(eventData);

@@ -6,14 +6,15 @@ import com.bitmovin.analytics.utils.Util
 
 class EventData(
     bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
+    deviceInfo: DeviceInformation,
     val impressionId: String,
     val userId: String
 ) {
-    var userAgent: String? = null
-    var deviceInformation: DeviceInformationDto? = null
-    var language: String? = null
-    var analyticsVersion: String? = BuildConfig.VERSION_NAME
-    val playerTech: String? = Util.PLAYER_TECH
+    val userAgent: String = deviceInfo.userAgent
+    val deviceInformation: DeviceInformationDto = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV)
+    val language: String = deviceInfo.locale
+    val analyticsVersion: String = BuildConfig.VERSION_NAME
+    val playerTech: String = Util.PLAYER_TECH
 
     val key: String? = bitmovinAnalyticsConfig.getKey()
     val playerKey: String? = bitmovinAnalyticsConfig.getPlayerKey()
@@ -32,9 +33,9 @@ class EventData(
     val cdnProvider: String? = bitmovinAnalyticsConfig.getCdnProvider()
     var player: String? = bitmovinAnalyticsConfig.getPlayerType()?.toString()
 
-    var domain: String? = null
-    var screenHeight: Int? = null
-    var screenWidth: Int? = null
+    val domain: String =  deviceInfo.packageName
+    val screenHeight: Int = deviceInfo.screenHeight
+    val screenWidth: Int = deviceInfo.screenWidth
     var isLive: Boolean = false
     var isCasting: Boolean = false
     var videoDuration: Long = 0
@@ -70,7 +71,7 @@ class EventData(
     var progUrl: String? = null
     var isMuted = false
     var sequenceNumber: Int = 0
-    var platform: String? = null
+    val platform: String = if (deviceInfo.isTV) "androidTV" else "android"
     var videoCodec: String? = null
     var audioCodec: String? = null
     var supportedVideoCodecs: List<String>? = null

@@ -6,10 +6,10 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.EventDataDecoratorPipeline;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
+import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataDecorator;
-import com.bitmovin.analytics.data.decorators.DeviceInformationEventDataDecorator;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
@@ -74,7 +74,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataDecorator {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final BitmovinPlayer bitmovinPlayer;
-    private final DeviceInformationEventDataDecorator deviceInformationEventDataDecorator;
+    private final DeviceInformationProvider deviceInformationProvider;
     private PlayerStateMachine stateMachine;
     private ExceptionMapper<ErrorEvent> exceptionMapper = new BitmovinPlayerExceptionMapper();
     private int totalDroppedVideoFrames;
@@ -82,11 +82,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataDecorator {
     private boolean isVideoAttemptedPlay = false;
     private DRMInformation drmInformation = null;
 
-    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, DeviceInformationEventDataDecorator deviceInformationEventDataDecorator, PlayerStateMachine stateMachine) {
+    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, DeviceInformationProvider deviceInformationProvider, PlayerStateMachine stateMachine) {
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
-        this.deviceInformationEventDataDecorator = deviceInformationEventDataDecorator;
+        this.deviceInformationProvider = deviceInformationProvider;
     }
 
     public void init() {
@@ -255,7 +255,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataDecorator {
 
     @Override
     public void registerEventDataDecorators(EventDataDecoratorPipeline pipeline) {
-        pipeline.registerEventDataDecorator(this.deviceInformationEventDataDecorator);
         pipeline.registerEventDataDecorator(this);
     }
 
@@ -268,6 +267,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataDecorator {
     @Override
     public DRMInformation getDRMInformation() {
         return drmInformation;
+    }
+
+    @Override
+    public DeviceInformationProvider getDeviceInformationProvider() {
+        return this.deviceInformationProvider;
     }
 
     @Override

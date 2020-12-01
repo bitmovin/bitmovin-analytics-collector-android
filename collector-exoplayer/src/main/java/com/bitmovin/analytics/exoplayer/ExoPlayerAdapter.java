@@ -7,9 +7,9 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.EventDataDecoratorPipeline;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
+import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
-import com.bitmovin.analytics.data.decorators.DeviceInformationEventDataDecorator;
 import com.bitmovin.analytics.data.EventDataDecorator;
 import com.bitmovin.analytics.data.SpeedMeasurement;
 import com.bitmovin.analytics.enums.DRMType;
@@ -71,7 +71,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private boolean playerIsReady;
     private String manifestUrl;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
-    private final DeviceInformationEventDataDecorator deviceInformationEventDataDecorator;
+    private final DeviceInformationProvider deviceInformationProvider;
     private long drmLoadStartTime = 0;
     private String drmType = null;
     private DRMInformation drmInformation = null;
@@ -81,12 +81,12 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     private boolean isPlaying = false;
     private boolean isPaused = false;
 
-    public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, DeviceInformationEventDataDecorator deviceInformationEventDataDecorator, PlayerStateMachine stateMachine) {
+    public ExoPlayerAdapter(ExoPlayer exoplayer, BitmovinAnalyticsConfig config, DeviceInformationProvider deviceInformationProvider, PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
         this.config = config;
-        this.deviceInformationEventDataDecorator = deviceInformationEventDataDecorator;
+        this.deviceInformationProvider = deviceInformationProvider;
         attachAnalyticsListener();
     }
 
@@ -220,7 +220,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
 
     @Override
     public void registerEventDataDecorators(EventDataDecoratorPipeline pipeline) {
-        pipeline.registerEventDataDecorator(this.deviceInformationEventDataDecorator);
         pipeline.registerEventDataDecorator(this);
     }
 
@@ -249,6 +248,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
     @Override
     public DRMInformation getDRMInformation() {
         return drmInformation;
+    }
+
+    @Override
+    public DeviceInformationProvider getDeviceInformationProvider() {
+        return this.deviceInformationProvider;
     }
 
     @Override
