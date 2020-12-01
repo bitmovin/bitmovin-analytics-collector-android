@@ -3,13 +3,13 @@ package com.bitmovin.analytics.bitmovin.player;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.EventDataDecoratorPipeline;
+import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
-import com.bitmovin.analytics.data.EventDataDecorator;
+import com.bitmovin.analytics.data.manipulators.EventDataManipulator;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
@@ -70,7 +70,7 @@ import com.bitmovin.player.config.track.SubtitleTrack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BitmovinSdkAdapter implements PlayerAdapter, EventDataDecorator {
+public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final BitmovinPlayer bitmovinPlayer;
@@ -152,7 +152,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataDecorator {
     }
 
     @Override
-    public void decorate(@NotNull EventData data) {
+    public void manipulate(@NotNull EventData data) {
         data.setPlayer(PlayerType.BITMOVIN.toString());
 
         //duration
@@ -252,8 +252,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataDecorator {
     }
 
     @Override
-    public void registerEventDataDecorators(EventDataDecoratorPipeline pipeline) {
-        pipeline.registerEventDataDecorator(this);
+    public void registerEventDataManipulators(EventDataManipulatorPipeline pipeline) {
+        pipeline.registerEventDataManipulator(this);
     }
 
     @Override

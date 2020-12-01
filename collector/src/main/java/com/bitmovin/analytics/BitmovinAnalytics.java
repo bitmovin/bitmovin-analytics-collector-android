@@ -11,11 +11,12 @@ import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
-import com.bitmovin.analytics.data.EventDataDecorator;
+import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
+import com.bitmovin.analytics.data.manipulators.EventDataManipulator;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.data.UserIdProvider;
-import com.bitmovin.analytics.data.decorators.ManifestUrlEventDataDecorator;
+import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.license.LicenseCallback;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -33,7 +34,7 @@ import static com.bitmovin.analytics.utils.DataSerializer.serialize;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, EventDataDecoratorPipeline {
+public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, EventDataManipulatorPipeline {
 
     private static final String TAG = "BitmovinAnalytics";
 
@@ -46,7 +47,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
     protected BitmovinAdAnalytics adAnalytics;
     protected IEventDataDispatcher eventDataDispatcher;
     protected Context context;
-    private final List<EventDataDecorator> eventDataDecorators = new ArrayList<>();
+    private final List<EventDataManipulator> eventDataManipulators = new ArrayList<>();
     private final UserIdProvider userIdProvider;
 
     /**
@@ -95,11 +96,11 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
         this.playerAdapter = adapter;
         this.playerAdapter.init();
 
-        this.eventDataDecorators.clear();
-        // this.registerEventDataDecorators(prePipelineDecorator);
-        this.playerAdapter.registerEventDataDecorators(this);
-        this.registerEventDataDecorator(new ManifestUrlEventDataDecorator(this.bitmovinAnalyticsConfig));
-        // this.registerEventDataDecorators(postPipelineDecorator);
+        this.eventDataManipulators.clear();
+        // this.registerEventDataManipulators(prePipelineManipulator);
+        this.playerAdapter.registerEventDataManipulators(this);
+        this.registerEventDataManipulator(new ManifestUrlEventDataManipulator(this.bitmovinAnalyticsConfig));
+        // this.registerEventDataManipulators(postPipelineManipulator);
     }
 
     protected void attachAd(AdAdapter adapter) {
@@ -130,16 +131,16 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
     }
 
     @Override
-    public void registerEventDataDecorator(@NotNull EventDataDecorator decorator) {
-        this.eventDataDecorators.add(decorator);
+    public void registerEventDataManipulator(@NotNull EventDataManipulator manipulator) {
+        this.eventDataManipulators.add(manipulator);
     }
 
     public EventData createEventData() {
         DeviceInformationProvider deviceInformationProvider = this.playerAdapter.getDeviceInformationProvider();
         EventData eventData = new EventData(this.bitmovinAnalyticsConfig, deviceInformationProvider.getDeviceInformation(), this.playerStateMachine.getImpressionId(), this.userIdProvider.userId());
 
-        for(EventDataDecorator decorator : this.eventDataDecorators) {
-            decorator.decorate(eventData);
+        for(EventDataManipulator decorator : this.eventDataManipulators) {
+            decorator.manipulate(eventData);
         }
 
         return eventData;

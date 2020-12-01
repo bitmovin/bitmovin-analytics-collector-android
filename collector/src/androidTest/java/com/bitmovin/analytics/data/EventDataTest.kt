@@ -39,7 +39,7 @@ class EventDataTest {
     }
 
     @Test
-    fun testDecorateSetsDeviceInformationOnEventDataForAndroidTV() {
+    fun testEventDataSetsPlatformToAndroidTVIfDeviceInformationIsTVIsTrue() {
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", true, "user-agent", "de", "package-name", 100, 200)
         val eventData = EventData(bitmovinAnalyticsConfig, deviceInformation, impressionId, userId)
 

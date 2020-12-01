@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.adapters;
 
-import com.bitmovin.analytics.EventDataDecoratorPipeline;
+import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 
@@ -13,7 +13,7 @@ public interface PlayerAdapter {
 
     void release();
 
-    void registerEventDataDecorators(EventDataDecoratorPipeline pipeline);
+    void registerEventDataManipulators(EventDataManipulatorPipeline pipeline);
 
     long getPosition();
 

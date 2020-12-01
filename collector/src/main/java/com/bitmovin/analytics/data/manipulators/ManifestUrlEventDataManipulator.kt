@@ -1,16 +1,15 @@
-package com.bitmovin.analytics.data.decorators
+package com.bitmovin.analytics.data.manipulators
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.data.EventDataDecorator
 
 /**
  * Decorates the event data with the m3u8 and mpd url if they are set in the bitmovin analytics configuration.
  */
-open class ManifestUrlEventDataDecorator(
+open class ManifestUrlEventDataManipulator(
     private val bitmovinAnalyticsConfig: BitmovinAnalyticsConfig
-) : EventDataDecorator {
-    override fun decorate(data: EventData) {
+) : EventDataManipulator {
+    override fun manipulate(data: EventData) {
         if (bitmovinAnalyticsConfig.m3u8Url != null) {
             data.m3u8Url = bitmovinAnalyticsConfig.m3u8Url
         }
