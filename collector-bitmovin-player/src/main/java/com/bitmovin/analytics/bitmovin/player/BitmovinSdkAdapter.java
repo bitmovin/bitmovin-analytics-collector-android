@@ -153,8 +153,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataDecorator {
 
     @Override
     public void decorate(@NotNull EventData data) {
-
-        data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
         data.setPlayer(PlayerType.BITMOVIN.toString());
 
         //duration
