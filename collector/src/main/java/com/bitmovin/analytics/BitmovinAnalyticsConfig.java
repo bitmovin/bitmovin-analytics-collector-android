@@ -298,7 +298,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * MPD URL of the manifest.
+     * Set MPD URL recorded in analytics.
      * If not set explicitly the collector will retrieve available information from the player.
      * @param mpdUrl
      */
@@ -311,7 +311,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * M3U8 URL of the manifest.
+     * Set M3U8 URL recorded in analytics.
      * If not set explicitly the collector will retrieve available information from the player.
      * @param m3u8Url
      */
