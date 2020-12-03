@@ -18,6 +18,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private String customData7;
     private String customUserId;
     private String experimentName;
+    private String mpdUrl;
+    private String m3u8Url;
     private int heartbeatInterval = 59700;
     private String key;
     private String title;
@@ -76,6 +78,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         customData7 = in.readString();
         customUserId = in.readString();
         experimentName = in.readString();
+        mpdUrl = in.readString();
+        m3u8Url = in.readString();
         heartbeatInterval = in.readInt();
         key = in.readString();
         title = in.readString();
@@ -103,6 +107,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         dest.writeString(customData7);
         dest.writeString(customUserId);
         dest.writeString(experimentName);
+        dest.writeString(mpdUrl);
+        dest.writeString(m3u8Url);
         dest.writeInt(heartbeatInterval);
         dest.writeString(key);
         dest.writeString(title);
@@ -266,6 +272,12 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         return experimentName;
     }
 
+    /**
+     * A/B Test Experiment Name
+     */
+    public void setExperimentName(String experimentName) {
+        this.experimentName = experimentName;
+    }
 
     /**
      * Human readable title of the video asset currently playing
@@ -286,10 +298,29 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * A/B Test Experiment Name
+     * Set MPD URL recorded in analytics.
+     * If not set explicitly the collector will retrieve available information from the player.
+     * @param mpdUrl
      */
-    public void setExperimentName(String experimentName) {
-        this.experimentName = experimentName;
+    public void setMpdUrl(String mpdUrl) {
+        this.mpdUrl = mpdUrl;
+    }
+
+    public String getMpdUrl() {
+        return this.mpdUrl;
+    }
+
+    /**
+     * Set M3U8 URL recorded in analytics.
+     * If not set explicitly the collector will retrieve available information from the player.
+     * @param m3u8Url
+     */
+    public void setM3u8Url(String m3u8Url) {
+        this.m3u8Url = m3u8Url;
+    }
+
+    public String getM3u8Url() {
+        return this.m3u8Url;
     }
 
     public PlayerType getPlayerType() {
