@@ -182,7 +182,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         eventData.playerStartupTime = 1
         eventData.autoplay = this.analytics.adAdapter.isAutoplayEnabled
 
-        eventData.setEventData(analytics.playerAdapter.createEventData())
+        eventData.setEventData(analytics.createEventData())
         eventData.setAdBreak(adBreak)
         eventData.setAdSample(adSample)
 

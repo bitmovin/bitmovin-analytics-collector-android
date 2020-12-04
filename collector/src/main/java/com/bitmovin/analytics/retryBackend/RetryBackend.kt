@@ -64,8 +64,6 @@ class RetryBackend(val config: CollectorConfig, val context: Context?): Backend 
                     val backOffTime = minOf(2.toDouble().pow(retrySample.eventData.retry).toInt(), 64)*1000
                     //more than 5min in queue
                     if (retrySample.totalTime + backOffTime < maxKeepTime) {
-//                        val scheduledTime = Calendar.getInstance()
-//                        scheduledTime.add(Calendar.MILLISECOND, backOffTime)
 
                         retrySample.scheduledTime = Calendar.getInstance().run {
                             add(Calendar.MILLISECOND, backOffTime)
@@ -83,7 +81,6 @@ class RetryBackend(val config: CollectorConfig, val context: Context?): Backend 
             }
 
             override fun onResponse(call: Call, response: Response) {
-//                processQueuedSamples()
 
             }
         })

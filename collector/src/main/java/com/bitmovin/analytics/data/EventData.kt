@@ -6,15 +6,16 @@ import com.bitmovin.analytics.utils.Util
 
 class EventData(
     bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
-    val impressionId: String,
     deviceInfo: DeviceInformation,
+    val impressionId: String,
     val userId: String
 ) {
-    val userAgent = deviceInfo.userAgent
-    val deviceInformation = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV)
-    val language: String = deviceInfo.locale //
-    var analyticsVersion: String? = BuildConfig.VERSION_NAME
-    val playerTech: String? = Util.PLAYER_TECH
+    val userAgent: String = deviceInfo.userAgent
+    val deviceInformation: DeviceInformationDto = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV)
+    val language: String = deviceInfo.locale
+    val analyticsVersion: String = BuildConfig.VERSION_NAME
+    val playerTech: String = Util.PLAYER_TECH
+
     val key: String? = bitmovinAnalyticsConfig.getKey()
     val playerKey: String? = bitmovinAnalyticsConfig.getPlayerKey()
     val videoId: String? = bitmovinAnalyticsConfig.getVideoId()
@@ -28,12 +29,13 @@ class EventData(
     val customData6: String? = bitmovinAnalyticsConfig.getCustomData6()
     val customData7: String? = bitmovinAnalyticsConfig.customData7
     val path: String? = bitmovinAnalyticsConfig.getPath()
-    val experimentName = bitmovinAnalyticsConfig.getExperimentName()
+    val experimentName: String? = bitmovinAnalyticsConfig.experimentName
     val cdnProvider: String? = bitmovinAnalyticsConfig.getCdnProvider()
     var player: String? = bitmovinAnalyticsConfig.getPlayerType()?.toString()
+
     val domain: String = deviceInfo.packageName
-    val screenHeight: Int = deviceInfo.screenHeight // context?.getResources()?.getDisplayMetrics()?.heightPixels ?: 0
-    val screenWidth: Int = deviceInfo.screenWidth // context?.getResources()?.getDisplayMetrics()?.widthPixels ?: 0
+    val screenHeight: Int = deviceInfo.screenHeight
+    val screenWidth: Int = deviceInfo.screenWidth
     var isLive: Boolean = false
     var isCasting: Boolean = false
     var videoDuration: Long = 0

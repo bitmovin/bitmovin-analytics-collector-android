@@ -6,7 +6,6 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector;
 import com.bitmovin.analytics.enums.CDNProvider;
@@ -14,16 +13,16 @@ import com.bitmovin.player.BitmovinPlayer;
 import com.bitmovin.player.BitmovinPlayerView;
 import com.bitmovin.player.config.PlaybackConfiguration;
 import com.bitmovin.player.config.PlayerConfiguration;
-import com.bitmovin.player.config.drm.DRMSystems;
-import com.bitmovin.player.config.media.SourceConfiguration;
 import com.bitmovin.player.config.advertising.AdItem;
 import com.bitmovin.player.config.advertising.AdSource;
 import com.bitmovin.player.config.advertising.AdSourceType;
 import com.bitmovin.player.config.advertising.AdvertisingConfiguration;
+import com.bitmovin.player.config.drm.DRMSystems;
+import com.bitmovin.player.config.media.SourceConfiguration;
 import com.bitmovin.player.config.media.SourceItem;
 import com.bitmovin.player.config.track.AudioTrack;
-
 import com.bitmovin.player.config.track.SubtitleTrack;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -39,10 +38,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button changeAudio;
     private Button changeSubtitle;
     private PlayerConfiguration config;
+    private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
 
-    private SourceItem redbullSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
-    private SourceItem sintelSource = new SourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
-    private SourceItem corruptedSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd");
+    private final SourceItem redbullSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
+    private final SourceItem sintelSource = new SourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
+    private final SourceItem corruptedSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected BitmovinPlayerCollector initializeAnalytics() {
         //Step 1: Create your analytics config object with the Local Development Key
-        BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0");
+        bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0");
 
         //Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
@@ -180,7 +180,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onPlayerChangeSource() {
+        bitmovinAnalytics.detachPlayer();
+
         SourceConfiguration config = createDRMSource();
+        bitmovinAnalyticsConfig.setVideoId("DRMVideo-id");
+        bitmovinAnalyticsConfig.setTitle("DRM Video Title");
+
+        bitmovinAnalytics.attachPlayer(bitmovinPlayer);
         bitmovinPlayer.load(config);
     }
 
