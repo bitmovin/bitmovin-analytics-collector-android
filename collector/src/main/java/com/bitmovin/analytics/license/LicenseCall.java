@@ -35,9 +35,11 @@ public class LicenseCall {
 
     public void authenticate(final LicenseCallback callback) {
         final LicenseCallData data = new LicenseCallData();
-        data.setKey(this.config.getKey());
+        //data.setKey(this.config.getKey());
+         data.setKey("e73a3577-d91c-4214-9e6d-938fb936818a");
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
-        data.setDomain(context.getPackageName());
+        //data.setDomain(context.getPackageName());
+        data.setDomain("localhost");
         String json = DataSerializer.serialize(data);
         httpClient.post(this.backendUrl, json, new Callback() {
             @Override

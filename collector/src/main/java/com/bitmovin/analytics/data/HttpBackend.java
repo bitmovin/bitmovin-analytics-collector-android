@@ -7,6 +7,7 @@ import android.util.Log;
 import com.bitmovin.analytics.CollectorConfig;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
+import okhttp3.Callback;
 
 public class HttpBackend implements Backend {
     private static final String TAG = "BitmovinBackend";
@@ -29,7 +30,7 @@ public class HttpBackend implements Backend {
                 eventData.getState(),
                 eventData.getStartupTime(),
                 eventData.getVideoStartupTime(),
-                eventData.getBuffered(), 
+                eventData.getBuffered(),
                 eventData.getAudioLanguage()));
         this.httpClient.post(analyticsBackendUrl, DataSerializer.serialize(eventData), null);
     }
