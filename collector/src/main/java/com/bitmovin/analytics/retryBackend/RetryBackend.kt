@@ -11,6 +11,8 @@ import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.HttpClient
+import com.bitmovin.analytics.utils.Util.MAX_RETRY_SAMPLES
+import com.bitmovin.analytics.utils.Util.MAX_RETRY_TIME
 
 import kotlinx.coroutines.*
 import okhttp3.Call
@@ -18,7 +20,7 @@ import okhttp3.Callback
 import okhttp3.Response
 import java.io.IOException
 import java.lang.Exception
-import java.time.LocalDateTime
+import java.net.SocketTimeoutException
 
 import java.util.*
 import kotlin.math.pow
@@ -34,10 +36,6 @@ class RetryBackend(val config: CollectorConfig, val context: Context?): Backend 
     // todo check sync
     private var retrySamplesSet = sortedSetOf<RetrySample<EventData>>()
     private val handler: Handler = Handler()
-    //todo move somewhere constants
-    private val delay = 1000 //in milliseconds
-    private val maxSamplesSize = 10
-    private val maxKeepTime =  30000 // 300000 //in milliseconds
 
     override fun send(eventData: EventData) {
         scheduleSample(RetrySample(eventData, 0, Date()))
@@ -58,12 +56,12 @@ class RetryBackend(val config: CollectorConfig, val context: Context?): Backend 
 
         httpClient.post(analyticsBackendUrl, DataSerializer.serialize(retrySample.eventData), object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                if (e.message.equals("timeout", true)) {
+                if ( e is SocketTimeoutException) {
 
-                    retrySample.eventData.retry++
+                retrySample.eventData.retry++
                     val backOffTime = minOf(2.toDouble().pow(retrySample.eventData.retry).toInt(), 64)*1000
                     //more than 5min in queue
-                    if (retrySample.totalTime + backOffTime < maxKeepTime) {
+                    if (retrySample.totalTime + backOffTime < MAX_RETRY_TIME) {
 
                         retrySample.scheduledTime = Calendar.getInstance().run {
                             add(Calendar.MILLISECOND, backOffTime)
@@ -102,7 +100,7 @@ class RetryBackend(val config: CollectorConfig, val context: Context?): Backend 
                     }
                     retryToken = nextScheduledTime
                     val delay = maxOf(nextScheduledTime.time - Date().time, 0) // to prevent negative delay
-                    val s = handler.postAtTime(processSampleRunnable, retryToken, SystemClock.uptimeMillis()+delay)
+                    handler.postAtTime(processSampleRunnable, retryToken, SystemClock.uptimeMillis()+delay)
                 }
 
             }
@@ -137,7 +135,7 @@ class RetryBackend(val config: CollectorConfig, val context: Context?): Backend 
 
         try {
 
-            if (retrySamplesSet.size > maxSamplesSize) {
+            if (retrySamplesSet.size > MAX_RETRY_SAMPLES) {
                 val removeSample = retrySamplesSet.last()
                 retrySamplesSet.remove(removeSample);
             }

@@ -30,7 +30,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
         this.config = config;
         this.callback = callback;
         this.context = context;
-        this.backend = new BackendFactory().createBackend(config, context);
+        this.backend =  config.isResendDataOnHttpTimeout() ? new BackendFactory().createRetrySamplesBackend(config, context) : new BackendFactory().createBackend(config, context);
     }
 
     @Override
