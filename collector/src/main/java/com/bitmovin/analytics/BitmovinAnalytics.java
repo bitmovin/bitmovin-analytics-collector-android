@@ -221,9 +221,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
 
         data.setErrorCode(errorCode.getErrorCode());
         data.setErrorMessage(errorCode.getDescription());
-        if (errorCode.getErrorData() != null) {
-            data.setErrorData(serialize(errorCode.getErrorData()));
-        }
+        data.setErrorData(serialize(errorCode.getErrorData()));
         sendEventData(data);
     }
 

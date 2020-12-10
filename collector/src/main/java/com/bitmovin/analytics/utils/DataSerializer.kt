@@ -5,7 +5,11 @@ import com.google.gson.JsonSyntaxException
 
 object DataSerializer {
     @JvmStatic
-    fun <T> serialize(data: T): String {
+    fun <T> serialize(data: T?): String? {
+        if (data == null) {
+            return null
+        }
+
         val gson = Gson()
         return gson.toJson(data)
     }
