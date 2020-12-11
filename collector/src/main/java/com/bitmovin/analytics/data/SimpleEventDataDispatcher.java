@@ -30,7 +30,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
         this.config = config;
         this.callback = callback;
         this.context = context;
-        this.backend =  config.isResendDataOnHttpTimeout() ? new BackendFactory().createRetrySamplesBackend(config, context) : new BackendFactory().createBackend(config, context);
+        this.backend =  new BackendFactory().createBackend(config, context);
     }
 
     @Override
@@ -40,13 +40,13 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
             Iterator<EventData> it = data.iterator();
             while (it.hasNext()) {
                 EventData eventData = it.next();
-                this.backend.send(eventData);
+                this.backend.send(eventData, null);
                 it.remove();
             }
             Iterator<AdEventData> adIt = adData.iterator();
             while (adIt.hasNext()) {
                 AdEventData eventData = adIt.next();
-                this.backend.sendAd(eventData);
+                this.backend.sendAd(eventData, null);
                 adIt.remove();
             }
         }
@@ -74,7 +74,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     public void add(EventData eventData) {
         eventData.setSequenceNumber(this.sampleSequenceNumber++);
         if (enabled) {
-            this.backend.send(eventData);
+            this.backend.send(eventData, null);
         } else {
             this.data.add(eventData);
         }
@@ -83,7 +83,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     @Override
     public void addAd(AdEventData eventData) {
         if (enabled) {
-            this.backend.sendAd(eventData);
+            this.backend.sendAd(eventData, null);
         } else {
             this.adData.add(eventData);
         }

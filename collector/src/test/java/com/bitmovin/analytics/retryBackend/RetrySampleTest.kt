@@ -1,22 +1,16 @@
 package com.bitmovin.analytics.retryBackend
 
-
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
-
-import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator
+import com.bitmovin.analytics.retryBackend.RetrySample
 import org.assertj.core.api.Assertions
 import org.junit.Test
 import java.util.*
 
 class RetrySampleTest {
 
-
-
     @Test
     fun testSamplesShouldBeOrderedByScheduledTime() {
         // #region Mocking
-        var retrySamplesSet = sortedSetOf<RetrySample<String>>()
+        var retrySamplesSet = sortedSetOf<RetrySample>()
         val firstDate = Calendar.getInstance().run {
             add(Calendar.HOUR, 1)
             time
@@ -36,10 +30,11 @@ class RetrySampleTest {
             add(Calendar.HOUR, 4)
             time
         }
+        // #endRegion
 
-        retrySamplesSet.add(RetrySample("first input sample", 0, secondDate))
-        retrySamplesSet.add(RetrySample("second input sample",  0, fourthDate))
-        retrySamplesSet.add(RetrySample( "third input sample", 0, firstDate))
+        retrySamplesSet.add(RetrySample(null, null,  0, fourthDate, 0))
+        retrySamplesSet.add(RetrySample(null, null, 0, secondDate, 0))
+        retrySamplesSet.add(RetrySample( null, null, 0, firstDate, 0))
 
 
         Assertions.assertThat(retrySamplesSet.first().scheduledTime).isEqualTo(firstDate)
@@ -48,7 +43,7 @@ class RetrySampleTest {
 
         retrySamplesSet.pollLast()
 
-        retrySamplesSet.add(RetrySample( "fifth input sample", 0, thirdDate))
+        retrySamplesSet.add(RetrySample( null, null, 0, thirdDate, 0))
 
 
         Assertions.assertThat(retrySamplesSet.first().scheduledTime).isEqualTo(firstDate)

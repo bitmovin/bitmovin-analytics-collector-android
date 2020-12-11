@@ -23,7 +23,7 @@ public class HttpBackend implements Backend {
     }
 
     @Override
-    public void send(EventData eventData) {
+    public void send(EventData eventData, Callback callback) {
         Log.d(TAG, String.format("Sending sample: %s (state: %s, videoId: %s, startupTime: %d, videoStartupTime: %d, buffered: %d, audioLanguage: %s)",
                 eventData.getImpressionId(),
                 eventData.getVideoId(),
@@ -32,15 +32,15 @@ public class HttpBackend implements Backend {
                 eventData.getVideoStartupTime(),
                 eventData.getBuffered(),
                 eventData.getAudioLanguage()));
-        this.httpClient.post(analyticsBackendUrl, DataSerializer.serialize(eventData), null);
+        this.httpClient.post(analyticsBackendUrl, DataSerializer.serialize(eventData), callback);
     }
 
     @Override
-    public void sendAd(AdEventData eventData) {
+    public void sendAd(AdEventData eventData, Callback callback) {
         Log.d(TAG, String.format("Sending ad sample: %s (videoImpressionId: %s, adImpressionId: %s)",
                 eventData.getAdImpressionId(),
                 eventData.getVideoImpressionId(),
                 eventData.getAdImpressionId()));
-        this.httpClient.post(adsAnalyticsBackendUrl, DataSerializer.serialize(eventData), null);
+        this.httpClient.post(adsAnalyticsBackendUrl, DataSerializer.serialize(eventData), callback);
     }
 }
