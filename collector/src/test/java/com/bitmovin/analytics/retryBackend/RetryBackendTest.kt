@@ -6,27 +6,23 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import java.net.SocketTimeoutException
-import java.util.Calendar
-import java.util.Date
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
+import com.nhaarman.mockitokotlin2.*
 import okhttp3.Call
 import okhttp3.Callback
 import org.assertj.core.api.Assertions
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.nhaarman.mockitokotlin2.any
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito
 import org.powermock.core.classloader.annotations.PowerMockIgnore
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 import org.powermock.reflect.Whitebox
+import java.net.SocketTimeoutException
+import java.util.Date
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 @RunWith(PowerMockRunner::class)
 @PrepareForTest(Uri::class, RetryBackend::class, Handler::class)
