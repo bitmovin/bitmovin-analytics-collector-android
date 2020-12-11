@@ -20,7 +20,7 @@ import okhttp3.Callback
 import org.assertj.core.api.Assertions
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
+import com.nhaarman.mockitokotlin2.any
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito
 import org.powermock.core.classloader.annotations.PowerMockIgnore
@@ -134,11 +134,11 @@ class RetryBackendTest {
         val secondSample = setupEventData(2)
 
         retryBacked.addSample(RetrySample(firstSample, null, 0, firstDate, 6))
-        verify(handler, times(1)).postAtTime(any(Runnable::class.java), any(Date::class.java), anyLong())
+        verify(handler, times(1)).postAtTime(any(), any(), anyLong())
 
         retryBacked.addSample(RetrySample(secondSample, null, 0, firstDate, 4))
-        verify(handler, times(1)).removeCallbacks(any(Runnable::class.java), any(Date::class.java))
-        verify(handler, times(2)).postAtTime(any(Runnable::class.java), any(Date::class.java), anyLong())
+        verify(handler, times(1)).removeCallbacks(any(), any())
+        verify(handler, times(2)).postAtTime(any(), any(), anyLong())
     }
 
     @Test
@@ -177,7 +177,7 @@ class RetryBackendTest {
         thread3.run()
         thread4.run()
 
-        verify(handler, times(1)).postAtTime(any(Runnable::class.java), any(Date::class.java), anyLong())
+        verify(handler, times(1)).postAtTime(any(), any(), anyLong())
     }
 
     private fun setupEventData(sequenceNumber: Int): EventData {

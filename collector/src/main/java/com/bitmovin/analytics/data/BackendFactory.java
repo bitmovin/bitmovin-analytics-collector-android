@@ -17,8 +17,4 @@ public class BackendFactory {
 
         return new RetryBackend(httpBackend, new Handler());
     }
-
-//    public Backend createRetrySamplesBackend(BitmovinAnalyticsConfig config, Context context){
-//        return new RetryBackend(config.getConfig(), context);
-//    }
 }
