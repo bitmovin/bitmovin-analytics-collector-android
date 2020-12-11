@@ -1,35 +1,32 @@
 package com.bitmovin.analytics.retryBackend
 
-
 import android.net.Uri
 import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
+import java.net.SocketTimeoutException
+import java.util.Calendar
+import java.util.Date
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 import okhttp3.Call
 import okhttp3.Callback
 import org.assertj.core.api.Assertions
-import org.assertj.core.data.Offset
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
-import org.powermock.api.mockito.PowerMockito
-import org.powermock.api.mockito.PowerMockito.verifyPrivate
 import org.powermock.core.classloader.annotations.PowerMockIgnore
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 import org.powermock.reflect.Whitebox
-import java.net.SocketTimeoutException
-import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
-
 
 @RunWith(PowerMockRunner::class)
 @PrepareForTest(Uri::class, RetryBackend::class, Handler::class)
@@ -55,11 +52,10 @@ class RetryBackendTest {
         time
     }
 
-
     @Test
     fun sampleShouldBeProcessedAfterHttpRequestTimeout() {
 
-        whenever(backendMock.send(any(), any())).thenAnswer{
+        whenever(backendMock.send(any(), any())).thenAnswer {
             (it.arguments[1] as Callback).onFailure(callMock, SocketTimeoutException("Timeout"))
         }
 
@@ -67,7 +63,6 @@ class RetryBackendTest {
         retryBacked.send(setupEventData(1), callbackMock)
 
         verify(retryBacked, times(1)).processQueuedSamples()
-
     }
 
     @Test
@@ -75,11 +70,11 @@ class RetryBackendTest {
 
         val retryBacked = Mockito.spy(RetryBackend(backendMock, handlerMock))
 
-        val firstSample= setupEventData(1)
+        val firstSample = setupEventData(1)
         val secondSample = setupEventData(2)
 
-        retryBacked.addSample(RetrySample(firstSample, null,0, thirdDate, 0))
-        retryBacked.addSample(RetrySample(secondSample, null,0, firstDate, 0))
+        retryBacked.addSample(RetrySample(firstSample, null, 0, thirdDate, 0))
+        retryBacked.addSample(RetrySample(secondSample, null, 0, firstDate, 0))
 
         // wait to be sure that processing of samples is finished
         TimeUnit.SECONDS.sleep(2)
@@ -89,16 +84,15 @@ class RetryBackendTest {
         Assertions.assertThat(sample.eventData).isEqualTo(secondSample)
     }
 
-
     @Test
     fun sampleShouldBeDiscardedIfMaxRetryTimeExceeded() {
 
         val retryBacked = Mockito.spy(RetryBackend(backendMock, handlerMock))
 
-        val firstSample= setupEventData(1)
-        retryBacked.addSample(RetrySample(firstSample, null,200000, firstDate, 9))
+        val firstSample = setupEventData(1)
+        retryBacked.addSample(RetrySample(firstSample, null, 200000, firstDate, 9))
 
-        //wait to be sure that processing of sample is finished
+        // wait to be sure that processing of sample is finished
         TimeUnit.SECONDS.sleep(2)
         val sample = Whitebox.invokeMethod<RetrySample>(retryBacked, "getSample")
         Assertions.assertThat(sample).isEqualTo(null)
@@ -108,12 +102,12 @@ class RetryBackendTest {
     fun getSamplesShouldNotReturnSamplesWithFutureScheduledTime() {
 
         val retryBacked = Mockito.spy(RetryBackend(backendMock, handlerMock))
-        whenever(backendMock.send(any(), any())).thenAnswer{
+        whenever(backendMock.send(any(), any())).thenAnswer {
             (it.arguments[1] as Callback).onFailure(callMock, SocketTimeoutException("Timeout"))
         }
 
-        val firstSample= setupEventData(1)
-        retryBacked.addSample(RetrySample(firstSample, null,0, firstDate, 2))
+        val firstSample = setupEventData(1)
+        retryBacked.addSample(RetrySample(firstSample, null, 0, firstDate, 2))
 
         TimeUnit.SECONDS.sleep(4)
 
@@ -124,38 +118,34 @@ class RetryBackendTest {
 
         sample = Whitebox.invokeMethod<RetrySample>(retryBacked, "getSample")
         Assertions.assertThat(sample.eventData).isEqualTo(firstSample)
-
     }
-
 
     @Test
     fun handlerShouldBeCanceledIfSampleWithSmallerScheduledTimeArrives() {
         val handler = Mockito.spy(Handler())
 
-        whenever(backendMock.send(any(), any())).thenAnswer{
+        whenever(backendMock.send(any(), any())).thenAnswer {
             (it.arguments[1] as Callback).onFailure(callMock, SocketTimeoutException("Timeout"))
         }
 
         val retryBacked = Mockito.spy(RetryBackend(backendMock, handler))
 
-        val firstSample= setupEventData(1)
-        val secondSample= setupEventData(2)
+        val firstSample = setupEventData(1)
+        val secondSample = setupEventData(2)
 
-        retryBacked.addSample(RetrySample(firstSample, null,0, firstDate, 6))
+        retryBacked.addSample(RetrySample(firstSample, null, 0, firstDate, 6))
         verify(handler, times(1)).postAtTime(any(Runnable::class.java), any(Date::class.java), anyLong())
 
-        retryBacked.addSample(RetrySample(secondSample, null,0, firstDate, 4))
+        retryBacked.addSample(RetrySample(secondSample, null, 0, firstDate, 4))
         verify(handler, times(1)).removeCallbacks(any(Runnable::class.java), any(Date::class.java))
         verify(handler, times(2)).postAtTime(any(Runnable::class.java), any(Date::class.java), anyLong())
-
     }
 
-
     @Test
-    fun sampleWithSmallestScheduleTimeShouldBeSentNextThreads () {
+    fun sampleWithSmallestScheduleTimeShouldBeSentNextThreads() {
         val handler = Mockito.spy(Handler())
 
-        whenever(backendMock.send(any(), any())).thenAnswer{
+        whenever(backendMock.send(any(), any())).thenAnswer {
             (it.arguments[1] as Callback).onFailure(callMock, SocketTimeoutException("Timeout"))
         }
 
@@ -167,19 +157,19 @@ class RetryBackendTest {
         val fourthSample = setupEventData(4)
 
         val thread1 = thread {
-            retryBacked.addSample(RetrySample(firstSample, null,0, firstDate, 1))
+            retryBacked.addSample(RetrySample(firstSample, null, 0, firstDate, 1))
         }
 
         val thread2 = thread {
-            retryBacked.addSample(RetrySample(secondSample, null,0, firstDate, 2))
+            retryBacked.addSample(RetrySample(secondSample, null, 0, firstDate, 2))
         }
 
         val thread3 = thread {
-            retryBacked.addSample(RetrySample(thirdSample, null,0, firstDate, 3))
+            retryBacked.addSample(RetrySample(thirdSample, null, 0, firstDate, 3))
         }
 
         val thread4 = thread {
-            retryBacked.addSample(RetrySample(fourthSample, null,0, firstDate, 4))
+            retryBacked.addSample(RetrySample(fourthSample, null, 0, firstDate, 4))
         }
 
         thread1.run()
@@ -188,15 +178,11 @@ class RetryBackendTest {
         thread4.run()
 
         verify(handler, times(1)).postAtTime(any(Runnable::class.java), any(Date::class.java), anyLong())
-
     }
 
-    private fun setupEventData(sequenceNumber: Int): EventData{
-        var eventData = EventData(config, deviceInformation, "testImpressionId", "userId");
+    private fun setupEventData(sequenceNumber: Int): EventData {
+        var eventData = EventData(config, deviceInformation, "testImpressionId", "userId")
         eventData.sequenceNumber = sequenceNumber
-        return eventData;
+        return eventData
     }
-
 }
-
-

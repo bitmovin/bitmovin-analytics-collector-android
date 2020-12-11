@@ -10,7 +10,7 @@ import android.os.Handler;
 public class BackendFactory {
 
     public Backend createBackend(BitmovinAnalyticsConfig config, Context context) {
-        HttpBackend httpBackend = new HttpBackend(config.getConfig(), context);
+        HttpBackend httpBackend = new HttpBackend(config, context);
         if(!config.isResendDataOnHttpTimeout() ){
            return httpBackend;
        }

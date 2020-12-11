@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import com.bitmovin.analytics.CollectorConfig;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
 import okhttp3.Callback;
@@ -15,11 +15,11 @@ public class HttpBackend implements Backend {
     private String analyticsBackendUrl;
     private String adsAnalyticsBackendUrl;
 
-    public HttpBackend(CollectorConfig config, Context context) {
-        analyticsBackendUrl = Uri.parse(config.getBackendUrl()).buildUpon().appendEncodedPath("analytics").build().toString();
-        adsAnalyticsBackendUrl = Uri.parse(config.getBackendUrl()).buildUpon().appendEncodedPath("analytics/a").build().toString();
+    public HttpBackend(BitmovinAnalyticsConfig analyticsConfig, Context context) {
+        analyticsBackendUrl = Uri.parse(analyticsConfig.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("analytics").build().toString();
+        adsAnalyticsBackendUrl = Uri.parse(analyticsConfig.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("analytics/a").build().toString();
         Log.d(TAG, String.format("Initialized Analytics HTTP Backend with %s", analyticsBackendUrl));
-        this.httpClient = new HttpClient(context);
+        this.httpClient = new HttpClient(context, analyticsConfig);
     }
 
     @Override

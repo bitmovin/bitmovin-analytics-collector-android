@@ -1,9 +1,8 @@
 package com.bitmovin.analytics.retryBackend
 
-import com.bitmovin.analytics.retryBackend.RetrySample
+import java.util.Calendar
 import org.assertj.core.api.Assertions
 import org.junit.Test
-import java.util.*
 
 class RetrySampleTest {
 
@@ -32,10 +31,9 @@ class RetrySampleTest {
         }
         // #endRegion
 
-        retrySamplesSet.add(RetrySample(null, null,  0, fourthDate, 0))
+        retrySamplesSet.add(RetrySample(null, null, 0, fourthDate, 0))
         retrySamplesSet.add(RetrySample(null, null, 0, secondDate, 0))
-        retrySamplesSet.add(RetrySample( null, null, 0, firstDate, 0))
-
+        retrySamplesSet.add(RetrySample(null, null, 0, firstDate, 0))
 
         Assertions.assertThat(retrySamplesSet.first().scheduledTime).isEqualTo(firstDate)
         Assertions.assertThat(retrySamplesSet.elementAt(1).scheduledTime).isEqualTo(secondDate)
@@ -43,8 +41,7 @@ class RetrySampleTest {
 
         retrySamplesSet.pollLast()
 
-        retrySamplesSet.add(RetrySample( null, null, 0, thirdDate, 0))
-
+        retrySamplesSet.add(RetrySample(null, null, 0, thirdDate, 0))
 
         Assertions.assertThat(retrySamplesSet.first().scheduledTime).isEqualTo(firstDate)
         Assertions.assertThat(retrySamplesSet.elementAt(1).scheduledTime).isEqualTo(secondDate)

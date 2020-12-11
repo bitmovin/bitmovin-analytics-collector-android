@@ -3,7 +3,10 @@ package com.bitmovin.analytics.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -19,15 +22,26 @@ public class HttpClient {
     private static final String TAG = "HttpClient";
     private OkHttpClient client = null;
     private Context context;
+    private BitmovinAnalyticsConfig analyticsConfig;
 
-    public HttpClient(Context context) {
+    public HttpClient(Context context, BitmovinAnalyticsConfig analyticsConfig) {
         this.context = context;
+        this.analyticsConfig = analyticsConfig;
     }
 
 
     public void post(String url, String postBody, final Callback callback) {
         if (client == null) {
-            client = new OkHttpClient();
+            if (analyticsConfig.isResendDataOnHttpTimeout()){
+                client = new OkHttpClient.Builder()
+
+                        .retryOnConnectionFailure(false)
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .writeTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS).build();
+            } else {
+                client = new OkHttpClient();
+            }
         }
 
         Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody));

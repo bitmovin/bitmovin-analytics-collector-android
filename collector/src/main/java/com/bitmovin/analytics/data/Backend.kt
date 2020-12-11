@@ -1,8 +1,8 @@
-package com.bitmovin.analytics.data;
+package com.bitmovin.analytics.data
 
-import okhttp3.Callback;
+import okhttp3.Callback
 
-public interface Backend {
-    void send(EventData eventData, Callback callback);
-    void sendAd(AdEventData eventData, Callback callback);
+interface Backend {
+    fun send(eventData: EventData, callback: Callback?)
+    fun sendAd(eventData: AdEventData, callback: Callback?)
 }

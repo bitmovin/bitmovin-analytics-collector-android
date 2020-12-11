@@ -26,7 +26,7 @@ public class Util {
     public static final int ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL = 1000 * 60 * 60; // in milliseconds;
     public static final int REBUFFERING_TIMEOUT = 1000 * 60 * 2; // in milliseconds
     public static final int MAX_RETRY_SAMPLES = 100;
-    public static final int MAX_RETRY_TIME = 30000; // 300000; //in milliseconds
+    public static final int MAX_RETRY_TIME =  300; //in seconds
 
     private static final Map<String, String> VIDEO_FORMAT_MIME_TYPE_MAP;
     public static final String PLAYER_TECH = "Android:Exoplayer";

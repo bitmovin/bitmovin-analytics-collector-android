@@ -30,16 +30,14 @@ public class LicenseCall {
         this.context = context;
         this.backendUrl = Uri.parse(config.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
         Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl));
-        this.httpClient = new HttpClient(context);
+        this.httpClient = new HttpClient(context, config);
     }
 
     public void authenticate(final LicenseCallback callback) {
         final LicenseCallData data = new LicenseCallData();
-        //data.setKey(this.config.getKey());
-         data.setKey("e73a3577-d91c-4214-9e6d-938fb936818a");
+        data.setKey(this.config.getKey());
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
-        //data.setDomain(context.getPackageName());
-        data.setDomain("localhost");
+        data.setDomain(context.getPackageName());
         String json = DataSerializer.serialize(data);
         httpClient.post(this.backendUrl, json, new Callback() {
             @Override
