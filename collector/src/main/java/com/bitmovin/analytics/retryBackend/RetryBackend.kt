@@ -25,135 +25,147 @@ import okhttp3.internal.http2.StreamResetException
 class RetryBackend(private val next: Backend, val handler: Handler) : Backend {
 
     private val TAG = "RetryBackend"
-    private val lock = ReentrantLock()
-    private var retrySamplesSet = sortedSetOf<RetrySample>()
-    private var retryToken: Date? = null
+//    private val lock = ReentrantLock()
+
+
+//    private var retrySamplesSet = sortedSetOf<RetrySample<Any>>()
+    private var retryDateToken: Date? = null
 
     override fun send(eventData: EventData, callback: Callback?) {
-        scheduleSample(RetrySample(eventData, null, 0, Date(), 0))
+        scheduleSample(RetrySample(eventData, 0, Date(), 0))
     }
 
     override fun sendAd(eventData: AdEventData, callback: Callback?) {
-        scheduleSample(RetrySample(null, eventData, 0, Date(), 0))
+        scheduleSample(RetrySample( eventData, 0, Date(), 0))
     }
 
-    private fun scheduleSample(retrySample: RetrySample) {
+    private fun scheduleSample(retrySample: RetrySample<Any>) {
 
-        Log.d(TAG, "sending sample retry ${retrySample.retry}")
+//        Log.d(TAG, "sending sample${retrySample.eventData?.sequenceNumber} retry ${retrySample.retry}")
 
-        if (retrySample.eventData != null) {
-            retrySample.eventData.retry = retrySample.retry
+        if (retrySample.eventData is EventData) {
+            retrySample.eventData.retryCount = retrySample.retry
             this.next.send(retrySample.eventData, object : Callback {
 
                 override fun onFailure(call: Call, e: IOException) {
+                    Log.d(TAG, "$e.message ${e.cause}")
                     if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
-                        addSample(retrySample)
                         call.cancel()
+                        RetryQueue.pushSample(retrySample)
+                        processQueuedSamples()
                     }
                 }
 
                 override fun onResponse(call: Call, response: Response) {
                 }
             })
-        } else if (retrySample.adEventData != null) {
-            retrySample.adEventData.retry = retrySample.retry
-            this.next.sendAd(retrySample.adEventData, object : Callback {
+        } else if (retrySample.eventData is AdEventData) {
+            retrySample.eventData.retryCount = retrySample.retry
+            this.next.sendAd(retrySample.eventData, object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-
-                    if (e is SocketTimeoutException) {
-                        addSample(retrySample)
+                    Log.d(TAG, "$e.message ${e.cause}")
+                    if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
+                        call.cancel()
+                        RetryQueue.pushSample(retrySample)
+                        processQueuedSamples()
                     }
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    processQueuedSamples()
                 }
             })
         }
     }
 
+
     @Synchronized
     fun processQueuedSamples() {
         try {
-            if (retrySamplesSet.size > 0) {
-                val nextScheduledTime = retrySamplesSet.first().scheduledTime
+            val nextScheduledTime = RetryQueue.getNextScheduleTime()
+            if (nextScheduledTime != null) {
 
-                if (retryToken != nextScheduledTime) {
-                    if (retryToken != null) {
-                        handler.removeCallbacks(processSampleRunnable, retryToken)
+                Log.d(TAG, "process samples token ${retryDateToken}oken schTime $nextScheduledTime")
+
+                if (retryDateToken != nextScheduledTime) {
+                    if (retryDateToken != null) {
+                        handler.removeCallbacks(processSampleRunnable, retryDateToken)
                     }
-                    retryToken = nextScheduledTime
+                    retryDateToken = nextScheduledTime
                     val delay = maxOf(nextScheduledTime.time - Date().time, 0) // to prevent negative delay
-                    val t = handler.postAtTime(processSampleRunnable, retryToken, SystemClock.uptimeMillis() + delay)
-                    Log.d(TAG, t.toString())
+                    handler.postAtTime(processSampleRunnable, retryDateToken, SystemClock.uptimeMillis() + delay)
                 }
             }
         } catch (e: Exception) {
-            Log.d(TAG, "processQueuedSamples exception ${e.message}")
+            Log.d(TAG, "processQueuedSamples ${e.message}")
         }
     }
 
     private val processSampleRunnable = Runnable {
         try {
-            val retrySample = getSample()
-            Log.d(TAG, "pop sample ${retrySample?.eventData?.sequenceNumber}")
+
+            val retrySample = RetryQueue.getNextSampleOrNull()
+//            Log.d(TAG, "pop sample ${retrySample?.eventData?.sequenceNumber}")
             if (retrySample != null) {
                 scheduleSample(retrySample)
             }
-            retryToken = null
+            retryDateToken = null
             processQueuedSamples()
         } catch (e: Exception) {
-            Log.d(TAG, "processSampleRunnable exception ${e.message}")
+            Log.d(TAG, "processSampleRunnable ${e.message}")
         }
     }
 
-    fun addSample(retrySample: RetrySample) {
+//    fun addSample(retrySample: RetrySample<Any>) {
+//
+//        try {
+////            lock.lock()
+////            retrySample.retry++
+////            val backOffTime = minOf(2.toDouble().pow(retrySample.retry).toInt(), 64)
+////            retrySample.totalTime += backOffTime
+////            // more than 5min in queue
+////            if (retrySample.totalTime < MAX_RETRY_TIME) {
+////
+////                retrySample.scheduledTime = Calendar.getInstance().run {
+////                    add(Calendar.SECOND, backOffTime)
+////                    time
+////                }
+////                Log.d(TAG, "scheduledTime ${retrySample.scheduledTime}")
+////
+////                if (retrySamplesSet.size > MAX_RETRY_SAMPLES) {
+////                    val removeSample = retrySamplesSet.last()
+////                    retrySamplesSet.remove(removeSample)
+////                    Log.d(TAG, "removed sample ${removeSample?.eventData?.sequenceNumber} ")
+////                }
+////
+////                Log.d(TAG, "add sample ${retrySample?.eventData?.sequenceNumber} backOffTime=${retrySample.totalTime} schedTime=${retrySample.scheduledTime}")
+////                retrySamplesSet.add(retrySample)
+////                RetryQueue.pushSample(retrySample)
+////                processQueuedSamples()
+////            } else {
+////                Log.d(TAG, "max keep time exceeded ${retrySample.eventData?.sequenceNumber}")
+////            }
+//        } catch (e: Exception) {
+//            Log.d(TAG, "addSample ${e.message}")
+//        }
+//        //        finally {
+////            lock.unlock()
+////        }
+//    }
 
-        try {
-            lock.lock()
-            retrySample.retry++
-            val backOffTime = minOf(2.toDouble().pow(retrySample.retry).toInt(), 64)
-            // more than 5min in queue
-            if (retrySample.totalTime + backOffTime < MAX_RETRY_TIME) {
-
-                retrySample.scheduledTime = Calendar.getInstance().run {
-                    add(Calendar.SECOND, backOffTime)
-                    time
-                }
-                retrySample.totalTime += backOffTime
-
-                if (retrySamplesSet.size > MAX_RETRY_SAMPLES) {
-                    val removeSample = retrySamplesSet.last()
-                    retrySamplesSet.remove(removeSample)
-                    Log.d(TAG, "removed retry sample ${removeSample?.eventData?.sequenceNumber} ")
-                }
-
-                Log.d(TAG, "add sample backOffTime=${retrySample.totalTime} scheduledTime=${retrySample.scheduledTime}")
-                retrySamplesSet.add(retrySample)
-
-                processQueuedSamples()
-            }
-        } catch (e: Exception) {
-            Log.d(TAG, "addSample exception ${e.message}")
-        } finally {
-            lock.unlock()
-        }
-    }
-
-    private fun getSample(): RetrySample? {
-        try {
-            lock.lock()
-            val retrySample = retrySamplesSet.firstOrNull { it.scheduledTime.before(Date()) || it.scheduledTime == Date() }
-            retrySamplesSet.remove(retrySample)
-            return retrySample
-        } catch (e: Exception) {
-            Log.d(TAG, "getSample exception ${e.message}")
-        } finally {
-            lock.unlock()
-        }
-
-        return null
-    }
+//    private fun getNextSampleOrNull(): RetrySample? {
+//        try {
+//            lock.lock()
+//            val retrySample = retrySamplesSet.firstOrNull { it.scheduledTime <= Date() }
+//            retrySamplesSet.remove(retrySample)
+//            return retrySample
+//        } catch (e: Exception) {
+//            Log.d(TAG, "getSample ${e.message}")
+//        } finally {
+//            lock.unlock()
+//        }
+//
+//        return null
+//    }
 
     fun destroy() { // destroys an instance of RetryBackend
         Log.d(TAG, "destroy")

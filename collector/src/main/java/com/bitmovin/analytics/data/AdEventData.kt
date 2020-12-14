@@ -111,7 +111,7 @@ data class AdEventData(
     var platform: String? = null,
     var audioCodec: String? = null,
     var videoCodec: String? = null,
-    var retry: Int = 0
+    var retryCount: Int = 0
 ) {
 
     fun setEventData(eventData: EventData) {
