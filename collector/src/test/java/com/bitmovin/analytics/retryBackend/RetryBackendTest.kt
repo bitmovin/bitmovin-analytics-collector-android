@@ -1,9 +1,8 @@
 package com.bitmovin.analytics.retryBackend
 
-import android.net.Uri
 import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.data.Backend
+import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
 import com.nhaarman.mockitokotlin2.any
@@ -17,22 +16,14 @@ import java.util.Date
 import okhttp3.Call
 import okhttp3.Callback
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito
-import org.powermock.core.classloader.annotations.PowerMockIgnore
-import org.powermock.core.classloader.annotations.PrepareForTest
-import org.powermock.modules.junit4.PowerMockRunner
-import org.powermock.reflect.Whitebox
+import kotlin.concurrent.thread
 
-@RunWith(PowerMockRunner::class)
-@PrepareForTest(Uri::class, RetryBackend::class, Handler::class)
-@PowerMockIgnore("javax.net.ssl.*")
 class RetryBackendTest {
 
     private val config = BitmovinAnalyticsConfig()
-    private val backendMock = mock<Backend>()
-    private val callbackMock = mock<Callback>()
+    private val backendMock = mock<CallbackBackend>()
     private val callMock = mock<Call>()
     private val handlerMock = mock<Handler>()
     private val deviceInformation = DeviceInformation("manufacturer", "model", false, "userAgentString", "locale", "packageName", 0, 0)
@@ -57,12 +48,12 @@ class RetryBackendTest {
         }
 
         val retryBacked = Mockito.spy(RetryBackend(backendMock, handlerMock))
-        retryBacked.send(setupEventData(1), callbackMock)
+        retryBacked.send(setupEventData(1))
 
         verify(retryBacked, times(1)).processQueuedSamples()
     }
 
-//    @Test
+    //    @Test
 //    fun getSamplesShouldNotReturnSamplesWithFutureScheduledTime() {
 //
 //        val retryBacked = Mockito.spy(RetryBackend(backendMock, handlerMock))
@@ -87,62 +78,35 @@ class RetryBackendTest {
     @Test
     fun handlerShouldBeCanceledIfSampleWithSmallerScheduledTimeArrives() {
         val handler = Mockito.spy(Handler())
+        val queue = mock<RetryQueue>()
 
         whenever(backendMock.send(any(), any())).thenAnswer {
             (it.arguments[1] as Callback).onFailure(callMock, SocketTimeoutException("Timeout"))
         }
 
+        Mockito.`when`(queue.getNextScheduleTime()).thenReturn(thirdDate).thenReturn(firstDate)
+
         val retryBacked = Mockito.spy(RetryBackend(backendMock, handler))
 
-        val firstSample = setupEventData(1)
-        val secondSample = setupEventData(2)
+        retryBacked.processQueuedSamples()
 
-        Whitebox.invokeMethod<RetrySample<Any>>(retryBacked, "scheduleSample", RetrySample(firstSample, 0, firstDate, 6))
         verify(handler, times(1)).postAtTime(any(), any(), anyLong())
 
-        Whitebox.invokeMethod<RetrySample<Any>>(retryBacked, "scheduleSample", RetrySample(secondSample, 0, firstDate, 4))
+        retryBacked.processQueuedSamples()
         verify(handler, times(1)).removeCallbacks(any(), any())
         verify(handler, times(2)).postAtTime(any(), any(), anyLong())
-    }
-//
-//    @Test
-//    fun sampleWithSmallestScheduleTimeShouldBeSentNextThreads() {
-//        val handler = Mockito.spy(Handler())
-//
-//        whenever(backendMock.send(any(), any())).thenAnswer {
-//            (it.arguments[1] as Callback).onFailure(callMock, SocketTimeoutException("Timeout"))
-//        }
-//
-//        val retryBacked = Mockito.spy(RetryBackend(backendMock, handler))
 //
 //        val firstSample = setupEventData(1)
 //        val secondSample = setupEventData(2)
-//        val thirdSample = setupEventData(3)
-//        val fourthSample = setupEventData(4)
 //
-//        val thread1 = thread {
-//            retryBacked.addSample(RetrySample(firstSample, null, 0, firstDate, 1))
-//        }
-//
-//        val thread2 = thread {
-//            retryBacked.addSample(RetrySample(secondSample, null, 0, firstDate, 2))
-//        }
-//
-//        val thread3 = thread {
-//            retryBacked.addSample(RetrySample(thirdSample, null, 0, firstDate, 3))
-//        }
-//
-//        val thread4 = thread {
-//            retryBacked.addSample(RetrySample(fourthSample, null, 0, firstDate, 4))
-//        }
-//
-//        thread1.run()
-//        thread2.run()
-//        thread3.run()
-//        thread4.run()
-//
+//        Whitebox.invokeMethod<RetrySample<Any>>(retryBacked, "scheduleSample", RetrySample(firstSample, 0, firstDate, 6))
 //        verify(handler, times(1)).postAtTime(any(), any(), anyLong())
-//    }
+//
+//        Whitebox.invokeMethod<RetrySample<Any>>(retryBacked, "scheduleSample", RetrySample(secondSample, 0, firstDate, 4))
+//        verify(handler, times(1)).removeCallbacks(any(), any())
+//        verify(handler, times(2)).postAtTime(any(), any(), anyLong())
+    }
+
 
     private fun setupEventData(sequenceNumber: Int): EventData {
         var eventData = EventData(config, deviceInformation, "testImpressionId", "userId")

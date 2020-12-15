@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalyticsConfig.setTitle("Android Bitmovin SDK Video with DASH");
             bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
             bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
-            bitmovinAnalyticsConfig.setExperimentName("experiment-1");
+            bitmovinAnalyticsConfig.setExperimentName("experiment-timeout");
             bitmovinAnalyticsConfig.setCustomData1("customData1");
             bitmovinAnalyticsConfig.setCustomData2("customData2");
             bitmovinAnalyticsConfig.setCustomData3("customData3");
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalyticsConfig.setPath("/vod/new/");
             bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
             bitmovinAnalyticsConfig.setIsLive(false);
-            bitmovinAnalyticsConfig.setResendDataOnHttpTimeout(true);
+            bitmovinAnalyticsConfig.getConfig().setTryResendDataOnFailedConnection(true);
 
             eventLogView.setText("");
 
@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //Step 4: Attach ExoPlayer
             bitmovinAnalytics.attachPlayer(player);
-
 
             //Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);

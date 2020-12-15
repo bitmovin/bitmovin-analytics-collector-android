@@ -5,12 +5,12 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.bitmovin.analytics.CollectorConfig;
+import com.bitmovin.analytics.retryBackend.RetryCallback;
+import com.bitmovin.analytics.utils.ClientFactory;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
 
 import org.jetbrains.annotations.NotNull;
-
-import okhttp3.Callback;
 
 public class HttpBackend implements Backend, CallbackBackend {
     private static final String TAG = "BitmovinBackend";
@@ -22,11 +22,21 @@ public class HttpBackend implements Backend, CallbackBackend {
         analyticsBackendUrl = Uri.parse(config.getBackendUrl()).buildUpon().appendEncodedPath("analytics").build().toString();
         adsAnalyticsBackendUrl = Uri.parse(config.getBackendUrl()).buildUpon().appendEncodedPath("analytics/a").build().toString();
         Log.d(TAG, String.format("Initialized Analytics HTTP Backend with %s", analyticsBackendUrl));
-        this.httpClient = new HttpClient(context, config.getTryResendDataOnFailedConnection());
+        this.httpClient = new HttpClient(context, new ClientFactory().createClient(config));
     }
 
     @Override
-    public void send(EventData eventData, Callback callback) {
+    public void send(EventData eventData) {
+        this.send(eventData, null);
+    }
+
+    @Override
+    public void sendAd(AdEventData eventData) {
+        this.sendAd(eventData, null);
+    }
+
+    @Override
+    public void send(@NotNull EventData eventData, RetryCallback callback) {
         Log.d(TAG, String.format("Sending sample: %s (state: %s, videoId: %s, startupTime: %d, videoStartupTime: %d, buffered: %d, audioLanguage: %s)",
                 eventData.getImpressionId(),
                 eventData.getVideoId(),
@@ -39,7 +49,7 @@ public class HttpBackend implements Backend, CallbackBackend {
     }
 
     @Override
-    public void sendAd(AdEventData eventData, Callback callback) {
+    public void sendAd(AdEventData eventData, RetryCallback callback) {
         Log.d(TAG, String.format("Sending ad sample: %s (videoImpressionId: %s, adImpressionId: %s)",
                 eventData.getAdImpressionId(),
                 eventData.getVideoImpressionId(),
@@ -47,13 +57,4 @@ public class HttpBackend implements Backend, CallbackBackend {
         this.httpClient.post(adsAnalyticsBackendUrl, DataSerializer.serialize(eventData), callback);
     }
 
-    @Override
-    public void send(@NotNull EventData eventData) {
-        this.send(eventData, null);
-    }
-
-    @Override
-    public void sendAd(@NotNull AdEventData eventData) {
-        this.sendAd(eventData, null);
-    }
 }

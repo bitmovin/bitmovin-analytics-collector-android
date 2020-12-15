@@ -23,26 +23,13 @@ public class HttpClient {
     private static final String TAG = "HttpClient";
     private OkHttpClient client = null;
     private Context context;
-    private boolean tryResendDataOnFailedConnection;
 
-    public HttpClient(Context context, boolean tryResendDataOnFailedConnection) {
+    public HttpClient(Context context, OkHttpClient client) {
         this.context = context;
-        this.tryResendDataOnFailedConnection = tryResendDataOnFailedConnection;
+        this.client = client;
     }
 
-
     public void post(String url, String postBody, final Callback callback) {
-        if (client == null) {
-            if (tryResendDataOnFailedConnection){
-                Log.d("RetryBackend", "retry");
-                client = new OkHttpClient.Builder()
-                        .retryOnConnectionFailure(false).build();
-            } else {
-                Log.d("RetryBackend", "regular");
-                client = new OkHttpClient();
-            }
-        }
-
         Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody));
         Request request = new Request.Builder()
                 .url(url)
@@ -70,8 +57,6 @@ public class HttpClient {
                 }
                 response.close();
             }
-
-
         });
     }
 }
