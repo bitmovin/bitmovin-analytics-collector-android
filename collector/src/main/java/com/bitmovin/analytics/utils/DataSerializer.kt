@@ -6,22 +6,17 @@ import com.google.gson.JsonSyntaxException
 object DataSerializer {
     @JvmStatic
     fun <T> serialize(data: T?): String? {
-        if (data == null) {
-            return null
-        }
-
-        val gson = Gson()
-        return gson.toJson(data)
+        return data?.let { Gson().toJson(it) }
     }
 
     @JvmStatic
     fun <T> deserialize(input: String?, classOfT: Class<T>?): T? {
-        var response: T? = null
-        return try {
-            response = Gson().fromJson(input, classOfT)
-            response
-        } catch (e: JsonSyntaxException) {
-            response
+        return input?.let {
+            return try {
+                Gson().fromJson(input, classOfT)
+            } catch (e: JsonSyntaxException) {
+                null
+            }
         }
     }
 }
