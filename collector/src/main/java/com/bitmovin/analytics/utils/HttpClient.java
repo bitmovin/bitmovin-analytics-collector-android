@@ -3,11 +3,7 @@ package com.bitmovin.analytics.utils;
 import android.content.Context;
 import android.util.Log;
 
-import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.CollectorConfig;
-
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;

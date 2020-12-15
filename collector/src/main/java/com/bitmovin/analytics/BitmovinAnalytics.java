@@ -405,4 +405,4 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
             }
         }
     };
-}
+ }

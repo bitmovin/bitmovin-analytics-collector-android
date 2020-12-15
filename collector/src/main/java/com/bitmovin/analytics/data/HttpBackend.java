@@ -10,8 +10,6 @@ import com.bitmovin.analytics.utils.ClientFactory;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
 
-import org.jetbrains.annotations.NotNull;
-
 public class HttpBackend implements Backend, CallbackBackend {
     private static final String TAG = "BitmovinBackend";
     private HttpClient httpClient;
@@ -36,7 +34,7 @@ public class HttpBackend implements Backend, CallbackBackend {
     }
 
     @Override
-    public void send(@NotNull EventData eventData, RetryCallback callback) {
+    public void send(EventData eventData, RetryCallback callback) {
         Log.d(TAG, String.format("Sending sample: %s (state: %s, videoId: %s, startupTime: %d, videoStartupTime: %d, buffered: %d, audioLanguage: %s)",
                 eventData.getImpressionId(),
                 eventData.getVideoId(),

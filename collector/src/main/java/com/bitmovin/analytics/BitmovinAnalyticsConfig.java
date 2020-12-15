@@ -411,5 +411,4 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     public void setIsLive(Boolean live) {
         isLive = live;
     }
-
 }

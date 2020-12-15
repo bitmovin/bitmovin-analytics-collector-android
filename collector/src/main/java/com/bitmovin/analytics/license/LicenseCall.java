@@ -6,13 +6,11 @@ import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.BuildConfig;
-import com.bitmovin.analytics.CollectorConfig;
 import com.bitmovin.analytics.data.LicenseCallData;
 import com.bitmovin.analytics.data.LicenseResponse;
 import com.bitmovin.analytics.utils.ClientFactory;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
-import com.bitmovin.analytics.utils.Util;
 
 import java.io.IOException;
 

@@ -3,7 +3,6 @@ package com.bitmovin.analytics.data;
 import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.CollectorConfig;
 import com.bitmovin.analytics.license.LicenseCall;
 import com.bitmovin.analytics.license.LicenseCallback;
 
@@ -31,7 +30,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
         this.config = config;
         this.callback = callback;
         this.context = context;
-        this.backend =  new BackendFactory().createBackend(config, context);
+        this.backend = new BackendFactory().createBackend(config, context);
     }
 
     @Override

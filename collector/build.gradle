@@ -58,7 +58,6 @@ dependencies {
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
-
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation 'com.google.code.gson:gson:2.8.5'
 }
