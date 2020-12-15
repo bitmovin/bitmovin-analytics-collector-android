@@ -27,7 +27,7 @@ object RetryQueue {
 
     private var retrySamplesSet = sortedSetOf(sampleComparator)
 
-    fun addSample(retrySample: RetrySample<Any> ) {
+    fun addSample(retrySample: RetrySample<Any>) {
         try {
             lock.lock()
 
@@ -66,7 +66,6 @@ object RetryQueue {
 
         try {
             lock.lock()
-            println( "date ${test()}||  ${retrySamplesSet.first().scheduledTime} || ${now()}  ||  ${retrySamplesSet.first().scheduledTime.before(now())} || ${retrySamplesSet.firstOrNull { it.scheduledTime.before(now()) } }")
             val retrySample = retrySamplesSet.firstOrNull { it.scheduledTime.before(now()) }
             retrySamplesSet.remove(retrySample)
             return retrySample

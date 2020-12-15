@@ -21,6 +21,7 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
 
     private val TAG = "RetryBackend"
     private var retryDateToken: Date? = null
+    fun getNextScheduledTime() = RetryQueue.getNextScheduleTime()
 
     override fun send(eventData: EventData) {
         scheduleSample(RetrySample(eventData, 0, Date(), 0))
@@ -70,7 +71,7 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
     @Synchronized
     fun processQueuedSamples() {
         try {
-            val nextScheduledTime = RetryQueue.getNextScheduleTime()
+            val nextScheduledTime = getNextScheduledTime()
             if (nextScheduledTime != null) {
 
                 Log.d(TAG, "process samples token $retryDateToken   schTime $nextScheduledTime")
@@ -102,7 +103,6 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
             Log.d(TAG, "processSampleRunnable ${e.message}")
         }
     }
-
 
     fun destroy() { // destroys an instance of RetryBackend
         Log.d(TAG, "destroy")

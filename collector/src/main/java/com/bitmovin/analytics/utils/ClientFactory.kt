@@ -2,8 +2,8 @@ package com.bitmovin.analytics.utils
 
 import android.util.Log
 import com.bitmovin.analytics.CollectorConfig
-import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
+import okhttp3.OkHttpClient
 
 class ClientFactory {
     fun createClient(config: CollectorConfig): OkHttpClient {
