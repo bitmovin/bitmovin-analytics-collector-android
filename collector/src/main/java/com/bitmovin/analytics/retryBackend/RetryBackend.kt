@@ -6,17 +6,12 @@ import android.util.Log
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.utils.Util.MAX_RETRY_SAMPLES
-import com.bitmovin.analytics.utils.Util.MAX_RETRY_TIME
 import java.io.IOException
 import java.lang.Exception
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import java.util.Calendar
 import java.util.Date
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.math.pow
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
@@ -27,7 +22,6 @@ class RetryBackend(private val next: Backend, val handler: Handler) : Backend {
     private val TAG = "RetryBackend"
 //    private val lock = ReentrantLock()
 
-
 //    private var retrySamplesSet = sortedSetOf<RetrySample<Any>>()
     private var retryDateToken: Date? = null
 
@@ -36,14 +30,15 @@ class RetryBackend(private val next: Backend, val handler: Handler) : Backend {
     }
 
     override fun sendAd(eventData: AdEventData, callback: Callback?) {
-        scheduleSample(RetrySample( eventData, 0, Date(), 0))
+        scheduleSample(RetrySample(eventData, 0, Date(), 0))
     }
 
     private fun scheduleSample(retrySample: RetrySample<Any>) {
 
-//        Log.d(TAG, "sending sample${retrySample.eventData?.sequenceNumber} retry ${retrySample.retry}")
+
 
         if (retrySample.eventData is EventData) {
+            Log.d(TAG, "sending sample${retrySample.eventData?.sequenceNumber} retry ${retrySample.retry}")
             retrySample.eventData.retryCount = retrySample.retry
             this.next.send(retrySample.eventData, object : Callback {
 
@@ -51,7 +46,7 @@ class RetryBackend(private val next: Backend, val handler: Handler) : Backend {
                     Log.d(TAG, "$e.message ${e.cause}")
                     if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
                         call.cancel()
-                        RetryQueue.pushSample(retrySample)
+                        RetryQueue.addSample(retrySample)
                         processQueuedSamples()
                     }
                 }
@@ -66,7 +61,7 @@ class RetryBackend(private val next: Backend, val handler: Handler) : Backend {
                     Log.d(TAG, "$e.message ${e.cause}")
                     if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
                         call.cancel()
-                        RetryQueue.pushSample(retrySample)
+                        RetryQueue.addSample(retrySample)
                         processQueuedSamples()
                     }
                 }
@@ -77,14 +72,13 @@ class RetryBackend(private val next: Backend, val handler: Handler) : Backend {
         }
     }
 
-
     @Synchronized
     fun processQueuedSamples() {
         try {
             val nextScheduledTime = RetryQueue.getNextScheduleTime()
             if (nextScheduledTime != null) {
 
-                Log.d(TAG, "process samples token ${retryDateToken}oken schTime $nextScheduledTime")
+                Log.d(TAG, "process samples token $retryDateToken   schTime $nextScheduledTime")
 
                 if (retryDateToken != nextScheduledTime) {
                     if (retryDateToken != null) {
@@ -118,38 +112,38 @@ class RetryBackend(private val next: Backend, val handler: Handler) : Backend {
 //    fun addSample(retrySample: RetrySample<Any>) {
 //
 //        try {
-////            lock.lock()
-////            retrySample.retry++
-////            val backOffTime = minOf(2.toDouble().pow(retrySample.retry).toInt(), 64)
-////            retrySample.totalTime += backOffTime
-////            // more than 5min in queue
-////            if (retrySample.totalTime < MAX_RETRY_TIME) {
-////
-////                retrySample.scheduledTime = Calendar.getInstance().run {
-////                    add(Calendar.SECOND, backOffTime)
-////                    time
-////                }
-////                Log.d(TAG, "scheduledTime ${retrySample.scheduledTime}")
-////
-////                if (retrySamplesSet.size > MAX_RETRY_SAMPLES) {
-////                    val removeSample = retrySamplesSet.last()
-////                    retrySamplesSet.remove(removeSample)
-////                    Log.d(TAG, "removed sample ${removeSample?.eventData?.sequenceNumber} ")
-////                }
-////
-////                Log.d(TAG, "add sample ${retrySample?.eventData?.sequenceNumber} backOffTime=${retrySample.totalTime} schedTime=${retrySample.scheduledTime}")
-////                retrySamplesSet.add(retrySample)
-////                RetryQueue.pushSample(retrySample)
-////                processQueuedSamples()
-////            } else {
-////                Log.d(TAG, "max keep time exceeded ${retrySample.eventData?.sequenceNumber}")
-////            }
+// //            lock.lock()
+// //            retrySample.retry++
+// //            val backOffTime = minOf(2.toDouble().pow(retrySample.retry).toInt(), 64)
+// //            retrySample.totalTime += backOffTime
+// //            // more than 5min in queue
+// //            if (retrySample.totalTime < MAX_RETRY_TIME) {
+// //
+// //                retrySample.scheduledTime = Calendar.getInstance().run {
+// //                    add(Calendar.SECOND, backOffTime)
+// //                    time
+// //                }
+// //                Log.d(TAG, "scheduledTime ${retrySample.scheduledTime}")
+// //
+// //                if (retrySamplesSet.size > MAX_RETRY_SAMPLES) {
+// //                    val removeSample = retrySamplesSet.last()
+// //                    retrySamplesSet.remove(removeSample)
+// //                    Log.d(TAG, "removed sample ${removeSample?.eventData?.sequenceNumber} ")
+// //                }
+// //
+// //                Log.d(TAG, "add sample ${retrySample?.eventData?.sequenceNumber} backOffTime=${retrySample.totalTime} schedTime=${retrySample.scheduledTime}")
+// //                retrySamplesSet.add(retrySample)
+// //                RetryQueue.pushSample(retrySample)
+// //                processQueuedSamples()
+// //            } else {
+// //                Log.d(TAG, "max keep time exceeded ${retrySample.eventData?.sequenceNumber}")
+// //            }
 //        } catch (e: Exception) {
 //            Log.d(TAG, "addSample ${e.message}")
 //        }
 //        //        finally {
-////            lock.unlock()
-////        }
+// //            lock.unlock()
+// //        }
 //    }
 
 //    private fun getNextSampleOrNull(): RetrySample? {

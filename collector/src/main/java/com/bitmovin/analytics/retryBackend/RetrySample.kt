@@ -1,10 +1,8 @@
 package com.bitmovin.analytics.retryBackend
 
-import com.bitmovin.analytics.data.AdEventData
-import com.bitmovin.analytics.data.EventData
 import java.util.Date
 
-class RetrySample<T>(val eventData: T,  var totalTime: Int, var scheduledTime: Date, var retry: Int){
+class RetrySample<T>(val eventData: T, var totalTime: Int, var scheduledTime: Date, var retry: Int) {
 //    override fun compareTo(other: RetrySample): Int {
 //        return when {
 //            (this == null && other == null) -> 0

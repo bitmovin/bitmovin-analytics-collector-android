@@ -3,16 +3,16 @@ package com.bitmovin.analytics.retryBackend
 import android.util.Log
 import com.bitmovin.analytics.utils.Util
 import java.lang.Exception
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 import kotlin.Comparator
 import kotlin.math.pow
 
 object RetryQueue {
     private val TAG = "RetryQueue"
 
-    private val sampleComparator =  Comparator<RetrySample<Any>> { a, b ->
+    private val sampleComparator = Comparator<RetrySample<Any>> { a, b ->
         when {
-            (a == null && b == null) -> 0
             (a.scheduledTime == b.scheduledTime) -> 0
             (a.scheduledTime.before(b.scheduledTime)) -> -1
             else -> 1
@@ -21,7 +21,7 @@ object RetryQueue {
 
     private var retrySamplesSet = sortedSetOf(sampleComparator)
 
-    fun pushSample (retrySample: RetrySample<Any>){
+    fun addSample(retrySample: RetrySample<Any>) {
         retrySample.retry++
         val backOffTime = minOf(2.toDouble().pow(retrySample.retry).toInt(), 64)
         retrySample.totalTime += backOffTime
@@ -39,14 +39,13 @@ object RetryQueue {
                 retrySamplesSet.remove(removeSample)
                 Log.d(TAG, "removed sample ")
 //                        "${removeSample?.eventData?.sequenceNumber}
-
             }
-        }
 
             Log.d(TAG, "add sample " +
 //                    "${retrySample?.eventData?.sequenceNumber} " +
                     "backOffTime=${retrySample.totalTime} schedTime=${retrySample.scheduledTime}")
             retrySamplesSet.add(retrySample)
+        }
     }
 
     fun getNextSampleOrNull(): RetrySample<Any>? {
@@ -65,7 +64,7 @@ object RetryQueue {
     fun getNextScheduleTime(): Date? {
         try {
             return retrySamplesSet.first().scheduledTime
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.d(TAG, "getNextScheduleTime ${e.message}")
         }
         return null
