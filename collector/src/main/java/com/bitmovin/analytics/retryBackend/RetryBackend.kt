@@ -21,7 +21,8 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
 
     private val TAG = "RetryBackend"
     private var retryDateToken: Date? = null
-    fun getNextScheduledTime() = RetryQueue.getNextScheduleTime()
+    private val retryQueue = RetryQueue()
+    fun getNextScheduledTime() = retryQueue.getNextScheduleTime()
 
     override fun send(eventData: EventData) {
         scheduleSample(RetrySample(eventData, 0, Date(), 0))
@@ -42,7 +43,7 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
                     Log.d(TAG, "$e.message ${e.cause}")
                     if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
                         call.cancel()
-                        RetryQueue.addSample(retrySample)
+                        retryQueue.addSample(retrySample)
                         processQueuedSamples()
                     }
                 }
@@ -57,7 +58,7 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
                     Log.d(TAG, "$e.message ${e.cause}")
                     if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
                         call.cancel()
-                        RetryQueue.addSample(retrySample)
+                        retryQueue.addSample(retrySample)
                         processQueuedSamples()
                     }
                 }
@@ -93,7 +94,7 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
     private val processSampleRunnable = Runnable {
         try {
 
-            val retrySample = RetryQueue.getNextSampleOrNull()
+            val retrySample = retryQueue.getNextSampleOrNull()
             if (retrySample != null) {
                 scheduleSample(retrySample)
             }

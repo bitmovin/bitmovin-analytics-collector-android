@@ -3,7 +3,6 @@ package com.bitmovin.analytics.retryBackend
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
-import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import org.assertj.core.api.Assertions
@@ -17,11 +16,6 @@ class RetryQueueTest {
 
     private val firstDate = Date()
 
-    private val secondDate = Calendar.getInstance().run {
-        add(Calendar.HOUR, 4)
-        time
-    }
-
     private fun setupEventData(sequenceNumber: Int): EventData {
         var eventData = EventData(config, deviceInformation, "testImpressionId", "userId")
         eventData.sequenceNumber = sequenceNumber
@@ -31,7 +25,7 @@ class RetryQueueTest {
     @Test
     fun sampleShouldBeDiscardedIfMaxRetryTimeExceeded() {
 
-        val retryQueue = Mockito.spy(RetryQueue)
+        val retryQueue = Mockito.spy(RetryQueue())
 
         val firstSample = setupEventData(1)
         retryQueue.addSample(RetrySample(firstSample, 290, firstDate, 9))
@@ -43,7 +37,7 @@ class RetryQueueTest {
     @Test
     fun sampleShouldBeDiscardedIfMaxNumberOfSamplesReached() {
 
-        val retryQueue = Mockito.spy(RetryQueue)
+        val retryQueue = Mockito.spy(RetryQueue())
 
         `when`(retryQueue.getMaxSampleNumber()).thenAnswer { 2 }
 
@@ -76,7 +70,7 @@ class RetryQueueTest {
     @Test
     fun getSamplesShouldNotReturnSamplesWithFutureScheduledTime() {
 
-        val retryQueue = Mockito.spy(RetryQueue)
+        val retryQueue = Mockito.spy(RetryQueue())
         val firstSample = setupEventData(1)
 
         retryQueue.addSample(RetrySample(firstSample, 0, firstDate, 2))

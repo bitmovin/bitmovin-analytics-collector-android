@@ -19,13 +19,13 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     private Queue<AdEventData> adData;
 
     private boolean enabled = false;
-    private CollectorConfig config;
+    private BitmovinAnalyticsConfig config;
     private final LicenseCallback callback;
     private Context context;
 
     private int sampleSequenceNumber = 0;
 
-    public SimpleEventDataDispatcher(CollectorConfig config, Context context, LicenseCallback callback) {
+    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, LicenseCallback callback) {
         this.data = new ConcurrentLinkedQueue<>();
         this.adData = new ConcurrentLinkedQueue<>();
         this.config = config;

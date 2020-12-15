@@ -9,13 +9,11 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.Comparator
 import kotlin.math.pow
 
-object RetryQueue {
+class RetryQueue {
     private val TAG = "RetryQueue"
     private val lock = ReentrantLock()
 
     fun getMaxSampleNumber() = Util.MAX_RETRY_SAMPLES
-    fun now() = Date()
-    fun test() = "test"
 
     private val sampleComparator = Comparator<RetrySample<Any>> { a, b ->
         when {
@@ -66,7 +64,7 @@ object RetryQueue {
 
         try {
             lock.lock()
-            val retrySample = retrySamplesSet.firstOrNull { it.scheduledTime.before(now()) }
+            val retrySample = retrySamplesSet.firstOrNull { it.scheduledTime <= Date() }
             retrySamplesSet.remove(retrySample)
             return retrySample
         } catch (e: Exception) {

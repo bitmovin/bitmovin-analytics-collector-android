@@ -23,25 +23,23 @@ import okhttp3.Response;
 public class LicenseCall {
     private static final String TAG = "LicenseCall";
     private final String backendUrl;
-    private CollectorConfig config;
+    private BitmovinAnalyticsConfig config;
     private Context context;
     private HttpClient httpClient;
 
-    public LicenseCall(CollectorConfig config, Context context) {
+    public LicenseCall(BitmovinAnalyticsConfig config, Context context) {
         this.config = config;
         this.context = context;
-        this.backendUrl = Uri.parse(config.getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
+        this.backendUrl = Uri.parse(config.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
         Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl));
-        this.httpClient = new HttpClient(context, new ClientFactory().createClient(config));
+        this.httpClient = new HttpClient(context, new ClientFactory().createClient(config.getConfig()));
     }
 
     public void authenticate(final LicenseCallback callback) {
         final LicenseCallData data = new LicenseCallData();
-        //data.setKey(this.config.getKey());
-         data.setKey("e73a3577-d91c-4214-9e6d-938fb936818a");
+        data.setKey(this.config.getKey());
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
-        //data.setDomain(context.getPackageName());
-        data.setDomain("localhost");
+        data.setDomain(context.getPackageName());
         String json = DataSerializer.serialize(data);
         httpClient.post(this.backendUrl, json, new Callback() {
             @Override
