@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.CollectorConfig;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -22,24 +23,22 @@ public class HttpClient {
     private static final String TAG = "HttpClient";
     private OkHttpClient client = null;
     private Context context;
-    private BitmovinAnalyticsConfig analyticsConfig;
+    private boolean tryResendDataOnFailedConnection;
 
-    public HttpClient(Context context, BitmovinAnalyticsConfig analyticsConfig) {
+    public HttpClient(Context context, boolean tryResendDataOnFailedConnection) {
         this.context = context;
-        this.analyticsConfig = analyticsConfig;
+        this.tryResendDataOnFailedConnection = tryResendDataOnFailedConnection;
     }
 
 
     public void post(String url, String postBody, final Callback callback) {
         if (client == null) {
-            if (analyticsConfig.isResendDataOnHttpTimeout()){
+            if (tryResendDataOnFailedConnection){
+                Log.d("RetryBackend", "retry");
                 client = new OkHttpClient.Builder()
-
-                        .retryOnConnectionFailure(false)
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .writeTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(30, TimeUnit.SECONDS).build();
+                        .retryOnConnectionFailure(false).build();
             } else {
+                Log.d("RetryBackend", "regular");
                 client = new OkHttpClient();
             }
         }
@@ -71,6 +70,8 @@ public class HttpClient {
                 }
                 response.close();
             }
+
+
         });
     }
 }

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.BuildConfig;
+import com.bitmovin.analytics.CollectorConfig;
 import com.bitmovin.analytics.data.LicenseCallData;
 import com.bitmovin.analytics.data.LicenseResponse;
 import com.bitmovin.analytics.utils.DataSerializer;
@@ -21,23 +22,25 @@ import okhttp3.Response;
 public class LicenseCall {
     private static final String TAG = "LicenseCall";
     private final String backendUrl;
-    private BitmovinAnalyticsConfig config;
+    private CollectorConfig config;
     private Context context;
     private HttpClient httpClient;
 
-    public LicenseCall(BitmovinAnalyticsConfig config, Context context) {
+    public LicenseCall(CollectorConfig config, Context context) {
         this.config = config;
         this.context = context;
-        this.backendUrl = Uri.parse(config.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
+        this.backendUrl = Uri.parse(config.getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
         Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl));
-        this.httpClient = new HttpClient(context, config);
+        this.httpClient = new HttpClient(context, config.getTryResendDataOnFailedConnection());
     }
 
     public void authenticate(final LicenseCallback callback) {
         final LicenseCallData data = new LicenseCallData();
-        data.setKey(this.config.getKey());
+        //data.setKey(this.config.getKey());
+         data.setKey("e73a3577-d91c-4214-9e6d-938fb936818a");
         data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
-        data.setDomain(context.getPackageName());
+        //data.setDomain(context.getPackageName());
+        data.setDomain("localhost");
         String json = DataSerializer.serialize(data);
         httpClient.post(this.backendUrl, json, new Callback() {
             @Override

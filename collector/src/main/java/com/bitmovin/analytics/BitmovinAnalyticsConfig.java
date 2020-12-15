@@ -30,7 +30,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private Boolean ads = true;
     private Context context;
     private Boolean isLive;
-    private Boolean resendDataOnHttpTimeout = false;
     private CollectorConfig config = new CollectorConfig();
 
     public static final Creator<BitmovinAnalyticsConfig> CREATOR = new Creator<BitmovinAnalyticsConfig>() {
@@ -91,7 +90,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         isLive = (Boolean) in.readSerializable();
         config = in.readParcelable(CollectorConfig.class.getClassLoader());
         ads = in.readInt() == 1;
-        resendDataOnHttpTimeout = (Boolean) in.readSerializable();
     }
 
     public BitmovinAnalyticsConfig() {
@@ -121,7 +119,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         dest.writeSerializable(isLive);
         dest.writeParcelable(config, config.describeContents());
         dest.writeInt(ads ? 1 : 0);
-        dest.writeSerializable(resendDataOnHttpTimeout);
     }
 
     @Override
@@ -414,24 +411,5 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     public void setIsLive(Boolean live) {
         isLive = live;
     }
-
-    /**
-     * Returns true if data will be resent again if http timeout happens
-     *
-     * @return
-     */
-    public Boolean isResendDataOnHttpTimeout() {
-        return resendDataOnHttpTimeout;
-    }
-
-    /**
-     * Try to resend data if http timeout happens
-     *
-     * @param enabled
-     */
-    public void setResendDataOnHttpTimeout(Boolean enabled) {
-        resendDataOnHttpTimeout = enabled;
-    }
-
 
 }

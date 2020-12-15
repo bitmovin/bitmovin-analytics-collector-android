@@ -4,22 +4,25 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.CollectorConfig;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
+
+import org.jetbrains.annotations.NotNull;
+
 import okhttp3.Callback;
 
-public class HttpBackend implements Backend {
+public class HttpBackend implements Backend, CallbackBackend {
     private static final String TAG = "BitmovinBackend";
     private HttpClient httpClient;
     private String analyticsBackendUrl;
     private String adsAnalyticsBackendUrl;
 
-    public HttpBackend(BitmovinAnalyticsConfig analyticsConfig, Context context) {
-        analyticsBackendUrl = Uri.parse(analyticsConfig.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("analytics").build().toString();
-        adsAnalyticsBackendUrl = Uri.parse(analyticsConfig.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("analytics/a").build().toString();
+    public HttpBackend(CollectorConfig config, Context context) {
+        analyticsBackendUrl = Uri.parse(config.getBackendUrl()).buildUpon().appendEncodedPath("analytics").build().toString();
+        adsAnalyticsBackendUrl = Uri.parse(config.getBackendUrl()).buildUpon().appendEncodedPath("analytics/a").build().toString();
         Log.d(TAG, String.format("Initialized Analytics HTTP Backend with %s", analyticsBackendUrl));
-        this.httpClient = new HttpClient(context, analyticsConfig);
+        this.httpClient = new HttpClient(context, config.getTryResendDataOnFailedConnection());
     }
 
     @Override
@@ -42,5 +45,15 @@ public class HttpBackend implements Backend {
                 eventData.getVideoImpressionId(),
                 eventData.getAdImpressionId()));
         this.httpClient.post(adsAnalyticsBackendUrl, DataSerializer.serialize(eventData), callback);
+    }
+
+    @Override
+    public void send(@NotNull EventData eventData) {
+        this.send(eventData, null);
+    }
+
+    @Override
+    public void sendAd(@NotNull AdEventData eventData) {
+        this.sendAd(eventData, null);
     }
 }

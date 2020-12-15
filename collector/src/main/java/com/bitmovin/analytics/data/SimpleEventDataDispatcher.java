@@ -3,6 +3,7 @@ package com.bitmovin.analytics.data;
 import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.CollectorConfig;
 import com.bitmovin.analytics.license.LicenseCall;
 import com.bitmovin.analytics.license.LicenseCallback;
 
@@ -18,13 +19,13 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     private Queue<AdEventData> adData;
 
     private boolean enabled = false;
-    private BitmovinAnalyticsConfig config;
+    private CollectorConfig config;
     private final LicenseCallback callback;
     private Context context;
 
     private int sampleSequenceNumber = 0;
 
-    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, LicenseCallback callback) {
+    public SimpleEventDataDispatcher(CollectorConfig config, Context context, LicenseCallback callback) {
         this.data = new ConcurrentLinkedQueue<>();
         this.adData = new ConcurrentLinkedQueue<>();
         this.config = config;
@@ -40,13 +41,13 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
             Iterator<EventData> it = data.iterator();
             while (it.hasNext()) {
                 EventData eventData = it.next();
-                this.backend.send(eventData, null);
+                this.backend.send(eventData);
                 it.remove();
             }
             Iterator<AdEventData> adIt = adData.iterator();
             while (adIt.hasNext()) {
                 AdEventData eventData = adIt.next();
-                this.backend.sendAd(eventData, null);
+                this.backend.sendAd(eventData);
                 adIt.remove();
             }
         }
@@ -74,7 +75,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     public void add(EventData eventData) {
         eventData.setSequenceNumber(this.sampleSequenceNumber++);
         if (enabled) {
-            this.backend.send(eventData, null);
+            this.backend.send(eventData);
         } else {
             this.data.add(eventData);
         }
@@ -83,7 +84,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
     @Override
     public void addAd(AdEventData eventData) {
         if (enabled) {
-            this.backend.sendAd(eventData, null);
+            this.backend.sendAd(eventData);
         } else {
             this.adData.add(eventData);
         }

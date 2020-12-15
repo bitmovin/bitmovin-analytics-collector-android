@@ -5,6 +5,7 @@ import android.os.SystemClock
 import android.util.Log
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
+import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.EventData
 import java.io.IOException
 import java.lang.Exception
@@ -17,7 +18,7 @@ import okhttp3.Callback
 import okhttp3.Response
 import okhttp3.internal.http2.StreamResetException
 
-class RetryBackend(private val next: Backend, val handler: Handler) : Backend {
+class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Backend {
 
     private val TAG = "RetryBackend"
 //    private val lock = ReentrantLock()
@@ -25,11 +26,11 @@ class RetryBackend(private val next: Backend, val handler: Handler) : Backend {
 //    private var retrySamplesSet = sortedSetOf<RetrySample<Any>>()
     private var retryDateToken: Date? = null
 
-    override fun send(eventData: EventData, callback: Callback?) {
+    override fun send(eventData: EventData) {
         scheduleSample(RetrySample(eventData, 0, Date(), 0))
     }
 
-    override fun sendAd(eventData: AdEventData, callback: Callback?) {
+    override fun sendAd(eventData: AdEventData) {
         scheduleSample(RetrySample(eventData, 0, Date(), 0))
     }
 
