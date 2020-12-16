@@ -7,7 +7,3 @@ interface Backend {
     fun sendAd(eventData: AdEventData)
 }
 
-interface CallbackBackend {
-    fun send(eventData: EventData, callback: RetryCallback?)
-    fun sendAd(eventData: AdEventData, callback: RetryCallback?)
-}
