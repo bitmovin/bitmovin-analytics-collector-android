@@ -12,6 +12,7 @@ import kotlin.math.pow
 class RetryQueue {
     private val TAG = "RetryQueue"
     private val lock = ReentrantLock()
+    private var retrySamplesSet = mutableListOf<RetrySample<Any>>()
 
     fun getMaxSampleNumber() = Util.MAX_RETRY_SAMPLES
 
@@ -23,35 +24,26 @@ class RetryQueue {
         }
     }
 
-    private var retrySamplesSet = sortedSetOf(sampleComparator)
-
     fun addSample(retrySample: RetrySample<Any>) {
         try {
             lock.lock()
-
             retrySample.retry++
+
             val backOffTime = minOf(2.toDouble().pow(retrySample.retry).toInt(), 64)
             retrySample.totalTime += backOffTime
             // more than 5min in queue
             if (retrySample.totalTime < Util.MAX_RETRY_TIME) {
-
                 retrySample.scheduledTime = Calendar.getInstance().run {
                     add(Calendar.SECOND, backOffTime)
                     time
                 }
-                Log.d(TAG, "scheduledTime ${retrySample.scheduledTime}")
-
                 if (retrySamplesSet.size > getMaxSampleNumber()) {
                     val removeSample = retrySamplesSet.last()
                     retrySamplesSet.remove(removeSample)
                     Log.d(TAG, "removed sample ")
-//                        "${removeSample?.eventData?.sequenceNumber}
                 }
-
-                Log.d(TAG, "add sample " +
-//                    "${retrySample?.eventData?.sequenceNumber} " +
-                        "backOffTime=${retrySample.totalTime} schedTime=${retrySample.scheduledTime}")
                 retrySamplesSet.add(retrySample)
+                retrySamplesSet.sortWith(sampleComparator)
             }
         } catch (e: Exception) {
             Log.d(TAG, "addSample ${e.message}")
@@ -61,7 +53,6 @@ class RetryQueue {
     }
 
     fun getNextSampleOrNull(): RetrySample<Any>? {
-
         try {
             lock.lock()
             val retrySample = retrySamplesSet.firstOrNull { it.scheduledTime <= Date() }
@@ -77,7 +68,9 @@ class RetryQueue {
 
     fun getNextScheduleTime(): Date? {
         try {
-            return retrySamplesSet.first().scheduledTime
+            if (retrySamplesSet.size > 0) {
+                return retrySamplesSet.first().scheduledTime
+            }
         } catch (e: Exception) {
             Log.d(TAG, "getNextScheduleTime ${e.message}")
         }
