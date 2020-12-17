@@ -12,10 +12,10 @@ import kotlin.math.pow
 class RetryQueue {
     private val TAG = "RetryQueue"
     private val lock = ReentrantLock()
-    private var retrySamplesSet = mutableListOf<RetrySample<Any>>()
 
     fun getMaxSampleNumber() = Util.MAX_RETRY_SAMPLES
 
+    private var retrySamplesList = mutableListOf<RetrySample<Any>>()
     private val sampleComparator = Comparator<RetrySample<Any>> { a, b ->
         when {
             (a.scheduledTime == b.scheduledTime) -> 0
@@ -25,6 +25,7 @@ class RetryQueue {
     }
 
     fun addSample(retrySample: RetrySample<Any>) {
+
         try {
             lock.lock()
             retrySample.retry++
@@ -37,13 +38,14 @@ class RetryQueue {
                     add(Calendar.SECOND, backOffTime)
                     time
                 }
-                if (retrySamplesSet.size > getMaxSampleNumber()) {
-                    val removeSample = retrySamplesSet.last()
-                    retrySamplesSet.remove(removeSample)
-                    Log.d(TAG, "removed sample ")
+
+                if (retrySamplesList.size > getMaxSampleNumber()) {
+                    val removeSample = retrySamplesList.last()
+                    retrySamplesList.remove(removeSample)
+                    Log.d(TAG, "removed sample")
                 }
-                retrySamplesSet.add(retrySample)
-                retrySamplesSet.sortWith(sampleComparator)
+                retrySamplesList.add(retrySample)
+                retrySamplesList.sortWith(sampleComparator)
             }
         } catch (e: Exception) {
             Log.d(TAG, "addSample ${e.message}")
@@ -55,8 +57,8 @@ class RetryQueue {
     fun getNextSampleOrNull(): RetrySample<Any>? {
         try {
             lock.lock()
-            val retrySample = retrySamplesSet.firstOrNull { it.scheduledTime <= Date() }
-            retrySamplesSet.remove(retrySample)
+            val retrySample = retrySamplesList.firstOrNull { it.scheduledTime <= Date() }
+            retrySamplesList.remove(retrySample)
             return retrySample
         } catch (e: Exception) {
             Log.d(TAG, "getSample ${e.message}")
@@ -68,8 +70,8 @@ class RetryQueue {
 
     fun getNextScheduleTime(): Date? {
         try {
-            if (retrySamplesSet.size > 0) {
-                return retrySamplesSet.first().scheduledTime
+            if (retrySamplesList.size > 0) {
+                return retrySamplesList.first().scheduledTime
             }
         } catch (e: Exception) {
             Log.d(TAG, "getNextScheduleTime ${e.message}")
