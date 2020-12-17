@@ -3,6 +3,7 @@ package com.bitmovin.analytics.retryBackend
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
+import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import org.assertj.core.api.Assertions
@@ -15,6 +16,10 @@ class RetryQueueTest {
     private val deviceInformation = DeviceInformation("manufacturer", "model", false, "userAgentString", "locale", "packageName", 0, 0)
 
     private val firstDate = Date()
+    private val secondDate = Calendar.getInstance().run {
+        add(Calendar.HOUR, 2)
+        time
+    }
 
     private fun setupEventData(sequenceNumber: Int): EventData {
         var eventData = EventData(config, deviceInformation, "testImpressionId", "userId")
@@ -45,12 +50,12 @@ class RetryQueueTest {
         val secondSample = setupEventData(2)
         val thirdSample = setupEventData(3)
         val fourthSample = setupEventData(4)
-        retryQueue.addSample(RetrySample(firstSample, 0, firstDate, 4))
+        retryQueue.addSample(RetrySample(firstSample, 0, secondDate, 4))
         retryQueue.addSample(RetrySample(secondSample, 0, firstDate, 0))
         retryQueue.addSample(RetrySample(thirdSample, 0, firstDate, 1))
         retryQueue.addSample(RetrySample(fourthSample, 0, firstDate, 2))
 
-        TimeUnit.SECONDS.sleep(5)
+        TimeUnit.SECONDS.sleep(4)
 
         var sample = retryQueue.getNextSampleOrNull()
         Assertions.assertThat(sample?.eventData).isEqualTo(secondSample)

@@ -13,8 +13,6 @@ import com.nhaarman.mockitokotlin2.whenever
 import java.net.SocketTimeoutException
 import java.util.Calendar
 import java.util.Date
-import okhttp3.Call
-import okhttp3.Callback
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito
@@ -23,7 +21,6 @@ class RetryBackendTest {
 
     private val config = BitmovinAnalyticsConfig()
     private val backendMock = mock<CallbackBackend>()
-    private val callMock = mock<Call>()
     private val handlerMock = mock<Handler>()
     private val deviceInformation = DeviceInformation("manufacturer", "model", false, "userAgentString", "locale", "packageName", 0, 0)
 
@@ -38,7 +35,7 @@ class RetryBackendTest {
     fun sampleShouldBeProcessedAfterHttpRequestTimeout() {
 
         whenever(backendMock.send(any(), any())).thenAnswer {
-            (it.arguments[1] as Callback).onFailure(callMock, SocketTimeoutException("Timeout"))
+            (it.arguments[1] as OnFailureCallback).onFailure(SocketTimeoutException("Timeout"), {})
         }
 
         val retryBacked = Mockito.spy(RetryBackend(backendMock, handlerMock))
