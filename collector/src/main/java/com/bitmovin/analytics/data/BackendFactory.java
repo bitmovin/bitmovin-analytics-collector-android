@@ -10,9 +10,9 @@ public class BackendFactory {
 
     public Backend createBackend(BitmovinAnalyticsConfig config, Context context) {
         HttpBackend httpBackend = new HttpBackend(config.getConfig(), context);
-        if(!config.getConfig().getTryResendDataOnFailedConnection() ){
-           return httpBackend;
-       }
+        if (!config.getConfig().getTryResendDataOnFailedConnection()) {
+            return httpBackend;
+        }
 
         return new RetryBackend(httpBackend, new Handler());
     }
