@@ -5,10 +5,16 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.bitmovin.analytics.CollectorConfig;
-import com.bitmovin.analytics.retryBackend.RetryCallback;
+import com.bitmovin.analytics.retryBackend.OnFailureCallback;
 import com.bitmovin.analytics.utils.ClientFactory;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class HttpBackend implements Backend, CallbackBackend {
     private static final String TAG = "BitmovinBackend";
@@ -34,7 +40,7 @@ public class HttpBackend implements Backend, CallbackBackend {
     }
 
     @Override
-    public void send(EventData eventData, RetryCallback callback) {
+    public void send(EventData eventData, OnFailureCallback callback) {
         Log.d(TAG, String.format("Sending sample: %s (state: %s, videoId: %s, startupTime: %d, videoStartupTime: %d, buffered: %d, audioLanguage: %s)",
                 eventData.getImpressionId(),
                 eventData.getVideoId(),
@@ -43,16 +49,38 @@ public class HttpBackend implements Backend, CallbackBackend {
                 eventData.getVideoStartupTime(),
                 eventData.getBuffered(),
                 eventData.getAudioLanguage()));
-        this.httpClient.post(analyticsBackendUrl, DataSerializer.serialize(eventData), callback);
+        this.httpClient.post(analyticsBackendUrl, DataSerializer.serialize(eventData), new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                if(callback != null) {
+                    callback.onFailure(e, () -> { call.cancel(); return  null;});
+                }
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+            }
+        });
     }
 
     @Override
-    public void sendAd(AdEventData eventData, RetryCallback callback) {
+    public void sendAd(AdEventData eventData, OnFailureCallback callback) {
         Log.d(TAG, String.format("Sending ad sample: %s (videoImpressionId: %s, adImpressionId: %s)",
                 eventData.getAdImpressionId(),
                 eventData.getVideoImpressionId(),
                 eventData.getAdImpressionId()));
-        this.httpClient.post(adsAnalyticsBackendUrl, DataSerializer.serialize(eventData), callback);
+        this.httpClient.post(adsAnalyticsBackendUrl, DataSerializer.serialize(eventData), new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                if(callback !=null) {
+                    callback.onFailure(e, () ->{ call.cancel(); return  null;});
+                }
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+            }
+        });
     }
 
 }

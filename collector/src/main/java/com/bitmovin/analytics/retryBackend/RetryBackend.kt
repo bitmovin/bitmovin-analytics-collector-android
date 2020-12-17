@@ -7,14 +7,11 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.EventData
-import java.io.IOException
-import java.lang.Exception
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.Date
-import okhttp3.Call
-import okhttp3.Response
+import kotlin.Exception
 import okhttp3.internal.http2.StreamResetException
 
 class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Backend {
@@ -33,36 +30,23 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
     }
 
     private fun scheduleSample(retrySample: RetrySample<Any>) {
+        val callback = object : OnFailureCallback {
+            override fun onFailure(e: Exception, cancel: () -> Unit) {
+                if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
+                    cancel()
+                    retryQueue.addSample(retrySample)
+                    processQueuedSamples()
+                }
+            }
+        }
 
         if (retrySample.eventData is EventData) {
             Log.d(TAG, "sending sample ${retrySample.eventData?.sequenceNumber} retry ${retrySample.retry}")
             retrySample.eventData.retryCount = retrySample.retry
-            this.next.send(retrySample.eventData, object : RetryCallback {
-                override fun onFailure(call: Call, e: IOException) {
-                    if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
-                        call.cancel()
-                        retryQueue.addSample(retrySample)
-                        processQueuedSamples()
-                    }
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                }
-            })
+            this.next.send(retrySample.eventData, callback)
         } else if (retrySample.eventData is AdEventData) {
             retrySample.eventData.retryCount = retrySample.retry
-            this.next.sendAd(retrySample.eventData, object : RetryCallback {
-                override fun onFailure(call: Call, e: IOException) {
-                    if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
-                        call.cancel()
-                        retryQueue.addSample(retrySample)
-                        processQueuedSamples()
-                    }
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                }
-            })
+            this.next.sendAd(retrySample.eventData, callback)
         }
     }
 
@@ -70,15 +54,13 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
     fun processQueuedSamples() {
         try {
             val nextScheduledTime = getNextScheduledTime()
-            if (nextScheduledTime != null) {
-                if (retryDateToken != nextScheduledTime) {
-                    if (retryDateToken != null) {
-                        handler.removeCallbacks(processSampleRunnable, retryDateToken)
-                    }
-                    retryDateToken = nextScheduledTime
-                    val delay = maxOf(nextScheduledTime.time - Date().time, 0) // to prevent negative delay
-                    handler.postAtTime(processSampleRunnable, retryDateToken, SystemClock.uptimeMillis() + delay)
+            if (nextScheduledTime != null || retryDateToken != nextScheduledTime) {
+                if (retryDateToken != null) {
+                    handler.removeCallbacks(processSampleRunnable, retryDateToken)
                 }
+                retryDateToken = nextScheduledTime
+                val delay = maxOf((nextScheduledTime?.time ?: 0) - Date().time, 0) // to prevent negative delay
+                handler.postAtTime(processSampleRunnable, retryDateToken, SystemClock.uptimeMillis() + delay)
             }
         } catch (e: Exception) {
             Log.d(TAG, "processQueuedSamples ${e.message}")
@@ -98,7 +80,7 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
         }
     }
 
-    fun destroy() { // destroys an instance of RetryBackend
+    protected fun finalize() { // destroys an instance of RetryBackend
         Log.d(TAG, "destroy")
         handler.removeCallbacksAndMessages(null) // removes all callbacks and messages
     }
