@@ -64,7 +64,7 @@ class RetryBackend(private val next: CallbackBackend, private val scheduleSample
                 scheduleSampleHandler.postAtTime(sendNextSampleRunnable, retryDateToken, SystemClock.uptimeMillis() + delay)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "processQueuedSamples", e)
+            Log.e(TAG, "processQueuedSamples() threw an unexpected exception: ${e.message}", e)
         }
     }
 
@@ -78,7 +78,7 @@ class RetryBackend(private val next: CallbackBackend, private val scheduleSample
             retryDateToken = null
             processQueuedSamples()
         } catch (e: Exception) {
-            Log.e(TAG, "processSampleRunnable", e)
+            Log.e(TAG, "processSampleRunnable() threw an unexpected exception: ${e.message}", e)
         }
     }
 

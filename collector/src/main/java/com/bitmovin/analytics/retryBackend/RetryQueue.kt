@@ -50,8 +50,9 @@ class RetryQueue {
             }
             retrySamplesList.add(retrySample)
             retrySamplesList.sortWith(sampleComparator)
+
         } catch (e: Exception) {
-            Log.e(TAG, "addSample", e)
+            Log.e(TAG, "addSample threw an unexpected exception: ${e.message}", e)
         } finally {
             lock.unlock()
         }
@@ -64,7 +65,7 @@ class RetryQueue {
             retrySamplesList.remove(retrySample)
             return retrySample
         } catch (e: Exception) {
-            Log.e(TAG, "getSample", e)
+            Log.e(TAG, "getSample threw an unexpected exception: ${e.message}", e)
         } finally {
             lock.unlock()
         }
@@ -77,7 +78,7 @@ class RetryQueue {
                 return retrySamplesList.first().scheduledTime
             }
         } catch (e: Exception) {
-            Log.e(TAG, "getNextScheduleTime", e)
+            Log.e(TAG, "getNextScheduleTime threw an unexpected exception ${e.message}", e)
         }
         return null
     }
