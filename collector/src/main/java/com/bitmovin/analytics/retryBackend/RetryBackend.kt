@@ -14,7 +14,7 @@ import java.util.Date
 import kotlin.Exception
 import okhttp3.internal.http2.StreamResetException
 
-class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Backend {
+class RetryBackend(private val next: CallbackBackend, private val scheduleSampleHandler: Handler) : Backend {
 
     private val TAG = "RetryBackend"
     private var retryDateToken: Date? = null
@@ -57,18 +57,19 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
             val nextScheduledTime = getNextScheduledTime()
             if (nextScheduledTime != null || retryDateToken != nextScheduledTime) {
                 if (retryDateToken != null) {
-                    handler.removeCallbacks(processSampleRunnable, retryDateToken)
+                    scheduleSampleHandler.removeCallbacks(sendNextSampleRunnable, retryDateToken)
                 }
                 retryDateToken = nextScheduledTime
                 val delay = maxOf((nextScheduledTime?.time ?: 0) - Date().time, 0) // to prevent negative delay
-                handler.postAtTime(processSampleRunnable, retryDateToken, SystemClock.uptimeMillis() + delay)
+                scheduleSampleHandler.postAtTime(sendNextSampleRunnable, retryDateToken, SystemClock.uptimeMillis() + delay)
             }
         } catch (e: Exception) {
             Log.e(TAG, "processQueuedSamples", e)
         }
     }
 
-    private val processSampleRunnable = Runnable {
+    // https://developer.android.com/reference/java/lang/Runnable
+    private val sendNextSampleRunnable = Runnable {
         try {
             val retrySample = retryQueue.getNextSampleOrNull()
             if (retrySample != null) {

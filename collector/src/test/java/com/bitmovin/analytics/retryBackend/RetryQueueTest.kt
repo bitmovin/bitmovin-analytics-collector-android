@@ -44,7 +44,7 @@ class RetryQueueTest {
 
         val retryQueue = Mockito.spy(RetryQueue())
 
-        `when`(retryQueue.getMaxSampleNumber()).thenAnswer { 2 }
+        `when`(retryQueue.getMaxSampleNumber()).thenAnswer { 3 }
 
         val firstSample = setupEventData(1)
         val secondSample = setupEventData(2)
