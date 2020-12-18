@@ -52,9 +52,13 @@ public class HttpBackend implements Backend, CallbackBackend {
         this.httpClient.post(analyticsBackendUrl, DataSerializer.serialize(eventData), new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(callback != null) {
-                    callback.onFailure(e, () -> { call.cancel(); return  null;});
+                if (callback == null) {
+                    return;
                 }
+                callback.onFailure(e, () -> {
+                    call.cancel();
+                    return null;
+                });
             }
 
             @Override
@@ -72,9 +76,13 @@ public class HttpBackend implements Backend, CallbackBackend {
         this.httpClient.post(adsAnalyticsBackendUrl, DataSerializer.serialize(eventData), new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if(callback !=null) {
-                    callback.onFailure(e, () ->{ call.cancel(); return  null;});
+                if (callback == null) {
+                    return;
                 }
+                callback.onFailure(e, () -> {
+                    call.cancel();
+                    return null;
+                });
             }
 
             @Override
