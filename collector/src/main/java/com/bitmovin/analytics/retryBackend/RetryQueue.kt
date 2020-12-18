@@ -50,7 +50,6 @@ class RetryQueue {
             }
             retrySamplesList.add(retrySample)
             retrySamplesList.sortWith(sampleComparator)
-
         } catch (e: Exception) {
             Log.e(TAG, "addSample threw an unexpected exception: ${e.message}", e)
         } finally {
