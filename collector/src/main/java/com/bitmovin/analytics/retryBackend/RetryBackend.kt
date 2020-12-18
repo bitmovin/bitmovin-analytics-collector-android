@@ -45,6 +45,7 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
             retrySample.eventData.retryCount = retrySample.retry
             this.next.send(retrySample.eventData, callback)
         } else if (retrySample.eventData is AdEventData) {
+            Log.d(TAG, "sending ad sample ${retrySample.eventData?.adId} retry ${retrySample.retry}")
             retrySample.eventData.retryCount = retrySample.retry
             this.next.sendAd(retrySample.eventData, callback)
         }
@@ -63,7 +64,7 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
                 handler.postAtTime(processSampleRunnable, retryDateToken, SystemClock.uptimeMillis() + delay)
             }
         } catch (e: Exception) {
-            Log.d(TAG, "processQueuedSamples ${e.message}")
+            Log.e(TAG, "processQueuedSamples", e)
         }
     }
 
@@ -76,12 +77,12 @@ class RetryBackend(private val next: CallbackBackend, val handler: Handler) : Ba
             retryDateToken = null
             processQueuedSamples()
         } catch (e: Exception) {
-            Log.d(TAG, "processSampleRunnable ${e.message}")
+            Log.e(TAG, "processSampleRunnable", e)
         }
     }
 
     protected fun finalize() { // destroys an instance of RetryBackend
-        Log.d(TAG, "destroy")
-        handler.removeCallbacksAndMessages(null) // removes all callbacks and messages
+        Log.d(TAG, "finalize")
+        scheduleSampleHandler.removeCallbacksAndMessages(null) // removes all callbacks and messages
     }
 }

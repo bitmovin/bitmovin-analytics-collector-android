@@ -51,7 +51,7 @@ class RetryQueue {
             retrySamplesList.add(retrySample)
             retrySamplesList.sortWith(sampleComparator)
         } catch (e: Exception) {
-            Log.d(TAG, "addSample ${e.message}")
+            Log.e(TAG, "addSample", e)
         } finally {
             lock.unlock()
         }
@@ -64,7 +64,7 @@ class RetryQueue {
             retrySamplesList.remove(retrySample)
             return retrySample
         } catch (e: Exception) {
-            Log.d(TAG, "getSample ${e.message}")
+            Log.e(TAG, "getSample", e)
         } finally {
             lock.unlock()
         }
@@ -77,7 +77,7 @@ class RetryQueue {
                 return retrySamplesList.first().scheduledTime
             }
         } catch (e: Exception) {
-            Log.d(TAG, "getNextScheduleTime ${e.message}")
+            Log.e(TAG, "getNextScheduleTime", e)
         }
         return null
     }
