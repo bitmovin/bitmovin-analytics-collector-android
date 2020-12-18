@@ -12,7 +12,7 @@ class RetryQueue {
     private val lock = ReentrantLock()
     private val MAX_RETRY_TIME = 300 // in seconds
     private val MAX_RETRY_SAMPLES = 100
-    private val MAX_BACKOFF_INTERVAL = 100
+    private val MAX_BACKOFF_INTERVAL = 64
 
     fun getMaxSampleNumber() = MAX_RETRY_SAMPLES
     fun now() = Date()
