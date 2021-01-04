@@ -46,7 +46,7 @@ class RetryQueue {
             if (retrySamplesList.size >= getMaxSampleNumber()) {
                 val removeSample = retrySamplesList.last()
                 retrySamplesList.remove(removeSample)
-                Log.d(TAG, "removed sample")
+                Log.d(TAG, "removed sample with highest scheduled time ${removeSample.scheduledTime} due to queue being over capacity of ${getMaxSampleNumber()}")
             }
             retrySamplesList.add(retrySample)
             retrySamplesList.sortWith(sampleComparator)
