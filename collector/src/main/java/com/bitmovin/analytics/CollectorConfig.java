@@ -6,6 +6,8 @@ import android.os.Parcelable;
 public class CollectorConfig implements Parcelable {
     private String backendUrl = "https://analytics-ingress-global.bitmovin.com/";
 
+    private Boolean tryResendDataOnFailedConnection = false;
+
     public CollectorConfig() {
     }
 
@@ -53,4 +55,23 @@ public class CollectorConfig implements Parcelable {
     public void setBackendUrl(String backendUrl) {
         this.backendUrl = backendUrl;
     }
+
+    /**
+     * Get if failed requests should be resent again
+     *
+     * @return
+     */
+    public Boolean getTryResendDataOnFailedConnection() {
+        return tryResendDataOnFailedConnection;
+    }
+
+    /**
+     * Set if failed requests should be resent again
+     *
+     * @param tryResendDataOnFailedConnection
+     */
+    public void setTryResendDataOnFailedConnection(Boolean tryResendDataOnFailedConnection) {
+        this.tryResendDataOnFailedConnection = tryResendDataOnFailedConnection;
+    }
+
 }

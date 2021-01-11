@@ -29,6 +29,14 @@ android {
         targetCompatibility rootProject.ext.targetCompatibility
     }
 
+    kotlinOptions {
+        jvmTarget = rootProject.ext.targetCompatibility
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     buildTypes {
         release {
             minifyEnabled false
