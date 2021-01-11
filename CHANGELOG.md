@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.21.0
+
 ### Added
 
 - ability to override `mpdUrl` and `m3u8Url` with the analytics configuration (AN-1919)
