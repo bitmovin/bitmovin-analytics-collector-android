@@ -96,6 +96,3 @@ spotless {
         googleJavaFormat()
     }
 }
-
-apply plugin: "com.diffplug.spotless"
-apply { plugin "org.jlleitschuh.gradle.ktlint" }
