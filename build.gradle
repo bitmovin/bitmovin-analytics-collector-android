@@ -53,19 +53,19 @@ allprojects {
 //        endWithNewline()
 //    }
 		groovyGradle {
-			target '*.gradle' // default target of groovyGradle
+			target '**/*.gradle' // default target of groovyGradle
 			greclipse()
 		}
 		kotlin {
-			target 'src/*/java/**/*.kt', 'src/*/kotlin/**/*.kt'
-			ktlint()   // has its own section below
+			target '**/*.kt'
+//			ktlint()   // has its own section below
 			ktfmt()    // has its own section below
-			prettier() // has its own section below
+//			prettier() // has its own section below
 //        licenseHeader '/* (C)$YEAR */' // or licenseHeaderFile
 		}
 		java {
-			target 'src/*/java/**/*.java'
-			googleJavaFormat()
+			target '**/*.java'
+			googleJavaFormat().aosp()
 		}
 	}
 
