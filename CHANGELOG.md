@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+
+- [Internal] Added code formatting
+
 ## v1.21.0
 
 ### Added
@@ -15,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- [internal] refactored `EventData` field population to use an `EventDataManipulationPipeline` (AN-1919)
+- [Internal] refactored `EventData` field population to use an `EventDataManipulationPipeline` (AN-1919)
 
 ## v1.20.0
 
