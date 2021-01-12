@@ -86,13 +86,14 @@ spotless {
         greclipse()
     }
     kotlin {
-        // by default the target is every '.kt' and '.kts` file in the java sourcesets
+        target 'src/*/java/**/*.kt', 'src/*/kotlin/**/*.kt'
         ktlint()   // has its own section below
         ktfmt()    // has its own section below
         prettier() // has its own section below
 //        licenseHeader '/* (C)$YEAR */' // or licenseHeaderFile
     }
     java {
+        target 'src/*/java/**/*.java'
         googleJavaFormat()
     }
 }
