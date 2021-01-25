@@ -2,6 +2,7 @@ package com.bitmovin.exoplayeranalyticsexample;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,11 +17,13 @@ import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.ExoMediaCrypto;
 import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
 import com.google.android.exoplayer2.drm.MediaDrmCallback;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.dash.DashChunkSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
@@ -34,7 +37,8 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, BitmovinAnalytics.DebugListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, BitmovinAnalytics.DebugListener, Player.EventListener
+{
     private SimpleExoPlayer player;
     private PlayerView playerView;
     private Button releaseButton;
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private ExoPlayerCollector bitmovinAnalytics;
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
+    private ConcatenatingMediaSource mediaSource;
 
 
     @Override
@@ -66,6 +71,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         createPlayer();
     }
 
+    private int oldIndex = 0;
+
+    @Override public void onPositionDiscontinuity(int reason)
+    {
+        int sourceIndex = player.getCurrentWindowIndex();
+        if(sourceIndex != oldIndex) {
+            if(oldIndex >= 0) {
+                mediaSource.removeMediaSource(oldIndex, new Handler(), () -> {
+                    Log.d("Mainactivity", "isPlaying: " + player.isPlaying());
+                    Log.d("Mainactivity", "playbackState: " + player.getPlaybackState());
+                    Log.d("Mainactivity", "playWhenReady: " + player.getPlayWhenReady());
+                    bitmovinAnalytics.attachPlayer(player);
+                });
+            }
+            oldIndex = sourceIndex;
+        }
+    }
+
     private void createPlayer() {
         if (player == null) {
 
@@ -73,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             exoBuilder.setBandwidthMeter(bandwidthMeter);
 
             player = exoBuilder.build();
+            player.addListener(this);
 
 
             //Step 1: Create your analytics config object
@@ -112,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //DASH example
             // DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
             DashMediaSource dashMediaSource = getSource("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd", dataSourceFactory);
+            //mediaSource = new ConcatenatingMediaSource(dashMediaSource, dashMediaSource);
 
             player.prepare(dashMediaSource);
             player.setPlayWhenReady(false);
