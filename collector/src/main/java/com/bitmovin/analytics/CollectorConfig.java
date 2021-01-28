@@ -8,8 +8,7 @@ public class CollectorConfig implements Parcelable {
 
     private Boolean tryResendDataOnFailedConnection = false;
 
-    public CollectorConfig() {
-    }
+    public CollectorConfig() {}
 
     protected CollectorConfig(Parcel in) {
         backendUrl = in.readString();
@@ -25,17 +24,18 @@ public class CollectorConfig implements Parcelable {
         return 0;
     }
 
-    public static final Creator<CollectorConfig> CREATOR = new Creator<CollectorConfig>() {
-        @Override
-        public CollectorConfig createFromParcel(Parcel in) {
-            return new CollectorConfig(in);
-        }
+    public static final Creator<CollectorConfig> CREATOR =
+            new Creator<CollectorConfig>() {
+                @Override
+                public CollectorConfig createFromParcel(Parcel in) {
+                    return new CollectorConfig(in);
+                }
 
-        @Override
-        public CollectorConfig[] newArray(int size) {
-            return new CollectorConfig[size];
-        }
-    };
+                @Override
+                public CollectorConfig[] newArray(int size) {
+                    return new CollectorConfig[size];
+                }
+            };
 
     /**
      * Get the URL of the Bitmovin Analytics backend.
@@ -47,8 +47,8 @@ public class CollectorConfig implements Parcelable {
     }
 
     /**
-     * Set the URL of the Bitmovin Analytics backend to interact with.
-     * Used for on-premise deployments of Bitmovin Analytics
+     * Set the URL of the Bitmovin Analytics backend to interact with. Used for on-premise
+     * deployments of Bitmovin Analytics
      *
      * @param backendUrl
      */
@@ -73,5 +73,4 @@ public class CollectorConfig implements Parcelable {
     public void setTryResendDataOnFailedConnection(Boolean tryResendDataOnFailedConnection) {
         this.tryResendDataOnFailedConnection = tryResendDataOnFailedConnection;
     }
-
 }

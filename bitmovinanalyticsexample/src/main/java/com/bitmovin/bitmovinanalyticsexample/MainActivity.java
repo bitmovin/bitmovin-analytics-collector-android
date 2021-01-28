@@ -3,9 +3,7 @@ package com.bitmovin.bitmovinanalyticsexample;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector;
 import com.bitmovin.analytics.enums.CDNProvider;
@@ -22,7 +20,6 @@ import com.bitmovin.player.config.media.SourceConfiguration;
 import com.bitmovin.player.config.media.SourceItem;
 import com.bitmovin.player.config.track.AudioTrack;
 import com.bitmovin.player.config.track.SubtitleTrack;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -40,9 +37,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PlayerConfiguration config;
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
 
-    private final SourceItem redbullSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
-    private final SourceItem sintelSource = new SourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
-    private final SourceItem corruptedSource = new SourceItem("https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd");
+    private final SourceItem redbullSource =
+            new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
+    private final SourceItem sintelSource =
+            new SourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
+    private final SourceItem corruptedSource =
+            new SourceItem(
+                    "https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +67,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.initializeBitmovinPlayer();
     }
 
-    protected void initializeBitmovinPlayer(){
+    protected void initializeBitmovinPlayer() {
         config = new PlayerConfiguration();
 
         SourceConfiguration source = this.createSourceConfig(redbullSource);
-//        SourceConfiguration source = this.createDRMSource();
+        //        SourceConfiguration source = this.createDRMSource();
         config.setSourceConfiguration(source);
 
-//        config.setAdvertisingConfiguration(initializeAds(config));
+        //        config.setAdvertisingConfiguration(initializeAds(config));
 
         PlaybackConfiguration playbackConfiguration = config.getPlaybackConfiguration();
         playbackConfiguration.setMuted(true);
@@ -88,10 +89,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected BitmovinPlayerCollector initializeAnalytics() {
-        //Step 1: Create your analytics config object with the Local Development Key
-        bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0");
+        // Step 1: Create your analytics config object with the Local Development Key
+        bitmovinAnalyticsConfig =
+                new BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0");
 
-        //Step 2: Add optional parameters
+        // Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
         bitmovinAnalyticsConfig.setTitle("Android ExoPlayer Video with DASH");
         bitmovinAnalyticsConfig.setCustomUserId("customBitmovinUserId1");
@@ -109,10 +111,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmovinAnalyticsConfig.setAds(false);
         bitmovinAnalyticsConfig.setIsLive(false);
 
-        //Step 3: Create Analytics Collector
+        // Step 3: Create Analytics Collector
         return new BitmovinPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
     }
-
 
     protected static SourceConfiguration createSourceConfig(SourceItem sourceItem) {
         // Create a new source configuration
@@ -126,7 +127,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected static SourceConfiguration createDRMSource() {
         // Create a new source configuration
         SourceConfiguration sourceConfiguration = new SourceConfiguration();
-        SourceItem sourceItem = new SourceItem("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
+        SourceItem sourceItem =
+                new SourceItem(
+                        "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
 
         // setup DRM handling
         String drmLicenseUrl = "https://widevine-proxy.appspot.com/proxy";
@@ -208,12 +211,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmovinPlayer.setSubtitle(id);
     }
 
-    private static final String AD_SOURCE_1 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=";
-    private static final String AD_SOURCE_2 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
-    private static final String AD_SOURCE_3 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-    private static final String AD_SOURCE_4 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator=";
-    private static final String AD_SOURCE_5 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=";
-
+    private static final String AD_SOURCE_1 =
+            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=";
+    private static final String AD_SOURCE_2 =
+            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
+    private static final String AD_SOURCE_3 =
+            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+    private static final String AD_SOURCE_4 =
+            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator=";
+    private static final String AD_SOURCE_5 =
+            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=";
 
     private AdvertisingConfiguration initializeAds(PlayerConfiguration config) {
         // Create AdSources
@@ -224,11 +231,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AdSource fifthAdSource = new AdSource(AdSourceType.IMA, AD_SOURCE_5);
 
         // Setup a pre-roll ad
-//        AdItem preRoll = new AdItem("pre", firstAdSource);
-//        AdItem preRoll = new AdItem("pre", secondAdSource);
+        //        AdItem preRoll = new AdItem("pre", firstAdSource);
+        //        AdItem preRoll = new AdItem("pre", secondAdSource);
         AdItem preRoll = new AdItem("pre", thirdAdSource);
-//        AdItem preRoll = new AdItem("pre", fourthAdSource);
-//        AdItem preRoll = new AdItem("pre", fifthAdSource);
+        //        AdItem preRoll = new AdItem("pre", fourthAdSource);
+        //        AdItem preRoll = new AdItem("pre", fifthAdSource);
         // Setup a mid-roll waterfalling ad at 10% of the content duration
         // NOTE: AdItems containing more than one AdSource, will be executed as waterfalling ad
         AdItem midRoll = new AdItem("10%", firstAdSource, secondAdSource);
@@ -236,7 +243,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AdItem postRoll = new AdItem("post", fourthAdSource);
 
         // Add the AdItems to the AdvertisingConfiguration
-        AdvertisingConfiguration advertisingConfiguration = new AdvertisingConfiguration(preRoll, midRoll, postRoll);
+        AdvertisingConfiguration advertisingConfiguration =
+                new AdvertisingConfiguration(preRoll, midRoll, postRoll);
         return advertisingConfiguration;
     }
 }

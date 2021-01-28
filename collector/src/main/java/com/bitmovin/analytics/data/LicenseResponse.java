@@ -23,13 +23,11 @@ public class LicenseResponse {
         this.message = message;
     }
 
-    public Map<String, String> getSettings()
-    {
+    public Map<String, String> getSettings() {
         return settings;
     }
 
-    public void setSettings(Map<String, String> settings)
-    {
+    public void setSettings(Map<String, String> settings) {
         this.settings = settings;
     }
 }

@@ -6,9 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.AdEventData;
@@ -31,10 +29,10 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
-
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, BitmovinAnalytics.DebugListener {
+public class MainActivity extends AppCompatActivity
+        implements View.OnClickListener, BitmovinAnalytics.DebugListener {
     private SimpleExoPlayer player;
     private PlayerView playerView;
     private Button releaseButton;
@@ -46,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private ExoPlayerCollector bitmovinAnalytics;
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,24 +58,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sourceChangeButton.setOnClickListener(this);
         eventLogView = findViewById(R.id.eventLog);
 
-        dataSourceFactory = new DefaultDataSourceFactory(this, bandwidthMeter,
-                buildHttpDataSourceFactory(bandwidthMeter));
+        dataSourceFactory =
+                new DefaultDataSourceFactory(
+                        this, bandwidthMeter, buildHttpDataSourceFactory(bandwidthMeter));
         createPlayer();
     }
 
     private void createPlayer() {
         if (player == null) {
 
-            SimpleExoPlayer.Builder exoBuilder= new SimpleExoPlayer.Builder(this);
+            SimpleExoPlayer.Builder exoBuilder = new SimpleExoPlayer.Builder(this);
             exoBuilder.setBandwidthMeter(bandwidthMeter);
 
             player = exoBuilder.build();
 
+            // Step 1: Create your analytics config object
+            bitmovinAnalyticsConfig =
+                    new BitmovinAnalyticsConfig("e73a3577-d91c-4214-9e6d-938fb936818a");
 
-            //Step 1: Create your analytics config object
-            bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("e73a3577-d91c-4214-9e6d-938fb936818a");
-
-            //Step 2: Add optional parameters
+            // Step 2: Add optional parameters
             bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
             bitmovinAnalyticsConfig.setTitle("Android Bitmovin SDK Video with DASH");
             bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
@@ -98,58 +96,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             eventLogView.setText("");
 
-            //Step 3: Create Analytics Collector
-            bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
+            // Step 3: Create Analytics Collector
+            bitmovinAnalytics =
+                    new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
             bitmovinAnalytics.addDebugListener(this);
             this.bitmovinAnalytics = bitmovinAnalytics;
 
-            //Step 4: Attach ExoPlayer
+            // Step 4: Attach ExoPlayer
             bitmovinAnalytics.attachPlayer(player);
 
-            //Step 5: Create, prepare, and play media source
+            // Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);
 
-            //DASH example
+            // DASH example
             // DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
-            DashMediaSource dashMediaSource = getSource("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd", dataSourceFactory);
+            DashMediaSource dashMediaSource =
+                    getSource(
+                            "https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd",
+                            dataSourceFactory);
 
             player.prepare(dashMediaSource);
             player.setPlayWhenReady(false);
         }
     }
 
-    protected DashMediaSource getDRMSource(DataSource.Factory dataSourceFactory){
-        DefaultDrmSessionManager<ExoMediaCrypto> drmSesssionManager = getDrmSession("https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID, Util.getUserAgent(this, "ExoPlayerExample")) ;
-        Uri dashStatic = Uri.parse("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
+    protected DashMediaSource getDRMSource(DataSource.Factory dataSourceFactory) {
+        DefaultDrmSessionManager<ExoMediaCrypto> drmSesssionManager =
+                getDrmSession(
+                        "https://widevine-proxy.appspot.com/proxy",
+                        C.WIDEVINE_UUID,
+                        Util.getUserAgent(this, "ExoPlayerExample"));
+        Uri dashStatic =
+                Uri.parse(
+                        "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
 
-        //DASH example
+        // DASH example
         return getMediaSource(dashStatic, dataSourceFactory, drmSesssionManager);
     }
 
     protected DashMediaSource getSource(String url, DataSource.Factory dataSourceFactory) {
         Uri dashStatic = Uri.parse(url);
-        //DASH example
+        // DASH example
         return getMediaSource(dashStatic, dataSourceFactory, null);
     }
 
-    protected static DefaultDrmSessionManager<ExoMediaCrypto> getDrmSession(String drmLicenseUrl, UUID drmScheme, String userAgent) {
+    protected static DefaultDrmSessionManager<ExoMediaCrypto> getDrmSession(
+            String drmLicenseUrl, UUID drmScheme, String userAgent) {
 
-        if(drmLicenseUrl != null && drmScheme != null) {
-            try{
-                DefaultDrmSessionManager.Builder drmBuilder = new DefaultDrmSessionManager.Builder();
+        if (drmLicenseUrl != null && drmScheme != null) {
+            try {
+                DefaultDrmSessionManager.Builder drmBuilder =
+                        new DefaultDrmSessionManager.Builder();
                 MediaDrmCallback mediaDrmCallback =
                         createMediaDrmCallback(drmLicenseUrl, userAgent);
-                return  drmBuilder.build(mediaDrmCallback);
-            } catch (Exception e ){
+                return drmBuilder.build(mediaDrmCallback);
+            } catch (Exception e) {
                 Log.e("Main Application", e.getMessage());
             }
         }
         return null;
     }
 
-    protected static DashMediaSource getMediaSource(Uri dashStatic, DataSource.Factory dataSourceFactory, DefaultDrmSessionManager<ExoMediaCrypto> drmSession) {
+    protected static DashMediaSource getMediaSource(
+            Uri dashStatic,
+            DataSource.Factory dataSourceFactory,
+            DefaultDrmSessionManager<ExoMediaCrypto> drmSession) {
         DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
-        DashMediaSource.Factory sourceFactory = new DashMediaSource.Factory(source, dataSourceFactory);
+        DashMediaSource.Factory sourceFactory =
+                new DashMediaSource.Factory(source, dataSourceFactory);
         if (drmSession != null) {
             sourceFactory.setDrmSessionManager(drmSession);
         }
@@ -174,9 +188,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private HttpDataSource.Factory buildHttpDataSourceFactory(DefaultBandwidthMeter bandwidthMeter) {
-        return new DefaultHttpDataSourceFactory(Util.getUserAgent(this,
-                getString(R.string.app_name)), bandwidthMeter);
+    private HttpDataSource.Factory buildHttpDataSourceFactory(
+            DefaultBandwidthMeter bandwidthMeter) {
+        return new DefaultHttpDataSourceFactory(
+                Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter);
     }
 
     @Override
@@ -202,20 +217,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onDispatchEventData(EventData data)
-    {
-        eventLogView.append(String.format("state: %s, duration: %s, time: %s\n", data.getState(), data.getDuration(), data.getTime()));
+    public void onDispatchEventData(EventData data) {
+        eventLogView.append(
+                String.format(
+                        "state: %s, duration: %s, time: %s\n",
+                        data.getState(), data.getDuration(), data.getTime()));
     }
 
     @Override
-    public void onDispatchAdEventData(AdEventData data)
-    {
-
-    }
+    public void onDispatchAdEventData(AdEventData data) {}
 
     @Override
-    public void onMessage(String message)
-    {
-
-    }
+    public void onMessage(String message) {}
 }

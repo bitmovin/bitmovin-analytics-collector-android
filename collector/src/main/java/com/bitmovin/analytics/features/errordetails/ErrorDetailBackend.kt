@@ -3,8 +3,8 @@ package com.bitmovin.analytics.features.errordetails
 import android.content.Context
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.HttpClient
-import okhttp3.OkHttpClient
 import java.util.LinkedList
+import okhttp3.OkHttpClient
 
 class ErrorDetailBackend(context: Context) {
     private val backendUrl = "https://analytics-ingress-global.bitmovin.com/errordetails"

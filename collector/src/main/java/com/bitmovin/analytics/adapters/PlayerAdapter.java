@@ -1,13 +1,11 @@
 package com.bitmovin.analytics.adapters;
 
-import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
 import com.bitmovin.analytics.data.DRMInformation;
-import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
-
-import org.jetbrains.annotations.Nullable;
-
+import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
+import com.bitmovin.analytics.features.Feature;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public interface PlayerAdapter {
     void init();

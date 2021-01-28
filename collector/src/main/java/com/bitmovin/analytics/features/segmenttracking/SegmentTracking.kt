@@ -18,7 +18,7 @@ class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSo
     }
 
     override fun configure(authenticated: Boolean, config: SegmentTrackingConfig?) {
-        if(config != null) {
+        if (config != null) {
             maxSegments = config.maxSegments
         }
     }
