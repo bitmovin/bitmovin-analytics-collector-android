@@ -7,11 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
-## v1.22.0-beta
-
 ### Added
 
 - Functionality to retry sending of samples that couldn't be sent due to a HTTP timeout
+- [Internal] Added code formatting
 
 ## v1.21.0
 
@@ -21,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- [internal] refactored `EventData` field population to use an `EventDataManipulationPipeline` (AN-1919)
+- [Internal] refactored `EventData` field population to use an `EventDataManipulationPipeline` (AN-1919)
 
 ## v1.20.0
 
