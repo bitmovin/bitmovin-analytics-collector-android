@@ -38,6 +38,6 @@ jobs:
 workflows:
   android-build:
     jobs:
-      build:
-        context:
-          - analytics
+      - build:
+          context:
+            - analytics
