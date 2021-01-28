@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Functionality to retry sending of samples that couldn't be sent due to a HTTP timeout
 - [Internal] Added code formatting
 
 ## v1.21.0

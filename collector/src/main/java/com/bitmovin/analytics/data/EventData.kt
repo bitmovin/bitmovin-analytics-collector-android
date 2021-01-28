@@ -83,4 +83,5 @@ class EventData(
     var videoStartFailed: Boolean = false
     var videoStartFailedReason: String? = null
     var downloadSpeedInfo: DownloadSpeedInfo? = null
+    var retryCount: Int = 0
 }
