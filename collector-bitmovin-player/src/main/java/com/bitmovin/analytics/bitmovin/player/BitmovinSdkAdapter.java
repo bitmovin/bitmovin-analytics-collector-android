@@ -90,8 +90,7 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase implements PlayerAdapt
     private DRMInformation drmInformation = null;
     private FeatureFactory featureFactory;
 
-    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, EventDataFactory factory,
-            PlayerStateMachine stateMachine, FeatureFactory featureFactory) {
+    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config, DeviceInformationProvider deviceInformationProvider, PlayerStateMachine stateMachine, FeatureFactory featureFactory) {
         this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;

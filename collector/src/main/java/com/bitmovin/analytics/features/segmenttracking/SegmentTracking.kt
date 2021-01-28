@@ -17,8 +17,10 @@ class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSo
         eventSources.forEach { it.addEventListener(this) }
     }
 
-    override fun configure(authenticated: Boolean, config: SegmentTrackingConfig) {
-        maxSegments = config.maxSegments
+    override fun configure(authenticated: Boolean, config: SegmentTrackingConfig?) {
+        if(config != null) {
+            maxSegments = config.maxSegments
+        }
     }
 
     override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {

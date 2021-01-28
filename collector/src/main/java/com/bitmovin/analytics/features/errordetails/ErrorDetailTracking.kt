@@ -17,7 +17,7 @@ class ErrorDetailTracking(val context: Context, private val segmentTracking: Seg
         eventSources.forEach { it.addEventListener(this) }
     }
 
-    override fun configure(authenticated: Boolean, config: ErrorDetailTrackingConfig) {
+    override fun configure(authenticated: Boolean, config: ErrorDetailTrackingConfig?) {
         backend.enabled = authenticated
     }
 
