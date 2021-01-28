@@ -2,7 +2,6 @@ package com.bitmovin.analytics.data;
 
 import android.content.Context;
 import android.os.Handler;
-
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.retryBackend.RetryBackend;
 

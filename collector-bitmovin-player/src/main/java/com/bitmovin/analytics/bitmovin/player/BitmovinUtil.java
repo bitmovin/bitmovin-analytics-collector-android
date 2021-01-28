@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player;
 
 import com.bitmovin.player.BuildConfig;
-
 import java.lang.reflect.Field;
 
 public class BitmovinUtil {
