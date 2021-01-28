@@ -36,8 +36,8 @@ jobs:
       #
 
 workflows:
+  version: 2
   android-build:
     jobs:
       - build:
-          context:
-            - analytics
+          context: analytics
