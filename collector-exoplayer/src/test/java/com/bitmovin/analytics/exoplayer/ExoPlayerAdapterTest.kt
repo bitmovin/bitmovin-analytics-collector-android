@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.exoplayer
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.google.android.exoplayer2.ExoPlayer
@@ -28,7 +28,7 @@ class ExoPlayerAdapterTest {
     private lateinit var stateMachine: PlayerStateMachine
     @Before
     fun setup() {
-        adapter = FakeExoPlayerAdapter(mock(ExoPlayer::class.java), mock(BitmovinAnalyticsConfig::class.java), mock(EventDataFactory::class.java), stateMachine)
+        adapter = FakeExoPlayerAdapter(mock(ExoPlayer::class.java), mock(BitmovinAnalyticsConfig::class.java), mock(DeviceInformationProvider::class.java), stateMachine)
     }
 
     @Test

@@ -8,9 +8,9 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.BuildConfig;
 import com.bitmovin.analytics.data.LicenseCallData;
 import com.bitmovin.analytics.data.LicenseResponse;
+import com.bitmovin.analytics.utils.ClientFactory;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
-import com.bitmovin.analytics.utils.Util;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public class LicenseCall {
         this.context = context;
         this.backendUrl = Uri.parse(config.getConfig().getBackendUrl()).buildUpon().appendEncodedPath("licensing").build().toString();
         Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl));
-        this.httpClient = new HttpClient(context);
+        this.httpClient = new HttpClient(context, new ClientFactory().createClient(config.getConfig()));
     }
 
     public void authenticate(final AuthenticationCallback callback) {

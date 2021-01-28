@@ -22,19 +22,18 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
      */
-    public BitmovinPlayerCollector(
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
+    public BitmovinPlayerCollector(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
         super(bitmovinAnalyticsConfig, context);
     }
 
     @Deprecated
-    public BitmovinPlayerCollector(
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
+    public BitmovinPlayerCollector(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
         this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
     }
 
     public void attachPlayer(BitmovinPlayer player) {
-        EventDataFactory factory = new EventDataFactory(this.bitmovinAnalyticsConfig, context, new DeviceInformationProvider(context, getUserAgent(context)), new UserIdProvider(context));
+        EventDataFactory factory = new EventDataFactory(this.bitmovinAnalyticsConfig, context,
+                new DeviceInformationProvider(context, getUserAgent(context)), new UserIdProvider(context));
         FeatureFactory featureFactory = new BitmovinFeatureFactory(this, player, context);
         BitmovinSdkAdapter adapter = new BitmovinSdkAdapter(player, this.bitmovinAnalyticsConfig, factory,
                 this.playerStateMachine, featureFactory);
@@ -63,6 +62,7 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
             versionName = "?";
         }
 
-        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") " + "BitmovinPlayer/" + BitmovinUtil.getPlayerVersion();
+        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") "
+                + "BitmovinPlayer/" + BitmovinUtil.getPlayerVersion();
     }
 }

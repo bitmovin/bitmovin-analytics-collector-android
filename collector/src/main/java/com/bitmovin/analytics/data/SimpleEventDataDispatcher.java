@@ -14,8 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class SimpleEventDataDispatcher implements IEventDataDispatcher, AuthenticationCallback
-{
+public class SimpleEventDataDispatcher implements IEventDataDispatcher, AuthenticationCallback {
     private static final String TAG = "BitmovinAnalytics/SimpleDispatcher";
     private final Backend backend;
 
@@ -40,7 +39,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, Authenti
 
     @Override
     synchronized public void authenticationCompleted(boolean success, Map<String, String> settings) {
-        if(callback != null) {
+        if (callback != null) {
             callback.configureFeatures(success, settings, data, adData);
         }
         if (success) {
@@ -59,7 +58,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, Authenti
             }
         }
 
-        if(callback != null) {
+        if (callback != null) {
             callback.authenticationCompleted(success);
         }
     }

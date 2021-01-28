@@ -20,16 +20,12 @@ public class HttpClient {
     private OkHttpClient client = null;
     private Context context;
 
-    public HttpClient(Context context) {
+    public HttpClient(Context context, OkHttpClient client) {
         this.context = context;
+        this.client = client;
     }
 
-
     public void post(String url, String postBody, final Callback callback) {
-        if (client == null) {
-            client = new OkHttpClient();
-        }
-
         Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody));
         Request request = new Request.Builder()
                 .url(url)
