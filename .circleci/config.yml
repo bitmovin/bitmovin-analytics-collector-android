@@ -2,6 +2,8 @@ version: 2
 jobs:
   build:
     working_directory: ~/code
+    context:
+      - analytics
     docker:
       - image: circleci/android:api-28
     environment:
@@ -23,6 +25,9 @@ jobs:
       - run:
           name: Run Tests
           command: ./gradlew lint test
+      - run:
+          name: SonarQube
+          command: ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: collector/build/test-results
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
