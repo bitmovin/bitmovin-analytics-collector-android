@@ -109,10 +109,7 @@ public class BitmovinAnalytics
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
         Collection<Feature<?>> features = this.playerAdapter.init();
-        for (Feature<?> feature: features)
-        {
-            this.featureManager.registerFeature(feature);
-        }
+        this.featureManager.registerFeatures(features);
 
         this.eventDataManipulators.clear();
         // this.registerEventDataManipulators(prePipelineManipulator);

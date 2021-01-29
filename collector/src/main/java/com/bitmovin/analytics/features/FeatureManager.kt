@@ -14,6 +14,10 @@ class FeatureManager {
         features.add(feature)
     }
 
+    fun registerFeatures(features: Collection<Feature<*>>) {
+        this.features.addAll(features)
+    }
+
     fun unregisterFeatures() {
         features.forEach { it.disable() }
         features.clear()
