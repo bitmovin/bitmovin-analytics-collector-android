@@ -317,8 +317,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, An
                     if (!stateMachine.isStartupFinished()) {
                         if (this.isPlaying != oldIsPlaying && this.isPlaying) {
                             // with autoplay enabled the player first enter here and start buffering
-                            // for the
-                            // video with playWhenReady = true
+                            // for the video with playWhenReady = true
                             startup(videoTime);
                         }
                     } else {
