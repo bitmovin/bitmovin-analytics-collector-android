@@ -5,7 +5,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
@@ -24,15 +23,19 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
     }
 
     @Deprecated
-    public BitmovinPlayerCollector(
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
+    public BitmovinPlayerCollector(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
         this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
     }
 
     public void attachPlayer(BitmovinPlayer player) {
-        DeviceInformationProvider deviceInformationProvider = new DeviceInformationProvider(context, getUserAgent(context));
-        BitmovinSdkAdapter adapter = new BitmovinSdkAdapter(player, this.bitmovinAnalyticsConfig, deviceInformationProvider,
-                this.playerStateMachine);
+        DeviceInformationProvider deviceInformationProvider =
+                new DeviceInformationProvider(context, getUserAgent(context));
+        BitmovinSdkAdapter adapter =
+                new BitmovinSdkAdapter(
+                        player,
+                        this.bitmovinAnalyticsConfig,
+                        deviceInformationProvider,
+                        this.playerStateMachine);
 
         this.attach(adapter);
 
@@ -58,6 +61,13 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
             versionName = "?";
         }
 
-        return applicationName + "/" + versionName + " (Linux;Android " + Build.VERSION.RELEASE + ") " + "BitmovinPlayer/" + BitmovinUtil.getPlayerVersion();
+        return applicationName
+                + "/"
+                + versionName
+                + " (Linux;Android "
+                + Build.VERSION.RELEASE
+                + ") "
+                + "BitmovinPlayer/"
+                + BitmovinUtil.getPlayerVersion();
     }
 }

@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Ability to attach the `ExoPlayerCollector` to a player that's already in a loading state.
 - [Internal] Added code formatting
 
+## v1.22.0-beta
+
+### Added
+
+- Functionality to retry sending of samples that couldn't be sent due to a HTTP timeout
+
 ## v1.21.0
 
 ### Added

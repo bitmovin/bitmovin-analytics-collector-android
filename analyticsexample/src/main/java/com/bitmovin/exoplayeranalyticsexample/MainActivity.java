@@ -7,9 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.AdEventData;
@@ -34,11 +32,10 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
-
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, BitmovinAnalytics.DebugListener, Player.EventListener
-{
+public class MainActivity extends AppCompatActivity
+        implements View.OnClickListener, BitmovinAnalytics.DebugListener, Player.EventListener {
     private SimpleExoPlayer player;
     private PlayerView playerView;
     private Button releaseButton;
@@ -51,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ExoPlayerCollector bitmovinAnalytics;
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
     private ConcatenatingMediaSource mediaSource;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,11 +69,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private int oldIndex = 0;
 
-    @Override public void onPositionDiscontinuity(int reason)
-    {
+    @Override
+    public void onPositionDiscontinuity(int reason) {
         int sourceIndex = player.getCurrentWindowIndex();
-        if(sourceIndex != oldIndex) {
-            if(oldIndex >= 0) {
+        if (sourceIndex != oldIndex) {
+            if (oldIndex >= 0) {
                 mediaSource.removeMediaSource(oldIndex, new Handler(), () -> {
                     Log.d("Mainactivity", "isPlaying: " + player.isPlaying());
                     Log.d("Mainactivity", "playbackState: " + player.getPlaybackState());
@@ -92,22 +88,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void createPlayer() {
         if (player == null) {
 
-            SimpleExoPlayer.Builder exoBuilder= new SimpleExoPlayer.Builder(this);
+            SimpleExoPlayer.Builder exoBuilder = new SimpleExoPlayer.Builder(this);
             exoBuilder.setBandwidthMeter(bandwidthMeter);
 
             player = exoBuilder.build();
             player.addListener(this);
 
-
-            //Step 1: Create your analytics config object
+            // Step 1: Create your analytics config object
             bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("e73a3577-d91c-4214-9e6d-938fb936818a");
 
-            //Step 2: Add optional parameters
+            // Step 2: Add optional parameters
             bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
             bitmovinAnalyticsConfig.setTitle("Android Bitmovin SDK Video with DASH");
             bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
             bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
-            bitmovinAnalyticsConfig.setExperimentName("experiment-1");
+            bitmovinAnalyticsConfig.setExperimentName("experiment-timeout");
             bitmovinAnalyticsConfig.setCustomData1("customData1");
             bitmovinAnalyticsConfig.setCustomData2("customData2");
             bitmovinAnalyticsConfig.setCustomData3("customData3");
@@ -118,61 +113,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bitmovinAnalyticsConfig.setPath("/vod/new/");
             bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
             bitmovinAnalyticsConfig.setIsLive(false);
+            bitmovinAnalyticsConfig.getConfig().setTryResendDataOnFailedConnection(true);
 
             eventLogView.setText("");
 
-            //Step 3: Create Analytics Collector
+            // Step 3: Create Analytics Collector
             bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
             bitmovinAnalytics.addDebugListener(this);
             this.bitmovinAnalytics = bitmovinAnalytics;
 
-            //Step 4: Attach ExoPlayer
+            // Step 4: Attach ExoPlayer
             bitmovinAnalytics.attachPlayer(player);
 
-
-            //Step 5: Create, prepare, and play media source
+            // Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);
 
-            //DASH example
+            // DASH example
             // DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
-            DashMediaSource dashMediaSource = getSource("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd", dataSourceFactory);
-            //mediaSource = new ConcatenatingMediaSource(dashMediaSource, dashMediaSource);
+            DashMediaSource dashMediaSource = getSource("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd",
+                    dataSourceFactory);
+            // mediaSource = new ConcatenatingMediaSource(dashMediaSource, dashMediaSource);
 
             player.prepare(dashMediaSource);
             player.setPlayWhenReady(false);
         }
     }
 
-    protected DashMediaSource getDRMSource(DataSource.Factory dataSourceFactory){
-        DefaultDrmSessionManager<ExoMediaCrypto> drmSesssionManager = getDrmSession("https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID, Util.getUserAgent(this, "ExoPlayerExample")) ;
+    protected DashMediaSource getDRMSource(DataSource.Factory dataSourceFactory) {
+        DefaultDrmSessionManager<ExoMediaCrypto> drmSesssionManager = getDrmSession(
+                "https://widevine-proxy.appspot.com/proxy", C.WIDEVINE_UUID,
+                Util.getUserAgent(this, "ExoPlayerExample"));
         Uri dashStatic = Uri.parse("https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
 
-        //DASH example
+        // DASH example
         return getMediaSource(dashStatic, dataSourceFactory, drmSesssionManager);
     }
 
     protected DashMediaSource getSource(String url, DataSource.Factory dataSourceFactory) {
         Uri dashStatic = Uri.parse(url);
-        //DASH example
+        // DASH example
         return getMediaSource(dashStatic, dataSourceFactory, null);
     }
 
-    protected static DefaultDrmSessionManager<ExoMediaCrypto> getDrmSession(String drmLicenseUrl, UUID drmScheme, String userAgent) {
+    protected static DefaultDrmSessionManager<ExoMediaCrypto> getDrmSession(String drmLicenseUrl, UUID drmScheme,
+            String userAgent) {
 
-        if(drmLicenseUrl != null && drmScheme != null) {
-            try{
+        if (drmLicenseUrl != null && drmScheme != null) {
+            try {
                 DefaultDrmSessionManager.Builder drmBuilder = new DefaultDrmSessionManager.Builder();
-                MediaDrmCallback mediaDrmCallback =
-                        createMediaDrmCallback(drmLicenseUrl, userAgent);
-                return  drmBuilder.build(mediaDrmCallback);
-            } catch (Exception e ){
+                MediaDrmCallback mediaDrmCallback = createMediaDrmCallback(drmLicenseUrl, userAgent);
+                return drmBuilder.build(mediaDrmCallback);
+            } catch (Exception e) {
                 Log.e("Main Application", e.getMessage());
             }
         }
         return null;
     }
 
-    protected static DashMediaSource getMediaSource(Uri dashStatic, DataSource.Factory dataSourceFactory, DefaultDrmSessionManager<ExoMediaCrypto> drmSession) {
+    protected static DashMediaSource getMediaSource(Uri dashStatic, DataSource.Factory dataSourceFactory,
+            DefaultDrmSessionManager<ExoMediaCrypto> drmSession) {
         DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
         DashMediaSource.Factory sourceFactory = new DashMediaSource.Factory(source, dataSourceFactory);
         if (drmSession != null) {
@@ -181,12 +180,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return sourceFactory.createMediaSource(dashStatic);
     }
 
-    protected static HttpMediaDrmCallback createMediaDrmCallback(
-            String licenseUrl, String userAgent) {
-        HttpDataSource.Factory licenseDataSourceFactory =
-                new DefaultHttpDataSourceFactory(userAgent);
-        HttpMediaDrmCallback drmCallback =
-                new HttpMediaDrmCallback(licenseUrl, licenseDataSourceFactory);
+    protected static HttpMediaDrmCallback createMediaDrmCallback(String licenseUrl, String userAgent) {
+        HttpDataSource.Factory licenseDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent);
+        HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(licenseUrl, licenseDataSourceFactory);
 
         return drmCallback;
     }
@@ -200,8 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private HttpDataSource.Factory buildHttpDataSourceFactory(DefaultBandwidthMeter bandwidthMeter) {
-        return new DefaultHttpDataSourceFactory(Util.getUserAgent(this,
-                getString(R.string.app_name)), bandwidthMeter);
+        return new DefaultHttpDataSourceFactory(Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter);
     }
 
     @Override
@@ -227,20 +222,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onDispatchEventData(EventData data)
-    {
-        eventLogView.append(String.format("state: %s, duration: %s, time: %s\n", data.getState(), data.getDuration(), data.getTime()));
+    public void onDispatchEventData(EventData data) {
+        eventLogView.append(String.format("state: %s, duration: %s, time: %s\n", data.getState(), data.getDuration(),
+                data.getTime()));
     }
 
     @Override
-    public void onDispatchAdEventData(AdEventData data)
-    {
-
+    public void onDispatchAdEventData(AdEventData data) {
     }
 
     @Override
-    public void onMessage(String message)
-    {
-
+    public void onMessage(String message) {
     }
 }

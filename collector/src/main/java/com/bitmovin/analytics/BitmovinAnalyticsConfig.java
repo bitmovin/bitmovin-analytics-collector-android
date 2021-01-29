@@ -3,7 +3,6 @@ package com.bitmovin.analytics;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 
@@ -32,17 +31,18 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private Boolean isLive;
     private CollectorConfig config = new CollectorConfig();
 
-    public static final Creator<BitmovinAnalyticsConfig> CREATOR = new Creator<BitmovinAnalyticsConfig>() {
-        @Override
-        public BitmovinAnalyticsConfig createFromParcel(Parcel in) {
-            return new BitmovinAnalyticsConfig(in);
-        }
+    public static final Creator<BitmovinAnalyticsConfig> CREATOR =
+            new Creator<BitmovinAnalyticsConfig>() {
+                @Override
+                public BitmovinAnalyticsConfig createFromParcel(Parcel in) {
+                    return new BitmovinAnalyticsConfig(in);
+                }
 
-        @Override
-        public BitmovinAnalyticsConfig[] newArray(int size) {
-            return new BitmovinAnalyticsConfig[size];
-        }
-    };
+                @Override
+                public BitmovinAnalyticsConfig[] newArray(int size) {
+                    return new BitmovinAnalyticsConfig[size];
+                }
+            };
 
     @Deprecated
     public BitmovinAnalyticsConfig(String key, Context context) {
@@ -55,7 +55,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         this(key, playerKey);
         this.context = context;
     }
-
 
     public BitmovinAnalyticsConfig(String key) {
         this.key = key;
@@ -92,8 +91,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         ads = in.readInt() == 1;
     }
 
-    public BitmovinAnalyticsConfig() {
-    }
+    public BitmovinAnalyticsConfig() {}
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -243,9 +241,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Optional free-form data
-     * Not enabled by default
-     * Must be activated for your organization
+     * Optional free-form data Not enabled by default Must be activated for your organization
      *
      * @param customData6
      */
@@ -258,9 +254,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Optional free-form data
-     * Not enabled by default
-     * Must be activated for your organization
+     * Optional free-form data Not enabled by default Must be activated for your organization
      *
      * @param customData7
      */
@@ -272,9 +266,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         return experimentName;
     }
 
-    /**
-     * A/B Test Experiment Name
-     */
+    /** A/B Test Experiment Name */
     public void setExperimentName(String experimentName) {
         this.experimentName = experimentName;
     }
@@ -298,8 +290,9 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Set MPD URL recorded in analytics.
-     * If not set explicitly the collector will retrieve available information from the player.
+     * Set MPD URL recorded in analytics. If not set explicitly the collector will retrieve
+     * available information from the player.
+     *
      * @param mpdUrl
      */
     public void setMpdUrl(String mpdUrl) {
@@ -311,8 +304,9 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Set M3U8 URL recorded in analytics.
-     * If not set explicitly the collector will retrieve available information from the player.
+     * Set M3U8 URL recorded in analytics. If not set explicitly the collector will retrieve
+     * available information from the player.
+     *
      * @param m3u8Url
      */
     public void setM3u8Url(String m3u8Url) {
@@ -374,7 +368,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     public CollectorConfig getConfig() {
         return config;
     }
-
 
     /**
      * Returns a value indicating if ads tracking is enabled
