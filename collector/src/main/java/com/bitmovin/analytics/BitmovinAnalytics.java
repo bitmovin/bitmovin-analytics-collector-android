@@ -413,31 +413,31 @@ public class BitmovinAnalytics
     }
 
     public void addDebugListener(DebugListener listener) {
-        eventEmitter.addEventListener(listener);
+        eventEmitter.addEventListener(DebugListener.class, listener);
     }
 
     public void removeDebugListener(DebugListener listener) {
-        eventEmitter.removeEventListener(listener);
+        eventEmitter.removeEventListener(DebugListener.class, listener);
     }
 
     @Override
     public void addEventListener(@NotNull OnErrorDetailEventListener listener) {
-        eventEmitter.addEventListener(listener);
+        eventEmitter.addEventListener(OnErrorDetailEventListener.class, listener);
     }
 
     @Override
     public void removeEventListener(@NotNull OnErrorDetailEventListener listener) {
-        eventEmitter.removeEventListener(listener);
+        eventEmitter.removeEventListener(OnErrorDetailEventListener.class,listener);
     }
 
     @Override
     public void addEventListener(@NotNull OnAnalyticsReleasingEventListener listener) {
-        eventEmitter.addEventListener(listener);
+        eventEmitter.addEventListener(OnAnalyticsReleasingEventListener.class, listener);
     }
 
     @Override
     public void removeEventListener(@NotNull OnAnalyticsReleasingEventListener listener) {
-        eventEmitter.removeEventListener(listener);
+        eventEmitter.removeEventListener(OnAnalyticsReleasingEventListener.class, listener);
     }
 
     public interface DebugListener extends EventListener {

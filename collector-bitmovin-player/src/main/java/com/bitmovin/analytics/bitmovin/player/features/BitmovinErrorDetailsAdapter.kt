@@ -29,11 +29,11 @@ class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer, private va
     }
 
     override fun addEventListener(listener: OnErrorDetailEventListener) {
-        eventEmitter.addEventListener(listener)
+        eventEmitter.addEventListener(OnErrorDetailEventListener::class, listener)
     }
 
     override fun removeEventListener(listener: OnErrorDetailEventListener) {
-        eventEmitter.removeEventListener(listener)
+        eventEmitter.removeEventListener(OnErrorDetailEventListener::class, listener)
     }
 
     override fun onReleasing() {

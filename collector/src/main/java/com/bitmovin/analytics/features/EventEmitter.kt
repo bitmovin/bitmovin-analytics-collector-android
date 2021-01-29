@@ -23,17 +23,23 @@ class EventEmitter {
         }
     }
 
-    fun addEventListener(listener: EventListener) {
-        val clazz = listener.javaClass
-        val existing = listeners[clazz] ?: mutableListOf()
-        existing.add(listener)
-        listeners[clazz] = existing
+    fun <TEventListener : EventListener>addEventListener(clazz: Class<TEventListener>, listener: TEventListener) {
+        this.addEventListener(clazz.kotlin, listener)
     }
 
-    fun removeEventListener(listener: EventListener) {
-        val clazz = listener.javaClass
-        val existing = listeners[clazz] ?: mutableListOf()
+    fun <TEventListener : EventListener>removeEventListener(clazz: Class<TEventListener>, listener: TEventListener) {
+        this.removeEventListener(clazz.kotlin, listener)
+    }
+
+    fun <TEventListener : EventListener>addEventListener(clazz: KClass<TEventListener>, listener: TEventListener) {
+        val existing = listeners[clazz.java] ?: mutableListOf()
+        existing.add(listener)
+        listeners[clazz.java] = existing
+    }
+
+    fun <TEventListener : EventListener>removeEventListener(clazz: KClass<TEventListener>, listener: TEventListener) {
+        val existing = listeners[clazz.java] ?: mutableListOf()
         existing.remove(listener)
-        listeners[clazz] = existing
+        listeners[clazz.java] = existing
     }
 }

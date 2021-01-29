@@ -47,11 +47,11 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
     }
 
     override fun addEventListener(listener: OnDownloadFinishedEventListener) {
-        eventEmitter.addEventListener(listener)
+        eventEmitter.addEventListener(OnDownloadFinishedEventListener::class, listener)
     }
 
     override fun removeEventListener(listener: OnDownloadFinishedEventListener) {
-        eventEmitter.removeEventListener(listener)
+        eventEmitter.removeEventListener(OnDownloadFinishedEventListener::class, listener)
     }
 
     override fun onReleasing() {
