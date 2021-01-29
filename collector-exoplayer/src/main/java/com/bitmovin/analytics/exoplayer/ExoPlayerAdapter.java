@@ -56,7 +56,8 @@ import java.util.Date;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ExoPlayerAdapter implements PlayerAdapter, Player.EventListener, AnalyticsListener, EventDataManipulator {
+public class ExoPlayerAdapter
+        implements PlayerAdapter, Player.EventListener, AnalyticsListener, EventDataManipulator {
     private static final String TAG = "ExoPlayerAdapter";
     private static final String DASH_MANIFEST_CLASSNAME =
             "com.google.android.exoplayer2.source.dash.manifest.DashManifest";

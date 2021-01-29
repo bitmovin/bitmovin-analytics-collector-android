@@ -68,7 +68,6 @@ import com.bitmovin.player.config.quality.VideoQuality;
 import com.bitmovin.player.config.track.AudioTrack;
 import com.bitmovin.player.config.track.SubtitleTrack;
 import java.util.Collection;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

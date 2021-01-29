@@ -22,7 +22,7 @@ class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSo
         if (config != null) {
             maxSegments = config.maxSegments
         }
-        limitQueue(segmentQueue,  maxSegments)
+        limitQueue(segmentQueue, maxSegments)
     }
 
     override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
@@ -38,10 +38,10 @@ class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSo
 
     private fun addSegment(segment: Segment) {
         segmentQueue.offer(segment)
-        limitQueue(segmentQueue,  maxSegments)
+        limitQueue(segmentQueue, maxSegments)
     }
 
-    private fun <T>limitQueue(queue: Queue<T>, max: Int) {
+    private fun <T> limitQueue(queue: Queue<T>, max: Int) {
         while (queue.size > max) {
             queue.remove()
         }
