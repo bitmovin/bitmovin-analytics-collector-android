@@ -7,7 +7,7 @@ import java.util.LinkedList
 import java.util.Queue
 
 class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSource) : Feature<SegmentTrackingConfig>(), OnDownloadFinishedEventListener {
-    private var maxSegments = 20
+    private var maxSegments = 10
     private val segmentQueue: Queue<Segment> = LinkedList()
 
     override val name = "segmentTracking"
