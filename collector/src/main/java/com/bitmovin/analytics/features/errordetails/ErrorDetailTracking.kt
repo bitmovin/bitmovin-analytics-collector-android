@@ -18,6 +18,17 @@ class ErrorDetailTracking(val context: Context, private val segmentTracking: Seg
     }
 
     override fun configure(authenticated: Boolean, config: ErrorDetailTrackingConfig?) {
+        // We need to make sure that the features we depend on have already be configured.
+        // In this case, `SegmentTracking` already needs to have the `maxSegments` set to the correct value.
+        if(segmentTracking != null) {
+            backend.queue.forEach {
+                if (it.segments == null)
+                    return@forEach
+                while (it.segments.size > segmentTracking.maxSegments) {
+                    it.segments.removeAt(it.segments.size - 1)
+                }
+            }
+        }
         backend.enabled = authenticated
     }
 
@@ -30,8 +41,8 @@ class ErrorDetailTracking(val context: Context, private val segmentTracking: Seg
         if (!isEnabled) {
             return
         }
-        val segmentInfos = segmentTracking?.getSegments()
-        val errorDetails = ErrorDetail(timestamp, code, message, throwable?.topOfStacktrace, segmentInfos)
+        val segmentInfos = segmentTracking?.getSegments()?.toMutableList()
+        val errorDetails = ErrorDetail(timestamp, code, message, throwable?.topOfStacktrace?.toList(), segmentInfos)
         backend.send(errorDetails)
     }
 }

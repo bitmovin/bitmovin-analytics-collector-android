@@ -7,7 +7,8 @@ import java.util.LinkedList
 import java.util.Queue
 
 class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSource) : Feature<SegmentTrackingConfig>(), OnDownloadFinishedEventListener {
-    private var maxSegments = 10
+    var maxSegments = 10
+        private set
     private val segmentQueue: Queue<Segment> = LinkedList()
 
     override val name = "segmentTracking"
@@ -21,6 +22,7 @@ class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSo
         if (config != null) {
             maxSegments = config.maxSegments
         }
+        limitQueue(segmentQueue,  maxSegments)
     }
 
     override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
@@ -36,12 +38,12 @@ class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSo
 
     private fun addSegment(segment: Segment) {
         segmentQueue.offer(segment)
-        limitQueue()
+        limitQueue(segmentQueue,  maxSegments)
     }
 
-    private fun limitQueue() {
-        while (segmentQueue.size > maxSegments) {
-            segmentQueue.remove()
+    private fun <T>limitQueue(queue: Queue<T>, max: Int) {
+        while (queue.size > max) {
+            queue.remove()
         }
     }
 

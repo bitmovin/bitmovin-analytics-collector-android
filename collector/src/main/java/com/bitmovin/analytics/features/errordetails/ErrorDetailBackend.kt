@@ -9,7 +9,7 @@ import okhttp3.OkHttpClient
 class ErrorDetailBackend(context: Context) {
     private val backendUrl = "https://analytics-ingress-global.bitmovin.com/errordetails"
     private val httpClient = HttpClient(context, OkHttpClient())
-    private val queue = LinkedList<ErrorDetail>()
+    val queue = LinkedList<ErrorDetail>()
 
     var enabled: Boolean = false
         set(value) {
