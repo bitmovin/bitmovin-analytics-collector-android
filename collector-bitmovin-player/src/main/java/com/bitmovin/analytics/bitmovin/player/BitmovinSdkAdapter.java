@@ -2,7 +2,6 @@ package com.bitmovin.analytics.bitmovin.player;
 
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.PlayerAdapterBase;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
@@ -69,11 +68,12 @@ import com.bitmovin.player.config.quality.VideoQuality;
 import com.bitmovin.player.config.track.AudioTrack;
 import com.bitmovin.player.config.track.SubtitleTrack;
 import java.util.Collection;
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BitmovinSdkAdapter extends PlayerAdapterBase
-        implements PlayerAdapter, EventDataManipulator {
+public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final BitmovinPlayer bitmovinPlayer;
@@ -99,13 +99,12 @@ public class BitmovinSdkAdapter extends PlayerAdapterBase
         this.deviceInformationProvider = deviceInformationProvider;
     }
 
-    public void init() {
-        Collection<Feature<?>> features = featureFactory.createFeatures();
-        registerFeatures(features);
+    public Collection<Feature<?>> init() {
         addPlayerListeners();
         checkAutoplayStartup();
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
+        return featureFactory.createFeatures();
     }
 
     private void addPlayerListeners() {

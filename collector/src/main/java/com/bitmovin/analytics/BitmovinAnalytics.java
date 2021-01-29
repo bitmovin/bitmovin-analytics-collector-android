@@ -20,6 +20,7 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
 import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.features.EventEmitter;
+import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureManager;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventSource;
@@ -107,7 +108,11 @@ public class BitmovinAnalytics
         detachPlayer();
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
-        this.playerAdapter.init();
+        Collection<Feature<?>> features = this.playerAdapter.init();
+        for (Feature<?> feature: features)
+        {
+            this.featureManager.registerFeature(feature);
+        }
 
         this.eventDataManipulators.clear();
         // this.registerEventDataManipulators(prePipelineManipulator);
