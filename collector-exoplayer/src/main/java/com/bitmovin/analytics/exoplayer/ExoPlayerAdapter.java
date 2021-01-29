@@ -131,17 +131,19 @@ public class ExoPlayerAdapter
     }
 
     /*
-      Because of the late initialization of the Adapter we do not get the first couple of events
-      so in case the player starts a video due to autoplay=true we need to transition into startup state manually
-     */
+     Because of the late initialization of the Adapter we do not get the first couple of events
+     so in case the player starts a video due to autoplay=true we need to transition into startup state manually
+    */
     private void checkAutoplayStartup() {
         int playbackState = exoplayer.getPlaybackState();
         boolean playWhenReady = exoplayer.getPlayWhenReady();
-        if(playbackState == Player.STATE_BUFFERING)
-        {
+        if (playbackState == Player.STATE_BUFFERING) {
             if (playWhenReady != this.isPlaying && playWhenReady) {
-                Log.d(TAG, "Collector was attached while media source was already loading, transitioning to startup state.");
-                // with autoplay enabled the player first enter here and start buffering for the video with playWhenReady = true
+                Log.d(
+                        TAG,
+                        "Collector was attached while media source was already loading, transitioning to startup state.");
+                // with autoplay enabled the player first enter here and start buffering for the
+                // video with playWhenReady = true
                 this.isPlaying = true;
                 startup(getPosition());
             }
