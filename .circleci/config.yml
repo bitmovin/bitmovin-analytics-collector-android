@@ -23,6 +23,9 @@ jobs:
       - run:
           name: Run Tests
           command: ./gradlew lint test
+      - run:
+          name: SonarQube
+          command: ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: collector/build/test-results
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
@@ -31,3 +34,10 @@ jobs:
           path: collector-bitmovin-player/build/test-results
       # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
       #
+
+workflows:
+  version: 2
+  android-build:
+    jobs:
+      - build:
+          context: analytics

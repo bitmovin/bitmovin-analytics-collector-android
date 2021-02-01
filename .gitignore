@@ -10,3 +10,5 @@
 .externalNativeBuild
 .idea
 bitmovin.properties
+
+*.exec
