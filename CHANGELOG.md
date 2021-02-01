@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.22.0
+
 ### Added
 
 - Ability to attach the `ExoPlayerCollector` to a player that's already in a loading state.
