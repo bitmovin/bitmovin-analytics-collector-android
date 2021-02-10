@@ -120,9 +120,9 @@ public class Util {
         return isLiveFromConfig != null ? isLiveFromConfig : false;
     }
 
-    public static boolean isClassLoaded(String className) {
+    public static boolean isClassLoaded(String className, ClassLoader loader) {
         try {
-            Class.forName(className);
+            Class.forName(className, false, loader);
             return true;
         } catch (ClassNotFoundException e) {
             return false;
