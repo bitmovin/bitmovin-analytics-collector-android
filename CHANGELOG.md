@@ -7,15 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+- [Internal] `FeatureManager` allows dynamically adding and disabling features based on player support.
+- [Internal] `SegmentTrackingFeature` to always track the latest `n` downloaded elements
+- [Internal] `ErrorDetailsFeature` to track additional details in case an error occurs
+
 ## v1.22.0
 
 ### Added
 
-- [Internal] `FeatureManager` allows dynamically adding and disabling features based on player support.
-- [Internal] `SegmentTrackingFeature` to always track the latest `n` downloaded elements
-- [Internal] `ErrorDetailsFeature` to track additional details in case an error occurs
-- [Internal] Added code formatting
 - Ability to attach the `ExoPlayerCollector` to a player that's already in a loading state.
+- [Internal] Added code formatting
 
 ## v1.22.0-beta
 
