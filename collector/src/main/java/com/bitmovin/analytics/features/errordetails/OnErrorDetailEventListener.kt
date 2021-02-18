@@ -1,12 +1,5 @@
 package com.bitmovin.analytics.features.errordetails
 
-import com.bitmovin.analytics.EventListener
-
-interface OnErrorDetailEventSource {
-    fun addEventListener(listener: OnErrorDetailEventListener)
-    fun removeEventListener(listener: OnErrorDetailEventListener)
-}
-
-interface OnErrorDetailEventListener : EventListener {
+interface OnErrorDetailEventListener {
     fun onError(timestamp: Long, code: Int?, message: String?, throwable: Throwable?)
 }
