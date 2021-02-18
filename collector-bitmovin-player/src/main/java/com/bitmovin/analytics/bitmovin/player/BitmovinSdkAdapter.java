@@ -12,6 +12,8 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
+import com.bitmovin.analytics.features.Feature;
+import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
@@ -65,6 +67,7 @@ import com.bitmovin.player.config.quality.AudioQuality;
 import com.bitmovin.player.config.quality.VideoQuality;
 import com.bitmovin.player.config.track.AudioTrack;
 import com.bitmovin.player.config.track.SubtitleTrack;
+import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,23 +82,27 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean playerIsReady;
     private boolean isVideoAttemptedPlay = false;
     private DRMInformation drmInformation = null;
+    private FeatureFactory featureFactory;
 
     public BitmovinSdkAdapter(
             BitmovinPlayer bitmovinPlayer,
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
-            PlayerStateMachine stateMachine) {
+            PlayerStateMachine stateMachine,
+            FeatureFactory featureFactory) {
+        this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.deviceInformationProvider = deviceInformationProvider;
     }
 
-    public void init() {
+    public Collection<Feature<?>> init() {
         addPlayerListeners();
         checkAutoplayStartup();
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
+        return featureFactory.createFeatures();
     }
 
     private void addPlayerListeners() {
@@ -283,9 +290,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     public void clearValues() {}
 
     /*
-     Because of the late initialization of the Adapter we do not get the first couple of events
-     so in case the player starts a video due to autoplay=true we need to transition into startup state manually
-    */
+     * Because of the late initialization of the Adapter we do not get the first
+     * couple of events so in case the player starts a video due to autoplay=true we
+     * need to transition into startup state manually
+     */
     private void checkAutoplayStartup() {
         if (bitmovinPlayer.getConfig() != null) {
             PlaybackConfiguration playbackConfiguration =

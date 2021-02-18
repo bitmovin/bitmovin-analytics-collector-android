@@ -24,6 +24,7 @@ import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
+import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.DownloadSpeedMeter;
@@ -49,6 +50,8 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -121,13 +124,14 @@ public class ExoPlayerAdapter
     }
 
     @Override
-    public void init() {
+    public Collection<Feature<?>> init() {
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
         this.isVideoAttemptedPlay = false;
         isPlaying = false;
         isPaused = false;
         checkAutoplayStartup();
+        return new ArrayList<>();
     }
 
     /*
@@ -351,7 +355,7 @@ public class ExoPlayerAdapter
                     break;
                 case Player.STATE_ENDED:
                     // TODO this is equivalent to BMPs PlaybackFinished Event
-                    //  should we setup new impression here
+                    // should we setup new impression here
                     this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                     break;
                 default:

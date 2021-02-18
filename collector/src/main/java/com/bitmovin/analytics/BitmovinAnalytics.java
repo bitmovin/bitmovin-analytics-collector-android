@@ -19,12 +19,19 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulator;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
 import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
+import com.bitmovin.analytics.features.EventEmitter;
+import com.bitmovin.analytics.features.Feature;
+import com.bitmovin.analytics.features.FeatureManager;
+import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
+import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventSource;
 import com.bitmovin.analytics.license.LicenseCallback;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.Util;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,11 +39,17 @@ import org.jetbrains.annotations.NotNull;
  * supports analytics of ExoPlayer video players
  */
 public class BitmovinAnalytics
-        implements StateMachineListener, LicenseCallback, EventDataManipulatorPipeline {
+        implements StateMachineListener,
+                LicenseCallback,
+                OnErrorDetailEventSource,
+                OnAnalyticsReleasingEventSource,
+                EventDataManipulatorPipeline {
 
     private static final String TAG = "BitmovinAnalytics";
 
-    private List<DebugListener> debugListeners = new ArrayList<>();
+    // private List<DebugListener> debugListeners = new ArrayList<>();
+    private FeatureManager featureManager = new FeatureManager();
+    private EventEmitter eventEmitter = new EventEmitter();
 
     protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
     protected PlayerAdapter playerAdapter;
@@ -95,7 +108,8 @@ public class BitmovinAnalytics
         detachPlayer();
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
-        this.playerAdapter.init();
+        Collection<Feature<?>> features = this.playerAdapter.init();
+        this.featureManager.registerFeatures(features);
 
         this.eventDataManipulators.clear();
         // this.registerEventDataManipulators(prePipelineManipulator);
@@ -113,6 +127,11 @@ public class BitmovinAnalytics
     /** Detach the current player that is being used with Bitmovin Analytics. */
     public void detachPlayer() {
         detachAd();
+
+        featureManager.unregisterFeatures();
+        eventEmitter.emit(
+                OnAnalyticsReleasingEventListener.class,
+                OnAnalyticsReleasingEventListener::onReleasing);
 
         if (playerAdapter != null) {
             playerAdapter.release();
@@ -347,6 +366,14 @@ public class BitmovinAnalytics
             data.setErrorCode(errorCode.getErrorCode());
             data.setErrorMessage(errorCode.getDescription());
             data.setErrorData(serialize(errorCode.getErrorData()));
+            eventEmitter.emit(
+                    OnErrorDetailEventListener.class,
+                    listener ->
+                            listener.onError(
+                                    Util.getTimestamp(),
+                                    errorCode.getErrorCode(),
+                                    errorCode.getDescription(),
+                                    null));
         }
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data);
@@ -370,6 +397,15 @@ public class BitmovinAnalytics
     }
 
     @Override
+    public void configureFeatures(
+            boolean authenticated,
+            Map<String, String> settings,
+            Collection<EventData> samples,
+            Collection<AdEventData> adSamples) {
+        featureManager.configureFeatures(authenticated, settings, samples, adSamples);
+    }
+
+    @Override
     public void authenticationCompleted(boolean success) {
         if (!success) {
             detachPlayer();
@@ -377,14 +413,34 @@ public class BitmovinAnalytics
     }
 
     public void addDebugListener(DebugListener listener) {
-        debugListeners.add(listener);
+        eventEmitter.addEventListener(DebugListener.class, listener);
     }
 
     public void removeDebugListener(DebugListener listener) {
-        debugListeners.remove(listener);
+        eventEmitter.removeEventListener(DebugListener.class, listener);
     }
 
-    public interface DebugListener {
+    @Override
+    public void addEventListener(@NotNull OnErrorDetailEventListener listener) {
+        eventEmitter.addEventListener(OnErrorDetailEventListener.class, listener);
+    }
+
+    @Override
+    public void removeEventListener(@NotNull OnErrorDetailEventListener listener) {
+        eventEmitter.removeEventListener(OnErrorDetailEventListener.class,listener);
+    }
+
+    @Override
+    public void addEventListener(@NotNull OnAnalyticsReleasingEventListener listener) {
+        eventEmitter.addEventListener(OnAnalyticsReleasingEventListener.class, listener);
+    }
+
+    @Override
+    public void removeEventListener(@NotNull OnAnalyticsReleasingEventListener listener) {
+        eventEmitter.removeEventListener(OnAnalyticsReleasingEventListener.class, listener);
+    }
+
+    public interface DebugListener extends EventListener {
         void onDispatchEventData(EventData data);
 
         void onDispatchAdEventData(AdEventData data);
@@ -396,23 +452,19 @@ public class BitmovinAnalytics
             new DebugCallback() {
                 @Override
                 public void dispatchEventData(@NotNull EventData data) {
-                    for (DebugListener listener : BitmovinAnalytics.this.debugListeners) {
-                        listener.onDispatchEventData(data);
-                    }
+                    eventEmitter.emit(
+                            DebugListener.class, listener -> listener.onDispatchEventData(data));
                 }
 
                 @Override
                 public void dispatchAdEventData(@NotNull AdEventData data) {
-                    for (DebugListener listener : BitmovinAnalytics.this.debugListeners) {
-                        listener.onDispatchAdEventData(data);
-                    }
+                    eventEmitter.emit(
+                            DebugListener.class, listener -> listener.onDispatchAdEventData(data));
                 }
 
                 @Override
                 public void message(@NotNull String message) {
-                    for (DebugListener listener : BitmovinAnalytics.this.debugListeners) {
-                        listener.onMessage(message);
-                    }
+                    eventEmitter.emit(DebugListener.class, listener -> listener.onMessage(message));
                 }
             };
 }
