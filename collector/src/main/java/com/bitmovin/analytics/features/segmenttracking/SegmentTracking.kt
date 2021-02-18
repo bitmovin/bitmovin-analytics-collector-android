@@ -1,12 +1,13 @@
 package com.bitmovin.analytics.features.segmenttracking
 
+import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.Feature
 import java.util.LinkedList
 import java.util.Queue
 
-class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSource) : Feature<SegmentTrackingConfig>(), OnDownloadFinishedEventListener {
+class SegmentTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) : Feature<SegmentTrackingConfig>(), OnDownloadFinishedEventListener {
     var maxSegments = 10
         private set
     private val segmentQueue: Queue<Segment> = LinkedList()
@@ -15,7 +16,7 @@ class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSo
     override val configClass = SegmentTrackingConfig::class.java
 
     init {
-        eventSources.forEach { it.addEventListener(this) }
+        observables.forEach { it.subscribe(this) }
     }
 
     override fun configure(authenticated: Boolean, config: SegmentTrackingConfig?) {
@@ -27,7 +28,7 @@ class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSo
 
     override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         super.disable(samples, adSamples)
-        eventSources.forEach { it.removeEventListener(this) }
+        observables.forEach { it.unsubscribe(this) }
         segmentQueue.clear()
         // TODO ErrorDetailsFeature should also track Analytics Core errors
     }

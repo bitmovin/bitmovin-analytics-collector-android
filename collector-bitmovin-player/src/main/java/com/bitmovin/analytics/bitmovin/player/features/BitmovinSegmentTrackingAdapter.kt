@@ -1,23 +1,22 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
+import com.bitmovin.analytics.EventSource
+import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
-import com.bitmovin.analytics.OnAnalyticsReleasingEventSource
-import com.bitmovin.analytics.features.EventEmitter
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
-import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventSource
 import com.bitmovin.analytics.features.segmenttracking.Segment
 import com.bitmovin.analytics.features.segmenttracking.SegmentType
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 import com.bitmovin.player.config.network.HttpRequestType
 
-class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingEventSource: OnAnalyticsReleasingEventSource) : OnDownloadFinishedEventSource, OnAnalyticsReleasingEventListener {
-    private val eventEmitter: EventEmitter = EventEmitter()
+class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
+    private val eventSource = EventSource<OnDownloadFinishedEventListener>()
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
         val segmentType = mapHttpRequestType(it.downloadType)
         val segmentInfo = Segment(it.timestamp, segmentType, it.url, it.lastRedirectLocation, it.httpStatus, it.downloadTime, it.size, it.isSuccess)
-        eventEmitter.emit(OnDownloadFinishedEventListener::class) { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segmentInfo)) }
+        eventSource.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segmentInfo)) }
     }
 
     init {
@@ -37,21 +36,21 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
     }
 
     private fun wireEvents() {
-        onAnalyticsReleasingEventSource.addEventListener(this)
+        onAnalyticsReleasingObservable.subscribe(this)
         player.addEventListener(onDownloadFinishedListener)
     }
 
     fun unwireEvents() {
-        onAnalyticsReleasingEventSource.removeEventListener(this)
+        onAnalyticsReleasingObservable.unsubscribe(this)
         player.removeEventListener(onDownloadFinishedListener)
     }
 
     override fun subscribe(listener: OnDownloadFinishedEventListener) {
-        eventEmitter.addEventListener(OnDownloadFinishedEventListener::class, listener)
+        eventSource.subscribe(listener)
     }
 
     override fun unsubscribe(listener: OnDownloadFinishedEventListener) {
-        eventEmitter.removeEventListener(OnDownloadFinishedEventListener::class, listener)
+        eventSource.unsubscribe(listener)
     }
 
     override fun onReleasing() {
