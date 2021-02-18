@@ -3,7 +3,7 @@ package com.bitmovin.analytics.bitmovin.player.features
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.OnAnalyticsReleasingEventSource
 import com.bitmovin.analytics.features.EventEmitter
-import com.bitmovin.analytics.features.segmenttracking.DownloadFinishedEvent
+import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventSource
 import com.bitmovin.analytics.features.segmenttracking.Segment
@@ -17,7 +17,7 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
         val segmentType = mapHttpRequestType(it.downloadType)
         val segmentInfo = Segment(it.timestamp, segmentType, it.url, it.lastRedirectLocation, it.httpStatus, it.downloadTime, it.size, it.isSuccess)
-        eventEmitter.emit(OnDownloadFinishedEventListener::class) { listener -> listener.onDownloadFinished(DownloadFinishedEvent(segmentInfo)) }
+        eventEmitter.emit(OnDownloadFinishedEventListener::class) { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segmentInfo)) }
     }
 
     init {
@@ -46,11 +46,11 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
         player.removeEventListener(onDownloadFinishedListener)
     }
 
-    override fun addEventListener(listener: OnDownloadFinishedEventListener) {
+    override fun subscribe(listener: OnDownloadFinishedEventListener) {
         eventEmitter.addEventListener(OnDownloadFinishedEventListener::class, listener)
     }
 
-    override fun removeEventListener(listener: OnDownloadFinishedEventListener) {
+    override fun unsubscribe(listener: OnDownloadFinishedEventListener) {
         eventEmitter.removeEventListener(OnDownloadFinishedEventListener::class, listener)
     }
 

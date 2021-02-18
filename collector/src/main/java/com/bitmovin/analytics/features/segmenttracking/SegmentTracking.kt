@@ -32,7 +32,7 @@ class SegmentTracking(private vararg val eventSources: OnDownloadFinishedEventSo
         // TODO ErrorDetailsFeature should also track Analytics Core errors
     }
 
-    override fun onDownloadFinished(event: DownloadFinishedEvent) {
+    override fun onDownloadFinished(event: OnDownloadFinishedEventObject) {
         addSegment(event.segment)
     }
 
