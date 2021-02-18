@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
-import com.bitmovin.analytics.EventSource
+import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
@@ -12,11 +12,11 @@ import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 import com.bitmovin.player.config.network.HttpRequestType
 
 class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
-    private val eventSource = EventSource<OnDownloadFinishedEventListener>()
+    private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
         val segmentType = mapHttpRequestType(it.downloadType)
         val segmentInfo = Segment(it.timestamp, segmentType, it.url, it.lastRedirectLocation, it.httpStatus, it.downloadTime, it.size, it.isSuccess)
-        eventSource.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segmentInfo)) }
+        observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segmentInfo)) }
     }
 
     init {
@@ -46,11 +46,11 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
     }
 
     override fun subscribe(listener: OnDownloadFinishedEventListener) {
-        eventSource.subscribe(listener)
+        observableSupport.subscribe(listener)
     }
 
     override fun unsubscribe(listener: OnDownloadFinishedEventListener) {
-        eventSource.unsubscribe(listener)
+        observableSupport.unsubscribe(listener)
     }
 
     override fun onReleasing() {
