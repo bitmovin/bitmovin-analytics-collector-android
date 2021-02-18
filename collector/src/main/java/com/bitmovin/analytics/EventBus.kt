@@ -1,6 +1,5 @@
 package com.bitmovin.analytics
 
-import com.bitmovin.analytics.features.OnEventEmitter
 import kotlin.reflect.KClass
 
 class EventBus {
