@@ -391,6 +391,14 @@ public class BitmovinAnalytics
         return playerAdapter.getPosition();
     }
 
+    public Observable<OnAnalyticsReleasingEventListener> getOnAnalyticsReleasingObservable() {
+        return eventBus.get(OnAnalyticsReleasingEventListener.class);
+    }
+
+    public Observable<OnErrorDetailEventListener> getOnErrorDetailObservable() {
+        return eventBus.get(OnErrorDetailEventListener.class);
+    }
+
     @Override
     public void configureFeatures(
             boolean authenticated,
