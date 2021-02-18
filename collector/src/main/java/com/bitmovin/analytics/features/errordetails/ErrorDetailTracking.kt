@@ -21,13 +21,7 @@ class ErrorDetailTracking(val context: Context, private val segmentTracking: Seg
         // We need to make sure that the features we depend on have already be configured.
         // In this case, `SegmentTracking` already needs to have the `maxSegments` set to the correct value.
         if (segmentTracking != null) {
-            backend.queue.forEach {
-                if (it.segments == null)
-                    return@forEach
-                while (it.segments.size > segmentTracking.maxSegments) {
-                    it.segments.removeAt(it.segments.size - 1)
-                }
-            }
+            backend.limitSegmentsInQueue(segmentTracking.maxSegments)
         }
         backend.enabled = authenticated
     }

@@ -9,7 +9,7 @@ import okhttp3.OkHttpClient
 class ErrorDetailBackend(context: Context) {
     private val backendUrl = "https://analytics-ingress-global.bitmovin.com/errordetails"
     private val httpClient = HttpClient(context, OkHttpClient())
-    val queue = LinkedList<ErrorDetail>()
+    private val queue = LinkedList<ErrorDetail>()
 
     var enabled: Boolean = false
         set(value) {
@@ -20,6 +20,12 @@ class ErrorDetailBackend(context: Context) {
                 queue.clear()
             }
         }
+
+    fun limitSegmentsInQueue(max: Int) {
+        queue.forEach {
+            it.limitSegments(max)
+        }
+    }
 
     fun send(errorDetails: ErrorDetail) {
         if (enabled) {
