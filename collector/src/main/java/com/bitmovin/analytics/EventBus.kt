@@ -21,7 +21,7 @@ class EventBus {
         return get(type.kotlin)
     }
 
-    fun <TEventListener: Any> get(type: KClass<TEventListener>): Observable<TEventListener> {
+    operator fun <TEventListener: Any> get(type: KClass<TEventListener>): Observable<TEventListener> {
         observableMap[type] = observableMap[type] ?: ObservableSupport<TEventListener>()
         return observableMap[type] as Observable<TEventListener>
     }
