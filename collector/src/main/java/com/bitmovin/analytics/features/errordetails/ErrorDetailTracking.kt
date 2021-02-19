@@ -36,8 +36,8 @@ class ErrorDetailTracking(val context: Context, private val segmentTracking: Seg
         if (!isEnabled) {
             return
         }
-        val segmentInfos = segmentTracking?.getSegments()?.toMutableList()
-        val errorDetails = ErrorDetail(timestamp, code, message, throwable?.topOfStacktrace?.toList(), segmentInfos)
+        val segments = segmentTracking?.segments?.toMutableList()
+        val errorDetails = ErrorDetail(timestamp, code, message, throwable?.topOfStacktrace?.toList(), segments)
         backend.send(errorDetails)
     }
 }

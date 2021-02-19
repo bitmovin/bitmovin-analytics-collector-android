@@ -15,6 +15,9 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
     override val name = "segmentTracking"
     override val configClass = SegmentTrackingConfig::class.java
 
+    val segments: Collection<Segment>
+        get() = segmentQueue
+
     init {
         observables.forEach { it.subscribe(this) }
     }
@@ -46,9 +49,5 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
         while (queue.size > max) {
             queue.remove()
         }
-    }
-
-    fun getSegments(): Collection<Segment> {
-        return segmentQueue
     }
 }
