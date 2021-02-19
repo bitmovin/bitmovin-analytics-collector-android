@@ -1,5 +1,8 @@
 package com.bitmovin.analytics
 
+import android.app.Activity
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,5 +37,14 @@ class BitmovinAnalyticsTest {
     fun testNewDefaultConstructorChecksForNull() {
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("foo-bar")
         BitmovinAnalytics(bitmovinAnalyticsConfig, null)
+    }
+
+    @Test
+    fun testDetachPlayerShouldCallOnAnalyticsReleasing() {
+        val listener = mockk<OnAnalyticsReleasingEventListener>(relaxed = true)
+        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, Activity(), mockk(relaxed = true))
+        analytics.onAnalyticsReleasingObservable.subscribe(listener)
+        analytics.detachPlayer()
+        verify(exactly = 1) { listener.onReleasing() }
     }
 }
