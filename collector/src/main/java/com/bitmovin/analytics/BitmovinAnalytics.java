@@ -29,9 +29,11 @@ import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.Util;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
@@ -415,7 +417,10 @@ public class BitmovinAnalytics
     @Override
     public void configureFeatures(
             boolean authenticated,
-            Map<String, String> settings) {
+            @Nullable Map<String, String> settings) {
+        if(settings == null) {
+            settings = new HashMap<>();
+        }
         featureManager.configureFeatures(authenticated, settings);
     }
 
