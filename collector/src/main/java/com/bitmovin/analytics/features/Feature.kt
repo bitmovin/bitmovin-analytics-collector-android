@@ -3,15 +3,15 @@ package com.bitmovin.analytics.features
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.utils.DataSerializer
+import kotlin.reflect.KClass
 
-abstract class Feature<TConfig : FeatureConfig> {
+abstract class Feature<TConfig : FeatureConfig>(val name: String, private val configClass: KClass<TConfig>) {
     var isEnabled = true
         private set
-    abstract val name: String
-    abstract val configClass: Class<TConfig>
 
     open fun configure(authenticated: Boolean, config: TConfig?) {}
     open fun enabled() {}
+    //remove from here (feature base class shouldn't know about it)
     open fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf()) {
         isEnabled = false
     }

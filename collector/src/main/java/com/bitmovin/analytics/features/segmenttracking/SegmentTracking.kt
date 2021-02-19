@@ -7,13 +7,12 @@ import com.bitmovin.analytics.features.Feature
 import java.util.LinkedList
 import java.util.Queue
 
-class SegmentTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) : Feature<SegmentTrackingConfig>(), OnDownloadFinishedEventListener {
+class SegmentTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) :
+        Feature<SegmentTrackingConfig>("segmentTracking", SegmentTrackingConfig::class),
+        OnDownloadFinishedEventListener {
     var maxSegments = 10
         private set
     private val segmentQueue: Queue<Segment> = LinkedList()
-
-    override val name = "segmentTracking"
-    override val configClass = SegmentTrackingConfig::class.java
 
     val segments: Collection<Segment>
         get() = segmentQueue

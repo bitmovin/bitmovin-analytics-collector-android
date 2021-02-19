@@ -8,10 +8,9 @@ import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
 import com.bitmovin.analytics.utils.topOfStacktrace
 
-class ErrorDetailTracking(val context: Context, private val segmentTracking: SegmentTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) : Feature<ErrorDetailTrackingConfig>(), OnErrorDetailEventListener {
-    override val name = "errorDetails"
-    override val configClass = ErrorDetailTrackingConfig::class.java
-
+class ErrorDetailTracking(val context: Context, private val segmentTracking: SegmentTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) :
+        Feature<ErrorDetailTrackingConfig>("errorDetails", ErrorDetailTrackingConfig::class),
+        OnErrorDetailEventListener {
     private val backend = ErrorDetailBackend(context)
 
     init {
