@@ -11,8 +11,7 @@ abstract class Feature<TConfig : FeatureConfig>(val name: String, private val co
 
     open fun configure(authenticated: Boolean, config: TConfig) {}
     open fun enabled() {}
-    //remove from here (feature base class shouldn't know about it)
-    open fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf()) {
+    fun disable() {
         isEnabled = false
     }
 

@@ -38,7 +38,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, Authenti
     public synchronized void authenticationCompleted(
             boolean success, Map<String, String> settings) {
         if (callback != null) {
-            callback.configureFeatures(success, settings, data, adData);
+            callback.configureFeatures(success, settings);
         }
         if (success) {
             enabled = true;

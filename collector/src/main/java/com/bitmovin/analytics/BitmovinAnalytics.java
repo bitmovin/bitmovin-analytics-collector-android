@@ -402,10 +402,8 @@ public class BitmovinAnalytics
     @Override
     public void configureFeatures(
             boolean authenticated,
-            Map<String, String> settings,
-            Collection<EventData> samples,
-            Collection<AdEventData> adSamples) {
-        featureManager.configureFeatures(authenticated, settings, samples, adSamples);
+            Map<String, String> settings) {
+        featureManager.configureFeatures(authenticated, settings);
     }
 
     @Override
