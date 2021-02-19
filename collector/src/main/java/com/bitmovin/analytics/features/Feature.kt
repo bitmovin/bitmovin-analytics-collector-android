@@ -11,8 +11,11 @@ abstract class Feature<TConfig : FeatureConfig>(val name: String, private val co
 
     open fun configure(authenticated: Boolean, config: TConfig) {}
     open fun enabled() {}
+    open fun disabled() {}
+
     fun disable() {
         isEnabled = false
+        disabled()
     }
 
     fun configure(authenticated: Boolean, configString: String?): TConfig? {

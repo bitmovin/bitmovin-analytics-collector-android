@@ -27,8 +27,7 @@ class ErrorDetailTracking(val context: Context, private val segmentTracking: Seg
         backend.flush()
     }
 
-    override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
-        super.disable(samples, adSamples)
+    override fun disabled() {
         backend.clear()
         observables.forEach { it.unsubscribe(this) }
     }

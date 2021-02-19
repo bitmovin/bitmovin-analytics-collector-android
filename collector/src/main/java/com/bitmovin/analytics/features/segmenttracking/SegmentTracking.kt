@@ -26,8 +26,7 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
         limitQueue(segmentQueue, maxSegments)
     }
 
-    override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
-        super.disable(samples, adSamples)
+    override fun disabled() {
         observables.forEach { it.unsubscribe(this) }
         segmentQueue.clear()
         // TODO ErrorDetailsFeature should also track Analytics Core errors
