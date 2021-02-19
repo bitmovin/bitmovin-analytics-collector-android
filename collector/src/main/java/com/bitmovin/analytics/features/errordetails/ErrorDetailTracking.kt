@@ -17,17 +17,19 @@ class ErrorDetailTracking(val context: Context, private val segmentTracking: Seg
         observables.forEach { it.subscribe(this) }
     }
 
-    override fun configure(authenticated: Boolean, config: ErrorDetailTrackingConfig) {
-        // We need to make sure that the features we depend on have already be configured.
-        // In this case, `SegmentTracking` already needs to have the `maxSegments` set to the correct value.
-        if (segmentTracking != null) {
-            backend.limitSegmentsInQueue(segmentTracking.maxSegments)
+    override fun enabled() {
+        if(segmentTracking != null) {
+            val maxSegments = if(segmentTracking.isEnabled) segmentTracking.maxSegments else 0
+            backend.limitSegmentsInQueue(maxSegments)
         }
-        backend.enabled = authenticated
+
+        backend.enabled = true
+        backend.flush()
     }
 
     override fun disable(samples: MutableCollection<EventData>, adSamples: MutableCollection<AdEventData>) {
         super.disable(samples, adSamples)
+        backend.clear()
         observables.forEach { it.unsubscribe(this) }
     }
 
