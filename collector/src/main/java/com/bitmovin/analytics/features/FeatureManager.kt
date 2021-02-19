@@ -32,5 +32,9 @@ class FeatureManager {
                 features.remove(it)
             }
         }
+        // This hook can be used to flush data etc. By this point
+        // all features will already be configured, in case there
+        // is a dependency on each other.
+        features.forEach { it.enabled() }
     }
 }

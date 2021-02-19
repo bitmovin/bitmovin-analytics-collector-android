@@ -9,8 +9,9 @@ abstract class Feature<TConfig : FeatureConfig> {
         private set
     abstract val name: String
     abstract val configClass: Class<TConfig>
-    open fun configure(authenticated: Boolean, config: TConfig?) {}
 
+    open fun configure(authenticated: Boolean, config: TConfig?) {}
+    open fun enabled() {}
     open fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf()) {
         isEnabled = false
     }
