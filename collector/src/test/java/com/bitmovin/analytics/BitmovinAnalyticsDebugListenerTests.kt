@@ -36,8 +36,7 @@ class BitmovinAnalyticsDebugListenerTests {
     fun testShouldCallOnDispatchEventData() {
         val listener = mock<BitmovinAnalytics.DebugListener>()
         analytics.addDebugListener(listener)
-        val eventData = EventData(config, DeviceInformation("", "", false, "", "", "", 0, 0), "", "")
-        analytics.eventDataDispatcher.add(eventData)
+        analytics.eventDataDispatcher.add(mockk(relaxed = true))
         verify(listener, times(1)).onDispatchEventData(any())
     }
 
@@ -45,8 +44,7 @@ class BitmovinAnalyticsDebugListenerTests {
     fun testShouldCallOnDispatchAdEventData() {
         val listener = mock<BitmovinAnalytics.DebugListener>()
         analytics.addDebugListener(listener)
-        val eventData = AdEventData()
-        analytics.eventDataDispatcher.addAd(eventData)
+        analytics.eventDataDispatcher.addAd(mockk(relaxed = true))
         verify(listener, times(1)).onDispatchAdEventData(any())
     }
 
@@ -55,8 +53,7 @@ class BitmovinAnalyticsDebugListenerTests {
         val listener = mock<BitmovinAnalytics.DebugListener>()
         analytics.addDebugListener(listener)
         analytics.removeDebugListener(listener)
-        val eventData = EventData(config, DeviceInformation("", "", false, "", "", "", 0, 0), "", "")
-        analytics.eventDataDispatcher.add(eventData)
+        analytics.eventDataDispatcher.add(mockk(relaxed = true))
         verify(listener, never()).onDispatchEventData(any())
     }
 }
