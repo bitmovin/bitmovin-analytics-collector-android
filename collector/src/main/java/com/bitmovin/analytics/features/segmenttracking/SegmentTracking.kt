@@ -30,7 +30,6 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
     override fun disabled() {
         observables.forEach { it.unsubscribe(this) }
         segmentQueue.clear()
-        // TODO ErrorDetailsFeature should also track Analytics Core errors
     }
 
     override fun onDownloadFinished(event: OnDownloadFinishedEventObject) {
