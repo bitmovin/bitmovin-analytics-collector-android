@@ -12,14 +12,6 @@ class ErrorDetailBackend(context: Context) {
     private val queue = LinkedList<ErrorDetail>()
 
     var enabled: Boolean = false
-        set(value) {
-            field = value
-            if (value) {
-                flush()
-            } else {
-                queue.clear()
-            }
-        }
 
     fun limitSegmentsInQueue(max: Int) {
         queue.forEach {
@@ -35,10 +27,14 @@ class ErrorDetailBackend(context: Context) {
         }
     }
 
-    private fun flush() {
+    fun flush() {
         queue.forEach {
             send(it)
             queue.remove(it)
         }
+    }
+
+    fun clear() {
+        queue.clear()
     }
 }
