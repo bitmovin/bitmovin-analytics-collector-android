@@ -9,6 +9,7 @@ import com.bitmovin.analytics.data.HttpBackend
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import io.mockk.MockKAnnotations
@@ -50,5 +51,15 @@ class BitmovinAnalyticsDebugListenerTests {
         val eventData = AdEventData()
         analytics.eventDataDispatcher.addAd(eventData)
         verify(listener, times(1)).onDispatchAdEventData(any())
+    }
+
+    @Test
+    fun testShouldntCallMethodAfterRemovingDebugListener() {
+        val listener = mock<BitmovinAnalytics.DebugListener>()
+        analytics.addDebugListener(listener)
+        analytics.removeDebugListener(listener)
+        val eventData = EventData(config, DeviceInformation("", "", false, "", "", "", 0, 0), "", "")
+        analytics.eventDataDispatcher.add(eventData)
+        verify(listener, never()).onDispatchEventData(any())
     }
 }
