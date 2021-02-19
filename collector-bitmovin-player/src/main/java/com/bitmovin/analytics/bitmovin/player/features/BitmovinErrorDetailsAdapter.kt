@@ -22,7 +22,7 @@ class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer, private va
         player.addEventListener(onErrorListener)
     }
 
-    fun unwireEvents() {
+    private fun unwireEvents() {
         onAnalyticsReleasingObservable.unsubscribe(this)
         player.removeEventListener(onErrorListener)
     }
