@@ -21,10 +21,8 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
         observables.forEach { it.subscribe(this) }
     }
 
-    override fun configure(authenticated: Boolean, config: SegmentTrackingConfig?) {
-        if (config != null) {
-            maxSegments = config.maxSegments
-        }
+    override fun configure(authenticated: Boolean, config: SegmentTrackingConfig) {
+        maxSegments = config.maxSegments
         limitQueue(segmentQueue, maxSegments)
     }
 

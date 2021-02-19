@@ -17,7 +17,7 @@ class ErrorDetailTracking(val context: Context, private val segmentTracking: Seg
         observables.forEach { it.subscribe(this) }
     }
 
-    override fun configure(authenticated: Boolean, config: ErrorDetailTrackingConfig?) {
+    override fun configure(authenticated: Boolean, config: ErrorDetailTrackingConfig) {
         // We need to make sure that the features we depend on have already be configured.
         // In this case, `SegmentTracking` already needs to have the `maxSegments` set to the correct value.
         if (segmentTracking != null) {

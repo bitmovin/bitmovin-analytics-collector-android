@@ -9,7 +9,7 @@ abstract class Feature<TConfig : FeatureConfig>(val name: String, private val co
     var isEnabled = true
         private set
 
-    open fun configure(authenticated: Boolean, config: TConfig?) {}
+    open fun configure(authenticated: Boolean, config: TConfig) {}
     open fun enabled() {}
     //remove from here (feature base class shouldn't know about it)
     open fun disable(samples: MutableCollection<EventData> = mutableListOf(), adSamples: MutableCollection<AdEventData> = mutableListOf()) {
@@ -19,8 +19,10 @@ abstract class Feature<TConfig : FeatureConfig>(val name: String, private val co
     fun configure(authenticated: Boolean, configString: String?): TConfig? {
         configString ?: return null
         return try {
-            val config = DataSerializer.deserialize(configString, configClass)
-            configure(authenticated, config)
+            val config = DataSerializer.deserialize(configString, configClass.java)
+            if(config != null) {
+                configure(authenticated, config)
+            }
             config
         } catch (ignored: Throwable) {
             null
