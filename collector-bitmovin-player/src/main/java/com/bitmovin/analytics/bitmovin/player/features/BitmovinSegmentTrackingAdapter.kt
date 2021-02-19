@@ -40,7 +40,7 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
         player.addEventListener(onDownloadFinishedListener)
     }
 
-    fun unwireEvents() {
+    private fun unwireEvents() {
         onAnalyticsReleasingObservable.unsubscribe(this)
         player.removeEventListener(onDownloadFinishedListener)
     }
