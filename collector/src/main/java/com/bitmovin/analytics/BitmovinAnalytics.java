@@ -7,6 +7,7 @@ import android.util.Log;
 import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.AdEventData;
+import com.bitmovin.analytics.data.BackendFactory;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
@@ -62,7 +63,7 @@ public class BitmovinAnalytics
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
      * @param context {@link Context}
      */
-    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
+    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context, BackendFactory backendFactory) {
         if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }
@@ -73,7 +74,7 @@ public class BitmovinAnalytics
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
         this.playerStateMachine.addListener(this);
         IEventDataDispatcher innerEventDataDispatcher =
-                new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this);
+                new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this, backendFactory);
         this.eventDataDispatcher =
                 new DebuggingEventDataDispatcher(innerEventDataDispatcher, debugCallback);
         if (this.bitmovinAnalyticsConfig.getAds()) {
@@ -85,12 +86,24 @@ public class BitmovinAnalytics
      * Bitmovin Analytics
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
-     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass
+     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context, BackendFactory)} and pass
+     *     {@link Context} seperately.
+     */
+    @Deprecated
+    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
+        this(bitmovinAnalyticsConfig, context, new BackendFactory());
+    }
+
+    /**
+     * Bitmovin Analytics
+     *
+     * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
+     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context, BackendFactory)} and pass
      *     {@link Context} seperately.
      */
     @Deprecated
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
-        this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
+        this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext(), new BackendFactory());
     }
 
     /**

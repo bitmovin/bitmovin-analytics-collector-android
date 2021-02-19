@@ -30,9 +30,9 @@ class BitmovinAnalyticsDebugListenerTests {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        mockkConstructor(BackendFactory::class)
-        every { anyConstructed<BackendFactory>().createBackend(any(), any()) } returns mockk<HttpBackend>()
-        analytics = BitmovinAnalytics(config, Activity())
+//        mockkConstructor(BackendFactory::class)
+//        every { anyConstructed<BackendFactory>().createBackend(any(), any()) } returns mockk<HttpBackend>()
+        analytics = BitmovinAnalytics(config, Activity(), mockk())
     }
 
     @Test
