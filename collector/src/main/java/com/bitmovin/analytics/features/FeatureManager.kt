@@ -24,12 +24,14 @@ class FeatureManager {
     }
 
     fun configureFeatures(authenticated: Boolean, settings: Map<String, String>) {
-        features.forEach {
+        val iterator = features.iterator()
+        while(iterator.hasNext()) {
+            val it = iterator.next()
             val config = it.configure(authenticated, settings[it.name])
             if (!authenticated || config?.enabled != true) {
                 Log.d(TAG, "Disabling feature ${it.name} as it isn't enabled according to license callback.")
                 it.disable()
-                features.remove(it)
+                iterator.remove()
             }
         }
         // This hook can be used to flush data etc. By this point
