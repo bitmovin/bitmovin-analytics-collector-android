@@ -8,16 +8,13 @@ import com.nhaarman.mockitokotlin2.any
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkConstructor
-import io.mockk.mockkStatic
 import io.mockk.slot
-import io.mockk.verifyAll
 import io.mockk.verify
 import okhttp3.Callback
 import okhttp3.MediaType
 import okhttp3.Response
 import okhttp3.ResponseBody
 import org.junit.Test
-import org.mockito.MockedStatic
 import org.mockito.Mockito
 
 class LicenseCallTests {
@@ -35,7 +32,7 @@ class LicenseCallTests {
         return LicenseCall(BitmovinAnalyticsConfig(""), mockedContext)
     }
 
-    private fun getGrantedResponseBody(settings: String) = "{\"status\": \"granted\"${settings}}"
+    private fun getGrantedResponseBody(settings: String) = "{\"status\": \"granted\"$settings}"
 
     private fun verifyLicenseResponse(responseBody: String, expectedSuccess: Boolean, expectedSettings: Map<String, String>?) {
         val licenseCall = createLicenseCall(responseBody)

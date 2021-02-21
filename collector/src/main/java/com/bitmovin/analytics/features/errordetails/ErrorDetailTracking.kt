@@ -2,8 +2,6 @@ package com.bitmovin.analytics.features.errordetails
 
 import android.content.Context
 import com.bitmovin.analytics.Observable
-import com.bitmovin.analytics.data.AdEventData
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
 import com.bitmovin.analytics.utils.topOfStacktrace
@@ -18,8 +16,8 @@ class ErrorDetailTracking(val context: Context, private val segmentTracking: Seg
     }
 
     override fun enabled() {
-        if(segmentTracking != null) {
-            val maxSegments = if(segmentTracking.isEnabled) segmentTracking.maxSegments else 0
+        if (segmentTracking != null) {
+            val maxSegments = if (segmentTracking.isEnabled) segmentTracking.maxSegments else 0
             backend.limitSegmentsInQueue(maxSegments)
         }
 

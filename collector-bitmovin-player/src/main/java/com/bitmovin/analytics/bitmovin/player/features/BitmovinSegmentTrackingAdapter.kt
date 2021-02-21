@@ -1,10 +1,10 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
-import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.Observable
+import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
-import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.features.segmenttracking.Segment
 import com.bitmovin.analytics.features.segmenttracking.SegmentType
 import com.bitmovin.player.BitmovinPlayer

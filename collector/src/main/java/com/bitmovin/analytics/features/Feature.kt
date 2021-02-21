@@ -1,7 +1,5 @@
 package com.bitmovin.analytics.features
 
-import com.bitmovin.analytics.data.AdEventData
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.utils.DataSerializer
 import kotlin.reflect.KClass
 

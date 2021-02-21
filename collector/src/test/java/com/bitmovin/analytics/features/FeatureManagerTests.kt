@@ -1,21 +1,20 @@
 package com.bitmovin.analytics.features
 
-import io.mockk.Called
 import io.mockk.spyk
 import io.mockk.verify
 import io.mockk.verifyOrder
 import org.junit.Test
 
 class FeatureManagerTests {
-    class FeatureConfig1: FeatureConfig() {
+    class FeatureConfig1 : FeatureConfig() {
         var param1: String? = null
     }
-    class FeatureConfig2: FeatureConfig()
+    class FeatureConfig2 : FeatureConfig()
 
     @Test
     fun testShouldConfigureAllFeaturesBeforeCallingEnabledHook() {
-        val feature1 = spyk(object: Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
-        val feature2 = spyk(object: Feature<FeatureConfig2>("feature2", FeatureConfig2::class) {})
+        val feature1 = spyk(object : Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
+        val feature2 = spyk(object : Feature<FeatureConfig2>("feature2", FeatureConfig2::class) {})
 
         val featureManager = FeatureManager()
         featureManager.registerFeature(feature1)
@@ -65,7 +64,7 @@ class FeatureManagerTests {
     }
 
     private fun testShouldDisableFeature(authenticated: Boolean, settings: Map<String, String>) {
-        val feature1 = spyk(object: Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
+        val feature1 = spyk(object : Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
 
         val featureManager = FeatureManager()
         featureManager.registerFeature(feature1)
@@ -78,7 +77,7 @@ class FeatureManagerTests {
     }
 
     private fun testShouldEnableFeature(settings: Map<String, String>) {
-        val feature1 = spyk(object: Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
+        val feature1 = spyk(object : Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
 
         val featureManager = FeatureManager()
         featureManager.registerFeature(feature1)

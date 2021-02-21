@@ -40,9 +40,7 @@ import org.jetbrains.annotations.Nullable;
  * supports analytics of ExoPlayer video players
  */
 public class BitmovinAnalytics
-        implements StateMachineListener,
-                LicenseCallback,
-                EventDataManipulatorPipeline {
+        implements StateMachineListener, LicenseCallback, EventDataManipulatorPipeline {
 
     private static final String TAG = "BitmovinAnalytics";
 
@@ -65,7 +63,10 @@ public class BitmovinAnalytics
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
      * @param context {@link Context}
      */
-    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context, BackendFactory backendFactory) {
+    public BitmovinAnalytics(
+            BitmovinAnalyticsConfig bitmovinAnalyticsConfig,
+            Context context,
+            BackendFactory backendFactory) {
         if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }
@@ -76,7 +77,8 @@ public class BitmovinAnalytics
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
         this.playerStateMachine.addListener(this);
         IEventDataDispatcher innerEventDataDispatcher =
-                new SimpleEventDataDispatcher(this.bitmovinAnalyticsConfig, this.context, this, backendFactory);
+                new SimpleEventDataDispatcher(
+                        this.bitmovinAnalyticsConfig, this.context, this, backendFactory);
         this.eventDataDispatcher =
                 new DebuggingEventDataDispatcher(innerEventDataDispatcher, debugCallback);
         if (this.bitmovinAnalyticsConfig.getAds()) {
@@ -88,8 +90,8 @@ public class BitmovinAnalytics
      * Bitmovin Analytics
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
-     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context, BackendFactory)} and pass
-     *     {@link Context} seperately.
+     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context,
+     *     BackendFactory)} and pass {@link Context} seperately.
      */
     @Deprecated
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
@@ -100,8 +102,8 @@ public class BitmovinAnalytics
      * Bitmovin Analytics
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
-     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context, BackendFactory)} and pass
-     *     {@link Context} seperately.
+     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context,
+     *     BackendFactory)} and pass {@link Context} seperately.
      */
     @Deprecated
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
@@ -415,10 +417,8 @@ public class BitmovinAnalytics
     }
 
     @Override
-    public void configureFeatures(
-            boolean authenticated,
-            @Nullable Map<String, String> settings) {
-        if(settings == null) {
+    public void configureFeatures(boolean authenticated, @Nullable Map<String, String> settings) {
+        if (settings == null) {
             settings = new HashMap<>();
         }
         featureManager.configureFeatures(authenticated, settings);

@@ -1,8 +1,6 @@
 package com.bitmovin.analytics.features.segmenttracking
 
 import com.bitmovin.analytics.Observable
-import com.bitmovin.analytics.data.AdEventData
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.utils.QueueExtensions.Companion.limit
 import java.util.LinkedList

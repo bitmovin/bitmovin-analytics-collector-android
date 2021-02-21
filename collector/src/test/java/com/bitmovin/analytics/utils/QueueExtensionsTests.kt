@@ -1,9 +1,10 @@
 package com.bitmovin.analytics.utils
 
 import com.bitmovin.analytics.utils.QueueExtensions.Companion.limit
+import java.util.LinkedList
+import java.util.Queue
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import java.util.*
 
 class QueueExtensionsTests {
     @Test

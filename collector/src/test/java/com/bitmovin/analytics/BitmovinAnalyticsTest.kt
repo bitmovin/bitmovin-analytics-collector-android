@@ -1,7 +1,6 @@
 package com.bitmovin.analytics
 
 import android.app.Activity
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine

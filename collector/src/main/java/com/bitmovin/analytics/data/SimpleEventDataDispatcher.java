@@ -25,7 +25,10 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, Authenti
     private int sampleSequenceNumber = 0;
 
     public SimpleEventDataDispatcher(
-            BitmovinAnalyticsConfig config, Context context, LicenseCallback callback, BackendFactory backendFactory) {
+            BitmovinAnalyticsConfig config,
+            Context context,
+            LicenseCallback callback,
+            BackendFactory backendFactory) {
         this.data = new ConcurrentLinkedQueue<>();
         this.adData = new ConcurrentLinkedQueue<>();
         this.config = config;

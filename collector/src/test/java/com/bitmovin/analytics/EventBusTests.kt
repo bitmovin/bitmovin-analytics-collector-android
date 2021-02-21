@@ -40,12 +40,12 @@ class EventBusTests {
         val eventBus = EventBus()
         var event1Called = false
         var event2Called = false
-        eventBus[TestEvent::class].subscribe(object: TestEvent {
+        eventBus[TestEvent::class].subscribe(object : TestEvent {
             override fun onTest() {
                 event1Called = true
             }
         })
-        eventBus[TestEvent1::class].subscribe(object: TestEvent1 {
+        eventBus[TestEvent1::class].subscribe(object : TestEvent1 {
             override fun onTest() {
                 event2Called = true
             }
@@ -59,12 +59,12 @@ class EventBusTests {
     fun testShouldNotifyMultipleSubscribers() {
         val eventBus = EventBus()
         var count = 0
-        eventBus[TestEvent::class].subscribe(object: TestEvent {
+        eventBus[TestEvent::class].subscribe(object : TestEvent {
             override fun onTest() {
                 count++
             }
         })
-        eventBus[TestEvent::class].subscribe(object: TestEvent {
+        eventBus[TestEvent::class].subscribe(object : TestEvent {
             override fun onTest() {
                 count++
             }

@@ -1,6 +1,6 @@
 package com.bitmovin.analytics
 
-class ObservableSupport<TListener>: Observable<TListener> {
+class ObservableSupport<TListener> : Observable<TListener> {
     interface EventListenerNotifier<T> { fun notify(listener: T) }
 
     private val listeners = mutableListOf<TListener>()

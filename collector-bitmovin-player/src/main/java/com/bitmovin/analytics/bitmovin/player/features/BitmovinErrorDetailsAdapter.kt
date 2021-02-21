@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
-import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.Observable
+import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.player.BitmovinPlayer
