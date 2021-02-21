@@ -11,8 +11,7 @@ import java.util.Queue
 class SegmentTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) :
         Feature<SegmentTrackingConfig>("segmentTracking", SegmentTrackingConfig::class),
         OnDownloadFinishedEventListener {
-    var maxSegments = 10
-        private set
+    val maxSegments = config?.maxSegments ?: 10
     private val segmentQueue: Queue<Segment> = LinkedList()
 
     val segments: Collection<Segment>
@@ -22,8 +21,7 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
         observables.forEach { it.subscribe(this) }
     }
 
-    override fun configure(authenticated: Boolean, config: SegmentTrackingConfig) {
-        maxSegments = config.maxSegments
+    override fun configured(authenticated: Boolean, config: SegmentTrackingConfig?) {
         segmentQueue.limit(maxSegments)
     }
 
