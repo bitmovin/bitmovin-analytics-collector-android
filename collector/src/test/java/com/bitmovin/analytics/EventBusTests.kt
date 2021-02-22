@@ -1,5 +1,7 @@
 package com.bitmovin.analytics
 
+import io.mockk.mockk
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
@@ -71,5 +73,17 @@ class EventBusTests {
         })
         eventBus.notify(TestEvent::class) { it.onTest() }
         assertThat(count).isEqualTo(2)
+    }
+
+    @Test
+    fun testShouldSubscribeAndNotifyWithGenericSupport() {
+        val eventBus = EventBus()
+        val listener = mockk<TestEvent>(relaxed = true)
+        eventBus.subscribe(listener)
+        eventBus.notify<TestEvent> { it.onTest() }
+        verify(exactly = 1) { listener.onTest() }
+        eventBus.unsubscribe(listener)
+        eventBus.notify<TestEvent> { it.onTest() }
+        verify(exactly = 1) { listener.onTest() }
     }
 }
