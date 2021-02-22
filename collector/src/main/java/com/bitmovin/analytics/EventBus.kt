@@ -11,6 +11,12 @@ class EventBus {
         }
     }
 
+    fun <TEventListener : Any> notify(type: Class<TEventListener>, action: ObservableSupport.EventListenerNotifier<TEventListener>) {
+        notify(type.kotlin) {
+            action.notify(it)
+        }
+    }
+
     inline fun <reified TEventListener : Any> notify(noinline action: (listener: TEventListener) -> Unit) {
         notify(TEventListener::class, action)
     }
@@ -23,12 +29,6 @@ class EventBus {
     inline fun <reified TEventListener : Any> unsubscribe(listener: TEventListener) {
         val support = get(TEventListener::class)
         support.unsubscribe(listener)
-    }
-
-    fun <TEventListener : Any> notify(type: Class<TEventListener>, action: ObservableSupport.EventListenerNotifier<TEventListener>) {
-        notify(type.kotlin) {
-            action.notify(it)
-        }
     }
 
     fun <TEventListener : Any> get(type: Class<TEventListener>): Observable<TEventListener> {
