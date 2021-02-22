@@ -63,9 +63,7 @@ public class BitmovinAnalytics
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
      * @param context {@link Context}
      */
-    public BitmovinAnalytics(
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig,
-            Context context) {
+    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
         if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }
@@ -89,7 +87,8 @@ public class BitmovinAnalytics
      * Bitmovin Analytics
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
-     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass {@link Context} seperately.
+     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass
+     *     {@link Context} seperately.
      */
     @Deprecated
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
