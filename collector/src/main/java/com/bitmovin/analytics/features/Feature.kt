@@ -19,13 +19,13 @@ abstract class Feature<TConfig : FeatureConfig>(val name: String, private val co
     }
 
     fun configure(authenticated: Boolean, configString: String?): TConfig? {
-        configString ?: return null
-        return try {
-            config = DataSerializer.deserialize(configString, configClass.java)
-            configured(authenticated, config)
-            config
-        } catch (ignored: Throwable) {
-            null
+        if(configString != null) {
+            try {
+                config = DataSerializer.deserialize(configString, configClass.java)
+            } catch (ignored: Throwable) {
+            }
         }
+        configured(authenticated, config)
+        return config
     }
 }
