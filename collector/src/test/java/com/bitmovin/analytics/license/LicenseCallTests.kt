@@ -1,26 +1,29 @@
 package com.bitmovin.analytics.license
 
-import android.content.Context
 import android.net.Uri
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.utils.HttpClient
-import com.nhaarman.mockitokotlin2.any
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkConstructor
+import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.verify
 import okhttp3.Callback
 import okhttp3.MediaType
 import okhttp3.Response
 import okhttp3.ResponseBody
+import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 
 class LicenseCallTests {
+    @Before
+    fun setup() {
+        mockkStatic(Uri::class)
+        every { Uri.parse(any()) } returns mockk(relaxed = true)
+    }
+
     private fun createLicenseCall(responseBody: String): LicenseCall {
-        val mockedUri = Mockito.mockStatic(Uri::class.java)
-        val mockedContext = mockk<Context>(relaxed = true)
         val mockedResponse = mockk<Response>()
         every { mockedResponse.body() }.returns(ResponseBody.create(MediaType.get("text/json"), responseBody))
         mockkConstructor(HttpClient::class)
@@ -28,8 +31,7 @@ class LicenseCallTests {
         every { anyConstructed<HttpClient>().post(any(), any(), capture(slot)) }.answers {
             slot.captured.onResponse(mockk(), mockedResponse)
         }
-        mockedUri.`when`<Uri> { Uri.parse(any()) }.thenReturn(mockk(relaxed = true))
-        return LicenseCall(BitmovinAnalyticsConfig(""), mockedContext)
+        return LicenseCall(BitmovinAnalyticsConfig(""), mockk(relaxed = true))
     }
 
     private fun getGrantedResponseBody(settings: String) = "{\"status\": \"granted\"$settings}"
