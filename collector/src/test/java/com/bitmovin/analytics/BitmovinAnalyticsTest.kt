@@ -1,6 +1,7 @@
 package com.bitmovin.analytics
 
 import android.app.Activity
+import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
@@ -31,6 +32,9 @@ class BitmovinAnalyticsTest {
         bitmovinAnalyticsConfig.customData5 = "customData5"
         bitmovinAnalyticsConfig.customData6 = "customData6"
         bitmovinAnalyticsConfig.customData7 = "customData7"
+
+        mockkConstructor(BackendFactory::class)
+        every { anyConstructed<BackendFactory>().createBackend(any(), any()) } returns mockk(relaxed = true)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -48,7 +52,7 @@ class BitmovinAnalyticsTest {
     @Test
     fun testDetachPlayerShouldCallOnAnalyticsReleasingEventListener() {
         val listener = mockk<OnAnalyticsReleasingEventListener>(relaxed = true)
-        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, Activity(), mockk(relaxed = true))
+        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, Activity())
         analytics.onAnalyticsReleasingObservable.subscribe(listener)
         analytics.detachPlayer()
         verify(exactly = 1) { listener.onReleasing() }
@@ -58,7 +62,7 @@ class BitmovinAnalyticsTest {
     fun testOnVideoStartFailedShouldCallOnErrorDetailEventListener() {
         val listener = mockk<OnErrorDetailEventListener>(relaxed = true)
         mockkConstructor(PlayerStateMachine::class)
-        val analytics = spyk(BitmovinAnalytics(bitmovinAnalyticsConfig, Activity(), mockk(relaxed = true)))
+        val analytics = spyk(BitmovinAnalytics(bitmovinAnalyticsConfig, Activity()))
         every { analytics.sendEventData(any()) } answers {}
         every { analytics.createEventData() }.returns(mockk(relaxed = true))
         every { analytics.playerStateMachine.videoStartFailedReason } returns VideoStartFailedReason.TIMEOUT

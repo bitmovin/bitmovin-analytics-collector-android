@@ -65,8 +65,7 @@ public class BitmovinAnalytics
      */
     public BitmovinAnalytics(
             BitmovinAnalyticsConfig bitmovinAnalyticsConfig,
-            Context context,
-            BackendFactory backendFactory) {
+            Context context) {
         if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }
@@ -78,7 +77,7 @@ public class BitmovinAnalytics
         this.playerStateMachine.addListener(this);
         IEventDataDispatcher innerEventDataDispatcher =
                 new SimpleEventDataDispatcher(
-                        this.bitmovinAnalyticsConfig, this.context, this, backendFactory);
+                        this.bitmovinAnalyticsConfig, this.context, this, new BackendFactory());
         this.eventDataDispatcher =
                 new DebuggingEventDataDispatcher(innerEventDataDispatcher, debugCallback);
         if (this.bitmovinAnalyticsConfig.getAds()) {
@@ -90,24 +89,11 @@ public class BitmovinAnalytics
      * Bitmovin Analytics
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
-     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context,
-     *     BackendFactory)} and pass {@link Context} seperately.
-     */
-    @Deprecated
-    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
-        this(bitmovinAnalyticsConfig, context, new BackendFactory());
-    }
-
-    /**
-     * Bitmovin Analytics
-     *
-     * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
-     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context,
-     *     BackendFactory)} and pass {@link Context} seperately.
+     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass {@link Context} seperately.
      */
     @Deprecated
     public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
-        this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext(), new BackendFactory());
+        this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
     }
 
     /**
