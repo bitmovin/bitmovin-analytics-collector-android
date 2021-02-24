@@ -12,10 +12,10 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
     companion object {
         const val defaultMaxSegments = 10
     }
-
-    val maxSegments = config?.maxSegments ?: defaultMaxSegments
     private val segmentQueue: Queue<Segment> = LinkedList()
 
+    val maxSegments
+        get() = config?.maxSegments ?: defaultMaxSegments
     val segments: Collection<Segment>
         get() = segmentQueue
 
