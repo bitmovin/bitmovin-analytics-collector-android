@@ -9,7 +9,11 @@ import java.util.Queue
 class SegmentTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) :
         Feature<SegmentTrackingConfig>("segmentTracking", SegmentTrackingConfig::class),
         OnDownloadFinishedEventListener {
-    val maxSegments = config?.maxSegments ?: 10
+    companion object {
+        const val defaultMaxSegments = 10
+    }
+
+    val maxSegments = config?.maxSegments ?: defaultMaxSegments
     private val segmentQueue: Queue<Segment> = LinkedList()
 
     val segments: Collection<Segment>
