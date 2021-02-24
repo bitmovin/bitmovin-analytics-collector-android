@@ -35,7 +35,7 @@ class SegmentTrackingTests {
     fun testSuccessfullyAddsSegmentsFromMultipleSources() {
         val support1 = ObservableSupport<OnDownloadFinishedEventListener>()
         val support2 = ObservableSupport<OnDownloadFinishedEventListener>()
-        val segmentTracking = SegmentTracking(support1,  support2)
+        val segmentTracking = SegmentTracking(support1, support2)
         support1.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support1.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support2.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }

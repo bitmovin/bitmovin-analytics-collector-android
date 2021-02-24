@@ -65,6 +65,6 @@ class ErrorDetailBackendTests {
         verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
     }
 
-    private fun getErrorDetail(segmentCount: Int?) = ErrorDetail(0, null, null, null, if(segmentCount == null) null else (0..segmentCount).map { getSegment() }.toMutableList())
-    private fun getSegment() = Segment(0, SegmentType.MANIFEST_DASH, null, null , 0, 0.0, 0, true)
+    private fun getErrorDetail(segmentCount: Int?) = ErrorDetail(0, null, null, null, if (segmentCount == null) null else (0..segmentCount).map { getSegment() }.toMutableList())
+    private fun getSegment() = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0.0, 0, true)
 }

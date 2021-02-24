@@ -6,11 +6,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 class FeatureTests {
-    data class TestFeatureConfigNonOptional(val testValue: Int): FeatureConfig()
-    data class TestFeatureConfigOptional(val testValue: Int?): FeatureConfig()
+    data class TestFeatureConfigNonOptional(val testValue: Int) : FeatureConfig()
+    data class TestFeatureConfigOptional(val testValue: Int?) : FeatureConfig()
 
-    class Feature1: Feature<TestFeatureConfigNonOptional>("feature1", TestFeatureConfigNonOptional::class)
-    class Feature2: Feature<TestFeatureConfigOptional>("feature2", TestFeatureConfigOptional::class)
+    class Feature1 : Feature<TestFeatureConfigNonOptional>("feature1", TestFeatureConfigNonOptional::class)
+    class Feature2 : Feature<TestFeatureConfigOptional>("feature2", TestFeatureConfigOptional::class)
 
     @Test
     fun testConfigureWillReturnNullOnNullStringAndCallsConfigureHook() {

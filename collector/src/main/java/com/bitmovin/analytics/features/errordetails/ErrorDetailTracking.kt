@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.features.errordetails
 
-import android.content.Context
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
