@@ -28,7 +28,9 @@ class ErrorDetailBackend(context: Context) {
     }
 
     fun flush() {
-        queue.forEach {
+        // We create a copy of the list to avoid side-effects like ending up in an infinite loop if we always add and remove the same element.
+        // This shouldn't happen as Kotlin is call-by-value, so `send` would not modify the original queue.
+        queue.toList().forEach {
             send(it)
             queue.remove(it)
         }
