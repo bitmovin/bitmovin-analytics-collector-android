@@ -40,39 +40,23 @@ class EventBusTests {
     @Test
     fun testShouldNotifyCorrectSubscribers() {
         val eventBus = EventBus()
-        var event1Called = false
-        var event2Called = false
-        eventBus[TestEvent::class].subscribe(object : TestEvent {
-            override fun onTest() {
-                event1Called = true
-            }
-        })
-        eventBus[TestEvent1::class].subscribe(object : TestEvent1 {
-            override fun onTest() {
-                event2Called = true
-            }
-        })
+        val testEvent = mockk<TestEvent>(relaxed = true)
+        val testEvent1 = mockk<TestEvent1>(relaxed = true)
+        eventBus[TestEvent::class].subscribe(testEvent)
+        eventBus[TestEvent1::class].subscribe(testEvent1)
         eventBus.notify(TestEvent::class) { it.onTest() }
-        assertThat(event1Called).isTrue()
-        assertThat(event2Called).isFalse()
+        verify { testEvent.onTest() }
+        verify(exactly = 0) { testEvent1.onTest() }
     }
 
     @Test
     fun testShouldNotifyMultipleSubscribers() {
         val eventBus = EventBus()
-        var count = 0
-        eventBus[TestEvent::class].subscribe(object : TestEvent {
-            override fun onTest() {
-                count++
-            }
-        })
-        eventBus[TestEvent::class].subscribe(object : TestEvent {
-            override fun onTest() {
-                count++
-            }
-        })
+        val testEvent = mockk<TestEvent>(relaxed = true)
+        eventBus[TestEvent::class].subscribe(testEvent)
+        eventBus[TestEvent::class].subscribe(testEvent)
         eventBus.notify(TestEvent::class) { it.onTest() }
-        assertThat(count).isEqualTo(2)
+        verify(exactly = 2){testEvent.onTest()}
     }
 
     @Test
