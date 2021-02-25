@@ -56,7 +56,7 @@ class EventBusTests {
         eventBus[TestEvent::class].subscribe(testEvent)
         eventBus[TestEvent::class].subscribe(testEvent)
         eventBus.notify(TestEvent::class) { it.onTest() }
-        verify(exactly = 2){testEvent.onTest()}
+        verify(exactly = 2) { testEvent.onTest() }
     }
 
     @Test

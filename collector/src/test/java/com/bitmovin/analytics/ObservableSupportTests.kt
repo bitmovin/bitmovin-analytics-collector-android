@@ -45,7 +45,7 @@ class ObservableSupportTests {
     @Test
     fun testShouldSuccessfullyUnsubscribeDuringNotify() {
         val observableSupport = ObservableSupport<TestEventListener>()
-        val listener = object: TestEventListener {
+        val listener = object : TestEventListener {
             override fun onEvent() {
                 observableSupport.unsubscribe(this)
             }

@@ -4,11 +4,7 @@ import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
-import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
 import com.bitmovin.player.BitmovinPlayer
-import com.bitmovin.player.api.event.data.DownloadFinishedEvent
-import com.bitmovin.player.api.event.listener.EventListener
-import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 import com.bitmovin.player.api.event.listener.OnErrorListener
 import io.mockk.clearMocks
 import io.mockk.every
@@ -16,7 +12,6 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.verify
-import io.mockk.verifyAll
 import org.junit.Test
 
 class BitmovinErrorDetailsAdapterTests {
