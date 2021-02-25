@@ -19,6 +19,6 @@ class ObservableSupport<TListener> : Observable<TListener> {
     }
 
     fun notify(action: (listener: TListener) -> Unit) {
-        listeners.forEach(action)
+        listeners.toList().forEach(action)
     }
 }
