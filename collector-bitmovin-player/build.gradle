@@ -58,7 +58,7 @@ dependencies {
 	}
 	implementation "com.bitmovin.player:playercore:${rootProject.ext.playercoreVersion}"
 
-	testImplementation "io.mockk:mockk:1.10.6"
+	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 }
 
 publishing {
