@@ -65,21 +65,21 @@ echo "Creating and publishing :collector project..."
 ./gradlew -DdevelopLocal=false :collector:clean || exit
 ./gradlew -DdevelopLocal=false :collector:build || exit
 ./gradlew -DdevelopLocal=false :collector:assembleRelease || exit
-./gradlew -DdevelopLocal=false :collector:artifactoryPublish || exit
+#./gradlew -DdevelopLocal=false :collector:artifactoryPublish || exit
 echo "Created and published :collector project."
 
 echo "Creating and publishing :collector-bitmovin-player project..."
 ./gradlew -DdevelopLocal=false :collector-bitmovin-player:clean || exit
 ./gradlew -DdevelopLocal=false :collector-bitmovin-player:build || exit
 ./gradlew -DdevelopLocal=false :collector-bitmovin-player:assembleRelease || exit
-./gradlew -DdevelopLocal=false :collector-bitmovin-player:artifactoryPublish || exit
+#./gradlew -DdevelopLocal=false :collector-bitmovin-player:artifactoryPublish || exit
 echo "Created and published :collector-bitmovin-player project."
 
 echo "Creating and publishing :collector-exoplayer project..."
 ./gradlew -DdevelopLocal=false :collector-exoplayer:clean || exit
 ./gradlew -DdevelopLocal=false :collector-exoplayer:build || exit
 ./gradlew -DdevelopLocal=false :collector-exoplayer:assembleRelease || exit
-./gradlew -DdevelopLocal=false :collector-exoplayer:artifactoryPublish || exit
+#./gradlew -DdevelopLocal=false :collector-exoplayer:artifactoryPublish || exit
 echo "Created and published :collector-exoplayer project."
 
 #
