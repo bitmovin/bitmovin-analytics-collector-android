@@ -53,8 +53,8 @@ fi
 echo "Make sure to bump the libraryVersion and versionCode in the <root>/build.gradle file, README and CHANGELOG first and merge that PR into develop.\n\nAfter releasing, change the \"developLocal\" to false manually and start both the examples and make sure that the outgoing payload doesn't include \"-local\" in the version string (and pull the right version from artifactory).\n"
 echo "Version (without leading \"v\")":
 read VERSION
-git checkout develop
-git pull
+#git checkout develop
+#git pull
 
 if ! ./gradlew spotlessCheck --daemon; then
     echo "Code style violations detected, please fix them first on develop as otherwise the build will fail."
