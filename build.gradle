@@ -108,9 +108,10 @@ task createSpotlessPrePushHook() {
 	
 	echo '[git hook] executing gradle spotlessCheck before push'
 	
+	oldsha=\$(git rev-parse -q --verify refs/stash)
 	# stash any unstaged changes
-	git stash --keep-index --include-untracked
-	STASH_RESULT=\$?
+	git stash save --keep-index --include-untracked
+	newsha=\$(git rev-parse -q --verify refs/stash)
 	
 	# run the spotlessCheck with the gradle wrapper
 	./gradlew spotlessCheck --daemon
@@ -119,9 +120,10 @@ task createSpotlessPrePushHook() {
 	RESULT=\$?
 	
 	# unstash the unstaged changes
-	if [ \$STASH_RESULT = 0 ];
+	if [ "\$oldsha" != "\$newsha" ];
 	then
-	  git stash pop;
+		echo 'Popping stash as there have been changes before.' 
+	  	git stash pop;
 	fi
 	
 	# return the './gradlew spotlessCheck' exit code
