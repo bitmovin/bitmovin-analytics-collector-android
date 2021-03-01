@@ -100,7 +100,7 @@ ext {
 	mockkVersion = '1.10.6'
 }
 
-task createSpotlessPrePushHook() {
+task createPrePushHook() {
 	def gitHooksDirectory = new File("$project.rootDir/.git/hooks/")
 	if (!gitHooksDirectory.exists()) gitHooksDirectory.mkdirs()
 	def prePushHookFile = new File("$project.rootDir/.git/hooks", "pre-push")
