@@ -55,82 +55,89 @@ echo "Version (without leading \"v\")":
 read VERSION
 git checkout develop
 git pull
-git checkout main
-git pull
-git merge develop
-git tag -a v$VERSION -m "v$VERSION"
-git push origin main v$VERSION
 
-echo "Pushed \"main\" and \"$VERSION\" to repo."
-
-curl \
-  -u bitAnalyticsCircleCi:$ANALYTICS_GH_TOKEN \
-  -X POST \
-  -H "Accept: application/vnd.github.v3+json" \
-  https://api.github.com/repos/bitmovin/bitmovin-analytics-collector-android/releases \
-  -d "{\"tag_name\":\"v$VERSION\", \"name\": \"v$VERSION\", \"draft\": false}"
-
-echo "Created release in public repo."
+if ! ./gradlew spotlessCheck --daemon; then
+    echo "Code style violations detected, please fix them first on develop as otherwise the build will fail."
+    exit
+fi
 
 echo "Creating and publishing :collector project..."
-./gradlew -DdevelopLocal=false :collector:clean
-./gradlew -DdevelopLocal=false :collector:build
-./gradlew -DdevelopLocal=false :collector:assembleRelease
-./gradlew -DdevelopLocal=false :collector:artifactoryPublish
+./gradlew -DdevelopLocal=false :collector:clean || exit
+./gradlew -DdevelopLocal=false :collector:build || exit
+./gradlew -DdevelopLocal=false :collector:assembleRelease || exit
+./gradlew -DdevelopLocal=false :collector:artifactoryPublish || exit
 echo "Created and published :collector project."
 
 echo "Creating and publishing :collector-bitmovin-player project..."
-./gradlew -DdevelopLocal=false :collector-bitmovin-player:clean
-./gradlew -DdevelopLocal=false :collector-bitmovin-player:build
-./gradlew -DdevelopLocal=false :collector-bitmovin-player:assembleRelease
-./gradlew -DdevelopLocal=false :collector-bitmovin-player:artifactoryPublish
+./gradlew -DdevelopLocal=false :collector-bitmovin-player:clean || exit
+./gradlew -DdevelopLocal=false :collector-bitmovin-player:build || exit
+./gradlew -DdevelopLocal=false :collector-bitmovin-player:assembleRelease || exit
+./gradlew -DdevelopLocal=false :collector-bitmovin-player:artifactoryPublish || exit
 echo "Created and published :collector-bitmovin-player project."
 
 echo "Creating and publishing :collector-exoplayer project..."
-./gradlew -DdevelopLocal=false :collector-exoplayer:clean
-./gradlew -DdevelopLocal=false :collector-exoplayer:build
-./gradlew -DdevelopLocal=false :collector-exoplayer:assembleRelease
-./gradlew -DdevelopLocal=false :collector-exoplayer:artifactoryPublish
+./gradlew -DdevelopLocal=false :collector-exoplayer:clean || exit
+./gradlew -DdevelopLocal=false :collector-exoplayer:build || exit
+./gradlew -DdevelopLocal=false :collector-exoplayer:assembleRelease || exit
+./gradlew -DdevelopLocal=false :collector-exoplayer:artifactoryPublish || exit
 echo "Created and published :collector-exoplayer project."
 
-file="./bitmovin.properties"
-
-if [ -f "$file" ]
-then
-  echo "$file found."
-
-  while IFS='=' read -r key value
-  do
-    key=$(echo $key | tr '.' '_')
-    eval ${key}=\${value}
-  done < "$file"
-else
-  echo "$file not found."
-fi
-
-echo "Distributing the artifacts to bintray..."
-
-curl \
-  -u ${artifactoryUser}:${artifactoryPassword} \
-  -X POST \
-  https://bitmovin.jfrog.io/artifactory/api/distribute \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"targetRepo\": \"releases\",
-    \"overrideExistingFiles\": true,
-    \"packagesRepoPaths\": [
-      \"libs-release-local/com/bitmovin/analytics/collector/$VERSION/collector-$VERSION.pom\",
-      \"libs-release-local/com/bitmovin/analytics/collector/$VERSION/collector-$VERSION.aar\",
-      \"libs-release-local/com/bitmovin/analytics/collector-bitmovin-player/$VERSION/collector-bitmovin-player-$VERSION.pom\",
-      \"libs-release-local/com/bitmovin/analytics/collector-bitmovin-player/$VERSION/collector-bitmovin-player-$VERSION.aar\",
-      \"libs-release-local/com/bitmovin/analytics/collector-exoplayer/$VERSION/collector-exoplayer-$VERSION.pom\",
-      \"libs-release-local/com/bitmovin/analytics/collector-exoplayer/$VERSION/collector-exoplayer-$VERSION.aar\"
-    ]}"
-
-echo "\nDistributed the artifacts to bintray."
-
-notifyApi "android-bitmovin" $VERSION "collector-bitmovin-player"
-notifyApi "android-exo" $VERSION "collector-exoplayer"
-
-echo "Don't forget to update the changelog in Contentful."
-open "https://app.contentful.com/spaces/blfijbdi3ei3/entries"
+#
+#git checkout main
+#git pull
+#git merge develop
+#git tag -a v$VERSION -m "v$VERSION"
+#git push origin main v$VERSION
+#
+#echo "Pushed \"main\" and \"$VERSION\" to repo."
+#
+#curl \
+#  -u bitAnalyticsCircleCi:$ANALYTICS_GH_TOKEN \
+#  -X POST \
+#  -H "Accept: application/vnd.github.v3+json" \
+#  https://api.github.com/repos/bitmovin/bitmovin-analytics-collector-android/releases \
+#  -d "{\"tag_name\":\"v$VERSION\", \"name\": \"v$VERSION\", \"draft\": false}"
+#
+#echo "Created release in public repo."
+#
+#file="./bitmovin.properties"
+#
+#if [ -f "$file" ]
+#then
+#  echo "$file found."
+#
+#  while IFS='=' read -r key value
+#  do
+#    key=$(echo $key | tr '.' '_')
+#    eval ${key}=\${value}
+#  done < "$file"
+#else
+#  echo "$file not found."
+#fi
+#
+#echo "Distributing the artifacts to bintray..."
+#
+#curl \
+#  -u ${artifactoryUser}:${artifactoryPassword} \
+#  -X POST \
+#  https://bitmovin.jfrog.io/artifactory/api/distribute \
+#  -H "Content-Type: application/json" \
+#  -d "{
+#    \"targetRepo\": \"releases\",
+#    \"overrideExistingFiles\": true,
+#    \"packagesRepoPaths\": [
+#      \"libs-release-local/com/bitmovin/analytics/collector/$VERSION/collector-$VERSION.pom\",
+#      \"libs-release-local/com/bitmovin/analytics/collector/$VERSION/collector-$VERSION.aar\",
+#      \"libs-release-local/com/bitmovin/analytics/collector-bitmovin-player/$VERSION/collector-bitmovin-player-$VERSION.pom\",
+#      \"libs-release-local/com/bitmovin/analytics/collector-bitmovin-player/$VERSION/collector-bitmovin-player-$VERSION.aar\",
+#      \"libs-release-local/com/bitmovin/analytics/collector-exoplayer/$VERSION/collector-exoplayer-$VERSION.pom\",
+#      \"libs-release-local/com/bitmovin/analytics/collector-exoplayer/$VERSION/collector-exoplayer-$VERSION.aar\"
+#    ]}"
+#
+#echo "\nDistributed the artifacts to bintray."
+#
+#notifyApi "android-bitmovin" $VERSION "collector-bitmovin-player"
+#notifyApi "android-exo" $VERSION "collector-exoplayer"
+#
+#echo "Don't forget to update the changelog in Contentful."
+#open "https://app.contentful.com/spaces/blfijbdi3ei3/entries"
