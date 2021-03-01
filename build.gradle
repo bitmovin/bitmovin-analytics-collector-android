@@ -118,7 +118,7 @@ task createSpotlessPrePushHook() {
 	# store the last exit code in a variable
 	RESULT=\$?
 	
-	# unstash the unstashed changes
+	# unstash the unstaged changes
 	if [ \$STASH_RESULT = 0 ];
 	then
 	  git stash pop;
