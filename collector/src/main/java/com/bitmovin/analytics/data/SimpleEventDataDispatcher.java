@@ -25,20 +25,23 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, Authenti
     private int sampleSequenceNumber = 0;
 
     public SimpleEventDataDispatcher(
-            BitmovinAnalyticsConfig config, Context context, LicenseCallback callback) {
+            BitmovinAnalyticsConfig config,
+            Context context,
+            LicenseCallback callback,
+            BackendFactory backendFactory) {
         this.data = new ConcurrentLinkedQueue<>();
         this.adData = new ConcurrentLinkedQueue<>();
         this.config = config;
         this.callback = callback;
         this.context = context;
-        this.backend = new BackendFactory().createBackend(config, context);
+        this.backend = backendFactory.createBackend(config, context);
     }
 
     @Override
     public synchronized void authenticationCompleted(
             boolean success, Map<String, String> settings) {
         if (callback != null) {
-            callback.configureFeatures(success, settings, data, adData);
+            callback.configureFeatures(success, settings);
         }
         if (success) {
             enabled = true;

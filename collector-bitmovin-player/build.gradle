@@ -57,6 +57,8 @@ dependencies {
 		api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
 	}
 	implementation "com.bitmovin.player:playercore:${rootProject.ext.playercoreVersion}"
+
+	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 }
 
 publishing {

@@ -12,14 +12,6 @@ class ErrorDetailBackend(context: Context) {
     private val queue = LinkedList<ErrorDetail>()
 
     var enabled: Boolean = false
-        set(value) {
-            field = value
-            if (value) {
-                flush()
-            } else {
-                queue.clear()
-            }
-        }
 
     fun limitSegmentsInQueue(max: Int) {
         queue.forEach {
@@ -35,10 +27,16 @@ class ErrorDetailBackend(context: Context) {
         }
     }
 
-    private fun flush() {
-        queue.forEach {
+    fun flush() {
+        // We create a copy of the list to avoid side-effects like ending up in an infinite loop if we always add and remove the same element.
+        // This shouldn't happen as Kotlin is call-by-value, so `send` would not modify the original queue.
+        queue.toList().forEach {
             send(it)
             queue.remove(it)
         }
+    }
+
+    fun clear() {
+        queue.clear()
     }
 }
