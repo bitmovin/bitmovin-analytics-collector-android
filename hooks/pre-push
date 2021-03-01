@@ -4,7 +4,7 @@
 echo '[git hook] executing gradle spotlessCheck before commit'
 
 # stash any unstaged changes
-git stash -q --keep-index --include-untracked
+git stash --keep-index --include-untracked
 STASH_RESULT=$?
 
 # run the spotlessCheck with the gradle wrapper
@@ -15,7 +15,8 @@ RESULT=$?
 
 # unstash the unstashed changes
 if [ $STASH_RESULT = 0 ];
-then git stash pop -q;
+then
+  git stash pop;
 fi
 
 # return the './gradlew spotlessCheck' exit code
