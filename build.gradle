@@ -103,7 +103,9 @@ ext {
 task createSpotlessPrePushHook() {
 	def gitHooksDirectory = new File("$project.rootDir/.git/hooks/")
 	if (!gitHooksDirectory.exists()) gitHooksDirectory.mkdirs()
-	new File("$project.rootDir/.git/hooks", "pre-push").text = """
+	def prePushHookFile = new File("$project.rootDir/.git/hooks", "pre-push")
+	if (prePushHookFile.exists()) prePushHookFile.delete()
+	prePushHookFile.text = """
     #!/bin/sh
 	
 	echo '[git hook] executing gradle spotlessCheck before push'
