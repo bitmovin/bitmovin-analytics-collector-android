@@ -14,7 +14,7 @@ STASH_RESULT=$?
 RESULT=$?
 
 # unstash the unstashed changes
-if [ $STASH_RESULT -e 0 ];
+if [ $STASH_RESULT = 0 ];
 then git stash pop -q;
 fi
 
