@@ -75,8 +75,8 @@ ext {
 	developLocal =  System.getProperty("developLocal", "true").toBoolean()
 	versionNameSuffix = developLocal ? '-local' : ''
 	packageGroupId = 'com.bitmovin.analytics'
-	version = '1.22.0' + versionNameSuffix
-	versionCode = 122001
+	version = project.hasProperty('version') ? project.getProperty('version') : '1.22.0' + versionNameSuffix
+	versionCode = 122001 //only needed for the example apps - for the library, this doesn't matter
 
 	compileSdkVersion = 28
 	minSdkVersion = 16
@@ -98,4 +98,38 @@ ext {
 	constraintlayoutVersion = '1.1.3'
 	multidexVersion = '2.0.1'
 	mockkVersion = '1.10.6'
+}
+
+task createPrePushHook() {
+	def gitHooksDirectory = new File("$project.rootDir/.git/hooks/")
+	if (!gitHooksDirectory.exists()) gitHooksDirectory.mkdirs()
+	def prePushHookFile = new File("$project.rootDir/.git/hooks", "pre-push")
+	if (prePushHookFile.exists()) prePushHookFile.delete()
+	prePushHookFile.text = """
+    #!/bin/sh
+	
+	echo '[git hook] executing gradle spotlessCheck before push'
+	
+	oldsha=\$(git rev-parse -q --verify refs/stash)
+	# stash any unstaged changes
+	git stash save --keep-index --include-untracked
+	newsha=\$(git rev-parse -q --verify refs/stash)
+	
+	# run the spotlessCheck with the gradle wrapper
+	./gradlew spotlessCheck --daemon
+	
+	# store the last exit code in a variable
+	RESULT=\$?
+	
+	# unstash the unstaged changes
+	if [ "\$oldsha" != "\$newsha" ];
+	then
+		echo 'Popping stash as there have been changes before.' 
+	  	git stash pop;
+	fi
+	
+	# return the './gradlew spotlessCheck' exit code
+	exit \$RESULT
+"""
+	"chmod +x .git/hooks/pre-push".execute()
 }
