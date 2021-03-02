@@ -6,8 +6,9 @@ import android.os.Parcelable;
 public class CollectorConfig implements Parcelable {
     private String backendUrl = "https://analytics-ingress-global.bitmovin.com/";
 
-    public CollectorConfig() {
-    }
+    private Boolean tryResendDataOnFailedConnection = false;
+
+    public CollectorConfig() {}
 
     protected CollectorConfig(Parcel in) {
         backendUrl = in.readString();
@@ -23,17 +24,18 @@ public class CollectorConfig implements Parcelable {
         return 0;
     }
 
-    public static final Creator<CollectorConfig> CREATOR = new Creator<CollectorConfig>() {
-        @Override
-        public CollectorConfig createFromParcel(Parcel in) {
-            return new CollectorConfig(in);
-        }
+    public static final Creator<CollectorConfig> CREATOR =
+            new Creator<CollectorConfig>() {
+                @Override
+                public CollectorConfig createFromParcel(Parcel in) {
+                    return new CollectorConfig(in);
+                }
 
-        @Override
-        public CollectorConfig[] newArray(int size) {
-            return new CollectorConfig[size];
-        }
-    };
+                @Override
+                public CollectorConfig[] newArray(int size) {
+                    return new CollectorConfig[size];
+                }
+            };
 
     /**
      * Get the URL of the Bitmovin Analytics backend.
@@ -45,12 +47,30 @@ public class CollectorConfig implements Parcelable {
     }
 
     /**
-     * Set the URL of the Bitmovin Analytics backend to interact with.
-     * Used for on-premise deployments of Bitmovin Analytics
+     * Set the URL of the Bitmovin Analytics backend to interact with. Used for on-premise
+     * deployments of Bitmovin Analytics
      *
      * @param backendUrl
      */
     public void setBackendUrl(String backendUrl) {
         this.backendUrl = backendUrl;
+    }
+
+    /**
+     * Get if failed requests should be resent again
+     *
+     * @return
+     */
+    public Boolean getTryResendDataOnFailedConnection() {
+        return tryResendDataOnFailedConnection;
+    }
+
+    /**
+     * Set if failed requests should be resent again
+     *
+     * @param tryResendDataOnFailedConnection
+     */
+    public void setTryResendDataOnFailedConnection(Boolean tryResendDataOnFailedConnection) {
+        this.tryResendDataOnFailedConnection = tryResendDataOnFailedConnection;
     }
 }

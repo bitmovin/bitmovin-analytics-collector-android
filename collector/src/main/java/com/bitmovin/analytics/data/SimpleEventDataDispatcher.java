@@ -1,16 +1,16 @@
 package com.bitmovin.analytics.data;
 
 import android.content.Context;
-
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.license.AuthenticationCallback;
 import com.bitmovin.analytics.license.LicenseCall;
 import com.bitmovin.analytics.license.LicenseCallback;
-
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseCallback {
+public class SimpleEventDataDispatcher implements IEventDataDispatcher, AuthenticationCallback {
     private static final String TAG = "BitmovinAnalytics/SimpleDispatcher";
     private final Backend backend;
 
@@ -24,17 +24,25 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
 
     private int sampleSequenceNumber = 0;
 
-    public SimpleEventDataDispatcher(BitmovinAnalyticsConfig config, Context context, LicenseCallback callback) {
+    public SimpleEventDataDispatcher(
+            BitmovinAnalyticsConfig config,
+            Context context,
+            LicenseCallback callback,
+            BackendFactory backendFactory) {
         this.data = new ConcurrentLinkedQueue<>();
         this.adData = new ConcurrentLinkedQueue<>();
         this.config = config;
         this.callback = callback;
         this.context = context;
-        this.backend = new BackendFactory().createBackend(config, context);
+        this.backend = backendFactory.createBackend(config, context);
     }
 
     @Override
-    synchronized public void authenticationCompleted(boolean success) {
+    public synchronized void authenticationCompleted(
+            boolean success, Map<String, String> settings) {
+        if (callback != null) {
+            callback.configureFeatures(success, settings);
+        }
         if (success) {
             enabled = true;
             Iterator<EventData> it = data.iterator();
@@ -51,7 +59,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
             }
         }
 
-        if(callback != null) {
+        if (callback != null) {
             callback.authenticationCompleted(success);
         }
     }
@@ -94,5 +102,4 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, LicenseC
         this.data.clear();
         this.adData.clear();
     }
-
 }

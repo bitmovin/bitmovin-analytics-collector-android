@@ -3,57 +3,57 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+	compileSdkVersion rootProject.ext.compileSdkVersion
 
-    defaultConfig {
-        applicationId "com.bitmovin.exoplayeranalyticsexample"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode rootProject.ext.versionCode
-        versionName rootProject.ext.version
+	defaultConfig {
+		applicationId "com.bitmovin.exoplayeranalyticsexample"
+		minSdkVersion rootProject.ext.minSdkVersion
+		targetSdkVersion rootProject.ext.targetSdkVersion
+		versionCode rootProject.ext.versionCode
+		versionName rootProject.ext.version
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
-    }
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+		multiDexEnabled true
+	}
 
-    lintOptions {
-        abortOnError false
-    }
+	lintOptions {
+		abortOnError false
+	}
 
-    compileOptions {
-        sourceCompatibility rootProject.ext.sourceCompatibility
-        targetCompatibility rootProject.ext.targetCompatibility
-    }
+	compileOptions {
+		sourceCompatibility rootProject.ext.sourceCompatibility
+		targetCompatibility rootProject.ext.targetCompatibility
+	}
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
 }
 
 configurations {
-    exoReleaseCompile
+	exoReleaseCompile
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
-    implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
-    implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
-    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
-    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
-    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+	implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
+	implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
+	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
 
 
-    implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
-    implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
+	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
+	implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
 
-    // Pull from Maven Repo
-    if (rootProject.ext.developLocal) {
-        implementation project(':collector-exoplayer')
-    } else {
-        implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
-    }
+	// Pull from Maven Repo
+	if (rootProject.ext.developLocal) {
+		implementation project(':collector-exoplayer')
+	} else {
+		implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
+	}
 }

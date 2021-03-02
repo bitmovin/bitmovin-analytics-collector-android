@@ -1,13 +1,11 @@
 package com.bitmovin.analytics.data;
 
-
 public class LicenseCallData {
     private String key;
     private String analyticsVersion;
     private String domain;
 
-    public LicenseCallData() {
-    }
+    public LicenseCallData() {}
 
     public void setKey(String key) {
         this.key = key;
@@ -21,9 +19,7 @@ public class LicenseCallData {
         this.domain = domain;
     }
 
-
     public String getKey() {
         return key;
     }
 }
-

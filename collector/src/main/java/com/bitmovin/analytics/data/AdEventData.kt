@@ -110,7 +110,8 @@ data class AdEventData(
     var autoplay: Boolean? = null,
     var platform: String? = null,
     var audioCodec: String? = null,
-    var videoCodec: String? = null
+    var videoCodec: String? = null,
+    var retryCount: Int = 0
 ) {
 
     fun setEventData(eventData: EventData) {

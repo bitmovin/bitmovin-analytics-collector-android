@@ -7,7 +7,6 @@ import android.media.MediaCodecList;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Pair;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +22,8 @@ public class Util {
     public static final int MILLISECONDS_IN_SECONDS = 1000;
     public static final int VIDEOSTART_TIMEOUT = 1000 * 60; // in milliseconds
     public static final int ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD = 50;
-    public static final int ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL = 1000 * 60 * 60; // in milliseconds;
+    public static final int ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL =
+            1000 * 60 * 60; // in milliseconds;
     public static final int REBUFFERING_TIMEOUT = 1000 * 60 * 2; // in milliseconds
 
     private static final Map<String, String> VIDEO_FORMAT_MIME_TYPE_MAP;
@@ -36,19 +36,17 @@ public class Util {
         VIDEO_FORMAT_MIME_TYPE_MAP.put("vp9", "video/x-vnd.on2.vp9");
     }
 
-
     public static String getUUID() {
         return UUID.randomUUID().toString();
     }
 
     public static String getUserId(Context context) {
-        return Settings.Secure.getString(context.getContentResolver(),
-                Settings.Secure.ANDROID_ID);
+        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     /**
-     * Returns the time in ms since the system was booted, and guaranteed to be monotonic
-     * Details here: https://developer.android.com/reference/android/os/SystemClock
+     * Returns the time in ms since the system was booted, and guaranteed to be monotonic Details
+     * here: https://developer.android.com/reference/android/os/SystemClock
      *
      * @return The time in ms since the system was booted, and guaranteed to be monotonic.
      */
@@ -66,8 +64,7 @@ public class Util {
 
     public static List<String> getSupportedVideoFormats() {
         List<String> codecs = new ArrayList<>();
-        for (String format :
-                VIDEO_FORMAT_MIME_TYPE_MAP.keySet()) {
+        for (String format : VIDEO_FORMAT_MIME_TYPE_MAP.keySet()) {
             if (isMimeTypeSupported(VIDEO_FORMAT_MIME_TYPE_MAP.get(format))) {
                 codecs.add(format);
             }
@@ -113,7 +110,8 @@ public class Util {
         return new Pair<>(null, null);
     }
 
-    public static boolean getIsLiveFromConfigOrPlayer(boolean isPlayerReady, Boolean isLiveFromConfig, boolean isLiveFromPlayer) {
+    public static boolean getIsLiveFromConfigOrPlayer(
+            boolean isPlayerReady, Boolean isLiveFromConfig, boolean isLiveFromPlayer) {
         if (isPlayerReady) {
             return isLiveFromPlayer;
         }
