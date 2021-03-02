@@ -1,25 +1,35 @@
-apply from: './bitmovinpropertiesloader.gradle'
-
 buildscript {
 	ext.kotlin_version = '1.3.50'
 
-	repositories {
-		google()
-		jcenter()
-		maven { url "https://plugins.gradle.org/m2/" }
-	}
+    repositories {
+        google()
+        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url 'http://bitmovin.bintray.com/maven' }
+        mavenCentral()
+    }
 
-	dependencies {
-		classpath 'com.android.tools.build:gradle:4.0.2'
-		classpath "com.diffplug.spotless:spotless-plugin-gradle:5.9.0"
-		classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.8"
-		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-		classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.0.2'
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:5.9.0"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.8"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
+        classpath 'org.jacoco:org.jacoco.core:0.8.6'
 
-		// NOTE: Do not place your application dependencies here; they belong
-		// in the individual module build.gradle files
-	}
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1.1"
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
 }
+
+plugins {
+    id 'java'
+    id 'jacoco'
+    id "org.sonarqube" version "3.1.1"
+}
+
+apply from: './bitmovinpropertiesloader.gradle'
 
 allprojects {
 	repositories {
@@ -132,4 +142,32 @@ task createPrePushHook() {
 	exit \$RESULT
 """
 	"chmod +x .git/hooks/pre-push".execute()
+}
+
+sonarqube {
+    properties {
+        property "sonar.host.url", "https://sonar.bitmovin.com"
+        property "sonar.projectName", "Analytics Collector Android"
+        property "sonar.projectKey", "analytics-collector-android"
+        property "sonar.tests", ["src/test/java"]
+        property "sonar.test.inclusions", "**/*Test*/**"
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.sources", "src/main/java"
+        property "sonar.exclusions", '**/*Test*/**,' +
+                '*.json,' +
+                '**/*test*/**,' +
+                '**/.gradle/**,' +
+                '**/R.class'
+    }
+}
+
+project(":analyticsexample") {
+    sonarqube {
+        skipProject = true
+    }
+}
+project(":bitmovinanalyticsexample") {
+    sonarqube {
+        skipProject = true
+    }
 }

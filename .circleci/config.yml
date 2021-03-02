@@ -1,0 +1,50 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-28
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "collector/build.gradle" }}-{{ checksum  "collector-exoplayer/build.gradle" }}-{{ checksum  "collector-bitmovin-player/build.gradle" }}
+#      - run:
+#         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
+#         command: sudo chmod +x ./gradlew
+      - run:
+          name: Code style check
+          command: |
+            # Code Style Check
+            echo "Checking Code Style..."
+
+            ./gradlew spotlessCheck
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "collector/build.gradle" }}-{{ checksum  "collector-exoplayer/build.gradle" }}-{{ checksum  "collector-bitmovin-player/build.gradle" }}
+      - run:
+          name: Run Tests
+          command: ./gradlew lint test
+      - run:
+          name: SonarQube
+          command: ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN
+      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: collector/build/test-results
+      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: collector-exoplayer/build/test-results
+      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: collector-bitmovin-player/build/test-results
+      # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
+      #
+
+workflows:
+  version: 2
+  android-build:
+    jobs:
+      - build:
+          context: analytics

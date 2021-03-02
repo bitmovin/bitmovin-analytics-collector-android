@@ -99,14 +99,14 @@ public class ExoPlayerAdapter
 
     private boolean isHlsManifestClassLoaded() {
         if (this._isHlsManifestClassLoaded == null) {
-            this._isHlsManifestClassLoaded = Util.isClassLoaded(HLS_MANIFEST_CLASSNAME);
+            this._isHlsManifestClassLoaded = Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, this.getClass().getClassLoader());
         }
         return this._isHlsManifestClassLoaded;
     }
 
     private boolean isDashManifestClassLoaded() {
         if (this._isDashManifestClassLoaded == null) {
-            this._isDashManifestClassLoaded = Util.isClassLoaded(DASH_MANIFEST_CLASSNAME);
+            this._isDashManifestClassLoaded = Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.getClass().getClassLoader());
         }
         return this._isDashManifestClassLoaded;
     }
