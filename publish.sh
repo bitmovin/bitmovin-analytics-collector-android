@@ -90,7 +90,9 @@ git merge develop
 git tag -a v$VERSION -m "v$VERSION" #TODO check if tag exists in the beginning. If yes, ask if the user wants to override the version and force overriding of tag
 git push origin main v$VERSION
 #TODO exit if error
-echo "Pushed \"main\" and \"$VERSION\" to repo."
+echo "Pushed \"main\" and \"$VERSION\" to internal repo."
+git push git@github.com:bitmovin/bitmovin-analytics-collector-android.git main $VERSION
+echo "Pushed \"main\" and \"$VERSION\" to public repo."
 
 #TODO override existing release
 curl \
