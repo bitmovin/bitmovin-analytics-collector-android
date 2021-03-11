@@ -58,7 +58,11 @@ dependencies {
 	} else {
 		api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
 	}
-	implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
+	implementation("com.google.android.exoplayer:exoplayer") {
+		version {
+			strictly "(${rootProject.ext.exoplayerVersion}, 2.12.0)"
+		}
+	}
 }
 
 publishing {
