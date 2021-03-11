@@ -75,8 +75,8 @@ ext {
 	developLocal =  System.getProperty("developLocal", "true").toBoolean()
 	versionNameSuffix = developLocal ? '-local' : ''
 	packageGroupId = 'com.bitmovin.analytics'
-	version = '1.22.0' + versionNameSuffix
-	versionCode = 122001
+	version = '1.22.1' + versionNameSuffix
+	versionCode = 122002
 
 	compileSdkVersion = 28
 	minSdkVersion = 16
