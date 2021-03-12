@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] `ErrorDetailsFeature` to track additional details in case an error occurs
 - [Internal] Enabled code style checks on pre-push and publish
 
+## v1.22.1
+
+### Fixed
+
+- Added upper exclusive bound of 2.12.0 for ExoPlayer dependency
+
 ## v1.22.0
 
 ### Added
