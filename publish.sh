@@ -94,7 +94,7 @@ git tag -a v$VERSION -m "v$VERSION" #TODO check if tag exists in the beginning. 
 git push origin main v$VERSION
 #TODO exit if error
 echo "Pushed \"main\" and \"$VERSION\" to internal repo."
-git push git@github.com:bitmovin/bitmovin-analytics-collector-android.git main $VERSION
+git push git@github.com:bitmovin/bitmovin-analytics-collector-android.git main v$VERSION
 echo "Pushed \"main\" and \"$VERSION\" to public repo."
 
 #TODO override existing release
