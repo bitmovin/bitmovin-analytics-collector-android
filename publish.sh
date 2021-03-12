@@ -67,6 +67,7 @@ echo "Creating and publishing :collector project..."
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:build || exit
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:assembleRelease || exit
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:artifactoryPublish || exit
+./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:publishToMavenLocal || exit
 echo "Created and published :collector project."
 
 echo "Creating and publishing :collector-bitmovin-player project..."
@@ -74,6 +75,7 @@ echo "Creating and publishing :collector-bitmovin-player project..."
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:build || exit
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:assembleRelease || exit
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:artifactoryPublish || exit
+./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:publishToMavenLocal || exit
 echo "Created and published :collector-bitmovin-player project."
 
 echo "Creating and publishing :collector-exoplayer project..."
@@ -81,6 +83,7 @@ echo "Creating and publishing :collector-exoplayer project..."
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:build || exit
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:assembleRelease || exit
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:artifactoryPublish || exit
+./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:publishToMavenLocal || exit
 echo "Created and published :collector-exoplayer project."
 
 
@@ -91,7 +94,7 @@ git tag -a v$VERSION -m "v$VERSION" #TODO check if tag exists in the beginning. 
 git push origin main v$VERSION
 #TODO exit if error
 echo "Pushed \"main\" and \"$VERSION\" to internal repo."
-git push git@github.com:bitmovin/bitmovin-analytics-collector-android.git main $VERSION
+git push git@github.com:bitmovin/bitmovin-analytics-collector-android.git main v$VERSION
 echo "Pushed \"main\" and \"$VERSION\" to public repo."
 
 #TODO override existing release
