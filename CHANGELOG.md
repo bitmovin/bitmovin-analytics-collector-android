@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.22.1
+
+### Fixed
+
+- Added upper exclusive bound of 2.12.0 for ExoPlayer dependency
+
 ## v1.22.0
 
 ### Added
