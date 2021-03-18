@@ -42,7 +42,6 @@ dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 	implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
 	implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
-    implementation project(path: ':collector-exoplayer-x12')
 	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
 	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
 	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
