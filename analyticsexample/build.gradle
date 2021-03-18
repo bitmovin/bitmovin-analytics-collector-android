@@ -42,17 +42,18 @@ dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 	implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
 	implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
+    implementation project(path: ':collector-exoplayer-x12')
 	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
 	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
 	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
 
 
 	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
-	implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
+	implementation "com.google.android.exoplayer:exoplayer:2.13.2"
 
 	// Pull from Maven Repo
 	if (rootProject.ext.developLocal) {
-		implementation project(':collector-exoplayer')
+		implementation project(':collector-exoplayer-x12')
 	} else {
 		implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
 	}

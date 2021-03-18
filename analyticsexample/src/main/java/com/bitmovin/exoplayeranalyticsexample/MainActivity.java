@@ -13,7 +13,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.CDNProvider;
-import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
+import com.bitmovin.analytics.exoplayer.x12.ExoPlayerCollector;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -29,6 +29,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity
     private Button createButton;
     private Button sourceChangeButton;
     private TextView eventLogView;
-    private final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+
     private DataSource.Factory dataSourceFactory;
 
     private ExoPlayerCollector bitmovinAnalytics;
@@ -62,9 +63,7 @@ public class MainActivity extends AppCompatActivity
         sourceChangeButton.setOnClickListener(this);
         eventLogView = findViewById(R.id.eventLog);
 
-        dataSourceFactory =
-                new DefaultDataSourceFactory(
-                        this, bandwidthMeter, buildHttpDataSourceFactory(bandwidthMeter));
+        dataSourceFactory = new DefaultDataSourceFactory(this, buildHttpDataSourceFactory());
         createPlayer();
     }
 
@@ -91,7 +90,7 @@ public class MainActivity extends AppCompatActivity
 
     private void createPlayer() {
         if (player == null) {
-
+            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(this).build();
             SimpleExoPlayer.Builder exoBuilder = new SimpleExoPlayer.Builder(this);
             exoBuilder.setBandwidthMeter(bandwidthMeter);
 
@@ -142,13 +141,13 @@ public class MainActivity extends AppCompatActivity
                             dataSourceFactory);
             // mediaSource = new ConcatenatingMediaSource(dashMediaSource, dashMediaSource);
 
-            player.prepare(dashMediaSource);
+            player.setMediaSource(dashMediaSource);
             player.setPlayWhenReady(false);
         }
     }
 
     protected DashMediaSource getDRMSource(DataSource.Factory dataSourceFactory) {
-        DefaultDrmSessionManager<ExoMediaCrypto> drmSesssionManager =
+        DefaultDrmSessionManager drmSesssionManager =
                 getDrmSession(
                         "https://widevine-proxy.appspot.com/proxy",
                         C.WIDEVINE_UUID,
@@ -167,7 +166,7 @@ public class MainActivity extends AppCompatActivity
         return getMediaSource(dashStatic, dataSourceFactory, null);
     }
 
-    protected static DefaultDrmSessionManager<ExoMediaCrypto> getDrmSession(
+    protected static DefaultDrmSessionManager getDrmSession(
             String drmLicenseUrl, UUID drmScheme, String userAgent) {
 
         if (drmLicenseUrl != null && drmScheme != null) {
@@ -187,7 +186,7 @@ public class MainActivity extends AppCompatActivity
     protected static DashMediaSource getMediaSource(
             Uri dashStatic,
             DataSource.Factory dataSourceFactory,
-            DefaultDrmSessionManager<ExoMediaCrypto> drmSession) {
+            DefaultDrmSessionManager drmSession) {
         DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
         DashMediaSource.Factory sourceFactory =
                 new DashMediaSource.Factory(source, dataSourceFactory);
@@ -200,7 +199,7 @@ public class MainActivity extends AppCompatActivity
     protected static HttpMediaDrmCallback createMediaDrmCallback(
             String licenseUrl, String userAgent) {
         HttpDataSource.Factory licenseDataSourceFactory =
-                new DefaultHttpDataSourceFactory(userAgent);
+                new DefaultHttpDataSource.Factory().setUserAgent(userAgent);
         HttpMediaDrmCallback drmCallback =
                 new HttpMediaDrmCallback(licenseUrl, licenseDataSourceFactory);
 
@@ -215,10 +214,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private HttpDataSource.Factory buildHttpDataSourceFactory(
-            DefaultBandwidthMeter bandwidthMeter) {
-        return new DefaultHttpDataSourceFactory(
-                Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter);
+    private HttpDataSource.Factory buildHttpDataSourceFactory() {
+        return new DefaultHttpDataSource.Factory().setUserAgent(Util.getUserAgent(this, getString(R.string.app_name)));
+
     }
 
     @Override
@@ -240,7 +238,7 @@ public class MainActivity extends AppCompatActivity
         bitmovinAnalyticsConfig.setTitle("DRM Video Title");
 
         bitmovinAnalytics.attachPlayer(player);
-        player.prepare(dashMediaSource);
+        player.setMediaSource(dashMediaSource);
     }
 
     @Override
