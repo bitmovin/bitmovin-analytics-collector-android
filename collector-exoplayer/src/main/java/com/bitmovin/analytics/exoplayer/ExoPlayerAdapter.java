@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.exoplayer.x12;
+package com.bitmovin.analytics.exoplayer;
 
 import static com.google.android.exoplayer2.C.CLEARKEY_UUID;
 import static com.google.android.exoplayer2.C.DATA_TYPE_MANIFEST;
@@ -24,6 +24,8 @@ import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
+import com.bitmovin.analytics.exoplayer.base.ExoPlayerExceptionMapper;
+import com.bitmovin.analytics.exoplayer.base.ExoUtil;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
