@@ -53,6 +53,7 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -88,7 +89,6 @@ public class ExoPlayerAdapter
     private boolean isVideoAttemptedPlay = false;
     private long previousQualityChangeBitrate = 0;
     private boolean isPlaying = false;
-    private boolean playWhenReady = false;
 
     public ExoPlayerAdapter(
             ExoPlayer exoplayer,
@@ -160,7 +160,6 @@ public class ExoPlayerAdapter
         this.playerIsReady = false;
         this.isVideoAttemptedPlay = false;
         isPlaying = false;
-        playWhenReady = false;
         checkAutoplayStartup();
         return new ArrayList<>();
     }
@@ -279,8 +278,19 @@ public class ExoPlayerAdapter
             for (int i = 0; i < exoplayer.getCurrentTrackSelections().length; i++) {
                 TrackSelection trackSelection = exoplayer.getCurrentTrackSelections().get(i);
                 if (trackSelection != null) {
-                    // TODO this needs to be fully rewritten
-                    Format format = trackSelection.getFormat(0);
+                    // TODO this needs to be fully rewritten -> reflection
+                    Format format = null;
+                    Method getSelectedTracksMethod = null;
+                    try{
+                        getSelectedTracksMethod = trackSelection.getClass().getMethod("getSelectedFormat");
+                        format = (Format) getSelectedTracksMethod.invoke(trackSelection);
+                    } catch (Exception e) { }
+
+
+                    if (getSelectedTracksMethod == null && format == null){
+                        format = trackSelection.getFormat(0);
+                    }
+
                     switch (exoplayer.getRendererType(i)) {
                         case TRACK_TYPE_AUDIO:
                             data.setAudioBitrate(format.sampleRate);
@@ -312,7 +322,6 @@ public class ExoPlayerAdapter
     }
 
     @Override
-//    todo check annotation
     public void onMediaItemTransition(@androidx.annotation.Nullable MediaItem mediaItem, int reason) {
 
     }
@@ -330,12 +339,6 @@ public class ExoPlayerAdapter
     @Override
     public void onIsLoadingChanged(boolean isLoading)  {
         Log.d(TAG, "onIsLoadingChanged");
-    }
-
-// TODO find alternative implementation :O
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-
     }
 
     @Override
@@ -424,45 +427,26 @@ public class ExoPlayerAdapter
             long videoTime = getPosition();
             Log.d(TAG, String.format("onPlaybackStateChanged: %s", ExoUtil.exoStateToString(state)));
 
-            boolean oldIsPlaying = this.isPlaying;
-//            boolean oldIsPaused = !this.isPlaying;
-            this.isPlaying = playWhenReady;
-//            boolean isPaused = !this.isPlaying;
-
-            // original logic copied from BMP SDK
-            if (state != Player.STATE_ENDED) {
-                if (isPlaying != oldIsPlaying && isPlaying == false && oldIsPlaying) {
-                    stateMachine.pause(getPosition());
-                }
-            }
             switch (state) {
                 case Player.STATE_READY:
-                    if (this.isPlaying) {
-                        stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                    //if autoplay is enabled startup state is not yet finished
+                    if (!stateMachine.isStartupFinished() && (stateMachine.getCurrentState() != PlayerState.STARTUP && exoplayer.getPlayWhenReady())) {
+                        stateMachine.transitionState(PlayerState.READY, getPosition());
                     }
                     break;
                 case Player.STATE_BUFFERING:
-                    if (!stateMachine.isStartupFinished()) {
-                        if (this.isPlaying != oldIsPlaying && this.isPlaying) {
-                            // with autoplay enabled the player first enter here and start buffering
-                            // for the video with playWhenReady = true
-                            startup(videoTime);
-                        }
-                    } else {
-                        if (isPlaying
+                        if (stateMachine.isStartupFinished() && this.isPlaying
                                 && stateMachine.getCurrentState() != PlayerState.SEEKING) {
                             this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
                         }
-                    }
                     break;
                 case Player.STATE_IDLE:
                     // TODO check what this state could mean for analytics?
-                    this.stateMachine.transitionState(PlayerState.READY, videoTime);
                     break;
                 case Player.STATE_ENDED:
                     // TODO this is equivalent to BMPs PlaybackFinished Event
                     // should we setup new impression here
-                    this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
+                    // onIsPlayingChanged is triggered after this event and does transition to PAUSE state
                     break;
                 default:
                     Log.d(TAG, "Unknown Player PlayerState encountered");
@@ -475,9 +459,11 @@ public class ExoPlayerAdapter
     @Override
     public void onPlayWhenReadyChanged(EventTime eventTime, boolean playWhenReady, int reason) {
         try {
-            Log.d(TAG, String.format("onPlayerStateChanged: %b, %s", playWhenReady, ExoUtil.exoStateToString(reason)));
+            Log.d(TAG, String.format("onPlayWhenReadyChanged: %b, %s", playWhenReady, ExoUtil.exoStateToString(reason)));
 
-            this.playWhenReady = playWhenReady;
+            if (!stateMachine.isStartupFinished() && playWhenReady) {
+                startup(getPosition());
+            }
 
         } catch (Exception e) {
                   Log.d(TAG, e.getMessage(), e);
@@ -493,9 +479,13 @@ public class ExoPlayerAdapter
     public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
         try {
             Log.d(TAG, "onIsPlayingChanged " + isPlaying);
-            if (!stateMachine.isStartupFinished() && isPlaying) {
-                startup(getPosition());
+            this.isPlaying = isPlaying;
+            if (isPlaying) {
+                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+            }else if (stateMachine.getCurrentState() != PlayerState.SEEKING && stateMachine.getCurrentState() != PlayerState.BUFFERING) {
+                this.stateMachine.transitionState(PlayerState.PAUSE, getPosition());
             }
+
         } catch (Exception e) {
             Log.d(TAG, e.getMessage(), e);
         }
@@ -568,7 +558,6 @@ public class ExoPlayerAdapter
 
     }
 
-    // todo test
     @Override
     public void onLoadCompleted(EventTime eventTime, LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {
         try {
@@ -670,19 +659,14 @@ public class ExoPlayerAdapter
 
     @Override
     public void onAudioInputFormatChanged(EventTime eventTime, Format format, @androidx.annotation.Nullable DecoderReuseEvaluation decoderReuseEvaluation) {
-//        todo do we need this, if yes check what is available in Format class
-//        handleInputFormatChanged(format);
+        handleInputFormatChanged(format);
     }
 
     private void handleInputFormatChanged(Format format){
         try {
             if ((this.stateMachine.getCurrentState() == PlayerState.PLAYING)
                     || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)) {
-                Log.d(
-                        TAG,
-                        String.format(
-                                "inputFormatChanged: Bitrate: %d Resolution: %d x %d",
-                                format.bitrate, format.width, format.height));
+                Log.d(TAG, String.format("inputFormatChanged: Bitrate: %d", format.bitrate));
                 if (format.bitrate == this.previousQualityChangeBitrate) {
                     Log.d(TAG, "inputFormatChanged: Skipping sample sending");
                     return;
