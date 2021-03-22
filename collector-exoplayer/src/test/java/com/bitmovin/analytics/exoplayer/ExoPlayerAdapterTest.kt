@@ -31,30 +31,55 @@ class ExoPlayerAdapterTest {
         adapter = FakeExoPlayerAdapter(mock(ExoPlayer::class.java), mock(BitmovinAnalyticsConfig::class.java), mock(DeviceInformationProvider::class.java), stateMachine)
     }
 
-//    @Test
-//    fun testNoStateTransitionToQualityChangeIfBitrateDidNotChange() {
-//        val bitrate = 3000
-//        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
-//        `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
-//        adapter.fakePosition = 20
-//        adapter.onDecoderInputFormatChanged(getEventTime(20L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
-//        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
-//
-//        adapter.onDecoderInputFormatChanged(getEventTime(30L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
-//        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
-//    }
-//
-//    @Test
-//    fun testNoStateTransitionToQualityChangeIfQualityChangeLimit() {
-//        val bitrate = 3000
-//        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
-//        `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
-//        adapter.fakePosition = 20
-//        adapter.onDecoderInputFormatChanged(getEventTime(20L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
-//        verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
-//    }
-//
-//    private fun getEventTime(realTime: Long): AnalyticsListener.EventTime {
-//        return AnalyticsListener.EventTime(realTime, Timeline.EMPTY, 0, null, 0, 0, 0)
-//    }
+    @Test
+    fun testNoStateTransitionToQualityChangeIfBitrateDidNotChangeOnVideoFormatChanged() {
+        val bitrate = 3000
+        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
+        `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
+        adapter.fakePosition = 20
+        adapter.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+
+        adapter.onVideoInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+    }
+
+    @Test
+    fun testNoStateTransitionToQualityChangeIfBitrateDidNotChangeOnAudioFormatChanged() {
+        val bitrate = 3000
+        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
+        `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
+        adapter.fakePosition = 20
+        adapter.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+
+        adapter.onAudioInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+    }
+
+    @Test
+    fun testNoStateTransitionToQualityChangeIfQualityChangeLimitOnVideoFormatChanged() {
+        val bitrate = 3000
+        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
+        `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
+        adapter.fakePosition = 20
+        adapter.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+    }
+
+    @Test
+    fun testNoStateTransitionToQualityChangeIfQualityChangeLimitOnAudioFormatChanged() {
+        val bitrate = 3000
+        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
+        `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
+        adapter.fakePosition = 20
+        adapter.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+    }
+
+
+    private fun getEventTime(realTime: Long): AnalyticsListener.EventTime {
+        return AnalyticsListener.EventTime(realTime, Timeline.EMPTY, 0, null, 0, Timeline.EMPTY,
+                0, null, 0, 0)
+    }
 }
