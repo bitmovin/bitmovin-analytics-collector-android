@@ -77,7 +77,6 @@ class ExoPlayerAdapterTest {
         verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
-
     private fun getEventTime(realTime: Long): AnalyticsListener.EventTime {
         return AnalyticsListener.EventTime(realTime, Timeline.EMPTY, 0, null, 0, Timeline.EMPTY,
                 0, null, 0, 0)
