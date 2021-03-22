@@ -46,7 +46,7 @@ dependencies {
 	implementation fileTree(dir: 'libs', include: ['*.jar'])
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 	implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
-//	todo is this correct place or should it depend on local development and release??
+	//	todo is this correct place or should it depend on local development and release??
 	implementation project(path: ':collector-exoplayer-base')
 	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
 	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
