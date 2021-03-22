@@ -1,6 +1,6 @@
 include ':collector-exoplayer-base'
-include ':collector-exoplayer-x12'
+include ':collector-exoplayer'
 include ':collector', ':analyticsexample', ':bitmovinanalyticsexample'
-include 'collector-exoplayer'
+include 'collector-exoplayer-v1'
 include 'collector-bitmovin-player'
 
