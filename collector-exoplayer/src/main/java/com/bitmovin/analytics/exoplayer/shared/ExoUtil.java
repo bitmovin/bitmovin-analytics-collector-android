@@ -1,4 +1,5 @@
 package com.bitmovin.analytics.exoplayer.shared;
+
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
