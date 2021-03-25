@@ -24,8 +24,9 @@ import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
-import com.bitmovin.analytics.exoplayer.base.ExoPlayerExceptionMapper;
-import com.bitmovin.analytics.exoplayer.base.ExoUtil;
+
+import com.bitmovin.analytics.exoplayer.shared.ExoPlayerExceptionMapper;
+import com.bitmovin.analytics.exoplayer.shared.ExoUtil;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -62,6 +63,8 @@ import java.util.Date;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+
 
 public class ExoPlayerAdapter
         implements PlayerAdapter, Player.EventListener, AnalyticsListener, EventDataManipulator {

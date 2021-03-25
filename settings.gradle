@@ -1,4 +1,3 @@
-include ':collector-exoplayer-base'
 include ':collector-exoplayer'
 include ':collector', ':analyticsexample', ':bitmovinanalyticsexample'
 include 'collector-exoplayer-v1'
