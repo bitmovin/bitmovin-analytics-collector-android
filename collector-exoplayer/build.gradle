@@ -27,8 +27,8 @@ android {
 		targetCompatibility rootProject.ext.targetCompatibility
 	}
 
-	// including com.bitmovin.analytics.exoplayer.com.bitmovin.analytics.exoplayer.shared util classes
-	sourceSets.main.java.srcDirs += ['/src/main/java/shared/']
+	// including com.bitmovin.analytics.exoplayer.shared util classes
+	sourceSets.main.java.srcDirs += ['../exoplayer-shared/']
 
 	buildTypes {
 		release {
