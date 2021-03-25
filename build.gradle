@@ -85,7 +85,9 @@ ext {
 	developLocal =  System.getProperty("developLocal", "true").toBoolean()
 	versionNameSuffix = developLocal ? '-local' : ''
 	packageGroupId = 'com.bitmovin.analytics'
+	versionV1 = project.hasProperty('versionV1') ? project.getProperty('versionV1') : '1.22.1' + versionNameSuffix
 	version = project.hasProperty('version') ? project.getProperty('version') : '1.22.1' + versionNameSuffix
+	versionCodeV1 = 122002 //only needed for the example apps - for the library, this doesn't matter
 	versionCode = 122002 //only needed for the example apps - for the library, this doesn't matter
 
 	compileSdkVersion = 28
