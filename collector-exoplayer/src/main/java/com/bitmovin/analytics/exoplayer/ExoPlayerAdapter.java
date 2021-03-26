@@ -34,7 +34,6 @@ import com.bitmovin.analytics.utils.Util;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -59,7 +58,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -742,58 +740,4 @@ public class ExoPlayerAdapter
     public void onDrmSessionReleased(EventTime eventTime) {
         Log.d(TAG, "onDrmSessionReleased");
     }
-
-    @Override
-    public void onMediaItemTransition(
-            EventTime eventTime, @androidx.annotation.Nullable MediaItem mediaItem, int reason) {}
-
-    @Override
-    public void onMediaItemTransition(
-            @androidx.annotation.Nullable MediaItem mediaItem, int reason) {}
-
-    @Override
-    public void onStaticMetadataChanged(List<Metadata> metadataList) {}
-
-    @Override
-    public void onPlaybackStateChanged(int state) {}
-
-    @Override
-    public void onPlayWhenReadyChanged(boolean playWhenReady, int reason) {}
-
-    @Override
-    public void onExperimentalOffloadSchedulingEnabledChanged(boolean offloadSchedulingEnabled) {}
-
-    @Override
-    public void onExperimentalSleepingForOffloadChanged(boolean sleepingForOffload) {}
-
-    @Override
-    public void onEvents(Player player, Player.Events events) {}
-
-    @Override
-    public void onStaticMetadataChanged(EventTime eventTime, List<Metadata> metadataList) {}
-
-    @Override
-    public void onAudioEnabled(EventTime eventTime, DecoderCounters counters) {}
-
-    @Override
-    public void onAudioPositionAdvancing(EventTime eventTime, long playoutStartSystemTimeMs) {}
-
-    @Override
-    public void onSkipSilenceEnabledChanged(EventTime eventTime, boolean skipSilenceEnabled) {}
-
-    @Override
-    public void onAudioSinkError(EventTime eventTime, Exception audioSinkError) {}
-
-    @Override
-    public void onVideoEnabled(EventTime eventTime, DecoderCounters counters) {}
-
-    @Override
-    public void onVideoFrameProcessingOffset(
-            EventTime eventTime, long totalProcessingOffsetUs, int frameCount) {}
-
-    @Override
-    public void onPlayerReleased(EventTime eventTime) {}
-
-    @Override
-    public void onEvents(Player player, Events events) {}
 }
