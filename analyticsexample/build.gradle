@@ -48,7 +48,7 @@ dependencies {
 
 
 	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
-	implementation "com.google.android.exoplayer:exoplayer:2.13.2"
+	implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
 
 	// Pull from Maven Repo
 	if (rootProject.ext.developLocal) {

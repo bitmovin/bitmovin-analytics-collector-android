@@ -102,7 +102,7 @@ ext {
 	testRunnerVersion = '1.0.1'
 	espressoCoreVersion = '3.2.0'
 	playercoreVersion = '2.44.0'
-	exoplayerVersion = '2.11.4'
+	exoplayerVersion = '2.13.2'
 	assertjCoreVersion = '3.11.1'
 	mockitoCoreVersion = '3.5.0'
 	androidXVersion = '1.1.0'
