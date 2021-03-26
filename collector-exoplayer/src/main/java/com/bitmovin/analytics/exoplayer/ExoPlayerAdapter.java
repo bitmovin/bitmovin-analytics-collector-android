@@ -254,7 +254,6 @@ public class ExoPlayerAdapter
         }
     }
 
-
     @Override
     public void release() {
         playerIsReady = false;
@@ -315,7 +314,6 @@ public class ExoPlayerAdapter
         meter.reset();
     }
 
-
     @Override
     public void onTimelineChanged(Timeline timeline, int reason) {
         Log.d(TAG, "onTimelineChanged");
@@ -349,7 +347,6 @@ public class ExoPlayerAdapter
         }
     }
 
-
     @Override
     public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
         try {
@@ -380,7 +377,7 @@ public class ExoPlayerAdapter
                     // if autoplay is enabled startup state is not yet finished
                     if (!stateMachine.isStartupFinished()
                             && (stateMachine.getCurrentState() != PlayerState.STARTUP
-                            && exoplayer.getPlayWhenReady())) {
+                                    && exoplayer.getPlayWhenReady())) {
                         stateMachine.transitionState(PlayerState.READY, getPosition());
                     }
                     break;
@@ -447,7 +444,6 @@ public class ExoPlayerAdapter
         }
     }
 
-
     @Override
     public void onPositionDiscontinuity(int reason) {
         Log.d(TAG, "onPositionDiscontinuity");
@@ -457,7 +453,6 @@ public class ExoPlayerAdapter
     public void onPositionDiscontinuity(EventTime eventTime, int reason) {
         Log.d(TAG, "onPositionDiscontinuity");
     }
-
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
@@ -471,8 +466,7 @@ public class ExoPlayerAdapter
 
     @Override
     public void onPlaybackSuppressionReasonChanged(
-            EventTime eventTime, int playbackSuppressionReason) {
-    }
+            EventTime eventTime, int playbackSuppressionReason) {}
 
     @Override
     public void onTimelineChanged(EventTime eventTime, int reason) {
@@ -493,7 +487,6 @@ public class ExoPlayerAdapter
     @Override
     public void onPlaybackParametersChanged(
             EventTime eventTime, PlaybackParameters playbackParameters) {}
-
 
     @Override
     public void onRepeatModeChanged(EventTime eventTime, int repeatMode) {}
@@ -543,8 +536,8 @@ public class ExoPlayerAdapter
     private void addDrmType(MediaLoadData mediaLoadData) {
         String drmType = null;
         for (int i = 0;
-             drmType == null && i < mediaLoadData.trackFormat.drmInitData.schemeDataCount;
-             i++) {
+                drmType == null && i < mediaLoadData.trackFormat.drmInitData.schemeDataCount;
+                i++) {
             DrmInitData.SchemeData data = mediaLoadData.trackFormat.drmInitData.get(i);
             drmType = getDrmTypeFromSchemeData(data);
         }
@@ -623,7 +616,6 @@ public class ExoPlayerAdapter
 
     @Override
     public void onVideoDecoderReleased(EventTime eventTime, String decoderName) {}
-
 
     @Override
     public void onAudioInputFormatChanged(
@@ -709,7 +701,6 @@ public class ExoPlayerAdapter
                         width, height, unappliedRotationDegrees, pixelWidthHeightRatio));
     }
 
-
     @Override
     public void onRenderedFirstFrame(
             EventTime eventTime, @androidx.annotation.Nullable Surface surface) {
@@ -787,7 +778,6 @@ public class ExoPlayerAdapter
     @Override
     public void onAudioPositionAdvancing(EventTime eventTime, long playoutStartSystemTimeMs) {}
 
-
     @Override
     public void onSkipSilenceEnabledChanged(EventTime eventTime, boolean skipSilenceEnabled) {}
 
@@ -797,11 +787,9 @@ public class ExoPlayerAdapter
     @Override
     public void onVideoEnabled(EventTime eventTime, DecoderCounters counters) {}
 
-
     @Override
     public void onVideoFrameProcessingOffset(
             EventTime eventTime, long totalProcessingOffsetUs, int frameCount) {}
-
 
     @Override
     public void onPlayerReleased(EventTime eventTime) {}
