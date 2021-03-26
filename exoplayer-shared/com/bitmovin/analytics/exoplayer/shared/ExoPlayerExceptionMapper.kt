@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.exoplayer.base
+package com.bitmovin.analytics.exoplayer.shared
 
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.ErrorData

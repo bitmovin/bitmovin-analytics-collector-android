@@ -4,7 +4,7 @@ import android.content.Context;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
-import com.bitmovin.analytics.exoplayer.base.ExoUtil;
+import com.bitmovin.analytics.exoplayer.shared.ExoUtil;
 import com.google.android.exoplayer2.ExoPlayer;
 
 public class ExoPlayerCollector extends BitmovinAnalytics {
