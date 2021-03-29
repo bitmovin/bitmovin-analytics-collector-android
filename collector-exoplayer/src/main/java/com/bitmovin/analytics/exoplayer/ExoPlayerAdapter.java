@@ -329,20 +329,7 @@ public class ExoPlayerAdapter
 
     @Override
     public void onPlayWhenReadyChanged(EventTime eventTime, boolean playWhenReady, int reason) {
-        try {
-            Log.d(
-                    TAG,
-                    String.format(
-                            "onPlayWhenReadyChanged: %b, %s",
-                            playWhenReady, ExoUtil.exoStateToString(reason)));
-
-            if (!stateMachine.isStartupFinished() && playWhenReady) {
-                startup(getPosition());
-            }
-
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
+        Log.d(TAG, String.format("onPlayWhenReadyChanged: %b, %d", playWhenReady, reason));
     }
 
     @Override
@@ -380,8 +367,9 @@ public class ExoPlayerAdapter
                     }
                     break;
                 case Player.STATE_BUFFERING:
-                    if (stateMachine.isStartupFinished()
-                            && this.isPlaying
+                    if (!stateMachine.isStartupFinished()) {
+                        startup(videoTime);
+                    } else if (this.isPlaying
                             && stateMachine.getCurrentState() != PlayerState.SEEKING) {
                         this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
                     }
@@ -404,16 +392,7 @@ public class ExoPlayerAdapter
     }
 
     @Override
-    public void onIsPlayingChanged(boolean isPlaying) {
-        try {
-            Log.d(TAG, "onIsPlayingChanged " + isPlaying);
-            if (!stateMachine.isStartupFinished() && isPlaying) {
-                startup(getPosition());
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+    public void onIsPlayingChanged(boolean isPlaying) {}
 
     @Override
     public void onRepeatModeChanged(int repeatMode) {
