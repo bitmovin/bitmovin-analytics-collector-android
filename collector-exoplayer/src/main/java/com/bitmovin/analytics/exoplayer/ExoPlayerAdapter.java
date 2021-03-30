@@ -214,17 +214,16 @@ public class ExoPlayerAdapter
             for (int i = 0; i < exoplayer.getCurrentTrackSelections().length; i++) {
                 TrackSelection trackSelection = exoplayer.getCurrentTrackSelections().get(i);
                 if (trackSelection != null) {
-                    // TODO this needs to be fully rewritten -> reflection
-                    Format format = null;
-                    Method getSelectedTracksMethod = null;
+                    Format format;
                     try {
-                        getSelectedTracksMethod =
+                         Method getSelectedTracksMethod =
                                 trackSelection.getClass().getMethod("getSelectedFormat");
                         format = (Format) getSelectedTracksMethod.invoke(trackSelection);
                     } catch (Exception e) {
+                        format = null;
                     }
 
-                    if (getSelectedTracksMethod == null && format == null) {
+                    if (format == null) {
                         format = trackSelection.getFormat(0);
                     }
 
