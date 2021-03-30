@@ -164,7 +164,12 @@ sonarqube {
 	}
 }
 
-project(":analyticsexample") {
+project(":collector-exoplayer-example") {
+	sonarqube {
+		skipProject = true
+	}
+}
+project(":collector-exoplayer-v1-example") {
 	sonarqube {
 		skipProject = true
 	}
