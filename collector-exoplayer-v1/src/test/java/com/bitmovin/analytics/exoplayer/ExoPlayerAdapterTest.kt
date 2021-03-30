@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.exoplayer.v1
+package com.bitmovin.analytics.exoplayer
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
