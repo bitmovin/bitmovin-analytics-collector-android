@@ -1,4 +1,4 @@
-package com.bitmovin.exoplayeranalyticsexample.v1;
+package com.bitmovin.exoplayeranalyticsexample;
 
 import static org.junit.Assert.*;
 
