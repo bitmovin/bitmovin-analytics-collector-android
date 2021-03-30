@@ -88,6 +88,7 @@ public class ExoPlayerAdapter
     private boolean isVideoAttemptedPlay = false;
     private long previousQualityChangeBitrate = 0;
     private boolean isPlaying = false;
+    private boolean isInInitialBufferState = false;
 
     public ExoPlayerAdapter(
             ExoPlayer exoplayer,
@@ -134,6 +135,7 @@ public class ExoPlayerAdapter
     public Collection<Feature<?>> init() {
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
+        this.isInInitialBufferState = false;
         this.isVideoAttemptedPlay = false;
         isPlaying = false;
         checkAutoplayStartup();
@@ -254,6 +256,7 @@ public class ExoPlayerAdapter
     @Override
     public void release() {
         playerIsReady = false;
+        this.isInInitialBufferState = false;
         manifestUrl = null;
         if (this.exoplayer != null) {
             this.exoplayer.removeListener(this);
@@ -329,6 +332,10 @@ public class ExoPlayerAdapter
     @Override
     public void onPlayWhenReadyChanged(EventTime eventTime, boolean playWhenReady, int reason) {
         Log.d(TAG, String.format("onPlayWhenReadyChanged: %b, %d", playWhenReady, reason));
+        // if player preload is setup this is the events that gets triggered after user clicks play
+        if(this.isInInitialBufferState && playWhenReady && !stateMachine.isStartupFinished()){
+            startup(getPosition());
+        }
     }
 
     @Override
@@ -354,7 +361,8 @@ public class ExoPlayerAdapter
             long videoTime = getPosition();
             Log.d(
                     TAG,
-                    String.format("onPlaybackStateChanged: %s", ExoUtil.exoStateToString(state)));
+                    String.format("onPlaybackStateChanged: %s playWhenready: %b isPlaying: %b", ExoUtil.exoStateToString(state),
+                            this.exoplayer.getPlayWhenReady(), this.exoplayer.isPlaying()));
 
             switch (state) {
                 case Player.STATE_READY:
@@ -367,8 +375,18 @@ public class ExoPlayerAdapter
                     break;
                 case Player.STATE_BUFFERING:
                     if (!stateMachine.isStartupFinished()) {
-                        startup(videoTime);
-                    } else if (this.isPlaying
+                        // this is the case when there is no preloading
+                        // player is now starting to get content before playing it
+                        if (this.exoplayer.getPlayWhenReady()) {
+                            startup(videoTime);
+                        } else {
+                            // this is the case when preloading of content is setup
+                            // so at this point player is getting content and will start playing
+                            // once user preses play
+                            this.isInInitialBufferState = true;
+                        }
+                      }
+                    else if (this.isPlaying
                             && stateMachine.getCurrentState() != PlayerState.SEEKING) {
                         this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
                     }
