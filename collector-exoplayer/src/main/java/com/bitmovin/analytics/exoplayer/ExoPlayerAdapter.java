@@ -216,7 +216,7 @@ public class ExoPlayerAdapter
                 if (trackSelection != null) {
                     Format format;
                     try {
-                         Method getSelectedTracksMethod =
+                        Method getSelectedTracksMethod =
                                 trackSelection.getClass().getMethod("getSelectedFormat");
                         format = (Format) getSelectedTracksMethod.invoke(trackSelection);
                     } catch (Exception e) {
@@ -331,7 +331,7 @@ public class ExoPlayerAdapter
     public void onPlayWhenReadyChanged(EventTime eventTime, boolean playWhenReady, int reason) {
         Log.d(TAG, String.format("onPlayWhenReadyChanged: %b, %d", playWhenReady, reason));
         // if player preload is setup this is the events that gets triggered after user clicks play
-        if(this.isInInitialBufferState && playWhenReady && !stateMachine.isStartupFinished()){
+        if (this.isInInitialBufferState && playWhenReady && !stateMachine.isStartupFinished()) {
             startup(getPosition());
         }
     }
@@ -359,8 +359,11 @@ public class ExoPlayerAdapter
             long videoTime = getPosition();
             Log.d(
                     TAG,
-                    String.format("onPlaybackStateChanged: %s playWhenready: %b isPlaying: %b", ExoUtil.exoStateToString(state),
-                            this.exoplayer.getPlayWhenReady(), this.exoplayer.isPlaying()));
+                    String.format(
+                            "onPlaybackStateChanged: %s playWhenready: %b isPlaying: %b",
+                            ExoUtil.exoStateToString(state),
+                            this.exoplayer.getPlayWhenReady(),
+                            this.exoplayer.isPlaying()));
 
             switch (state) {
                 case Player.STATE_READY:
@@ -383,8 +386,7 @@ public class ExoPlayerAdapter
                             // once user preses play
                             this.isInInitialBufferState = true;
                         }
-                      }
-                    else if (this.isPlaying
+                    } else if (this.isPlaying
                             && stateMachine.getCurrentState() != PlayerState.SEEKING) {
                         this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
                     }
