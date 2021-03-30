@@ -32,7 +32,7 @@ class ExoPlayerAdapterTest {
     }
 
     @Test
-    fun testNoStateTransitionToQualityChangeIfBitrateDidNotChange() {
+    fun `no state transition to QualityChange if bitrate did not change`() {
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
@@ -45,7 +45,7 @@ class ExoPlayerAdapterTest {
     }
 
     @Test
-    fun testNoStateTransitionToQualityChangeIfQualityChangeLimit() {
+    fun `no state transition to QualityChange if quality change limit reached`() {
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)

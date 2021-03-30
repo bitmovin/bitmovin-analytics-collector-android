@@ -32,7 +32,7 @@ class ExoPlayerAdapterTest {
     }
 
     @Test
-    fun testNoStateTransitionToQualityChangeIfBitrateDidNotChangeOnVideoFormatChanged() {
+    fun `onVideoInputFormatChanged does not transition state if bitrate did not change`() {
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
@@ -45,7 +45,7 @@ class ExoPlayerAdapterTest {
     }
 
     @Test
-    fun testNoStateTransitionToQualityChangeIfBitrateDidNotChangeOnAudioFormatChanged() {
+    fun `onAudioInputFormatChanged does not transition state if bitrate did not change`() {
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
@@ -58,7 +58,7 @@ class ExoPlayerAdapterTest {
     }
 
     @Test
-    fun testNoStateTransitionToQualityChangeIfQualityChangeLimitOnVideoFormatChanged() {
+    fun `onVideoInputFormatChanged does not transition state if change limit reached`(){
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
@@ -68,7 +68,7 @@ class ExoPlayerAdapterTest {
     }
 
     @Test
-    fun testNoStateTransitionToQualityChangeIfQualityChangeLimitOnAudioFormatChanged() {
+    fun `onAudioInputFormatChanged does not transition state if change limit reached`(){
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
