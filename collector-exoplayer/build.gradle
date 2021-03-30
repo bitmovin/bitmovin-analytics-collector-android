@@ -27,8 +27,6 @@ android {
 		targetCompatibility rootProject.ext.targetCompatibility
 	}
 
-	// including com.bitmovin.analytics.exoplayer.shared util classes
-	sourceSets.main.java.srcDirs += ['../exoplayer-shared/']
 
 	buildTypes {
 		release {
@@ -65,11 +63,7 @@ dependencies {
 	} else {
 		api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
 	}
-	implementation("com.google.android.exoplayer:exoplayer") {
-		version {
-			strictly "(2.12.0, ${rootProject.ext.analyticsV2ExoplayerVersion}]"
-		}
-	}
+	implementation "com.google.android.exoplayer:exoplayer:[2.12.0, ${rootProject.ext.exoplayerVersion}]"
 }
 
 publishing {
