@@ -48,12 +48,12 @@ dependencies {
 
 
 	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
-	implementation "com.google.android.exoplayer:exoplayer:2.11.4"
+	implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerCollectorV1Version}"
 
 	// Pull from Maven Repo
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-exoplayer-v1')
 	} else {
-		implementation "com.bitmovin.analytics:collector-exoplayer-v1:${rootProject.ext.versionV1}"
+		implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.versionV1}"
 	}
 }
