@@ -1,5 +1,5 @@
 include ':collector-exoplayer'
-include ':collector', ':analyticsexample', ':bitmovinanalyticsexample'
+include ':collector', ':collector-exoplayer-example',':collector-exoplayer-v1-example', ':bitmovinanalyticsexample'
 include 'collector-exoplayer-v1'
 include 'collector-bitmovin-player'
 

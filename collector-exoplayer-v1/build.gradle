@@ -11,8 +11,8 @@ android {
 	defaultConfig {
 		minSdkVersion rootProject.ext.minSdkVersion
 		targetSdkVersion rootProject.ext.targetSdkVersion
-		versionCode rootProject.ext.versionCode
-		versionName rootProject.ext.version
+		versionCode rootProject.ext.versionCodeV1
+		versionName rootProject.ext.versionV1
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled true
@@ -69,7 +69,7 @@ publishing {
 	publications {
 		aar(MavenPublication) {
 			groupId rootProject.ext.packageGroupId
-			version = rootProject.ext.version
+			version = rootProject.ext.versionV1
 			artifactId project.getName()
 
 			// Tell maven to prepare the generated "*.aar" file for publishing
@@ -114,7 +114,7 @@ artifactory {
 	publish {
 		repository {
 			// The Artifactory repository key to publish to
-			repoKey = rootProject.ext.version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
+			repoKey = rootProject.ext.versionV1.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
 			username = bitmovinProperties.getProperty('artifactoryUser') // The publisher user name
 			password = bitmovinProperties.getProperty('artifactoryPassword')
 			// The publisher password
