@@ -19,6 +19,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.bitmovin.exoplayeranalyticsexample.v1", appContext.getPackageName());
+        assertEquals("com.bitmovin.exoplayeranalyticsexample", appContext.getPackageName());
     }
 }
