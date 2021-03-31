@@ -142,9 +142,10 @@ public class MainActivity extends AppCompatActivity
             // mediaSource = new ConcatenatingMediaSource(dashMediaSource, dashMediaSource);
 
             player.setMediaSource(dashMediaSource);
-            player.setPlayWhenReady(true);
+            player.setPlayWhenReady(false);
             // without prepare() it will not start autoplay
-            player.prepare();
+            // prepare also starts preloading data before user clicks play
+            // player.prepare();
         }
     }
 
