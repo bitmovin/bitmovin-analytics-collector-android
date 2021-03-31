@@ -330,7 +330,8 @@ public class ExoPlayerAdapter
     @Override
     public void onPlayWhenReadyChanged(EventTime eventTime, boolean playWhenReady, int reason) {
         Log.d(TAG, String.format("onPlayWhenReadyChanged: %b, %d", playWhenReady, reason));
-        // if player preload is setup this is the events that gets triggered after user clicks play
+        // if player preload is setup without autoplay being enabled
+        // this gets triggered after user clicks play
         if (this.isInInitialBufferState && playWhenReady && !stateMachine.isStartupFinished()) {
             startup(getPosition());
         }
