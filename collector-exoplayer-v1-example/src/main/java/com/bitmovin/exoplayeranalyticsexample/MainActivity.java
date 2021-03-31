@@ -1,4 +1,4 @@
-package com.bitmovin.exoplayeranalyticsexample.v1;
+package com.bitmovin.exoplayeranalyticsexample;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity
             bitmovinAnalyticsConfig.setTitle("Android Bitmovin SDK Video with DASH");
             bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
             bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
-            bitmovinAnalyticsConfig.setExperimentName("experiment-exoplayer-v1");
+            bitmovinAnalyticsConfig.setExperimentName("experiment-timeout");
             bitmovinAnalyticsConfig.setCustomData1("customData1");
             bitmovinAnalyticsConfig.setCustomData2("customData2");
             bitmovinAnalyticsConfig.setCustomData3("customData3");
