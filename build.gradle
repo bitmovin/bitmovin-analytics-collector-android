@@ -97,13 +97,16 @@ ext {
 	sourceCompatibility = JavaVersion.VERSION_1_8
 	targetCompatibility = JavaVersion.VERSION_1_8
 
+	playerCollectorV1Version = '2.44.0'
+	playerVersion = '3.0.0-rc.1'
+
+	exoplayerCollectorV1Version = '2.11.8'
+	exoplayerVersion = '2.13.2'
+
 	constraintLayoutVersion = '1.0.2'
 	junitVersion = '4.12'
 	testRunnerVersion = '1.0.1'
 	espressoCoreVersion = '3.2.0'
-	playercoreVersion = '2.44.0'
-	exoplayerCollectorV1Version = '2.11.8'
-	exoplayerVersion = '2.13.2'
 	assertjCoreVersion = '3.11.1'
 	mockitoCoreVersion = '3.5.0'
 	androidXVersion = '1.1.0'
@@ -111,6 +114,8 @@ ext {
 	constraintlayoutVersion = '1.1.3'
 	multidexVersion = '2.0.1'
 	mockkVersion = '1.10.6'
+	imaSdkVersion = '3.19.4'
+	playServicesAdsVersion = '19.3.0'
 }
 
 task createPrePushHook() {
@@ -174,7 +179,7 @@ project(":collector-exoplayer-v1-example") {
 		skipProject = true
 	}
 }
-project(":bitmovinanalyticsexample") {
+project(":collector-bitmovin-player-example") {
 	sonarqube {
 		skipProject = true
 	}

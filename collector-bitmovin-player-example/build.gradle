@@ -1,0 +1,67 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+	compileSdkVersion rootProject.ext.compileSdkVersion
+
+	defaultConfig {
+		applicationId 'com.bitmovin.bitmovinplayerexample'
+		minSdkVersion rootProject.ext.minSdkVersion
+		targetSdkVersion rootProject.ext.targetSdkVersion
+		versionCode rootProject.ext.versionCode
+		versionName rootProject.ext.version
+
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+		multiDexEnabled true
+	}
+
+	lintOptions {
+		abortOnError false
+	}
+
+	compileOptions {
+		sourceCompatibility rootProject.ext.sourceCompatibility
+		targetCompatibility rootProject.ext.targetCompatibility
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
+}
+
+configurations {
+	bitmovinReleaseCompile
+}
+
+dependencies {
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+	implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
+	implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
+	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
+
+
+	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
+	implementation "com.bitmovin.player:playercore:${rootProject.ext.playerCollectorV1Version}"
+
+	// only needed if ads are used
+	implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+	implementation "com.google.ads.interactivemedia.v3:interactivemedia:3.11.3"
+	implementation "com.google.android.gms:play-services-ads:17.1.2"
+	/** required because of play-services-ads:17.1.2 SDK 26 dependencies */
+	implementation 'androidx.browser:browser:1.0.0'
+
+	// Pull from Maven Repo
+	if (rootProject.ext.developLocal) {
+		implementation project(':collector-bitmovin-player')
+	} else {
+		implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
+	}
+}
+
