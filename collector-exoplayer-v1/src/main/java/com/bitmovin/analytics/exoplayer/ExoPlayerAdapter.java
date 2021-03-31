@@ -39,11 +39,9 @@ import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
-import com.google.android.exoplayer2.decoder.DecoderReuseEvaluation;
 import com.google.android.exoplayer2.drm.DrmInitData;
 import com.google.android.exoplayer2.metadata.Metadata;
-import com.google.android.exoplayer2.source.LoadEventInfo;
-import com.google.android.exoplayer2.source.MediaLoadData;
+import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.manifest.DashManifest;
 import com.google.android.exoplayer2.source.hls.HlsManifest;
@@ -52,7 +50,6 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -62,7 +59,6 @@ import org.jetbrains.annotations.Nullable;
 public class ExoPlayerAdapter
         implements PlayerAdapter, Player.EventListener, AnalyticsListener, EventDataManipulator {
     private static final String TAG = "ExoPlayerAdapter";
-
     private static final String DASH_MANIFEST_CLASSNAME =
             "com.google.android.exoplayer2.source.dash.manifest.DashManifest";
     private static final String HLS_MANIFEST_CLASSNAME =
@@ -86,7 +82,7 @@ public class ExoPlayerAdapter
     private boolean isVideoAttemptedPlay = false;
     private long previousQualityChangeBitrate = 0;
     private boolean isPlaying = false;
-    private boolean isInInitialBufferState = false;
+    private boolean isPaused = false;
 
     public ExoPlayerAdapter(
             ExoPlayer exoplayer,
@@ -133,9 +129,9 @@ public class ExoPlayerAdapter
     public Collection<Feature<?>> init() {
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
-        this.isInInitialBufferState = false;
         this.isVideoAttemptedPlay = false;
         isPlaying = false;
+        isPaused = false;
         checkAutoplayStartup();
         return new ArrayList<>();
     }
@@ -214,19 +210,7 @@ public class ExoPlayerAdapter
             for (int i = 0; i < exoplayer.getCurrentTrackSelections().length; i++) {
                 TrackSelection trackSelection = exoplayer.getCurrentTrackSelections().get(i);
                 if (trackSelection != null) {
-                    Format format;
-                    try {
-                        Method getSelectedTracksMethod =
-                                trackSelection.getClass().getMethod("getSelectedFormat");
-                        format = (Format) getSelectedTracksMethod.invoke(trackSelection);
-                    } catch (Exception e) {
-                        format = null;
-                    }
-
-                    if (format == null) {
-                        format = trackSelection.getFormat(0);
-                    }
-
+                    Format format = trackSelection.getSelectedFormat();
                     switch (exoplayer.getRendererType(i)) {
                         case TRACK_TYPE_AUDIO:
                             data.setAudioBitrate(format.sampleRate);
@@ -254,7 +238,6 @@ public class ExoPlayerAdapter
     @Override
     public void release() {
         playerIsReady = false;
-        this.isInInitialBufferState = false;
         manifestUrl = null;
         if (this.exoplayer != null) {
             this.exoplayer.removeListener(this);
@@ -323,83 +306,59 @@ public class ExoPlayerAdapter
     }
 
     @Override
-    public void onIsLoadingChanged(boolean isLoading) {
-        Log.d(TAG, "onIsLoadingChanged");
+    public void onLoadingChanged(boolean isLoading) {
+        Log.d(TAG, "onLoadingChanged");
     }
 
     @Override
-    public void onPlayWhenReadyChanged(EventTime eventTime, boolean playWhenReady, int reason) {
-        Log.d(TAG, String.format("onPlayWhenReadyChanged: %b, %d", playWhenReady, reason));
-        // if player preload is setup without autoplay being enabled
-        // this gets triggered after user clicks play
-        if (this.isInInitialBufferState && playWhenReady && !stateMachine.isStartupFinished()) {
-            startup(getPosition());
-        }
-    }
-
-    @Override
-    public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
-        try {
-            Log.d(TAG, "onIsPlayingChanged " + isPlaying);
-            this.isPlaying = isPlaying;
-            if (isPlaying) {
-                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-            } else if (stateMachine.getCurrentState() != PlayerState.SEEKING
-                    && stateMachine.getCurrentState() != PlayerState.BUFFERING) {
-                this.stateMachine.transitionState(PlayerState.PAUSE, getPosition());
-            }
-
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void onPlaybackStateChanged(EventTime eventTime, int state) {
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         try {
             long videoTime = getPosition();
             Log.d(
                     TAG,
                     String.format(
-                            "onPlaybackStateChanged: %s playWhenready: %b isPlaying: %b",
-                            ExoUtil.exoStateToString(state),
-                            this.exoplayer.getPlayWhenReady(),
-                            this.exoplayer.isPlaying()));
+                            "onPlayerStateChanged: %b, %s",
+                            playWhenReady, ExoUtil.exoStateToString(playbackState)));
 
-            switch (state) {
+            boolean oldIsPlaying = this.isPlaying;
+            boolean oldIsPaused = this.isPaused;
+            this.isPlaying = playWhenReady;
+            this.isPaused = !this.isPlaying;
+
+            // original logic copied from BMP SDK
+            if (playbackState != Player.STATE_ENDED) {
+                if (this.isPaused != oldIsPaused && this.isPaused && oldIsPlaying) {
+                    stateMachine.pause(getPosition());
+                }
+            }
+            switch (playbackState) {
                 case Player.STATE_READY:
-                    // if autoplay is enabled startup state is not yet finished
-                    if (!stateMachine.isStartupFinished()
-                            && (stateMachine.getCurrentState() != PlayerState.STARTUP
-                                    && exoplayer.getPlayWhenReady())) {
-                        stateMachine.transitionState(PlayerState.READY, getPosition());
+                    if (this.isPlaying) {
+                        stateMachine.transitionState(PlayerState.PLAYING, getPosition());
                     }
                     break;
                 case Player.STATE_BUFFERING:
                     if (!stateMachine.isStartupFinished()) {
-                        // this is the case when there is no preloading
-                        // player is now starting to get content before playing it
-                        if (this.exoplayer.getPlayWhenReady()) {
+                        if (this.isPlaying != oldIsPlaying && this.isPlaying) {
+                            // with autoplay enabled the player first enter here and start buffering
+                            // for the video with playWhenReady = true
                             startup(videoTime);
-                        } else {
-                            // this is the case when preloading of content is setup
-                            // so at this point player is getting content and will start playing
-                            // once user preses play
-                            this.isInInitialBufferState = true;
                         }
-                    } else if (this.isPlaying
-                            && stateMachine.getCurrentState() != PlayerState.SEEKING) {
-                        this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
+                    } else {
+                        if (!this.isPaused
+                                && stateMachine.getCurrentState() != PlayerState.SEEKING) {
+                            this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
+                        }
                     }
                     break;
                 case Player.STATE_IDLE:
                     // TODO check what this state could mean for analytics?
+                    this.stateMachine.transitionState(PlayerState.READY, videoTime);
                     break;
                 case Player.STATE_ENDED:
                     // TODO this is equivalent to BMPs PlaybackFinished Event
                     // should we setup new impression here
-                    // onIsPlayingChanged is triggered after this event and does transition to PAUSE
-                    // state
+                    this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                     break;
                 default:
                     Log.d(TAG, "Unknown Player PlayerState encountered");
@@ -410,7 +369,16 @@ public class ExoPlayerAdapter
     }
 
     @Override
-    public void onIsPlayingChanged(boolean isPlaying) {}
+    public void onIsPlayingChanged(EventTime eventTime, boolean isPlaying) {
+        try {
+            Log.d(TAG, "onIsPlayingChanged " + isPlaying);
+            if (!stateMachine.isStartupFinished() && isPlaying) {
+                startup(getPosition());
+            }
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage(), e);
+        }
+    }
 
     @Override
     public void onRepeatModeChanged(int repeatMode) {
@@ -445,13 +413,16 @@ public class ExoPlayerAdapter
     }
 
     @Override
-    public void onPositionDiscontinuity(EventTime eventTime, int reason) {
-        Log.d(TAG, "onPositionDiscontinuity");
-    }
+    public void onPositionDiscontinuity(EventTime eventTime, int reason) {}
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
         Log.d(TAG, "onPlaybackParametersChanged");
+    }
+
+    @Override
+    public void onSeekProcessed() {
+        Log.d(TAG, "onSeekProcessed");
     }
 
     @Override
@@ -480,6 +451,9 @@ public class ExoPlayerAdapter
     }
 
     @Override
+    public void onSeekProcessed(EventTime eventTime) {}
+
+    @Override
     public void onPlaybackParametersChanged(
             EventTime eventTime, PlaybackParameters playbackParameters) {}
 
@@ -490,7 +464,7 @@ public class ExoPlayerAdapter
     public void onShuffleModeChanged(EventTime eventTime, boolean shuffleModeEnabled) {}
 
     @Override
-    public void onIsLoadingChanged(EventTime eventTime, boolean isLoading) {}
+    public void onLoadingChanged(EventTime eventTime, boolean isLoading) {}
 
     @Override
     public void onPlayerError(EventTime eventTime, ExoPlaybackException error) {}
@@ -503,11 +477,15 @@ public class ExoPlayerAdapter
 
     @Override
     public void onLoadStarted(
-            EventTime eventTime, LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {}
+            EventTime eventTime,
+            MediaSourceEventListener.LoadEventInfo loadEventInfo,
+            MediaSourceEventListener.MediaLoadData mediaLoadData) {}
 
     @Override
     public void onLoadCompleted(
-            EventTime eventTime, LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {
+            EventTime eventTime,
+            MediaSourceEventListener.LoadEventInfo loadEventInfo,
+            MediaSourceEventListener.MediaLoadData mediaLoadData) {
         try {
             if (mediaLoadData.dataType == DATA_TYPE_MANIFEST) {
                 this.manifestUrl = loadEventInfo.dataSpec.uri.toString();
@@ -528,7 +506,7 @@ public class ExoPlayerAdapter
         }
     }
 
-    private void addDrmType(MediaLoadData mediaLoadData) {
+    private void addDrmType(MediaSourceEventListener.MediaLoadData mediaLoadData) {
         String drmType = null;
         for (int i = 0;
                 drmType == null && i < mediaLoadData.trackFormat.drmInitData.schemeDataCount;
@@ -539,7 +517,7 @@ public class ExoPlayerAdapter
         this.drmType = drmType;
     }
 
-    private void addSpeedMeasurement(LoadEventInfo loadEventInfo) {
+    private void addSpeedMeasurement(MediaSourceEventListener.LoadEventInfo loadEventInfo) {
         SpeedMeasurement measurement = new SpeedMeasurement();
         measurement.setTimestamp(new Date());
         measurement.setDuration(loadEventInfo.loadDurationMs);
@@ -565,21 +543,34 @@ public class ExoPlayerAdapter
 
     @Override
     public void onLoadCanceled(
-            EventTime eventTime, LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {}
+            EventTime eventTime,
+            MediaSourceEventListener.LoadEventInfo loadEventInfo,
+            MediaSourceEventListener.MediaLoadData mediaLoadData) {}
 
     @Override
     public void onLoadError(
             EventTime eventTime,
-            LoadEventInfo loadEventInfo,
-            MediaLoadData mediaLoadData,
+            MediaSourceEventListener.LoadEventInfo loadEventInfo,
+            MediaSourceEventListener.MediaLoadData mediaLoadData,
             IOException error,
             boolean wasCanceled) {}
 
     @Override
-    public void onDownstreamFormatChanged(EventTime eventTime, MediaLoadData mediaLoadData) {}
+    public void onDownstreamFormatChanged(
+            EventTime eventTime, MediaSourceEventListener.MediaLoadData mediaLoadData) {}
 
     @Override
-    public void onUpstreamDiscarded(EventTime eventTime, MediaLoadData mediaLoadData) {}
+    public void onUpstreamDiscarded(
+            EventTime eventTime, MediaSourceEventListener.MediaLoadData mediaLoadData) {}
+
+    @Override
+    public void onMediaPeriodCreated(EventTime eventTime) {}
+
+    @Override
+    public void onMediaPeriodReleased(EventTime eventTime) {}
+
+    @Override
+    public void onReadingStarted(EventTime eventTime) {}
 
     @Override
     public void onBandwidthEstimate(
@@ -599,42 +590,28 @@ public class ExoPlayerAdapter
     }
 
     @Override
-    public void onAudioDecoderInitialized(
-            EventTime eventTime, String decoderName, long initializationDurationMs) {}
+    public void onDecoderEnabled(
+            EventTime eventTime, int trackType, DecoderCounters decoderCounters) {}
 
     @Override
-    public void onAudioDecoderReleased(EventTime eventTime, String decoderName) {}
-
-    @Override
-    public void onVideoDecoderInitialized(
-            EventTime eventTime, String decoderName, long initializationDurationMs) {}
-
-    @Override
-    public void onVideoDecoderReleased(EventTime eventTime, String decoderName) {}
-
-    @Override
-    public void onAudioInputFormatChanged(
+    public void onDecoderInitialized(
             EventTime eventTime,
-            Format format,
-            @androidx.annotation.Nullable DecoderReuseEvaluation decoderReuseEvaluation) {
-        handleInputFormatChanged(format);
-    }
+            int trackType,
+            String decoderName,
+            long initializationDurationMs) {}
 
     @Override
-    public void onVideoInputFormatChanged(
-            EventTime eventTime,
-            Format format,
-            @androidx.annotation.Nullable DecoderReuseEvaluation decoderReuseEvaluation) {
-        handleInputFormatChanged(format);
-    }
-
-    private void handleInputFormatChanged(Format format) {
+    public void onDecoderInputFormatChanged(EventTime eventTime, int trackType, Format format) {
         try {
             if ((this.stateMachine.getCurrentState() == PlayerState.PLAYING)
                     || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)) {
-                Log.d(TAG, String.format("inputFormatChanged: Bitrate: %d", format.bitrate));
+                Log.d(
+                        TAG,
+                        String.format(
+                                "onDecoderInputFormatChanged: Bitrate: %d Resolution: %d x %d",
+                                format.bitrate, format.width, format.height));
                 if (format.bitrate == this.previousQualityChangeBitrate) {
-                    Log.d(TAG, "inputFormatChanged: Skipping sample sending");
+                    Log.d(TAG, "onDecoderInputFormatChanged: Skipping sample sending");
                     return;
                 }
                 this.previousQualityChangeBitrate = format.bitrate;
@@ -651,13 +628,11 @@ public class ExoPlayerAdapter
     }
 
     @Override
-    public void onAudioDisabled(EventTime eventTime, DecoderCounters counters) {}
+    public void onDecoderDisabled(
+            EventTime eventTime, int trackType, DecoderCounters decoderCounters) {}
 
     @Override
-    public void onVideoDisabled(EventTime eventTime, DecoderCounters counters) {}
-
-    @Override
-    public void onAudioSessionIdChanged(EventTime eventTime, int audioSessionId) {}
+    public void onAudioSessionId(EventTime eventTime, int audioSessionId) {}
 
     @Override
     public void onAudioAttributesChanged(EventTime eventTime, AudioAttributes audioAttributes) {

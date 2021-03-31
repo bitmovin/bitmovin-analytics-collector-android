@@ -27,7 +27,6 @@ android {
 		targetCompatibility rootProject.ext.targetCompatibility
 	}
 
-
 	buildTypes {
 		release {
 			minifyEnabled false
@@ -63,7 +62,7 @@ dependencies {
 	} else {
 		api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
 	}
-	implementation "com.google.android.exoplayer:exoplayer:[2.12.0, ${rootProject.ext.exoplayerVersion}]"
+	implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerCollectorV1Version}"
 }
 
 publishing {

@@ -18,7 +18,6 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
-import com.google.android.exoplayer2.drm.ExoMediaCrypto;
 import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
 import com.google.android.exoplayer2.drm.MediaDrmCallback;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
@@ -148,7 +147,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected DashMediaSource getDRMSource(DataSource.Factory dataSourceFactory) {
-        DefaultDrmSessionManager<ExoMediaCrypto> drmSesssionManager =
+        DefaultDrmSessionManager drmSesssionManager =
                 getDrmSession(
                         "https://widevine-proxy.appspot.com/proxy",
                         C.WIDEVINE_UUID,
@@ -167,7 +166,7 @@ public class MainActivity extends AppCompatActivity
         return getMediaSource(dashStatic, dataSourceFactory, null);
     }
 
-    protected static DefaultDrmSessionManager<ExoMediaCrypto> getDrmSession(
+    protected static DefaultDrmSessionManager getDrmSession(
             String drmLicenseUrl, UUID drmScheme, String userAgent) {
 
         if (drmLicenseUrl != null && drmScheme != null) {
@@ -187,7 +186,7 @@ public class MainActivity extends AppCompatActivity
     protected static DashMediaSource getMediaSource(
             Uri dashStatic,
             DataSource.Factory dataSourceFactory,
-            DefaultDrmSessionManager<ExoMediaCrypto> drmSession) {
+            DefaultDrmSessionManager drmSession) {
         DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
         DashMediaSource.Factory sourceFactory =
                 new DashMediaSource.Factory(source, dataSourceFactory);

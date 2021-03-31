@@ -32,7 +32,7 @@ class ExoPlayerAdapterTest {
     }
 
     @Test
-    fun `onVideoInputFormatChanged does not transition state if bitrate did not change`() {
+    fun `no state transition to QualityChange if bitrate did not change`() {
         // arrange
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
@@ -40,41 +40,20 @@ class ExoPlayerAdapterTest {
         adapter.fakePosition = 20
 
         // act
-        adapter.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        adapter.onDecoderInputFormatChanged(getEventTime(20L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
 
         // assert
         verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
 
         // act
-        adapter.onVideoInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        adapter.onDecoderInputFormatChanged(getEventTime(30L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
 
         // assert
         verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
     @Test
-    fun `onAudioInputFormatChanged does not transition state if bitrate did not change`() {
-        // arrange
-        val bitrate = 3000
-        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
-        `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
-        adapter.fakePosition = 20
-
-        // act
-        adapter.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
-
-        // assert
-        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
-
-        // act
-        adapter.onAudioInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build(), null)
-
-        // assert
-        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
-    }
-
-    @Test
-    fun `onVideoInputFormatChanged does not transition state if change limit reached`() {
+    fun `no state transition to QualityChange if quality change limit reached`() {
         // arrange
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
@@ -82,29 +61,13 @@ class ExoPlayerAdapterTest {
         adapter.fakePosition = 20
 
         // act
-        adapter.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
-
-        // assert
-        verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
-    }
-
-    @Test
-    fun `onAudioInputFormatChanged does not transition state if change limit reached`() {
-        // arrange
-        val bitrate = 3000
-        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
-        `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
-        adapter.fakePosition = 20
-
-        // act
-        adapter.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        adapter.onDecoderInputFormatChanged(getEventTime(20L), 0, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
 
         // assert
         verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
     private fun getEventTime(realTime: Long): AnalyticsListener.EventTime {
-        return AnalyticsListener.EventTime(realTime, Timeline.EMPTY, 0, null, 0, Timeline.EMPTY,
-                0, null, 0, 0)
+        return AnalyticsListener.EventTime(realTime, Timeline.EMPTY, 0, null, 0, 0, 0)
     }
 }

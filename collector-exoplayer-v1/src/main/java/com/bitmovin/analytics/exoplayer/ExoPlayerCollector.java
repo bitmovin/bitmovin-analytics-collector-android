@@ -18,6 +18,16 @@ public class ExoPlayerCollector extends BitmovinAnalytics {
         super(bitmovinAnalyticsConfig, context);
     }
 
+    /**
+     * Bitmovin Analytics
+     *
+     * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
+     */
+    @Deprecated
+    public ExoPlayerCollector(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
+        this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
+    }
+
     public void attachPlayer(ExoPlayer player) {
         DeviceInformationProvider deviceInformationProvider =
                 new DeviceInformationProvider(context, ExoUtil.getUserAgent(context));
