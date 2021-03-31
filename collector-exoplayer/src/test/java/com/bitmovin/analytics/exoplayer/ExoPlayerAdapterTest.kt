@@ -33,47 +33,73 @@ class ExoPlayerAdapterTest {
 
     @Test
     fun `onVideoInputFormatChanged does not transition state if bitrate did not change`() {
+        // arrange
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
         adapter.fakePosition = 20
+
+        // act
         adapter.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+
+        // assert
         verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
 
+        // act
         adapter.onVideoInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+
+        // assert
         verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
     @Test
     fun `onAudioInputFormatChanged does not transition state if bitrate did not change`() {
+        // arrange
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
         adapter.fakePosition = 20
+
+        // act
         adapter.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+
+        // assert
         verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
 
+        // act
         adapter.onAudioInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+
+        // assert
         verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
     @Test
     fun `onVideoInputFormatChanged does not transition state if change limit reached`() {
+        // arrange
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
         adapter.fakePosition = 20
+
+        // act
         adapter.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+
+        // assert
         verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
     @Test
     fun `onAudioInputFormatChanged does not transition state if change limit reached`() {
+        // arrange
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
         adapter.fakePosition = 20
+
+        // act
         adapter.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+
+        // assert
         verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
