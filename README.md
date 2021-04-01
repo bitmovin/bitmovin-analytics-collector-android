@@ -18,20 +18,35 @@ allprojects {
 
 And this line to your main project `build.gradle`
 
-For Bitmovin Player:
+For Bitmovin Player v2:
 
 ```
 dependencies {
     implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.22.1'
-
 }
 ```
 
-For ExoPlayer:
+For Bitmovin Player v3:
+
+```
+dependencies {
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.0.0'
+}
+```
+
+For ExoPlayer < v2.12.0:
 
 ```
 dependencies {
     implementation 'com.bitmovin.analytics:collector-exoplayer:1.22.1'
+}
+```
+
+For ExoPlayer >= v2.12.0:
+
+```
+dependencies {
+    implementation 'com.bitmovin.analytics:collector-exoplayer:2.0.0'
 }
 ```
 
