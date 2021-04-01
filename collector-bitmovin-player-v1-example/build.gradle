@@ -61,7 +61,7 @@ dependencies {
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-bitmovin-player-v1')
 	} else {
-		implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.versionV1}"
+		implementation "com.bitmovin.analytics:collector-bitmovin-player-v1:${rootProject.ext.versionV1}"
 	}
 }
 

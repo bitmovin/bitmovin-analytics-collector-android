@@ -184,3 +184,8 @@ project(":collector-bitmovin-player-example") {
 		skipProject = true
 	}
 }
+project(":collector-bitmovin-player-v1-example") {
+	sonarqube {
+		skipProject = true
+	}
+}
