@@ -1,4 +1,4 @@
-package com.bitmovin.bitmovinplayerexample;
+package com.bitmovin.collector.bitmovinplayer.example.v1;
 
 import android.os.Bundle;
 import android.view.View;
