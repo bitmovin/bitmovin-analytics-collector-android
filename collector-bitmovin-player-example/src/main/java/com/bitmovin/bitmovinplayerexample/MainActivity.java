@@ -37,8 +37,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PlayerConfiguration config;
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
 
-    private final SourceItem redbullSource =
-            new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
     private final SourceItem sintelSource =
             new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd");
     private final SourceItem corruptedSource =

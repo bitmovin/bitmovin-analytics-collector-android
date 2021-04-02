@@ -37,10 +37,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PlayerConfiguration config;
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
 
-    private final SourceItem redbullSource =
-            new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8");
     private final SourceItem sintelSource =
-            new SourceItem("http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd");
+            new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd");
     private final SourceItem corruptedSource =
             new SourceItem(
                     "https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd");
@@ -70,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void initializeBitmovinPlayer() {
         config = new PlayerConfiguration();
 
-        SourceConfiguration source = this.createSourceConfig(redbullSource);
+        SourceConfiguration source = this.createSourceConfig(sintelSource);
         //        SourceConfiguration source = this.createDRMSource();
         config.setSourceConfiguration(source);
 
