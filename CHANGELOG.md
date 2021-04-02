@@ -11,8 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support for exoplayer version > 2.12
 
 - [Internal] Separated BitmovinPlayer v2 and v3 collectors and example modules
-    - rename all occurrences of `bitmovinanalyticsexample` module to `bitmovinplayerexample`
-    - update example app icons and colors to distinguish between v1 and v2 collector example apps
+    - example apps (v1 and latest) package and id renaming
+    - example apps (v1 and latest) icons and colors change
 - [Internal] Separated exoplayer collector projects
 - [Internal] Added new sample app for testing older versions of exoplayer collector
 - [Internal] `FeatureManager` allows dynamically adding and disabling features based on player support.
