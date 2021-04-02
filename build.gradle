@@ -97,8 +97,8 @@ ext {
 	sourceCompatibility = JavaVersion.VERSION_1_8
 	targetCompatibility = JavaVersion.VERSION_1_8
 
-	playerCollectorV1Version = '2.44.0'
-	playerVersion = '3.0.0-rc.1'
+	bitmovinPlayerCollectorV1Version = '2.44.0'
+	bitmovinPlayerVersion = '3.0.0-rc.1'
 
 	exoplayerCollectorV1Version = '2.11.8'
 	exoplayerVersion = '2.13.2'
