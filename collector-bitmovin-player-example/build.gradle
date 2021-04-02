@@ -48,7 +48,7 @@ dependencies {
 
 
 	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
-	implementation "com.bitmovin.player:playercore:${rootProject.ext.bitmovinPlayerCollectorV1Version}"
+	implementation "com.bitmovin.player:playercore:${rootProject.ext.bitmovinPlayer2Version}"
 
 	// only needed if ads are used
 	implementation 'androidx.legacy:legacy-support-v4:1.0.0'
