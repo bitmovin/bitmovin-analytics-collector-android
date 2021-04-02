@@ -9,8 +9,8 @@ android {
 		applicationId 'com.bitmovin.bitmovinplayerexample'
 		minSdkVersion rootProject.ext.minSdkVersion
 		targetSdkVersion rootProject.ext.targetSdkVersion
-		versionCode rootProject.ext.versionCodeV1
-		versionName rootProject.ext.versionV1
+		versionCode rootProject.ext.versionCode
+		versionName rootProject.ext.version
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled true
@@ -61,7 +61,7 @@ dependencies {
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-bitmovin-player-v1')
 	} else {
-		implementation "com.bitmovin.analytics:collector-bitmovin-player-v1:${rootProject.ext.versionV1}"
+		implementation "com.bitmovin.analytics:collector-bitmovin-player-v1:${rootProject.ext.version}"
 	}
 }
 

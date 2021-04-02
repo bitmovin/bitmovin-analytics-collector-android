@@ -9,8 +9,8 @@ android {
 		applicationId "com.bitmovin.exoplayeranalyticsexample"
 		minSdkVersion rootProject.ext.minSdkVersion
 		targetSdkVersion rootProject.ext.targetSdkVersion
-		versionCode rootProject.ext.versionCodeV1
-		versionName rootProject.ext.versionV1
+		versionCode rootProject.ext.versionCode
+		versionName rootProject.ext.version
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled true
@@ -54,6 +54,6 @@ dependencies {
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-exoplayer-v1')
 	} else {
-		implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.versionV1}"
+		implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
 	}
 }

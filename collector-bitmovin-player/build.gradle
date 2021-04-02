@@ -69,7 +69,7 @@ publishing {
 		aar(MavenPublication) {
 			groupId rootProject.ext.packageGroupId
 			version = rootProject.ext.version
-			artifactId project.getName()
+			artifactId project.getName() // SVARGA: problem: does it include -v1 suffix ?
 
 			// Tell maven to prepare the generated "*.aar" file for publishing
 			artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")

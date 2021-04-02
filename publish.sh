@@ -50,9 +50,13 @@ if [ -z "$ANALYTICS_API_RELEASE_TOKEN" ]; then
     setEnvVariable "ANALYTICS_API_RELEASE_TOKEN" $ANALYTICS_API_RELEASE_TOKEN
 fi
 
+#// SVARGA: check if uptodate
 echo "Make sure to bump the version in the README and CHANGELOG first and merge that PR into develop.\n\nAfter releasing, change the \"developLocal\" to false manually and start both the examples and make sure that the outgoing payload doesn't include \"-local\" in the version string (and pull the right version from artifactory).\n"
 echo "Version (without leading \"v\")":
 read VERSION
+
+#// SVARGA: add are you sure about version echo
+
 git checkout develop
 git pull
 
@@ -70,6 +74,7 @@ echo "Creating and publishing :collector project..."
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:publishToMavenLocal || exit
 echo "Created and published :collector project."
 
+#// SVARGA: if statement
 echo "Creating and publishing :collector-bitmovin-player project..."
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:clean || exit
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:build || exit
@@ -85,7 +90,7 @@ echo "Creating and publishing :collector-exoplayer project..."
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:artifactoryPublish || exit
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:publishToMavenLocal || exit
 echo "Created and published :collector-exoplayer project."
-
+#// SVARGA: if statement END
 
 git checkout main
 git pull
