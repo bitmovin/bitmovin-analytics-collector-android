@@ -1,4 +1,4 @@
-package com.bitmovin.exoplayeranalyticsexample;
+package com.bitmovin.collector.exoplayer.example.v1;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,7 +15,6 @@ import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
@@ -29,7 +28,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 import java.util.UUID;
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity
     private Button createButton;
     private Button sourceChangeButton;
     private TextView eventLogView;
-
+    private final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
     private DataSource.Factory dataSourceFactory;
 
     private ExoPlayerCollector bitmovinAnalytics;
@@ -62,7 +61,9 @@ public class MainActivity extends AppCompatActivity
         sourceChangeButton.setOnClickListener(this);
         eventLogView = findViewById(R.id.eventLog);
 
-        dataSourceFactory = new DefaultDataSourceFactory(this, buildHttpDataSourceFactory());
+        dataSourceFactory =
+                new DefaultDataSourceFactory(
+                        this, bandwidthMeter, buildHttpDataSourceFactory(bandwidthMeter));
         createPlayer();
     }
 
@@ -89,7 +90,6 @@ public class MainActivity extends AppCompatActivity
 
     private void createPlayer() {
         if (player == null) {
-            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(this).build();
 
             SimpleExoPlayer.Builder exoBuilder = new SimpleExoPlayer.Builder(this);
             exoBuilder.setBandwidthMeter(bandwidthMeter);
@@ -141,11 +141,8 @@ public class MainActivity extends AppCompatActivity
                             dataSourceFactory);
             // mediaSource = new ConcatenatingMediaSource(dashMediaSource, dashMediaSource);
 
-            player.setMediaSource(dashMediaSource);
+            player.prepare(dashMediaSource);
             player.setPlayWhenReady(false);
-            // without prepare() it will not start autoplay
-            // prepare also starts preloading data before user clicks play
-            // player.prepare();
         }
     }
 
@@ -196,14 +193,13 @@ public class MainActivity extends AppCompatActivity
         if (drmSession != null) {
             sourceFactory.setDrmSessionManager(drmSession);
         }
-        MediaItem mediaItem = MediaItem.fromUri(dashStatic);
-        return sourceFactory.createMediaSource(mediaItem);
+        return sourceFactory.createMediaSource(dashStatic);
     }
 
     protected static HttpMediaDrmCallback createMediaDrmCallback(
             String licenseUrl, String userAgent) {
         HttpDataSource.Factory licenseDataSourceFactory =
-                new DefaultHttpDataSource.Factory().setUserAgent(userAgent);
+                new DefaultHttpDataSourceFactory(userAgent);
         HttpMediaDrmCallback drmCallback =
                 new HttpMediaDrmCallback(licenseUrl, licenseDataSourceFactory);
 
@@ -218,9 +214,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private HttpDataSource.Factory buildHttpDataSourceFactory() {
-        return new DefaultHttpDataSource.Factory()
-                .setUserAgent(Util.getUserAgent(this, getString(R.string.app_name)));
+    private HttpDataSource.Factory buildHttpDataSourceFactory(
+            DefaultBandwidthMeter bandwidthMeter) {
+        return new DefaultHttpDataSourceFactory(
+                Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter);
     }
 
     @Override
@@ -242,7 +239,7 @@ public class MainActivity extends AppCompatActivity
         bitmovinAnalyticsConfig.setTitle("DRM Video Title");
 
         bitmovinAnalytics.attachPlayer(player);
-        player.setMediaSource(dashMediaSource);
+        player.prepare(dashMediaSource);
     }
 
     @Override
