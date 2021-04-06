@@ -21,24 +21,31 @@
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
+
                 <Button
-                        android:id="@+id/release_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Release"
-                        />
+                    android:id="@+id/release_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Release" />
+
                 <Button
-                        android:id="@+id/create_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Create"
-                        />
+                    android:id="@+id/create_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Create" />
+
                 <Button
                     android:id="@+id/source_change_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Change Source"
-                    />
+                    android:text="Change Source" />
+
+                <Button
+                    android:id="@+id/set_custom_data"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set custom data"
+                    android:textSize="8sp" />
             </LinearLayout>
 
         </com.google.android.exoplayer2.ui.PlayerView>

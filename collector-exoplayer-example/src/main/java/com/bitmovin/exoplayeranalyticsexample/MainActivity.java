@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity
     private Button releaseButton;
     private Button createButton;
     private Button sourceChangeButton;
+    private Button setCustomDataButton;
     private TextView eventLogView;
 
     private DataSource.Factory dataSourceFactory;
@@ -61,6 +62,8 @@ public class MainActivity extends AppCompatActivity
         createButton.setOnClickListener(this);
         sourceChangeButton = findViewById(R.id.source_change_button);
         sourceChangeButton.setOnClickListener(this);
+        setCustomDataButton = findViewById(R.id.set_custom_data);
+        setCustomDataButton.setOnClickListener(this);
         eventLogView = findViewById(R.id.eventLog);
 
         dataSourceFactory = new DefaultDataSourceFactory(this, buildHttpDataSourceFactory());
@@ -107,7 +110,7 @@ public class MainActivity extends AppCompatActivity
             bitmovinAnalyticsConfig.setTitle("Android Bitmovin SDK Video with DASH");
             bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
             bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
-            bitmovinAnalyticsConfig.setExperimentName("experiment-timeout");
+            bitmovinAnalyticsConfig.setExperimentName("experiment-custom-data");
             bitmovinAnalyticsConfig.setCustomData1("customData1");
             bitmovinAnalyticsConfig.setCustomData2("customData2");
             bitmovinAnalyticsConfig.setCustomData3("customData3");
@@ -130,9 +133,6 @@ public class MainActivity extends AppCompatActivity
 
             // Step 4: Attach ExoPlayer
             bitmovinAnalytics.attachPlayer(player);
-
-            CustomData customData = bitmovinAnalyticsConfig.getCustomData();
-            bitmovinAnalytics.setCustomData(customData);
 
             // Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);
@@ -235,6 +235,8 @@ public class MainActivity extends AppCompatActivity
             createPlayer();
         } else if (v == sourceChangeButton) {
             changeSource();
+        } else if (v == setCustomDataButton) {
+            setCustomData();
         }
     }
 
@@ -248,6 +250,12 @@ public class MainActivity extends AppCompatActivity
         bitmovinAnalytics.attachPlayer(player);
         player.setMediaSource(dashMediaSource);
     }
+
+    private void setCustomData() {
+        CustomData customData = new CustomData("1", "2", "3", "4", "5", "6", "7", "experiment-custom-data-1");
+        bitmovinAnalytics.setCustomDataOnce(customData);
+    }
+
 
     @Override
     public void onDispatchEventData(EventData data) {
