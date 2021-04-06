@@ -84,10 +84,17 @@ allprojects {
 ext {
 	developLocal = System.getProperty("developLocal", "true").toBoolean()
 	packageGroupId = 'com.bitmovin.analytics'
-	// versionCode is used only by PlayStore to indicate updates of apps, not relevant for us
+
+	/** Not relevant for us as versionCode is used only by PlayStore to indicate updates of apps,
+	 * but we publish artifacts to maven repositories
+	 */
 	versionCode = 122003
-	// one version property is used for all gradle modules
-	// collectors version v1 or v2 is set during release by publish script
+
+	/**
+	 * In local development one version is used across all gradle modules. But in production/release,
+	 * we set version property to '1.X' or '2.X' in 'publish.sh' script and based on that we release
+	 * and publish correct collectors v1 or v2.
+	 */
 	version = (project.hasProperty('version') ? project.getProperty('version') : '0.0.0') + (developLocal ? '-local' : '')
 
 	compileSdkVersion = 28

@@ -57,11 +57,11 @@ dependencies {
 	/** required because of play-services-ads:17.1.2 SDK 26 dependencies */
 	implementation 'androidx.browser:browser:1.0.0'
 
-	// Pull from Maven Repo
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-bitmovin-player-v1')
 	} else {
-		implementation "com.bitmovin.analytics:collector-bitmovin-player-v1:${rootProject.ext.version}"
+		// v1 collector artifact is published without '-v1' suffix
+		implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
 	}
 }
 

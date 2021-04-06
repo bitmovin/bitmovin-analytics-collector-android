@@ -57,7 +57,6 @@ dependencies {
 	/** required because of play-services-ads:17.1.2 SDK 26 dependencies */
 	implementation 'androidx.browser:browser:1.0.0'
 
-	// Pull from Maven Repo
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-bitmovin-player')
 	} else {

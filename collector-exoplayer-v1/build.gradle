@@ -70,7 +70,11 @@ publishing {
 		aar(MavenPublication) {
 			groupId rootProject.ext.packageGroupId
 			version = rootProject.ext.version
-			artifactId project.getName()
+			/**
+			 * ArtifactId of v1 collector is changed to normal one, because we want to publish same
+			 * artifact to maven as before (compatibility)
+			 */
+			artifactId project(':collector-exoplayer').name
 
 			// Tell maven to prepare the generated "*.aar" file for publishing
 			artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")

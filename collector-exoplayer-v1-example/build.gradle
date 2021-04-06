@@ -50,10 +50,10 @@ dependencies {
 	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
 	implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerCollectorV1Version}"
 
-	// Pull from Maven Repo
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-exoplayer-v1')
 	} else {
+		// v1 collector artifact is published without '-v1' suffix
 		implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
 	}
 }
