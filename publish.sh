@@ -47,7 +47,7 @@ if [ -z "$ANALYTICS_GH_TOKEN" ]; then
 fi
 
 if [ -z "$ANALYTICS_API_RELEASE_TOKEN" ]; then
-  echo "ANALYTICS_API_RELEASE_TOKEN not found in environment variables. You need to provide the bitmovin API Key for the user 'dhi+analytics-admin-user' (admin.bitmovin.com/users/4c5d7ec9-6fc0-4c75-8534-532b3b2e7426)"
+  echo "ANALYTICS_API_RELEASE_TOKEN not found in environment variables. You need to provide the bitmovin API Key for the user 'dhi+analytics-admin-user', starting with with 'bb2...' (admin.bitmovin.com/users/4c5d7ec9-6fc0-4c75-8534-532b3b2e7426)"
   echo "Enter the token:"
   read ANALYTICS_API_RELEASE_TOKEN
   echo ""
