@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void initializeBitmovinPlayer() {
         PlaybackConfig playbackConfig = new PlaybackConfig();
         playbackConfig.setMuted(false);
-        playbackConfig.setAutoplayEnabled(true);
+        playbackConfig.setAutoplayEnabled(false);
 
         PlayerConfig config = new PlayerConfig();
         config.setPlaybackConfig(playbackConfig);
