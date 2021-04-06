@@ -6,11 +6,11 @@ android {
 	compileSdkVersion rootProject.ext.compileSdkVersion
 
 	defaultConfig {
-		applicationId "com.bitmovin.exoplayeranalyticsexample"
+		applicationId "com.bitmovin.analytics.exoplayer.example.v1"
 		minSdkVersion rootProject.ext.minSdkVersion
 		targetSdkVersion rootProject.ext.targetSdkVersion
-		versionCode rootProject.ext.versionCodeV1
-		versionName rootProject.ext.versionV1
+		versionCode rootProject.ext.versionCode
+		versionName rootProject.ext.version
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled true
@@ -50,10 +50,10 @@ dependencies {
 	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
 	implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerCollectorV1Version}"
 
-	// Pull from Maven Repo
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-exoplayer-v1')
 	} else {
-		implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.versionV1}"
+		// v1 collector artifact is published without '-v1' suffix
+		implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
 	}
 }

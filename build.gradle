@@ -82,13 +82,20 @@ allprojects {
 }
 
 ext {
-	developLocal =  System.getProperty("developLocal", "true").toBoolean()
-	versionNameSuffix = developLocal ? '-local' : ''
+	developLocal = System.getProperty("developLocal", "true").toBoolean()
 	packageGroupId = 'com.bitmovin.analytics'
-	versionV1 = project.hasProperty('versionV1') ? project.getProperty('versionV1') : '1.22.1' + versionNameSuffix
-	version = project.hasProperty('version') ? project.getProperty('version') : '1.22.1' + versionNameSuffix
-	versionCodeV1 = 122002 //only needed for the example apps - for the library, this doesn't matter
-	versionCode = 122002 //only needed for the example apps - for the library, this doesn't matter
+
+	/** Not relevant for us as versionCode is used only by PlayStore to indicate updates of apps,
+	 * but we publish artifacts to maven repositories
+	 */
+	versionCode = 122003
+
+	/**
+	 * In local development one version is used across all gradle modules. But in production/release,
+	 * we set version property to '1.X' or '2.X' in 'publish.sh' script and based on that we release
+	 * and publish correct collectors v1 or v2.
+	 */
+	version = (project.hasProperty('version') ? project.getProperty('version') : '0.0.0') + (developLocal ? '-local' : '')
 
 	compileSdkVersion = 28
 	minSdkVersion = 16
@@ -97,13 +104,16 @@ ext {
 	sourceCompatibility = JavaVersion.VERSION_1_8
 	targetCompatibility = JavaVersion.VERSION_1_8
 
+	bitmovinPlayer2Version = '2.44.0'
+	bitmovinPlayerVersion = '3.0.0-rc.1'
+
+	exoplayerCollectorV1Version = '2.11.8'
+	exoplayerVersion = '2.13.2'
+
 	constraintLayoutVersion = '1.0.2'
 	junitVersion = '4.12'
 	testRunnerVersion = '1.0.1'
 	espressoCoreVersion = '3.2.0'
-	playercoreVersion = '2.44.0'
-	exoplayerCollectorV1Version = '2.11.8'
-	exoplayerVersion = '2.13.2'
 	assertjCoreVersion = '3.11.1'
 	mockitoCoreVersion = '3.5.0'
 	androidXVersion = '1.1.0'
@@ -111,6 +121,8 @@ ext {
 	constraintlayoutVersion = '1.1.3'
 	multidexVersion = '2.0.1'
 	mockkVersion = '1.10.6'
+	imaSdkVersion = '3.19.4'
+	playServicesAdsVersion = '19.3.0'
 }
 
 task createPrePushHook() {
@@ -174,7 +186,12 @@ project(":collector-exoplayer-v1-example") {
 		skipProject = true
 	}
 }
-project(":bitmovinanalyticsexample") {
+project(":collector-bitmovin-player-example") {
+	sonarqube {
+		skipProject = true
+	}
+}
+project(":collector-bitmovin-player-v1-example") {
 	sonarqube {
 		skipProject = true
 	}

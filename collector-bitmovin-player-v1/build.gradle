@@ -1,0 +1,138 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'maven-publish'
+apply from: '../bitmovinpropertiesloader.gradle'
+
+android {
+	compileSdkVersion rootProject.ext.compileSdkVersion
+
+	defaultConfig {
+		minSdkVersion rootProject.ext.minSdkVersion
+		targetSdkVersion rootProject.ext.targetSdkVersion
+		versionCode rootProject.ext.versionCode
+		versionName rootProject.ext.version
+
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+		multiDexEnabled true
+	}
+
+	lintOptions {
+		abortOnError false
+	}
+
+	compileOptions {
+		sourceCompatibility rootProject.ext.sourceCompatibility
+		targetCompatibility rootProject.ext.targetCompatibility
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+		debug {
+			testCoverageEnabled true
+		}
+	}
+
+	testOptions {
+		unitTests.returnDefaultValues = true
+	}
+}
+
+dependencies {
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+	implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
+	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
+
+
+	testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+	testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+
+	if (rootProject.ext.developLocal) {
+		api project(':collector')
+	} else {
+		api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
+	}
+	implementation "com.bitmovin.player:playercore:${rootProject.ext.bitmovinPlayer2Version}"
+
+	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
+}
+
+publishing {
+	publications {
+		aar(MavenPublication) {
+			groupId rootProject.ext.packageGroupId
+			version = rootProject.ext.version
+			/**
+			 * ArtifactId of v1 collector is changed to normal one, because we want to publish same
+			 * artifact to maven as before (compatibility)
+			 */
+			artifactId project(':collector-bitmovin-player').name
+
+			// Tell maven to prepare the generated "*.aar" file for publishing
+			artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+
+			pom.withXml {
+				def dependenciesNode = asNode().appendNode('dependencies')
+
+				//Defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
+				def configurationNames = ['api']
+
+				configurationNames.each { configurationName ->
+					configurations[configurationName].allDependencies.each {
+
+						if ((it.group == 'com.google.android.libraries.cast.companionlibrary' && it.name == 'ccl') ||
+						(it.group == 'com.android.support' && it.name == 'mediarouter-v7') ||
+						(it.group == 'com.android.support' && it.name == 'support-v4') ||
+						(it.group == 'com.android.support' && it.name == 'appcompat-v7') ||
+						(it.group == 'com.google.android.gms' && it.name == 'play-services-cast-framework') ||
+						(it.group == 'com.google.ads.interactivemedia.v3' && it.name == 'interactivemedia') ||
+						(it.group == 'com.google.android.gms' && it.name == 'play-services-ads')) {
+							return
+						}
+
+
+						if (it.group == null || it.name == null) {
+							return
+						}
+
+						def dependencyNode = dependenciesNode.appendNode('dependency')
+						dependencyNode.appendNode('groupId', it.group)
+						dependencyNode.appendNode('artifactId', it.name)
+						dependencyNode.appendNode('version', it.version)
+					}
+				}
+			}
+		}
+	}
+}
+
+artifactory {
+	contextUrl = 'https://bitmovin.jfrog.io/bitmovin'
+	publish {
+		repository {
+			// The Artifactory repository key to publish to
+			repoKey = rootProject.ext.version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
+			username = bitmovinProperties.getProperty('artifactoryUser') // The publisher user name
+			password = bitmovinProperties.getProperty('artifactoryPassword')
+			// The publisher password
+			maven = true
+		}
+		defaults {
+			// Tell the Artifactory Plugin which artifacts should be published to Artifactory.
+			publications('aar')
+			publishArtifacts = true
+
+			// Properties to be attached to the published artifacts.
+			properties = ['qa.level': 'basic', 'dev.team': 'core']
+			// Publish generated POM files to Artifactory (true by default)
+			publishPom = true
+		}
+	}
+}

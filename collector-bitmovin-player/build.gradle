@@ -59,7 +59,7 @@ dependencies {
 	} else {
 		api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
 	}
-	implementation "com.bitmovin.player:playercore:${rootProject.ext.playercoreVersion}"
+	implementation "com.bitmovin.player:playercore:${rootProject.ext.bitmovinPlayer2Version}"
 
 	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 }
