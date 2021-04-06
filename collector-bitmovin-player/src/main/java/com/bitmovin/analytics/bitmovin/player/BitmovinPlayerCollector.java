@@ -7,12 +7,16 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.bitmovin.player.config.BitmovinAnalyticsSourceConfig;
+import com.bitmovin.analytics.bitmovin.player.config.BitmovinAnalyticsSourceConfigProvider;
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.player.api.Player;
 
 public class BitmovinPlayerCollector extends BitmovinAnalytics {
+
+    private BitmovinAnalyticsSourceConfigProvider sourceConfigProvider = new BitmovinAnalyticsSourceConfigProvider();
 
     /**
      * Bitmovin Analytics
@@ -47,6 +51,10 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
             BitmovinSdkAdAdapter adAdapter = new BitmovinSdkAdAdapter(player, this.adAnalytics);
             this.attachAd(adAdapter);
         }
+    }
+
+    public void addSourceConfig(BitmovinAnalyticsSourceConfig sourceConfig) {
+        this.sourceConfigProvider.addSource(sourceConfig);
     }
 
     private String getUserAgent(Context context) {
