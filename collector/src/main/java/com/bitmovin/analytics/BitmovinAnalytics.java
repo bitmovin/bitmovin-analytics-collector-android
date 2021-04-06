@@ -383,13 +383,9 @@ public class BitmovinAnalytics
             Log.d(TAG, "Custom data not set because player is not attached");
             return;
         }
+        createAndSendBasicEventData();
         this.bitmovinAnalyticsConfig.setCustomData(customData);
-        EventData data = this.createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data);
-
+        createAndSendBasicEventData();
     }
 
     public void setCustomDataOnce(CustomData customData){
@@ -397,14 +393,22 @@ public class BitmovinAnalytics
             Log.d(TAG, "Custom data not set because player is not attached");
             return;
         }
+        createAndSendBasicEventData();
 
         CustomData currentCustomData = this.bitmovinAnalyticsConfig.getCustomData();
         this.bitmovinAnalyticsConfig.setCustomData(customData);
 
-        EventData eventData = this.createEventData();
-        sendEventData(eventData);
+        createAndSendBasicEventData();
 
         this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
+    }
+
+    public void createAndSendBasicEventData(){
+        EventData data = this.createEventData();
+        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
+        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+        sendEventData(data);
     }
 
     public void sendEventData(EventData data) {
