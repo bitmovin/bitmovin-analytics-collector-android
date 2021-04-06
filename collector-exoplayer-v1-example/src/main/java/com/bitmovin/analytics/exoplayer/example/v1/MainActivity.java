@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.AdEventData;
+import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     private Button releaseButton;
     private Button createButton;
     private Button sourceChangeButton;
+    private Button setCustomDataButton;
     private TextView eventLogView;
     private final DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
     private DataSource.Factory dataSourceFactory;
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity
         createButton.setOnClickListener(this);
         sourceChangeButton = findViewById(R.id.source_change_button);
         sourceChangeButton.setOnClickListener(this);
+        setCustomDataButton = findViewById(R.id.set_custom_data);
+        setCustomDataButton.setOnClickListener(this);
         eventLogView = findViewById(R.id.eventLog);
 
         dataSourceFactory =
@@ -228,7 +232,14 @@ public class MainActivity extends AppCompatActivity
             createPlayer();
         } else if (v == sourceChangeButton) {
             changeSource();
+        } else if (v == setCustomDataButton) {
+            setCustomData();
         }
+    }
+
+    private void setCustomData() {
+        CustomData customData = new CustomData("1", "2", "3", "4", "5", "6", "7", "experiment-custom-data-1");
+        bitmovinAnalytics.setCustomDataOnce(customData);
     }
 
     private void changeSource() {

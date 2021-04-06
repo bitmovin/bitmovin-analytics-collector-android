@@ -39,6 +39,12 @@
                     android:layout_height="wrap_content"
                     android:text="Change Source"
                     />
+                <Button
+                    android:id="@+id/set_custom_data"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set custom data"
+                    android:textSize="8sp" />
             </LinearLayout>
 
         </com.google.android.exoplayer2.ui.PlayerView>
