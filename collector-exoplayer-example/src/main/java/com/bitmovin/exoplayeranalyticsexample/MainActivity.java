@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.AdEventData;
+import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
@@ -129,6 +130,9 @@ public class MainActivity extends AppCompatActivity
 
             // Step 4: Attach ExoPlayer
             bitmovinAnalytics.attachPlayer(player);
+
+            CustomData customData = bitmovinAnalyticsConfig.getCustomData();
+            bitmovinAnalytics.setCustomData(customData);
 
             // Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);

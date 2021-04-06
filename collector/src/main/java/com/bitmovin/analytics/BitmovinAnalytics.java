@@ -8,6 +8,7 @@ import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
+import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
@@ -375,6 +376,35 @@ public class BitmovinAnalytics
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data);
         this.detachPlayer();
+    }
+
+    public void setCustomData(CustomData customData){
+        if (playerAdapter == null) {
+            Log.d(TAG, "Custom data not set because player is not attached");
+            return;
+        }
+        this.bitmovinAnalyticsConfig.setCustomData(customData);
+        EventData data = this.createEventData();
+        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
+        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
+        sendEventData(data);
+
+    }
+
+    public void setCustomDataOnce(CustomData customData){
+        if (playerAdapter == null) {
+            Log.d(TAG, "Custom data not set because player is not attached");
+            return;
+        }
+
+        CustomData currentCustomData = this.bitmovinAnalyticsConfig.getCustomData();
+        this.bitmovinAnalyticsConfig.setCustomData(customData);
+
+        EventData eventData = this.createEventData();
+        sendEventData(eventData);
+
+        this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
     }
 
     public void sendEventData(EventData data) {
