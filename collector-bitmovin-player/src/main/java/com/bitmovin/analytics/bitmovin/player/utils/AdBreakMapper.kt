@@ -3,31 +3,31 @@ package com.bitmovin.analytics.bitmovin.player.utils
 import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdPosition
-import com.bitmovin.player.model.advertising.AdConfiguration
-import com.bitmovin.player.model.advertising.ima.ImaAdBreak
+import com.bitmovin.player.api.advertising.AdConfig
+import com.bitmovin.player.api.advertising.ima.ImaAdBreak
 import java.util.ArrayList
 
 class AdBreakMapper {
 
-    fun fromPlayerAdConfiguration(adConfiguration: AdConfiguration): AdBreak {
-        var collectorAdBreak = AdBreak("notset", ArrayList<Ad>() as List<Ad>)
+    fun fromPlayerAdConfiguration(adConfig: AdConfig): AdBreak {
+        val collectorAdBreak = AdBreak("notset", ArrayList<Ad>() as List<Ad>)
 
-        fromPlayerAdConfiguration(collectorAdBreak, adConfiguration)
-
-        return collectorAdBreak
-    }
-
-    fun fromPlayerAdConfiguration(collectorAdBreak: AdBreak, adConfiguration: AdConfiguration): AdBreak {
-
-        collectorAdBreak.replaceContentDuration = adConfiguration.replaceContentDuration?.toLong()?.times(1000)
-
-        if (adConfiguration is com.bitmovin.player.model.advertising.AdBreak)
-            fromPlayerAdBreak(collectorAdBreak, adConfiguration)
+        fromPlayerAdConfiguration(collectorAdBreak, adConfig)
 
         return collectorAdBreak
     }
 
-    private fun fromPlayerAdBreak(collectorAdBreak: AdBreak, playerAdBreak: com.bitmovin.player.model.advertising.AdBreak) {
+    private fun fromPlayerAdConfiguration(collectorAdBreak: AdBreak, adConfig: AdConfig): AdBreak {
+
+        collectorAdBreak.replaceContentDuration = adConfig.replaceContentDuration?.toLong()?.times(1000)
+
+        if (adConfig is com.bitmovin.player.api.advertising.AdBreak)
+            fromPlayerAdBreak(collectorAdBreak, adConfig)
+
+        return collectorAdBreak
+    }
+
+    private fun fromPlayerAdBreak(collectorAdBreak: AdBreak, playerAdBreak: com.bitmovin.player.api.advertising.AdBreak) {
 
         val ads = ArrayList<Ad>(playerAdBreak.ads.size)
         if (playerAdBreak.ads.isNotEmpty())

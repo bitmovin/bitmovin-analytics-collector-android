@@ -7,40 +7,37 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector;
 import com.bitmovin.analytics.enums.CDNProvider;
-import com.bitmovin.player.BitmovinPlayer;
-import com.bitmovin.player.BitmovinPlayerView;
-import com.bitmovin.player.config.PlaybackConfiguration;
-import com.bitmovin.player.config.PlayerConfiguration;
-import com.bitmovin.player.config.advertising.AdItem;
-import com.bitmovin.player.config.advertising.AdSource;
-import com.bitmovin.player.config.advertising.AdSourceType;
-import com.bitmovin.player.config.advertising.AdvertisingConfiguration;
-import com.bitmovin.player.config.drm.DRMSystems;
-import com.bitmovin.player.config.media.SourceConfiguration;
-import com.bitmovin.player.config.media.SourceItem;
-import com.bitmovin.player.config.track.AudioTrack;
-import com.bitmovin.player.config.track.SubtitleTrack;
-import java.util.Arrays;
+import com.bitmovin.player.PlayerView;
+import com.bitmovin.player.api.PlaybackConfig;
+import com.bitmovin.player.api.Player;
+import com.bitmovin.player.api.PlayerConfig;
+import com.bitmovin.player.api.advertising.AdItem;
+import com.bitmovin.player.api.advertising.AdSource;
+import com.bitmovin.player.api.advertising.AdSourceType;
+import com.bitmovin.player.api.advertising.AdvertisingConfig;
+import com.bitmovin.player.api.drm.WidevineConfig;
+import com.bitmovin.player.api.media.audio.AudioTrack;
+import com.bitmovin.player.api.media.subtitle.SubtitleTrack;
+import com.bitmovin.player.api.source.SourceConfig;
 import java.util.List;
-import java.util.UUID;
 
+// SVARGA: convert to kotlin
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private BitmovinPlayerView bitmovinPlayerView;
-    private BitmovinPlayer bitmovinPlayer;
+    private PlayerView bitmovinPlayerView;
+    private Player bitmovinPlayer;
     private BitmovinPlayerCollector bitmovinAnalytics;
     private Button releaseButton;
     private Button createButton;
     private Button changeSource;
     private Button changeAudio;
     private Button changeSubtitle;
-    private PlayerConfiguration config;
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
 
-    private final SourceItem sintelSource =
-            new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd");
-    private final SourceItem corruptedSource =
-            new SourceItem(
+    private final SourceConfig sintelSourceConfig =
+            new SourceConfig("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd");
+    private final SourceConfig corruptedSourceConfig =
+            new SourceConfig(
                     "https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd");
 
     @Override
@@ -66,22 +63,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected void initializeBitmovinPlayer() {
-        config = new PlayerConfiguration();
+        PlaybackConfig playbackConfig = new PlaybackConfig();
+        playbackConfig.setMuted(false);
+        playbackConfig.setAutoplayEnabled(true);
 
-        SourceConfiguration source = this.createSourceConfig(sintelSource);
-        //        SourceConfiguration source = this.createDRMSource();
-        config.setSourceConfiguration(source);
+        PlayerConfig config = new PlayerConfig();
+        config.setPlaybackConfig(playbackConfig);
+        config.setAdvertisingConfig(createAdvertisingConfig());
 
-        //        config.setAdvertisingConfiguration(initializeAds(config));
-
-        PlaybackConfiguration playbackConfiguration = config.getPlaybackConfiguration();
-        playbackConfiguration.setMuted(true);
-        playbackConfiguration.setAutoplayEnabled(false);
-
-        this.bitmovinPlayer = new BitmovinPlayer(getApplicationContext(), config);
+        bitmovinPlayer = Player.create(getApplicationContext(), config);
 
         this.bitmovinAnalytics.detachPlayer();
         this.bitmovinAnalytics.attachPlayer(bitmovinPlayer);
+
+        bitmovinPlayer.load(sintelSourceConfig);
 
         this.bitmovinPlayerView.setPlayer(this.bitmovinPlayer);
     }
@@ -113,31 +108,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return new BitmovinPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
     }
 
-    protected static SourceConfiguration createSourceConfig(SourceItem sourceItem) {
-        // Create a new source configuration
-        SourceConfiguration sourceConfiguration = new SourceConfiguration();
-        // Add a new source item
-        sourceConfiguration.addSourceItem(sourceItem);
-
-        return sourceConfiguration;
-    }
-
-    protected static SourceConfiguration createDRMSource() {
-        // Create a new source configuration
-        SourceConfiguration sourceConfiguration = new SourceConfiguration();
-        SourceItem sourceItem =
-                new SourceItem(
+    protected static SourceConfig createDRMSourceConfig() {
+        // Create a new source config
+        SourceConfig sourceConfig =
+                SourceConfig.fromUrl(
                         "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
 
-        // setup DRM handling
-        String drmLicenseUrl = "https://widevine-proxy.appspot.com/proxy";
-        UUID drmSchemeUuid = DRMSystems.WIDEVINE_UUID;
-        sourceItem.addDRMConfiguration(drmSchemeUuid, drmLicenseUrl);
+        // Attach DRM handling to the source config
+        sourceConfig.setDrmConfig(new WidevineConfig("https://widevine-proxy.appspot.com/proxy"));
 
-        // Add a new source item
-        sourceConfiguration.addSourceItem(sourceItem);
+        return sourceConfig;
+    }
 
-        return sourceConfiguration;
+    @Override
+    protected void onStart() {
+        bitmovinPlayerView.onStart();
+        super.onStart();
     }
 
     @Override
@@ -150,6 +136,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onPause() {
         bitmovinPlayerView.onPause();
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        bitmovinPlayerView.onStop();
+        super.onStop();
     }
 
     @Override
@@ -183,66 +175,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void onPlayerChangeSource() {
         bitmovinAnalytics.detachPlayer();
 
-        SourceConfiguration config = createDRMSource();
+        SourceConfig sourceConfig = createDRMSourceConfig();
         bitmovinAnalyticsConfig.setVideoId("DRMVideo-id");
         bitmovinAnalyticsConfig.setTitle("DRM Video Title");
 
         bitmovinAnalytics.attachPlayer(bitmovinPlayer);
-        bitmovinPlayer.load(config);
+        bitmovinPlayer.load(sourceConfig);
     }
 
     private void onAudioTrackChange() {
-        AudioTrack[] available = bitmovinPlayer.getAvailableAudio();
-        List<AudioTrack> audioTracks = Arrays.asList(available);
+        List<AudioTrack> audioTracks = bitmovinPlayer.getAvailableAudio();
         int index = audioTracks.indexOf(bitmovinPlayer.getAudio());
 
-        String id = available[(index + 1) % available.length].getId();
+        int nextIndex = (index + 1) % audioTracks.size();
+        String id = audioTracks.get(nextIndex).getId();
         bitmovinPlayer.setAudio(id);
     }
 
     private void onSubtitleChange() {
-        SubtitleTrack[] available = bitmovinPlayer.getAvailableSubtitles();
-        List<SubtitleTrack> audioTracks = Arrays.asList(available);
-        int index = audioTracks.indexOf(bitmovinPlayer.getSubtitle());
+        List<SubtitleTrack> subtitleTracks = bitmovinPlayer.getAvailableSubtitles();
+        int index = subtitleTracks.indexOf(bitmovinPlayer.getSubtitle());
 
-        String id = available[(index + 1) % available.length].getId();
+        int nextIndex = (index + 1) % subtitleTracks.size();
+        String id = subtitleTracks.get(nextIndex).getId();
         bitmovinPlayer.setSubtitle(id);
     }
 
-    private static final String AD_SOURCE_1 =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=";
-    private static final String AD_SOURCE_2 =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
-    private static final String AD_SOURCE_3 =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-    private static final String AD_SOURCE_4 =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator=";
-    private static final String AD_SOURCE_5 =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=";
+    private static AdvertisingConfig createAdvertisingConfig() {
+        // These are IMA Sample Tags from
+        // https://developers.google.com/interactive-media-ads/docs/sdks/android/tags
+        String AD_SOURCE_1 =
+                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=";
+        String AD_SOURCE_2 =
+                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
+        String AD_SOURCE_3 =
+                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+        String AD_SOURCE_4 =
+                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator=";
 
-    private AdvertisingConfiguration initializeAds(PlayerConfiguration config) {
         // Create AdSources
-        AdSource firstAdSource = new AdSource(AdSourceType.IMA, AD_SOURCE_1);
-        AdSource secondAdSource = new AdSource(AdSourceType.IMA, AD_SOURCE_2);
-        AdSource thirdAdSource = new AdSource(AdSourceType.IMA, AD_SOURCE_3);
-        AdSource fourthAdSource = new AdSource(AdSourceType.IMA, AD_SOURCE_4);
-        AdSource fifthAdSource = new AdSource(AdSourceType.IMA, AD_SOURCE_5);
+        AdSource firstAdSource = new AdSource(AdSourceType.Ima, AD_SOURCE_1);
+        AdSource secondAdSource = new AdSource(AdSourceType.Ima, AD_SOURCE_2);
+        AdSource thirdAdSource = new AdSource(AdSourceType.Ima, AD_SOURCE_3);
+        AdSource fourthAdSource = new AdSource(AdSourceType.Ima, AD_SOURCE_4);
 
-        // Setup a pre-roll ad
-        //        AdItem preRoll = new AdItem("pre", firstAdSource);
-        //        AdItem preRoll = new AdItem("pre", secondAdSource);
+        // Set up a pre-roll ad
         AdItem preRoll = new AdItem("pre", thirdAdSource);
-        //        AdItem preRoll = new AdItem("pre", fourthAdSource);
-        //        AdItem preRoll = new AdItem("pre", fifthAdSource);
-        // Setup a mid-roll waterfalling ad at 10% of the content duration
-        // NOTE: AdItems containing more than one AdSource, will be executed as waterfalling ad
+
+        // Set up a mid-roll waterfalling ad at 10% of the content duration
+        // NOTE: AdItems containing more than one AdSource will be executed as waterfalling ad
         AdItem midRoll = new AdItem("10%", firstAdSource, secondAdSource);
-        // Setup a post-roll ad
+
+        // Set up a post-roll ad
         AdItem postRoll = new AdItem("post", fourthAdSource);
 
         // Add the AdItems to the AdvertisingConfiguration
-        AdvertisingConfiguration advertisingConfiguration =
-                new AdvertisingConfiguration(preRoll, midRoll, postRoll);
-        return advertisingConfiguration;
+        return new AdvertisingConfig(preRoll, midRoll, postRoll);
     }
 }

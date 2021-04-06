@@ -10,7 +10,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.features.FeatureFactory;
-import com.bitmovin.player.BitmovinPlayer;
+import com.bitmovin.player.api.Player;
 
 public class BitmovinPlayerCollector extends BitmovinAnalytics {
 
@@ -29,7 +29,7 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
         this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
     }
 
-    public void attachPlayer(BitmovinPlayer player) {
+    public void attachPlayer(Player player) {
         DeviceInformationProvider deviceInformationProvider =
                 new DeviceInformationProvider(context, getUserAgent(context));
         FeatureFactory featureFactory = new BitmovinFeatureFactory(this, player, context);
