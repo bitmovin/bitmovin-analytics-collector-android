@@ -54,16 +54,15 @@ if [ -z "$ANALYTICS_API_RELEASE_TOKEN" ]; then
   setEnvVariable "ANALYTICS_API_RELEASE_TOKEN" $ANALYTICS_API_RELEASE_TOKEN
 fi
 
-#// SVARGA: uncomment
-#echo "! Before publishing, make sure the version has been already bumped in the 'README.md' and 'CHANGELOG.md' and already merged as release PR into 'develop' branch !"
-#read -p "(Press enter to continue)"
-#echo ""
-#echo "! After publishing, change the 'developLocal' gradle property to 'false' manually and start all the examples locally to make sure that the outgoing payload doesn't include '-local' in the version string (and pull the right published artifacts from artifactory) !"
-#read -p "(Press enter to continue)"
-#echo ""
-#echo "! After publishing, Don't forget to update the changelog in Contentful !"
-#read -p "(Press enter to continue)"
-#echo ""
+echo "! Before publishing, make sure the version has been already bumped in the 'README.md' and 'CHANGELOG.md' and already merged as release PR into 'develop' branch !"
+read -p "(Press enter to continue)"
+echo ""
+echo "! After publishing, change the 'developLocal' gradle property to 'false' manually and start all the examples locally to make sure that the outgoing payload doesn't include '-local' in the version string (and pull the right published artifacts from artifactory) !"
+read -p "(Press enter to continue)"
+echo ""
+echo "! After publishing, Don't forget to update the changelog in Contentful !"
+read -p "(Press enter to continue)"
+echo ""
 echo "Enter the version (without leading 'v')":
 read VERSION
 echo ""
