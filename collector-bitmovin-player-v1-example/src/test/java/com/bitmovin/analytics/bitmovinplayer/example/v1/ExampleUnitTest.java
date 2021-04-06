@@ -1,4 +1,4 @@
-package com.bitmovin.collector.bitmovinplayer.example.v1;
+package com.bitmovin.analytics.bitmovinplayer.example.v1;
 
 import static org.junit.Assert.*;
 

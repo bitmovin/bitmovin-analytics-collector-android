@@ -1,4 +1,4 @@
-package com.bitmovin.collector.bitmovinplayer.example.v1;
+package com.bitmovin.analytics.bitmovinplayer.example;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +20,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals(
-                "com.bitmovin.collector.bitmovinplayer.example.v1", appContext.getPackageName());
+        assertEquals("com.bitmovin.analytics.bitmovinplayer.example", appContext.getPackageName());
     }
 }
