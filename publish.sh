@@ -91,9 +91,8 @@ echo "\nAre all tokens, artifacts and versions correct ?"
 read -p "(Press enter to continue)"
 
 echo "\nGit Checkout and pull 'develop' branch..."
-#// SVARGA: uncomment
-#git checkout develop
-#git pull
+git checkout develop
+git pull
 
 echo "\nCheck correct code style..."
 if ! ./gradlew spotlessCheck --daemon; then
@@ -104,46 +103,45 @@ fi
 #TODO next release: check if version parameter works (for CircleCI, we also need to add libs-release-local from the .m2/settings.xml, so it will build the other bitmovin and exo collectors (otherwise it can't resolve the dependency on collector before distributing to bintray)
 echo "\n:collector project build and publishing..."
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:clean || exit
-#./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:build || exit // SVARGA: uncomment
+./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:build || exit
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:assembleRelease || exit
-#./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:artifactoryPublish || exit // SVARGA: uncomment
+./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:artifactoryPublish || exit
 ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector:publishToMavenLocal || exit
 echo "\n:collector project built and published!"
 
 if $IS_V1_RELEASE; then
   echo "\n:collector-bitmovin-player-v1 project build and publishing..."
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player-v1:clean || exit
-  #./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player-v1:build || exit // SVARGA: uncomment
+  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player-v1:build || exit
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player-v1:assembleRelease || exit
-  #./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player-v1:artifactoryPublish || exit // SVARGA: uncomment
+  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player-v1:artifactoryPublish || exit
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player-v1:publishToMavenLocal || exit
   echo "\n:collector-bitmovin-player-v1 project built and published!"
 
   echo "\n:collector-exoplayer-v1 project build and publishing..."
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer-v1:clean || exit
-  #  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer-v1:build || exit // SVARGA: uncomment
+  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer-v1:build || exit
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer-v1:assembleRelease || exit
-  #  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer-v1:artifactoryPublish || exit // SVARGA: uncomment
+  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer-v1:artifactoryPublish || exit
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer-v1:publishToMavenLocal || exit
   echo "\n:collector-exoplayer-v1 project built and published!"
 else
   echo "\n:collector-bitmovin-player project build and publishing..."
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:clean || exit
-  #./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:build || exit // SVARGA: uncomment
+  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:build || exit
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:assembleRelease || exit
-  #./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:artifactoryPublish || exit // SVARGA: uncomment
+  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:artifactoryPublish || exit
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-bitmovin-player:publishToMavenLocal || exit
   echo "\n:collector-bitmovin-player project built and published!"
 
   echo "\n:collector-exoplayer project build and publishing..."
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:clean || exit
-  #  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:build || exit // SVARGA: uncomment
+  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:build || exit
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:assembleRelease || exit
-  #  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:artifactoryPublish || exit // SVARGA: uncomment
+  ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:artifactoryPublish || exit
   ./gradlew -DdevelopLocal=false -Pversion="$VERSION" :collector-exoplayer:publishToMavenLocal || exit
   echo "\n:collector-exoplayer project built and published!"
 fi
-exit 0 #// SVARGA: remove exit 0
 
 echo "\nGit release"
 echo "\nGit Checkout and pull 'main' branch..."
