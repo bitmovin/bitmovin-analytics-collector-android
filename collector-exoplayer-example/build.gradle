@@ -6,7 +6,7 @@ android {
 	compileSdkVersion rootProject.ext.compileSdkVersion
 
 	defaultConfig {
-		applicationId "com.bitmovin.collector.exoplayer.example"
+		applicationId "com.bitmovin.analytics.exoplayer.example"
 		minSdkVersion rootProject.ext.minSdkVersion
 		targetSdkVersion rootProject.ext.targetSdkVersion
 		versionCode rootProject.ext.versionCode

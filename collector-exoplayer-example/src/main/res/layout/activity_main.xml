@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/root_view"
     android:keepScreenOn="true"
-    tools:context="com.bitmovin.collector.exoplayer.example.MainActivity">
+    tools:context="com.bitmovin.analytics.exoplayer.example.MainActivity">
 
     <LinearLayout
             android:layout_width="match_parent"

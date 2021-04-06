@@ -1,4 +1,4 @@
-package com.bitmovin.collector.exoplayer.example.v1;
+package com.bitmovin.analytics.exoplayer.example.v1;
 
 import android.net.Uri;
 import android.os.Bundle;
