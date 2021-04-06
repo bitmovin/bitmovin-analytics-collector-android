@@ -1,0 +1,6 @@
+## Template for 'bitmovin.properties' file, required by publish script.
+#
+# Credentials can be found in LastPast: 'bitmovin artifactory'.
+#
+#artifactoryUser=
+#artifactoryPassword=
