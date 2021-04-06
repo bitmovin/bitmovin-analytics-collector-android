@@ -6,7 +6,7 @@ android {
 	compileSdkVersion rootProject.ext.compileSdkVersion
 
 	defaultConfig {
-		applicationId "com.bitmovin.exoplayeranalyticsexample"
+		applicationId "com.bitmovin.analytics.exoplayer.example"
 		minSdkVersion rootProject.ext.minSdkVersion
 		targetSdkVersion rootProject.ext.targetSdkVersion
 		versionCode rootProject.ext.versionCode
@@ -50,7 +50,6 @@ dependencies {
 	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
 	implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
 
-	// Pull from Maven Repo
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-exoplayer')
 	} else {
