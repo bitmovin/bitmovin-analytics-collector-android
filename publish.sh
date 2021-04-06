@@ -163,7 +163,7 @@ git push origin main v$VERSION
 echo "\n Git push 'main' and tag 'v$VERSION' to public repo."
 git push git@github.com:bitmovin/bitmovin-analytics-collector-android.git main v$VERSION
 
-echo "Created release in public repo."
+echo "Creating release in public repo."
 #TODO override existing release
 curl \
   -u bitAnalyticsCircleCi:$ANALYTICS_GH_TOKEN \
