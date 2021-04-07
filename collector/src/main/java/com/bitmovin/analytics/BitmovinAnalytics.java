@@ -404,7 +404,7 @@ public class BitmovinAnalytics
         this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
     }
 
-    public void createAndSendBasicEventData() {
+    private void createAndSendBasicEventData() {
         EventData data = this.createEventData();
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
