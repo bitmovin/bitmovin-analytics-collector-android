@@ -3,6 +3,7 @@ package com.bitmovin.analytics.bitmovin.player;
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.bitmovin.player.config.BitmovinAnalyticsSourceConfigProvider;
 import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
@@ -44,25 +45,31 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean isVideoAttemptedPlay = false;
     private DRMInformation drmInformation = null;
     private FeatureFactory featureFactory;
+    private BitmovinAnalyticsSourceConfigProvider sourceConfigProvider;
+    private SourceSwitchHandler sourceSwitchHandler;
 
     public BitmovinSdkAdapter(
             Player bitmovinPlayer,
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
-            FeatureFactory featureFactory) {
+            FeatureFactory featureFactory,
+            BitmovinAnalyticsSourceConfigProvider sourceConfigProvider) {
         this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.deviceInformationProvider = deviceInformationProvider;
+        this.sourceConfigProvider = sourceConfigProvider;
+        this.sourceSwitchHandler = new SourceSwitchHandler(this, config, sourceConfigProvider, stateMachine, bitmovinPlayer);
     }
 
     public Collection<Feature<?>> init() {
         addPlayerListeners();
         checkAutoplayStartup();
-        this.totalDroppedVideoFrames = 0;
-        this.playerIsReady = false;
+        playerIsReady = false;
+        this.reset();
+        this.sourceSwitchHandler.init();
         return featureFactory.createFeatures();
     }
 
@@ -106,6 +113,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 PlayerEvent.AdBreakStarted.class, this::playerEventAdBreakStartedListener);
         this.bitmovinPlayer.on(
                 PlayerEvent.AdBreakFinished.class, this::playerEventAdBreakFinishedListener);
+
+        this.sourceSwitchHandler.addPlayerListener();
     }
 
     private void removePlayerListener() {
@@ -134,6 +143,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
         this.bitmovinPlayer.off(this::playerEventAdBreakStartedListener);
         this.bitmovinPlayer.off(this::playerEventAdBreakFinishedListener);
+        this.sourceSwitchHandler.removePlayerListener();
     }
 
     @Override
@@ -239,6 +249,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         if (bitmovinPlayer != null) {
             removePlayerListener();
         }
+        this.reset();
+    }
+
+    public void reset() {
+        this.totalDroppedVideoFrames = 0;
+        this.drmInformation = null;
         stateMachine.resetStateMachine();
     }
 
