@@ -5,6 +5,8 @@ import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.player.api.Player
+import com.bitmovin.player.api.deficiency.PlayerErrorCode
+import com.bitmovin.player.api.deficiency.SourceErrorCode
 import com.bitmovin.player.api.event.Event
 import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.event.SourceEvent
@@ -12,8 +14,8 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
-import io.mockk.slot
 import io.mockk.verify
+import java.lang.Exception
 import kotlin.reflect.KClass
 import org.junit.Test
 
@@ -58,25 +60,39 @@ class BitmovinErrorDetailsAdapterTests {
     @Test
     fun `subscribe adds listener and call it, when player event is triggered`() {
         // arrange
-
         val player = mockk<Player>(relaxed = true)
+        var capturedPlayerEventErrorHandler: ((PlayerEvent.Error) -> Unit)? = null
+        var capturedSourceEventErrorHandler: ((SourceEvent.Error) -> Unit)? = null
+        every { player.on(any<KClass<Event>>(), any()) } answers {
+            val firstArgument = it.invocation.args[0]
 
-        val capturedPlayerEvent = slot<(PlayerEvent.Error) -> Unit>()
-        val capturedSourceEvent = slot<(SourceEvent.Error) -> Unit>()
-        every { player.on(any<KClass<PlayerEvent.Error>>(), capture(capturedPlayerEvent)) } answers {
+            if (firstArgument == PlayerEvent.Error::class) capturedPlayerEventErrorHandler = secondArg()
+            if (firstArgument == SourceEvent.Error::class) capturedSourceEventErrorHandler = secondArg()
         }
-//        every { player.on(any(), capture(capturedSourceEvent)) } answers {}
-
         val adapter = BitmovinErrorDetailsAdapter(player, mockk(relaxed = true))
 
         // act
         val adapterSubscribeListener = mockk<OnErrorDetailEventListener>(relaxed = true)
         adapter.subscribe(adapterSubscribeListener)
 
-        capturedPlayerEvent.captured(mockk(relaxed = true))
-        capturedSourceEvent.captured(mockk(relaxed = true))
+        val playerEventError = PlayerEvent.Error(
+                PlayerErrorCode.General,
+                "test-player-event-error-message",
+                Exception("test-player-event-error-exception")
+        )
+        playerEventError.timestamp = 12345
+        capturedPlayerEventErrorHandler?.let { it(playerEventError) }
+
+        val sourceEventError = SourceEvent.Error(
+                SourceErrorCode.DrmGeneral,
+                "test-source-event-error-message",
+                Exception("test-source-event-error-exception")
+        )
+        sourceEventError.timestamp = 54321
+        capturedSourceEventErrorHandler?.let { it(sourceEventError) }
 
         // assert
-        verify(exactly = 2) { adapterSubscribeListener.onError(any(), any(), any(), any()) }
+        verify { adapterSubscribeListener.onError(playerEventError.timestamp, playerEventError.code.value, playerEventError.message, playerEventError.data as? Throwable) }
+        verify { adapterSubscribeListener.onError(sourceEventError.timestamp, sourceEventError.code.value, sourceEventError.message, sourceEventError.data as? Throwable) }
     }
 }

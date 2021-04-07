@@ -5,12 +5,12 @@ import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
 import com.bitmovin.player.api.Player
-import com.bitmovin.player.api.event.EventListener
 import com.bitmovin.player.api.event.SourceEvent
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.Test
 
@@ -55,16 +55,16 @@ class BitmovinSegmentTrackingAdapterTests {
     fun `subscribe adds listener and call it, when player event is triggered`() {
         // arrange
         val player = mockk<Player>(relaxed = true)
-        val capturedPlayerEventListeners = mutableListOf<EventListener<SourceEvent.DownloadFinished>>()
-        every { player.on(any(), capture(capturedPlayerEventListeners)) }
+        val slot = slot<(SourceEvent.DownloadFinished) -> Unit>()
+        every { player.on(any(), capture(slot)) }.answers {}
         val adapter = BitmovinSegmentTrackingAdapter(player, mockk(relaxed = true))
 
         // act
         val adapterSubscribeListener = mockk<OnDownloadFinishedEventListener>(relaxed = true)
         adapter.subscribe(adapterSubscribeListener)
-        for (playerEventListener in capturedPlayerEventListeners) {
-            playerEventListener.onEvent(mockk(relaxed = true))
-        }
+
+        val sourceEventDownloadFinished = mockk<SourceEvent.DownloadFinished>(relaxed = true)
+        slot.captured(sourceEventDownloadFinished)
 
         // arrange
         verify(exactly = 1) { adapterSubscribeListener.onDownloadFinished(any()) }
