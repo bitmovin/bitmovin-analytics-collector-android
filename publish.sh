@@ -39,7 +39,7 @@ if test -e ~/.bash_profile; then
 fi
 
 if [ -z "$ANALYTICS_GH_TOKEN" ]; then
-  echo "ANALYTICS_GH_TOKEN not found in environment variables. You need to provide the Github Access Token for the user 'bitAnalyticsCircleCi' (found in LastPass)"
+  echo "ANALYTICS_GH_TOKEN not found in environment variables. You need to provide the Github Access Token (LastPass: 'bitAnalyticsCircleCi')"
   echo "Enter the token:"
   read ANALYTICS_GH_TOKEN
   echo ""
@@ -55,6 +55,9 @@ if [ -z "$ANALYTICS_API_RELEASE_TOKEN" ]; then
 fi
 
 echo "! Before publishing, make sure the version has been already bumped in the 'README.md' and 'CHANGELOG.md' and already merged as release PR into 'develop' branch !"
+read -p "(Press enter to continue)"
+echo ""
+echo "! Before publishing, make sure you have created 'bitmovin.properties' file with correct credentials (LastPass: 'bitmovin artifactory') !"
 read -p "(Press enter to continue)"
 echo ""
 echo "! After publishing, change the 'developLocal' gradle property to 'false' manually and start all the examples locally to make sure that the outgoing payload doesn't include '-local' in the version string (and pull the right published artifacts from artifactory) !"
