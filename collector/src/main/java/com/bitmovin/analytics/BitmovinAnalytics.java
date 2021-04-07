@@ -189,6 +189,7 @@ public class BitmovinAnalytics
         }
 
         // Setting a startup time of 1 to workaround dashboard issue
+        // TODO how to handle playerstartup only for first source
         data.setPlayerStartupTime(1);
         data.setStartupTime(duration + 1);
 
@@ -381,7 +382,6 @@ public class BitmovinAnalytics
         sendEventData(data);
         this.detachPlayer();
     }
-
 
     // TODO TSA because it is public should we name it sourceChange(source: AnalyticsSourceConfig)?
     @Override

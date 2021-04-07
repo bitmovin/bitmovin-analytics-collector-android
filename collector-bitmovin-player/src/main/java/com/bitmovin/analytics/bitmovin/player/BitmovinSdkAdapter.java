@@ -472,6 +472,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         }
     }
 
+    // TODO TSA events with bitrate 0 at the end of playing a source
+    // should they be ignored?
     private void playerEventVideoPlaybackQualityChangedListener(
             PlayerEvent.VideoPlaybackQualityChanged event) {
         try {

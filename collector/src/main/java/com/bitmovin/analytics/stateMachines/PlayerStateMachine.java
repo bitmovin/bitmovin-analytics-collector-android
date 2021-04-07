@@ -116,26 +116,8 @@ public class PlayerStateMachine {
         transitionState(PlayerState.SOURCE_CHANGED, position);
 
         if (sourceConfig != null){
-            updateConfig(sourceConfig);
+            this.config.updateConfig(sourceConfig);
         }
-    }
-
-    private void updateConfig(AnalyticsSourceConfig sourceConfig) {
-        this.config.setCdnProvider(sourceConfig.getCdnProvider());
-        this.config.setCustomData1(sourceConfig.getCustomData1());
-        this.config.setCustomData2(sourceConfig.getCustomData2());
-        this.config.setCustomData3(sourceConfig.getCustomData3());
-        this.config.setCustomData4(sourceConfig.getCustomData4());
-        this.config.setCustomData5(sourceConfig.getCustomData5());
-        this.config.setCustomData6(sourceConfig.getCustomData6());
-        this.config.setCustomData7(sourceConfig.getCustomData7());
-        this.config.setExperimentName(sourceConfig.getExperimentName());
-        this.config.setM3u8Url(sourceConfig.getM3u8Url());
-        this.config.setMpdUrl(sourceConfig.getMpdUrl());
-        this.config.setPath(sourceConfig.getPath());
-        this.config.setTitle(sourceConfig.getTitle());
-        this.config.setVideoId(sourceConfig.getVideoId());
-        this.config.setIsLive(sourceConfig.isLive());
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
