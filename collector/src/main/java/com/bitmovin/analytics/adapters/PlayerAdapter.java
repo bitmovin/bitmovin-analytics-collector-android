@@ -12,6 +12,8 @@ public interface PlayerAdapter {
 
     void release();
 
+    void reset();
+
     void registerEventDataManipulators(EventDataManipulatorPipeline pipeline);
 
     long getPosition();

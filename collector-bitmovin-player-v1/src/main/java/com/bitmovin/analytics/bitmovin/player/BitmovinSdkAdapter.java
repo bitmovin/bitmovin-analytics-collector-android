@@ -266,6 +266,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     @Override
+    public void reset() {}
+
+    @Override
     public void registerEventDataManipulators(EventDataManipulatorPipeline pipeline) {
         pipeline.registerEventDataManipulator(this);
     }

@@ -250,12 +250,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             removePlayerListener();
         }
         this.reset();
+        this.stateMachine.resetStateMachine();
     }
 
+    @Override
     public void reset() {
         this.totalDroppedVideoFrames = 0;
         this.drmInformation = null;
-        stateMachine.resetStateMachine();
     }
 
     @Override
