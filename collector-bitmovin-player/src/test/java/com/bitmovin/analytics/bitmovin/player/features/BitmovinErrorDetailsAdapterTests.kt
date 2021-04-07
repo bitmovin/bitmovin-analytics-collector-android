@@ -5,9 +5,7 @@ import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.player.api.Player
-import com.bitmovin.player.api.deficiency.ErrorEvent
 import com.bitmovin.player.api.event.Event
-import com.bitmovin.player.api.event.EventListener
 import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.event.SourceEvent
 import io.mockk.clearMocks
@@ -66,8 +64,6 @@ class BitmovinErrorDetailsAdapterTests {
         val capturedPlayerEvent = slot<(PlayerEvent.Error) -> Unit>()
         val capturedSourceEvent = slot<(SourceEvent.Error) -> Unit>()
         every { player.on(any<KClass<PlayerEvent.Error>>(), capture(capturedPlayerEvent)) } answers {
-
-
         }
 //        every { player.on(any(), capture(capturedSourceEvent)) } answers {}
 
