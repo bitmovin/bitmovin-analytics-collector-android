@@ -5,6 +5,7 @@ import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.player.api.Player
+import com.bitmovin.player.api.deficiency.ErrorEvent
 import com.bitmovin.player.api.event.Event
 import com.bitmovin.player.api.event.EventListener
 import com.bitmovin.player.api.event.PlayerEvent
@@ -13,6 +14,7 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.slot
 import io.mockk.verify
 import kotlin.reflect.KClass
 import org.junit.Test
@@ -61,10 +63,13 @@ class BitmovinErrorDetailsAdapterTests {
 
         val player = mockk<Player>(relaxed = true)
 
-        val capturedPlayerEventListeners = mutableListOf<EventListener<Event>>()
-        every { player.on(any<KClass<PlayerEvent.Error>>(), any()) } answers {
-            capturedPlayerEventListeners.add(secondArg())
+        val capturedPlayerEvent = slot<(PlayerEvent.Error) -> Unit>()
+        val capturedSourceEvent = slot<(SourceEvent.Error) -> Unit>()
+        every { player.on(any<KClass<PlayerEvent.Error>>(), capture(capturedPlayerEvent)) } answers {
+
+
         }
+//        every { player.on(any(), capture(capturedSourceEvent)) } answers {}
 
         val adapter = BitmovinErrorDetailsAdapter(player, mockk(relaxed = true))
 
@@ -72,9 +77,8 @@ class BitmovinErrorDetailsAdapterTests {
         val adapterSubscribeListener = mockk<OnErrorDetailEventListener>(relaxed = true)
         adapter.subscribe(adapterSubscribeListener)
 
-        for (playerEventListener in capturedPlayerEventListeners) {
-            playerEventListener.onEvent(mockk(relaxed = true))
-        }
+        capturedPlayerEvent.captured(mockk(relaxed = true))
+        capturedSourceEvent.captured(mockk(relaxed = true))
 
         // assert
         verify(exactly = 2) { adapterSubscribeListener.onError(any(), any(), any(), any()) }
