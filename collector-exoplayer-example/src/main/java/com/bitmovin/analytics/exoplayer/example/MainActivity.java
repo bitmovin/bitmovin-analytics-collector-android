@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity
             bitmovinAnalyticsConfig.setTitle("Android Bitmovin SDK Video with DASH");
             bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
             bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
-            bitmovinAnalyticsConfig.setExperimentName("experiment-custom-data");
+            bitmovinAnalyticsConfig.setExperimentName("experiment-timeout");
             bitmovinAnalyticsConfig.setCustomData1("customData1");
             bitmovinAnalyticsConfig.setCustomData2("customData2");
             bitmovinAnalyticsConfig.setCustomData3("customData3");
@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setCustomData() {
-        CustomData customData = this.bitmovinAnalyticsConfig.getCustomData();
+        CustomData customData = bitmovinAnalytics.getCustomData();
         customData.setCustomData2("custom_data_2_changed");
         customData.setCustomData4("custom_data_4_changed");
         customData.setExperimentName("experiment-custom-data-2");
