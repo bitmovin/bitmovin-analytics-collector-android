@@ -101,5 +101,6 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, Authenti
     public void clear() {
         this.data.clear();
         this.adData.clear();
+        this.sampleSequenceNumber = 0;
     }
 }
