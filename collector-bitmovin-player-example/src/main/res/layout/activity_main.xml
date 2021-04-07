@@ -15,44 +15,74 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <Button
-            android:id="@+id/release_button"
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="413dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginRight="1dp"
+        android:layout_marginBottom="3dp"
+        app:layout_constraintBottom_toTopOf="@id/playerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <TableRow
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Release"
-            />
-        <Button
-            android:id="@+id/create_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Create"
-            />
+            android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/change_audio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/exo_track_selection_title_audio" />
+            <Button
+                android:id="@+id/release_button"
+                android:layout_width="122dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Release" />
 
-        <Button
-          android:id="@+id/change_subtitle"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:text="Subtitle" />
+            <Button
+                android:id="@+id/create_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Create" />
 
+            <Button
+                android:id="@+id/change_audio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/exo_track_selection_title_audio" />
+        </TableRow>
 
-        <Button
-            android:id="@+id/change_source"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Change Source" />
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/change_subtitle"
+                android:layout_width="122dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Subtitle" />
+
+            <Button
+                android:id="@+id/change_source"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Change Source" />
+
+            <Button
+                android:id="@+id/seek_second_source"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Second Source" />
+        </TableRow>
+
+    </TableLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

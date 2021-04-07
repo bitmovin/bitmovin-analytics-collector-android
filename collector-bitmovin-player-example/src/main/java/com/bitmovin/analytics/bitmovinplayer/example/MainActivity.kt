@@ -25,6 +25,7 @@ import com.bitmovin.player.api.source.SourceType
 class MainActivity : AppCompatActivity() {
     private var playerView: PlayerView? = null
     private var player: Player? = null
+    private var playlistConfig: PlaylistConfig? = null
 
     private var bitmovinPlayerCollector: BitmovinPlayerCollector? = null
 
@@ -72,6 +73,10 @@ class MainActivity : AppCompatActivity() {
             bitmovinPlayerCollector!!.attachPlayer(player)
             player!!.load(createDRMSourceConfig())
         }
+        findViewById<Button>(R.id.seek_second_source).setOnClickListener {
+            val secondSource = playlistConfig?.sources?.get(1) ?: return@setOnClickListener
+            player?.playlist?.seek(secondSource, 0.0)
+        }
 
         playerView = findViewById(R.id.playerView)
 
@@ -95,11 +100,11 @@ class MainActivity : AppCompatActivity() {
         player = Player.create(applicationContext, playerConfig)
 
         bitmovinPlayerCollector = BitmovinPlayerCollector(createBitmovinAnalyticsConfig(), applicationContext)
-        val playlistConfig = getPlaylistConfig()
+        playlistConfig = getPlaylistConfig()
 
         bitmovinPlayerCollector!!.attachPlayer(player)
 
-        player!!.load(playlistConfig)
+        player!!.load(playlistConfig!!)
 
         playerView!!.player = player
     }
