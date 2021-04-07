@@ -418,18 +418,14 @@ public class BitmovinAnalyticsConfig implements Parcelable {
                 this.getExperimentName());
     }
 
-    protected BitmovinAnalyticsConfig setCustomData(CustomData customData) {
-
-        BitmovinAnalyticsConfig config = this;
-        config.customData1 = customData.getCustomData1();
-        config.customData2 = customData.getCustomData2();
-        config.customData3 = customData.getCustomData3();
-        config.customData4 = customData.getCustomData4();
-        config.customData5 = customData.getCustomData5();
-        config.customData6 = customData.getCustomData6();
-        config.customData7 = customData.getCustomData7();
-        config.experimentName = customData.getExperimentName();
-
-        return config;
+    protected void setCustomData(CustomData customData) {
+        this.setCustomData1(customData.getCustomData1());
+        this.setCustomData2(customData.getCustomData2());
+        this.setCustomData3(customData.getCustomData3());
+        this.setCustomData4(customData.getCustomData4());
+        this.setCustomData5(customData.getCustomData5());
+        this.setCustomData6(customData.getCustomData6());
+        this.setCustomData7(customData.getCustomData7());
+        this.setExperimentName(customData.getExperimentName());
     }
 }

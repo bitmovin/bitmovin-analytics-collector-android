@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.data
 
-class CustomData(
+data class CustomData(
     var customData1: String?,
     var customData2: String?,
     var customData3: String?,
