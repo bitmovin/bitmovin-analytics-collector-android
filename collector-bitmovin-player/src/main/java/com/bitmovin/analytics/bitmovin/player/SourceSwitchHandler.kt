@@ -2,8 +2,8 @@ package com.bitmovin.analytics.bitmovin.player
 
 import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.bitmovin.player.config.BitmovinAnalyticsSourceConfig
 import com.bitmovin.analytics.bitmovin.player.config.BitmovinAnalyticsSourceConfigProvider
+import com.bitmovin.analytics.config.AnalyticsSourceConfig
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.player.api.Player
@@ -87,7 +87,7 @@ internal class SourceSwitchHandler(
         bitmovinPlayer.off(this::playerEventStallEndedListener)
     }
 
-    private fun updateConfig(sourceConfig: BitmovinAnalyticsSourceConfig) {
+    private fun updateConfig(sourceConfig: AnalyticsSourceConfig) {
         this.config.cdnProvider = sourceConfig.cdnProvider
         this.config.customData1 = sourceConfig.customData1
         this.config.customData2 = sourceConfig.customData2

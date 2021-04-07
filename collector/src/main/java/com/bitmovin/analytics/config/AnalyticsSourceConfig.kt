@@ -1,9 +1,6 @@
-package com.bitmovin.analytics.bitmovin.player.config
+package com.bitmovin.analytics.config
 
-import com.bitmovin.player.api.source.Source
-
-class BitmovinAnalyticsSourceConfig(var playerSource: Source) {
-
+class AnalyticsSourceConfig {
     var title: String? = null
     var videoId: String? = null
     var cdnProvider: String? = null

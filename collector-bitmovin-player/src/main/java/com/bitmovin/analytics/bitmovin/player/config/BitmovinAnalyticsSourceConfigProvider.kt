@@ -1,28 +1,24 @@
 package com.bitmovin.analytics.bitmovin.player.config
 
-import android.util.Log
+import com.bitmovin.analytics.config.AnalyticsSourceConfig
 import com.bitmovin.player.api.source.Source
 
 class BitmovinAnalyticsSourceConfigProvider {
     private val TAG = "BitmovinAnalyticsSourceConfigProvider"
-    private val sources = mutableListOf<BitmovinAnalyticsSourceConfig>()
+    private val sources = mutableMapOf<Source, AnalyticsSourceConfig>()
 
-    fun addSource(source: BitmovinAnalyticsSourceConfig) {
-        sources.add(source)
+    fun addSource(playerSource: Source, analyticsSourceConfig: AnalyticsSourceConfig) {
+        sources[playerSource] = analyticsSourceConfig
     }
 
-    fun getSource(playerSource: Source?): BitmovinAnalyticsSourceConfig? {
+    fun getSource(playerSource: Source?): AnalyticsSourceConfig? {
         if (playerSource == null) {
             return null
         }
-        val analyticsSources = sources.filter { config -> config.playerSource == playerSource }
-        if (analyticsSources.count() > 1) {
-            Log.w(TAG, "Collector contains more than one BitmovinAnalyticsSourceConfig for the same player source: ${playerSource.config.title} - ${playerSource.config.url}")
-        }
-        return analyticsSources.firstOrNull()
+        return sources[playerSource]
     }
 
-    fun getAllSources(): List<BitmovinAnalyticsSourceConfig> {
-        return sources.toList()
+    fun getAllSources() : Map<Source, AnalyticsSourceConfig> {
+        return sources.toMap()
     }
 }
