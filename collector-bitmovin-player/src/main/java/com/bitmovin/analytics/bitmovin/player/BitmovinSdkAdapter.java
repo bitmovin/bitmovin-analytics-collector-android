@@ -113,6 +113,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 PlayerEvent.AdBreakStarted.class, this::playerEventAdBreakStartedListener);
         this.bitmovinPlayer.on(
                 PlayerEvent.AdBreakFinished.class, this::playerEventAdBreakFinishedListener);
+        this.bitmovinPlayer.on(
+                PlayerEvent.TimeChanged.class, this::playerEventTimeChangedListener);
 
         this.sourceSwitchHandler.addPlayerListener();
     }
@@ -143,6 +145,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
         this.bitmovinPlayer.off(this::playerEventAdBreakStartedListener);
         this.bitmovinPlayer.off(this::playerEventAdBreakFinishedListener);
+        this.bitmovinPlayer.off(this::playerEventTimeChangedListener);
         this.sourceSwitchHandler.removePlayerListener();
     }
 
@@ -384,6 +387,16 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         }
     }
 
+    private void playerEventTimeChangedListener(PlayerEvent.TimeChanged event) {
+        try {
+            if (!bitmovinPlayer.isStalled()) {
+                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+            }
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage(), e);
+        }
+    }
+
     private void playerEventSeekedListener(PlayerEvent.Seeked event) {
         Log.d(TAG, "On Seeked Listener");
     }
@@ -449,7 +462,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     private void playerEventStallStartedListener(PlayerEvent.StallStarted event) {
         try {
-            Log.d(TAG, "On Stall Started Listener");
+            Log.d(TAG, "On Stall Started Listener isPlaying:" + bitmovinPlayer.isPlaying());
             if (stateMachine.getCurrentState() != PlayerState.SEEKING
                     && stateMachine.isStartupFinished()) {
                 stateMachine.transitionState(PlayerState.BUFFERING, getPosition());
