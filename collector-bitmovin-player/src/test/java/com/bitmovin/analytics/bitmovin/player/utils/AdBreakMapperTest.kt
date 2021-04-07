@@ -1,11 +1,11 @@
 package com.bitmovin.analytics.bitmovin.player.utils
 
 import com.bitmovin.analytics.ads.AdPosition
-import com.bitmovin.player.model.advertising.AdBreak
-import com.bitmovin.player.model.advertising.AdConfiguration
-import com.bitmovin.player.model.advertising.AdTag
-import com.bitmovin.player.model.advertising.AdTagType
-import com.bitmovin.player.model.advertising.ima.ImaAdBreak
+import com.bitmovin.player.api.advertising.AdBreak
+import com.bitmovin.player.api.advertising.AdConfig
+import com.bitmovin.player.api.advertising.AdTag
+import com.bitmovin.player.api.advertising.AdTagType
+import com.bitmovin.player.api.advertising.ima.ImaAdBreak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations
 class AdBreakMapperTest {
 
     @Mock
-    private lateinit var adConfiguration: AdConfiguration
+    private lateinit var adConfiguration: AdConfig
 
     @Mock
     private lateinit var adBreak: AdBreak
@@ -40,7 +40,7 @@ class AdBreakMapperTest {
         `when`(adBreak.scheduleTime).thenReturn(TEN_SECONDS)
 
         `when`(imaAdBreak.id).thenReturn(ID)
-        `when`(imaAdBreak.tag).thenReturn(AdTag("", AdTagType.VMAP))
+        `when`(imaAdBreak.tag).thenReturn(AdTag("", AdTagType.Vmap))
         `when`(imaAdBreak.position).thenReturn(PRE)
     }
 
