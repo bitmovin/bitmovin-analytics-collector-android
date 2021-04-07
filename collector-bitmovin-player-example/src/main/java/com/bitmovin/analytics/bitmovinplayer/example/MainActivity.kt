@@ -5,6 +5,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
+import com.bitmovin.analytics.config.AnalyticsSourceConfig
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.player.PlayerView
 import com.bitmovin.player.api.PlaybackConfig
@@ -15,7 +16,11 @@ import com.bitmovin.player.api.advertising.AdSource
 import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdvertisingConfig
 import com.bitmovin.player.api.drm.WidevineConfig
+import com.bitmovin.player.api.playlist.PlaylistConfig
+import com.bitmovin.player.api.playlist.PlaylistOptions
+import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
+import com.bitmovin.player.api.source.SourceType
 
 class MainActivity : AppCompatActivity() {
     private var playerView: PlayerView? = null
@@ -85,15 +90,34 @@ class MainActivity : AppCompatActivity() {
         val playbackConfig = PlaybackConfig()
         playbackConfig.isMuted = false
         playbackConfig.isAutoplayEnabled = false
-        val playerConfig = PlayerConfig(playbackConfig = playbackConfig, advertisingConfig = createAdvertisingConfig())
+        val playerConfig = PlayerConfig(playbackConfig = playbackConfig)
+//        playerConfig.advertisingConfig = createAdvertisingConfig()
         player = Player.create(applicationContext, playerConfig)
 
         bitmovinPlayerCollector = BitmovinPlayerCollector(createBitmovinAnalyticsConfig(), applicationContext)
+        val playlistConfig = getPlaylistConfig()
+
         bitmovinPlayerCollector!!.attachPlayer(player)
 
-        player!!.load(sintelSourceConfig)
+        player!!.load(playlistConfig)
 
         playerView!!.player = player
+    }
+
+    private fun getPlaylistConfig(): PlaylistConfig {
+        val playerSource: Source = Source.create(redbullSourceConfig)
+        val redbull = AnalyticsSourceConfig()
+        redbull.videoId = "source-video-id"
+        redbull.title = "redbull"
+        this.bitmovinPlayerCollector?.addSourceConfig(playerSource, redbull)
+
+        val playerSource2: Source = Source.create(sintelSourceConfig)
+        val sintel = AnalyticsSourceConfig()
+        sintel.videoId = "source-video-id-2"
+        sintel.title = "sintel"
+        this.bitmovinPlayerCollector?.addSourceConfig(playerSource2, sintel)
+
+        return PlaylistConfig(listOf(playerSource, playerSource2), PlaylistOptions())
     }
 
     override fun onStart() {
@@ -122,6 +146,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        private val redbullSourceConfig = SourceConfig("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8", SourceType.Hls)
         private val sintelSourceConfig = SourceConfig.fromUrl("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd")
         private val corruptedSourceConfig = SourceConfig.fromUrl(
                 "https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd")
