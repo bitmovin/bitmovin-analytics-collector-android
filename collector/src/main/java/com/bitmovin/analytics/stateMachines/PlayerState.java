@@ -12,6 +12,18 @@ public enum PlayerState {
         void onExitState(
                 PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {}
     },
+    SOURCE_CHANGED {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {
+            for (StateMachineListener listener : machine.getListeners()) {
+                listener.onSourceChanged();
+            }
+        }
+
+        @Override
+        void onExitState(
+                PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {}
+    },
     STARTUP {
         @Override
         void onEnterState(PlayerStateMachine machine) {

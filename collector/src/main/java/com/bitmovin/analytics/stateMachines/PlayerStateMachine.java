@@ -3,8 +3,12 @@ package com.bitmovin.analytics.stateMachines;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.config.AnalyticsSourceConfig;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
@@ -89,7 +93,7 @@ public class PlayerStateMachine {
         videoTimeStart = videoTimeEnd;
     }
 
-    public void resetStateMachine() {
+    private void reset() {
         disableHeartbeat();
         disableRebufferHeartbeat();
         this.impressionId = Util.getUUID();
@@ -99,8 +103,39 @@ public class PlayerStateMachine {
         videoStartTimeout.cancel();
         qualityChangeResetTimeout.cancel();
         rebufferingTimeout.cancel();
-        setCurrentState(PlayerState.READY);
         resetQualityChangeCount();
+    }
+
+    public void resetStateMachine() {
+        reset();
+        setCurrentState(PlayerState.READY);
+    }
+
+    public void sourceChange(@Nullable  AnalyticsSourceConfig sourceConfig, long position) {
+        reset();
+        transitionState(PlayerState.SOURCE_CHANGED, position);
+
+        if (sourceConfig != null){
+            updateConfig(sourceConfig);
+        }
+    }
+
+    private void updateConfig(AnalyticsSourceConfig sourceConfig) {
+        this.config.setCdnProvider(sourceConfig.getCdnProvider());
+        this.config.setCustomData1(sourceConfig.getCustomData1());
+        this.config.setCustomData2(sourceConfig.getCustomData2());
+        this.config.setCustomData3(sourceConfig.getCustomData3());
+        this.config.setCustomData4(sourceConfig.getCustomData4());
+        this.config.setCustomData5(sourceConfig.getCustomData5());
+        this.config.setCustomData6(sourceConfig.getCustomData6());
+        this.config.setCustomData7(sourceConfig.getCustomData7());
+        this.config.setExperimentName(sourceConfig.getExperimentName());
+        this.config.setM3u8Url(sourceConfig.getM3u8Url());
+        this.config.setMpdUrl(sourceConfig.getMpdUrl());
+        this.config.setPath(sourceConfig.getPath());
+        this.config.setTitle(sourceConfig.getTitle());
+        this.config.setVideoId(sourceConfig.getVideoId());
+        this.config.setIsLive(sourceConfig.isLive());
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {

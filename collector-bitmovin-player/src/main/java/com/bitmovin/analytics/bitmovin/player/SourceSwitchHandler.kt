@@ -44,11 +44,8 @@ internal class SourceSwitchHandler(
     private fun playerEventPlaylistTransitionListener(event: PlayerEvent.PlaylistTransition) {
         try {
             Log.d(TAG, "Event PlaylistTransition: from: ${event.from.config.url} to: ${event.to.config.url}")
-            adapter.reset()
             val sourceConfig = sourceConfigProvider.getSource(event.to)
-            if (sourceConfig != null) {
-                updateConfig(sourceConfig)
-            }
+            stateMachine.sourceChange(sourceConfig, event.timestamp)
             stateMachine.transitionState(PlayerState.STARTUP, adapter.position)
             state = SourceSwitchState.Startup
         } catch (e: Exception) {
