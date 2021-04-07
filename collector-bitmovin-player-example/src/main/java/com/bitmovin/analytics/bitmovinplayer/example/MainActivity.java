@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             onSubtitleChange();
         } else if (v == setCustomData) {
             setCustomData();
-       }
+        }
     }
 
     private void onPlayerChangeSource() {
@@ -222,7 +222,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         customData.setExperimentName("experiment-custom-data-2");
         bitmovinAnalytics.setCustomData(customData);
     }
-
 
     private static final String AD_SOURCE_1 =
             "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=";

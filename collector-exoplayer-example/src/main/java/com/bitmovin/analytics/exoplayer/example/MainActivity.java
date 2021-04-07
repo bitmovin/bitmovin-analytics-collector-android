@@ -259,7 +259,6 @@ public class MainActivity extends AppCompatActivity
         bitmovinAnalytics.setCustomDataOnce(customData);
     }
 
-
     @Override
     public void onDispatchEventData(EventData data) {
         eventLogView.append(

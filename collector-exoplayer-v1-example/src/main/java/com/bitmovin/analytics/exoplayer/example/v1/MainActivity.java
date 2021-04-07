@@ -238,7 +238,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setCustomData() {
-        CustomData customData = new CustomData("1", "2", "3", "4", "5", "6", "7", "experiment-custom-data-1");
+        CustomData customData =
+                new CustomData("1", "2", "3", "4", "5", "6", "7", "experiment-custom-data-1");
         bitmovinAnalytics.setCustomDataOnce(customData);
     }
 

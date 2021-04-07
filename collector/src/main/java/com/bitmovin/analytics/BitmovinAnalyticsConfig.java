@@ -3,7 +3,6 @@ package com.bitmovin.analytics;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.enums.PlayerType;
@@ -408,8 +407,15 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     public CustomData getCustomData() {
-        return new CustomData(this.getCustomData1(), this.getCustomData2(), this.getCustomData3(), this.getCustomData4(), this.getCustomData5(), this.getCustomData6(), this.getCustomData7(), this.getExperimentName());
-
+        return new CustomData(
+                this.getCustomData1(),
+                this.getCustomData2(),
+                this.getCustomData3(),
+                this.getCustomData4(),
+                this.getCustomData5(),
+                this.getCustomData6(),
+                this.getCustomData7(),
+                this.getExperimentName());
     }
 
     protected BitmovinAnalyticsConfig setCustomData(CustomData customData) {
@@ -424,6 +430,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         config.customData7 = customData.getCustomData7();
         config.experimentName = customData.getExperimentName();
 
-        return  config;
+        return config;
     }
 }
