@@ -378,6 +378,10 @@ public class BitmovinAnalytics
         this.detachPlayer();
     }
 
+    public CustomData getCustomData() {
+        return this.bitmovinAnalyticsConfig.getCustomData();
+    }
+
     public void setCustomData(CustomData customData) {
         if (playerAdapter == null) {
             Log.d(TAG, "Custom data could not be set because player is not attached");

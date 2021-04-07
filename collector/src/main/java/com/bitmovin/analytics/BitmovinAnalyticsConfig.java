@@ -406,7 +406,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         isLive = live;
     }
 
-    public CustomData getCustomData() {
+    protected CustomData getCustomData() {
         return new CustomData(
                 this.getCustomData1(),
                 this.getCustomData2(),
