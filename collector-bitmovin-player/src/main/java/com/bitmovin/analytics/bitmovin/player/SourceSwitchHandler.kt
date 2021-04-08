@@ -10,7 +10,6 @@ import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.event.SourceEvent
 
 internal class SourceSwitchHandler(
-    val adapter: BitmovinSdkAdapter,
     val config: BitmovinAnalyticsConfig,
     val sourceConfigProvider: BitmovinAnalyticsSourceConfigProvider,
     val stateMachine: PlayerStateMachine,
@@ -48,8 +47,12 @@ internal class SourceSwitchHandler(
     // Event Handlers
 
     private fun sourceEventSourceLoadedListener(event: SourceEvent.Loaded) {
-        val sourceConfig = sourceConfigProvider.getSource(event.source) ?: return
-        config.updateConfig(sourceConfig)
+        try {
+            val sourceConfig = sourceConfigProvider.getSource(event.source) ?: return
+            config.updateConfig(sourceConfig)
+        } catch (e: Exception) {
+            Log.d(TAG, e.message, e)
+        }
     }
 
     private fun playerEventPlaylistTransitionListener(event: PlayerEvent.PlaylistTransition) {
@@ -57,7 +60,8 @@ internal class SourceSwitchHandler(
             Log.d(TAG, "Event PlaylistTransition: from: ${event.from.config.url} to: ${event.to.config.url}")
             val sourceConfig = sourceConfigProvider.getSource(event.to)
             stateMachine.sourceChange(sourceConfig, event.timestamp)
-            stateMachine.transitionState(PlayerState.STARTUP, adapter.position)
+            val positionFromPlayer = BitmovinUtil.getPositionFromPlayer(bitmovinPlayer)
+            stateMachine.transitionState(PlayerState.STARTUP, positionFromPlayer)
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }

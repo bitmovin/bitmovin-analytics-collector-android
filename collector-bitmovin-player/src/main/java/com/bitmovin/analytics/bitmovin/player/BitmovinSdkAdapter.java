@@ -63,7 +63,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.sourceConfigProvider = sourceConfigProvider;
         this.sourceSwitchHandler =
                 new SourceSwitchHandler(
-                        this, config, sourceConfigProvider, stateMachine, bitmovinPlayer);
+                        config, sourceConfigProvider, stateMachine, bitmovinPlayer);
     }
 
     public Collection<Feature<?>> init() {
@@ -268,7 +268,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     @Override
     public long getPosition() {
-        return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
+        return BitmovinUtil.getPositionFromPlayer(bitmovinPlayer);
     }
 
     @Nullable
