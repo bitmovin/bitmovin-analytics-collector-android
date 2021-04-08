@@ -4,12 +4,12 @@ import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.bitmovin.player.config.BitmovinAnalyticsSourceConfigProvider;
-import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
+import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
@@ -21,6 +21,9 @@ import com.bitmovin.analytics.utils.Util;
 import com.bitmovin.player.api.PlaybackConfig;
 import com.bitmovin.player.api.Player;
 import com.bitmovin.player.api.deficiency.ErrorEvent;
+import com.bitmovin.player.api.drm.ClearKeyConfig;
+import com.bitmovin.player.api.drm.DrmConfig;
+import com.bitmovin.player.api.drm.WidevineConfig;
 import com.bitmovin.player.api.event.PlayerEvent;
 import com.bitmovin.player.api.event.SourceEvent;
 import com.bitmovin.player.api.media.audio.AudioTrack;
@@ -31,7 +34,6 @@ import com.bitmovin.player.api.source.Source;
 import com.bitmovin.player.api.source.SourceConfig;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
@@ -42,10 +44,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private ExceptionMapper<ErrorEvent> exceptionMapper = new BitmovinPlayerExceptionMapper();
     private int totalDroppedVideoFrames;
     private boolean isVideoAttemptedPlay = false;
-    private DRMInformation drmInformation = null;
     private FeatureFactory featureFactory;
     private BitmovinAnalyticsSourceConfigProvider sourceConfigProvider;
     private SourceSwitchHandler sourceSwitchHandler;
+
+    private Long drmDownloadTime = null;
 
     public BitmovinSdkAdapter(
             Player bitmovinPlayer,
@@ -148,22 +151,57 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     @Override
     public void manipulate(@NotNull EventData data) {
-        data.setPlayer(PlayerType.BITMOVIN.toString());
-
-        // SVARGA: test duration isLive set
-        // duration and isLive
-        double duration = bitmovinPlayer.getDuration();
-        if (bitmovinPlayer.getSource() == null || duration == -1) {
-            // Player source or duration is not available yet, fallback to BitmovinAnalyticsConfig
-            data.setLive(config.isLive() != null && config.isLive());
-        } else {
-            if (duration == Double.POSITIVE_INFINITY) {
-                data.setLive(true);
+        // duration and isLive, streamFormat, mpdUrl, and m3u8Url
+        Source source = bitmovinPlayer.getSource();
+        if (source != null) {
+            double duration = source.getDuration();
+            if (duration == -1) {
+                // Source duration is not available yet, fallback to BitmovinAnalyticsConfig
+                data.setLive(config.isLive() != null && config.isLive());
             } else {
-                data.setLive(false);
-                data.setVideoDuration((long) duration * Util.MILLISECONDS_IN_SECONDS);
+                if (duration == Double.POSITIVE_INFINITY) {
+                    data.setLive(true);
+                } else {
+                    data.setLive(false);
+                    data.setVideoDuration((long) duration * Util.MILLISECONDS_IN_SECONDS);
+                }
             }
+
+            SourceConfig sourceConfig = source.getConfig();
+
+            switch (sourceConfig.getType()) {
+                case Hls:
+                    data.setM3u8Url(sourceConfig.getUrl());
+                    data.setStreamFormat(Util.HLS_STREAM_FORMAT);
+                    break;
+                case Dash:
+                    data.setMpdUrl(sourceConfig.getUrl());
+                    data.setStreamFormat(Util.DASH_STREAM_FORMAT);
+                    break;
+                case Progressive:
+                    data.setProgUrl(sourceConfig.getUrl());
+                    data.setStreamFormat(Util.PROGRESSIVE_STREAM_FORMAT);
+                    break;
+                case Smooth:
+                    data.setStreamFormat(Util.SMOOTH_STREAM_FORMAT);
+                    break;
+            }
+
+            DrmConfig drmConfig = sourceConfig.getDrmConfig();
+            if (drmConfig instanceof WidevineConfig) {
+                data.setDrmType(DRMType.WIDEVINE.getValue());
+            } else if (drmConfig instanceof ClearKeyConfig) {
+                data.setDrmType(DRMType.CLEARKEY.getValue());
+            } else if (drmConfig != null) {
+                Log.d(TAG, "Warning: unknown DRM Type " + drmConfig.getClass().getSimpleName());
+            }
+
+        } else {
+            // player active Source is not available
+            data.setLive(config.isLive() != null && config.isLive());
         }
+
+        data.setPlayer(PlayerType.BITMOVIN.toString());
 
         // ad
         if (bitmovinPlayer.isAd()) {
@@ -179,37 +217,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         // DroppedVideoFrames
         data.setDroppedFrames(this.totalDroppedVideoFrames);
         this.totalDroppedVideoFrames = 0;
-
-        // streamFormat, mpdUrl, and m3u8Url
-        if (bitmovinPlayer.getSource() != null && bitmovinPlayer.getSource().getConfig() != null) {
-
-            //  SourceItem sourceItem = bitmovinPlayer.getConfig().getSourceItem();
-            SourceConfig sourceConfig = bitmovinPlayer.getSource().getConfig();
-
-            switch (sourceConfig.getType()) {
-                case Hls:
-                    if (sourceConfig.getHlsSource() != null) {
-                        data.setM3u8Url(sourceConfig.getHlsSource().getUrl());
-                    }
-                    data.setStreamFormat(Util.HLS_STREAM_FORMAT);
-                    break;
-                case Dash:
-                    if (sourceConfig.getDashSource() != null) {
-                        data.setMpdUrl(sourceConfig.getDashSource().getUrl());
-                    }
-                    data.setStreamFormat(Util.DASH_STREAM_FORMAT);
-                    break;
-                case Progressive:
-                    if (sourceConfig.getProgressiveSource() != null) {
-                        data.setM3u8Url(sourceConfig.getProgressiveSource().getUrl());
-                    }
-                    data.setStreamFormat(Util.PROGRESSIVE_STREAM_FORMAT);
-                    break;
-                case Smooth:
-                    data.setStreamFormat(Util.SMOOTH_STREAM_FORMAT);
-                    break;
-            }
-        }
 
         // video quality
         VideoQuality videoQuality = bitmovinPlayer.getPlaybackVideoData();
@@ -240,11 +247,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         if (audioTrack != null && audioTrack.getId() != null) {
             data.setAudioLanguage(audioTrack.getLanguage());
         }
-
-        // DRM Information
-        if (drmInformation != null) {
-            data.setDrmType(drmInformation.getType());
-        }
     }
 
     @Override
@@ -259,7 +261,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     @Override
     public void reset() {
         this.totalDroppedVideoFrames = 0;
-        this.drmInformation = null;
+        this.drmDownloadTime = null;
     }
 
     @Override
@@ -272,10 +274,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
     }
 
-    @Nullable
     @Override
-    public DRMInformation getDRMInformation() {
-        return drmInformation;
+    public Long getDRMDownloadTime() {
+        return drmDownloadTime;
     }
 
     @Override
@@ -517,10 +518,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private void sourceEventDownloadFinishedListener(SourceEvent.DownloadFinished event) {
         try {
             if (event.getDownloadType().toString().contains("drm/license")) {
-                drmInformation =
-                        new DRMInformation(
-                                Double.valueOf(event.getDownloadTime() * 1000).longValue(),
-                                event.getDownloadType().toString().replace("drm/license/", ""));
+                drmDownloadTime = Double.valueOf(event.getDownloadTime() * 1000).longValue();
             }
         } catch (Exception e) {
             Log.d(TAG, e.getMessage(), e);
