@@ -3,9 +3,7 @@ package com.bitmovin.analytics.stateMachines;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
-
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.config.AnalyticsSourceConfig;
@@ -111,11 +109,11 @@ public class PlayerStateMachine {
         setCurrentState(PlayerState.READY);
     }
 
-    public void sourceChange(@Nullable  AnalyticsSourceConfig sourceConfig, long position) {
+    public void sourceChange(@Nullable AnalyticsSourceConfig sourceConfig, long position) {
         reset();
         transitionState(PlayerState.SOURCE_CHANGED, position);
 
-        if (sourceConfig != null){
+        if (sourceConfig != null) {
             this.config.updateConfig(sourceConfig);
         }
     }

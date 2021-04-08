@@ -10,11 +10,12 @@ import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.event.SourceEvent
 
 internal class SourceSwitchHandler(
-        val adapter: BitmovinSdkAdapter,
-        val config: BitmovinAnalyticsConfig,
-        val sourceConfigProvider: BitmovinAnalyticsSourceConfigProvider,
-        val stateMachine: PlayerStateMachine,
-        val bitmovinPlayer: Player) {
+    val adapter: BitmovinSdkAdapter,
+    val config: BitmovinAnalyticsConfig,
+    val sourceConfigProvider: BitmovinAnalyticsSourceConfigProvider,
+    val stateMachine: PlayerStateMachine,
+    val bitmovinPlayer: Player
+) {
 
     private val TAG = "SourceSwitchHandler"
 

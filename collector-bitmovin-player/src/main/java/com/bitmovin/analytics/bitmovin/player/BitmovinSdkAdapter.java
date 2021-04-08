@@ -61,7 +61,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.bitmovinPlayer = bitmovinPlayer;
         this.deviceInformationProvider = deviceInformationProvider;
         this.sourceConfigProvider = sourceConfigProvider;
-        this.sourceSwitchHandler = new SourceSwitchHandler(this, config, sourceConfigProvider, stateMachine, bitmovinPlayer);
+        this.sourceSwitchHandler =
+                new SourceSwitchHandler(
+                        this, config, sourceConfigProvider, stateMachine, bitmovinPlayer);
     }
 
     public Collection<Feature<?>> init() {
@@ -113,8 +115,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 PlayerEvent.AdBreakStarted.class, this::playerEventAdBreakStartedListener);
         this.bitmovinPlayer.on(
                 PlayerEvent.AdBreakFinished.class, this::playerEventAdBreakFinishedListener);
-        this.bitmovinPlayer.on(
-                PlayerEvent.TimeChanged.class, this::playerEventTimeChangedListener);
+        this.bitmovinPlayer.on(PlayerEvent.TimeChanged.class, this::playerEventTimeChangedListener);
 
         this.sourceSwitchHandler.addPlayerListener();
     }

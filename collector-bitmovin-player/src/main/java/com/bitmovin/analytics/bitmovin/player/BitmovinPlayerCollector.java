@@ -17,7 +17,8 @@ import com.bitmovin.player.api.source.Source;
 
 public class BitmovinPlayerCollector extends BitmovinAnalytics {
 
-    private BitmovinAnalyticsSourceConfigProvider sourceConfigProvider = new BitmovinAnalyticsSourceConfigProvider();
+    private BitmovinAnalyticsSourceConfigProvider sourceConfigProvider =
+            new BitmovinAnalyticsSourceConfigProvider();
 
     /**
      * Bitmovin Analytics

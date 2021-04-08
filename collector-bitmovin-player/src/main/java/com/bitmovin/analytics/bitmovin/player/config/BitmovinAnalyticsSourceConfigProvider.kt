@@ -18,7 +18,7 @@ class BitmovinAnalyticsSourceConfigProvider {
         return sources[playerSource]
     }
 
-    fun getAllSources() : Map<Source, AnalyticsSourceConfig> {
+    fun getAllSources(): Map<Source, AnalyticsSourceConfig> {
         return sources.toMap()
     }
 }

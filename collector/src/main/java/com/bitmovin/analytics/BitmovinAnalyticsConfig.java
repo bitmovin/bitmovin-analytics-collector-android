@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-
 import com.bitmovin.analytics.config.AnalyticsSourceConfig;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.enums.PlayerType;
@@ -95,7 +94,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     public BitmovinAnalyticsConfig() {}
-
 
     public void updateConfig(AnalyticsSourceConfig sourceConfig) {
         Log.d("BitmovinAnalyticsConfig", "Updating Config: " + sourceConfig.getTitle());
