@@ -59,7 +59,7 @@ internal class SourceSwitchHandler(
             Log.d(TAG, "Event PlaylistTransition: from: ${event.from.config.url} to: ${event.to.config.url}")
             val sourceConfig = sourceConfigProvider.getSource(event.to)
             stateMachine.sourceChange(sourceConfig, event.timestamp)
-            val positionFromPlayer = BitmovinUtil.getPositionFromPlayer(bitmovinPlayer)
+            val positionFromPlayer = BitmovinUtil.getCurrentTimeInMs(bitmovinPlayer)
             stateMachine.transitionState(PlayerState.STARTUP, positionFromPlayer)
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)

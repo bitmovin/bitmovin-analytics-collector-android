@@ -270,7 +270,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     @Override
     public long getPosition() {
-        return BitmovinUtil.getPositionFromPlayer(bitmovinPlayer);
+        return BitmovinUtil.getCurrentTimeInMs(bitmovinPlayer);
     }
 
     @Override

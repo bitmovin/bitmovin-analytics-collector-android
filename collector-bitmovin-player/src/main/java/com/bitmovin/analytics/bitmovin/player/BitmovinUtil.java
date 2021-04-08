@@ -16,7 +16,7 @@ public class BitmovinUtil {
         return "unknown";
     }
 
-    public static Long getPositionFromPlayer(Player player) {
-        return (long) player.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
+    public static long getCurrentTimeInMs(Player player) {
+        return Double.valueOf(player.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS).longValue();
     }
 }
