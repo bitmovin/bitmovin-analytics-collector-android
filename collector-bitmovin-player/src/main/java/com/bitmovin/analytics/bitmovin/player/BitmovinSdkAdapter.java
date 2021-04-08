@@ -445,14 +445,15 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             (event) -> {
                 try {
                     Log.d(TAG, "On AudioChanged");
-                    // TODO add a audio track changed to the statemachine that will check if tranistion is allowed
+                    // TODO add a audio track changed to the statemachine that will check if
+                    // tranistion is allowed
                     // and make sure the old sample is send with the old audio track value
                     if (!stateMachine.isStartupFinished()) {
                         return;
                     }
 
                     if (stateMachine.getCurrentState() != PlayerState.PLAYING
-                                    && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                            && stateMachine.getCurrentState() != PlayerState.PAUSE) {
                         return;
                     }
 
@@ -491,8 +492,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             (event) -> {
                 try {
                     Log.d(TAG, "On Stall Started Listener isPlaying:" + bitmovinPlayer.isPlaying());
-                    if (stateMachine.getCurrentState() != PlayerState.SEEKING
-                            && stateMachine.isStartupFinished()) {
+                    if (!stateMachine.isStartupFinished()) {
+                        return;
+                    }
+
+                    // if stalling is triggered by a seeking event
+                    // we count the buffering time towards the seeking time
+                    if (stateMachine.getCurrentState() != PlayerState.SEEKING) {
                         stateMachine.transitionState(PlayerState.BUFFERING, getPosition());
                     }
                 } catch (Exception e) {
@@ -507,15 +513,24 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     (event) -> {
                         try {
                             Log.d(TAG, "On Video Quality Changed");
-                            if ((stateMachine.getCurrentState() == PlayerState.PLAYING
-                                            || stateMachine.getCurrentState() == PlayerState.PAUSE)
-                                    && stateMachine.isStartupFinished()
-                                    && stateMachine.isQualityChangeEventEnabled()) {
-                                PlayerState originalState = stateMachine.getCurrentState();
-                                stateMachine.transitionState(
-                                        PlayerState.QUALITYCHANGE, getPosition());
-                                stateMachine.transitionState(originalState, getPosition());
+                            if (!stateMachine.isStartupFinished()) {
+                                return;
                             }
+
+                            // TODO create videoQualityChange method in statemachine wich will check
+                            // if transition is allowed
+                            if (!stateMachine.isQualityChangeEventEnabled()) {
+                                return;
+                            }
+
+                            if (stateMachine.getCurrentState() != PlayerState.PLAYING
+                                    && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                                return;
+                            }
+
+                            PlayerState originalState = stateMachine.getCurrentState();
+                            stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
+                            stateMachine.transitionState(originalState, getPosition());
                         } catch (Exception e) {
                             Log.d(TAG, e.getMessage(), e);
                         }
