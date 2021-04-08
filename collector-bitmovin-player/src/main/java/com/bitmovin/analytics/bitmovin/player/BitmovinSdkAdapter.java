@@ -293,16 +293,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
      * need to transition into startup state manually
      */
     private void checkAutoplayStartup() {
-        if (bitmovinPlayer.getConfig() != null) {
-            PlaybackConfig playbackConfig = bitmovinPlayer.getConfig().getPlaybackConfig();
-            Source source = bitmovinPlayer.getSource();
+        PlaybackConfig playbackConfig = bitmovinPlayer.getConfig().getPlaybackConfig();
+        Source source = bitmovinPlayer.getSource();
 
-            if (playbackConfig != null
-                    && source != null
-                    && source.getConfig() != null
-                    && playbackConfig.isAutoplayEnabled()) {
-                startup();
-            }
+        if (source != null && playbackConfig.isAutoplayEnabled()) {
+            Log.d(TAG, "Detected Autoplay going to startup");
+            startup();
         }
     }
 
