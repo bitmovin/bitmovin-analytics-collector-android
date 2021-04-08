@@ -65,8 +65,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.deviceInformationProvider = deviceInformationProvider;
         this.sourceConfigProvider = sourceConfigProvider;
         this.sourceSwitchHandler =
-                new SourceSwitchHandler(
-                        this, config, sourceConfigProvider, stateMachine, bitmovinPlayer);
+                new SourceSwitchHandler(config, sourceConfigProvider, stateMachine, bitmovinPlayer);
     }
 
     public Collection<Feature<?>> init() {
@@ -117,8 +116,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.bitmovinPlayer.on(
                 PlayerEvent.AdBreakFinished.class, this.playerEventAdBreakFinishedListener);
         this.bitmovinPlayer.on(PlayerEvent.TimeChanged.class, this.playerEventTimeChangedListener);
-
-        this.sourceSwitchHandler.addPlayerListener();
     }
 
     private void removePlayerListener() {
@@ -148,7 +145,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.bitmovinPlayer.off(this.playerEventAdBreakStartedListener);
         this.bitmovinPlayer.off(this.playerEventAdBreakFinishedListener);
         this.bitmovinPlayer.off(this.playerEventTimeChangedListener);
-        this.sourceSwitchHandler.removePlayerListener();
     }
 
     @Override
@@ -255,6 +251,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     public void release() {
         if (bitmovinPlayer != null) {
             removePlayerListener();
+            this.sourceSwitchHandler.destroy();
         }
         this.reset();
         this.stateMachine.resetStateMachine();
@@ -273,7 +270,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     @Override
     public long getPosition() {
-        return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
+        return BitmovinUtil.getPositionFromPlayer(bitmovinPlayer);
     }
 
     @Override
