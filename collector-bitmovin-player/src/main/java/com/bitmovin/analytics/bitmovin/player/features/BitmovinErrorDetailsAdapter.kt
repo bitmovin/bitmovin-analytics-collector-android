@@ -11,11 +11,11 @@ import com.bitmovin.player.api.event.SourceEvent
 class BitmovinErrorDetailsAdapter(private val player: Player, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnErrorDetailEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnErrorDetailEventListener>()
 
-    private fun playerEventErrorListener(event: PlayerEvent.Error) {
+    private val playerEventErrorListener: (PlayerEvent.Error) -> Unit = { event ->
         observableSupport.notify { listener -> listener.onError(event.timestamp, event.code.value, event.message, event.data as? Throwable) }
     }
 
-    private fun sourceEventErrorListener(event: SourceEvent.Error) {
+    private val sourceEventErrorListener: (SourceEvent.Error) -> Unit = { event ->
         observableSupport.notify { listener -> listener.onError(event.timestamp, event.code.value, event.message, event.data as? Throwable) }
     }
 
@@ -25,14 +25,14 @@ class BitmovinErrorDetailsAdapter(private val player: Player, private val onAnal
 
     private fun wireEvents() {
         onAnalyticsReleasingObservable.subscribe(this)
-        player.on(PlayerEvent.Error::class, ::playerEventErrorListener)
-        player.on(SourceEvent.Error::class, ::sourceEventErrorListener)
+        player.on(PlayerEvent.Error::class, this.playerEventErrorListener)
+        player.on(SourceEvent.Error::class, this.sourceEventErrorListener)
     }
 
     private fun unwireEvents() {
         onAnalyticsReleasingObservable.unsubscribe(this)
-        player.off(::playerEventErrorListener)
-        player.off(::sourceEventErrorListener)
+        player.off(this.playerEventErrorListener)
+        player.off(this.sourceEventErrorListener)
     }
 
     override fun onReleasing() {
