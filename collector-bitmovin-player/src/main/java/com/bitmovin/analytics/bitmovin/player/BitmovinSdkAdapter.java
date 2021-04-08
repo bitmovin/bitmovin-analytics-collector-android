@@ -261,6 +261,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     public void reset() {
         this.totalDroppedVideoFrames = 0;
         this.drmDownloadTime = null;
+        this.isVideoAttemptedPlay = false;
     }
 
     @Override
@@ -304,6 +305,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private void startup() {
         stateMachine.transitionState(PlayerState.STARTUP, getPosition());
         if (!bitmovinPlayer.isAd()) {
+            // if ad is playing as first thing we prevent from sending the
+            // VideoStartFailedReason.PAGE_CLOSED / VideoStartFailedReason.PLAYER_ERROR
+            // because actual video is not playing yet
             isVideoAttemptedPlay = true;
         }
     }
