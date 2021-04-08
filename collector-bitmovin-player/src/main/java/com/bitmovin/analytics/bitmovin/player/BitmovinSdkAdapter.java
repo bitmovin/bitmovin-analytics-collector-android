@@ -596,37 +596,29 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     private final EventListener<PlayerEvent.Error> playerErrorEventListener =
             (event) -> {
-                try {
-                    Log.d(TAG, "onPlayerError");
-                    long videoTime = getPosition();
-                    ErrorCode errorCode = exceptionMapper.map(event);
-
-                    stateMachine.setErrorCode(errorCode);
-                    if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-                        stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
-                    }
-                    stateMachine.transitionState(PlayerState.ERROR, videoTime);
-                } catch (Exception e) {
-                    Log.d(TAG, e.getMessage(), e);
-                }
+                Log.d(TAG, "onPlayerError");
+                handleErrorEvent(exceptionMapper.map(event));
             };
 
     private final EventListener<SourceEvent.Error> sourceErrorEventListener =
             (event) -> {
-                try {
-                    Log.d(TAG, "onPlayerError");
-                    long videoTime = getPosition();
-                    ErrorCode errorCode = exceptionMapper.map(event);
-
-                    stateMachine.setErrorCode(errorCode);
-                    if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-                        stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
-                    }
-                    stateMachine.transitionState(PlayerState.ERROR, videoTime);
-                } catch (Exception e) {
-                    Log.d(TAG, e.getMessage(), e);
-                }
+                Log.d(TAG, "onSourceError");
+                handleErrorEvent(exceptionMapper.map(event));
             };
+
+    private void handleErrorEvent(ErrorCode errorCode) {
+        try {
+            long videoTime = getPosition();
+
+            stateMachine.setErrorCode(errorCode);
+            if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
+                stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
+            }
+            stateMachine.transitionState(PlayerState.ERROR, videoTime);
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage(), e);
+        }
+    }
 
     private final EventListener<PlayerEvent.AdBreakStarted> playerEventAdBreakStartedListener =
             (event) -> {
