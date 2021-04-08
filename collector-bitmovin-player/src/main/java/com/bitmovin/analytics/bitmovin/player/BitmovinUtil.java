@@ -17,6 +17,11 @@ public class BitmovinUtil {
     }
 
     public static long getCurrentTimeInMs(Player player) {
-        return Double.valueOf(player.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS).longValue();
+        long currentTime = toPrimitiveLong(player.getCurrentTime());
+        return currentTime * Util.MILLISECONDS_IN_SECONDS;
+    }
+
+    public static long toPrimitiveLong(Double value) {
+        return value == null ? 0 : value.longValue();
     }
 }

@@ -347,12 +347,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 try {
                     Log.d(TAG, "On Playback Finished Listener");
 
-                    long position =
+                    // if it's life stream we are using currentPosition of playback as videoTime
+                    long videoTime =
                             (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
-                                    ? (long) bitmovinPlayer.getDuration()
+                                    ? BitmovinUtil.toPrimitiveLong(bitmovinPlayer.getDuration())
                                             * Util.MILLISECONDS_IN_SECONDS
                                     : getPosition();
-                    stateMachine.transitionState(PlayerState.PAUSE, position);
+                    stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                     stateMachine.disableHeartbeat();
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
@@ -423,7 +424,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<PlayerEvent.StallEnded> playerEventStallEndedListener =
             (event) -> {
                 try {
-                    Log.d(TAG, "On Stall Ended: " + String.valueOf(bitmovinPlayer.isPlaying()));
+                    Log.d(TAG, "On Stall Ended: " + bitmovinPlayer.isPlaying());
                     if (stateMachine.isStartupFinished()) {
                         if (bitmovinPlayer.isPlaying()
                                 && stateMachine.getCurrentState() != PlayerState.PLAYING) {
@@ -441,7 +442,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<SourceEvent.AudioChanged> sourceEventAudioChangedListener =
             (event) -> {
                 try {
-                    Log.d(TAG, "On AudioChanged: " + bitmovinPlayer.getAudio().getId());
+                    Log.d(TAG, "On AudioChanged");
                     if ((stateMachine.getCurrentState() == PlayerState.PLAYING
                                     || stateMachine.getCurrentState() == PlayerState.PAUSE)
                             && stateMachine.isStartupFinished()) {
@@ -545,7 +546,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 try {
                     if (event.getDownloadType().toString().contains("drm/license")) {
                         drmDownloadTime =
-                                Double.valueOf(event.getDownloadTime() * 1000).longValue();
+                                BitmovinUtil.toPrimitiveLong(event.getDownloadTime()) * Util.MILLISECONDS_IN_SECONDS;
                     }
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
