@@ -551,22 +551,31 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     (event) -> {
                         try {
                             Log.d(TAG, "On Audio Quality Changed");
-                            if ((stateMachine.getCurrentState() == PlayerState.PLAYING
-                                            || stateMachine.getCurrentState() == PlayerState.PAUSE)
-                                    && stateMachine.isStartupFinished()
-                                    && stateMachine.isQualityChangeEventEnabled()) {
-                                PlayerState originalState = stateMachine.getCurrentState();
-                                AudioQuality oldQuality = event.getOldAudioQuality();
-                                AudioQuality newQuality = event.getNewAudioQuality();
-                                if (oldQuality != null
-                                        && newQuality != null
-                                        && oldQuality.getBitrate() == newQuality.getBitrate()) {
-                                    return;
-                                }
-                                stateMachine.transitionState(
-                                        PlayerState.QUALITYCHANGE, getPosition());
-                                stateMachine.transitionState(originalState, getPosition());
+                            if (!stateMachine.isStartupFinished()) {
+                                return;
                             }
+
+                            // TODO create audioQualityChange method in statemachine wich will check
+                            // if transition is allowed
+                            if (!stateMachine.isQualityChangeEventEnabled()) {
+                                return;
+                            }
+
+                            if (stateMachine.getCurrentState() != PlayerState.PLAYING
+                                    && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                                return;
+                            }
+
+                            PlayerState originalState = stateMachine.getCurrentState();
+                            AudioQuality oldQuality = event.getOldAudioQuality();
+                            AudioQuality newQuality = event.getNewAudioQuality();
+                            if (oldQuality != null
+                                    && newQuality != null
+                                    && oldQuality.getBitrate() == newQuality.getBitrate()) {
+                                return;
+                            }
+                            stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
+                            stateMachine.transitionState(originalState, getPosition());
                         } catch (Exception e) {
                             Log.d(TAG, e.getMessage(), e);
                         }
