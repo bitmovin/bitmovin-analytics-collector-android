@@ -105,6 +105,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getPlaylistConfig(): PlaylistConfig {
+        val liveSimSource: Source = Source.create(liveSimSourceConfig)
+        val liveSimAnalyticsSourceConfig = AnalyticsSourceConfig()
+        liveSimAnalyticsSourceConfig.videoId = "source-video-id"
+        liveSimAnalyticsSourceConfig.title = "redbull"
+        bitmovinPlayerCollector?.addSourceConfig(liveSimSource, liveSimAnalyticsSourceConfig)
+
         val playerSource: Source = Source.create(redbullSourceConfig)
         val redbull = AnalyticsSourceConfig()
         redbull.videoId = "source-video-id"
@@ -117,7 +123,7 @@ class MainActivity : AppCompatActivity() {
         sintel.title = "sintel"
         this.bitmovinPlayerCollector?.addSourceConfig(playerSource2, sintel)
 
-        return PlaylistConfig(listOf(playerSource, playerSource2), PlaylistOptions())
+        return PlaylistConfig(listOf(playerSource, playerSource2, liveSimSource), PlaylistOptions())
     }
 
     override fun onStart() {
@@ -146,6 +152,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        private val liveSimSourceConfig = SourceConfig.fromUrl("https://livesim.dashif.org/livesim/testpic_2s/Manifest.mpd")
         private val redbullSourceConfig = SourceConfig("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8", SourceType.Hls)
         private val sintelSourceConfig = SourceConfig.fromUrl("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd")
         private val corruptedSourceConfig = SourceConfig.fromUrl(

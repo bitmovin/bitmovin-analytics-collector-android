@@ -150,10 +150,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     public void manipulate(@NotNull EventData data) {
         data.setPlayer(PlayerType.BITMOVIN.toString());
 
+        // SVARGA: test duration isLive set
         // duration and isLive
         double duration = bitmovinPlayer.getDuration();
-        if (duration == -1) {
-            // Player is not ready yet, fallback to BitmovinAnalyticsConfig
+        if (bitmovinPlayer.getSource() == null || duration == -1) {
+            // Player source or duration is not available yet, fallback to BitmovinAnalyticsConfig
             data.setLive(config.isLive() != null && config.isLive());
         } else {
             if (duration == Double.POSITIVE_INFINITY) {
