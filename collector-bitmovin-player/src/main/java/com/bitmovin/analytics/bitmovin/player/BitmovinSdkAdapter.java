@@ -446,6 +446,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 try {
                     Log.d(TAG, "On AudioChanged");
                     // TODO add a audio track changed to the statemachine that will check if tranistion is allowed
+                    // and make sure the old sample is send with the old audio track value
                     if (!stateMachine.isStartupFinished()) {
                         return;
                     }
@@ -467,14 +468,20 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<SourceEvent.SubtitleChanged> sourceEventSubtitleChangedListener =
             (event) -> {
                 try {
-                    Log.d(TAG, "On SubtitleChanged: " + bitmovinPlayer.getSubtitle().getId());
-                    if ((stateMachine.getCurrentState() == PlayerState.PLAYING
-                                    || stateMachine.getCurrentState() == PlayerState.PAUSE)
-                            && stateMachine.isStartupFinished()) {
-                        PlayerState originalState = stateMachine.getCurrentState();
-                        stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
-                        stateMachine.transitionState(originalState, getPosition());
+                    Log.d(TAG, "On SubtitleChanged");
+                    if (!stateMachine.isStartupFinished()) {
+                        return;
                     }
+
+                    if (stateMachine.getCurrentState() != PlayerState.PLAYING
+                            && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                        return;
+                    }
+
+                    PlayerState originalState = stateMachine.getCurrentState();
+                    stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
+                    stateMachine.transitionState(originalState, getPosition());
+
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
                 }
