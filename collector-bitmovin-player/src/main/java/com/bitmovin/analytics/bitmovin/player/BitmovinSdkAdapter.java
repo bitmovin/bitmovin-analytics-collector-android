@@ -41,7 +41,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private PlayerStateMachine stateMachine;
     private ExceptionMapper<ErrorEvent> exceptionMapper = new BitmovinPlayerExceptionMapper();
     private int totalDroppedVideoFrames;
-    private boolean playerIsReady;
     private boolean isVideoAttemptedPlay = false;
     private DRMInformation drmInformation = null;
     private FeatureFactory featureFactory;
@@ -69,7 +68,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     public Collection<Feature<?>> init() {
         addPlayerListeners();
         checkAutoplayStartup();
-        playerIsReady = false;
         this.reset();
         this.sourceSwitchHandler.init();
         return featureFactory.createFeatures();
@@ -91,7 +89,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 PlayerEvent.StallStarted.class, this::playerEventStallStartedListener);
         this.bitmovinPlayer.on(
                 PlayerEvent.PlaybackFinished.class, this::playerEventPlaybackFinishedListener);
-        this.bitmovinPlayer.on(PlayerEvent.Ready.class, this::playerEventReadyListener);
         this.bitmovinPlayer.on(
                 PlayerEvent.VideoPlaybackQualityChanged.class,
                 this::playerEventVideoPlaybackQualityChangedListener);
@@ -133,7 +130,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.bitmovinPlayer.off(this::playerEventStallStartedListener);
         this.bitmovinPlayer.off(this::playerEventSeekListener);
         this.bitmovinPlayer.off(this::playerEventPlaybackFinishedListener);
-        this.bitmovinPlayer.off(this::playerEventReadyListener);
         this.bitmovinPlayer.off(this::playerEventVideoPlaybackQualityChangedListener);
         this.bitmovinPlayer.off(this::playerEventAudioPlaybackQualityChangedListener);
         this.bitmovinPlayer.off(this::playerEventDroppedVideoFramesListener);
@@ -154,21 +150,24 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     public void manipulate(@NotNull EventData data) {
         data.setPlayer(PlayerType.BITMOVIN.toString());
 
-        // duration
+        // duration and isLive
         double duration = bitmovinPlayer.getDuration();
-        if (duration != Double.POSITIVE_INFINITY) {
-            data.setVideoDuration((long) duration * Util.MILLISECONDS_IN_SECONDS);
+        if (duration == -1) {
+            // Player is not ready yet, fallback to BitmovinAnalyticsConfig
+            data.setLive(config.isLive() != null && config.isLive());
+        } else {
+            if (duration == Double.POSITIVE_INFINITY) {
+                data.setLive(true);
+            } else {
+                data.setLive(false);
+                data.setVideoDuration((long) duration * Util.MILLISECONDS_IN_SECONDS);
+            }
         }
 
         // ad
         if (bitmovinPlayer.isAd()) {
             data.setAd(1);
         }
-
-        // isLive
-        data.setLive(
-                Util.getIsLiveFromConfigOrPlayer(
-                        playerIsReady, config.isLive(), bitmovinPlayer.isLive()));
 
         // version
         data.setVersion(PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.getPlayerVersion());
@@ -249,7 +248,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     @Override
     public void release() {
-        playerIsReady = false;
         if (bitmovinPlayer != null) {
             removePlayerListener();
         }
@@ -348,11 +346,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         } catch (Exception e) {
             Log.d(TAG, e.getMessage(), e);
         }
-    }
-
-    private void playerEventReadyListener(PlayerEvent.Ready event) {
-        Log.d(TAG, "On Ready Listener");
-        playerIsReady = true;
     }
 
     private void playerEventPausedListener(PlayerEvent.Paused event) {
