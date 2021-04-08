@@ -31,7 +31,7 @@ class BitmovinSdkAdapterTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), mockk(), playerStateMachine, mockk(relaxed = true))
+        bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), mockk(), playerStateMachine, mockk(relaxed = true), mockk(relaxed = true))
     }
 
     @Test
@@ -44,7 +44,7 @@ class BitmovinSdkAdapterTest {
         bitmovinSdkAdapter.init()
 
         // asset
-        assertThat(capturedPlayerEventListeners.size).isEqualTo(22)
+        assertThat(capturedPlayerEventListeners.size).isEqualTo(23)
     }
 
     @Test
