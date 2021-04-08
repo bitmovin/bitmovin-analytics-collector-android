@@ -210,7 +210,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 case PROGRESSIVE:
                     if (sourceItem.getProgressiveSources() != null
                             && sourceItem.getProgressiveSources().size() > 0) {
-                        data.setM3u8Url(sourceItem.getProgressiveSources().get(0).getUrl());
+                        data.setProgUrl(sourceItem.getProgressiveSources().get(0).getUrl());
                     }
                     data.setStreamFormat(Util.PROGRESSIVE_STREAM_FORMAT);
                     break;
