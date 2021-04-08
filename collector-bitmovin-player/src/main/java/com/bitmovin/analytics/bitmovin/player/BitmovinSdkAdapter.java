@@ -24,6 +24,7 @@ import com.bitmovin.player.api.deficiency.ErrorEvent;
 import com.bitmovin.player.api.drm.ClearKeyConfig;
 import com.bitmovin.player.api.drm.DrmConfig;
 import com.bitmovin.player.api.drm.WidevineConfig;
+import com.bitmovin.player.api.event.EventListener;
 import com.bitmovin.player.api.event.PlayerEvent;
 import com.bitmovin.player.api.event.SourceEvent;
 import com.bitmovin.player.api.media.audio.AudioTrack;
@@ -38,7 +39,7 @@ import org.jetbrains.annotations.NotNull;
 public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
-    private final Player bitmovinPlayer;
+    private Player bitmovinPlayer;
     private final DeviceInformationProvider deviceInformationProvider;
     private PlayerStateMachine stateMachine;
     private ExceptionMapper<ErrorEvent> exceptionMapper = new BitmovinPlayerExceptionMapper();
@@ -79,73 +80,74 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private void addPlayerListeners() {
         Log.d(TAG, "Adding Player Listeners");
 
-        this.bitmovinPlayer.on(SourceEvent.Loaded.class, this::sourceEventLoadedListener);
-        this.bitmovinPlayer.on(SourceEvent.Unloaded.class, this::sourceEventUnloadedListener);
+        this.bitmovinPlayer.on(SourceEvent.Loaded.class, this.sourceEventLoadedListener);
+        this.bitmovinPlayer.on(SourceEvent.Unloaded.class, this.sourceEventUnloadedListener);
 
-        this.bitmovinPlayer.on(PlayerEvent.Play.class, this::playerEventPlayListener);
-        this.bitmovinPlayer.on(PlayerEvent.Playing.class, this::playerEventPlayingListener);
-        this.bitmovinPlayer.on(PlayerEvent.Paused.class, this::playerEventPausedListener);
-        this.bitmovinPlayer.on(PlayerEvent.StallEnded.class, this::playerEventStallEndedListener);
-        this.bitmovinPlayer.on(PlayerEvent.Seeked.class, this::playerEventSeekedListener);
-        this.bitmovinPlayer.on(PlayerEvent.Seek.class, this::playerEventSeekListener);
+        this.bitmovinPlayer.on(PlayerEvent.Play.class, this.playerEventPlayListener);
+        this.bitmovinPlayer.on(PlayerEvent.Playing.class, this.playerEventPlayingListener);
+        this.bitmovinPlayer.on(PlayerEvent.Paused.class, this.playerEventPausedListener);
+        this.bitmovinPlayer.on(PlayerEvent.StallEnded.class, this.playerEventStallEndedListener);
+        this.bitmovinPlayer.on(PlayerEvent.Seeked.class, this.playerEventSeekedListener);
+        this.bitmovinPlayer.on(PlayerEvent.Seek.class, this.playerEventSeekListener);
         this.bitmovinPlayer.on(
-                PlayerEvent.StallStarted.class, this::playerEventStallStartedListener);
+                PlayerEvent.StallStarted.class, this.playerEventStallStartedListener);
         this.bitmovinPlayer.on(
-                PlayerEvent.PlaybackFinished.class, this::playerEventPlaybackFinishedListener);
+                PlayerEvent.PlaybackFinished.class, this.playerEventPlaybackFinishedListener);
         this.bitmovinPlayer.on(
                 PlayerEvent.VideoPlaybackQualityChanged.class,
-                this::playerEventVideoPlaybackQualityChangedListener);
+                this.playerEventVideoPlaybackQualityChangedListener);
         this.bitmovinPlayer.on(
                 PlayerEvent.AudioPlaybackQualityChanged.class,
-                this::playerEventAudioPlaybackQualityChangedListener);
+                this.playerEventAudioPlaybackQualityChangedListener);
         this.bitmovinPlayer.on(
-                PlayerEvent.DroppedVideoFrames.class, this::playerEventDroppedVideoFramesListener);
+                PlayerEvent.DroppedVideoFrames.class, this.playerEventDroppedVideoFramesListener);
         this.bitmovinPlayer.on(
-                SourceEvent.SubtitleChanged.class, this::sourceEventSubtitleChangedListener);
+                SourceEvent.SubtitleChanged.class, this.sourceEventSubtitleChangedListener);
         this.bitmovinPlayer.on(
-                SourceEvent.AudioChanged.class, this::sourceEventAudioChangedListener);
+                SourceEvent.AudioChanged.class, this.sourceEventAudioChangedListener);
         this.bitmovinPlayer.on(
-                SourceEvent.DownloadFinished.class, this::sourceEventDownloadFinishedListener);
-        this.bitmovinPlayer.on(PlayerEvent.Destroy.class, this::playerEventDestroyListener);
+                SourceEvent.DownloadFinished.class, this.sourceEventDownloadFinishedListener);
+        this.bitmovinPlayer.on(PlayerEvent.Destroy.class, this.playerEventDestroyListener);
 
-        this.bitmovinPlayer.on(PlayerEvent.Error.class, this::errorEventListener);
-        this.bitmovinPlayer.on(SourceEvent.Error.class, this::errorEventListener);
+        this.bitmovinPlayer.on(PlayerEvent.Error.class, this.playerErrorEventListener);
+        this.bitmovinPlayer.on(SourceEvent.Error.class, this.sourceErrorEventListener);
 
         this.bitmovinPlayer.on(
-                PlayerEvent.AdBreakStarted.class, this::playerEventAdBreakStartedListener);
+                PlayerEvent.AdBreakStarted.class, this.playerEventAdBreakStartedListener);
         this.bitmovinPlayer.on(
-                PlayerEvent.AdBreakFinished.class, this::playerEventAdBreakFinishedListener);
-        this.bitmovinPlayer.on(PlayerEvent.TimeChanged.class, this::playerEventTimeChangedListener);
+                PlayerEvent.AdBreakFinished.class, this.playerEventAdBreakFinishedListener);
+        this.bitmovinPlayer.on(PlayerEvent.TimeChanged.class, this.playerEventTimeChangedListener);
 
         this.sourceSwitchHandler.addPlayerListener();
     }
 
     private void removePlayerListener() {
         Log.d(TAG, "Removing Player Listeners");
-        this.bitmovinPlayer.off(this::sourceEventLoadedListener);
-        this.bitmovinPlayer.off(this::sourceEventUnloadedListener);
+        this.bitmovinPlayer.off(this.sourceEventLoadedListener);
+        this.bitmovinPlayer.off(this.sourceEventUnloadedListener);
 
-        this.bitmovinPlayer.off(this::playerEventPlayListener);
-        this.bitmovinPlayer.off(this::playerEventPlayingListener);
-        this.bitmovinPlayer.off(this::playerEventPausedListener);
-        this.bitmovinPlayer.off(this::playerEventStallEndedListener);
-        this.bitmovinPlayer.off(this::playerEventSeekedListener);
-        this.bitmovinPlayer.off(this::playerEventStallStartedListener);
-        this.bitmovinPlayer.off(this::playerEventSeekListener);
-        this.bitmovinPlayer.off(this::playerEventPlaybackFinishedListener);
-        this.bitmovinPlayer.off(this::playerEventVideoPlaybackQualityChangedListener);
-        this.bitmovinPlayer.off(this::playerEventAudioPlaybackQualityChangedListener);
-        this.bitmovinPlayer.off(this::playerEventDroppedVideoFramesListener);
-        this.bitmovinPlayer.off(this::sourceEventSubtitleChangedListener);
-        this.bitmovinPlayer.off(this::sourceEventAudioChangedListener);
-        this.bitmovinPlayer.off(this::sourceEventDownloadFinishedListener);
-        this.bitmovinPlayer.off(this::playerEventDestroyListener);
+        this.bitmovinPlayer.off(this.playerEventPlayListener);
+        this.bitmovinPlayer.off(this.playerEventPlayingListener);
+        this.bitmovinPlayer.off(this.playerEventPausedListener);
+        this.bitmovinPlayer.off(this.playerEventStallEndedListener);
+        this.bitmovinPlayer.off(this.playerEventSeekedListener);
+        this.bitmovinPlayer.off(this.playerEventStallStartedListener);
+        this.bitmovinPlayer.off(this.playerEventSeekListener);
+        this.bitmovinPlayer.off(this.playerEventPlaybackFinishedListener);
+        this.bitmovinPlayer.off(this.playerEventVideoPlaybackQualityChangedListener);
+        this.bitmovinPlayer.off(this.playerEventAudioPlaybackQualityChangedListener);
+        this.bitmovinPlayer.off(this.playerEventDroppedVideoFramesListener);
+        this.bitmovinPlayer.off(this.sourceEventSubtitleChangedListener);
+        this.bitmovinPlayer.off(this.sourceEventAudioChangedListener);
+        this.bitmovinPlayer.off(this.sourceEventDownloadFinishedListener);
+        this.bitmovinPlayer.off(this.playerEventDestroyListener);
 
-        this.bitmovinPlayer.off(this::errorEventListener);
+        this.bitmovinPlayer.off(this.sourceErrorEventListener);
+        this.bitmovinPlayer.off(this.playerErrorEventListener);
 
-        this.bitmovinPlayer.off(this::playerEventAdBreakStartedListener);
-        this.bitmovinPlayer.off(this::playerEventAdBreakFinishedListener);
-        this.bitmovinPlayer.off(this::playerEventTimeChangedListener);
+        this.bitmovinPlayer.off(this.playerEventAdBreakStartedListener);
+        this.bitmovinPlayer.off(this.playerEventAdBreakFinishedListener);
+        this.bitmovinPlayer.off(this.playerEventTimeChangedListener);
         this.sourceSwitchHandler.removePlayerListener();
     }
 
@@ -309,251 +311,295 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         }
     }
 
-    private void sourceEventLoadedListener(SourceEvent.Loaded event) {
-        Log.d(TAG, "On Source Loaded");
-        isVideoAttemptedPlay = false;
-    }
+    private final EventListener<SourceEvent.Loaded> sourceEventLoadedListener =
+            (event) -> {
+                Log.d(TAG, "On Source Loaded");
+                isVideoAttemptedPlay = false;
+            };
 
-    private void sourceEventUnloadedListener(SourceEvent.Unloaded event) {
-        try {
-            Log.d(TAG, "On Source Unloaded");
-            stateMachine.resetStateMachine();
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void playerEventDestroyListener(PlayerEvent.Destroy event) {
-        try {
-            Log.d(TAG, "On Destroy");
-            if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-                stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PAGE_CLOSED);
-                stateMachine.transitionState(PlayerState.EXITBEFOREVIDEOSTART, getPosition());
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void playerEventPlaybackFinishedListener(PlayerEvent.PlaybackFinished event) {
-        try {
-            Log.d(TAG, "On Playback Finished Listener");
-
-            long position =
-                    (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
-                            ? (long) bitmovinPlayer.getDuration() * Util.MILLISECONDS_IN_SECONDS
-                            : getPosition();
-            stateMachine.transitionState(PlayerState.PAUSE, position);
-            stateMachine.disableHeartbeat();
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void playerEventPausedListener(PlayerEvent.Paused event) {
-        try {
-            Log.d(TAG, "On Pause Listener");
-            stateMachine.pause(getPosition());
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void playerEventPlayListener(PlayerEvent.Play event) {
-        try {
-            Log.d(TAG, "On Play Listener");
-            if (!stateMachine.isStartupFinished()) {
-                startup();
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void playerEventPlayingListener(PlayerEvent.Playing event) {
-        try {
-            Log.d(TAG, "On Playing Listener " + stateMachine.getCurrentState().toString());
-            stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void playerEventTimeChangedListener(PlayerEvent.TimeChanged event) {
-        try {
-            if (!bitmovinPlayer.isStalled()) {
-                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void playerEventSeekedListener(PlayerEvent.Seeked event) {
-        Log.d(TAG, "On Seeked Listener");
-    }
-
-    private void playerEventSeekListener(PlayerEvent.Seek event) {
-        try {
-            Log.d(TAG, "On Seek Listener");
-            if (stateMachine.getCurrentState() != PlayerState.SEEKING
-                    && stateMachine.isStartupFinished()) {
-                stateMachine.transitionState(PlayerState.SEEKING, getPosition());
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void playerEventStallEndedListener(PlayerEvent.StallEnded event) {
-        try {
-            Log.d(TAG, "On Stall Ended: " + String.valueOf(bitmovinPlayer.isPlaying()));
-            if (stateMachine.isStartupFinished()) {
-                if (bitmovinPlayer.isPlaying()
-                        && stateMachine.getCurrentState() != PlayerState.PLAYING) {
-                    stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-                } else if (bitmovinPlayer.isPaused()
-                        && stateMachine.getCurrentState() != PlayerState.PAUSE) {
-                    stateMachine.transitionState(PlayerState.PAUSE, getPosition());
+    private final EventListener<SourceEvent.Unloaded> sourceEventUnloadedListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "On Source Unloaded");
+                    stateMachine.resetStateMachine();
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
                 }
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+            };
 
-    private void sourceEventAudioChangedListener(SourceEvent.AudioChanged event) {
-        try {
-            Log.d(TAG, "On AudioChanged: " + bitmovinPlayer.getAudio().getId());
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING
-                            || stateMachine.getCurrentState() == PlayerState.PAUSE)
-                    && stateMachine.isStartupFinished()) {
-                PlayerState originalState = stateMachine.getCurrentState();
-                stateMachine.transitionState(PlayerState.AUDIOTRACKCHANGE, getPosition());
-                stateMachine.transitionState(originalState, getPosition());
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+    private final EventListener<PlayerEvent.Destroy> playerEventDestroyListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "On Destroy");
+                    if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
+                        stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PAGE_CLOSED);
+                        stateMachine.transitionState(
+                                PlayerState.EXITBEFOREVIDEOSTART, getPosition());
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
 
-    private void sourceEventSubtitleChangedListener(SourceEvent.SubtitleChanged event) {
-        try {
-            Log.d(TAG, "On SubtitleChanged: " + bitmovinPlayer.getSubtitle().getId());
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING
-                            || stateMachine.getCurrentState() == PlayerState.PAUSE)
-                    && stateMachine.isStartupFinished()) {
-                PlayerState originalState = stateMachine.getCurrentState();
-                stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
-                stateMachine.transitionState(originalState, getPosition());
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+    private final EventListener<PlayerEvent.PlaybackFinished> playerEventPlaybackFinishedListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "On Playback Finished Listener");
 
-    private void playerEventStallStartedListener(PlayerEvent.StallStarted event) {
-        try {
-            Log.d(TAG, "On Stall Started Listener isPlaying:" + bitmovinPlayer.isPlaying());
-            if (stateMachine.getCurrentState() != PlayerState.SEEKING
-                    && stateMachine.isStartupFinished()) {
-                stateMachine.transitionState(PlayerState.BUFFERING, getPosition());
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+                    long position =
+                            (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
+                                    ? (long) bitmovinPlayer.getDuration()
+                                            * Util.MILLISECONDS_IN_SECONDS
+                                    : getPosition();
+                    stateMachine.transitionState(PlayerState.PAUSE, position);
+                    stateMachine.disableHeartbeat();
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
+
+    private final EventListener<PlayerEvent.Paused> playerEventPausedListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "On Pause Listener");
+                    stateMachine.pause(getPosition());
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
+
+    private final EventListener<PlayerEvent.Play> playerEventPlayListener =
+            event -> {
+                try {
+                    Log.d(TAG, "On Play Listener");
+                    if (!stateMachine.isStartupFinished()) {
+                        startup();
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
+
+    private final EventListener<PlayerEvent.Playing> playerEventPlayingListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "On Playing Listener " + stateMachine.getCurrentState().toString());
+                    stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
+
+    private final EventListener<PlayerEvent.TimeChanged> playerEventTimeChangedListener =
+            (event) -> {
+                try {
+                    if (!bitmovinPlayer.isStalled()) {
+                        stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
+
+    private final EventListener<PlayerEvent.Seeked> playerEventSeekedListener =
+            (event) -> {
+                Log.d(TAG, "On Seeked Listener");
+            };
+
+    private final EventListener<PlayerEvent.Seek> playerEventSeekListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "On Seek Listener");
+                    if (stateMachine.getCurrentState() != PlayerState.SEEKING
+                            && stateMachine.isStartupFinished()) {
+                        stateMachine.transitionState(PlayerState.SEEKING, getPosition());
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
+
+    private final EventListener<PlayerEvent.StallEnded> playerEventStallEndedListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "On Stall Ended: " + String.valueOf(bitmovinPlayer.isPlaying()));
+                    if (stateMachine.isStartupFinished()) {
+                        if (bitmovinPlayer.isPlaying()
+                                && stateMachine.getCurrentState() != PlayerState.PLAYING) {
+                            stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                        } else if (bitmovinPlayer.isPaused()
+                                && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                            stateMachine.transitionState(PlayerState.PAUSE, getPosition());
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
+
+    private final EventListener<SourceEvent.AudioChanged> sourceEventAudioChangedListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "On AudioChanged: " + bitmovinPlayer.getAudio().getId());
+                    if ((stateMachine.getCurrentState() == PlayerState.PLAYING
+                                    || stateMachine.getCurrentState() == PlayerState.PAUSE)
+                            && stateMachine.isStartupFinished()) {
+                        PlayerState originalState = stateMachine.getCurrentState();
+                        stateMachine.transitionState(PlayerState.AUDIOTRACKCHANGE, getPosition());
+                        stateMachine.transitionState(originalState, getPosition());
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
+
+    private final EventListener<SourceEvent.SubtitleChanged> sourceEventSubtitleChangedListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "On SubtitleChanged: " + bitmovinPlayer.getSubtitle().getId());
+                    if ((stateMachine.getCurrentState() == PlayerState.PLAYING
+                                    || stateMachine.getCurrentState() == PlayerState.PAUSE)
+                            && stateMachine.isStartupFinished()) {
+                        PlayerState originalState = stateMachine.getCurrentState();
+                        stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
+                        stateMachine.transitionState(originalState, getPosition());
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
+
+    private final EventListener<PlayerEvent.StallStarted> playerEventStallStartedListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "On Stall Started Listener isPlaying:" + bitmovinPlayer.isPlaying());
+                    if (stateMachine.getCurrentState() != PlayerState.SEEKING
+                            && stateMachine.isStartupFinished()) {
+                        stateMachine.transitionState(PlayerState.BUFFERING, getPosition());
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
 
     // TODO TSA events with bitrate 0 at the end of playing a source
     // should they be ignored?
-    private void playerEventVideoPlaybackQualityChangedListener(
-            PlayerEvent.VideoPlaybackQualityChanged event) {
-        try {
-            Log.d(TAG, "On Video Quality Changed");
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING
-                            || stateMachine.getCurrentState() == PlayerState.PAUSE)
-                    && stateMachine.isStartupFinished()
-                    && stateMachine.isQualityChangeEventEnabled()) {
-                PlayerState originalState = stateMachine.getCurrentState();
-                stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
-                stateMachine.transitionState(originalState, getPosition());
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+    private final EventListener<PlayerEvent.VideoPlaybackQualityChanged>
+            playerEventVideoPlaybackQualityChangedListener =
+                    (event) -> {
+                        try {
+                            Log.d(TAG, "On Video Quality Changed");
+                            if ((stateMachine.getCurrentState() == PlayerState.PLAYING
+                                            || stateMachine.getCurrentState() == PlayerState.PAUSE)
+                                    && stateMachine.isStartupFinished()
+                                    && stateMachine.isQualityChangeEventEnabled()) {
+                                PlayerState originalState = stateMachine.getCurrentState();
+                                stateMachine.transitionState(
+                                        PlayerState.QUALITYCHANGE, getPosition());
+                                stateMachine.transitionState(originalState, getPosition());
+                            }
+                        } catch (Exception e) {
+                            Log.d(TAG, e.getMessage(), e);
+                        }
+                    };
 
-    private void playerEventDroppedVideoFramesListener(PlayerEvent.DroppedVideoFrames event) {
-        try {
-            totalDroppedVideoFrames += event.getDroppedFrames();
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+    private final EventListener<PlayerEvent.DroppedVideoFrames>
+            playerEventDroppedVideoFramesListener =
+                    (event) -> {
+                        try {
+                            totalDroppedVideoFrames += event.getDroppedFrames();
+                        } catch (Exception e) {
+                            Log.d(TAG, e.getMessage(), e);
+                        }
+                    };
 
-    private void playerEventAudioPlaybackQualityChangedListener(
-            PlayerEvent.AudioPlaybackQualityChanged event) {
-        try {
-            Log.d(TAG, "On Audio Quality Changed");
-            if ((stateMachine.getCurrentState() == PlayerState.PLAYING
-                            || stateMachine.getCurrentState() == PlayerState.PAUSE)
-                    && stateMachine.isStartupFinished()
-                    && stateMachine.isQualityChangeEventEnabled()) {
-                PlayerState originalState = stateMachine.getCurrentState();
-                AudioQuality oldQuality = event.getOldAudioQuality();
-                AudioQuality newQuality = event.getNewAudioQuality();
-                if (oldQuality != null
-                        && newQuality != null
-                        && oldQuality.getBitrate() == newQuality.getBitrate()) {
-                    return;
+    private final EventListener<PlayerEvent.AudioPlaybackQualityChanged>
+            playerEventAudioPlaybackQualityChangedListener =
+                    (event) -> {
+                        try {
+                            Log.d(TAG, "On Audio Quality Changed");
+                            if ((stateMachine.getCurrentState() == PlayerState.PLAYING
+                                            || stateMachine.getCurrentState() == PlayerState.PAUSE)
+                                    && stateMachine.isStartupFinished()
+                                    && stateMachine.isQualityChangeEventEnabled()) {
+                                PlayerState originalState = stateMachine.getCurrentState();
+                                AudioQuality oldQuality = event.getOldAudioQuality();
+                                AudioQuality newQuality = event.getNewAudioQuality();
+                                if (oldQuality != null
+                                        && newQuality != null
+                                        && oldQuality.getBitrate() == newQuality.getBitrate()) {
+                                    return;
+                                }
+                                stateMachine.transitionState(
+                                        PlayerState.QUALITYCHANGE, getPosition());
+                                stateMachine.transitionState(originalState, getPosition());
+                            }
+                        } catch (Exception e) {
+                            Log.d(TAG, e.getMessage(), e);
+                        }
+                    };
+
+    private final EventListener<SourceEvent.DownloadFinished> sourceEventDownloadFinishedListener =
+            (event) -> {
+                try {
+                    if (event.getDownloadType().toString().contains("drm/license")) {
+                        drmDownloadTime =
+                                Double.valueOf(event.getDownloadTime() * 1000).longValue();
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
                 }
-                stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
-                stateMachine.transitionState(originalState, getPosition());
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+            };
 
-    private void sourceEventDownloadFinishedListener(SourceEvent.DownloadFinished event) {
-        try {
-            if (event.getDownloadType().toString().contains("drm/license")) {
-                drmDownloadTime = Double.valueOf(event.getDownloadTime() * 1000).longValue();
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+    private final EventListener<PlayerEvent.Error> playerErrorEventListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "onPlayerError");
+                    long videoTime = getPosition();
+                    ErrorCode errorCode = exceptionMapper.map(event);
 
-    private void errorEventListener(ErrorEvent event) {
-        try {
-            Log.d(TAG, "onPlayerError");
-            long videoTime = getPosition();
-            ErrorCode errorCode = exceptionMapper.map(event);
+                    stateMachine.setErrorCode(errorCode);
+                    if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
+                        stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
+                    }
+                    stateMachine.transitionState(PlayerState.ERROR, videoTime);
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
 
-            stateMachine.setErrorCode(errorCode);
-            if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-                stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
-            }
-            stateMachine.transitionState(PlayerState.ERROR, videoTime);
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+    private final EventListener<SourceEvent.Error> sourceErrorEventListener =
+            (event) -> {
+                try {
+                    Log.d(TAG, "onPlayerError");
+                    long videoTime = getPosition();
+                    ErrorCode errorCode = exceptionMapper.map(event);
 
-    private void playerEventAdBreakStartedListener(PlayerEvent.AdBreakStarted event) {
-        try {
-            stateMachine.startAd(getPosition());
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+                    stateMachine.setErrorCode(errorCode);
+                    if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
+                        stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
+                    }
+                    stateMachine.transitionState(PlayerState.ERROR, videoTime);
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
 
-    private void playerEventAdBreakFinishedListener(PlayerEvent.AdBreakFinished event) {
-        try {
-            stateMachine.transitionState(PlayerState.ADFINISHED, getPosition());
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
+    private final EventListener<PlayerEvent.AdBreakStarted> playerEventAdBreakStartedListener =
+            (event) -> {
+                try {
+                    stateMachine.startAd(getPosition());
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
+
+    private final EventListener<PlayerEvent.AdBreakFinished> playerEventAdBreakFinishedListener =
+            (event) -> {
+                try {
+                    stateMachine.transitionState(PlayerState.ADFINISHED, getPosition());
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            };
 }
