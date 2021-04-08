@@ -116,8 +116,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.bitmovinPlayer.on(
                 PlayerEvent.AdBreakFinished.class, this::playerEventAdBreakFinishedListener);
         this.bitmovinPlayer.on(PlayerEvent.TimeChanged.class, this::playerEventTimeChangedListener);
-
-        this.sourceSwitchHandler.addPlayerListener();
     }
 
     private void removePlayerListener() {
@@ -147,7 +145,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.bitmovinPlayer.off(this::playerEventAdBreakStartedListener);
         this.bitmovinPlayer.off(this::playerEventAdBreakFinishedListener);
         this.bitmovinPlayer.off(this::playerEventTimeChangedListener);
-        this.sourceSwitchHandler.removePlayerListener();
     }
 
     @Override
@@ -252,6 +249,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         playerIsReady = false;
         if (bitmovinPlayer != null) {
             removePlayerListener();
+            this.sourceSwitchHandler.destroy();
         }
         this.reset();
         this.stateMachine.resetStateMachine();
@@ -296,7 +294,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         if (bitmovinPlayer.getConfig() != null) {
             PlaybackConfig playbackConfig = bitmovinPlayer.getConfig().getPlaybackConfig();
             Source source = bitmovinPlayer.getSource();
-
             if (playbackConfig != null
                     && source != null
                     && source.getConfig() != null

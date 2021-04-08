@@ -20,11 +20,32 @@ internal class SourceSwitchHandler(
     private val TAG = "SourceSwitchHandler"
 
     fun init() {
+        addPlayerListener()
+        updateConfigIfSourceIsAvailable()
+    }
+
+    fun destroy() {
+        removePlayerListener()
+    }
+
+    private fun addPlayerListener() {
+        bitmovinPlayer.on(PlayerEvent.PlaylistTransition::class, this::playerEventPlaylistTransitionListener)
+        bitmovinPlayer.on(SourceEvent.Loaded::class, this::sourceEventSourceLoadedListener)
+    }
+
+    private fun removePlayerListener() {
+        bitmovinPlayer.off(this::playerEventPlaylistTransitionListener)
+        bitmovinPlayer.off(this::sourceEventSourceLoadedListener)
+    }
+
+    private fun updateConfigIfSourceIsAvailable() {
         val playerSource = bitmovinPlayer.source ?: return
         // if collector is attached to player after the player has loaded data and sourceLoaded event already triggered
         val sourceConfig = sourceConfigProvider.getSource(playerSource) ?: return
         config.updateConfig(sourceConfig)
     }
+
+    // Event Handlers
 
     private fun sourceEventSourceLoadedListener(event: SourceEvent.Loaded) {
         val sourceConfig = sourceConfigProvider.getSource(event.source) ?: return
@@ -40,15 +61,5 @@ internal class SourceSwitchHandler(
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
-    }
-
-    fun addPlayerListener() {
-        bitmovinPlayer.on(PlayerEvent.PlaylistTransition::class, this::playerEventPlaylistTransitionListener)
-        bitmovinPlayer.on(SourceEvent.Loaded::class, this::sourceEventSourceLoadedListener)
-    }
-
-    fun removePlayerListener() {
-        bitmovinPlayer.off(this::playerEventPlaylistTransitionListener)
-        bitmovinPlayer.off(this::sourceEventSourceLoadedListener)
     }
 }
