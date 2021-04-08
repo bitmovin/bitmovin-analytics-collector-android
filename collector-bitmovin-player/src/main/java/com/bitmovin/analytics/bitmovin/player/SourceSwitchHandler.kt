@@ -28,13 +28,13 @@ internal class SourceSwitchHandler(
     }
 
     private fun addPlayerListener() {
-        bitmovinPlayer.on(PlayerEvent.PlaylistTransition::class, this::playerEventPlaylistTransitionListener)
-        bitmovinPlayer.on(SourceEvent.Loaded::class, this::sourceEventSourceLoadedListener)
+        bitmovinPlayer.on(PlayerEvent.PlaylistTransition::class, this.playerEventPlaylistTransitionListener)
+        bitmovinPlayer.on(SourceEvent.Loaded::class, this.sourceEventSourceLoadedListener)
     }
 
     private fun removePlayerListener() {
-        bitmovinPlayer.off(this::playerEventPlaylistTransitionListener)
-        bitmovinPlayer.off(this::sourceEventSourceLoadedListener)
+        bitmovinPlayer.off(this.playerEventPlaylistTransitionListener)
+        bitmovinPlayer.off(this.sourceEventSourceLoadedListener)
     }
 
     private fun updateConfigIfSourceIsAvailable() {
@@ -45,17 +45,16 @@ internal class SourceSwitchHandler(
     }
 
     // Event Handlers
-
-    private fun sourceEventSourceLoadedListener(event: SourceEvent.Loaded) {
+    private val sourceEventSourceLoadedListener: (SourceEvent.Loaded) -> Unit = method@{ event ->
         try {
-            val sourceConfig = sourceConfigProvider.getSource(event.source) ?: return
+            val sourceConfig = sourceConfigProvider.getSource(event.source) ?: return@method
             config.updateConfig(sourceConfig)
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
     }
 
-    private fun playerEventPlaylistTransitionListener(event: PlayerEvent.PlaylistTransition) {
+    private val playerEventPlaylistTransitionListener: (PlayerEvent.PlaylistTransition) -> Unit = { event ->
         try {
             Log.d(TAG, "Event PlaylistTransition: from: ${event.from.config.url} to: ${event.to.config.url}")
             val sourceConfig = sourceConfigProvider.getSource(event.to)
