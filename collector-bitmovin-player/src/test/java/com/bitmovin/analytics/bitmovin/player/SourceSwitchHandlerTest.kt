@@ -128,6 +128,8 @@ class SourceSwitchHandlerTest {
         verify { mockConfig.updateConfig(eq(analyticsSourceConfig)) }
     }
 
+    // hacky way to captor event listeners
+    // will call SourceSwitchHandler.init() so be aware of side effects
     private inline fun <reified E : Event, reified C : (E) -> Unit> captorEventListener(): C? {
         // arrange
         var listener: C? = null
