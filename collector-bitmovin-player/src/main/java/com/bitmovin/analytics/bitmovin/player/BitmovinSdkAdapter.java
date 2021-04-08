@@ -412,8 +412,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             (event) -> {
                 try {
                     Log.d(TAG, "On Seek Listener");
-                    if (stateMachine.getCurrentState() != PlayerState.SEEKING
-                            && stateMachine.isStartupFinished()) {
+                    if (stateMachine.isStartupFinished()) {
                         stateMachine.transitionState(PlayerState.SEEKING, getPosition());
                     }
                 } catch (Exception e) {
