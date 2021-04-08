@@ -395,6 +395,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<PlayerEvent.TimeChanged> playerEventTimeChangedListener =
             (event) -> {
                 try {
+                    // TODO TSA check with all player booleans
                     if (!bitmovinPlayer.isStalled()) {
                         stateMachine.transitionState(PlayerState.PLAYING, getPosition());
                     }
@@ -545,7 +546,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 try {
                     if (event.getDownloadType().toString().contains("drm/license")) {
                         drmDownloadTime =
-                                BitmovinUtil.toPrimitiveLong(event.getDownloadTime()) * Util.MILLISECONDS_IN_SECONDS;
+                                BitmovinUtil.toPrimitiveLong(event.getDownloadTime())
+                                        * Util.MILLISECONDS_IN_SECONDS;
                     }
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
