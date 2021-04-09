@@ -532,8 +532,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 public void onStallStarted(StallStartedEvent stallStartedEvent) {
                     try {
                         Log.d(TAG, "On Stall Started Listener");
-                        if (stateMachine.getCurrentState() != PlayerState.SEEKING
-                                && stateMachine.isStartupFinished()) {
+                        if (!stateMachine.isStartupFinished()) {
+                            return;
+                        }
+
+                        // if stalling is triggered by a seeking event
+                        // we count the buffering time towards the seeking time
+                        if (stateMachine.getCurrentState() != PlayerState.SEEKING) {
                             stateMachine.transitionState(PlayerState.BUFFERING, getPosition());
                         }
                     } catch (Exception e) {
@@ -549,14 +554,22 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                         VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
                     try {
                         Log.d(TAG, "On Video Quality Changed");
-                        if ((stateMachine.getCurrentState() == PlayerState.PLAYING
-                                        || stateMachine.getCurrentState() == PlayerState.PAUSE)
-                                && stateMachine.isStartupFinished()
-                                && stateMachine.isQualityChangeEventEnabled()) {
-                            PlayerState originalState = stateMachine.getCurrentState();
-                            stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
-                            stateMachine.transitionState(originalState, getPosition());
+                        if (!stateMachine.isStartupFinished()) {
+                            return;
                         }
+
+                        if (!stateMachine.isQualityChangeEventEnabled()) {
+                            return;
+                        }
+
+                        if (stateMachine.getCurrentState() != PlayerState.PLAYING
+                                && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                            return;
+                        }
+
+                        PlayerState originalState = stateMachine.getCurrentState();
+                        stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
+                        stateMachine.transitionState(originalState, getPosition());
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
                     }
