@@ -354,7 +354,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                             * Util.MILLISECONDS_IN_SECONDS
                                     : getPosition();
                     stateMachine.transitionState(PlayerState.PAUSE, videoTime);
-                    stateMachine.disableHeartbeat();
+                    this.reset();
+                    stateMachine.resetStateMachine();
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
                 }
