@@ -484,14 +484,18 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 public void onAudioChanged(AudioChangedEvent audioChangedEvent) {
                     try {
                         Log.d(TAG, "On AudioChanged");
-                        if ((stateMachine.getCurrentState() == PlayerState.PLAYING
-                                        || stateMachine.getCurrentState() == PlayerState.PAUSE)
-                                && stateMachine.isStartupFinished()) {
-                            PlayerState originalState = stateMachine.getCurrentState();
-                            stateMachine.transitionState(
-                                    PlayerState.AUDIOTRACKCHANGE, getPosition());
-                            stateMachine.transitionState(originalState, getPosition());
+                        if (!stateMachine.isStartupFinished()) {
+                            return;
                         }
+
+                        if (stateMachine.getCurrentState() != PlayerState.PLAYING
+                                && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                            return;
+                        }
+
+                        PlayerState originalState = stateMachine.getCurrentState();
+                        stateMachine.transitionState(PlayerState.AUDIOTRACKCHANGE, getPosition());
+                        stateMachine.transitionState(originalState, getPosition());
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
                     }
