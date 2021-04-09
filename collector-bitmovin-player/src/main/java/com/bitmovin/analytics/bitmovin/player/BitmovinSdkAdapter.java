@@ -4,6 +4,7 @@ import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.bitmovin.player.config.BitmovinAnalyticsSourceConfigProvider;
+import com.bitmovin.analytics.config.AnalyticsSourceConfig;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -38,7 +39,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
-    private final BitmovinAnalyticsConfig config;
+    private BitmovinAnalyticsConfig config;
     private Player bitmovinPlayer;
     private final DeviceInformationProvider deviceInformationProvider;
     private PlayerStateMachine stateMachine;
@@ -47,7 +48,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean isVideoAttemptedPlay = false;
     private FeatureFactory featureFactory;
     private BitmovinAnalyticsSourceConfigProvider sourceConfigProvider;
-    private SourceSwitchHandler sourceSwitchHandler;
 
     private Long drmDownloadTime = null;
 
@@ -64,15 +64,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.bitmovinPlayer = bitmovinPlayer;
         this.deviceInformationProvider = deviceInformationProvider;
         this.sourceConfigProvider = sourceConfigProvider;
-        this.sourceSwitchHandler =
-                new SourceSwitchHandler(config, sourceConfigProvider, stateMachine, bitmovinPlayer);
     }
 
     public Collection<Feature<?>> init() {
         addPlayerListeners();
         checkAutoplayStartup();
+        updateConfigIfSourceIsAvailable();
         this.reset();
-        this.sourceSwitchHandler.init();
         return featureFactory.createFeatures();
     }
 
@@ -116,6 +114,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.bitmovinPlayer.on(
                 PlayerEvent.AdBreakFinished.class, this.playerEventAdBreakFinishedListener);
         this.bitmovinPlayer.on(PlayerEvent.TimeChanged.class, this.playerEventTimeChangedListener);
+        this.bitmovinPlayer.on(
+                PlayerEvent.PlaylistTransition.class, this.playerEventPlaylistTransitionListener);
     }
 
     private void removePlayerListener() {
@@ -145,6 +145,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.bitmovinPlayer.off(this.playerEventAdBreakStartedListener);
         this.bitmovinPlayer.off(this.playerEventAdBreakFinishedListener);
         this.bitmovinPlayer.off(this.playerEventTimeChangedListener);
+        this.bitmovinPlayer.off(this.playerEventPlaylistTransitionListener);
     }
 
     @Override
@@ -251,7 +252,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     public void release() {
         if (bitmovinPlayer != null) {
             removePlayerListener();
-            this.sourceSwitchHandler.destroy();
         }
         this.reset();
         this.stateMachine.resetStateMachine();
@@ -302,6 +302,21 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         }
     }
 
+    private void updateConfigIfSourceIsAvailable() {
+        Source playerSource = bitmovinPlayer.getSource();
+        if (playerSource == null) {
+            return;
+        }
+        // if collector is attached to player after the player has loaded data and sourceLoaded
+        // event already triggered
+        AnalyticsSourceConfig sourceConfig = sourceConfigProvider.getSource(playerSource);
+        if (sourceConfig == null) {
+            return;
+        }
+
+        this.config.updateConfig(sourceConfig);
+    }
+
     private void startup() {
         stateMachine.transitionState(PlayerState.STARTUP, getPosition());
         if (!bitmovinPlayer.isAd()) {
@@ -315,7 +330,17 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<SourceEvent.Loaded> sourceEventLoadedListener =
             (event) -> {
                 Log.d(TAG, "On Source Loaded");
-                isVideoAttemptedPlay = false;
+                try {
+                    isVideoAttemptedPlay = false;
+                    AnalyticsSourceConfig sourceConfig =
+                            sourceConfigProvider.getSource(event.getSource());
+                    if (sourceConfig == null) {
+                        return;
+                    }
+                    this.config.updateConfig(sourceConfig);
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
             };
 
     private final EventListener<SourceEvent.Unloaded> sourceEventUnloadedListener =
@@ -639,4 +664,23 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     Log.d(TAG, e.getMessage(), e);
                 }
             };
+
+    private final EventListener<PlayerEvent.PlaylistTransition>
+            playerEventPlaylistTransitionListener =
+                    (event) -> {
+                        try {
+                            Log.d(
+                                    TAG,
+                                    "Event PlaylistTransition: from: ${event.from.config.url} to: ${event.to.config.url}");
+                            AnalyticsSourceConfig sourceConfig =
+                                    sourceConfigProvider.getSource(event.getTo());
+                            stateMachine.sourceChange(sourceConfig, event.getTimestamp());
+                            // TODO TSA move STARTUP to sourceChange
+                            long positionFromPlayer =
+                                    BitmovinUtil.getCurrentTimeInMs(bitmovinPlayer);
+                            stateMachine.transitionState(PlayerState.STARTUP, positionFromPlayer);
+                        } catch (Exception e) {
+                            Log.d(TAG, e.getMessage(), e);
+                        }
+                    };
 }
