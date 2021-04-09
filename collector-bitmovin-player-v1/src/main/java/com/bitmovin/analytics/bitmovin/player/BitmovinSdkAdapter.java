@@ -461,14 +461,16 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 public void onStallEnded(StallEndedEvent stallEndedEvent) {
                     try {
                         Log.d(TAG, "On Stall Ended: " + bitmovinPlayer.isPlaying());
-                        if (stateMachine.isStartupFinished()) {
-                            if (bitmovinPlayer.isPlaying()
-                                    && stateMachine.getCurrentState() != PlayerState.PLAYING) {
-                                stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-                            } else if (bitmovinPlayer.isPaused()
-                                    && stateMachine.getCurrentState() != PlayerState.PAUSE) {
-                                stateMachine.transitionState(PlayerState.PAUSE, getPosition());
-                            }
+                        if (!stateMachine.isStartupFinished()) {
+                            return;
+                        }
+
+                        if (bitmovinPlayer.isPlaying()
+                                && stateMachine.getCurrentState() != PlayerState.PLAYING) {
+                            stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                        } else if (bitmovinPlayer.isPaused()
+                                && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                            stateMachine.transitionState(PlayerState.PAUSE, getPosition());
                         }
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
