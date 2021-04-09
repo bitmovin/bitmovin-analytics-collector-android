@@ -395,8 +395,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<PlayerEvent.TimeChanged> playerEventTimeChangedListener =
             (event) -> {
                 try {
-                    // TODO TSA check with all player booleans
-                    if (!bitmovinPlayer.isStalled()) {
+                    if (!bitmovinPlayer.isStalled()
+                            && !bitmovinPlayer.isPaused()
+                            && bitmovinPlayer.isPlaying()) {
                         stateMachine.transitionState(PlayerState.PLAYING, getPosition());
                     }
                 } catch (Exception e) {

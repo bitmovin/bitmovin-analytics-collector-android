@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
         sintel.title = "sintel"
         this.bitmovinPlayerCollector?.addSourceConfig(playerSource2, sintel)
 
-        return PlaylistConfig(listOf(playerSource, playerSource2, liveSimSource), PlaylistOptions())
+        return PlaylistConfig(listOf(playerSource, playerSource2), PlaylistOptions())
     }
 
     override fun onStart() {
