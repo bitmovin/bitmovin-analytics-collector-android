@@ -366,12 +366,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     try {
                         Log.d(TAG, "On Playback Finished Listener");
 
-                        long position =
+                        // if it's life stream we are using currentPosition of playback as videoTime
+                        long videoTime =
                                 (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
                                         ? Util.toPrimitiveLong(bitmovinPlayer.getDuration())
                                                 * Util.MILLISECONDS_IN_SECONDS
                                         : getPosition();
-                        stateMachine.transitionState(PlayerState.PAUSE, position);
+                        stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                         stateMachine.disableHeartbeat();
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
@@ -460,7 +461,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 @Override
                 public void onStallEnded(StallEndedEvent stallEndedEvent) {
                     try {
-                        Log.d(TAG, "On Stall Ended: " + String.valueOf(bitmovinPlayer.isPlaying()));
+                        Log.d(TAG, "On Stall Ended: " + bitmovinPlayer.isPlaying());
                         if (stateMachine.isStartupFinished()) {
                             if (bitmovinPlayer.isPlaying()
                                     && stateMachine.getCurrentState() != PlayerState.PLAYING) {
@@ -481,7 +482,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 @Override
                 public void onAudioChanged(AudioChangedEvent audioChangedEvent) {
                     try {
-                        Log.d(TAG, "On AudioChanged: " + bitmovinPlayer.getAudio().getId());
+                        Log.d(TAG, "On AudioChanged");
                         if ((stateMachine.getCurrentState() == PlayerState.PLAYING
                                         || stateMachine.getCurrentState() == PlayerState.PAUSE)
                                 && stateMachine.isStartupFinished()) {
