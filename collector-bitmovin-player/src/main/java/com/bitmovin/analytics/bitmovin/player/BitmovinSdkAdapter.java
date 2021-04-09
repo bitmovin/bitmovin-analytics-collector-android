@@ -453,10 +453,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                 sourceConfigProvider.getSource(event.getTo().getSource());
                         activeTransitionFromSource = event.getFrom().getSource();
                         long oldVideoTime =
-                                BitmovinUtil.toPrimitiveLong(event.getFrom().getTime())
+                                Util.toPrimitiveLong(event.getFrom().getTime())
                                         * Util.MILLISECONDS_IN_SECONDS;
                         long newVideoTime =
-                                BitmovinUtil.toPrimitiveLong(event.getTo().getTime())
+                                Util.toPrimitiveLong(event.getTo().getTime())
                                         * Util.MILLISECONDS_IN_SECONDS;
                         stateMachine.sourceChange(sourceConfig, oldVideoTime, newVideoTime);
                     } else {
