@@ -273,7 +273,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     @Override
     public long getPosition() {
-        return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
+        return BitmovinUtil.getCurrentTimeInMs(bitmovinPlayer);
     }
 
     @Override
@@ -365,7 +365,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
                         long position =
                                 (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
-                                        ? (long) bitmovinPlayer.getDuration()
+                                        ? Util.toPrimitiveLong(bitmovinPlayer.getDuration())
                                                 * Util.MILLISECONDS_IN_SECONDS
                                         : getPosition();
                         stateMachine.transitionState(PlayerState.PAUSE, position);
@@ -601,8 +601,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                 .toString()
                                 .contains("drm/license")) {
                             drmDownloadTime =
-                                    Double.valueOf(downloadFinishedEvent.getDownloadTime() * 1000)
-                                            .longValue();
+                                    Util.toPrimitiveLong(downloadFinishedEvent.getDownloadTime())
+                                            * Util.MILLISECONDS_IN_SECONDS;
                             drmType =
                                     downloadFinishedEvent
                                             .getDownloadType()

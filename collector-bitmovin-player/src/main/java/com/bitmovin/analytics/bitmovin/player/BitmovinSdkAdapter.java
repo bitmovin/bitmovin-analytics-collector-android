@@ -382,7 +382,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     // if it's life stream we are using currentPosition of playback as videoTime
                     long videoTime =
                             (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
-                                    ? BitmovinUtil.toPrimitiveLong(bitmovinPlayer.getDuration())
+                                    ? Util.toPrimitiveLong(bitmovinPlayer.getDuration())
                                             * Util.MILLISECONDS_IN_SECONDS
                                     : getPosition();
                     stateMachine.transitionState(PlayerState.PAUSE, videoTime);
@@ -636,7 +636,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 try {
                     if (event.getDownloadType().toString().contains("drm/license")) {
                         drmDownloadTime =
-                                BitmovinUtil.toPrimitiveLong(event.getDownloadTime())
+                                Util.toPrimitiveLong(event.getDownloadTime())
                                         * Util.MILLISECONDS_IN_SECONDS;
                     }
                 } catch (Exception e) {
