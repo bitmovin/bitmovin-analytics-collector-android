@@ -49,6 +49,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private FeatureFactory featureFactory;
     private BitmovinAnalyticsSourceConfigProvider sourceConfigProvider;
 
+    private Source activeTransitionToSource = null;
+
     private Long drmDownloadTime = null;
 
     public BitmovinSdkAdapter(
@@ -254,6 +256,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             removePlayerListener();
         }
         this.reset();
+        this.activeTransitionToSource = null;
         this.stateMachine.resetStateMachine();
     }
 
@@ -439,9 +442,26 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<PlayerEvent.Seek> playerEventSeekListener =
             (event) -> {
                 try {
-                    Log.d(TAG, "On Seek Listener");
-                    if (stateMachine.isStartupFinished()) {
-                        stateMachine.transitionState(PlayerState.SEEKING, getPosition());
+                    Log.d(
+                            TAG,
+                            "On Seek Listener");
+                    if (event.getTo().getSource() != event.getFrom().getSource()) {
+                        // seek to different source will trigger SOURCE_CHANGE
+                        AnalyticsSourceConfig sourceConfig =
+                                sourceConfigProvider.getSource(event.getTo().getSource());
+                        activeTransitionToSource = event.getTo().getSource();
+                        long oldVideoTime =
+                                BitmovinUtil.toPrimitiveLong(event.getFrom().getTime())
+                                        * Util.MILLISECONDS_IN_SECONDS;
+                        long newVideoTime =
+                                BitmovinUtil.toPrimitiveLong(event.getTo().getTime())
+                                        * Util.MILLISECONDS_IN_SECONDS;
+                        stateMachine.sourceChange(sourceConfig, oldVideoTime, newVideoTime);
+                    } else {
+                        // seek to same source will trigger SEEK
+                        if (stateMachine.isStartupFinished()) {
+                            stateMachine.transitionState(PlayerState.SEEKING, getPosition());
+                        }
                     }
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
@@ -544,7 +564,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                 return;
                             }
 
-                            // TODO create videoQualityChange method in statemachine wich will check
+                            // TODO create videoQualityChange method in statemachine which will
+                            // check
                             // if transition is allowed
                             if (!stateMachine.isQualityChangeEventEnabled()) {
                                 return;
@@ -676,12 +697,14 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                             + event.getFrom().getConfig().getUrl()
                                             + " to: "
                                             + event.getTo().getConfig().getUrl());
-                            AnalyticsSourceConfig sourceConfig =
-                                    sourceConfigProvider.getSource(event.getTo());
-                            long positionFromPlayer =
-                                    BitmovinUtil.getCurrentTimeInMs(bitmovinPlayer);
+                            if (activeTransitionToSource == null) {
+                                AnalyticsSourceConfig sourceConfig =
+                                        sourceConfigProvider.getSource(event.getTo());
+                                activeTransitionToSource = event.getTo();
+                                stateMachine.sourceChange(sourceConfig, 123, getPosition());
+                            }
 
-                            stateMachine.sourceChange(sourceConfig, positionFromPlayer);
+                            activeTransitionToSource = null;
                         } catch (Exception e) {
                             Log.d(TAG, e.getMessage(), e);
                         }
