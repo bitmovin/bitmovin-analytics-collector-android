@@ -109,13 +109,15 @@ public class PlayerStateMachine {
         setCurrentState(PlayerState.READY);
     }
 
-    public void sourceChange(@Nullable AnalyticsSourceConfig sourceConfig, long position) {
+    public void sourceChange(@Nullable AnalyticsSourceConfig sourceConfig, long newVideoTime) {
         reset();
-        transitionState(PlayerState.SOURCE_CHANGED, position);
+        transitionState(PlayerState.SOURCE_CHANGED, this.videoTimeStart);
 
         if (sourceConfig != null) {
             this.config.updateConfig(sourceConfig);
         }
+
+        transitionState(PlayerState.STARTUP, newVideoTime);
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {

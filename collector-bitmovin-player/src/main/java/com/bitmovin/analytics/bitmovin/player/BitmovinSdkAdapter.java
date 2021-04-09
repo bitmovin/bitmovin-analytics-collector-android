@@ -671,14 +671,17 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                         try {
                             Log.d(
                                     TAG,
-                                    "Event PlaylistTransition: from: ${event.from.config.url} to: ${event.to.config.url}");
+                                    "Event PlaylistTransition"
+                                            + " from: "
+                                            + event.getFrom().getConfig().getUrl()
+                                            + " to: "
+                                            + event.getTo().getConfig().getUrl());
                             AnalyticsSourceConfig sourceConfig =
                                     sourceConfigProvider.getSource(event.getTo());
-                            stateMachine.sourceChange(sourceConfig, event.getTimestamp());
-                            // TODO TSA move STARTUP to sourceChange
                             long positionFromPlayer =
                                     BitmovinUtil.getCurrentTimeInMs(bitmovinPlayer);
-                            stateMachine.transitionState(PlayerState.STARTUP, positionFromPlayer);
+
+                            stateMachine.sourceChange(sourceConfig, positionFromPlayer);
                         } catch (Exception e) {
                             Log.d(TAG, e.getMessage(), e);
                         }
