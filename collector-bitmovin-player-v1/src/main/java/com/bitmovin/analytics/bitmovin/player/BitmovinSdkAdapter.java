@@ -507,14 +507,19 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 @Override
                 public void onSubtitleChanged(SubtitleChangedEvent event) {
                     try {
-                        Log.d(TAG, "On SubtitleChanged: " + bitmovinPlayer.getSubtitle().getId());
-                        if ((stateMachine.getCurrentState() == PlayerState.PLAYING
-                                        || stateMachine.getCurrentState() == PlayerState.PAUSE)
-                                && stateMachine.isStartupFinished()) {
-                            PlayerState originalState = stateMachine.getCurrentState();
-                            stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
-                            stateMachine.transitionState(originalState, getPosition());
+                        Log.d(TAG, "On SubtitleChanged");
+                        if (!stateMachine.isStartupFinished()) {
+                            return;
                         }
+
+                        if (stateMachine.getCurrentState() != PlayerState.PLAYING
+                                && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                            return;
+                        }
+
+                        PlayerState originalState = stateMachine.getCurrentState();
+                        stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
+                        stateMachine.transitionState(originalState, getPosition());
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
                     }
