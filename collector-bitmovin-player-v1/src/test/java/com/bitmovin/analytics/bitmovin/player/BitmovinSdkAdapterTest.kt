@@ -43,7 +43,6 @@ class BitmovinSdkAdapterTest {
 
     @Test
     fun testNoStateTransitionToQualityChangeIfBitrateDidNotChange() {
-        Mockito.`when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
         val event = getListenerWithType<OnAudioPlaybackQualityChangedListener>()
         assert(event != null)
         event!!.onAudioPlaybackQualityChanged(getAudioPlaybackQualityChangedEvent(200, 200))
