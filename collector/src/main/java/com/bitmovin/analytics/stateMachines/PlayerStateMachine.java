@@ -260,6 +260,14 @@ public class PlayerStateMachine {
         this.qualityChangeCount = 0;
     }
 
+    public void transitionToCustomDataSetState(long position) {
+        PlayerState originalState = this.getCurrentState();
+        if(originalState == PlayerState.PLAYING || originalState == PlayerState.PAUSE){
+            this.transitionState(PlayerState.CUSTOMDATASET, position);
+            this.transitionState(originalState, position);
+        }
+    }
+
     protected CountDownTimer qualityChangeResetTimeout =
             new CountDownTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL, 1000) {
 
