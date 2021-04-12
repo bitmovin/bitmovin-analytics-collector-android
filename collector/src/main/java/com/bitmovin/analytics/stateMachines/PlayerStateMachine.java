@@ -262,7 +262,7 @@ public class PlayerStateMachine {
 
     public void transitionToCustomDataSetState(long position) {
         PlayerState originalState = this.getCurrentState();
-        if(originalState == PlayerState.PLAYING || originalState == PlayerState.PAUSE){
+        if (originalState == PlayerState.PLAYING || originalState == PlayerState.PAUSE) {
             this.transitionState(PlayerState.CUSTOMDATASET, position);
             this.transitionState(originalState, position);
         }

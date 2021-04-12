@@ -154,13 +154,11 @@ public enum PlayerState {
     },
     CUSTOMDATASET {
         @Override
-        void onEnterState(PlayerStateMachine machine) {
-        }
+        void onEnterState(PlayerStateMachine machine) {}
 
         @Override
         void onExitState(
-                PlayerStateMachine machine, long elapsedTime, PlayerState destinationPlayerState) {
-        }
+                PlayerStateMachine machine, long elapsedTime, PlayerState destinationPlayerState) {}
     },
 
     AUDIOTRACKCHANGE {

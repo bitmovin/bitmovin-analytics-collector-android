@@ -392,11 +392,11 @@ public class BitmovinAnalytics
         this.bitmovinAnalyticsConfig.setCustomData(customData);
     }
 
-   public void setCustomDataOnce(CustomData customData) {
-       if (playerAdapter == null) {
-           Log.d(TAG, "Custom data could not be set because player is not attached");
-           return;
-       }
+    public void setCustomDataOnce(CustomData customData) {
+        if (playerAdapter == null) {
+            Log.d(TAG, "Custom data could not be set because player is not attached");
+            return;
+        }
 
         CustomData currentCustomData = this.bitmovinAnalyticsConfig.getCustomData();
         this.bitmovinAnalyticsConfig.setCustomData(customData);
