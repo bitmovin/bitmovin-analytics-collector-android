@@ -25,6 +25,7 @@ import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureManager;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.LicenseCallback;
+import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.Util;
@@ -387,29 +388,22 @@ public class BitmovinAnalytics
             Log.d(TAG, "Custom data could not be set because player is not attached");
             return;
         }
-        createAndSendBasicEventData();
+        this.playerStateMachine.transitionToCustomDataSetState(getPosition());
         this.bitmovinAnalyticsConfig.setCustomData(customData);
-        createAndSendBasicEventData();
     }
 
-    public void setCustomDataOnce(CustomData customData) {
-        if (playerAdapter == null) {
-            Log.d(TAG, "Custom data could not be set because player is not attached");
-            return;
-        }
-        createAndSendBasicEventData();
+   public void setCustomDataOnce(CustomData customData) {
+       if (playerAdapter == null) {
+           Log.d(TAG, "Custom data could not be set because player is not attached");
+           return;
+       }
+
         CustomData currentCustomData = this.bitmovinAnalyticsConfig.getCustomData();
         this.bitmovinAnalyticsConfig.setCustomData(customData);
-        createAndSendBasicEventData();
+        EventData eventData = createEventData();
+        eventData.setState(PlayerState.CUSTOMDATASET.toString().toLowerCase());
+        sendEventData(eventData);
         this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
-    }
-
-    private void createAndSendBasicEventData() {
-        EventData data = this.createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data);
     }
 
     public void sendEventData(EventData data) {
