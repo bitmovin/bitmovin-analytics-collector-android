@@ -699,11 +699,20 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                             + event.getFrom().getConfig().getUrl()
                                             + " to: "
                                             + event.getTo().getConfig().getUrl());
+                            // if activeTransitionFromSource is not null the source transition
+                            // was triggered by seek listener
+                            // otherwise this playlistTransition automatically triggered
+                            // at the end of the playback
                             if (activeTransitionFromSource == null) {
                                 AnalyticsSourceConfig sourceConfig =
                                         sourceConfigProvider.getSource(event.getTo());
                                 activeTransitionFromSource = event.getFrom();
-                                stateMachine.sourceChange(sourceConfig, 123, getPosition());
+                                long videoEndTimeOfPreviousSource =
+                                        BitmovinUtil.toPrimitiveLong(
+                                                        activeTransitionFromSource.getDuration())
+                                                * Util.MILLISECONDS_IN_SECONDS;
+                                stateMachine.sourceChange(
+                                        sourceConfig, videoEndTimeOfPreviousSource, getPosition());
                             }
 
                             activeTransitionFromSource = null;

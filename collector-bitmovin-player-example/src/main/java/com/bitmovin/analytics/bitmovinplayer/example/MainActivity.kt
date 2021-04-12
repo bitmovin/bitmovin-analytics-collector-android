@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.seek_second_source).setOnClickListener {
             val secondSource = playlistConfig?.sources?.get(1) ?: return@setOnClickListener
-            player?.playlist?.seek(secondSource, 0.0)
+            player?.playlist?.seek(secondSource, 10.0)
         }
 
         playerView = findViewById(R.id.playerView)
