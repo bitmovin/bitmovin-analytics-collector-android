@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity
             bitmovinAnalyticsConfig.setPath("/vod/new/");
             bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
             bitmovinAnalyticsConfig.setIsLive(false);
-            bitmovinAnalyticsConfig.getConfig().setTryResendDataOnFailedConnection(true);
+            bitmovinAnalyticsConfig.getConfig().setTryResendDataOnFailedConnection(false);
 
             eventLogView.setText("");
 
@@ -253,10 +253,9 @@ public class MainActivity extends AppCompatActivity
 
     private void setCustomData() {
         CustomData customData = bitmovinAnalytics.getCustomData();
+        customData.setCustomData1("custom_data_1_changed");
         customData.setCustomData2("custom_data_2_changed");
-        customData.setCustomData4("custom_data_4_changed");
-        customData.setExperimentName("experiment-custom-data-2");
-        bitmovinAnalytics.setCustomDataOnce(customData);
+        bitmovinAnalytics.setCustomData(customData);
     }
 
     @Override

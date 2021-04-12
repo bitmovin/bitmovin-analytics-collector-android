@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity
             // Step 3: Create Analytics Collector
             bitmovinAnalytics =
                     new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
+
             bitmovinAnalytics.addDebugListener(this);
             this.bitmovinAnalytics = bitmovinAnalytics;
 
@@ -241,7 +242,6 @@ public class MainActivity extends AppCompatActivity
         CustomData customData = bitmovinAnalytics.getCustomData();
         customData.setCustomData2("custom_data_2_changed");
         customData.setCustomData4("custom_data_4_changed");
-        customData.setExperimentName("experiment-custom-data-2");
         bitmovinAnalytics.setCustomDataOnce(customData);
     }
 
