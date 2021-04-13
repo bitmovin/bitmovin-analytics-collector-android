@@ -4,7 +4,6 @@ import com.bitmovin.analytics.config.AnalyticsSourceConfig
 import com.bitmovin.player.api.source.Source
 
 class BitmovinAnalyticsSourceConfigProvider {
-    private val TAG = "BitmovinAnalyticsSourceConfigProvider"
     private val sources = mutableMapOf<Source, AnalyticsSourceConfig>()
 
     fun addSource(playerSource: Source, analyticsSourceConfig: AnalyticsSourceConfig) {

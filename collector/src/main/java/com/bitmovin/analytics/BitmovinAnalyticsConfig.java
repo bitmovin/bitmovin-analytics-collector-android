@@ -97,21 +97,21 @@ public class BitmovinAnalyticsConfig implements Parcelable {
 
     public void updateConfig(AnalyticsSourceConfig sourceConfig) {
         Log.d("BitmovinAnalyticsConfig", "Updating Config: " + sourceConfig.getTitle());
-        this.setCdnProvider(sourceConfig.getCdnProvider());
-        this.setCustomData1(sourceConfig.getCustomData1());
-        this.setCustomData2(sourceConfig.getCustomData2());
-        this.setCustomData3(sourceConfig.getCustomData3());
-        this.setCustomData4(sourceConfig.getCustomData4());
-        this.setCustomData5(sourceConfig.getCustomData5());
-        this.setCustomData6(sourceConfig.getCustomData6());
-        this.setCustomData7(sourceConfig.getCustomData7());
-        this.setExperimentName(sourceConfig.getExperimentName());
-        this.setM3u8Url(sourceConfig.getM3u8Url());
-        this.setMpdUrl(sourceConfig.getMpdUrl());
-        this.setPath(sourceConfig.getPath());
-        this.setTitle(sourceConfig.getTitle());
-        this.setVideoId(sourceConfig.getVideoId());
-        this.setIsLive(sourceConfig.isLive());
+        setCdnProvider(sourceConfig.getCdnProvider());
+        setCustomData1(sourceConfig.getCustomData1());
+        setCustomData2(sourceConfig.getCustomData2());
+        setCustomData3(sourceConfig.getCustomData3());
+        setCustomData4(sourceConfig.getCustomData4());
+        setCustomData5(sourceConfig.getCustomData5());
+        setCustomData6(sourceConfig.getCustomData6());
+        setCustomData7(sourceConfig.getCustomData7());
+        setExperimentName(sourceConfig.getExperimentName());
+        setM3u8Url(sourceConfig.getM3u8Url());
+        setMpdUrl(sourceConfig.getMpdUrl());
+        setPath(sourceConfig.getPath());
+        setTitle(sourceConfig.getTitle());
+        setVideoId(sourceConfig.getVideoId());
+        setIsLive(sourceConfig.isLive());
     }
 
     @Override
