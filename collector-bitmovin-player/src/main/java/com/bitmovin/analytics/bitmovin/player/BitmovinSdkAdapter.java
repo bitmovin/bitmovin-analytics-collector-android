@@ -567,8 +567,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             }
 
                             // TODO create videoQualityChange method in statemachine which will
-                            // check
-                            // if transition is allowed
+                            // check if transition is allowed
                             if (!stateMachine.isQualityChangeEventEnabled()) {
                                 return;
                             }
