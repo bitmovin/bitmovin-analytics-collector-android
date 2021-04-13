@@ -91,7 +91,7 @@ public class PlayerStateMachine {
         videoTimeStart = videoTimeEnd;
     }
 
-    private void reset() {
+    private void resetSourceRelatedState() {
         disableHeartbeat();
         disableRebufferHeartbeat();
         this.impressionId = Util.getUUID();
@@ -105,13 +105,13 @@ public class PlayerStateMachine {
     }
 
     public void resetStateMachine() {
-        reset();
+        resetSourceRelatedState();
         setCurrentState(PlayerState.READY);
     }
 
     public void sourceChange(
-            @Nullable SourceMetadata sourceConfig, long oldVideoTime, long newVideoTime) {
-        reset();
+            long oldVideoTime, long newVideoTime, @Nullable SourceMetadata sourceConfig) {
+        resetSourceRelatedState();
         transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime);
 
         if (sourceConfig != null) {

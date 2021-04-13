@@ -462,7 +462,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                         long newVideoTime =
                                 BitmovinUtil.toPrimitiveLong(event.getTo().getTime())
                                         * Util.MILLISECONDS_IN_SECONDS;
-                        stateMachine.sourceChange(sourceConfig, oldVideoTime, newVideoTime);
+                        stateMachine.sourceChange(oldVideoTime, newVideoTime, sourceConfig);
                     } else {
                         // seek to same source will trigger SEEK
                         if (stateMachine.isStartupFinished()) {
@@ -715,7 +715,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                                                 .getDuration())
                                                 * Util.MILLISECONDS_IN_SECONDS;
                                 stateMachine.sourceChange(
-                                        sourceConfig, videoEndTimeOfPreviousSource, getPosition());
+                                        videoEndTimeOfPreviousSource, getPosition(), sourceConfig);
                             }
 
                             activeSeekTransitionFromSource = null;
