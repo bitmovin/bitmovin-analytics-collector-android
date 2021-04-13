@@ -73,10 +73,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     public Collection<Feature<?>> init() {
+        this.reset();
         addPlayerListeners();
         checkAutoplayStartup();
         updateConfigIfSourceIsAvailable();
-        this.reset();
         return featureFactory.createFeatures();
     }
 
