@@ -215,4 +215,4 @@ notifyApi "android-bitmovin" $VERSION "collector-bitmovin-player"
 notifyApi "android-exo" $VERSION "collector-exoplayer"
 
 echo "Don't forget to update the changelog in Contentful."
-open "https://app.contentful.com/spaces/blfijbdi3ei3/entries"
+open "https://app.contentful.com/spaces/blfijbdi3ei3/entries?id=Dg0lZXAPC2p1fVj6&order.fieldId=updatedAt&order.direction=descending&folderId=KJ8HH1mX0jJQ5mHx&searchText=ANDROID&contentTypeId=release&displayedFieldIds=contentType&displayedFieldIds=updatedAt&displayedFieldIds=author&filters.0.key=fields.product&filters.0.val=ANALYTICS"
