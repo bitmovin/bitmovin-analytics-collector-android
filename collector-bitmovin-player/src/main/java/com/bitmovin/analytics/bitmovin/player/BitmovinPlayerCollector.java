@@ -7,19 +7,19 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.bitmovin.player.config.BitmovinSourceMetadataProvider;
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory;
 import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.player.api.Player;
 import com.bitmovin.player.api.source.Source;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BitmovinPlayerCollector extends BitmovinAnalytics {
 
-    private BitmovinSourceMetadataProvider sourceMetadataProvider =
-            new BitmovinSourceMetadataProvider();
-
+    // TODO TSA refactor to map
+    private HashMap<Source, SourceMetadata> sourceMetadataMap = new HashMap<>();
     /**
      * Bitmovin Analytics
      *
@@ -46,7 +46,7 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
                         deviceInformationProvider,
                         this.playerStateMachine,
                         featureFactory,
-                        sourceMetadataProvider);
+                        (Map<Source, SourceMetadata>) sourceMetadataMap);
 
         this.attach(adapter);
 
@@ -57,7 +57,7 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
     }
 
     public void addSourceMetadata(Source playerSource, SourceMetadata sourceMetadata) {
-        this.sourceMetadataProvider.addSource(playerSource, sourceMetadata);
+        sourceMetadataMap.put(playerSource, sourceMetadata);
     }
 
     private String getUserAgent(Context context) {
