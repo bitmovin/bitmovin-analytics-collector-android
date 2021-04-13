@@ -39,15 +39,15 @@ import org.jetbrains.annotations.NotNull;
 
 public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
-    private BitmovinAnalyticsConfig config;
-    private Player bitmovinPlayer;
+    private final BitmovinAnalyticsConfig config;
+    private final Player bitmovinPlayer;
     private final DeviceInformationProvider deviceInformationProvider;
     private PlayerStateMachine stateMachine;
     private ExceptionMapper<ErrorEvent> exceptionMapper = new BitmovinPlayerExceptionMapper();
     private int totalDroppedVideoFrames;
     private boolean isVideoAttemptedPlay = false;
     private FeatureFactory featureFactory;
-    private BitmovinAnalyticsSourceConfigProvider sourceConfigProvider;
+    private final BitmovinAnalyticsSourceConfigProvider sourceConfigProvider;
 
     private Source activeTransitionFromSource = null;
 
@@ -340,11 +340,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 try {
                     isVideoAttemptedPlay = false;
                     AnalyticsSourceConfig sourceConfig =
-                            sourceConfigProvider.getSource(event.getSource());
+                            getSourceConfigProvider().getSource(event.getSource());
                     if (sourceConfig == null) {
                         return;
                     }
-                    this.config.updateConfig(sourceConfig);
+                    getConfig().updateConfig(sourceConfig);
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
                 }
@@ -380,9 +380,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     Log.d(TAG, "On Playback Finished Listener");
 
                     // if it's life stream we are using currentPosition of playback as videoTime
+                    Player player = getPlayer();
                     long videoTime =
-                            (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
-                                    ? BitmovinUtil.toPrimitiveLong(bitmovinPlayer.getDuration())
+                            (player.getDuration() != Double.POSITIVE_INFINITY)
+                                    ? BitmovinUtil.toPrimitiveLong(player.getDuration())
                                             * Util.MILLISECONDS_IN_SECONDS
                                     : getPosition();
                     stateMachine.transitionState(PlayerState.PAUSE, videoTime);
@@ -428,9 +429,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<PlayerEvent.TimeChanged> playerEventTimeChangedListener =
             (event) -> {
                 try {
-                    if (!bitmovinPlayer.isStalled()
-                            && !bitmovinPlayer.isPaused()
-                            && bitmovinPlayer.isPlaying()) {
+                    Player player = getPlayer();
+                    if (!player.isStalled() && !player.isPaused() && player.isPlaying()) {
                         stateMachine.transitionState(PlayerState.PLAYING, getPosition());
                     }
                 } catch (Exception e) {
@@ -450,7 +450,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     if (event.getTo().getSource() != event.getFrom().getSource()) {
                         // seek to different source will trigger SOURCE_CHANGE
                         AnalyticsSourceConfig sourceConfig =
-                                sourceConfigProvider.getSource(event.getTo().getSource());
+                                getSourceConfigProvider().getSource(event.getTo().getSource());
                         activeTransitionFromSource = event.getFrom().getSource();
                         long oldVideoTime =
                                 BitmovinUtil.toPrimitiveLong(event.getFrom().getTime())
@@ -473,15 +473,16 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<PlayerEvent.StallEnded> playerEventStallEndedListener =
             (event) -> {
                 try {
-                    Log.d(TAG, "On Stall Ended: " + bitmovinPlayer.isPlaying());
+                    Player player = getPlayer();
+                    Log.d(TAG, "On Stall Ended: " + player.isPlaying());
                     if (!stateMachine.isStartupFinished()) {
                         return;
                     }
 
-                    if (bitmovinPlayer.isPlaying()
+                    if (player.isPlaying()
                             && stateMachine.getCurrentState() != PlayerState.PLAYING) {
                         stateMachine.transitionState(PlayerState.PLAYING, getPosition());
-                    } else if (bitmovinPlayer.isPaused()
+                    } else if (player.isPaused()
                             && stateMachine.getCurrentState() != PlayerState.PAUSE) {
                         stateMachine.transitionState(PlayerState.PAUSE, getPosition());
                     }
@@ -540,7 +541,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<PlayerEvent.StallStarted> playerEventStallStartedListener =
             (event) -> {
                 try {
-                    Log.d(TAG, "On Stall Started Listener isPlaying:" + bitmovinPlayer.isPlaying());
+                    Log.d(TAG, "On Stall Started Listener isPlaying:" + getPlayer().isPlaying());
                     if (!stateMachine.isStartupFinished()) {
                         return;
                     }
@@ -704,7 +705,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             // at the end of the playback
                             if (activeTransitionFromSource == null) {
                                 AnalyticsSourceConfig sourceConfig =
-                                        sourceConfigProvider.getSource(event.getTo());
+                                        getSourceConfigProvider().getSource(event.getTo());
                                 activeTransitionFromSource = event.getFrom();
                                 long videoEndTimeOfPreviousSource =
                                         BitmovinUtil.toPrimitiveLong(
@@ -719,4 +720,16 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             Log.d(TAG, e.getMessage(), e);
                         }
                     };
+
+    private BitmovinAnalyticsSourceConfigProvider getSourceConfigProvider() {
+        return sourceConfigProvider;
+    }
+
+    private BitmovinAnalyticsConfig getConfig() {
+        return config;
+    }
+
+    private Player getPlayer() {
+        return bitmovinPlayer;
+    }
 }
