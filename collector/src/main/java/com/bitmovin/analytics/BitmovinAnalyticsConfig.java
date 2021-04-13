@@ -95,23 +95,23 @@ public class BitmovinAnalyticsConfig implements Parcelable {
 
     public BitmovinAnalyticsConfig() {}
 
-    public void updateSourceMetadata(SourceMetadata sourceConfig) {
-        Log.d("BitmovinAnalyticsConfig", "Updating Config: " + sourceConfig.getTitle());
-        setCdnProvider(sourceConfig.getCdnProvider());
-        setCustomData1(sourceConfig.getCustomData1());
-        setCustomData2(sourceConfig.getCustomData2());
-        setCustomData3(sourceConfig.getCustomData3());
-        setCustomData4(sourceConfig.getCustomData4());
-        setCustomData5(sourceConfig.getCustomData5());
-        setCustomData6(sourceConfig.getCustomData6());
-        setCustomData7(sourceConfig.getCustomData7());
-        setExperimentName(sourceConfig.getExperimentName());
-        setM3u8Url(sourceConfig.getM3u8Url());
-        setMpdUrl(sourceConfig.getMpdUrl());
-        setPath(sourceConfig.getPath());
-        setTitle(sourceConfig.getTitle());
-        setVideoId(sourceConfig.getVideoId());
-        setIsLive(sourceConfig.isLive());
+    public void updateSourceMetadata(SourceMetadata sourceMetadata) {
+        Log.d("BitmovinAnalyticsConfig", "Updating Config: " + sourceMetadata.getTitle());
+        setCdnProvider(sourceMetadata.getCdnProvider());
+        setCustomData1(sourceMetadata.getCustomData1());
+        setCustomData2(sourceMetadata.getCustomData2());
+        setCustomData3(sourceMetadata.getCustomData3());
+        setCustomData4(sourceMetadata.getCustomData4());
+        setCustomData5(sourceMetadata.getCustomData5());
+        setCustomData6(sourceMetadata.getCustomData6());
+        setCustomData7(sourceMetadata.getCustomData7());
+        setExperimentName(sourceMetadata.getExperimentName());
+        setM3u8Url(sourceMetadata.getM3u8Url());
+        setMpdUrl(sourceMetadata.getMpdUrl());
+        setPath(sourceMetadata.getPath());
+        setTitle(sourceMetadata.getTitle());
+        setVideoId(sourceMetadata.getVideoId());
+        setIsLive(sourceMetadata.isLive());
     }
 
     @Override
