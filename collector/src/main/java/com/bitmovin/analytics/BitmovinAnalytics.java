@@ -373,9 +373,8 @@ public class BitmovinAnalytics
         this.detachPlayer();
     }
 
-    // TODO TSA because it is public should we name it sourceChange(source: AnalyticsSourceConfig)?
     @Override
-    public void onSourceChanged() {
+    public final void onSourceChanged() {
         this.eventDataDispatcher.clear();
         // TODO reset features and prepare for new source
 
