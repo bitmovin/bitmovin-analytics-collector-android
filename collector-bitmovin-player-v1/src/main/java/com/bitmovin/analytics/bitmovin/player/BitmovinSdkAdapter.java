@@ -264,7 +264,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     @Override
-    public void resetSourceRelatedState() {}
+    public void resetSourceRelatedState() {
+        // no Playlist transition event in older version of Bitmovin Player collector (v1)
+    }
 
     @Override
     public void registerEventDataManipulators(EventDataManipulatorPipeline pipeline) {

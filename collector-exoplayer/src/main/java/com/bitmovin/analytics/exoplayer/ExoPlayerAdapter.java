@@ -265,7 +265,9 @@ public class ExoPlayerAdapter
     }
 
     @Override
-    public void resetSourceRelatedState() {}
+    public void resetSourceRelatedState() {
+        // no Playlist transition event in older version of collector (v1)
+    }
 
     @Override
     public void registerEventDataManipulators(EventDataManipulatorPipeline pipeline) {
