@@ -78,7 +78,7 @@ fi
 
 echo "---------- Summary ----------"
 echo 'ANALYTICS_GH_TOKEN='$ANALYTICS_GH_TOKEN
-echo '$ANALYTICS_API_RELEASE_TOKEN='$ANALYTICS_API_RELEASE_TOKEN
+echo 'ANALYTICS_API_RELEASE_TOKEN='$ANALYTICS_API_RELEASE_TOKEN
 echo 'VERSION='$VERSION
 echo ""
 echo "Artifacts to publish:"
