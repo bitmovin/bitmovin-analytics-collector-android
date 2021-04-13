@@ -10,7 +10,7 @@ public interface PlayerAdapter {
 
     void release();
 
-    void reset();
+    void resetSourceRelatedState();
 
     void registerEventDataManipulators(EventDataManipulatorPipeline pipeline);
 

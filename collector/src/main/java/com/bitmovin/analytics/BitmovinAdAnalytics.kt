@@ -28,7 +28,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
             field
         }
 
-    fun reset() {
+    fun resetSourceRelatedState() {
         activeAdBreak = null
         activeAdSample = null
         adPodPosition = 0

@@ -265,7 +265,7 @@ public class ExoPlayerAdapter
     }
 
     @Override
-    public void reset() {}
+    public void resetSourceRelatedState() {}
 
     @Override
     public void registerEventDataManipulators(EventDataManipulatorPipeline pipeline) {

@@ -145,8 +145,6 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: BitmovinPlayer, val adAnalytics: 
         bitmovinPlayer.removeEventListener(onAdQuartileListener)
     }
 
-    override fun reset() {}
-
     override val isLinearAdActive: Boolean
         get() = bitmovinPlayer.isAd
     override val moduleInformation: AdModuleInformation

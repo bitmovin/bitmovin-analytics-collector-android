@@ -145,11 +145,6 @@ public class BitmovinAnalytics
         }
     }
 
-    private void reset() {
-        this.eventDataDispatcher.clear();
-        // TODO reset features and prepare for new source
-    }
-
     @Override
     public void registerEventDataManipulator(@NotNull EventDataManipulator manipulator) {
         this.eventDataManipulators.add(manipulator);
@@ -381,17 +376,15 @@ public class BitmovinAnalytics
     // TODO TSA because it is public should we name it sourceChange(source: AnalyticsSourceConfig)?
     @Override
     public void onSourceChanged() {
-        this.reset();
-        if (this.adAdapter != null) {
-            this.adAdapter.reset();
-        }
+        this.eventDataDispatcher.clear();
+        // TODO reset features and prepare for new source
 
         if (this.adAnalytics != null) {
-            this.adAnalytics.reset();
+            this.adAnalytics.resetSourceRelatedState();
         }
 
         if (this.playerAdapter != null) {
-            this.playerAdapter.reset();
+            this.playerAdapter.resetSourceRelatedState();
         }
     }
 

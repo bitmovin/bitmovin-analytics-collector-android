@@ -73,7 +73,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     public Collection<Feature<?>> init() {
-        this.reset();
+        this.resetSourceRelatedState();
         addPlayerListeners();
         checkAutoplayStartup();
         updateConfigIfSourceIsAvailable();
@@ -263,13 +263,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         if (bitmovinPlayer != null) {
             removePlayerListener();
         }
-        this.reset();
+        this.resetSourceRelatedState();
         this.activeSeekTransitionFromSource = null;
         this.stateMachine.resetStateMachine();
     }
 
     @Override
-    public void reset() {
+    public void resetSourceRelatedState() {
         this.totalDroppedVideoFrames = 0;
         this.drmDownloadTime = null;
         this.isVideoAttemptedPlay = false;
@@ -391,7 +391,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                             * Util.MILLISECONDS_IN_SECONDS
                                     : getPosition();
                     stateMachine.transitionState(PlayerState.PAUSE, videoTime);
-                    this.reset();
+                    this.resetSourceRelatedState();
                     stateMachine.resetStateMachine();
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
