@@ -5,7 +5,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
-import com.bitmovin.analytics.config.AnalyticsSourceConfig
+import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.player.PlayerView
 import com.bitmovin.player.api.PlaybackConfig
@@ -99,20 +99,20 @@ class MainActivity : AppCompatActivity() {
 
         bitmovinPlayerCollector = BitmovinPlayerCollector(createBitmovinAnalyticsConfig(), applicationContext)
 
-        val redbullAnalyticsSourceConfig = AnalyticsSourceConfig()
-        redbullAnalyticsSourceConfig.videoId = "source-video-id"
-        redbullAnalyticsSourceConfig.title = "redbull"
-        bitmovinPlayerCollector?.addSourceConfig(redbullSource, redbullAnalyticsSourceConfig)
+        val redbullMetadata = SourceMetadata(
+                videoId = "source-video-id",
+                title = "redbull")
+        bitmovinPlayerCollector?.addSourceMetadata(redbullSource, redbullMetadata)
 
-        val sintelAnalyticsSourceConfig = AnalyticsSourceConfig()
-        sintelAnalyticsSourceConfig.videoId = "source-video-id-2"
-        sintelAnalyticsSourceConfig.title = "sintel"
-        bitmovinPlayerCollector?.addSourceConfig(sintelSource, sintelAnalyticsSourceConfig)
+        val sintelMetadata = SourceMetadata(
+            videoId = "source-video-id-2",
+            title = "sintel")
+        bitmovinPlayerCollector?.addSourceMetadata(sintelSource, sintelMetadata)
 
-        val liveSimAnalyticsSourceConfig = AnalyticsSourceConfig()
-        liveSimAnalyticsSourceConfig.videoId = "source-video-id"
-        liveSimAnalyticsSourceConfig.title = "redbull"
-        bitmovinPlayerCollector?.addSourceConfig(liveSimSource, liveSimAnalyticsSourceConfig)
+        val liveSimMetadata = SourceMetadata(
+            videoId = "source-video-id",
+            title = "redbull")
+        bitmovinPlayerCollector?.addSourceMetadata(liveSimSource, liveSimMetadata)
 
         bitmovinPlayerCollector!!.attachPlayer(player)
 

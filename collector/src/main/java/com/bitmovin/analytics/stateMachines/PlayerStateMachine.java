@@ -6,7 +6,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.config.AnalyticsSourceConfig;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
@@ -110,7 +110,7 @@ public class PlayerStateMachine {
     }
 
     public void sourceChange(
-            @Nullable AnalyticsSourceConfig sourceConfig, long oldVideoTime, long newVideoTime) {
+            @Nullable SourceMetadata sourceConfig, long oldVideoTime, long newVideoTime) {
         reset();
         transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime);
 

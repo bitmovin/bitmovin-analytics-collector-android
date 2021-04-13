@@ -3,8 +3,8 @@ package com.bitmovin.analytics.bitmovin.player;
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
-import com.bitmovin.analytics.bitmovin.player.config.BitmovinAnalyticsSourceConfigProvider;
-import com.bitmovin.analytics.config.AnalyticsSourceConfig;
+import com.bitmovin.analytics.bitmovin.player.config.BitmovinSourceMetadataProvider;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -47,7 +47,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private int totalDroppedVideoFrames;
     private boolean isVideoAttemptedPlay = false;
     private FeatureFactory featureFactory;
-    private final BitmovinAnalyticsSourceConfigProvider sourceConfigProvider;
+    private final BitmovinSourceMetadataProvider sourceMetadataProvider;
 
     /**
      * This field is set during the seek event to a different source. We use it to ensure that a
@@ -63,13 +63,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
             FeatureFactory featureFactory,
-            BitmovinAnalyticsSourceConfigProvider sourceConfigProvider) {
+            BitmovinSourceMetadataProvider sourceMetadataProvider) {
         this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.deviceInformationProvider = deviceInformationProvider;
-        this.sourceConfigProvider = sourceConfigProvider;
+        this.sourceMetadataProvider = sourceMetadataProvider;
     }
 
     public Collection<Feature<?>> init() {
@@ -320,7 +320,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         }
         // if collector is attached to player after the player has loaded data and sourceLoaded
         // event already triggered
-        AnalyticsSourceConfig sourceConfig = sourceConfigProvider.getSource(playerSource);
+        SourceMetadata sourceConfig = sourceMetadataProvider.getSource(playerSource);
         if (sourceConfig == null) {
             return;
         }
@@ -343,8 +343,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 Log.d(TAG, "On Source Loaded");
                 try {
                     isVideoAttemptedPlay = false;
-                    AnalyticsSourceConfig sourceConfig =
-                            getSourceConfigProvider().getSource(event.getSource());
+                    SourceMetadata sourceConfig =
+                            getSourceMetadataProvider().getSource(event.getSource());
                     if (sourceConfig == null) {
                         return;
                     }
@@ -453,8 +453,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     Log.d(TAG, "On Seek Listener");
                     if (event.getTo().getSource() != event.getFrom().getSource()) {
                         // seek to different source will trigger SOURCE_CHANGE
-                        AnalyticsSourceConfig sourceConfig =
-                                getSourceConfigProvider().getSource(event.getTo().getSource());
+                        SourceMetadata sourceConfig =
+                                getSourceMetadataProvider().getSource(event.getTo().getSource());
                         activeSeekTransitionFromSource = event.getFrom().getSource();
                         long oldVideoTime =
                                 BitmovinUtil.toPrimitiveLong(event.getFrom().getTime())
@@ -706,8 +706,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             // otherwise this playlistTransition automatically triggered
                             // at the end of the playback
                             if (activeSeekTransitionFromSource == null) {
-                                AnalyticsSourceConfig sourceConfig =
-                                        getSourceConfigProvider().getSource(event.getTo());
+                                SourceMetadata sourceConfig =
+                                        getSourceMetadataProvider().getSource(event.getTo());
                                 activeSeekTransitionFromSource = event.getFrom();
                                 long videoEndTimeOfPreviousSource =
                                         BitmovinUtil.toPrimitiveLong(
@@ -724,8 +724,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                         }
                     };
 
-    private BitmovinAnalyticsSourceConfigProvider getSourceConfigProvider() {
-        return sourceConfigProvider;
+    private BitmovinSourceMetadataProvider getSourceMetadataProvider() {
+        return sourceMetadataProvider;
     }
 
     private BitmovinAnalyticsConfig getConfig() {
