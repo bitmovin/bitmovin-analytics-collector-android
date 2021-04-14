@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v1.23.0-beta1
+
+### Changed
+
+- Added default implementation of AnalyticsListener.onPlayerStateChanged to avoid ExoPlayer crashes on certain devices
+
 ## v2.0.0-beta1
 
 ### Added
