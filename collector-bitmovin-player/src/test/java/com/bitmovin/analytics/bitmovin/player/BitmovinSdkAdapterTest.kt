@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
+import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.player.api.Player
@@ -7,6 +8,7 @@ import com.bitmovin.player.api.event.Event
 import com.bitmovin.player.api.event.EventListener
 import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.media.audio.quality.AudioQuality
+import com.bitmovin.player.api.source.Source
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -26,12 +28,13 @@ class BitmovinSdkAdapterTest {
     @RelaxedMockK
     private lateinit var player: Player
 
+    private val sourceMap = mutableMapOf<Source, SourceMetadata>()
     private lateinit var bitmovinSdkAdapter: BitmovinSdkAdapter
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), mockk(), playerStateMachine, mockk(relaxed = true), mockk(relaxed = true))
+        bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), mockk(), playerStateMachine, mockk(relaxed = true), sourceMap)
     }
 
     @Test
