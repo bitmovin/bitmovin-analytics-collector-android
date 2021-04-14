@@ -98,9 +98,7 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, Authenti
     }
 
     @Override
-    public void clear() {
-        this.data.clear();
-        this.adData.clear();
+    public void resetSourceRelatedState() {
         this.sampleSequenceNumber = 0;
     }
 }

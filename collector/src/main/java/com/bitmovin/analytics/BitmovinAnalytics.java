@@ -375,7 +375,7 @@ public class BitmovinAnalytics
 
     @Override
     public final void onSourceChanged() {
-        this.eventDataDispatcher.clear();
+        this.eventDataDispatcher.resetSourceRelatedState();
         // TODO reset features and prepare for new source
 
         if (this.adAnalytics != null) {

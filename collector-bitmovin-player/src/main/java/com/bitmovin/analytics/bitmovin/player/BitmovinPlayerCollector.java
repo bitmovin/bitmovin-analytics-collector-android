@@ -17,9 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BitmovinPlayerCollector extends BitmovinAnalytics {
-
-    // TODO TSA refactor to map
     private HashMap<Source, SourceMetadata> sourceMetadataMap = new HashMap<>();
+
     /**
      * Bitmovin Analytics
      *
