@@ -378,10 +378,6 @@ public class BitmovinAnalytics
         this.eventDataDispatcher.resetSourceRelatedState();
         // TODO reset features and prepare for new source
 
-        if (this.adAnalytics != null) {
-            this.adAnalytics.resetSourceRelatedState();
-        }
-
         if (this.playerAdapter != null) {
             this.playerAdapter.resetSourceRelatedState();
         }
