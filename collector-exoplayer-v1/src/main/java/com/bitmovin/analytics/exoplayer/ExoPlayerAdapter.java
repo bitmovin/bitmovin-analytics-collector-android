@@ -311,6 +311,9 @@ public class ExoPlayerAdapter
     }
 
     @Override
+    public void onPlayerStateChanged(EventTime eventTime, boolean playWhenReady, int playbackState) {}
+
+    @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         try {
             long videoTime = getPosition();
