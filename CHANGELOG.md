@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Development
+## Development v2
+
+### Added
+- Added `setCustomData` and `setCustomDataOnce`
+
+
+## Development v1
 
 ### Added
 - Support for exoplayer version > 2.12
