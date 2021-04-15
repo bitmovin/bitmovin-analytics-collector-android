@@ -264,9 +264,9 @@ public class PlayerStateMachine {
         PlayerState originalState = this.getCurrentState();
         if (originalState == PlayerState.PLAYING || originalState == PlayerState.PAUSE) {
             this.transitionState(PlayerState.CUSTOMDATACHANGE, position);
-            updateConfig.run();
             this.transitionState(originalState, position);
         }
+        updateConfig.run();
     }
 
     protected CountDownTimer qualityChangeResetTimeout =
