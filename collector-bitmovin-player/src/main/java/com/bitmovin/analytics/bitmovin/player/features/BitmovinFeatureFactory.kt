@@ -4,9 +4,9 @@ import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
-import com.bitmovin.player.BitmovinPlayer
+import com.bitmovin.player.api.Player
 
-class BitmovinFeatureFactory(private val analytics: BitmovinAnalytics, private val player: BitmovinPlayer, private val context: Context) : FeatureFactory {
+class BitmovinFeatureFactory(private val analytics: BitmovinAnalytics, private val player: Player, private val context: Context) : FeatureFactory {
     override fun createFeatures(): Collection<Feature<*>> {
         val features = mutableListOf<Feature<*>>()
 //        TODO features are disabled for now
