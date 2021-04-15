@@ -260,10 +260,11 @@ public class PlayerStateMachine {
         this.qualityChangeCount = 0;
     }
 
-    public void transitionToCustomDataSetState(long position) {
+    public void changeCustomData(long position, Runnable updateConfig) {
         PlayerState originalState = this.getCurrentState();
         if (originalState == PlayerState.PLAYING || originalState == PlayerState.PAUSE) {
-            this.transitionState(PlayerState.CUSTOMDATASET, position);
+            this.transitionState(PlayerState.CUSTOMDATACHANGE, position);
+            updateConfig.run();
             this.transitionState(originalState, position);
         }
     }

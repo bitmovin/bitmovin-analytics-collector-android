@@ -384,12 +384,8 @@ public class BitmovinAnalytics
     }
 
     public void setCustomData(CustomData customData) {
-        if (playerAdapter == null) {
-            Log.d(TAG, "Custom data could not be set because player is not attached");
-            return;
-        }
-        this.playerStateMachine.transitionToCustomDataSetState(getPosition());
-        this.bitmovinAnalyticsConfig.setCustomData(customData);
+        // lambda used because setCustomData on config is protected method
+        this.playerStateMachine.changeCustomData(getPosition(), () -> { this.bitmovinAnalyticsConfig.setCustomData(customData); });
     }
 
     public void setCustomDataOnce(CustomData customData) {
