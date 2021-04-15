@@ -110,8 +110,8 @@ public class PlayerStateMachine {
     }
 
     public void sourceChange(long oldVideoTime, long newVideoTime) {
-        resetSourceRelatedState();
         transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime);
+        resetSourceRelatedState();
         transitionState(PlayerState.STARTUP, newVideoTime);
     }
 
