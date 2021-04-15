@@ -154,13 +154,28 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.bitmovinPlayer.off(this.playerEventPlaylistTransitionListener);
     }
 
+    private Source getCurrentSource() {
+        return activeSeekTransitionFromSource != null
+                ? activeSeekTransitionFromSource
+                : bitmovinPlayer.getSource();
+    }
+
+    @Override
+    public SourceMetadata getCurrentSourceMetadata()
+    {
+        Source source = getCurrentSource();
+        if(source == null) {
+            return null;
+        }
+
+        return this.sourceMetadataMap.get(source);
+    }
+
     @Override
     public void manipulate(@NotNull EventData data) {
         // if this sample
-        Source source =
-                activeSeekTransitionFromSource != null
-                        ? activeSeekTransitionFromSource
-                        : bitmovinPlayer.getSource();
+        Source source = getCurrentSource();
+
         // duration and isLive, streamFormat, mpdUrl, and m3u8Url
         if (source != null) {
             double duration = source.getDuration();

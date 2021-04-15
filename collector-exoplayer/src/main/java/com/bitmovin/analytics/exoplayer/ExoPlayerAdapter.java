@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -138,10 +139,15 @@ public class ExoPlayerAdapter
         return new ArrayList<>();
     }
 
+    @Override
+    public SourceMetadata getCurrentSourceMetadata() {
+        return null;
+    }
+
     /*
-     Because of the late initialization of the Adapter we do not get the first couple of events
-     so in case the player starts a video due to autoplay=true we need to transition into startup state manually
-    */
+         Because of the late initialization of the Adapter we do not get the first couple of events
+         so in case the player starts a video due to autoplay=true we need to transition into startup state manually
+        */
     private void checkAutoplayStartup() {
         int playbackState = exoplayer.getPlaybackState();
         boolean playWhenReady = exoplayer.getPlayWhenReady();
