@@ -153,9 +153,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     private Source getCurrentSource() {
-        return overrideCurrentSource != null
-                ? overrideCurrentSource
-                : bitmovinPlayer.getSource();
+        return overrideCurrentSource != null ? overrideCurrentSource : bitmovinPlayer.getSource();
     }
 
     @Override
@@ -682,14 +680,19 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                             + event.getTo().getConfig().getUrl());
 
                             // The `sourceChange` will send the remaining sample from the previous
-                            // source, but the player will already return the new source on `getSource()`.
-                            // That's why we need to override it here, and this will be reset automatically
+                            // source, but the player will already return the new source on
+                            // `getSource()`.
+                            // That's why we need to override it here, and this will be reset
+                            // automatically
                             // once the StateMachine triggers `resetSourceRelatedState`.
                             overrideCurrentSource = event.getFrom();
                             // Transitioning can either be triggered by finishing the previous
                             // source or seeking to another source. In both cases, we set the
                             // videoEndTime to the duration of the old source.
-                            long videoEndTimeOfPreviousSource = BitmovinUtil.toPrimitiveLong(overrideCurrentSource.getDuration())  * Util.MILLISECONDS_IN_SECONDS;
+                            long videoEndTimeOfPreviousSource =
+                                    BitmovinUtil.toPrimitiveLong(
+                                                    overrideCurrentSource.getDuration())
+                                            * Util.MILLISECONDS_IN_SECONDS;
                             stateMachine.sourceChange(videoEndTimeOfPreviousSource, getPosition());
                         } catch (Exception e) {
                             Log.d(TAG, e.getMessage(), e);
