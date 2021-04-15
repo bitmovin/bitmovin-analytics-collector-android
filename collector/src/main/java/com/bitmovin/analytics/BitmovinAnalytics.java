@@ -401,7 +401,7 @@ public class BitmovinAnalytics
         CustomData currentCustomData = this.bitmovinAnalyticsConfig.getCustomData();
         this.bitmovinAnalyticsConfig.setCustomData(customData);
         EventData eventData = createEventData();
-        eventData.setState(PlayerState.CUSTOMDATASET.toString().toLowerCase());
+        eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
         sendEventData(eventData);
         this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
     }

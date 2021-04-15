@@ -152,7 +152,7 @@ public enum PlayerState {
             }
         }
     },
-    CUSTOMDATASET {
+    CUSTOMDATACHANGE {
         @Override
         void onEnterState(PlayerStateMachine machine) {}
 
