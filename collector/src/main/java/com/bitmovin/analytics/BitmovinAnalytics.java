@@ -8,7 +8,6 @@ import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
-import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
@@ -177,13 +176,10 @@ public class BitmovinAnalytics
         data.setDuration(duration);
         data.setVideoStartupTime(duration);
 
-        DRMInformation drmInfo = playerAdapter.getDRMInformation();
-        if (drmInfo != null) {
-            data.setDrmType(drmInfo.getType());
-            data.setDrmLoadTime(drmInfo.getLoadTime());
-        }
+        data.setDrmLoadTime(playerAdapter.getDRMDownloadTime());
 
         // Setting a startup time of 1 to workaround dashboard issue
+        // TODO how to handle playerstartup only for first source
         data.setPlayerStartupTime(1);
         data.setStartupTime(duration + 1);
 
@@ -375,6 +371,16 @@ public class BitmovinAnalytics
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data);
         this.detachPlayer();
+    }
+
+    @Override
+    public final void onSourceChanged() {
+        this.eventDataDispatcher.resetSourceRelatedState();
+        // TODO reset features and prepare for new source
+
+        if (this.playerAdapter != null) {
+            this.playerAdapter.resetSourceRelatedState();
+        }
     }
 
     public void sendEventData(EventData data) {

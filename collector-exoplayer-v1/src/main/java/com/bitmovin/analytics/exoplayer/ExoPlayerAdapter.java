@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
-import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -54,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class ExoPlayerAdapter
         implements PlayerAdapter, Player.EventListener, AnalyticsListener, EventDataManipulator {
@@ -75,14 +73,15 @@ public class ExoPlayerAdapter
     private String manifestUrl;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
     private final DeviceInformationProvider deviceInformationProvider;
-    private long drmLoadStartTime = 0;
-    private String drmType = null;
-    private DRMInformation drmInformation = null;
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private boolean isVideoAttemptedPlay = false;
     private long previousQualityChangeBitrate = 0;
     private boolean isPlaying = false;
     private boolean isPaused = false;
+
+    private long drmLoadStartTime = 0;
+    private Long drmDownloadTime = null;
+    private String drmType = null;
 
     public ExoPlayerAdapter(
             ExoPlayer exoplayer,
@@ -230,9 +229,7 @@ public class ExoPlayerAdapter
         data.setDownloadSpeedInfo(meter.getInfo());
 
         // DRM Information
-        if (drmInformation != null) {
-            data.setDrmType(drmInformation.getType());
-        }
+        data.setDrmType(drmType);
     }
 
     @Override
@@ -248,6 +245,11 @@ public class ExoPlayerAdapter
         }
         meter.reset();
         stateMachine.resetStateMachine();
+    }
+
+    @Override
+    public void resetSourceRelatedState() {
+        // no Playlist transition event in older version of collector (v1)
     }
 
     @Override
@@ -279,10 +281,9 @@ public class ExoPlayerAdapter
         return 0;
     }
 
-    @Nullable
     @Override
-    public DRMInformation getDRMInformation() {
-        return drmInformation;
+    public Long getDRMDownloadTime() {
+        return drmDownloadTime;
     }
 
     @Override
@@ -690,7 +691,7 @@ public class ExoPlayerAdapter
     @Override
     public void onDrmKeysLoaded(EventTime eventTime) {
         try {
-            drmInformation = new DRMInformation(eventTime.realtimeMs - drmLoadStartTime, drmType);
+            drmDownloadTime = eventTime.realtimeMs - drmLoadStartTime;
             Log.d(TAG, String.format("DRM Keys loaded %d", eventTime.realtimeMs));
         } catch (Exception e) {
             Log.d(TAG, e.getMessage(), e);

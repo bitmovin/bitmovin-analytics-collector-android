@@ -1,17 +1,27 @@
 package com.bitmovin.analytics.bitmovin.player;
 
-import com.bitmovin.player.BuildConfig;
+import com.bitmovin.analytics.utils.Util;
+import com.bitmovin.player.api.Player;
 import java.lang.reflect.Field;
 
 public class BitmovinUtil {
 
     public static String getPlayerVersion() {
         try {
-            Field versionField = BuildConfig.class.getField("VERSION_NAME");
+            Field versionField = com.bitmovin.player.BuildConfig.class.getField("VERSION_NAME");
             return (String) versionField.get(null);
         } catch (NoSuchFieldException e) {
         } catch (IllegalAccessException e) {
         }
         return "unknown";
+    }
+
+    public static long getCurrentTimeInMs(Player player) {
+        long currentTime = toPrimitiveLong(player.getCurrentTime());
+        return currentTime * Util.MILLISECONDS_IN_SECONDS;
+    }
+
+    public static long toPrimitiveLong(Double value) {
+        return value == null ? 0 : value.longValue();
     }
 }

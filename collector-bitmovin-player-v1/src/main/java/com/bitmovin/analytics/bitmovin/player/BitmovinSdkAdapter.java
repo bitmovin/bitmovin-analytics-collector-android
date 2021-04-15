@@ -3,7 +3,6 @@ package com.bitmovin.analytics.bitmovin.player;
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
-import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -69,7 +68,6 @@ import com.bitmovin.player.config.track.AudioTrack;
 import com.bitmovin.player.config.track.SubtitleTrack;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
@@ -81,8 +79,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private int totalDroppedVideoFrames;
     private boolean playerIsReady;
     private boolean isVideoAttemptedPlay = false;
-    private DRMInformation drmInformation = null;
     private FeatureFactory featureFactory;
+
+    private Long drmDownloadTime = null;
+    private String drmType = null;
 
     public BitmovinSdkAdapter(
             BitmovinPlayer bitmovinPlayer,
@@ -210,7 +210,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 case PROGRESSIVE:
                     if (sourceItem.getProgressiveSources() != null
                             && sourceItem.getProgressiveSources().size() > 0) {
-                        data.setM3u8Url(sourceItem.getProgressiveSources().get(0).getUrl());
+                        data.setProgUrl(sourceItem.getProgressiveSources().get(0).getUrl());
                     }
                     data.setStreamFormat(Util.PROGRESSIVE_STREAM_FORMAT);
                     break;
@@ -251,9 +251,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         }
 
         // DRM Information
-        if (drmInformation != null) {
-            data.setDrmType(drmInformation.getType());
-        }
+        data.setDrmType(drmType);
     }
 
     @Override
@@ -266,6 +264,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     @Override
+    public void resetSourceRelatedState() {
+        // no Playlist transition event in older version of Bitmovin Player collector (v1)
+    }
+
+    @Override
     public void registerEventDataManipulators(EventDataManipulatorPipeline pipeline) {
         pipeline.registerEventDataManipulator(this);
     }
@@ -275,10 +278,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         return (long) bitmovinPlayer.getCurrentTime() * Util.MILLISECONDS_IN_SECONDS;
     }
 
-    @Nullable
     @Override
-    public DRMInformation getDRMInformation() {
-        return drmInformation;
+    public Long getDRMDownloadTime() {
+        return drmDownloadTime;
     }
 
     @Override
@@ -600,16 +602,14 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                 .getDownloadType()
                                 .toString()
                                 .contains("drm/license")) {
-                            drmInformation =
-                                    new DRMInformation(
-                                            Double.valueOf(
-                                                            downloadFinishedEvent.getDownloadTime()
-                                                                    * 1000)
-                                                    .longValue(),
-                                            downloadFinishedEvent
-                                                    .getDownloadType()
-                                                    .toString()
-                                                    .replace("drm/license/", ""));
+                            drmDownloadTime =
+                                    Double.valueOf(downloadFinishedEvent.getDownloadTime() * 1000)
+                                            .longValue();
+                            drmType =
+                                    downloadFinishedEvent
+                                            .getDownloadType()
+                                            .toString()
+                                            .replace("drm/license/", "");
                         }
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);

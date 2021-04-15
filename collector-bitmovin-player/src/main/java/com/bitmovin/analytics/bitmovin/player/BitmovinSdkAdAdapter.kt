@@ -9,6 +9,7 @@ import com.bitmovin.analytics.bitmovin.player.utils.AdQuartileFactory
 import com.bitmovin.analytics.data.AdModuleInformation
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.PlayerEvent
+
 /**
  * An adapter that maps the Ad Events to the BitmovinAdAnalytics class
  */
@@ -19,16 +20,16 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
     private val adQuartileFactory: AdQuartileFactory = AdQuartileFactory()
     private val TAG = "BitmovinSdkAdAdapter"
 
-    private fun playerEventAdStartedListener(event: PlayerEvent.AdStarted) {
+    private val playerEventAdStartedListener: (PlayerEvent.AdStarted) -> Unit = method@{ event ->
         try {
-            val ad = event.ad ?: return
+            val ad = event.ad ?: return@method
             adAnalytics.onAdStarted(adMapper.fromPlayerAd(ad))
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Started", e)
         }
     }
 
-    private fun playerEventAdFinishedListener(event: PlayerEvent.AdFinished) {
+    private val playerEventAdFinishedListener: (PlayerEvent.AdFinished) -> Unit = {
         try {
             adAnalytics.onAdFinished()
         } catch (e: Exception) {
@@ -36,16 +37,16 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
         }
     }
 
-    private fun playerEventAdBreakStartedListener(event: PlayerEvent.AdBreakStarted) {
+    private val playerEventAdBreakStartedListener: (PlayerEvent.AdBreakStarted) -> Unit = method@{ event ->
         try {
-            val adBreak = event.adBreak ?: return
+            val adBreak = event.adBreak ?: return@method
             adAnalytics.onAdBreakStarted(adBreakMapper.fromPlayerAdConfiguration(adBreak))
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Break Started", e)
         }
     }
 
-    private fun playerEventAdBreakFinishedListener(event: PlayerEvent.AdBreakFinished) {
+    private val playerEventAdBreakFinishedListener: (PlayerEvent.AdBreakFinished) -> Unit = {
         try {
             adAnalytics.onAdBreakFinished()
         } catch (e: Exception) {
@@ -53,7 +54,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
         }
     }
 
-    private fun playerEventAdClickedListener(event: PlayerEvent.AdClicked) {
+    private val playerEventAdClickedListener: (PlayerEvent.AdClicked) -> Unit = { event ->
         try {
             adAnalytics.onAdClicked(event.clickThroughUrl)
         } catch (e: Exception) {
@@ -61,9 +62,9 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
         }
     }
 
-    private fun playerEventAdErrorListener(event: PlayerEvent.AdError) {
+    private val playerEventAdErrorListener: (PlayerEvent.AdError) -> Unit = method@{ event ->
         try {
-            val adConf = event.adConfig ?: return
+            val adConf = event.adConfig ?: return@method
             adAnalytics.onAdError(
                     adBreakMapper.fromPlayerAdConfiguration(adConf),
                     event.code,
@@ -73,7 +74,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
         }
     }
 
-    private fun playerEventAdSkippedListener(event: PlayerEvent.AdSkipped) {
+    private val playerEventAdSkippedListener: (PlayerEvent.AdSkipped) -> Unit = {
         try {
             adAnalytics.onAdSkipped()
         } catch (e: Exception) {
@@ -81,24 +82,24 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
         }
     }
 
-    private fun playerEventAdManifestLoadedListener(event: PlayerEvent.AdManifestLoaded) {
+    private val playerEventAdManifestLoadedListener: (PlayerEvent.AdManifestLoaded) -> Unit = method@{ event ->
         try {
-            val adBreak = event.adBreak ?: return
+            val adBreak = event.adBreak ?: return@method
             adAnalytics.onAdManifestLoaded(adBreakMapper.fromPlayerAdConfiguration(adBreak), event.downloadTime)
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Manifest Loaded", e)
         }
     }
 
-    private fun playerEventPlayListener(event: PlayerEvent.Play) {
+    private val playerEventPlayListener: (PlayerEvent.Play) -> Unit = {
 //        adAnalytics.onPlay()
     }
 
-    private fun playerEventPausedListener(event: PlayerEvent.Paused) {
+    private val playerEventPausedListener: (PlayerEvent.Paused) -> Unit = {
 //        adAnalytics.onPause()
     }
 
-    private fun playerEventAdQuartileListener(event: PlayerEvent.AdQuartile) {
+    private val playerEventAdQuartileListener: (PlayerEvent.AdQuartile) -> Unit = { event ->
         try {
             adAnalytics.onAdQuartile(adQuartileFactory.FromPlayerAdQuartile(event.quartile))
         } catch (e: Exception) {
@@ -107,31 +108,31 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
     }
 
     init {
-        bitmovinPlayer.on(PlayerEvent.AdStarted::class, ::playerEventAdStartedListener)
-        bitmovinPlayer.on(PlayerEvent.AdFinished::class, ::playerEventAdFinishedListener)
-        bitmovinPlayer.on(PlayerEvent.AdBreakStarted::class, ::playerEventAdBreakStartedListener)
-        bitmovinPlayer.on(PlayerEvent.AdBreakFinished::class, ::playerEventAdBreakFinishedListener)
-        bitmovinPlayer.on(PlayerEvent.AdClicked::class, ::playerEventAdClickedListener)
-        bitmovinPlayer.on(PlayerEvent.AdError::class, ::playerEventAdErrorListener)
-        bitmovinPlayer.on(PlayerEvent.AdSkipped::class, ::playerEventAdSkippedListener)
-        bitmovinPlayer.on(PlayerEvent.AdManifestLoaded::class, ::playerEventAdManifestLoadedListener)
-        bitmovinPlayer.on(PlayerEvent.Play::class, ::playerEventPlayListener)
-        bitmovinPlayer.on(PlayerEvent.Paused::class, ::playerEventPausedListener)
-        bitmovinPlayer.on(PlayerEvent.AdQuartile::class, ::playerEventAdQuartileListener)
+        bitmovinPlayer.on(PlayerEvent.AdStarted::class, playerEventAdStartedListener)
+        bitmovinPlayer.on(PlayerEvent.AdFinished::class, playerEventAdFinishedListener)
+        bitmovinPlayer.on(PlayerEvent.AdBreakStarted::class, playerEventAdBreakStartedListener)
+        bitmovinPlayer.on(PlayerEvent.AdBreakFinished::class, playerEventAdBreakFinishedListener)
+        bitmovinPlayer.on(PlayerEvent.AdClicked::class, playerEventAdClickedListener)
+        bitmovinPlayer.on(PlayerEvent.AdError::class, playerEventAdErrorListener)
+        bitmovinPlayer.on(PlayerEvent.AdSkipped::class, playerEventAdSkippedListener)
+        bitmovinPlayer.on(PlayerEvent.AdManifestLoaded::class, playerEventAdManifestLoadedListener)
+        bitmovinPlayer.on(PlayerEvent.Play::class, playerEventPlayListener)
+        bitmovinPlayer.on(PlayerEvent.Paused::class, playerEventPausedListener)
+        bitmovinPlayer.on(PlayerEvent.AdQuartile::class, playerEventAdQuartileListener)
     }
 
     override fun release() {
-        bitmovinPlayer.off(::playerEventAdStartedListener)
-        bitmovinPlayer.off(::playerEventAdFinishedListener)
-        bitmovinPlayer.off(::playerEventAdBreakStartedListener)
-        bitmovinPlayer.off(::playerEventAdBreakFinishedListener)
-        bitmovinPlayer.off(::playerEventAdClickedListener)
-        bitmovinPlayer.off(::playerEventAdErrorListener)
-        bitmovinPlayer.off(::playerEventAdSkippedListener)
-        bitmovinPlayer.off(::playerEventAdManifestLoadedListener)
-        bitmovinPlayer.off(::playerEventPlayListener)
-        bitmovinPlayer.off(::playerEventPausedListener)
-        bitmovinPlayer.off(::playerEventAdQuartileListener)
+        bitmovinPlayer.off(playerEventAdStartedListener)
+        bitmovinPlayer.off(playerEventAdFinishedListener)
+        bitmovinPlayer.off(playerEventAdBreakStartedListener)
+        bitmovinPlayer.off(playerEventAdBreakFinishedListener)
+        bitmovinPlayer.off(playerEventAdClickedListener)
+        bitmovinPlayer.off(playerEventAdErrorListener)
+        bitmovinPlayer.off(playerEventAdSkippedListener)
+        bitmovinPlayer.off(playerEventAdManifestLoadedListener)
+        bitmovinPlayer.off(playerEventPlayListener)
+        bitmovinPlayer.off(playerEventPausedListener)
+        bitmovinPlayer.off(playerEventAdQuartileListener)
     }
 
     override val isLinearAdActive: Boolean
