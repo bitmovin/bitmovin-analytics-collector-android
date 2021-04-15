@@ -5,7 +5,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
-import com.bitmovin.analytics.config.AnalyticsSourceConfig
+import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.player.PlayerView
 import com.bitmovin.player.api.PlaybackConfig
@@ -20,12 +20,10 @@ import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
-import com.bitmovin.player.api.source.SourceType
 
 class MainActivity : AppCompatActivity() {
     private var playerView: PlayerView? = null
     private var player: Player? = null
-    private var playlistConfig: PlaylistConfig? = null
 
     private var bitmovinPlayerCollector: BitmovinPlayerCollector? = null
 
@@ -74,8 +72,8 @@ class MainActivity : AppCompatActivity() {
             player!!.load(createDRMSourceConfig())
         }
         findViewById<Button>(R.id.seek_second_source).setOnClickListener {
-            val secondSource = playlistConfig?.sources?.get(1) ?: return@setOnClickListener
-            player?.playlist?.seek(secondSource, 0.0)
+            val secondSource = player?.playlist?.sources?.get(1) ?: return@setOnClickListener
+            player?.playlist?.seek(secondSource, 10.0)
         }
 
         playerView = findViewById(R.id.playerView)
@@ -100,35 +98,28 @@ class MainActivity : AppCompatActivity() {
         player = Player.create(applicationContext, playerConfig)
 
         bitmovinPlayerCollector = BitmovinPlayerCollector(createBitmovinAnalyticsConfig(), applicationContext)
-        playlistConfig = getPlaylistConfig()
+
+        val redbullMetadata = SourceMetadata(
+                videoId = "source-video-id",
+                title = "redbull")
+        bitmovinPlayerCollector?.addSourceMetadata(redbullSource, redbullMetadata)
+
+        val sintelMetadata = SourceMetadata(
+            videoId = "source-video-id-2",
+            title = "sintel")
+        bitmovinPlayerCollector?.addSourceMetadata(sintelSource, sintelMetadata)
+
+        val liveSimMetadata = SourceMetadata(
+            videoId = "source-video-id",
+            title = "redbull")
+        bitmovinPlayerCollector?.addSourceMetadata(liveSimSource, liveSimMetadata)
 
         bitmovinPlayerCollector!!.attachPlayer(player)
 
-        player!!.load(playlistConfig!!)
+        val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource), PlaylistOptions())
+        player!!.load(playlistConfig)
 
         playerView!!.player = player
-    }
-
-    private fun getPlaylistConfig(): PlaylistConfig {
-        val liveSimSource: Source = Source.create(liveSimSourceConfig)
-        val liveSimAnalyticsSourceConfig = AnalyticsSourceConfig()
-        liveSimAnalyticsSourceConfig.videoId = "source-video-id"
-        liveSimAnalyticsSourceConfig.title = "redbull"
-        bitmovinPlayerCollector?.addSourceConfig(liveSimSource, liveSimAnalyticsSourceConfig)
-
-        val playerSource: Source = Source.create(redbullSourceConfig)
-        val redbull = AnalyticsSourceConfig()
-        redbull.videoId = "source-video-id"
-        redbull.title = "redbull"
-        this.bitmovinPlayerCollector?.addSourceConfig(playerSource, redbull)
-
-        val playerSource2: Source = Source.create(sintelSourceConfig)
-        val sintel = AnalyticsSourceConfig()
-        sintel.videoId = "source-video-id-2"
-        sintel.title = "sintel"
-        this.bitmovinPlayerCollector?.addSourceConfig(playerSource2, sintel)
-
-        return PlaylistConfig(listOf(playerSource, playerSource2), PlaylistOptions())
     }
 
     override fun onStart() {
@@ -157,11 +148,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val liveSimSourceConfig = SourceConfig.fromUrl("https://livesim.dashif.org/livesim/testpic_2s/Manifest.mpd")
-        private val redbullSourceConfig = SourceConfig("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8", SourceType.Hls)
-        private val sintelSourceConfig = SourceConfig.fromUrl("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd")
-        private val corruptedSourceConfig = SourceConfig.fromUrl(
-                "https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd")
+        private val liveSimSource = Source.create(SourceConfig.fromUrl("https://livesim.dashif.org/livesim/testpic_2s/Manifest.mpd"))
+        private val redbullSource = Source.create(SourceConfig.fromUrl("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8"))
+        private val sintelSource = Source.create(SourceConfig.fromUrl("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd"))
+        private val corruptedSource = Source.create(SourceConfig.fromUrl("https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd"))
 
         private fun createBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {
             /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */

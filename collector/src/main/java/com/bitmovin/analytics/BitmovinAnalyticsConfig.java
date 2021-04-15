@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-import com.bitmovin.analytics.config.AnalyticsSourceConfig;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 
@@ -95,23 +95,27 @@ public class BitmovinAnalyticsConfig implements Parcelable {
 
     public BitmovinAnalyticsConfig() {}
 
-    public void updateConfig(AnalyticsSourceConfig sourceConfig) {
-        Log.d("BitmovinAnalyticsConfig", "Updating Config: " + sourceConfig.getTitle());
-        this.setCdnProvider(sourceConfig.getCdnProvider());
-        this.setCustomData1(sourceConfig.getCustomData1());
-        this.setCustomData2(sourceConfig.getCustomData2());
-        this.setCustomData3(sourceConfig.getCustomData3());
-        this.setCustomData4(sourceConfig.getCustomData4());
-        this.setCustomData5(sourceConfig.getCustomData5());
-        this.setCustomData6(sourceConfig.getCustomData6());
-        this.setCustomData7(sourceConfig.getCustomData7());
-        this.setExperimentName(sourceConfig.getExperimentName());
-        this.setM3u8Url(sourceConfig.getM3u8Url());
-        this.setMpdUrl(sourceConfig.getMpdUrl());
-        this.setPath(sourceConfig.getPath());
-        this.setTitle(sourceConfig.getTitle());
-        this.setVideoId(sourceConfig.getVideoId());
-        this.setIsLive(sourceConfig.isLive());
+    public void setSourceMetadata(SourceMetadata sourceMetadata) {
+        if (sourceMetadata == null) {
+            return;
+        }
+
+        Log.d("BitmovinAnalyticsConfig", "Updating Config: " + sourceMetadata.getTitle());
+        setCdnProvider(sourceMetadata.getCdnProvider());
+        setCustomData1(sourceMetadata.getCustomData1());
+        setCustomData2(sourceMetadata.getCustomData2());
+        setCustomData3(sourceMetadata.getCustomData3());
+        setCustomData4(sourceMetadata.getCustomData4());
+        setCustomData5(sourceMetadata.getCustomData5());
+        setCustomData6(sourceMetadata.getCustomData6());
+        setCustomData7(sourceMetadata.getCustomData7());
+        setExperimentName(sourceMetadata.getExperimentName());
+        setM3u8Url(sourceMetadata.getM3u8Url());
+        setMpdUrl(sourceMetadata.getMpdUrl());
+        setPath(sourceMetadata.getPath());
+        setTitle(sourceMetadata.getTitle());
+        setVideoId(sourceMetadata.getVideoId());
+        setIsLive(sourceMetadata.isLive());
     }
 
     @Override

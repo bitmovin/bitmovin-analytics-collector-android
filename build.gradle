@@ -95,7 +95,7 @@ ext {
 	 * we set version property to '1.X' or '2.X' in 'publish.sh' script and based on that we release
 	 * and publish correct collectors v1 or v2.
 	 */
-	version = (project.hasProperty('version') ? project.getProperty('version') : '0.0.0') + (developLocal ? '-local' : '')
+	version = System.getProperty("version", "0.0.0") + (developLocal ? '-local' : '')
 
 	compileSdkVersion = 28
 	minSdkVersion = 16

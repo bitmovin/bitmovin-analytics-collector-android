@@ -17,8 +17,8 @@ class DebuggingEventDataDispatcher(
         innerEventDataDispatcher.addAd(data)
     }
 
-    override fun clear() {
-        innerEventDataDispatcher.clear()
+    override fun resetSourceRelatedState() {
+        innerEventDataDispatcher.resetSourceRelatedState()
     }
 
     override fun disable() {

@@ -6,7 +6,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.config.AnalyticsSourceConfig;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
@@ -91,7 +91,7 @@ public class PlayerStateMachine {
         videoTimeStart = videoTimeEnd;
     }
 
-    private void reset() {
+    private void resetSourceRelatedState() {
         disableHeartbeat();
         disableRebufferHeartbeat();
         this.impressionId = Util.getUUID();
@@ -105,17 +105,17 @@ public class PlayerStateMachine {
     }
 
     public void resetStateMachine() {
-        reset();
+        resetSourceRelatedState();
         setCurrentState(PlayerState.READY);
     }
 
     public void sourceChange(
-            @Nullable AnalyticsSourceConfig sourceConfig, long oldVideoTime, long newVideoTime) {
-        reset();
+            long oldVideoTime, long newVideoTime, @Nullable SourceMetadata sourceConfig) {
+        resetSourceRelatedState();
         transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime);
 
         if (sourceConfig != null) {
-            this.config.updateConfig(sourceConfig);
+            this.config.setSourceMetadata(sourceConfig);
         }
 
         transitionState(PlayerState.STARTUP, newVideoTime);

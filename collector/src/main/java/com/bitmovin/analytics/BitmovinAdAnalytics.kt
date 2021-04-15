@@ -28,17 +28,6 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
             field
         }
 
-    fun reset() {
-        activeAdBreak = null
-        activeAdSample = null
-        adPodPosition = 0
-        elapsedTimeAdStartup = null
-        elapsedTimeBeginPlaying = null
-        isPlaying = false
-        adManifestDownloadTimes.clear()
-        currentTime = null
-    }
-
     fun onAdStarted(ad: Ad) {
         if (!ad.isLinear) {
             return
