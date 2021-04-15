@@ -76,7 +76,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         resetSourceRelatedState();
         addPlayerListeners();
         checkAutoplayStartup();
-        updateConfigIfSourceIsAvailable();
         return featureFactory.createFeatures();
     }
 
@@ -333,21 +332,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         }
     }
 
-    private void updateConfigIfSourceIsAvailable() {
-        Source playerSource = bitmovinPlayer.getSource();
-        if (playerSource == null) {
-            return;
-        }
-        // if collector is attached to player after the player has loaded data and sourceLoaded
-        // event already triggered
-        SourceMetadata sourceConfig = sourceMetadataMap.get(playerSource);
-        if (sourceConfig == null) {
-            return;
-        }
-
-        config.setSourceMetadata(sourceConfig);
-    }
-
     private void startup() {
         stateMachine.transitionState(PlayerState.STARTUP, getPosition());
         if (!bitmovinPlayer.isAd()) {
@@ -361,16 +345,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<SourceEvent.Loaded> sourceEventLoadedListener =
             (event) -> {
                 Log.d(TAG, "On Source Loaded");
-                try {
-                    isVideoAttemptedPlay = false;
-                    SourceMetadata sourceConfig = getSourceMetadataMap().get(event.getSource());
-                    if (sourceConfig == null) {
-                        return;
-                    }
-                    getConfig().setSourceMetadata(sourceConfig);
-                } catch (Exception e) {
-                    Log.d(TAG, e.getMessage(), e);
-                }
+                isVideoAttemptedPlay = false;
             };
 
     private final EventListener<SourceEvent.Unloaded> sourceEventUnloadedListener =
