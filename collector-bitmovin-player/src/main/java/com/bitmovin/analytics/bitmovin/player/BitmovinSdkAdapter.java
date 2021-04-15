@@ -49,11 +49,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private FeatureFactory featureFactory;
     private final Map<Source, SourceMetadata> sourceMetadataMap;
 
-    /**
-     * This field is set during the seek event to a different source. We use it to ensure that a
-     * sourceChange is only triggered once.
-     */
-    private Source activeSeekTransitionFromSource = null;
+    // When transitioning in a Playlist, BitmovinPlayer will already return the
+    // new source in `getSource`, but we are still interested in sending a sample
+    // with information of the previous one.
+    private Source overrideCurrentSource = null;
 
     private Long drmDownloadTime = null;
 
@@ -154,8 +153,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     private Source getCurrentSource() {
-        return activeSeekTransitionFromSource != null
-                ? activeSeekTransitionFromSource
+        return overrideCurrentSource != null
+                ? overrideCurrentSource
                 : bitmovinPlayer.getSource();
     }
 
@@ -283,12 +282,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             removePlayerListener();
         }
         resetSourceRelatedState();
-        activeSeekTransitionFromSource = null;
         stateMachine.resetStateMachine();
     }
 
     @Override
     public void resetSourceRelatedState() {
+        overrideCurrentSource = null;
         totalDroppedVideoFrames = 0;
         drmDownloadTime = null;
         isVideoAttemptedPlay = false;
@@ -445,24 +444,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             (event) -> {
                 try {
                     Log.d(TAG, "On Seek Listener");
-                    if (event.getTo().getSource() != event.getFrom().getSource()) {
-                        // seek to different source will trigger SOURCE_CHANGE
-                        SourceMetadata sourceConfig =
-                                getSourceMetadataMap().get(event.getTo().getSource());
-                        activeSeekTransitionFromSource = event.getFrom().getSource();
-                        long oldVideoTime =
-                                BitmovinUtil.toPrimitiveLong(event.getFrom().getTime())
-                                        * Util.MILLISECONDS_IN_SECONDS;
-                        long newVideoTime =
-                                BitmovinUtil.toPrimitiveLong(event.getTo().getTime())
-                                        * Util.MILLISECONDS_IN_SECONDS;
-                        stateMachine.sourceChange(oldVideoTime, newVideoTime, sourceConfig);
-                    } else {
-                        // seek to same source will trigger SEEK
-                        if (stateMachine.isStartupFinished()) {
-                            stateMachine.transitionState(PlayerState.SEEKING, getPosition());
-                        }
+                    if (!stateMachine.isStartupFinished()) {
+                        return;
                     }
+                    stateMachine.transitionState(PlayerState.SEEKING, getPosition());
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
                 }
@@ -695,32 +680,21 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                             + event.getFrom().getConfig().getUrl()
                                             + " to: "
                                             + event.getTo().getConfig().getUrl());
-                            // if activeTransitionFromSource is not null the source transition
-                            // was triggered by seek listener
-                            // otherwise this playlistTransition automatically triggered
-                            // at the end of the playback
-                            if (activeSeekTransitionFromSource == null) {
-                                SourceMetadata sourceConfig =
-                                        getSourceMetadataMap().get(event.getTo());
-                                activeSeekTransitionFromSource = event.getFrom();
-                                long videoEndTimeOfPreviousSource =
-                                        BitmovinUtil.toPrimitiveLong(
-                                                        activeSeekTransitionFromSource
-                                                                .getDuration())
-                                                * Util.MILLISECONDS_IN_SECONDS;
-                                stateMachine.sourceChange(
-                                        videoEndTimeOfPreviousSource, getPosition(), sourceConfig);
-                            }
 
-                            activeSeekTransitionFromSource = null;
+                            // The `sourceChange` will send the remaining sample from the previous
+                            // source, but the player will already return the new source on `getSource()`.
+                            // That's why we need to override it here, and this will be reset automatically
+                            // once the StateMachine triggers `resetSourceRelatedState`.
+                            overrideCurrentSource = event.getFrom();
+                            // Transitioning can either be triggered by finishing the previous
+                            // source or seeking to another source. In both cases, we set the
+                            // videoEndTime to the duration of the old source.
+                            long videoEndTimeOfPreviousSource = BitmovinUtil.toPrimitiveLong(overrideCurrentSource.getDuration())  * Util.MILLISECONDS_IN_SECONDS;
+                            stateMachine.sourceChange(videoEndTimeOfPreviousSource, getPosition());
                         } catch (Exception e) {
                             Log.d(TAG, e.getMessage(), e);
                         }
                     };
-
-    private Map<Source, SourceMetadata> getSourceMetadataMap() {
-        return sourceMetadataMap;
-    }
 
     private Player getPlayer() {
         return bitmovinPlayer;
