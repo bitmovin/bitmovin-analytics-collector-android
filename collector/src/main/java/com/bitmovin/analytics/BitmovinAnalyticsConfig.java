@@ -3,8 +3,6 @@ package com.bitmovin.analytics;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 

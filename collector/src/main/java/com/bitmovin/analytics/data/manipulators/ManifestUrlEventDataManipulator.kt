@@ -13,15 +13,14 @@ open class ManifestUrlEventDataManipulator(
 ) : EventDataManipulator {
     override fun manipulate(data: EventData) {
         val currentSourceMetadata = playerAdapter.currentSourceMetadata
-        if(currentSourceMetadata != null) {
+        if (currentSourceMetadata != null) {
             if (currentSourceMetadata.m3u8Url != null) {
                 data.m3u8Url = currentSourceMetadata.m3u8Url
             }
             if (currentSourceMetadata.mpdUrl != null) {
                 data.mpdUrl = currentSourceMetadata.mpdUrl
             }
-        }
-        else {
+        } else {
             if (bitmovinAnalyticsConfig.m3u8Url != null) {
                 data.m3u8Url = bitmovinAnalyticsConfig.m3u8Url
             }

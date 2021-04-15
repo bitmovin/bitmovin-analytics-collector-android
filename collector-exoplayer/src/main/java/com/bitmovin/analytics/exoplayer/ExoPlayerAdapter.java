@@ -145,9 +145,9 @@ public class ExoPlayerAdapter
     }
 
     /*
-         Because of the late initialization of the Adapter we do not get the first couple of events
-         so in case the player starts a video due to autoplay=true we need to transition into startup state manually
-        */
+     Because of the late initialization of the Adapter we do not get the first couple of events
+     so in case the player starts a video due to autoplay=true we need to transition into startup state manually
+    */
     private void checkAutoplayStartup() {
         int playbackState = exoplayer.getPlaybackState();
         boolean playWhenReady = exoplayer.getPlayWhenReady();

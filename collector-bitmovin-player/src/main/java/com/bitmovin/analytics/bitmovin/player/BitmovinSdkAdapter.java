@@ -161,10 +161,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     @Override
-    public SourceMetadata getCurrentSourceMetadata()
-    {
+    public SourceMetadata getCurrentSourceMetadata() {
         Source source = getCurrentSource();
-        if(source == null) {
+        if (source == null) {
             return null;
         }
 
@@ -178,14 +177,15 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         SourceMetadata sourceMetadata = getCurrentSourceMetadata();
 
         boolean fallbackIsLive = config.isLive() != null && config.isLive();
-        if(sourceMetadata != null) {
+        if (sourceMetadata != null) {
             fallbackIsLive = sourceMetadata.isLive() != null && sourceMetadata.isLive();
         }
         // duration and isLive, streamFormat, mpdUrl, and m3u8Url
         if (source != null) {
             double duration = source.getDuration();
             if (duration == -1) {
-                // Source duration is not available yet, fallback to SourceMetadata / BitmovinAnalyticsConfig
+                // Source duration is not available yet, fallback to SourceMetadata /
+                // BitmovinAnalyticsConfig
                 data.setLive(fallbackIsLive);
             } else {
                 if (duration == Double.POSITIVE_INFINITY) {

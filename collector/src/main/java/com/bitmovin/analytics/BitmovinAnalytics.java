@@ -112,7 +112,8 @@ public class BitmovinAnalytics
         // this.registerEventDataManipulators(prePipelineManipulator);
         this.playerAdapter.registerEventDataManipulators(this);
         this.registerEventDataManipulator(
-                new ManifestUrlEventDataManipulator(this.playerAdapter, this.bitmovinAnalyticsConfig));
+                new ManifestUrlEventDataManipulator(
+                        this.playerAdapter, this.bitmovinAnalyticsConfig));
         // this.registerEventDataManipulators(postPipelineManipulator);
     }
 
