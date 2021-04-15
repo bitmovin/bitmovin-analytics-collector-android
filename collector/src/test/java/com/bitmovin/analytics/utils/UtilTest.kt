@@ -57,4 +57,14 @@ class UtilTest {
         val isLive = Util.getIsLiveFromConfigOrPlayer(true, config.isLive, false)
         assertThat(isLive).isFalse()
     }
+
+    @Test
+    fun toPrimitiveLong() {
+        assertThat(Util.toPrimitiveLong(-1.2)).isEqualTo(-1)
+        assertThat(Util.toPrimitiveLong(-1.6)).isEqualTo(-1)
+        assertThat(Util.toPrimitiveLong(0.0)).isEqualTo(0)
+        assertThat(Util.toPrimitiveLong(1.2)).isEqualTo(1)
+        assertThat(Util.toPrimitiveLong(1.6)).isEqualTo(1)
+        assertThat(Util.toPrimitiveLong(null)).isEqualTo(0)
+    }
 }

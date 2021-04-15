@@ -386,7 +386,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     Player player = getPlayer();
                     long videoTime =
                             (player.getDuration() != Double.POSITIVE_INFINITY)
-                                    ? BitmovinUtil.toPrimitiveLong(player.getDuration())
+                                    ? Util.toPrimitiveLong(player.getDuration())
                                             * Util.MILLISECONDS_IN_SECONDS
                                     : getPosition();
                     stateMachine.transitionState(PlayerState.PAUSE, videoTime);
@@ -456,10 +456,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                 getSourceMetadataMap().get(event.getTo().getSource());
                         activeSeekTransitionFromSource = event.getFrom().getSource();
                         long oldVideoTime =
-                                BitmovinUtil.toPrimitiveLong(event.getFrom().getTime())
+                                Util.toPrimitiveLong(event.getFrom().getTime())
                                         * Util.MILLISECONDS_IN_SECONDS;
                         long newVideoTime =
-                                BitmovinUtil.toPrimitiveLong(event.getTo().getTime())
+                                Util.toPrimitiveLong(event.getTo().getTime())
                                         * Util.MILLISECONDS_IN_SECONDS;
                         stateMachine.sourceChange(oldVideoTime, newVideoTime, sourceConfig);
                     } else {
@@ -637,7 +637,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 try {
                     if (event.getDownloadType().toString().contains("drm/license")) {
                         drmDownloadTime =
-                                BitmovinUtil.toPrimitiveLong(event.getDownloadTime())
+                                Util.toPrimitiveLong(event.getDownloadTime())
                                         * Util.MILLISECONDS_IN_SECONDS;
                     }
                 } catch (Exception e) {
@@ -709,7 +709,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                         getSourceMetadataMap().get(event.getTo());
                                 activeSeekTransitionFromSource = event.getFrom();
                                 long videoEndTimeOfPreviousSource =
-                                        BitmovinUtil.toPrimitiveLong(
+                                        Util.toPrimitiveLong(
                                                         activeSeekTransitionFromSource
                                                                 .getDuration())
                                                 * Util.MILLISECONDS_IN_SECONDS;
