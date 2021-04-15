@@ -14,7 +14,6 @@ import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.player.api.Player;
 import com.bitmovin.player.api.source.Source;
 import java.util.HashMap;
-import java.util.Map;
 
 public class BitmovinPlayerCollector extends BitmovinAnalytics {
     private HashMap<Source, SourceMetadata> sourceMetadataMap = new HashMap<>();

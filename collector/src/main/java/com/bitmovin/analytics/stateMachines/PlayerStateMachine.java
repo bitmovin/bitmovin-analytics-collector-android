@@ -115,7 +115,7 @@ public class PlayerStateMachine {
         transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime);
 
         if (sourceConfig != null) {
-            this.config.updateSourceMetadata(sourceConfig);
+            this.config.setSourceMetadata(sourceConfig);
         }
 
         transitionState(PlayerState.STARTUP, newVideoTime);

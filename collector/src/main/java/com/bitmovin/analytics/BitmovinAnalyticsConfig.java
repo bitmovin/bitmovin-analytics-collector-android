@@ -95,7 +95,11 @@ public class BitmovinAnalyticsConfig implements Parcelable {
 
     public BitmovinAnalyticsConfig() {}
 
-    public void updateSourceMetadata(SourceMetadata sourceMetadata) {
+    public void setSourceMetadata(SourceMetadata sourceMetadata) {
+        if (sourceMetadata == null) {
+            return;
+        }
+
         Log.d("BitmovinAnalyticsConfig", "Updating Config: " + sourceMetadata.getTitle());
         setCdnProvider(sourceMetadata.getCdnProvider());
         setCustomData1(sourceMetadata.getCustomData1());

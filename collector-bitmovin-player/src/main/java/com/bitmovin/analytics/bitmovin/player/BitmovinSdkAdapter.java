@@ -325,7 +325,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             return;
         }
 
-        config.updateSourceMetadata(sourceConfig);
+        config.setSourceMetadata(sourceConfig);
     }
 
     private void startup() {
@@ -347,7 +347,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     if (sourceConfig == null) {
                         return;
                     }
-                    getConfig().updateSourceMetadata(sourceConfig);
+                    getConfig().setSourceMetadata(sourceConfig);
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
                 }
