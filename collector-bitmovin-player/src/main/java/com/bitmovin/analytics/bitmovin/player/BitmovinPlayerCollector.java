@@ -45,7 +45,7 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
                         deviceInformationProvider,
                         this.playerStateMachine,
                         featureFactory,
-                        (Map<Source, SourceMetadata>) sourceMetadataMap);
+                        sourceMetadataMap);
 
         this.attach(adapter);
 
