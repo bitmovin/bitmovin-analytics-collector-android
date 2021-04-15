@@ -14,11 +14,7 @@ public enum PlayerState {
     },
     SOURCE_CHANGED {
         @Override
-        void onEnterState(PlayerStateMachine machine) {
-            for (StateMachineListener listener : machine.getListeners()) {
-                listener.onSourceChanged();
-            }
-        }
+        void onEnterState(PlayerStateMachine machine) {}
 
         @Override
         void onExitState(

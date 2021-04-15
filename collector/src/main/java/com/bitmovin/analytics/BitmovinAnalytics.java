@@ -377,8 +377,7 @@ public class BitmovinAnalytics
         this.detachPlayer();
     }
 
-    @Override
-    public final void onSourceChanged() {
+    public final void resetSourceRelatedState() {
         this.eventDataDispatcher.resetSourceRelatedState();
         // TODO reset features and prepare for new source
 

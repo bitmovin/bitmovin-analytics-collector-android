@@ -35,6 +35,4 @@ public interface StateMachineListener {
     void onAudioTrackChange();
 
     void onVideoStartFailed();
-
-    void onSourceChanged();
 }
