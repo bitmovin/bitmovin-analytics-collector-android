@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v2.0.0-beta1
+
 ### Added
 - Support for exoplayer version > 2.12
 - Support for BitmovinPlayer version >= 3
