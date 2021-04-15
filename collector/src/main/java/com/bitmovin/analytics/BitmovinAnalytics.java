@@ -385,7 +385,11 @@ public class BitmovinAnalytics
 
     public void setCustomData(CustomData customData) {
         // lambda used because setCustomData on config is protected method
-        this.playerStateMachine.changeCustomData(getPosition(), () -> { this.bitmovinAnalyticsConfig.setCustomData(customData); });
+        this.playerStateMachine.changeCustomData(
+                getPosition(),
+                () -> {
+                    this.bitmovinAnalyticsConfig.setCustomData(customData);
+                });
     }
 
     public void setCustomDataOnce(CustomData customData) {
