@@ -175,13 +175,18 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     public void manipulate(@NotNull EventData data) {
         // if this sample
         Source source = getCurrentSource();
+        SourceMetadata sourceMetadata = getCurrentSourceMetadata();
 
+        boolean fallbackIsLive = config.isLive() != null && config.isLive();
+        if(sourceMetadata != null) {
+            fallbackIsLive = sourceMetadata.isLive() != null && sourceMetadata.isLive();
+        }
         // duration and isLive, streamFormat, mpdUrl, and m3u8Url
         if (source != null) {
             double duration = source.getDuration();
             if (duration == -1) {
-                // Source duration is not available yet, fallback to BitmovinAnalyticsConfig
-                data.setLive(config.isLive() != null && config.isLive());
+                // Source duration is not available yet, fallback to SourceMetadata / BitmovinAnalyticsConfig
+                data.setLive(fallbackIsLive);
             } else {
                 if (duration == Double.POSITIVE_INFINITY) {
                     data.setLive(true);
@@ -222,7 +227,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
         } else {
             // player active Source is not available
-            data.setLive(config.isLive() != null && config.isLive());
+            data.setLive(fallbackIsLive);
         }
 
         data.setPlayer(PlayerType.BITMOVIN.toString());
