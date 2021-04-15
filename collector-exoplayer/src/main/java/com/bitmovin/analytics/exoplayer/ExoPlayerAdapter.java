@@ -39,7 +39,6 @@ import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
-import com.google.android.exoplayer2.decoder.DecoderReuseEvaluation;
 import com.google.android.exoplayer2.drm.DrmInitData;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.source.LoadEventInfo;
@@ -603,28 +602,16 @@ public class ExoPlayerAdapter
             EventTime eventTime, String decoderName, long initializationDurationMs) {}
 
     @Override
-    public void onAudioDecoderReleased(EventTime eventTime, String decoderName) {}
-
-    @Override
     public void onVideoDecoderInitialized(
             EventTime eventTime, String decoderName, long initializationDurationMs) {}
 
     @Override
-    public void onVideoDecoderReleased(EventTime eventTime, String decoderName) {}
-
-    @Override
-    public void onAudioInputFormatChanged(
-            EventTime eventTime,
-            Format format,
-            @androidx.annotation.Nullable DecoderReuseEvaluation decoderReuseEvaluation) {
+    public void onAudioInputFormatChanged(EventTime eventTime, Format format) {
         handleInputFormatChanged(format);
     }
 
     @Override
-    public void onVideoInputFormatChanged(
-            EventTime eventTime,
-            Format format,
-            @androidx.annotation.Nullable DecoderReuseEvaluation decoderReuseEvaluation) {
+    public void onVideoInputFormatChanged(EventTime eventTime, Format format) {
         handleInputFormatChanged(format);
     }
 
@@ -655,9 +642,6 @@ public class ExoPlayerAdapter
 
     @Override
     public void onVideoDisabled(EventTime eventTime, DecoderCounters counters) {}
-
-    @Override
-    public void onAudioSessionIdChanged(EventTime eventTime, int audioSessionId) {}
 
     @Override
     public void onAudioAttributesChanged(EventTime eventTime, AudioAttributes audioAttributes) {
