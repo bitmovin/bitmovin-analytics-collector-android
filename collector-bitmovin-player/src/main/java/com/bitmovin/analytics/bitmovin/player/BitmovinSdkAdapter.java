@@ -722,10 +722,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         return sourceMetadataMap;
     }
 
-    private BitmovinAnalyticsConfig getConfig() {
-        return config;
-    }
-
     private Player getPlayer() {
         return bitmovinPlayer;
     }
