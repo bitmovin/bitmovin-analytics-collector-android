@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.Log;
 import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
@@ -153,9 +154,11 @@ public class BitmovinAnalytics
     public EventData createEventData() {
         DeviceInformationProvider deviceInformationProvider =
                 this.playerAdapter.getDeviceInformationProvider();
+        SourceMetadata currentSourceMetadata = this.playerAdapter.getCurrentSourceMetadata();
         EventData eventData =
                 new EventData(
                         this.bitmovinAnalyticsConfig,
+                        currentSourceMetadata,
                         deviceInformationProvider.getDeviceInformation(),
                         this.playerStateMachine.getImpressionId(),
                         this.userIdProvider.userId());
