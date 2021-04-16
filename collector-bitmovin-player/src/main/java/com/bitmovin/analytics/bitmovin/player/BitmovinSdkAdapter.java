@@ -378,7 +378,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     Player player = getPlayer();
                     long videoTime =
                             (player.getDuration() != Double.POSITIVE_INFINITY)
-                                    ? BitmovinUtil.toPrimitiveLong(player.getDuration())
+                                    ? Util.toPrimitiveLong(player.getDuration())
                                             * Util.MILLISECONDS_IN_SECONDS
                                     : getPosition();
                     stateMachine.transitionState(PlayerState.PAUSE, videoTime);
@@ -442,6 +442,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             (event) -> {
                 try {
                     Log.d(TAG, "On Seek Listener");
+
                     if (!stateMachine.isStartupFinished()) {
                         return;
                     }
@@ -615,7 +616,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 try {
                     if (event.getDownloadType().toString().contains("drm/license")) {
                         drmDownloadTime =
-                                BitmovinUtil.toPrimitiveLong(event.getDownloadTime())
+                                Util.toPrimitiveLong(event.getDownloadTime())
                                         * Util.MILLISECONDS_IN_SECONDS;
                     }
                 } catch (Exception e) {

@@ -126,4 +126,8 @@ public class Util {
             return false;
         }
     }
+
+    public static long toPrimitiveLong(Double value) {
+        return value == null ? 0 : value.longValue();
+    }
 }
