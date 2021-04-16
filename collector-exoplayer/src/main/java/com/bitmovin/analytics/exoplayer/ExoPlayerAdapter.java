@@ -82,8 +82,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     private long previousQualityChangeBitrate = 0;
     private boolean isPlaying = false;
     private boolean isInInitialBufferState = false;
-    private final DefaultAnalyticsListener defaultAnalyticsListener;
-    private final DefaultPlayerEventListener defaultPlayerEventListener;
+    protected final DefaultAnalyticsListener defaultAnalyticsListener;
+    protected final DefaultPlayerEventListener defaultPlayerEventListener;
 
     public ExoPlayerAdapter(
             ExoPlayer exoplayer,
