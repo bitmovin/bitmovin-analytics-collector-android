@@ -5,12 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Development
+## Development v2
+
+### Added
+- Added `setCustomData` and `setCustomDataOnce`
+
+
+## Development v1
 
 ## v2.0.0-beta1
 
 ### Added
 - Support for exoplayer version > 2.12
+- Added `setCustomData` and `setCustomDataOnce`
 
 - [Internal] Separated BitmovinPlayer v2 and v3 collectors and example modules
     - example apps (v1 and latest) package and id renaming
