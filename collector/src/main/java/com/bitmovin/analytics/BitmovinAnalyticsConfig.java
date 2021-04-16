@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 import com.bitmovin.analytics.config.SourceMetadata;
+import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.enums.PlayerType;
 
@@ -33,18 +34,17 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private Boolean isLive;
     private CollectorConfig config = new CollectorConfig();
 
-    public static final Creator<BitmovinAnalyticsConfig> CREATOR =
-            new Creator<BitmovinAnalyticsConfig>() {
-                @Override
-                public BitmovinAnalyticsConfig createFromParcel(Parcel in) {
-                    return new BitmovinAnalyticsConfig(in);
-                }
+    public static final Creator<BitmovinAnalyticsConfig> CREATOR = new Creator<BitmovinAnalyticsConfig>() {
+        @Override
+        public BitmovinAnalyticsConfig createFromParcel(Parcel in) {
+            return new BitmovinAnalyticsConfig(in);
+        }
 
-                @Override
-                public BitmovinAnalyticsConfig[] newArray(int size) {
-                    return new BitmovinAnalyticsConfig[size];
-                }
-            };
+        @Override
+        public BitmovinAnalyticsConfig[] newArray(int size) {
+            return new BitmovinAnalyticsConfig[size];
+        }
+    };
 
     @Deprecated
     public BitmovinAnalyticsConfig(String key, Context context) {
@@ -93,7 +93,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         ads = in.readInt() == 1;
     }
 
-    public BitmovinAnalyticsConfig() {}
+    public BitmovinAnalyticsConfig() {
+    }
 
     public void setSourceMetadata(SourceMetadata sourceMetadata) {
         if (sourceMetadata == null) {
@@ -266,7 +267,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Optional free-form data Not enabled by default Must be activated for your organization
+     * Optional free-form data Not enabled by default Must be activated for your
+     * organization
      *
      * @param customData6
      */
@@ -279,7 +281,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Optional free-form data Not enabled by default Must be activated for your organization
+     * Optional free-form data Not enabled by default Must be activated for your
+     * organization
      *
      * @param customData7
      */
@@ -315,8 +318,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Set MPD URL recorded in analytics. If not set explicitly the collector will retrieve
-     * available information from the player.
+     * Set MPD URL recorded in analytics. If not set explicitly the collector will
+     * retrieve available information from the player.
      *
      * @param mpdUrl
      */
@@ -329,8 +332,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Set M3U8 URL recorded in analytics. If not set explicitly the collector will retrieve
-     * available information from the player.
+     * Set M3U8 URL recorded in analytics. If not set explicitly the collector will
+     * retrieve available information from the player.
      *
      * @param m3u8Url
      */
@@ -413,7 +416,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Returns true if the stream is marked as live before stream metadata is available.
+     * Returns true if the stream is marked as live before stream metadata is
+     * available.
      *
      * @return
      */
@@ -428,5 +432,22 @@ public class BitmovinAnalyticsConfig implements Parcelable {
      */
     public void setIsLive(Boolean live) {
         isLive = live;
+    }
+
+    protected CustomData getCustomData() {
+        return new CustomData(this.getCustomData1(), this.getCustomData2(), this.getCustomData3(),
+                this.getCustomData4(), this.getCustomData5(), this.getCustomData6(), this.getCustomData7(),
+                this.getExperimentName());
+    }
+
+    protected void setCustomData(CustomData customData) {
+        this.setCustomData1(customData.getCustomData1());
+        this.setCustomData2(customData.getCustomData2());
+        this.setCustomData3(customData.getCustomData3());
+        this.setCustomData4(customData.getCustomData4());
+        this.setCustomData5(customData.getCustomData5());
+        this.setCustomData6(customData.getCustomData6());
+        this.setCustomData7(customData.getCustomData7());
+        this.setExperimentName(customData.getExperimentName());
     }
 }

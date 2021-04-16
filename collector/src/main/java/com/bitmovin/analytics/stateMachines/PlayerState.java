@@ -164,6 +164,15 @@ public enum PlayerState {
             }
         }
     },
+    CUSTOMDATACHANGE {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {}
+
+        @Override
+        void onExitState(
+                PlayerStateMachine machine, long elapsedTime, PlayerState destinationPlayerState) {}
+    },
+
     AUDIOTRACKCHANGE {
         @Override
         void onEnterState(PlayerStateMachine machine) {}
