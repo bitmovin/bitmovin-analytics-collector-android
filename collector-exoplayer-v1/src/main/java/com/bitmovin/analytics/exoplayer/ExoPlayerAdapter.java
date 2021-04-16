@@ -318,7 +318,9 @@ public class ExoPlayerAdapter
 
     @Override
     public void onPlayerStateChanged(
-            EventTime eventTime, boolean playWhenReady, int playbackState) {}
+            EventTime eventTime, boolean playWhenReady, int playbackState) {
+        /* On some devices ExoPlayer crashes if not every method is overridden, despite a default implementation in their code. */
+    }
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
