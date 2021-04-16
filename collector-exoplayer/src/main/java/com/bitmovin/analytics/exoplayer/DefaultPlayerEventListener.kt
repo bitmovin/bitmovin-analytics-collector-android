@@ -8,7 +8,7 @@ import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 
-abstract class DefaultPlayerEventListener: Player.EventListener {
+abstract class DefaultPlayerEventListener : Player.EventListener {
     override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {}
 
     override fun onSeekProcessed() {}

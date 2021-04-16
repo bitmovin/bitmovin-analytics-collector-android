@@ -16,7 +16,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import java.io.IOException
 import java.lang.Exception
 
-abstract class DefaultAnalyticsListener: AnalyticsListener {
+abstract class DefaultAnalyticsListener : AnalyticsListener {
     override fun onSeekProcessed(eventTime: AnalyticsListener.EventTime) {}
 
     override fun onIsLoadingChanged(eventTime: AnalyticsListener.EventTime, isLoading: Boolean) {}
