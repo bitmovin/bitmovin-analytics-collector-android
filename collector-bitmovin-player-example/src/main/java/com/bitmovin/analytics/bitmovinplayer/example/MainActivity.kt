@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
 import com.bitmovin.analytics.config.SourceMetadata
+import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.player.PlayerView
 import com.bitmovin.player.api.PlaybackConfig
@@ -74,6 +75,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.seek_second_source).setOnClickListener {
             val secondSource = player?.playlist?.sources?.get(1) ?: return@setOnClickListener
             player?.playlist?.seek(secondSource, 10.0)
+        }
+        findViewById<Button>(R.id.setCustomData).setOnClickListener {
+            setCustomData()
         }
 
         playerView = findViewById(R.id.playerView)
@@ -145,6 +149,14 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         playerView!!.onDestroy()
         super.onDestroy()
+    }
+
+    private fun setCustomData() {
+        val collector = bitmovinPlayerCollector ?: return
+        val customData: CustomData = collector.customData
+        customData.customData2 = "custom_data_2_changed"
+        customData.customData4 = "custom_data_4_changed"
+        collector.customData = customData
     }
 
     companion object {

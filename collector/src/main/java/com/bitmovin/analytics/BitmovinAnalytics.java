@@ -9,6 +9,7 @@ import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
+import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
@@ -24,6 +25,7 @@ import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureManager;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.LicenseCallback;
+import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.Util;
@@ -384,6 +386,33 @@ public class BitmovinAnalytics
         if (this.playerAdapter != null) {
             this.playerAdapter.resetSourceRelatedState();
         }
+    }
+
+    public CustomData getCustomData() {
+        return this.bitmovinAnalyticsConfig.getCustomData();
+    }
+
+    public void setCustomData(CustomData customData) {
+        // lambda used because setCustomData on config is protected method
+        this.playerStateMachine.changeCustomData(
+                getPosition(),
+                () -> {
+                    this.bitmovinAnalyticsConfig.setCustomData(customData);
+                });
+    }
+
+    public void setCustomDataOnce(CustomData customData) {
+        if (playerAdapter == null) {
+            Log.d(TAG, "Custom data could not be set because player is not attached");
+            return;
+        }
+
+        CustomData currentCustomData = this.bitmovinAnalyticsConfig.getCustomData();
+        this.bitmovinAnalyticsConfig.setCustomData(customData);
+        EventData eventData = createEventData();
+        eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
+        sendEventData(eventData);
+        this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
     }
 
     public void sendEventData(EventData data) {

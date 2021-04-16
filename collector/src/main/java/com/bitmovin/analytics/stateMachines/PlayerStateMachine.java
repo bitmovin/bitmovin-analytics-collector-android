@@ -271,6 +271,19 @@ public class PlayerStateMachine {
         this.qualityChangeCount = 0;
     }
 
+    public void changeCustomData(long position, Runnable updateConfig) {
+        PlayerState originalState = this.getCurrentState();
+        boolean shouldTransition =
+                originalState == PlayerState.PLAYING || originalState == PlayerState.PAUSE;
+        if (shouldTransition) {
+            this.transitionState(PlayerState.CUSTOMDATACHANGE, position);
+        }
+        updateConfig.run();
+        if (shouldTransition) {
+            this.transitionState(originalState, position);
+        }
+    }
+
     protected CountDownTimer qualityChangeResetTimeout =
             new CountDownTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL, 1000) {
 
