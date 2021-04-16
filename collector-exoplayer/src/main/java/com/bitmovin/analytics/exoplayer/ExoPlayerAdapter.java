@@ -59,7 +59,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ExoPlayerAdapter
-        implements PlayerAdapter, Player.EventListener, EventDataManipulator {
+        implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "ExoPlayerAdapter";
 
     private static final String DASH_MANIFEST_CLASSNAME =
@@ -86,7 +86,8 @@ public class ExoPlayerAdapter
     private long previousQualityChangeBitrate = 0;
     private boolean isPlaying = false;
     private boolean isInInitialBufferState = false;
-    private DefaultAnalyticsListener defaultAnalyticsListener;
+    private final DefaultAnalyticsListener defaultAnalyticsListener;
+    private final DefaultPlayerEventListener defaultPlayerEventListener;
 
     public ExoPlayerAdapter(
             ExoPlayer exoplayer,
@@ -94,9 +95,10 @@ public class ExoPlayerAdapter
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine) {
         this.defaultAnalyticsListener = createAnalyticsListener();
+        this.defaultPlayerEventListener = createPlayerEventListener();
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
-        this.exoplayer.addListener(this);
+        this.exoplayer.addListener(defaultPlayerEventListener);
         this.config = config;
         this.deviceInformationProvider = deviceInformationProvider;
         attachAnalyticsListener();
@@ -258,7 +260,7 @@ public class ExoPlayerAdapter
         this.isInInitialBufferState = false;
         manifestUrl = null;
         if (this.exoplayer != null) {
-            this.exoplayer.removeListener(this);
+            this.exoplayer.removeListener(this.defaultPlayerEventListener);
         }
         if (this.exoplayer instanceof SimpleExoPlayer) {
             SimpleExoPlayer simpleExoPlayer = (SimpleExoPlayer) this.exoplayer;
@@ -311,21 +313,6 @@ public class ExoPlayerAdapter
     @Override
     public void clearValues() {
         meter.reset();
-    }
-
-    @Override
-    public void onTimelineChanged(Timeline timeline, int reason) {
-        Log.d(TAG, "onTimelineChanged");
-    }
-
-    @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-        Log.d(TAG, "onTracksChanged");
-    }
-
-    @Override
-    public void onIsLoadingChanged(boolean isLoading) {
-        Log.d(TAG, "onIsLoadingChanged");
     }
 
     private DefaultAnalyticsListener createAnalyticsListener() {
@@ -547,49 +534,67 @@ public class ExoPlayerAdapter
         };
     }
 
-    @Override
-    public void onIsPlayingChanged(boolean isPlaying) {}
-
-    @Override
-    public void onRepeatModeChanged(int repeatMode) {
-        Log.d(TAG, "onRepeatModeChanged");
-    }
-
-    @Override
-    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-        Log.d(TAG, "onShuffleModeEnabledChanged");
-    }
-
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-        try {
-            Log.d(TAG, "onPlayerError");
-            long videoTime = getPosition();
-            error.printStackTrace();
-            ErrorCode errorCode = exceptionMapper.map(error);
-            if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-                stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
+    private DefaultPlayerEventListener createPlayerEventListener()
+    {
+        return new DefaultPlayerEventListener()
+        {
+            @Override
+            public void onRepeatModeChanged(int repeatMode) {
+                Log.d(TAG, "onRepeatModeChanged");
             }
-            this.stateMachine.setErrorCode(errorCode);
-            this.stateMachine.transitionState(PlayerState.ERROR, videoTime);
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
-    }
 
-    @Override
-    public void onPositionDiscontinuity(int reason) {
-        Log.d(TAG, "onPositionDiscontinuity");
-    }
+            @Override
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+                Log.d(TAG, "onShuffleModeEnabledChanged");
+            }
 
-    @Override
-    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-        Log.d(TAG, "onPlaybackParametersChanged");
-    }
+            @Override
+            public void onPlayerError(ExoPlaybackException error) {
+                try {
+                    Log.d(TAG, "onPlayerError");
+                    long videoTime = getPosition();
+                    error.printStackTrace();
+                    ErrorCode errorCode = exceptionMapper.map(error);
+                    if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
+                        stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
+                    }
+                    ExoPlayerAdapter.this.stateMachine.setErrorCode(errorCode);
+                    ExoPlayerAdapter.this.stateMachine.transitionState(PlayerState.ERROR, videoTime);
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
+            }
 
-    @Override
-    public void onPlaybackSuppressionReasonChanged(int playbackSuppressionReason) {
-        Log.d(TAG, "onPlaybackSuppressionReasonChanged " + playbackSuppressionReason);
+            @Override
+            public void onPositionDiscontinuity(int reason) {
+                Log.d(TAG, "onPositionDiscontinuity");
+            }
+
+            @Override
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+                Log.d(TAG, "onPlaybackParametersChanged");
+            }
+
+            @Override
+            public void onPlaybackSuppressionReasonChanged(int playbackSuppressionReason) {
+                Log.d(TAG, "onPlaybackSuppressionReasonChanged " + playbackSuppressionReason);
+            }
+
+            @Override
+            public void onTimelineChanged(Timeline timeline, int reason) {
+                Log.d(TAG, "onTimelineChanged");
+            }
+
+            @Override
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+                Log.d(TAG, "onTracksChanged");
+            }
+
+            @Override
+            public void onIsLoadingChanged(boolean isLoading) {
+                Log.d(TAG, "onIsLoadingChanged");
+            }
+        };
     }
 
     private void addDrmType(MediaLoadData mediaLoadData) {
