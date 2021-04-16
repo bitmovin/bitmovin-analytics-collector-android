@@ -32,17 +32,18 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private Boolean isLive;
     private CollectorConfig config = new CollectorConfig();
 
-    public static final Creator<BitmovinAnalyticsConfig> CREATOR = new Creator<BitmovinAnalyticsConfig>() {
-        @Override
-        public BitmovinAnalyticsConfig createFromParcel(Parcel in) {
-            return new BitmovinAnalyticsConfig(in);
-        }
+    public static final Creator<BitmovinAnalyticsConfig> CREATOR =
+            new Creator<BitmovinAnalyticsConfig>() {
+                @Override
+                public BitmovinAnalyticsConfig createFromParcel(Parcel in) {
+                    return new BitmovinAnalyticsConfig(in);
+                }
 
-        @Override
-        public BitmovinAnalyticsConfig[] newArray(int size) {
-            return new BitmovinAnalyticsConfig[size];
-        }
-    };
+                @Override
+                public BitmovinAnalyticsConfig[] newArray(int size) {
+                    return new BitmovinAnalyticsConfig[size];
+                }
+            };
 
     @Deprecated
     public BitmovinAnalyticsConfig(String key, Context context) {
@@ -91,8 +92,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         ads = in.readInt() == 1;
     }
 
-    public BitmovinAnalyticsConfig() {
-    }
+    public BitmovinAnalyticsConfig() {}
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -242,8 +242,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Optional free-form data Not enabled by default Must be activated for your
-     * organization
+     * Optional free-form data Not enabled by default Must be activated for your organization
      *
      * @param customData6
      */
@@ -256,8 +255,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Optional free-form data Not enabled by default Must be activated for your
-     * organization
+     * Optional free-form data Not enabled by default Must be activated for your organization
      *
      * @param customData7
      */
@@ -293,8 +291,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Set MPD URL recorded in analytics. If not set explicitly the collector will
-     * retrieve available information from the player.
+     * Set MPD URL recorded in analytics. If not set explicitly the collector will retrieve
+     * available information from the player.
      *
      * @param mpdUrl
      */
@@ -307,8 +305,8 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Set M3U8 URL recorded in analytics. If not set explicitly the collector will
-     * retrieve available information from the player.
+     * Set M3U8 URL recorded in analytics. If not set explicitly the collector will retrieve
+     * available information from the player.
      *
      * @param m3u8Url
      */
@@ -391,8 +389,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     /**
-     * Returns true if the stream is marked as live before stream metadata is
-     * available.
+     * Returns true if the stream is marked as live before stream metadata is available.
      *
      * @return
      */
@@ -410,8 +407,14 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     protected CustomData getCustomData() {
-        return new CustomData(this.getCustomData1(), this.getCustomData2(), this.getCustomData3(),
-                this.getCustomData4(), this.getCustomData5(), this.getCustomData6(), this.getCustomData7(),
+        return new CustomData(
+                this.getCustomData1(),
+                this.getCustomData2(),
+                this.getCustomData3(),
+                this.getCustomData4(),
+                this.getCustomData5(),
+                this.getCustomData6(),
+                this.getCustomData7(),
                 this.getExperimentName());
     }
 
