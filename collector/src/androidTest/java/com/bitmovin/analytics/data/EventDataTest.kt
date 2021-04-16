@@ -25,7 +25,7 @@ class EventDataTest {
     @Test
     fun testEventDataContainsDeviceInformation() {
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", false, "user-agent", "de", "package-name", 100, 200)
-        val eventData = EventData(bitmovinAnalyticsConfig, deviceInformation, impressionId, userId)
+        val eventData = EventData(bitmovinAnalyticsConfig, null, deviceInformation, impressionId, userId)
 
         assertThat(eventData.deviceInformation.manufacturer).isEqualTo("myManufacturer")
         assertThat(eventData.deviceInformation.model).isEqualTo("myModel")
@@ -41,7 +41,7 @@ class EventDataTest {
     @Test
     fun testEventDataSetsPlatformToAndroidTVIfDeviceInformationIsTVIsTrue() {
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", true, "user-agent", "de", "package-name", 100, 200)
-        val eventData = EventData(bitmovinAnalyticsConfig, deviceInformation, impressionId, userId)
+        val eventData = EventData(bitmovinAnalyticsConfig, null, deviceInformation, impressionId, userId)
 
         assertThat(eventData.platform).isEqualTo("androidTV")
     }
