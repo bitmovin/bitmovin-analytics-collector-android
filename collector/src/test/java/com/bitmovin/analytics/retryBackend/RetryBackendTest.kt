@@ -62,7 +62,7 @@ class RetryBackendTest {
     }
 
     private fun setupEventData(sequenceNumber: Int): EventData {
-        var eventData = EventData(config, deviceInformation, "testImpressionId", "userId")
+        var eventData = EventData(config, null, deviceInformation, "testImpressionId", "userId")
         eventData.sequenceNumber = sequenceNumber
         return eventData
     }

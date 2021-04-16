@@ -15,7 +15,7 @@ class DeviceInformationDtoDataSerializationTest {
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", false, "user-agent", "de", "package-name", 100, 200)
         // #endregion
 
-        val data = EventData(config, deviceInformation, "1234", "user-id")
+        val data = EventData(config, null, deviceInformation, "1234", "user-id")
         val serialized = DataSerializer.serialize(data)
 
         assertThat(serialized).contains("\"deviceInformation\":{")

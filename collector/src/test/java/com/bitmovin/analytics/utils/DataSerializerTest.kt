@@ -20,7 +20,7 @@ class DataSerializerTest {
 
         val errorCode = ErrorCode(1000, "Error Description", ErrorData("Error Data Message", arrayOf("first line of details", "second line of details")))
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig(analyticsLicenseKey, playerLicenseKey)
-        val eventData = EventData(bitmovinAnalyticsConfig, deviceInformation, impressionId, userId)
+        val eventData = EventData(bitmovinAnalyticsConfig, null, deviceInformation, impressionId, userId)
 
         eventData.m3u8Url = "https://www.mydomain.com/playlist.m3u8"
         eventData.ad = 0
@@ -41,7 +41,7 @@ class DataSerializerTest {
 
         val errorCode = ErrorCode(1000, "Error Description", null)
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig(analyticsLicenseKey, playerLicenseKey)
-        val eventData = EventData(bitmovinAnalyticsConfig, deviceInformation, impressionId, userId)
+        val eventData = EventData(bitmovinAnalyticsConfig, null, deviceInformation, impressionId, userId)
 
         eventData.m3u8Url = "https://www.mydomain.com/playlist.m3u8"
         eventData.ad = 0
