@@ -16,6 +16,11 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import java.io.IOException
 import java.lang.Exception
 
+/**
+ * ExoPlayer already has default implementations for all methods of the interface,
+ * but on some devices the code crashes with a `AbstractMethodException`, so we need
+ * our own default implementation as well.
+ */
 abstract class DefaultAnalyticsListener : AnalyticsListener {
     override fun onSeekProcessed(eventTime: AnalyticsListener.EventTime) {}
 

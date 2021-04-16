@@ -8,6 +8,11 @@ import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 
+/**
+ * ExoPlayer already has default implementations for all methods of the interface,
+ * but on some devices the code crashes with a `AbstractMethodException`, so we need
+ * our own default implementation as well.
+ */
 abstract class DefaultPlayerEventListener : Player.EventListener {
     override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {}
 
