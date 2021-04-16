@@ -691,8 +691,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             // source or seeking to another source. In both cases, we set the
                             // videoEndTime to the duration of the old source.
                             long videoEndTimeOfPreviousSource =
-                                    BitmovinUtil.toPrimitiveLong(
-                                                    overrideCurrentSource.getDuration())
+                                    Util.toPrimitiveLong(overrideCurrentSource.getDuration())
                                             * Util.MILLISECONDS_IN_SECONDS;
                             stateMachine.sourceChange(videoEndTimeOfPreviousSource, getPosition());
                         } catch (Exception e) {
