@@ -11,24 +11,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `setCustomData` and `setCustomDataOnce`
 
 ### Changed
+- Added default implementation of AnalyticsListener.onPlayerStateChanged to avoid ExoPlayer crashes on certain devices
 
 ### Removed
 
 ## Development v1
 
 ### Added
+- `setCustomData` and `setCustomDataOnce`
 
 ### Changed
+- Added default implementation of AnalyticsListener.onPlayerStateChanged to avoid ExoPlayer crashes on certain devices
 
 ### Removed
 
 --------------------------------------------
-
-## v1.22.2
-
-### Added
-- `setCustomData` and `setCustomDataOnce`
-
 
 ## v2.0.0-beta1
 

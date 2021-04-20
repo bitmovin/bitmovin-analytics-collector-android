@@ -301,6 +301,12 @@ public class ExoPlayerAdapter
     }
 
     @Override
+    public void onTimelineChanged(
+            Timeline timeline, @androidx.annotation.Nullable Object manifest, int reason) {
+        /* On some devices ExoPlayer crashes if not every method is overridden, despite a default implementation in their code. */
+    }
+
+    @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
         Log.d(TAG, "onTracksChanged");
     }
@@ -308,6 +314,12 @@ public class ExoPlayerAdapter
     @Override
     public void onLoadingChanged(boolean isLoading) {
         Log.d(TAG, "onLoadingChanged");
+    }
+
+    @Override
+    public void onPlayerStateChanged(
+            EventTime eventTime, boolean playWhenReady, int playbackState) {
+        /* On some devices ExoPlayer crashes if not every method is overridden, despite a default implementation in their code. */
     }
 
     @Override
@@ -428,6 +440,11 @@ public class ExoPlayerAdapter
     @Override
     public void onPlaybackSuppressionReasonChanged(int playbackSuppressionReason) {
         Log.d(TAG, "onPlaybackSuppressionReasonChanged " + playbackSuppressionReason);
+    }
+
+    @Override
+    public void onIsPlayingChanged(boolean isPlaying) {
+        /* On some devices ExoPlayer crashes if not every method is overridden, despite a default implementation in their code. */
     }
 
     @Override
