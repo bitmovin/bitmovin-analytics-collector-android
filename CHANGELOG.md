@@ -18,14 +18,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development v1
 
 ### Added
+
+### Changed
+
+### Removed
+
+--------------------------------------------
+
+## v1.23.0
+
+### Added
 - `setCustomData` and `setCustomDataOnce`
 
 ### Changed
 - Added default implementation of AnalyticsListener.onPlayerStateChanged to avoid ExoPlayer crashes on certain devices
 
 ### Removed
-
---------------------------------------------
 
 ## v2.0.0-beta1
 
