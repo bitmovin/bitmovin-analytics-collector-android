@@ -6,34 +6,30 @@ import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.utils.Util
 
 class EventData(
-    bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
-    sourceMetadata: SourceMetadata?,
     deviceInfo: DeviceInformation,
     val impressionId: String,
-    val userId: String
+    val userId: String,
+    val key: String?,
+    val playerKey: String?,
+    val videoId: String?,
+    val customUserId: String?,
+    val customData1: String?,
+    val customData2: String?,
+    val customData3: String?,
+    val customData4: String?,
+    val customData5: String?,
+    val customData6: String?,
+    val customData7: String?,
+    val path: String?,
+    val experimentName: String?,
+    val cdnProvider: String?,
+    val player: String?
 ) {
     val userAgent: String = deviceInfo.userAgent
     val deviceInformation: DeviceInformationDto = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV)
     val language: String = deviceInfo.locale
     val analyticsVersion: String = BuildConfig.VERSION_NAME
     val playerTech: String = Util.PLAYER_TECH
-
-    val key: String? = bitmovinAnalyticsConfig.key
-    val playerKey: String? = bitmovinAnalyticsConfig.playerKey
-    val videoId: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.videoId else sourceMetadata.videoId
-    val videoTitle: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.title else sourceMetadata.title
-    val customUserId: String? = bitmovinAnalyticsConfig.customUserId
-    val customData1: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.customData1 else sourceMetadata.customData1
-    val customData2: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.customData2 else sourceMetadata.customData2
-    val customData3: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.customData3 else sourceMetadata.customData3
-    val customData4: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.customData4 else sourceMetadata.customData4
-    val customData5: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.customData5 else sourceMetadata.customData5
-    val customData6: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.customData6 else sourceMetadata.customData6
-    val customData7: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.customData7 else sourceMetadata.customData7
-    val path: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.path else sourceMetadata.path
-    val experimentName: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.experimentName else sourceMetadata.experimentName
-    val cdnProvider: String? = if (sourceMetadata == null) bitmovinAnalyticsConfig.cdnProvider else sourceMetadata.cdnProvider
-    var player: String? = bitmovinAnalyticsConfig.playerType?.toString()
 
     val domain: String = deviceInfo.packageName
     val screenHeight: Int = deviceInfo.screenHeight

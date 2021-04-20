@@ -14,6 +14,7 @@ import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
+import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.data.UserIdProvider;
@@ -42,7 +43,7 @@ import org.jetbrains.annotations.Nullable;
  * supports analytics of ExoPlayer video players
  */
 public class BitmovinAnalytics
-        implements StateMachineListener, LicenseCallback, EventDataManipulatorPipeline {
+        implements StateMachineListener, LicenseCallback {
 
     private static final String TAG = "BitmovinAnalytics";
 
@@ -56,8 +57,8 @@ public class BitmovinAnalytics
     protected BitmovinAdAnalytics adAnalytics;
     protected IEventDataDispatcher eventDataDispatcher;
     protected Context context;
-    private final List<EventDataManipulator> eventDataManipulators = new ArrayList<>();
     private final UserIdProvider userIdProvider;
+    private final EventDataFactory eventDataFactory;
 
     /**
      * Bitmovin Analytics
@@ -73,6 +74,7 @@ public class BitmovinAnalytics
         this.context = context;
         this.userIdProvider = new UserIdProvider(context);
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
+        this.eventDataFactory = new EventDataFactory(bitmovinAnalyticsConfig, this.userIdProvider);
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
         this.playerStateMachine.addListener(this);
         IEventDataDispatcher innerEventDataDispatcher =
@@ -110,10 +112,9 @@ public class BitmovinAnalytics
         Collection<Feature<?>> features = this.playerAdapter.init();
         this.featureManager.registerFeatures(features);
 
-        this.eventDataManipulators.clear();
         // this.registerEventDataManipulators(prePipelineManipulator);
-        this.playerAdapter.registerEventDataManipulators(this);
-        this.registerEventDataManipulator(
+        this.playerAdapter.registerEventDataManipulators(eventDataFactory);
+        this.eventDataFactory.registerEventDataManipulator(
                 new ManifestUrlEventDataManipulator(
                         this.playerAdapter, this.bitmovinAnalyticsConfig));
         // this.registerEventDataManipulators(postPipelineManipulator);
@@ -141,6 +142,7 @@ public class BitmovinAnalytics
             playerStateMachine.resetStateMachine();
         }
         eventDataDispatcher.disable();
+        eventDataFactory.clearEventDataManipulators();
     }
 
     private void detachAd() {
@@ -149,28 +151,8 @@ public class BitmovinAnalytics
         }
     }
 
-    @Override
-    public void registerEventDataManipulator(@NotNull EventDataManipulator manipulator) {
-        this.eventDataManipulators.add(manipulator);
-    }
-
     public EventData createEventData() {
-        DeviceInformationProvider deviceInformationProvider =
-                this.playerAdapter.getDeviceInformationProvider();
-        SourceMetadata currentSourceMetadata = this.playerAdapter.getCurrentSourceMetadata();
-        EventData eventData =
-                new EventData(
-                        this.bitmovinAnalyticsConfig,
-                        currentSourceMetadata,
-                        deviceInformationProvider.getDeviceInformation(),
-                        this.playerStateMachine.getImpressionId(),
-                        this.userIdProvider.userId());
-
-        for (EventDataManipulator decorator : this.eventDataManipulators) {
-            decorator.manipulate(eventData);
-        }
-
-        return eventData;
+        return eventDataFactory.create(playerStateMachine.getImpressionId(),playerAdapter.getCurrentSourceMetadata(),playerAdapter.getDeviceInformationProvider());
     }
 
     @Override
