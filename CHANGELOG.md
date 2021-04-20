@@ -8,10 +8,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development v2
 
 ### Added
-- Added `setCustomData` and `setCustomDataOnce`
+- `setCustomData` and `setCustomDataOnce`
 
+### Changed
+
+### Removed
 
 ## Development v1
+
+### Added
+
+### Changed
+
+### Removed
+
+--------------------------------------------
+
+## v1.22.2
+
+### Added
+- `setCustomData` and `setCustomDataOnce`
+
 
 ## v2.0.0-beta1
 
