@@ -12,34 +12,51 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/release_button"
+                    android:layout_width="194dp"
+                    android:layout_height="match_parent"
+                    android:text="Release" />
+
+                <Button
+                    android:id="@+id/create_button"
+                    android:layout_width="215dp"
+                    android:layout_height="match_parent"
+                    android:text="Create" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/source_change_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Change Source" />
+
+                <Button
+                    android:id="@+id/set_custom_data"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Set custom data" />
+            </TableRow>
+
+        </TableLayout>
         <com.google.android.exoplayer2.ui.PlayerView
             android:id="@+id/a_main_exoplayer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight=".5">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <Button
-                    android:id="@+id/release_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Release"
-                    />
-                <Button
-                    android:id="@+id/create_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Create"
-                    />
-                <Button
-                    android:id="@+id/source_change_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Change Source"
-                    />
-            </LinearLayout>
 
         </com.google.android.exoplayer2.ui.PlayerView>
 

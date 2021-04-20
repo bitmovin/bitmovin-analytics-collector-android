@@ -5,13 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Development - v1
+## Development v2
+
+### Added
+
+- Added `setCustomData` and `setCustomDataOnce`
 
 ### Changed
 
 - Added default implementation of AnalyticsListener.onPlayerStateChanged to avoid ExoPlayer crashes on certain devices
 
-## Development - v2
+## Development v1
+
+### Changed
 
 - Added default implementation of AnalyticsListener.onPlayerStateChanged to avoid ExoPlayer crashes on certain devices
 
@@ -19,6 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Support for exoplayer version > 2.12
+- Added `setCustomData` and `setCustomDataOnce`
 
 - [Internal] Separated BitmovinPlayer v2 and v3 collectors and example modules
     - example apps (v1 and latest) package and id renaming

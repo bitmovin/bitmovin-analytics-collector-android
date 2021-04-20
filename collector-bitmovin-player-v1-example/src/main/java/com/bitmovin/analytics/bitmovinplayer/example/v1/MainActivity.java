@@ -6,6 +6,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector;
+import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.player.BitmovinPlayer;
 import com.bitmovin.player.BitmovinPlayerView;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button changeSource;
     private Button changeAudio;
     private Button changeSubtitle;
+    private Button setCustomData;
     private PlayerConfiguration config;
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
 
@@ -56,7 +58,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         changeAudio = findViewById(R.id.change_audio);
         changeAudio.setOnClickListener(this);
         changeSubtitle = findViewById(R.id.change_subtitle);
-        changeAudio.setOnClickListener(this);
+        changeSubtitle.setOnClickListener(this);
+        setCustomData = findViewById(R.id.setCustomData);
+        setCustomData.setOnClickListener(this);
 
         this.bitmovinPlayerView = this.findViewById(R.id.bitmovinPlayerView);
 
@@ -177,6 +181,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             onAudioTrackChange();
         } else if (v == changeSubtitle) {
             onSubtitleChange();
+        } else if (v == setCustomData) {
+            setCustomData();
         }
     }
 
@@ -207,6 +213,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         String id = available[(index + 1) % available.length].getId();
         bitmovinPlayer.setSubtitle(id);
+    }
+
+    private void setCustomData() {
+        CustomData customData = bitmovinAnalytics.getCustomData();
+        customData.setCustomData2("custom_data_2_changed");
+        customData.setCustomData4("custom_data_4_changed");
+        bitmovinAnalytics.setCustomData(customData);
     }
 
     private static final String AD_SOURCE_1 =
