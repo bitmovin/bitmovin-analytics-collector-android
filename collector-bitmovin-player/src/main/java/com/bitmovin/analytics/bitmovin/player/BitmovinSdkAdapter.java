@@ -695,7 +695,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                             * Util.MILLISECONDS_IN_SECONDS;
 
                             boolean shouldStartup = getPlayer().isPlaying();
-                            stateMachine.sourceChange(videoEndTimeOfPreviousSource, getPosition(), shouldStartup);
+                            stateMachine.sourceChange(
+                                    videoEndTimeOfPreviousSource, getPosition(), shouldStartup);
                         } catch (Exception e) {
                             Log.d(TAG, e.getMessage(), e);
                         }
