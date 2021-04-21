@@ -30,6 +30,7 @@ class EventDataFactory(private val config: BitmovinAnalyticsConfig, private val 
                 if (sourceMetadata == null) config.path else sourceMetadata.path,
                 if (sourceMetadata == null) config.experimentName else sourceMetadata.experimentName,
                 if (sourceMetadata == null) config.cdnProvider else sourceMetadata.cdnProvider,
+                /*TODO This will always be overridden in the adapters, we need a logic like with m3u8 url*/
                 config.playerType?.toString())
 
         for (decorator in eventDataManipulators) {

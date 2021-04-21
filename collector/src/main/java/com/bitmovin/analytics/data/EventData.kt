@@ -23,7 +23,7 @@ class EventData(
     val path: String?,
     val experimentName: String?,
     val cdnProvider: String?,
-    val player: String?
+    var player: String?
 ) {
     val userAgent: String = deviceInfo.userAgent
     val deviceInformation: DeviceInformationDto = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV)
