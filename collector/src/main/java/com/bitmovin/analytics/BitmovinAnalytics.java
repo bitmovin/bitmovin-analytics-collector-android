@@ -6,20 +6,16 @@ import android.content.Context;
 import android.util.Log;
 import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
-import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
 import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.data.UserIdProvider;
-import com.bitmovin.analytics.data.manipulators.EventDataManipulator;
-import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
 import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.features.Feature;
@@ -30,10 +26,8 @@ import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.Util;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,8 +36,7 @@ import org.jetbrains.annotations.Nullable;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics
-        implements StateMachineListener, LicenseCallback {
+public class BitmovinAnalytics implements StateMachineListener, LicenseCallback {
 
     private static final String TAG = "BitmovinAnalytics";
 
@@ -152,7 +145,10 @@ public class BitmovinAnalytics
     }
 
     public EventData createEventData() {
-        return eventDataFactory.create(playerStateMachine.getImpressionId(),playerAdapter.getCurrentSourceMetadata(),playerAdapter.getDeviceInformationProvider());
+        return eventDataFactory.create(
+                playerStateMachine.getImpressionId(),
+                playerAdapter.getCurrentSourceMetadata(),
+                playerAdapter.getDeviceInformationProvider());
     }
 
     @Override
