@@ -5,6 +5,7 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.data.EventDataFactory
 import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
@@ -35,7 +36,7 @@ class ManifestUrlEventDataManipulatorTest {
         val adapter = mockk<PlayerAdapter>(relaxed = true)
         every { adapter.currentSourceMetadata } returns null
 
-        val eventData = EventData(bitmovinAnalyticsConfigMock, null, deviceInformation, impressionId, userId)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, mockk(relaxed = true))
         eventData.m3u8Url = "foo"
         // #endregion
 
@@ -53,7 +54,7 @@ class ManifestUrlEventDataManipulatorTest {
         val adapter = mockk<PlayerAdapter>(relaxed = true)
         every { adapter.currentSourceMetadata } returns null
 
-        val eventData = EventData(bitmovinAnalyticsConfigMock, null, deviceInformation, impressionId, userId)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
         eventData.mpdUrl = "foo"
         // #endregion
 
@@ -72,7 +73,7 @@ class ManifestUrlEventDataManipulatorTest {
         val sourceMetadata = SourceMetadata(m3u8Url = "bar")
         every { adapter.currentSourceMetadata } returns sourceMetadata
 
-        val eventData = EventData(bitmovinAnalyticsConfigMock, null, deviceInformation, impressionId, userId)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
         eventData.m3u8Url = "foo"
         // #endregion
 
@@ -91,7 +92,7 @@ class ManifestUrlEventDataManipulatorTest {
         val sourceMetadata = SourceMetadata(mpdUrl = "bar")
         every { adapter.currentSourceMetadata } returns sourceMetadata
 
-        val eventData = EventData(bitmovinAnalyticsConfigMock, null, deviceInformation, impressionId, userId)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
         eventData.mpdUrl = "foo"
         // #endregion
 

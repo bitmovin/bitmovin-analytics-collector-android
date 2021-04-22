@@ -3,6 +3,8 @@ package com.bitmovin.analytics.retryBackend
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.data.EventDataFactory
+import io.mockk.mockk
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -22,7 +24,7 @@ class RetryQueueTest {
     }
 
     private fun setupEventData(sequenceNumber: Int): EventData {
-        var eventData = EventData(config, null, deviceInformation, "testImpressionId", "userId")
+        var eventData = EventDataFactory(config, mockk(relaxed = true)).create("testImpressionId", null, deviceInformation)
         eventData.sequenceNumber = sequenceNumber
         return eventData
     }

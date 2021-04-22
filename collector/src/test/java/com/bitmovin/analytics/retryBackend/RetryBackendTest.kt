@@ -5,11 +5,13 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.data.EventDataFactory
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.mockk
 import java.net.SocketTimeoutException
 import java.util.Calendar
 import java.util.Date
@@ -62,7 +64,7 @@ class RetryBackendTest {
     }
 
     private fun setupEventData(sequenceNumber: Int): EventData {
-        var eventData = EventData(config, null, deviceInformation, "testImpressionId", "userId")
+        var eventData = EventDataFactory(config, mockk(relaxed = true)).create("testImpressionId", null, deviceInformation)
         eventData.sequenceNumber = sequenceNumber
         return eventData
     }
