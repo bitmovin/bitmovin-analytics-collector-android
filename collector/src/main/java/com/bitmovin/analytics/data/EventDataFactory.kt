@@ -9,9 +9,9 @@ class EventDataFactory(private val config: BitmovinAnalyticsConfig, private val 
     private val eventDataManipulators = mutableListOf<EventDataManipulator>()
 
     // TODO DeviceInformationProvider for now is only available after `attachPlayerAdapter`, but can also be moved to the constructor of BitmovinAnalytics and also in this class
-    fun create(impressionId: String, sourceMetadata: SourceMetadata?, deviceInformationProvider: DeviceInformationProvider): EventData {
+    fun create(impressionId: String, sourceMetadata: SourceMetadata?, deviceInformation: DeviceInformation): EventData {
         val eventData = EventData(
-                deviceInformationProvider.getDeviceInformation(),
+                deviceInformation,
                 impressionId,
                 userIdProvider.userId(),
                 config.key,

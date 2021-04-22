@@ -148,7 +148,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         return eventDataFactory.create(
                 playerStateMachine.getImpressionId(),
                 playerAdapter.getCurrentSourceMetadata(),
-                playerAdapter.getDeviceInformationProvider());
+                playerAdapter.getDeviceInformationProvider().getDeviceInformation());
     }
 
     @Override
