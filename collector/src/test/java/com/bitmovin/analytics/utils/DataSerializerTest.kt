@@ -5,7 +5,6 @@ import com.bitmovin.analytics.BuildConfig
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.ErrorData
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.UserIdProvider
 import io.mockk.every

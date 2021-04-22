@@ -1,7 +1,6 @@
 package com.bitmovin.analytics
 
 import com.bitmovin.analytics.data.DeviceInformation
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.utils.DataSerializer
 import io.mockk.mockk
