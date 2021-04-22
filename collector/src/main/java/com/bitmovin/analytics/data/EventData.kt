@@ -12,6 +12,7 @@ class EventData(
     val key: String?,
     val playerKey: String?,
     val videoId: String?,
+    val videoTitle: String?,
     val customUserId: String?,
     val customData1: String?,
     val customData2: String?,

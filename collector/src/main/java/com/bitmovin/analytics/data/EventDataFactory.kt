@@ -17,7 +17,7 @@ class EventDataFactory(private val config: BitmovinAnalyticsConfig, private val 
                 userIdProvider.userId(),
                 config.key,
                 config.playerKey,
-                if (sourceMetadata == null) config.videoId else sourceMetadata.videoId
+                if (sourceMetadata == null) config.videoId else sourceMetadata.videoId,
                 if (sourceMetadata == null) config.title else sourceMetadata.title,
                 config.customUserId,
                 if (sourceMetadata == null) config.customData1 else sourceMetadata.customData1,
