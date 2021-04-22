@@ -108,6 +108,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     @Override
     public SourceMetadata getCurrentSourceMetadata() {
+        /* Adapter doesn't support source-specific metadata */
         return null;
     }
 
