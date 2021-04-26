@@ -33,8 +33,10 @@ public enum PlayerState {
             long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
             machine.addStartupTime(elapsedTime - elapsedTimeOnEnter);
             if (destinationPlayerState == PlayerState.PLAYING) {
+                // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the first startup sample, in case the collector supports multiple sources)
+                long playerStartupTime = machine.getAndResetPlayerStartupTime();
                 for (StateMachineListener listener : machine.getListeners()) {
-                    listener.onStartup(machine.getStartupTime());
+                    listener.onStartup(machine.getStartupTime(), playerStartupTime);
                 }
                 machine.setStartupFinished(true);
             }

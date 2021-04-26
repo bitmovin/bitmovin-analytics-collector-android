@@ -4,7 +4,7 @@ import com.bitmovin.analytics.data.ErrorCode;
 
 public interface StateMachineListener {
 
-    void onStartup(long duration);
+    void onStartup(long videoStartupTime, long playerStartupTime);
 
     void onPauseExit(long duration);
 
