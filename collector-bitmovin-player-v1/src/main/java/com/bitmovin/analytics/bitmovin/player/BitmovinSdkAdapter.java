@@ -3,6 +3,7 @@ package com.bitmovin.analytics.bitmovin.player;
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -103,6 +104,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
         return featureFactory.createFeatures();
+    }
+
+    @Override
+    public SourceMetadata getCurrentSourceMetadata() {
+        /* Adapter doesn't support source-specific metadata */
+        return null;
     }
 
     private void addPlayerListeners() {

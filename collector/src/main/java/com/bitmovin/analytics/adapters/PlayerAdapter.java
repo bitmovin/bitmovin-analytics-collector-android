@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.adapters;
 
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
 import com.bitmovin.analytics.features.Feature;
@@ -21,4 +22,6 @@ public interface PlayerAdapter {
     DeviceInformationProvider getDeviceInformationProvider();
 
     void clearValues();
+
+    SourceMetadata getCurrentSourceMetadata();
 }

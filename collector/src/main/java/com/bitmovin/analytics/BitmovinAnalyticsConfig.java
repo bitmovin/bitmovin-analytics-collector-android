@@ -3,8 +3,6 @@ package com.bitmovin.analytics;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.enums.CDNProvider;
 import com.bitmovin.analytics.enums.PlayerType;
@@ -95,29 +93,6 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     }
 
     public BitmovinAnalyticsConfig() {}
-
-    public void setSourceMetadata(SourceMetadata sourceMetadata) {
-        if (sourceMetadata == null) {
-            return;
-        }
-
-        Log.d("BitmovinAnalyticsConfig", "Updating Config: " + sourceMetadata.getTitle());
-        setCdnProvider(sourceMetadata.getCdnProvider());
-        setCustomData1(sourceMetadata.getCustomData1());
-        setCustomData2(sourceMetadata.getCustomData2());
-        setCustomData3(sourceMetadata.getCustomData3());
-        setCustomData4(sourceMetadata.getCustomData4());
-        setCustomData5(sourceMetadata.getCustomData5());
-        setCustomData6(sourceMetadata.getCustomData6());
-        setCustomData7(sourceMetadata.getCustomData7());
-        setExperimentName(sourceMetadata.getExperimentName());
-        setM3u8Url(sourceMetadata.getM3u8Url());
-        setMpdUrl(sourceMetadata.getMpdUrl());
-        setPath(sourceMetadata.getPath());
-        setTitle(sourceMetadata.getTitle());
-        setVideoId(sourceMetadata.getVideoId());
-        setIsLive(sourceMetadata.isLive());
-    }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {

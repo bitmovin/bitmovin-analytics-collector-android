@@ -3,10 +3,8 @@ package com.bitmovin.analytics.stateMachines;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
-import androidx.annotation.Nullable;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
@@ -109,15 +107,10 @@ public class PlayerStateMachine {
         setCurrentState(PlayerState.READY);
     }
 
-    public void sourceChange(
-            long oldVideoTime, long newVideoTime, @Nullable SourceMetadata sourceConfig) {
-        resetSourceRelatedState();
+    public void sourceChange(long oldVideoTime, long newVideoTime) {
         transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime);
-
-        if (sourceConfig != null) {
-            this.config.setSourceMetadata(sourceConfig);
-        }
-
+        resetSourceRelatedState();
+        analytics.resetSourceRelatedState();
         transitionState(PlayerState.STARTUP, newVideoTime);
     }
 

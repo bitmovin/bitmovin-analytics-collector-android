@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -133,6 +134,12 @@ public class ExoPlayerAdapter
         isPaused = false;
         checkAutoplayStartup();
         return new ArrayList<>();
+    }
+
+    @Override
+    public SourceMetadata getCurrentSourceMetadata() {
+        /* Adapter doesn't support source-specific metadata */
+        return null;
     }
 
     /*

@@ -8,7 +8,7 @@ data class SourceMetadata(
     val mpdUrl: String? = null,
     val m3u8Url: String? = null,
     val path: String? = null,
-    val isLive: Boolean = false,
+    val isLive: Boolean? = null,
     val customData1: String? = null,
     val customData2: String? = null,
     val customData3: String? = null,
