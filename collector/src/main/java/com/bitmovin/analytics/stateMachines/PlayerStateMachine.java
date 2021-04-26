@@ -107,11 +107,14 @@ public class PlayerStateMachine {
         setCurrentState(PlayerState.READY);
     }
 
-    public void sourceChange(long oldVideoTime, long newVideoTime) {
+    public void sourceChange(long oldVideoTime, long newVideoTime, boolean shouldStartup) {
         transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime);
         resetSourceRelatedState();
         analytics.resetSourceRelatedState();
-        transitionState(PlayerState.STARTUP, newVideoTime);
+
+        if (shouldStartup) {
+            transitionState(PlayerState.STARTUP, newVideoTime);
+        }
     }
 
     public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
