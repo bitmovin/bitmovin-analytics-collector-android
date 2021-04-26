@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Added default implementation of AnalyticsListener.onPlayerStateChanged to avoid ExoPlayer crashes on certain devices
+- support attachment of already playing ExoPlayer to ExoPlayerCollector
 
 ### Removed
 
@@ -20,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 ### Changed
+- support attachment of already playing ExoPlayer to ExoPlayerCollector
 
 ### Removed
 
