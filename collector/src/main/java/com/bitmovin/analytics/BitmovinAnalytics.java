@@ -358,7 +358,9 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     public final void resetSourceRelatedState() {
-        this.eventDataDispatcher.resetSourceRelatedState();
+        if (this.eventDataDispatcher != null) {
+            this.eventDataDispatcher.resetSourceRelatedState();
+        }
         // TODO reset features and prepare for new source
 
         if (this.playerAdapter != null) {

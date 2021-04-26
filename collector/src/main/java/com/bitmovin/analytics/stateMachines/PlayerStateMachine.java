@@ -100,6 +100,7 @@ public class PlayerStateMachine {
         qualityChangeResetTimeout.cancel();
         rebufferingTimeout.cancel();
         resetQualityChangeCount();
+        analytics.resetSourceRelatedState();
     }
 
     public void resetStateMachine() {
@@ -110,7 +111,6 @@ public class PlayerStateMachine {
     public void sourceChange(long oldVideoTime, long newVideoTime, boolean shouldStartup) {
         transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime);
         resetSourceRelatedState();
-        analytics.resetSourceRelatedState();
 
         if (shouldStartup) {
             transitionState(PlayerState.STARTUP, newVideoTime);
