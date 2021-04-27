@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+## Development v1
+
+## v1.24.0
+
+### Changed
+
+- Support attachment of already playing ExoPlayer to ExoPlayerCollector
+
+## v2.0.0-beta2
+
 ### Added
 - Support for BitmovinPlayer version >= 3
 - `setCustomData` and `setCustomDataOnce`
@@ -16,15 +26,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Support attachment of already playing ExoPlayer to ExoPlayerCollector
 - Added default implementation of AnalyticsListener.onPlayerStateChanged to avoid ExoPlayer crashes on certain devices
-
-### Removed
-
-## Development v1
-
-### Added
-
-### Changed
-- Support attachment of already playing ExoPlayer to ExoPlayerCollector
 
 ## v1.23.0
 
