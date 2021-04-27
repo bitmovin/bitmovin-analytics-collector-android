@@ -148,16 +148,27 @@ public class ExoPlayerAdapter
     */
     private void checkAutoplayStartup() {
         int playbackState = exoplayer.getPlaybackState();
-        boolean playWhenReady = exoplayer.getPlayWhenReady();
-        if (playbackState == Player.STATE_BUFFERING) {
-            if (playWhenReady != this.isPlaying && playWhenReady) {
+
+        boolean isBufferingAndWillAutoPlay =
+                exoplayer.getPlayWhenReady() && playbackState == Player.STATE_BUFFERING;
+        /* Even if flag was set as `player.setPlayWhenReady(false)`, when player is playing, flags is returned as `true` */
+        boolean isAlreadyPlaying =
+                exoplayer.getPlayWhenReady() && playbackState == Player.STATE_READY;
+
+        if (isBufferingAndWillAutoPlay || isAlreadyPlaying) {
+            this.isPlaying = true;
+
+            long position = getPosition();
+            Log.d(
+                    TAG,
+                    "Collector was attached while media source was already loading, transitioning to startup state.");
+            startup(position);
+
+            if (playbackState == Player.STATE_READY) {
                 Log.d(
                         TAG,
-                        "Collector was attached while media source was already loading, transitioning to startup state.");
-                // with autoplay enabled the player first enter here and start buffering for the
-                // video with playWhenReady = true
-                this.isPlaying = true;
-                startup(getPosition());
+                        "Collector was attached while media source was already playing, transitioning to playing state");
+                stateMachine.transitionState(PlayerState.PLAYING, position);
             }
         }
     }
@@ -309,6 +320,12 @@ public class ExoPlayerAdapter
     }
 
     @Override
+    public void onTimelineChanged(
+            Timeline timeline, @androidx.annotation.Nullable Object manifest, int reason) {
+        /* On some devices ExoPlayer crashes if not every method is overridden, despite a default implementation in their code. */
+    }
+
+    @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
         Log.d(TAG, "onTracksChanged");
     }
@@ -316,6 +333,12 @@ public class ExoPlayerAdapter
     @Override
     public void onLoadingChanged(boolean isLoading) {
         Log.d(TAG, "onLoadingChanged");
+    }
+
+    @Override
+    public void onPlayerStateChanged(
+            EventTime eventTime, boolean playWhenReady, int playbackState) {
+        /* On some devices ExoPlayer crashes if not every method is overridden, despite a default implementation in their code. */
     }
 
     @Override
@@ -436,6 +459,11 @@ public class ExoPlayerAdapter
     @Override
     public void onPlaybackSuppressionReasonChanged(int playbackSuppressionReason) {
         Log.d(TAG, "onPlaybackSuppressionReasonChanged " + playbackSuppressionReason);
+    }
+
+    @Override
+    public void onIsPlayingChanged(boolean isPlaying) {
+        /* On some devices ExoPlayer crashes if not every method is overridden, despite a default implementation in their code. */
     }
 
     @Override
