@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Support for BitmovinPlayer version >= 3
 - `setCustomData` and `setCustomDataOnce`
+- [Internal] BitmovinPlayer v3 - handling of multiple sources in PlaylistConfig
+- [Internal] Handling of playerStartupTime in cases where the adapter supports multiple sources
 
 ### Changed
 - Support attachment of already playing ExoPlayer to ExoPlayerCollector
@@ -49,8 +51,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] `ErrorDetailsFeature` to track additional details in case an error occurs
 - [Internal] Enabled code style checks on pre-push and publish
 - [Internal] Added new release process for future releases
-- [Internal] BitmovinPlayer v3 - handling of multiple sources in PlaylistConfig
-- [Internal] Handling of playerStartupTime in cases where the adapter supports multiple sources
 
 ## v1.22.1
 
