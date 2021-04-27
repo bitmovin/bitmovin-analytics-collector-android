@@ -544,8 +544,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             @Override
             public void onDrmKeysLoaded(EventTime eventTime) {
                 try {
-                    drmInformation =
-                            new DRMInformation(eventTime.realtimeMs - drmLoadStartTime, drmType);
+                    drmDownloadTime = eventTime.realtimeMs - drmLoadStartTime;
                     Log.d(TAG, String.format("DRM Keys loaded %d", eventTime.realtimeMs));
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
