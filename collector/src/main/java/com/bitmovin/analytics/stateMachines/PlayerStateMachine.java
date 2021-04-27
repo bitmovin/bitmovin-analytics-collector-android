@@ -20,6 +20,9 @@ public class PlayerStateMachine {
     private PlayerState currentState;
     private long elapsedTimeOnEnter = 0;
     private long startupTime = 0;
+    // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
+    // first startup sample, in case the collector supports multiple sources)
+    private long playerStartupTime = 1L;
     private boolean startupFinished = false;
     private long elapsedTimeSeekStart = 0;
     private long videoTimeStart;
@@ -214,6 +217,12 @@ public class PlayerStateMachine {
 
     public long getElapsedTimeSeekStart() {
         return elapsedTimeSeekStart;
+    }
+
+    public long getAndResetPlayerStartupTime() {
+        long playerStartupTime = this.playerStartupTime;
+        this.playerStartupTime = 0;
+        return playerStartupTime;
     }
 
     public void setElapsedTimeSeekStart(long elapsedTimeSeekStart) {

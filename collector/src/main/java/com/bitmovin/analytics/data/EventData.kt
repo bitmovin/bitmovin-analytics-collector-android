@@ -58,7 +58,7 @@ class EventData(
     var errorCode: Int? = null
     var errorMessage: String? = null
     var errorData: String? = null
-    var playerStartupTime: Int = 0
+    var playerStartupTime: Long = 0
     var pageLoadType: Int = 1
     var pageLoadTime: Int = 0
     var version: String? = null
