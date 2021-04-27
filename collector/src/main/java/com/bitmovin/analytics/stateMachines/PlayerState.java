@@ -33,8 +33,9 @@ public enum PlayerState {
             long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
             machine.addStartupTime(elapsedTime - elapsedTimeOnEnter);
             if (destinationPlayerState == PlayerState.PLAYING) {
+                long playerStartupTime = machine.getAndResetPlayerStartupTime();
                 for (StateMachineListener listener : machine.getListeners()) {
-                    listener.onStartup(machine.getStartupTime());
+                    listener.onStartup(machine.getStartupTime(), playerStartupTime);
                 }
                 machine.setStartupFinished(true);
             }

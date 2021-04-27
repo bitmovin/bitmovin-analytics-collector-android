@@ -152,20 +152,18 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     @Override
-    public void onStartup(long duration) {
+    public void onStartup(long videoStartupTime, long playerStartupTime) {
         Log.d(TAG, String.format("onStartup %s", playerStateMachine.getImpressionId()));
         EventData data = createEventData();
         data.setSupportedVideoCodecs(Util.getSupportedVideoFormats());
         data.setState("startup");
-        data.setDuration(duration);
-        data.setVideoStartupTime(duration);
+        data.setDuration(videoStartupTime + playerStartupTime);
+        data.setVideoStartupTime(videoStartupTime);
 
         data.setDrmLoadTime(playerAdapter.getDRMDownloadTime());
 
-        // Setting a startup time of 1 to workaround dashboard issue
-        // TODO how to handle playerstartup only for first source
-        data.setPlayerStartupTime(1);
-        data.setStartupTime(duration + 1);
+        data.setPlayerStartupTime(playerStartupTime);
+        data.setStartupTime(videoStartupTime + playerStartupTime);
 
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());

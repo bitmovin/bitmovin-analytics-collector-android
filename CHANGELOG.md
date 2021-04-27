@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Enabled code style checks on pre-push and publish
 - [Internal] Added new release process for future releases
 - [Internal] BitmovinPlayer v3 - handling of multiple sources in PlaylistConfig
+- [Internal] Handling of playerStartupTime in cases where the adapter supports multiple sources
 
 ## v1.22.1
 
