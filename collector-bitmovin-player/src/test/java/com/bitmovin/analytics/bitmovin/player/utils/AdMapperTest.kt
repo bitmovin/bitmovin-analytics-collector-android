@@ -1,9 +1,9 @@
 package com.bitmovin.analytics.bitmovin.player.utils
 
-import com.bitmovin.player.model.advertising.Ad
-import com.bitmovin.player.model.advertising.LinearAd
-import com.bitmovin.player.model.advertising.VastAdData
-import com.bitmovin.player.model.advertising.ima.ImaAdData
+import com.bitmovin.player.api.advertising.Ad
+import com.bitmovin.player.api.advertising.LinearAd
+import com.bitmovin.player.api.advertising.ima.ImaAdData
+import com.bitmovin.player.api.advertising.vast.VastAdData
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -25,7 +25,7 @@ class AdMapperTest {
     @Mock
     private lateinit var imaAdData: ImaAdData
 
-    private var adMapper = AdMapper()
+    private val adMapper = AdMapper()
 
     @Before
     fun setup() {
@@ -35,7 +35,7 @@ class AdMapperTest {
     @Test
     fun FromPlayerAdWithAdDataNullShouldNotSetAdDataValues() {
         `when`(playerAd.data).thenReturn(null)
-        var collectorAd = adMapper.fromPlayerAd(playerAd)
+        val collectorAd = adMapper.fromPlayerAd(playerAd)
 
         assertThat(collectorAd.bitrate).isNull()
         assertThat(collectorAd.title).isNull()
@@ -47,7 +47,7 @@ class AdMapperTest {
         val TEN_SECONDS_IN_MS = TEN_SENCONDS.toLong() * 1000
 
         `when`(linearAd.duration).thenReturn(TEN_SENCONDS)
-        var collectorAd = adMapper.fromPlayerAd(linearAd)
+        val collectorAd = adMapper.fromPlayerAd(linearAd)
 
         assertThat(collectorAd.duration).isEqualTo(TEN_SECONDS_IN_MS)
     }
@@ -57,7 +57,7 @@ class AdMapperTest {
         val TITLE = "Title"
         `when`(playerAd.data).thenReturn(vastAdData)
         `when`((playerAd.data as VastAdData).adTitle).thenReturn(TITLE)
-        var collectorAd = adMapper.fromPlayerAd(playerAd)
+        val collectorAd = adMapper.fromPlayerAd(playerAd)
 
         assertThat(collectorAd.title).isEqualTo(TITLE)
     }
@@ -67,7 +67,7 @@ class AdMapperTest {
         val DEALID = "dealid"
         `when`(playerAd.data).thenReturn(imaAdData)
         `when`((playerAd.data as ImaAdData).dealId).thenReturn(DEALID)
-        var collectorAd = adMapper.fromPlayerAd(playerAd)
+        val collectorAd = adMapper.fromPlayerAd(playerAd)
 
         assertThat(collectorAd.dealId).isEqualTo(DEALID)
     }

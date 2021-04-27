@@ -9,16 +9,13 @@ import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
 import com.bitmovin.analytics.data.CustomData;
-import com.bitmovin.analytics.data.DRMInformation;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
+import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.data.UserIdProvider;
-import com.bitmovin.analytics.data.manipulators.EventDataManipulator;
-import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
 import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.features.Feature;
@@ -29,10 +26,8 @@ import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.Util;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,8 +36,7 @@ import org.jetbrains.annotations.Nullable;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics
-        implements StateMachineListener, LicenseCallback, EventDataManipulatorPipeline {
+public class BitmovinAnalytics implements StateMachineListener, LicenseCallback {
 
     private static final String TAG = "BitmovinAnalytics";
 
@@ -56,8 +50,8 @@ public class BitmovinAnalytics
     protected BitmovinAdAnalytics adAnalytics;
     protected IEventDataDispatcher eventDataDispatcher;
     protected Context context;
-    private final List<EventDataManipulator> eventDataManipulators = new ArrayList<>();
     private final UserIdProvider userIdProvider;
+    private final EventDataFactory eventDataFactory;
 
     /**
      * Bitmovin Analytics
@@ -73,6 +67,7 @@ public class BitmovinAnalytics
         this.context = context;
         this.userIdProvider = new UserIdProvider(context);
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
+        this.eventDataFactory = new EventDataFactory(bitmovinAnalyticsConfig, this.userIdProvider);
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
         this.playerStateMachine.addListener(this);
         IEventDataDispatcher innerEventDataDispatcher =
@@ -110,11 +105,11 @@ public class BitmovinAnalytics
         Collection<Feature<?>> features = this.playerAdapter.init();
         this.featureManager.registerFeatures(features);
 
-        this.eventDataManipulators.clear();
         // this.registerEventDataManipulators(prePipelineManipulator);
-        this.playerAdapter.registerEventDataManipulators(this);
-        this.registerEventDataManipulator(
-                new ManifestUrlEventDataManipulator(this.bitmovinAnalyticsConfig));
+        this.playerAdapter.registerEventDataManipulators(eventDataFactory);
+        this.eventDataFactory.registerEventDataManipulator(
+                new ManifestUrlEventDataManipulator(
+                        this.playerAdapter, this.bitmovinAnalyticsConfig));
         // this.registerEventDataManipulators(postPipelineManipulator);
     }
 
@@ -140,6 +135,7 @@ public class BitmovinAnalytics
             playerStateMachine.resetStateMachine();
         }
         eventDataDispatcher.disable();
+        eventDataFactory.clearEventDataManipulators();
     }
 
     private void detachAd() {
@@ -148,46 +144,26 @@ public class BitmovinAnalytics
         }
     }
 
-    @Override
-    public void registerEventDataManipulator(@NotNull EventDataManipulator manipulator) {
-        this.eventDataManipulators.add(manipulator);
-    }
-
     public EventData createEventData() {
-        DeviceInformationProvider deviceInformationProvider =
-                this.playerAdapter.getDeviceInformationProvider();
-        EventData eventData =
-                new EventData(
-                        this.bitmovinAnalyticsConfig,
-                        deviceInformationProvider.getDeviceInformation(),
-                        this.playerStateMachine.getImpressionId(),
-                        this.userIdProvider.userId());
-
-        for (EventDataManipulator decorator : this.eventDataManipulators) {
-            decorator.manipulate(eventData);
-        }
-
-        return eventData;
+        return eventDataFactory.create(
+                playerStateMachine.getImpressionId(),
+                playerAdapter.getCurrentSourceMetadata(),
+                playerAdapter.getDeviceInformationProvider().getDeviceInformation());
     }
 
     @Override
-    public void onStartup(long duration) {
+    public void onStartup(long videoStartupTime, long playerStartupTime) {
         Log.d(TAG, String.format("onStartup %s", playerStateMachine.getImpressionId()));
         EventData data = createEventData();
         data.setSupportedVideoCodecs(Util.getSupportedVideoFormats());
         data.setState("startup");
-        data.setDuration(duration);
-        data.setVideoStartupTime(duration);
+        data.setDuration(videoStartupTime + playerStartupTime);
+        data.setVideoStartupTime(videoStartupTime);
 
-        DRMInformation drmInfo = playerAdapter.getDRMInformation();
-        if (drmInfo != null) {
-            data.setDrmType(drmInfo.getType());
-            data.setDrmLoadTime(drmInfo.getLoadTime());
-        }
+        data.setDrmLoadTime(playerAdapter.getDRMDownloadTime());
 
-        // Setting a startup time of 1 to workaround dashboard issue
-        data.setPlayerStartupTime(1);
-        data.setStartupTime(duration + 1);
+        data.setPlayerStartupTime(playerStartupTime);
+        data.setStartupTime(videoStartupTime + playerStartupTime);
 
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
@@ -377,6 +353,17 @@ public class BitmovinAnalytics
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data);
         this.detachPlayer();
+    }
+
+    public final void resetSourceRelatedState() {
+        if (this.eventDataDispatcher != null) {
+            this.eventDataDispatcher.resetSourceRelatedState();
+        }
+        // TODO reset features and prepare for new source
+
+        if (this.playerAdapter != null) {
+            this.playerAdapter.resetSourceRelatedState();
+        }
     }
 
     public CustomData getCustomData() {

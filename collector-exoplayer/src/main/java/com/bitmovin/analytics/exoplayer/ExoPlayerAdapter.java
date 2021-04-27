@@ -13,7 +13,7 @@ import android.util.Log;
 import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
-import com.bitmovin.analytics.data.DRMInformation;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "ExoPlayerAdapter";
@@ -74,9 +73,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     private String manifestUrl;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
     private final DeviceInformationProvider deviceInformationProvider;
-    private long drmLoadStartTime = 0;
-    private String drmType = null;
-    private DRMInformation drmInformation = null;
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private boolean isVideoAttemptedPlay = false;
     private long previousQualityChangeBitrate = 0;
@@ -84,6 +80,10 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean isInInitialBufferState = false;
     protected final DefaultAnalyticsListener defaultAnalyticsListener;
     protected final DefaultPlayerEventListener defaultPlayerEventListener;
+
+    private long drmLoadStartTime = 0;
+    private Long drmDownloadTime = null;
+    private String drmType = null;
 
     public ExoPlayerAdapter(
             ExoPlayer exoplayer,
@@ -139,16 +139,26 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
         return new ArrayList<>();
     }
 
+    @Override
+    public SourceMetadata getCurrentSourceMetadata() {
+        /* Adapter doesn't support source-specific metadata */
+        return null;
+    }
+
     /*
-     Because of the late initialization of the Adapter we do not get the first couple of events
-     so in case the player starts a video due to autoplay=true we need to transition into startup state manually
-    */
+     * Because of the late initialization of the Adapter we do not get the first
+     * couple of events so in case the player starts a video due to autoplay=true we
+     * need to transition into startup state manually
+     */
     private void checkAutoplayStartup() {
         int playbackState = exoplayer.getPlaybackState();
 
         boolean isBufferingAndWillAutoPlay =
                 exoplayer.getPlayWhenReady() && playbackState == Player.STATE_BUFFERING;
-        /* Even if flag was set as `player.setPlayWhenReady(false)`, when player is playing, flags is returned as `true` */
+        /*
+         * Even if flag was set as `player.setPlayWhenReady(false)`, when player is
+         * playing, flags is returned as `true`
+         */
         boolean isAlreadyPlaying =
                 exoplayer.getPlayWhenReady() && playbackState == Player.STATE_READY;
 
@@ -256,9 +266,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
         data.setDownloadSpeedInfo(meter.getInfo());
 
         // DRM Information
-        if (drmInformation != null) {
-            data.setDrmType(drmInformation.getType());
-        }
+        data.setDrmType(drmType);
     }
 
     @Override
@@ -275,6 +283,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
         }
         meter.reset();
         stateMachine.resetStateMachine();
+    }
+
+    @Override
+    public void resetSourceRelatedState() {
+        // no Playlist transition event in older version of collector (v1)
     }
 
     @Override
@@ -306,10 +319,9 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
         return 0;
     }
 
-    @Nullable
     @Override
-    public DRMInformation getDRMInformation() {
-        return drmInformation;
+    public Long getDRMDownloadTime() {
+        return drmDownloadTime;
     }
 
     @Override
@@ -532,8 +544,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             @Override
             public void onDrmKeysLoaded(EventTime eventTime) {
                 try {
-                    drmInformation =
-                            new DRMInformation(eventTime.realtimeMs - drmLoadStartTime, drmType);
+                    drmDownloadTime = eventTime.realtimeMs - drmLoadStartTime;
                     Log.d(TAG, String.format("DRM Keys loaded %d", eventTime.realtimeMs));
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);

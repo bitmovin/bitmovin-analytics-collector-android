@@ -1,56 +1,103 @@
 package com.bitmovin.analytics.bitmovin.player
 
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.data.DeviceInformationProvider
-import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
-import com.bitmovin.player.BitmovinPlayer
-import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent
-import com.bitmovin.player.api.event.listener.EventListener
-import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener
-import com.bitmovin.player.config.PlayerConfiguration
-import com.bitmovin.player.config.quality.AudioQuality
+import com.bitmovin.player.api.Player
+import com.bitmovin.player.api.event.Event
+import com.bitmovin.player.api.event.EventListener
+import com.bitmovin.player.api.event.PlayerEvent
+import com.bitmovin.player.api.media.audio.quality.AudioQuality
+import com.bitmovin.player.api.source.Source
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner::class)
 class BitmovinSdkAdapterTest {
 
-    val eventListener = mutableListOf<EventListener<*>>()
-    inline fun <reified T> getListenerWithType(): T? {
-        return eventListener.find { it is T } as? T
-    }
+    @MockK
+    private lateinit var playerStateMachine: PlayerStateMachine
 
-    @Mock
-    private lateinit var stateMachine: PlayerStateMachine
-    private lateinit var adapter: BitmovinSdkAdapter
-    @Mock
-    private lateinit var fakePlayer: BitmovinPlayer
+    @RelaxedMockK
+    private lateinit var player: Player
+
+    private val sourceMap = mutableMapOf<Source, SourceMetadata>()
+    private lateinit var bitmovinSdkAdapter: BitmovinSdkAdapter
 
     @Before
     fun setup() {
-        Mockito.`when`(fakePlayer.addEventListener(ArgumentMatchers.any())).then { invocation -> eventListener.add(invocation.getArgument(0)) }
-        Mockito.`when`(fakePlayer.getConfig()).thenReturn(Mockito.mock(PlayerConfiguration::class.java))
-        adapter = BitmovinSdkAdapter(fakePlayer, Mockito.mock(BitmovinAnalyticsConfig::class.java), Mockito.mock(DeviceInformationProvider::class.java), stateMachine, Mockito.mock(FeatureFactory::class.java))
-        adapter.init()
+        MockKAnnotations.init(this)
+        bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), mockk(), playerStateMachine, mockk(relaxed = true), sourceMap)
     }
 
     @Test
-    fun testNoStateTransitionToQualityChangeIfBitrateDidNotChange() {
-        Mockito.`when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
-        val event = getListenerWithType<OnAudioPlaybackQualityChangedListener>()
-        assert(event != null)
-        event!!.onAudioPlaybackQualityChanged(getAudioPlaybackQualityChangedEvent(200, 200))
-        Mockito.verify(stateMachine, Mockito.times(0)).transitionState(ArgumentMatchers.eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+    fun `init method register event listeners`() {
+        // arrange
+        val capturedPlayerEventListeners = mutableMapOf<Class<Event>, EventListener<Event>>()
+        every { player.on(any<Class<Event>>(), any()) } answers { capturedPlayerEventListeners[firstArg()] = secondArg() }
+
+        // act
+        bitmovinSdkAdapter.init()
+
+        // asset
+        verify(atLeast = 1) { player.on(any<Class<Event>>(), any()) }
+        assertThat(capturedPlayerEventListeners).isNotEmpty
     }
 
-    private fun getAudioPlaybackQualityChangedEvent(oldBitrate: Int, newBitrate: Int): AudioPlaybackQualityChangedEvent {
-        return AudioPlaybackQualityChangedEvent(AudioQuality("", "", oldBitrate, null), AudioQuality("", "", newBitrate, null))
+    @Test
+    fun `playerEventAudioPlaybackQualityChangedListener changes playerStateMachine, when AudioPlaybackQualityChanged event is triggered`() {
+        // arrange
+        val listenerSlot = slot<EventListener<PlayerEvent.AudioPlaybackQualityChanged>>()
+        every { player.on(PlayerEvent.AudioPlaybackQualityChanged::class.java, capture(listenerSlot)) } answers { }
+        every { player.currentTime } returns 0.0
+        every { playerStateMachine.currentState } returns PlayerState.PLAYING
+        every { playerStateMachine.isStartupFinished } returns true
+        every { playerStateMachine.isQualityChangeEventEnabled } returns true
+        every { playerStateMachine.transitionState(any(), any()) } answers {}
+
+        // act
+        bitmovinSdkAdapter.init()
+        val audioPlaybackQualityChangedEvent = PlayerEvent.AudioPlaybackQualityChanged(AudioQuality("", "", 200, null), AudioQuality("", "", 300, null))
+        listenerSlot.captured.onEvent(audioPlaybackQualityChangedEvent)
+
+        // asset
+        verify { playerStateMachine.currentState }
+        verify { playerStateMachine.isStartupFinished }
+        verify { playerStateMachine.isQualityChangeEventEnabled }
+
+        verify(exactly = 1) { playerStateMachine.transitionState(PlayerState.QUALITYCHANGE, any()) }
+        verify(exactly = 1) { playerStateMachine.transitionState(PlayerState.PLAYING, any()) }
+    }
+
+    @Test
+    fun `playerEventAudioPlaybackQualityChangedListener doesn't change playerStateMachine, when AudioPlaybackQualityChanged event with same bitrate is triggered`() {
+        // arrange
+        val listenerSlot = slot<EventListener<PlayerEvent.AudioPlaybackQualityChanged>>()
+        every { player.on(PlayerEvent.AudioPlaybackQualityChanged::class.java, capture(listenerSlot)) } answers { }
+        every { player.currentTime } returns 0.0
+        every { playerStateMachine.currentState } returns PlayerState.PLAYING
+        every { playerStateMachine.isStartupFinished } returns true
+        every { playerStateMachine.isQualityChangeEventEnabled } returns true
+        every { playerStateMachine.transitionState(any(), any()) } answers {}
+
+        // act
+        bitmovinSdkAdapter.init()
+        val sameAudioQuality = AudioQuality("", "", 200, null)
+        val audioPlaybackQualityChangedEvent = PlayerEvent.AudioPlaybackQualityChanged(sameAudioQuality, sameAudioQuality)
+        listenerSlot.captured.onEvent(audioPlaybackQualityChangedEvent)
+
+        // asset
+        verify { playerStateMachine.currentState }
+        verify { playerStateMachine.isStartupFinished }
+        verify { playerStateMachine.isQualityChangeEventEnabled }
+
+        verify(exactly = 0) { playerStateMachine.transitionState(any(), any()) }
     }
 }

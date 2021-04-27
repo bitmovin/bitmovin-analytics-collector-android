@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player;
 
+import com.bitmovin.analytics.utils.Util;
+import com.bitmovin.player.BitmovinPlayer;
 import com.bitmovin.player.BuildConfig;
 import java.lang.reflect.Field;
 
@@ -13,5 +15,10 @@ public class BitmovinUtil {
         } catch (IllegalAccessException e) {
         }
         return "unknown";
+    }
+
+    public static long getCurrentTimeInMs(BitmovinPlayer bitmovinPlayer) {
+        long currentTime = Util.toPrimitiveLong(bitmovinPlayer.getCurrentTime());
+        return currentTime * Util.MILLISECONDS_IN_SECONDS;
     }
 }

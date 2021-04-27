@@ -9,5 +9,5 @@ public interface IEventDataDispatcher {
 
     public void addAd(AdEventData data);
 
-    public void clear();
+    public void resetSourceRelatedState();
 }

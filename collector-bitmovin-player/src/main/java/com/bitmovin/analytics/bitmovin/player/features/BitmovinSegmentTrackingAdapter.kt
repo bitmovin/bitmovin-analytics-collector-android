@@ -7,15 +7,16 @@ import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventLi
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.features.segmenttracking.Segment
 import com.bitmovin.analytics.features.segmenttracking.SegmentType
-import com.bitmovin.player.BitmovinPlayer
-import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
-import com.bitmovin.player.config.network.HttpRequestType
+import com.bitmovin.player.api.Player
+import com.bitmovin.player.api.event.SourceEvent
+import com.bitmovin.player.api.network.HttpRequestType
 
-class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
+class BitmovinSegmentTrackingAdapter(private val player: Player, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
-    private val onDownloadFinishedListener = OnDownloadFinishedListener {
-        val segmentType = mapHttpRequestType(it.downloadType)
-        val segmentInfo = Segment(it.timestamp, segmentType, it.url, it.lastRedirectLocation, it.httpStatus, it.downloadTime, it.size, it.isSuccess)
+
+    private val sourceEventDownloadFinishedListener: (SourceEvent.DownloadFinished) -> Unit = { event ->
+        val segmentType = mapHttpRequestType(event.downloadType)
+        val segmentInfo = Segment(event.timestamp, segmentType, event.url, event.lastRedirectLocation, event.httpStatus, event.downloadTime, event.size, event.isSuccess)
         observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segmentInfo)) }
     }
 
@@ -25,24 +26,24 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
 
     private fun mapHttpRequestType(requestType: HttpRequestType?): SegmentType {
         return when (requestType) {
-            HttpRequestType.DRM_LICENSE_WIDEVINE -> SegmentType.DRM_LICENSE_WIDEVINE
-            HttpRequestType.MEDIA_THUMBNAILS -> SegmentType.MEDIA_THUMBNAILS
-            HttpRequestType.MANIFEST_DASH -> SegmentType.MANIFEST_DASH
-            HttpRequestType.MANIFEST_HLS_MASTER -> SegmentType.MANIFEST_HLS_MASTER
-            HttpRequestType.MANIFEST_HLS_VARIANT -> SegmentType.MANIFEST_HLS_VARIANT
-            HttpRequestType.MANIFEST_SMOOTH -> SegmentType.MANIFEST_SMOOTH
+            HttpRequestType.DrmLicenseWidevine -> SegmentType.DRM_LICENSE_WIDEVINE
+            HttpRequestType.MediaThumbnails -> SegmentType.MEDIA_THUMBNAILS
+            HttpRequestType.ManifestDash -> SegmentType.MANIFEST_DASH
+            HttpRequestType.ManifestHlsMaster -> SegmentType.MANIFEST_HLS_MASTER
+            HttpRequestType.ManifestHlsVariant -> SegmentType.MANIFEST_HLS_VARIANT
+            HttpRequestType.ManifestSmooth -> SegmentType.MANIFEST_SMOOTH
             else -> SegmentType.UNKNOWN
         }
     }
 
     private fun wireEvents() {
         onAnalyticsReleasingObservable.subscribe(this)
-        player.addEventListener(onDownloadFinishedListener)
+        player.on(SourceEvent.DownloadFinished::class, sourceEventDownloadFinishedListener)
     }
 
     private fun unwireEvents() {
         onAnalyticsReleasingObservable.unsubscribe(this)
-        player.removeEventListener(onDownloadFinishedListener)
+        player.off(sourceEventDownloadFinishedListener)
     }
 
     override fun subscribe(listener: OnDownloadFinishedEventListener) {

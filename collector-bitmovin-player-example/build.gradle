@@ -42,25 +42,21 @@ dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 	implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
 	implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
-	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
-	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
-	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
-
-
 	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
-	implementation "com.bitmovin.player:playercore:${rootProject.ext.bitmovinPlayer2Version}"
-
-	// only needed if ads are used
 	implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-	implementation "com.google.ads.interactivemedia.v3:interactivemedia:3.11.3"
-	implementation "com.google.android.gms:play-services-ads:17.1.2"
-	/** required because of play-services-ads:17.1.2 SDK 26 dependencies */
-	implementation 'androidx.browser:browser:1.0.0'
 
+	implementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
+	implementation "com.google.ads.interactivemedia.v3:interactivemedia:${rootProject.ext.imaSdkVersion}" // only needed if ads are used
+	implementation "com.google.android.gms:play-services-ads:${rootProject.ext.playServicesAdsVersion}" // only needed if ads are used
+	implementation 'androidx.legacy:legacy-support-v4:1.0.0' // only needed if ads are used
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-bitmovin-player')
 	} else {
 		implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
 	}
+
+	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
 }
 

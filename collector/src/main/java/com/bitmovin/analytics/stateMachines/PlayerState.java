@@ -12,6 +12,14 @@ public enum PlayerState {
         void onExitState(
                 PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {}
     },
+    SOURCE_CHANGED {
+        @Override
+        void onEnterState(PlayerStateMachine machine) {}
+
+        @Override
+        void onExitState(
+                PlayerStateMachine machine, long elapsedTime, PlayerState desintationPlayerState) {}
+    },
     STARTUP {
         @Override
         void onEnterState(PlayerStateMachine machine) {
@@ -25,8 +33,9 @@ public enum PlayerState {
             long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
             machine.addStartupTime(elapsedTime - elapsedTimeOnEnter);
             if (destinationPlayerState == PlayerState.PLAYING) {
+                long playerStartupTime = machine.getAndResetPlayerStartupTime();
                 for (StateMachineListener listener : machine.getListeners()) {
-                    listener.onStartup(machine.getStartupTime());
+                    listener.onStartup(machine.getStartupTime(), playerStartupTime);
                 }
                 machine.setStartupFinished(true);
             }
