@@ -188,28 +188,11 @@ fi
 
 echo "Distributing the artifacts to bintray..."
 
-curl \
-  -u ${artifactoryUser}:${artifactoryPassword} \
-  -X POST \
-  https://bitmovin.jfrog.io/artifactory/api/distribute \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"targetRepo\": \"releases\",
-    \"overrideExistingFiles\": true,
-    \"packagesRepoPaths\": [
-      \"libs-release-local/com/bitmovin/analytics/collector/$VERSION/collector-$VERSION.pom\",
-      \"libs-release-local/com/bitmovin/analytics/collector/$VERSION/collector-$VERSION.aar\",
-      \"libs-release-local/com/bitmovin/analytics/collector-bitmovin-player/$VERSION/collector-bitmovin-player-$VERSION.pom\",
-      \"libs-release-local/com/bitmovin/analytics/collector-bitmovin-player/$VERSION/collector-bitmovin-player-$VERSION.aar\",
-      \"libs-release-local/com/bitmovin/analytics/collector-exoplayer/$VERSION/collector-exoplayer-$VERSION.pom\",
-      \"libs-release-local/com/bitmovin/analytics/collector-exoplayer/$VERSION/collector-exoplayer-$VERSION.aar\"
-    ]}"
-
-echo "\nDistributed the artifacts to bintray."
-
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector/${VERSION}"
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-bitmovin-player/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-bitmovin-player/${VERSION}"
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-exoplayer/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-exoplayer/${VERSION}"
+
+echo "\nDistributed the artifacts to bintray."
 
 notifyApi "android-bitmovin" $VERSION "collector-bitmovin-player"
 notifyApi "android-exo" $VERSION "collector-exoplayer"
