@@ -389,7 +389,6 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             updateConfigRunnable =
                     () -> {
                         sourceMetadata.setCustomData(customData);
-                        playerAdapter.updateCurrentSourceMetadata(sourceMetadata);
                     };
         }
         this.playerStateMachine.changeCustomData(getPosition(), updateConfigRunnable);

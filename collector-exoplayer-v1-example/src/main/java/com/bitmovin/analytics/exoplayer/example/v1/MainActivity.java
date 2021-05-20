@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity
         CustomData customData = bitmovinAnalytics.getCustomData();
         customData.setCustomData2("custom_data_2_changed");
         customData.setCustomData4("custom_data_4_changed");
-        bitmovinAnalytics.setCustomDataOnce(customData);
+        bitmovinAnalytics.setCustomData(customData);
     }
 
     private void changeSource() {
