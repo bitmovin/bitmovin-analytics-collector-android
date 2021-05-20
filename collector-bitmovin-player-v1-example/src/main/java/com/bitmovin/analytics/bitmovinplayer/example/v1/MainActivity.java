@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         CustomData customData = bitmovinAnalytics.getCustomData();
         customData.setCustomData2("custom_data_2_changed");
         customData.setCustomData4("custom_data_4_changed");
-        bitmovinAnalytics.setCustomData(customData);
+        bitmovinAnalytics.setCustomDataOnce(customData);
     }
 
     private static final String AD_SOURCE_1 =
