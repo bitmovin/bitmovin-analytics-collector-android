@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.Log;
 import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
 import com.bitmovin.analytics.data.CustomData;
@@ -367,16 +368,31 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     public CustomData getCustomData() {
+        SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
+        if (sourceMetadata != null) {
+            return sourceMetadata.getCustomData();
+        }
         return this.bitmovinAnalyticsConfig.getCustomData();
     }
 
     public void setCustomData(CustomData customData) {
-        // lambda used because setCustomData on config is protected method
-        this.playerStateMachine.changeCustomData(
-                getPosition(),
-                () -> {
-                    this.bitmovinAnalyticsConfig.setCustomData(customData);
-                });
+        SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
+        Runnable updateConfigRunnable;
+
+        // lambda used because setCustomData on bitmovinAnalyticsConfig is protected method
+        if (sourceMetadata == null) {
+            updateConfigRunnable =
+                    () -> {
+                        this.bitmovinAnalyticsConfig.setCustomData(customData);
+                    };
+        } else {
+            updateConfigRunnable =
+                    () -> {
+                        sourceMetadata.setCustomData(customData);
+                        playerAdapter.updateCurrentSourceMetadata(sourceMetadata);
+                    };
+        }
+        this.playerStateMachine.changeCustomData(getPosition(), updateConfigRunnable);
     }
 
     public void setCustomDataOnce(CustomData customData) {
@@ -385,12 +401,26 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             return;
         }
 
-        CustomData currentCustomData = this.bitmovinAnalyticsConfig.getCustomData();
-        this.bitmovinAnalyticsConfig.setCustomData(customData);
-        EventData eventData = createEventData();
-        eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
-        sendEventData(eventData);
-        this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
+        SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
+
+        CustomData currentCustomData =
+                sourceMetadata != null
+                        ? sourceMetadata.getCustomData()
+                        : this.bitmovinAnalyticsConfig.getCustomData();
+
+        if (sourceMetadata == null) {
+            this.bitmovinAnalyticsConfig.setCustomData(customData);
+            EventData eventData = createEventData();
+            eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
+            sendEventData(eventData);
+            this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
+        } else {
+            sourceMetadata.setCustomData(customData);
+            EventData eventData = createEventData();
+            eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
+            sendEventData(eventData);
+            sourceMetadata.setCustomData(currentCustomData);
+        }
     }
 
     public void sendEventData(EventData data) {

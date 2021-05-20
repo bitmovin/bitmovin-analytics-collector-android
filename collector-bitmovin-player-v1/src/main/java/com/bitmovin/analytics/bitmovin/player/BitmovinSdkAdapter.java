@@ -112,6 +112,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         return null;
     }
 
+    @Override
+    public void updateCurrentSourceMetadata(SourceMetadata sourceMetadata) {
+        /* Adapter doesn't support source-specific metadata */
+    }
+
     private void addPlayerListeners() {
         Log.d(TAG, "Adding Player Listeners");
         this.bitmovinPlayer.addEventListener(onSourceLoadedListener);

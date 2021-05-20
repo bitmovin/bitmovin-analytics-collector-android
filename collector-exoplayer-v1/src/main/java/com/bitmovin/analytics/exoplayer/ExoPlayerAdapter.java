@@ -142,6 +142,11 @@ public class ExoPlayerAdapter
         return null;
     }
 
+    @Override
+    public void updateCurrentSourceMetadata(SourceMetadata sourceMetadata) {
+        /* Adapter doesn't support source-specific metadata */
+    }
+
     /*
      Because of the late initialization of the Adapter we do not get the first couple of events
      so in case the player starts a video due to autoplay=true we need to transition into startup state manually

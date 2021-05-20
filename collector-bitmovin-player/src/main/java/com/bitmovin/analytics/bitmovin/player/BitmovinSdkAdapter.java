@@ -3,6 +3,7 @@ package com.bitmovin.analytics.bitmovin.player;
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.bitmovin.player.utils.SourceMetadataProvider;
 import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
@@ -34,7 +35,6 @@ import com.bitmovin.player.api.media.video.quality.VideoQuality;
 import com.bitmovin.player.api.source.Source;
 import com.bitmovin.player.api.source.SourceConfig;
 import java.util.Collection;
-import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
 public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
@@ -47,7 +47,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private int totalDroppedVideoFrames;
     private boolean isVideoAttemptedPlay = false;
     private FeatureFactory featureFactory;
-    private final Map<Source, SourceMetadata> sourceMetadataMap;
+    private final SourceMetadataProvider sourceMetadataProvider;
 
     // When transitioning in a Playlist, BitmovinPlayer will already return the
     // new source in `getSource`, but we are still interested in sending a sample
@@ -62,13 +62,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
             FeatureFactory featureFactory,
-            Map<Source, SourceMetadata> sourceMetadataMap) {
+            SourceMetadataProvider sourceMetadataProvider) {
         this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.deviceInformationProvider = deviceInformationProvider;
-        this.sourceMetadataMap = sourceMetadataMap;
+        this.sourceMetadataProvider = sourceMetadataProvider;
     }
 
     public Collection<Feature<?>> init() {
@@ -163,7 +163,17 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             return null;
         }
 
-        return this.sourceMetadataMap.get(source);
+        return this.sourceMetadataProvider.getSourceMetadata(source);
+    }
+
+    @Override
+    public void updateCurrentSourceMetadata(SourceMetadata sourceMetadata) {
+        Source source = getCurrentSource();
+        if (source == null) {
+            return;
+        }
+
+        this.sourceMetadataProvider.setSourceMetadata(source, sourceMetadata);
     }
 
     @Override
