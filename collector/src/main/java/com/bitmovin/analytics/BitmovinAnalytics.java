@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.Log;
 import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
+import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
 import com.bitmovin.analytics.data.CustomData;
@@ -367,16 +368,26 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     public CustomData getCustomData() {
+        SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
+        if (sourceMetadata != null) {
+            return SourceMetadataExtension.Companion.getCustomData(sourceMetadata);
+        }
         return this.bitmovinAnalyticsConfig.getCustomData();
     }
 
     public void setCustomData(CustomData customData) {
-        // lambda used because setCustomData on config is protected method
-        this.playerStateMachine.changeCustomData(
-                getPosition(),
-                () -> {
-                    this.bitmovinAnalyticsConfig.setCustomData(customData);
-                });
+        CustomDataHelpers.Setter customDataSetter = this.bitmovinAnalyticsConfig::setCustomData;
+
+        SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
+
+        if (sourceMetadata != null) {
+            customDataSetter =
+                    (changedCustomData) ->
+                            SourceMetadataExtension.Companion.setCustomData(
+                                    sourceMetadata, changedCustomData);
+        }
+
+        this.playerStateMachine.changeCustomData(getPosition(), customData, customDataSetter);
     }
 
     public void setCustomDataOnce(CustomData customData) {
@@ -384,13 +395,26 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             Log.d(TAG, "Custom data could not be set because player is not attached");
             return;
         }
+        CustomDataHelpers.Getter customDataGetter = this.bitmovinAnalyticsConfig::getCustomData;
+        CustomDataHelpers.Setter customDataSetter = this.bitmovinAnalyticsConfig::setCustomData;
 
-        CustomData currentCustomData = this.bitmovinAnalyticsConfig.getCustomData();
-        this.bitmovinAnalyticsConfig.setCustomData(customData);
+        SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
+
+        if (sourceMetadata != null) {
+            customDataGetter =
+                    () -> SourceMetadataExtension.Companion.getCustomData(sourceMetadata);
+            customDataSetter =
+                    (changedCustomData) ->
+                            SourceMetadataExtension.Companion.setCustomData(
+                                    sourceMetadata, changedCustomData);
+        }
+
+        CustomData currentCustomData = customDataGetter.getCustomData();
+        customDataSetter.setCustomData(customData);
         EventData eventData = createEventData();
         eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
         sendEventData(eventData);
-        this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
+        customDataSetter.setCustomData(currentCustomData);
     }
 
     public void sendEventData(EventData data) {

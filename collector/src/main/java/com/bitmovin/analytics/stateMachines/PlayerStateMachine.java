@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.CustomDataHelpers;
+import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
@@ -283,14 +285,15 @@ public class PlayerStateMachine {
         this.qualityChangeCount = 0;
     }
 
-    public void changeCustomData(long position, Runnable updateConfig) {
+    public void changeCustomData(
+            long position, CustomData customData, CustomDataHelpers.Setter customDataSetter) {
         PlayerState originalState = this.getCurrentState();
         boolean shouldTransition =
                 originalState == PlayerState.PLAYING || originalState == PlayerState.PAUSE;
         if (shouldTransition) {
             this.transitionState(PlayerState.CUSTOMDATACHANGE, position);
         }
-        updateConfig.run();
+        customDataSetter.setCustomData(customData);
         if (shouldTransition) {
             this.transitionState(originalState, position);
         }

@@ -37,7 +37,7 @@
 
             <Button
                 android:id="@+id/release_button"
-                android:layout_width="wrap_content"
+                android:layout_width="77dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Release" />
@@ -55,18 +55,18 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/exo_track_selection_title_audio" />
+
+            <Button
+                android:id="@+id/change_subtitle"
+                android:layout_width="148dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Subtitle" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:id="@+id/change_subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Subtitle" />
+            android:layout_height="wrap_content">
 
             <Button
                 android:id="@+id/change_source"
@@ -83,10 +83,11 @@
                 android:text="Second Source" />
 
             <Button
-                    android:id="@+id/setCustomData"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Set custom data" />
+                android:id="@+id/setCustomData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Set custom data" />
         </TableRow>
 
     </TableLayout>
