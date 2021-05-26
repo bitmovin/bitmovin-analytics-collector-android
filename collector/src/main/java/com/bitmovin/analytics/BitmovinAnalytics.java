@@ -399,27 +399,22 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             Log.d(TAG, "Custom data could not be set because player is not attached");
             return;
         }
+        CustomDataHelpers.Getter customDataGetter = this.bitmovinAnalyticsConfig::getCustomData;
+        CustomDataHelpers.Setter customDataSetter = this.bitmovinAnalyticsConfig::setCustomData;
 
         SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
 
-        CustomData currentCustomData =
-                sourceMetadata != null
-                        ? SourceMetadataExtension.Companion.getCustomData(sourceMetadata)
-                        : this.bitmovinAnalyticsConfig.getCustomData();
-
-        if (sourceMetadata == null) {
-            this.bitmovinAnalyticsConfig.setCustomData(customData);
-            EventData eventData = createEventData();
-            eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
-            sendEventData(eventData);
-            this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
-        } else {
-            SourceMetadataExtension.Companion.setCustomData(sourceMetadata, customData);
-            EventData eventData = createEventData();
-            eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
-            sendEventData(eventData);
-            SourceMetadataExtension.Companion.setCustomData(sourceMetadata, currentCustomData);
+        if(sourceMetadata != null) {
+            customDataGetter = () -> SourceMetadataExtension.Companion.getCustomData(sourceMetadata);
+            customDataSetter = (customData1) -> SourceMetadataExtension.Companion.setCustomData(sourceMetadata, customData1);
         }
+
+        CustomData currentCustomData = customDataGetter.getCustomData();
+        customDataSetter.setCustomData(customData);
+        EventData eventData = createEventData();
+        eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
+        sendEventData(eventData);
+        customDataSetter.setCustomData(currentCustomData);
     }
 
     public void sendEventData(EventData data) {
