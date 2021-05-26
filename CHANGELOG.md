@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Support for BitmovinPlayer v3
-- Support for ExoPlayer version > 2.12
+- Support for ExoPlayer version >= 2.12
 
 ### Changed
 - BitmovinPlayer v3 collector behaviour when using `setCustomData` and `setCustomDataOnce` and custom source configs
