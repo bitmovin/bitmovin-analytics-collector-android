@@ -7,10 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+## Development v1
+
+## v2.0.0
+
+### Added
+- Support for BitmovinPlayer v3
+
 ### Changed
 - BitmovinPlayer v3 collector behaviour when using `setCustomData` and `setCustomDataOnce` and custom source configs
-
-## Development v1
 
 ## v1.24.0
 
