@@ -49,7 +49,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## v2.0.0-beta1
 
 ### Added
-- Support for ExoPlayer version > 2.12
+- Support for ExoPlayer version >= 2.12
 
 - [Internal] Separated BitmovinPlayer v2 and v3 collectors and example modules
     - example apps (v1 and latest) package and id renaming
