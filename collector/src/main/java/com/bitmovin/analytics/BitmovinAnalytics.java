@@ -382,9 +382,9 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
         if (sourceMetadata != null) {
             customDataSetter =
-                    (customData1) ->
+                    (changedCustomData) ->
                             SourceMetadataExtension.Companion.setCustomData(
-                                    sourceMetadata, customData1);
+                                    sourceMetadata, changedCustomData);
         }
 
         this.playerStateMachine.changeCustomData(getPosition(), customData, customDataSetter);
@@ -404,9 +404,9 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             customDataGetter =
                     () -> SourceMetadataExtension.Companion.getCustomData(sourceMetadata);
             customDataSetter =
-                    (customData1) ->
+                    (changedCustomData) ->
                             SourceMetadataExtension.Companion.setCustomData(
-                                    sourceMetadata, customData1);
+                                    sourceMetadata, changedCustomData);
         }
 
         CustomData currentCustomData = customDataGetter.getCustomData();
