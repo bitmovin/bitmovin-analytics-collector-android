@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.config
 
-
 data class SourceMetadata(
     val title: String? = null,
     val videoId: String? = null,
@@ -17,6 +16,4 @@ data class SourceMetadata(
     var customData5: String? = null,
     var customData6: String? = null,
     var customData7: String? = null
-) {
-
-}
+)

@@ -380,8 +380,11 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
         SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
 
-        if(sourceMetadata != null) {
-            customDataSetter = (customData1) -> SourceMetadataExtension.Companion.setCustomData(sourceMetadata, customData1);
+        if (sourceMetadata != null) {
+            customDataSetter =
+                    (customData1) ->
+                            SourceMetadataExtension.Companion.setCustomData(
+                                    sourceMetadata, customData1);
         }
 
         this.playerStateMachine.changeCustomData(getPosition(), customData, customDataSetter);
@@ -397,9 +400,13 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
         SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
 
-        if(sourceMetadata != null) {
-            customDataGetter = () -> SourceMetadataExtension.Companion.getCustomData(sourceMetadata);
-            customDataSetter = (customData1) -> SourceMetadataExtension.Companion.setCustomData(sourceMetadata, customData1);
+        if (sourceMetadata != null) {
+            customDataGetter =
+                    () -> SourceMetadataExtension.Companion.getCustomData(sourceMetadata);
+            customDataSetter =
+                    (customData1) ->
+                            SourceMetadataExtension.Companion.setCustomData(
+                                    sourceMetadata, customData1);
         }
 
         CustomData currentCustomData = customDataGetter.getCustomData();

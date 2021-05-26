@@ -285,7 +285,8 @@ public class PlayerStateMachine {
         this.qualityChangeCount = 0;
     }
 
-    public void changeCustomData(long position, CustomData customData, CustomDataHelpers.Setter customDataSetter) {
+    public void changeCustomData(
+            long position, CustomData customData, CustomDataHelpers.Setter customDataSetter) {
         PlayerState originalState = this.getCurrentState();
         boolean shouldTransition =
                 originalState == PlayerState.PLAYING || originalState == PlayerState.PAUSE;
