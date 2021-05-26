@@ -370,7 +370,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     public CustomData getCustomData() {
         SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
         if (sourceMetadata != null) {
-            return sourceMetadata.getCustomData();
+            return SourceMetadataExtension.Companion.getCustomData(sourceMetadata);
         }
         return this.bitmovinAnalyticsConfig.getCustomData();
     }
@@ -388,7 +388,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         } else {
             updateConfigRunnable =
                     () -> {
-                        sourceMetadata.setCustomData(customData);
+                        SourceMetadataExtension.Companion.setCustomData(sourceMetadata, customData);
                     };
         }
         this.playerStateMachine.changeCustomData(getPosition(), updateConfigRunnable);
@@ -404,7 +404,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
         CustomData currentCustomData =
                 sourceMetadata != null
-                        ? sourceMetadata.getCustomData()
+                        ? SourceMetadataExtension.Companion.getCustomData(sourceMetadata)
                         : this.bitmovinAnalyticsConfig.getCustomData();
 
         if (sourceMetadata == null) {
@@ -414,11 +414,11 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
             sendEventData(eventData);
             this.bitmovinAnalyticsConfig.setCustomData(currentCustomData);
         } else {
-            sourceMetadata.setCustomData(customData);
+            SourceMetadataExtension.Companion.setCustomData(sourceMetadata, customData);
             EventData eventData = createEventData();
             eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
             sendEventData(eventData);
-            sourceMetadata.setCustomData(currentCustomData);
+            SourceMetadataExtension.Companion.setCustomData(sourceMetadata, currentCustomData);
         }
     }
 
