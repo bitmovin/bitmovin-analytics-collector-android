@@ -376,22 +376,15 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     public void setCustomData(CustomData customData) {
-        SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
-        Runnable updateConfigRunnable;
+        CustomDataHelpers.Setter customDataSetter = this.bitmovinAnalyticsConfig::setCustomData;
 
-        // lambda used because setCustomData on bitmovinAnalyticsConfig is protected method
-        if (sourceMetadata == null) {
-            updateConfigRunnable =
-                    () -> {
-                        this.bitmovinAnalyticsConfig.setCustomData(customData);
-                    };
-        } else {
-            updateConfigRunnable =
-                    () -> {
-                        SourceMetadataExtension.Companion.setCustomData(sourceMetadata, customData);
-                    };
+        SourceMetadata sourceMetadata = playerAdapter.getCurrentSourceMetadata();
+
+        if(sourceMetadata != null) {
+            customDataSetter = (customData1) -> SourceMetadataExtension.Companion.setCustomData(sourceMetadata, customData1);
         }
-        this.playerStateMachine.changeCustomData(getPosition(), updateConfigRunnable);
+
+        this.playerStateMachine.changeCustomData(getPosition(), customData, customDataSetter);
     }
 
     public void setCustomDataOnce(CustomData customData) {
