@@ -68,7 +68,10 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         }
         Log.d(TAG, "Initializing Bitmovin Analytics with Key: " + bitmovinAnalyticsConfig.getKey());
         this.context = context;
-        this.userIdProvider = bitmovinAnalyticsConfig.getRandomiseUserId() ? new RandomisedUserIdProvider() : new UserIdProvider(context);
+        this.userIdProvider =
+                bitmovinAnalyticsConfig.getRandomiseUserId()
+                        ? new RandomisedUserIdProvider()
+                        : new UserIdProvider(context);
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.eventDataFactory = new EventDataFactory(bitmovinAnalyticsConfig, this.userIdProvider);
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
