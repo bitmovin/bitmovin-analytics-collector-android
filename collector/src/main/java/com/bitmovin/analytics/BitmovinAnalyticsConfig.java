@@ -30,6 +30,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private Boolean ads = true;
     private Context context;
     private Boolean isLive;
+    private Boolean randomiseUserId = false;
     private CollectorConfig config = new CollectorConfig();
 
     public static final Creator<BitmovinAnalyticsConfig> CREATOR =
@@ -90,6 +91,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         isLive = (Boolean) in.readSerializable();
         config = in.readParcelable(CollectorConfig.class.getClassLoader());
         ads = in.readInt() == 1;
+        randomiseUserId = (Boolean) in.readSerializable();
     }
 
     public BitmovinAnalyticsConfig() {}
@@ -118,6 +120,7 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         dest.writeSerializable(isLive);
         dest.writeParcelable(config, config.describeContents());
         dest.writeInt(ads ? 1 : 0);
+        dest.writeSerializable(randomiseUserId);
     }
 
     @Override
@@ -404,6 +407,24 @@ public class BitmovinAnalyticsConfig implements Parcelable {
      */
     public void setIsLive(Boolean live) {
         isLive = live;
+    }
+
+    /**
+     * Returns true if random UserId value will be generated
+     *
+     * @return
+     */
+    public Boolean getRandomiseUserId() {
+        return randomiseUserId;
+    }
+
+    /**
+     * Generate random UserId value for session
+     *
+     * @param randomiseUserId
+     */
+    public void setRandomiseUserId(Boolean randomiseUserId) {
+        this.randomiseUserId = randomiseUserId;
     }
 
     protected CustomData getCustomData() {

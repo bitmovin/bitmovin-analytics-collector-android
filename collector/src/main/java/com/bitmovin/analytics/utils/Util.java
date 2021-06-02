@@ -44,6 +44,10 @@ public class Util {
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
+    public static String getRandomUserId() {
+        return UUID.randomUUID().toString();
+    }
+
     /**
      * Returns the time in ms since the system was booted, and guaranteed to be monotonic Details
      * here: https://developer.android.com/reference/android/os/SystemClock
