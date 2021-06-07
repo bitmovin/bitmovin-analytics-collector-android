@@ -1,11 +1,9 @@
 package com.bitmovin.analytics.data
 
-import com.bitmovin.analytics.utils.Util
+import java.util.UUID
 
 class RandomizedUserIdIdProvider : UserIdProvider {
-    private val userId: String = Util.getRandomUserId()
+    private val userId: String = UUID.randomUUID().toString()
 
-    override fun userId(): String {
-        return userId
-    }
+    override fun userId(): String = userId
 }

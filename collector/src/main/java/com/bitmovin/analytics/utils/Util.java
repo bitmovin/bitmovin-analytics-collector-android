@@ -1,11 +1,9 @@
 package com.bitmovin.analytics.utils;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.SystemClock;
-import android.provider.Settings;
 import android.util.Pair;
 import java.net.URI;
 import java.util.ArrayList;
@@ -37,14 +35,6 @@ public class Util {
     }
 
     public static String getUUID() {
-        return UUID.randomUUID().toString();
-    }
-
-    public static String getUserId(Context context) {
-        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-    }
-
-    public static String getRandomUserId() {
         return UUID.randomUUID().toString();
     }
 
