@@ -47,8 +47,8 @@ class EventDataTest {
     @Test
     fun testEventDataSetsRandomisedUserId() {
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", true, "user-agent", "de", "package-name", 100, 200)
-        var randomisedUserIdProvider = RandomisedUserIdProvider()
-        var randomisedUserIdProvider1 = RandomisedUserIdProvider()
+        var randomisedUserIdProvider = RandomisedUserIdIdProvider()
+        var randomisedUserIdProvider1 = RandomisedUserIdIdProvider()
         var eventData = EventDataFactory(bitmovinAnalyticsConfig, randomisedUserIdProvider).create(impressionId, null, deviceInformation)
         var eventData1 = EventDataFactory(bitmovinAnalyticsConfig, randomisedUserIdProvider).create(impressionId, null, deviceInformation)
         var eventData2 = EventDataFactory(bitmovinAnalyticsConfig, randomisedUserIdProvider1).create(impressionId, null, deviceInformation)

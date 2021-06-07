@@ -5,7 +5,7 @@ import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
 
-class EventDataFactory(private val config: BitmovinAnalyticsConfig, private val userIdProvider: UserProvider) : EventDataManipulatorPipeline {
+class EventDataFactory(private val config: BitmovinAnalyticsConfig, private val userIdProvider: UserIdProvider) : EventDataManipulatorPipeline {
     private val eventDataManipulators = mutableListOf<EventDataManipulator>()
 
     // TODO DeviceInformationProvider for now is only available after `attachPlayerAdapter`, but can also be moved to the constructor of BitmovinAnalytics and also in this class

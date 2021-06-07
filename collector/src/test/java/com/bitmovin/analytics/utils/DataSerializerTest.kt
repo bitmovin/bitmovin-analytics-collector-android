@@ -6,7 +6,7 @@ import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.ErrorData
 import com.bitmovin.analytics.data.EventDataFactory
-import com.bitmovin.analytics.data.UserIdProvider
+import com.bitmovin.analytics.data.SecureSettingsAndroidIdIdProvider
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -20,7 +20,7 @@ class DataSerializerTest {
         val impressionId = "79b531da-5abb-4fb2-8dbc-9a6c60b6526f"
         val userId = "c54d11c8-dba2-4475-a867-764befdb5ad2"
         val deviceInformation = DeviceInformation("Google", "Pixel 5", false, "user-agent-string", "en_US", "package.bitmovin.com", 640, 280)
-        val userIdProvider = mockk<UserIdProvider>()
+        val userIdProvider = mockk<SecureSettingsAndroidIdIdProvider>()
         every { userIdProvider.userId() } returns userId
 
         val errorCode = ErrorCode(1000, "Error Description", ErrorData("Error Data Message", arrayOf("first line of details", "second line of details")))
@@ -43,7 +43,7 @@ class DataSerializerTest {
         val impressionId = "79b531da-5abb-4fb2-8dbc-9a6c60b6526f"
         val userId = "c54d11c8-dba2-4475-a867-764befdb5ad2"
         val deviceInformation = DeviceInformation("Google", "Pixel 5", false, "user-agent-string", "en_US", "package.bitmovin.com", 640, 280)
-        val userIdProvider = mockk<UserIdProvider>()
+        val userIdProvider = mockk<SecureSettingsAndroidIdIdProvider>()
         every { userIdProvider.userId() } returns userId
 
         val errorCode = ErrorCode(1000, "Error Description", null)

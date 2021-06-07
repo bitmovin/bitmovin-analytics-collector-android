@@ -15,10 +15,10 @@ import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
-import com.bitmovin.analytics.data.RandomisedUserIdProvider;
+import com.bitmovin.analytics.data.RandomisedUserIdIdProvider;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
+import com.bitmovin.analytics.data.SecureSettingsAndroidIdIdProvider;
 import com.bitmovin.analytics.data.UserIdProvider;
-import com.bitmovin.analytics.data.UserProvider;
 import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.features.Feature;
@@ -53,7 +53,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     protected BitmovinAdAnalytics adAnalytics;
     protected IEventDataDispatcher eventDataDispatcher;
     protected Context context;
-    private final UserProvider userIdProvider;
+    private final UserIdProvider userIdProvider;
     private final EventDataFactory eventDataFactory;
 
     /**
@@ -70,8 +70,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         this.context = context;
         this.userIdProvider =
                 bitmovinAnalyticsConfig.getRandomiseUserId()
-                        ? new RandomisedUserIdProvider()
-                        : new UserIdProvider(context);
+                        ? new RandomisedUserIdIdProvider()
+                        : new SecureSettingsAndroidIdIdProvider(context);
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.eventDataFactory = new EventDataFactory(bitmovinAnalyticsConfig, this.userIdProvider);
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
