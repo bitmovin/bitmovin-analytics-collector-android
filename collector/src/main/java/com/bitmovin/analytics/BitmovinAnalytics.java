@@ -16,7 +16,7 @@ import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
 import com.bitmovin.analytics.data.RandomizedUserIdIdProvider;
-import com.bitmovin.analytics.data.SecureSettingsAndroidIdIdProvider;
+import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator;
@@ -71,7 +71,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         this.userIdProvider =
                 bitmovinAnalyticsConfig.getRandomizeUserId()
                         ? new RandomizedUserIdIdProvider()
-                        : new SecureSettingsAndroidIdIdProvider(context);
+                        : new SecureSettingsAndroidIdUserIdProvider(context);
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.eventDataFactory = new EventDataFactory(bitmovinAnalyticsConfig, this.userIdProvider);
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
