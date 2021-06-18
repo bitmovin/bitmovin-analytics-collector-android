@@ -43,4 +43,19 @@ class EventDataTest {
 
         assertThat(eventData.platform).isEqualTo("androidTV")
     }
+
+    @Test
+    fun testEventDataSetsRandomizedUserId() {
+        val deviceInformation = DeviceInformation("myManufacturer", "myModel", true, "user-agent", "de", "package-name", 100, 200)
+        var randomizedUserIdProvider = RandomizedUserIdIdProvider()
+        var randomizedUserIdProvider1 = RandomizedUserIdIdProvider()
+        var eventData = EventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider).create(impressionId, null, deviceInformation)
+        var eventData1 = EventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider).create(impressionId, null, deviceInformation)
+        var eventData2 = EventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider1).create(impressionId, null, deviceInformation)
+
+        assertThat(eventData.userId).isEqualTo(eventData1.userId)
+        assertThat(eventData.userId).isEqualTo(randomizedUserIdProvider.userId())
+        assertThat(eventData2.userId).isEqualTo(randomizedUserIdProvider1.userId())
+        assertThat(eventData2.userId).isNotEqualTo(eventData1.userId)
+    }
 }
