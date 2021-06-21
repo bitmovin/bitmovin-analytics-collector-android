@@ -7,15 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
-### Added
-- Option to generate randomized `userId` value
-
-
 ## Development v1
 
+## v2.1.0
+
 ### Added
 - Option to generate randomized `userId` value
 
+## v1.25.0
+
+### Added
+- Option to generate randomized `userId` value
 
 ## v2.0.0
 
