@@ -7,7 +7,7 @@ import java.util.LinkedList
 import okhttp3.OkHttpClient
 
 class ErrorDetailBackend(context: Context) {
-    private val backendUrl = "https://analytics-ingress-global.bitmovin.com/errordetails"
+    private val backendUrl = "https://analytics-ingress-global.bitmovin.com/analytics/error"
     private val httpClient = HttpClient(context, OkHttpClient())
     private val queue = LinkedList<ErrorDetail>()
 
