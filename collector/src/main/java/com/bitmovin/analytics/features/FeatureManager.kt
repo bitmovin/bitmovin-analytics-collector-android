@@ -25,11 +25,11 @@ class FeatureManager {
         features.forEach { it.reset() }
     }
 
-    fun configureFeatures(authenticated: Boolean, settings: Map<String, String>) {
+    fun configureFeatures(authenticated: Boolean, featureConfigs: Map<String, String>) {
         val iterator = features.iterator()
         while (iterator.hasNext()) {
             val it = iterator.next()
-            val config = it.configure(authenticated, settings[it.name])
+            val config = it.configure(authenticated, featureConfigs[it.name])
             if (!authenticated || config?.enabled != true) {
                 Log.d(TAG, "Disabling feature ${it.name} as it isn't enabled according to license callback.")
                 it.disable()
