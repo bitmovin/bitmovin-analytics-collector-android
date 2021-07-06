@@ -32,6 +32,10 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
         segmentQueue.clear()
     }
 
+    override fun reset() {
+        segmentQueue.clear()
+    }
+
     override fun onDownloadFinished(event: OnDownloadFinishedEventObject) {
         addSegment(event.segment)
     }

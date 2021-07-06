@@ -21,6 +21,10 @@ class FeatureManager {
         features.clear()
     }
 
+    fun resetFeatures() {
+        features.forEach { it.reset() }
+    }
+
     fun configureFeatures(authenticated: Boolean, settings: Map<String, String>) {
         val iterator = features.iterator()
         while (iterator.hasNext()) {
