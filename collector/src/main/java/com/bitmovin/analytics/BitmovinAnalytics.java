@@ -39,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener, LicenseCallback {
+public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, ImpressionIdProvider {
 
     private static final String TAG = "BitmovinAnalytics";
 
@@ -467,6 +467,12 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
     public void removeDebugListener(DebugListener listener) {
         eventBus.get(DebugListener.class).unsubscribe(listener);
+    }
+
+    @NotNull
+    @Override
+    public String getImpressionId() {
+        return this.playerStateMachine.getImpressionId();
     }
 
     public interface DebugListener {
