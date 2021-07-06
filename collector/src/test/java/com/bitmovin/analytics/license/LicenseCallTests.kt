@@ -34,37 +34,37 @@ class LicenseCallTests {
         return LicenseCall(BitmovinAnalyticsConfig(""), mockk(relaxed = true))
     }
 
-    private fun getGrantedResponseBody(settings: String) = "{\"status\": \"granted\"$settings}"
+    private fun getGrantedResponseBody(features: String) = "{\"status\": \"granted\"$features}"
 
-    private fun verifyLicenseResponse(responseBody: String, expectedSuccess: Boolean, expectedSettings: Map<String, String>?) {
+    private fun verifyLicenseResponse(responseBody: String, expectedSuccess: Boolean, expectedFeatures: Map<String, String>?) {
         val licenseCall = createLicenseCall(responseBody)
         val callback = mockk<AuthenticationCallback>(relaxed = true)
         licenseCall.authenticate(callback)
-        verify { callback.authenticationCompleted(expectedSuccess, expectedSettings) }
+        verify { callback.authenticationCompleted(expectedSuccess, expectedFeatures) }
     }
 
     @Test
-    fun testLicenseResponseShouldSuccessfullyBeParsedWithoutSettings() {
+    fun testLicenseResponseShouldSuccessfullyBeParsedWithoutFeatures() {
         verifyLicenseResponse(getGrantedResponseBody(""), true, null)
     }
 
     @Test
-    fun testLicenseResponseShouldSuccessfullyBeParsedWithNullSettings() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"settings\": null"), true, null)
+    fun testLicenseResponseShouldSuccessfullyBeParsedWithNullFeatures() {
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": null"), true, null)
     }
 
     @Test
-    fun testLicenseResponseShouldSuccessfullyBeParsedWithEmptySettings() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"settings\": {}"), true, HashMap())
+    fun testLicenseResponseShouldSuccessfullyBeParsedWithEmptyFeatures() {
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": {}"), true, HashMap())
     }
 
     @Test
-    fun testLicenseResponseShouldSuccessfullyBeParsedWithCorrectSettings() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"settings\": { \"feature\": \"foo\" }"), true, hashMapOf("feature" to "foo"))
+    fun testLicenseResponseShouldSuccessfullyBeParsedWithCorrectFeatures() {
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"feature\": \"foo\" }"), true, hashMapOf("feature" to "foo"))
     }
 
     @Test
-    fun testLicenseResponseShouldFailWithWrongSettings() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"settings\": \"asdf\""), false, null)
+    fun testLicenseResponseShouldFailWithWrongFeatures() {
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": \"asdf\""), false, null)
     }
 }

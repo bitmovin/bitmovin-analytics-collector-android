@@ -11,6 +11,9 @@ import com.bitmovin.analytics.utils.ClientFactory;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -86,7 +89,7 @@ public class LicenseCall {
                             return;
                         }
                         Log.d(TAG, "License response was granted");
-                        callback.authenticationCompleted(true, licenseResponse.getSettings());
+                        callback.authenticationCompleted(true, licenseResponse.getFeatures());
                     }
                 });
     }

@@ -63,12 +63,12 @@ class FeatureManagerTests {
         testShouldEnableFeature(mapOf("feature1" to "{\"enabled\": true}"))
     }
 
-    private fun testShouldDisableFeature(authenticated: Boolean, settings: Map<String, String>) {
+    private fun testShouldDisableFeature(authenticated: Boolean, features: Map<String, String>) {
         val feature1 = spyk(object : Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
 
         val featureManager = FeatureManager()
         featureManager.registerFeature(feature1)
-        featureManager.configureFeatures(authenticated, settings)
+        featureManager.configureFeatures(authenticated, features)
         verifyOrder {
             feature1.configure(any(), any())
             feature1.disabled()
@@ -76,12 +76,12 @@ class FeatureManagerTests {
         verify(exactly = 0) { feature1.enabled() }
     }
 
-    private fun testShouldEnableFeature(settings: Map<String, String>) {
+    private fun testShouldEnableFeature(features: Map<String, String>) {
         val feature1 = spyk(object : Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
 
         val featureManager = FeatureManager()
         featureManager.registerFeature(feature1)
-        featureManager.configureFeatures(true, settings)
+        featureManager.configureFeatures(true, features)
         verifyOrder {
             feature1.configured(any(), any())
             feature1.enabled()

@@ -5,7 +5,7 @@ import java.util.Map;
 public class LicenseResponse {
     private String status;
     private String message;
-    private Map<String, String> settings;
+    private Map<String, String> features;
 
     public String getStatus() {
         return status;
@@ -23,11 +23,11 @@ public class LicenseResponse {
         this.message = message;
     }
 
-    public Map<String, String> getSettings() {
-        return settings;
+    public Map<String, String> getFeatures() {
+        return features;
     }
 
-    public void setSettings(Map<String, String> settings) {
-        this.settings = settings;
+    public void setFeatures(Map<String, String> features) {
+        this.features = features;
     }
 }

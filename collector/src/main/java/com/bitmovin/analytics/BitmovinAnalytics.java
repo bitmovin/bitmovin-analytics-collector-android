@@ -449,11 +449,11 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
     }
 
     @Override
-    public void configureFeatures(boolean authenticated, @Nullable Map<String, String> settings) {
-        if (settings == null) {
-            settings = new HashMap<>();
+    public void configureFeatures(boolean authenticated, @Nullable Map<String, String> features) {
+        if (features == null) {
+            features = new HashMap<>();
         }
-        featureManager.configureFeatures(authenticated, settings);
+        featureManager.configureFeatures(authenticated, features);
     }
 
     @Override
