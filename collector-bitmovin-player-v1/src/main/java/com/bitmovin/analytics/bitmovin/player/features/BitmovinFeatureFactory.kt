@@ -15,10 +15,9 @@ class BitmovinFeatureFactory(private val analyticsConfig: BitmovinAnalyticsConfi
         val features = mutableListOf<Feature<*>>()
         val segmentTrackingAdapter = BitmovinSegmentTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
         val segmentTracking = SegmentTracking(segmentTrackingAdapter)
-        features.add(segmentTracking)
         val errorDetailsAdapter = BitmovinErrorDetailsAdapter(player, analytics.onAnalyticsReleasingObservable)
-        val errorDetailsBackend = ErrorDetailBackend(context)
-        features.add(ErrorDetailTracking(analyticsConfig, analytics, errorDetailsBackend, segmentTracking, errorDetailsAdapter, analytics.onErrorDetailObservable))
+        val errorDetailsBackend = ErrorDetailBackend(analyticsConfig.config, context)
+        features.add(ErrorDetailTracking(context, analyticsConfig, analytics, errorDetailsBackend, segmentTracking, errorDetailsAdapter, analytics.onErrorDetailObservable))
         return features
     }
 }

@@ -31,6 +31,10 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
             HttpRequestType.MANIFEST_HLS_MASTER -> SegmentType.MANIFEST_HLS_MASTER
             HttpRequestType.MANIFEST_HLS_VARIANT -> SegmentType.MANIFEST_HLS_VARIANT
             HttpRequestType.MANIFEST_SMOOTH -> SegmentType.MANIFEST_SMOOTH
+            HttpRequestType.KEY_HLS_AES -> SegmentType.KEY_HLS_AES
+            HttpRequestType.MEDIA_AUDIO -> SegmentType.MEDIA_AUDIO
+            HttpRequestType.MEDIA_SUBTITLES -> SegmentType.MEDIA_SUBTITLES
+            HttpRequestType.MEDIA_VIDEO -> SegmentType.MEDIA_VIDEO
             else -> SegmentType.UNKNOWN
         }
     }
