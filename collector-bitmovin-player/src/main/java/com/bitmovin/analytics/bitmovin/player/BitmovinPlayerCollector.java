@@ -36,7 +36,7 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
     public void attachPlayer(Player player) {
         DeviceInformationProvider deviceInformationProvider =
                 new DeviceInformationProvider(context, getUserAgent(context));
-        FeatureFactory featureFactory = new BitmovinFeatureFactory(this, player, context);
+        FeatureFactory featureFactory = new BitmovinFeatureFactory(bitmovinAnalyticsConfig,this, player, context);
         BitmovinSdkAdapter adapter =
                 new BitmovinSdkAdapter(
                         player,
