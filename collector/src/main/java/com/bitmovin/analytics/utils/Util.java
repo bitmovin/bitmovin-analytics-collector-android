@@ -5,6 +5,10 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.SystemClock;
 import android.util.Pair;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,5 +127,19 @@ public class Util {
 
     public static long toPrimitiveLong(Double value) {
         return value == null ? 0 : value.longValue();
+    }
+
+    public static String joinUrl(String baseUrl, String relativeUrl)
+    {
+        StringBuilder result = new StringBuilder(baseUrl);
+        if(!baseUrl.endsWith("/")) {
+            result.append('/');
+        }
+
+        if(relativeUrl.startsWith("/")) {
+            relativeUrl = relativeUrl.substring(1);
+        }
+        result.append(relativeUrl);
+        return result.toString();
     }
 }
