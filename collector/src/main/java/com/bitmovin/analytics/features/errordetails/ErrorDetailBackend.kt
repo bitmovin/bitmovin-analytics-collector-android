@@ -1,13 +1,15 @@
 package com.bitmovin.analytics.features.errordetails
 
 import android.content.Context
+import com.bitmovin.analytics.CollectorConfig
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.HttpClient
+import com.bitmovin.analytics.utils.Util
 import java.util.LinkedList
 import okhttp3.OkHttpClient
 
-class ErrorDetailBackend(context: Context) {
-    private val backendUrl = "https://analytics-ingress-global.bitmovin.com/analytics/error"
+class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
+    private val backendUrl = Util.joinUrl(collectorConfig.backendUrl, "/analytics/error")
     private val httpClient = HttpClient(context, OkHttpClient())
     private val queue = LinkedList<ErrorDetail>()
 
