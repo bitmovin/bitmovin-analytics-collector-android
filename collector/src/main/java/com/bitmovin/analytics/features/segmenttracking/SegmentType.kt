@@ -11,5 +11,6 @@ enum class SegmentType {
     MANIFEST_HLS_MASTER,
     MANIFEST_HLS_VARIANT,
     MANIFEST_SMOOTH,
+    KEY_HLS_AES,
     UNKNOWN
 }

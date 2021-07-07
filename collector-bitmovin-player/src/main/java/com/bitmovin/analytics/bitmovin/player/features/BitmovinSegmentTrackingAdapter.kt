@@ -36,6 +36,7 @@ class BitmovinSegmentTrackingAdapter(private val player: Player, private val onA
             HttpRequestType.MediaAudio -> SegmentType.MEDIA_AUDIO
             HttpRequestType.MediaProgressive -> SegmentType.MEDIA_PROGRESSIVE
             HttpRequestType.MediaSubtitles -> SegmentType.MEDIA_SUBTITLES
+            HttpRequestType.KeyHlsAes -> SegmentType.KEY_HLS_AES
             else -> SegmentType.UNKNOWN
         }
     }
