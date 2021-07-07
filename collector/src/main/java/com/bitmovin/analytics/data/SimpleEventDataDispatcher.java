@@ -3,6 +3,7 @@ package com.bitmovin.analytics.data;
 import android.content.Context;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.license.AuthenticationCallback;
+import com.bitmovin.analytics.license.FeatureConfigs;
 import com.bitmovin.analytics.license.LicenseCall;
 import com.bitmovin.analytics.license.LicenseCallback;
 import java.util.Iterator;
@@ -39,9 +40,9 @@ public class SimpleEventDataDispatcher implements IEventDataDispatcher, Authenti
 
     @Override
     public synchronized void authenticationCompleted(
-            boolean success, Map<String, String> features) {
+            boolean success, FeatureConfigs featureConfigs) {
         if (callback != null) {
-            callback.configureFeatures(success, features);
+            callback.configureFeatures(success, featureConfigs);
         }
         if (success) {
             enabled = true;

@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.features
 
 import android.util.Log
+import com.bitmovin.analytics.license.FeatureConfigs
 
 class FeatureManager {
     companion object {
@@ -25,11 +26,11 @@ class FeatureManager {
         features.forEach { it.reset() }
     }
 
-    fun configureFeatures(authenticated: Boolean, featureConfigs: Map<String, String>) {
+    fun configureFeatures(authenticated: Boolean, featureConfigs: FeatureConfigs?) {
         val iterator = features.iterator()
         while (iterator.hasNext()) {
             val it = iterator.next()
-            val config = it.configure(authenticated, featureConfigs[it.name])
+            val config = it.configure(authenticated, featureConfigs)
             if (!authenticated || config?.enabled != true) {
                 Log.d(TAG, "Disabling feature ${it.name} as it isn't enabled according to license callback.")
                 it.disable()

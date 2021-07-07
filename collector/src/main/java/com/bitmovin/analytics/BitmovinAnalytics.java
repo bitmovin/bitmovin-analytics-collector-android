@@ -24,6 +24,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureManager;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
+import com.bitmovin.analytics.license.FeatureConfigs;
 import com.bitmovin.analytics.license.LicenseCallback;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -449,11 +450,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback,
     }
 
     @Override
-    public void configureFeatures(boolean authenticated, @Nullable Map<String, String> features) {
-        if (features == null) {
-            features = new HashMap<>();
-        }
-        featureManager.configureFeatures(authenticated, features);
+    public void configureFeatures(boolean authenticated, @Nullable FeatureConfigs featureConfigs) {
+        featureManager.configureFeatures(authenticated, featureConfigs);
     }
 
     @Override
