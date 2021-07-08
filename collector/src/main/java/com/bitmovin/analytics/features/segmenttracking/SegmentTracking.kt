@@ -27,7 +27,7 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
         segmentQueue.limit(maxSegments)
     }
 
-    fun disabled() {
+    fun disable() {
         observables.forEach { it.unsubscribe(this) }
         segmentQueue.clear()
     }

@@ -31,7 +31,7 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
     }
 
     override fun disabled() {
-        segmentTracking?.disabled()
+        segmentTracking?.disable()
         backend.clear()
         observables.forEach { it.unsubscribe(this) }
     }
