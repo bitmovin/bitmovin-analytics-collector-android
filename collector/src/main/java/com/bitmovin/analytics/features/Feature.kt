@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.features
 
 import com.bitmovin.analytics.license.FeatureConfigs
-import com.bitmovin.analytics.utils.DataSerializer
 import kotlin.reflect.KClass
 
 abstract class Feature<TConfig : FeatureConfig>(val name: String, private val configClass: KClass<TConfig>) {
@@ -23,7 +22,7 @@ abstract class Feature<TConfig : FeatureConfig>(val name: String, private val co
     abstract fun extractConfig(featureConfigs: FeatureConfigs): TConfig?
 
     fun configure(authenticated: Boolean, featureConfigs: FeatureConfigs?): TConfig? {
-        if(featureConfigs != null) {
+        if (featureConfigs != null) {
             config = extractConfig(featureConfigs)
         }
         configured(authenticated, config)

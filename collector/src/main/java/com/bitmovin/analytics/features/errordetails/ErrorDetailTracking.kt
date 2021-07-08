@@ -3,14 +3,11 @@ package com.bitmovin.analytics.features.errordetails
 import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.ImpressionIdProvider
-import com.bitmovin.analytics.LicenseKeyProvider
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
 import com.bitmovin.analytics.license.FeatureConfigs
-import com.bitmovin.analytics.utils.Util
 import com.bitmovin.analytics.utils.topOfStacktrace
-import java.util.*
 
 class ErrorDetailTracking(private val context: Context, private val analyticsConfig: BitmovinAnalyticsConfig, private val impressionIdProvider: ImpressionIdProvider, private val backend: ErrorDetailBackend, private val segmentTracking: SegmentTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) :
         Feature<ErrorDetailTrackingConfig>("errorSegments", ErrorDetailTrackingConfig::class),
