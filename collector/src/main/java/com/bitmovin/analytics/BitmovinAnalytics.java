@@ -108,7 +108,7 @@ public class BitmovinAnalytics
         detachPlayer();
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
-        Collection<Feature<FeatureConfigContainer,?>> features = this.playerAdapter.init();
+        Collection<Feature<FeatureConfigContainer, ?>> features = this.playerAdapter.init();
         this.featureManager.registerFeatures(features);
 
         // this.registerEventDataManipulators(prePipelineManipulator);
@@ -449,7 +449,8 @@ public class BitmovinAnalytics
     }
 
     @Override
-    public void configureFeatures(boolean authenticated, @Nullable FeatureConfigContainer featureConfigs) {
+    public void configureFeatures(
+            boolean authenticated, @Nullable FeatureConfigContainer featureConfigs) {
         featureManager.configureFeatures(authenticated, featureConfigs);
     }
 
