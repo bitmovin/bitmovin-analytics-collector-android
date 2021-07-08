@@ -6,18 +6,18 @@ import com.bitmovin.analytics.ImpressionIdProvider
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
-import com.bitmovin.analytics.license.FeatureConfigs
+import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.utils.topOfStacktrace
 
 class ErrorDetailTracking(private val context: Context, private val analyticsConfig: BitmovinAnalyticsConfig, private val impressionIdProvider: ImpressionIdProvider, private val backend: ErrorDetailBackend, private val segmentTracking: SegmentTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) :
-        Feature<ErrorDetailTrackingConfig>("errorSegments", ErrorDetailTrackingConfig::class),
+        Feature<FeatureConfigContainer, ErrorDetailTrackingConfig>("errorSegments", ErrorDetailTrackingConfig::class),
         OnErrorDetailEventListener {
     private var errorIndex: Long = 0
     init {
         observables.forEach { it.subscribe(this) }
     }
 
-    override fun extractConfig(featureConfigs: FeatureConfigs) = featureConfigs.errorSegments
+    override fun extractConfig(featureConfigs: FeatureConfigContainer) = featureConfigs.errorSegments
 
     override fun configured(authenticated: Boolean, config: ErrorDetailTrackingConfig?) {
         val maxSegments = config?.numberOfSegments ?: 0

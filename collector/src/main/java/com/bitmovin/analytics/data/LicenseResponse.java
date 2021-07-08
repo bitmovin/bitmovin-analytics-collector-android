@@ -1,11 +1,11 @@
 package com.bitmovin.analytics.data;
 
-import com.bitmovin.analytics.license.FeatureConfigs;
+import com.bitmovin.analytics.license.FeatureConfigContainer;
 
 public class LicenseResponse {
     private String status;
     private String message;
-    private FeatureConfigs features;
+    private FeatureConfigContainer features;
 
     public String getStatus() {
         return status;
@@ -23,11 +23,11 @@ public class LicenseResponse {
         this.message = message;
     }
 
-    public FeatureConfigs getFeatures() {
+    public FeatureConfigContainer getFeatures() {
         return features;
     }
 
-    public void setFeatures(FeatureConfigs features) {
+    public void setFeatures(FeatureConfigContainer features) {
         this.features = features;
     }
 }

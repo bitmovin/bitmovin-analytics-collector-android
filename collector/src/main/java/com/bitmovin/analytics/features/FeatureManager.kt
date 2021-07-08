@@ -1,19 +1,18 @@
 package com.bitmovin.analytics.features
 
 import android.util.Log
-import com.bitmovin.analytics.license.FeatureConfigs
 
-class FeatureManager {
+class FeatureManager<TConfigContainer> {
     companion object {
         val TAG = FeatureManager::class.java.name
     }
-    private val features: MutableList<Feature<*>> = mutableListOf()
+    private val features: MutableList<Feature<TConfigContainer, *>> = mutableListOf()
 
-    fun registerFeature(feature: Feature<*>) {
+    fun registerFeature(feature: Feature<TConfigContainer, *>) {
         features.add(feature)
     }
 
-    fun registerFeatures(features: Collection<Feature<*>>) {
+    fun registerFeatures(features: Collection<Feature<TConfigContainer, *>>) {
         this.features.addAll(features)
     }
 
@@ -26,7 +25,7 @@ class FeatureManager {
         features.forEach { it.reset() }
     }
 
-    fun configureFeatures(authenticated: Boolean, featureConfigs: FeatureConfigs?) {
+    fun configureFeatures(authenticated: Boolean, featureConfigs: TConfigContainer?) {
         val iterator = features.iterator()
         while (iterator.hasNext()) {
             val it = iterator.next()

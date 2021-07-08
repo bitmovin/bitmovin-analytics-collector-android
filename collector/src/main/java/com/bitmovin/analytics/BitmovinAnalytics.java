@@ -24,7 +24,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureManager;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
-import com.bitmovin.analytics.license.FeatureConfigs;
+import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.license.LicenseCallback;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -43,7 +43,7 @@ public class BitmovinAnalytics
 
     private static final String TAG = "BitmovinAnalytics";
 
-    private FeatureManager featureManager = new FeatureManager();
+    private FeatureManager<FeatureConfigContainer> featureManager = new FeatureManager<>();
     private EventBus eventBus = new EventBus();
 
     protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
@@ -108,7 +108,7 @@ public class BitmovinAnalytics
         detachPlayer();
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
-        Collection<Feature<?>> features = this.playerAdapter.init();
+        Collection<Feature<FeatureConfigContainer,?>> features = this.playerAdapter.init();
         this.featureManager.registerFeatures(features);
 
         // this.registerEventDataManipulators(prePipelineManipulator);
@@ -449,7 +449,7 @@ public class BitmovinAnalytics
     }
 
     @Override
-    public void configureFeatures(boolean authenticated, @Nullable FeatureConfigs featureConfigs) {
+    public void configureFeatures(boolean authenticated, @Nullable FeatureConfigContainer featureConfigs) {
         featureManager.configureFeatures(authenticated, featureConfigs);
     }
 
