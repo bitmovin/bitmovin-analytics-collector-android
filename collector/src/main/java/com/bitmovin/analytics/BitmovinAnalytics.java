@@ -31,8 +31,6 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.Util;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +38,8 @@ import org.jetbrains.annotations.Nullable;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener, LicenseCallback, ImpressionIdProvider {
+public class BitmovinAnalytics
+        implements StateMachineListener, LicenseCallback, ImpressionIdProvider {
 
     private static final String TAG = "BitmovinAnalytics";
 

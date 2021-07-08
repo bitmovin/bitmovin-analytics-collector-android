@@ -2,8 +2,6 @@ package com.bitmovin.analytics.data;
 
 import com.bitmovin.analytics.license.FeatureConfigs;
 
-import java.util.Map;
-
 public class LicenseResponse {
     private String status;
     private String message;
