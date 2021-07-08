@@ -31,7 +31,7 @@ class FeatureManager<TConfigContainer> {
             val it = iterator.next()
             val config = it.configure(authenticated, featureConfigs)
             if (!authenticated || config?.enabled != true) {
-                Log.d(TAG, "Disabling feature ${it.name} as it isn't enabled according to license callback.")
+                Log.d(TAG, "Disabling feature ${it.javaClass.simpleName} as it isn't enabled according to license callback.")
                 it.disable()
                 iterator.remove()
             }
