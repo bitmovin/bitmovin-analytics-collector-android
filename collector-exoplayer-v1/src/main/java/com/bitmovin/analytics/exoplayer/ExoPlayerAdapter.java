@@ -48,7 +48,6 @@ import com.google.android.exoplayer2.source.dash.manifest.DashManifest;
 import com.google.android.exoplayer2.source.hls.HlsManifest;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -623,7 +622,7 @@ public class ExoPlayerAdapter
     @Override
     public void onDecoderInputFormatChanged(EventTime eventTime, int trackType, Format format) {
         try {
-            switch (trackType){
+            switch (trackType) {
                 case TRACK_TYPE_AUDIO:
                     handleAudioInputFormatChanged(format);
                     break;
