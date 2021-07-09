@@ -2,6 +2,4 @@ package com.bitmovin.analytics.features.errordetails
 
 import com.bitmovin.analytics.features.FeatureConfig
 
-class ErrorDetailTrackingConfig : FeatureConfig() {
-    val numberOfSegments: Int? = null
-}
+data class ErrorDetailTrackingConfig(override val enabled: Boolean = false, val numberOfSegments: Int? = null) : FeatureConfig
