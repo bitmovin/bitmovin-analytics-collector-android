@@ -2,6 +2,7 @@ package com.bitmovin.analytics.license
 
 import android.net.Uri
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.features.errordetails.ErrorDetailTrackingConfig
 import com.bitmovin.analytics.utils.HttpClient
 import io.mockk.every
 import io.mockk.mockk
@@ -36,7 +37,7 @@ class LicenseCallTests {
 
     private fun getGrantedResponseBody(features: String) = "{\"status\": \"granted\"$features}"
 
-    private fun verifyLicenseResponse(responseBody: String, expectedSuccess: Boolean, expectedFeatures: Map<String, String>?) {
+    private fun verifyLicenseResponse(responseBody: String, expectedSuccess: Boolean, expectedFeatures: FeatureConfigContainer?) {
         val licenseCall = createLicenseCall(responseBody)
         val callback = mockk<AuthenticationCallback>(relaxed = true)
         licenseCall.authenticate(callback)
@@ -55,12 +56,27 @@ class LicenseCallTests {
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEmptyFeatures() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": {}"), true, HashMap())
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": {}"), true, FeatureConfigContainer(null))
     }
 
     @Test
-    fun testLicenseResponseShouldSuccessfullyBeParsedWithCorrectFeatures() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"feature\": \"foo\" }"), true, hashMapOf("feature" to "foo"))
+    fun testLicenseResponseShouldSuccessfullyBeParsedWithErrorTracking() {
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorSegments\": {} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig( false)))
+    }
+
+    @Test
+    fun testLicenseResponseShouldSuccessfullyBeParsedWithDisabledErrorTracking() {
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorSegments\": {\"enabled\": false} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig( false)))
+    }
+
+    @Test
+    fun testLicenseResponseShouldSuccessfullyBeParsedWithEnabledErrorTracking() {
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorSegments\": {\"enabled\": true, \"numberOfSegments\": 12} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig( true, 12)))
+    }
+
+    @Test
+    fun testLicenseResponseShouldSuccessfullyBeParsedWithEnabledErrorTrackingAndTypo() {
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorSegments\": {\"enabled\": true, \"numberOfSeeegments\": 12} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig( true)))
     }
 
     @Test
