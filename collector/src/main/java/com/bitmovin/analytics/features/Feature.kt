@@ -18,7 +18,7 @@ abstract class Feature<TConfigContainer, TConfig : FeatureConfig>() {
 
     abstract fun extractConfig(featureConfigs: TConfigContainer): TConfig?
 
-    fun configure(authenticated: Boolean, configContainer: TConfigContainer?): FeatureConfig? {
+    fun configure(authenticated: Boolean, configContainer: TConfigContainer?): TConfig? {
         if (configContainer != null) {
             config = extractConfig(configContainer)
         }
