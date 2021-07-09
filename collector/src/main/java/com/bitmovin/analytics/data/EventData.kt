@@ -68,7 +68,7 @@ class EventData(
     var progUrl: String? = null
     var isMuted = false
     var sequenceNumber: Int = 0
-    val platform: String = if (deviceInfo.isTV) "androidTV" else "android"
+    val platform: String = Util.getPlatform(deviceInfo.isTV)
     var videoCodec: String? = null
     var audioCodec: String? = null
     var supportedVideoCodecs: List<String>? = null
