@@ -16,7 +16,7 @@ import org.junit.Test
 class ErrorDetailTrackingTests {
     @Test
     fun testErrorDetailLimitSegmentsShouldntFailIfSegmentsAreNull() {
-        val errorDetail = ErrorDetail("", "", "", 0, 0, null, null, null, null)
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, null, null)
         errorDetail.limitSegments(1)
     }
 
@@ -24,7 +24,7 @@ class ErrorDetailTrackingTests {
     fun testErrorDetailLimitSegmentsShouldLimitSegments() {
         val segment1 = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0.0, null, 0, true)
         val segment2 = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0.0, null, 0, true)
-        val errorDetail = ErrorDetail("", "", "", 0, 0, null, null, null, mutableListOf(segment1, segment2))
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, null, mutableListOf(segment1, segment2))
         assertThat(errorDetail.segments?.size).isEqualTo(2)
         errorDetail.limitSegments(1)
         assertThat(errorDetail.segments?.size).isEqualTo(1)
@@ -34,7 +34,7 @@ class ErrorDetailTrackingTests {
     fun testErrorDetailLimitSegmentsShouldRemoveItemsFromEnd() {
         val segment1 = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0.0, null, 0, true)
         val segment2 = Segment(1, SegmentType.MANIFEST_DASH, null, null, 0, 0.0, null, 0, true)
-        val errorDetail = ErrorDetail("", "", "", 0, 0, null, null, null, mutableListOf(segment1, segment2))
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, null, mutableListOf(segment1, segment2))
         errorDetail.limitSegments(1)
         assertThat(errorDetail.segments?.get(0)).isEqualTo(segment1)
         assertThat(errorDetail.segments?.get(0)).isNotEqualTo(segment2)
@@ -81,24 +81,13 @@ class ErrorDetailTrackingTests {
     }
 
     @Test
-    fun testLimitsQueuedItemsAfterEnablingFeature() {
+    fun testLimitsQueuedItemsAfterConfiguringFeature() {
         val support = ObservableSupport<OnErrorDetailEventListener>()
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
         val segmentTracking = SegmentTracking()
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking, support)
-        errorDetailTracking.enabled()
+        errorDetailTracking.configured(true, ErrorDetailTrackingConfig(true, 100))
         verify { backend.limitSegmentsInQueue(segmentTracking.maxSegments) }
-    }
-
-    @Test
-    fun testLimitsQueuedItemsToZeroIfSegmentTrackingIsDisabledAfterEnablingFeature() {
-        val support = ObservableSupport<OnErrorDetailEventListener>()
-        val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val segmentTracking = SegmentTracking()
-        segmentTracking.disable()
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking, support)
-        errorDetailTracking.enabled()
-        verify { backend.limitSegmentsInQueue(0) }
     }
 
     @Test
