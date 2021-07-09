@@ -57,7 +57,7 @@ class FeatureTests {
     @Test
     fun testConfigureWillReturnDisabledConfigAndCallsConfigureHook() {
         val feature = spyk(Feature1())
-        val config = feature.configure(true, ConfigContainer(TestFeatureConfigNonOptional(false,0), null))
+        val config = feature.configure(true, ConfigContainer(TestFeatureConfigNonOptional(false, 0), null))
         assertThat(config).isNotNull
         assertThat(config?.enabled).isFalse()
         assertThat(config?.testValue).isEqualTo(0)
@@ -67,7 +67,7 @@ class FeatureTests {
     @Test
     fun testConfigureWillReturnEnabledConfigAndCallsConfigureHook() {
         val feature = spyk(Feature1())
-        val config = feature.configure(true, ConfigContainer(TestFeatureConfigNonOptional(true,0), null))
+        val config = feature.configure(true, ConfigContainer(TestFeatureConfigNonOptional(true, 0), null))
         assertThat(config).isNotNull
         assertThat(config?.enabled).isTrue()
         assertThat(config?.testValue).isEqualTo(0)
