@@ -5,8 +5,6 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MANIFEST;
 import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 import static com.google.android.exoplayer2.C.PLAYREADY_UUID;
 import static com.google.android.exoplayer2.C.TIME_UNSET;
-import static com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO;
-import static com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO;
 import static com.google.android.exoplayer2.C.WIDEVINE_UUID;
 
 import android.util.Log;
@@ -24,6 +22,7 @@ import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
+import com.bitmovin.analytics.exoplayer.services.BitrateCollector;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -46,9 +45,7 @@ import com.google.android.exoplayer2.source.dash.manifest.DashManifest;
 import com.google.android.exoplayer2.source.hls.HlsManifest;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -72,10 +69,10 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean playerIsReady;
     private String manifestUrl;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
+    private BitrateCollector bitrateCollector;
     private final DeviceInformationProvider deviceInformationProvider;
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private boolean isVideoAttemptedPlay = false;
-    private long previousQualityChangeBitrate = 0;
     private boolean isPlaying = false;
     private boolean isInInitialBufferState = false;
     protected final DefaultAnalyticsListener defaultAnalyticsListener;
@@ -97,6 +94,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
         this.exoplayer.addListener(defaultPlayerEventListener);
         this.config = config;
         this.deviceInformationProvider = deviceInformationProvider;
+        this.bitrateCollector = new BitrateCollector(exoplayer);
         attachAnalyticsListener();
     }
 
@@ -229,40 +227,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             }
         }
 
-        // Info on current tracks that are playing
-        if (exoplayer.getCurrentTrackSelections() != null) {
-            for (int i = 0; i < exoplayer.getCurrentTrackSelections().length; i++) {
-                TrackSelection trackSelection = exoplayer.getCurrentTrackSelections().get(i);
-                if (trackSelection != null) {
-                    Format format;
-                    try {
-                        Method getSelectedTracksMethod =
-                                trackSelection.getClass().getMethod("getSelectedFormat");
-                        format = (Format) getSelectedTracksMethod.invoke(trackSelection);
-                    } catch (Exception e) {
-                        format = null;
-                    }
-
-                    if (format == null) {
-                        format = trackSelection.getFormat(0);
-                    }
-
-                    switch (exoplayer.getRendererType(i)) {
-                        case TRACK_TYPE_AUDIO:
-                            data.setAudioBitrate(format.sampleRate);
-                            break;
-                        case TRACK_TYPE_VIDEO:
-                            data.setVideoBitrate(format.bitrate);
-                            data.setVideoPlaybackHeight(format.height);
-                            data.setVideoPlaybackWidth(format.width);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-
         data.setDownloadSpeedInfo(meter.getInfo());
 
         // DRM Information
@@ -282,17 +246,20 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             simpleExoPlayer.removeAnalyticsListener(defaultAnalyticsListener);
         }
         meter.reset();
+        bitrateCollector.reset();
         stateMachine.resetStateMachine();
     }
 
     @Override
     public void resetSourceRelatedState() {
+        bitrateCollector.reset();
         // no Playlist transition event in older version of collector (v1)
     }
 
     @Override
     public void registerEventDataManipulators(EventDataManipulatorPipeline pipeline) {
         pipeline.registerEventDataManipulator(this);
+        pipeline.registerEventDataManipulator(bitrateCollector);
     }
 
     @Override
@@ -482,12 +449,58 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
 
             @Override
             public void onAudioInputFormatChanged(EventTime eventTime, Format format) {
-                handleInputFormatChanged(format);
+                Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate));
+                try {
+                    if (stateMachine.getCurrentState() != PlayerState.PLAYING
+                            && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                        // track correct bitrate within buffering or seeking
+                        bitrateCollector.setNewAudioBitrate(format);
+                        return;
+                    }
+                    if (!stateMachine.isQualityChangeEventEnabled()) {
+                        // track correct bitrate even though events are disabled
+                        bitrateCollector.setNewAudioBitrate(format);
+                        return;
+                    }
+                    if (!bitrateCollector.hasAudioBitrateChanged(format)) {
+                        return;
+                    }
+                    long videoTime = getPosition();
+                    PlayerState originalState = stateMachine.getCurrentState();
+                    stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
+                    bitrateCollector.setNewAudioBitrate(format);
+                    stateMachine.transitionState(originalState, videoTime);
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
             }
 
             @Override
             public void onVideoInputFormatChanged(EventTime eventTime, Format format) {
-                handleInputFormatChanged(format);
+                Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate));
+                try {
+                    if (stateMachine.getCurrentState() != PlayerState.PLAYING
+                            && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                        // track correct bitrate within buffering or seeking
+                        bitrateCollector.setNewVideoBitrate(format);
+                        return;
+                    }
+                    if (!stateMachine.isQualityChangeEventEnabled()) {
+                        // track correct bitrate even though events are disabled
+                        bitrateCollector.setNewVideoBitrate(format);
+                        return;
+                    }
+                    if (!bitrateCollector.hasVideoBitrateChanged(format)) {
+                        return;
+                    }
+                    long videoTime = getPosition();
+                    PlayerState originalState = stateMachine.getCurrentState();
+                    stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
+                    bitrateCollector.setNewVideoBitrate(format);
+                    stateMachine.transitionState(originalState, videoTime);
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                }
             }
 
             @Override
@@ -659,27 +672,5 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             drmType = DRMType.PLAYREADY.getValue();
         }
         return drmType;
-    }
-
-    private void handleInputFormatChanged(Format format) {
-        try {
-            if ((this.stateMachine.getCurrentState() == PlayerState.PLAYING)
-                    || (this.stateMachine.getCurrentState() == PlayerState.PAUSE)) {
-                Log.d(TAG, String.format("inputFormatChanged: Bitrate: %d", format.bitrate));
-                if (format.bitrate == this.previousQualityChangeBitrate) {
-                    Log.d(TAG, "inputFormatChanged: Skipping sample sending");
-                    return;
-                }
-                this.previousQualityChangeBitrate = format.bitrate;
-                if (this.stateMachine.isQualityChangeEventEnabled()) {
-                    long videoTime = getPosition();
-                    PlayerState originalState = this.stateMachine.getCurrentState();
-                    this.stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
-                    this.stateMachine.transitionState(originalState, videoTime);
-                }
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage(), e);
-        }
     }
 }
