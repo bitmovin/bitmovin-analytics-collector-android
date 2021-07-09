@@ -7,6 +7,7 @@ import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
+import com.bitmovin.analytics.utils.Util
 import com.bitmovin.analytics.utils.topOfStacktrace
 
 class ErrorDetailTracking(private val context: Context, private val analyticsConfig: BitmovinAnalyticsConfig, private val impressionIdProvider: ImpressionIdProvider, private val backend: ErrorDetailBackend, private val segmentTracking: SegmentTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) :
@@ -48,7 +49,8 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         val segments = segmentTracking?.segments?.toMutableList()
         val errorIndex = errorIndex
         this.errorIndex++
-        val errorDetails = ErrorDetail(analyticsConfig.key, context.packageName, impressionIdProvider.impressionId, errorIndex, timestamp, code, message, throwable?.topOfStacktrace?.toList(), segments)
+        val platform = Util.getPlatform(Util.isTVDevice(context))
+        val errorDetails = ErrorDetail(platform, analyticsConfig.key, context.packageName, impressionIdProvider.impressionId, errorIndex, timestamp, code, message, throwable?.topOfStacktrace?.toList(), segments)
         backend.send(errorDetails)
     }
 }
