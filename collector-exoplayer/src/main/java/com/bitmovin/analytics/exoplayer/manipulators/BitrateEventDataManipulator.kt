@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.exoplayer.services
+package com.bitmovin.analytics.exoplayer.manipulators
 
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
@@ -7,7 +7,7 @@ import com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 
-class BitrateCollector(private val exoplayer: ExoPlayer) : EventDataManipulator {
+class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataManipulator {
     private var currentAudioFormat: Format? = null
     private var currentVideoFormat: Format? = null
 
