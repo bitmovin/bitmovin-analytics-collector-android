@@ -48,9 +48,9 @@ class ErrorDetailTrackingTests {
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, null, support1, support2)
         mockkObject(errorDetailTracking)
         support1.notify { it.onError(null, null, null) }
-        support1.notify { it.onError( null, null, null) }
-        support2.notify { it.onError( null, null, null) }
-        support2.notify { it.onError( null, null, null) }
+        support1.notify { it.onError(null, null, null) }
+        support2.notify { it.onError(null, null, null) }
+        support2.notify { it.onError(null, null, null) }
 
         verify(exactly = 4) { errorDetailTracking.onError(any(), any(), any()) }
     }
@@ -62,12 +62,12 @@ class ErrorDetailTrackingTests {
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, null, support)
         mockkObject(errorDetailTracking)
         support.notify { it.onError(null, null, null) }
-        verify { errorDetailTracking.onError( any(), any(), any()) }
+        verify { errorDetailTracking.onError(any(), any(), any()) }
         clearMocks(errorDetailTracking)
         errorDetailTracking.disable()
         verify { backend.clear() }
         support.notify { it.onError(null, null, null) }
-        verify(exactly = 0) { errorDetailTracking.onError( any(), any(), any()) }
+        verify(exactly = 0) { errorDetailTracking.onError(any(), any(), any()) }
     }
 
     @Test
