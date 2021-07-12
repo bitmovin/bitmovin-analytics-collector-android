@@ -351,7 +351,6 @@ public class BitmovinAnalytics
                     OnErrorDetailEventListener.class,
                     listener ->
                             listener.onError(
-                                    Util.getTimestamp(),
                                     errorCode.getErrorCode(),
                                     errorCode.getDescription(),
                                     null));
