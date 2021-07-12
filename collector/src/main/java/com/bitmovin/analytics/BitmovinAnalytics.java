@@ -351,9 +351,7 @@ public class BitmovinAnalytics
                     OnErrorDetailEventListener.class,
                     listener ->
                             listener.onError(
-                                    errorCode.getErrorCode(),
-                                    errorCode.getDescription(),
-                                    null));
+                                    errorCode.getErrorCode(), errorCode.getDescription(), null));
         }
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data);
