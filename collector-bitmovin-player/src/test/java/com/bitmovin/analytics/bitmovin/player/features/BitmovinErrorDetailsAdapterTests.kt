@@ -92,7 +92,7 @@ class BitmovinErrorDetailsAdapterTests {
         capturedSourceEventErrorHandler?.let { it(sourceEventError) }
 
         // assert
-        verify { adapterSubscribeListener.onError(playerEventError.timestamp, playerEventError.code.value, playerEventError.message, playerEventError.data as? Throwable) }
-        verify { adapterSubscribeListener.onError(sourceEventError.timestamp, sourceEventError.code.value, sourceEventError.message, sourceEventError.data as? Throwable) }
+        verify { adapterSubscribeListener.onError(playerEventError.code.value, playerEventError.message, playerEventError.data as? Throwable) }
+        verify { adapterSubscribeListener.onError(sourceEventError.code.value, sourceEventError.message, sourceEventError.data as? Throwable) }
     }
 }
