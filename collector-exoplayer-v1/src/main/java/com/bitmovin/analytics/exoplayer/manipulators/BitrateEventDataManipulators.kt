@@ -8,8 +8,8 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 
 class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataManipulator {
-    private var currentAudioFormat: Format? = null
-    private var currentVideoFormat: Format? = null
+    var currentAudioFormat: Format? = null
+    var currentVideoFormat: Format? = null
 
     fun hasAudioBitrateChanged(newFormat: Format): Boolean {
         val oldFormat = currentAudioFormat
@@ -19,14 +19,6 @@ class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataM
     fun hasVideoBitrateChanged(newFormat: Format): Boolean {
         val oldFormat = currentVideoFormat
         return oldFormat == null || newFormat.bitrate.toLong() != oldFormat.bitrate.toLong()
-    }
-
-    fun setNewAudioBitrate(format: Format) {
-        this.currentAudioFormat = format
-    }
-
-    fun setNewVideoBitrate(format: Format) {
-        this.currentVideoFormat = format
     }
 
     override fun manipulate(data: EventData) {

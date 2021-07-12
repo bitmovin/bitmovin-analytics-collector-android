@@ -39,8 +39,8 @@ class BitrateEventDataManipulatorTest {
     @Test
     fun `hasAudioBitrateChanged should return true if currentAudioBitrate is different from newFormat`() {
         // arrange
-        val newFormat = Format.Builder().setAverageBitrate(789).build()
-        bitrateEventDataManipulator.currentAudioFormat = Format.Builder().setAverageBitrate(123).build()
+        val newFormat = getAudioFormat(789)
+        bitrateEventDataManipulator.currentAudioFormat = getAudioFormat(123)
 
         // act
         val hasAudioBitrateChanged = bitrateEventDataManipulator.hasAudioBitrateChanged(newFormat)
@@ -64,8 +64,8 @@ class BitrateEventDataManipulatorTest {
     @Test
     fun `hasVideoBitrateChanged should return true if currentVideoFormat is different from newFormat`() {
         // arrange
-        val newFormat = Format.Builder().setAverageBitrate(789).build()
-        bitrateEventDataManipulator.currentVideoFormat = Format.Builder().setAverageBitrate(123).build()
+        val newFormat = getVideoFormat(789)
+        bitrateEventDataManipulator.currentVideoFormat = getVideoFormat(123)
 
         // act
         val hasVideoBitrateChanged = bitrateEventDataManipulator.hasVideoBitrateChanged(newFormat)
@@ -81,8 +81,8 @@ class BitrateEventDataManipulatorTest {
         bitrateEventDataManipulator.currentAudioFormat = null
         bitrateEventDataManipulator.currentVideoFormat = null
         val data = mockk<EventData>(relaxed = true)
-        val videoFormatFromExo = Format.Builder().setAverageBitrate(123).build()
-        val audioFormatFromExo = Format.Builder().setAverageBitrate(321).build()
+        val videoFormatFromExo = getVideoFormat(123)
+        val audioFormatFromExo = getAudioFormat(345)
         prepareExoToReturnFormat(mockExoPlayer, videoFormatFromExo, audioFormatFromExo)
 
         // act
@@ -96,11 +96,7 @@ class BitrateEventDataManipulatorTest {
     @Test
     fun `manipulate will apply videoBitrate Information`() {
         // arrange
-        val videoFormatFromExo = Format.Builder()
-                .setAverageBitrate(123)
-                .setWidth(234)
-                .setHeight(345)
-                .build()
+        val videoFormatFromExo = getVideoFormat(123, 234, 345)
         bitrateEventDataManipulator.currentVideoFormat = videoFormatFromExo
         val data = mockk<EventData>(relaxed = true)
 
@@ -116,9 +112,7 @@ class BitrateEventDataManipulatorTest {
     @Test
     fun `manipulate will apply audioBitrate Information`() {
         // arrange
-        val audioFormatFromExo = Format.Builder()
-                .setAverageBitrate(123)
-                .build()
+        val audioFormatFromExo = getAudioFormat(123)
         bitrateEventDataManipulator.currentAudioFormat = audioFormatFromExo
         val data = mockk<EventData>(relaxed = true)
 
@@ -142,6 +136,11 @@ class BitrateEventDataManipulatorTest {
         assertThat(bitrateEventDataManipulator.currentAudioFormat?.bitrate).isNull()
         assertThat(bitrateEventDataManipulator.currentVideoFormat?.bitrate).isNull()
     }
+
+    private fun getAudioFormat(bitrate: Int) =
+            Format.createAudioSampleFormat(null, null, null, bitrate, 0, 1, 1, null, null, 0, null)
+    private fun getVideoFormat(bitrate: Int, width: Int = 0, height: Int = 0) =
+            Format.createVideoSampleFormat(null, null, null, bitrate, 0, width, height, 1F, null, null)
 
     private fun prepareExoToReturnFormat(exoPlayer: ExoPlayer, videoFormat: Format = mockk(), audioFormat: Format = mockk()) {
         every { exoPlayer.currentTrackSelections } answers { TrackSelectionArray(buildMockTrackSelection(videoFormat), buildMockTrackSelection(audioFormat)) }

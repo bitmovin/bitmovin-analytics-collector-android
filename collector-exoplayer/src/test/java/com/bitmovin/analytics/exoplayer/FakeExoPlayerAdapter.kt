@@ -15,10 +15,12 @@ class FakeExoPlayerAdapter(
     bitrateEventDataManipulator: BitrateEventDataManipulator
 ) : ExoPlayerAdapter(exoplayer, config, deviceInformationProvider, stateMachine, bitrateEventDataManipulator) {
 
-    constructor(exoplayer: ExoPlayer,
-                config: BitmovinAnalyticsConfig,
-                deviceInformationProvider: DeviceInformationProvider,
-                stateMachine: PlayerStateMachine) : this(exoplayer, config, deviceInformationProvider, stateMachine, BitrateEventDataManipulator(exoplayer))
+    constructor(
+        exoplayer: ExoPlayer,
+        config: BitmovinAnalyticsConfig,
+        deviceInformationProvider: DeviceInformationProvider,
+        stateMachine: PlayerStateMachine
+    ) : this(exoplayer, config, deviceInformationProvider, stateMachine, BitrateEventDataManipulator(exoplayer))
     var fakePosition: Long = 0
 
     override fun registerEventDataManipulators(pipeline: EventDataManipulatorPipeline) {
