@@ -86,7 +86,7 @@ public class LicenseCall {
                             return;
                         }
                         Log.d(TAG, "License response was granted");
-                        callback.authenticationCompleted(true, licenseResponse.getSettings());
+                        callback.authenticationCompleted(true, licenseResponse.getFeatures());
                     }
                 });
     }

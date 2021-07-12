@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.features.errordetails
 
+import com.bitmovin.analytics.CollectorConfig
 import com.bitmovin.analytics.features.segmenttracking.Segment
 import com.bitmovin.analytics.features.segmenttracking.SegmentType
 import com.bitmovin.analytics.utils.HttpClient
@@ -18,7 +19,7 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testCorrectlyLimitsSegmentsInQueue() {
-        val backend = ErrorDetailBackend(mockk())
+        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk())
         val d1 = getErrorDetail(5)
         val d2 = getErrorDetail(5)
         val d3 = getErrorDetail(null)
@@ -33,14 +34,14 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testWontPostWhileDisabled() {
-        val backend = ErrorDetailBackend(mockk())
+        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk())
         backend.send(getErrorDetail(0))
         verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
     }
 
     @Test
     fun testWillPostWhenEnabled() {
-        val backend = ErrorDetailBackend(mockk(relaxed = true))
+        val backend = ErrorDetailBackend(CollectorConfig().also { it.backendUrl = "http://localhost" }, mockk(relaxed = true))
         backend.enabled = true
         backend.send(getErrorDetail(0))
         verify(exactly = 1) { anyConstructed<HttpClient>().post(any(), any(), any()) }
@@ -48,7 +49,7 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testWillFlushToHttpClientIfEnabled() {
-        val backend = ErrorDetailBackend(mockk(relaxed = true))
+        val backend = ErrorDetailBackend(CollectorConfig().also { it.backendUrl = "http://localhost" }, mockk(relaxed = true))
         backend.send(getErrorDetail(0))
         backend.enabled = true
         verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
@@ -58,13 +59,13 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testWillRequeueOnFlushIfDisabled() {
-        val backend = ErrorDetailBackend(mockk(relaxed = true))
+        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk(relaxed = true))
         backend.send(getErrorDetail(0))
         verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
         backend.flush()
         verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
     }
 
-    private fun getErrorDetail(segmentCount: Int?) = ErrorDetail(0, null, null, null, if (segmentCount == null) null else (0..segmentCount).map { getSegment() }.toMutableList())
-    private fun getSegment() = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0.0, 0, true)
+    private fun getErrorDetail(segmentCount: Int?) = ErrorDetail("platform", "key", "domain", "impressionId", 0, 0, null, null, null, if (segmentCount == null) null else (0..segmentCount).map { getSegment() }.toMutableList())
+    private fun getSegment() = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0.0, null, 0, true)
 }

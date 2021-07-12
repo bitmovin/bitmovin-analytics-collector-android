@@ -7,27 +7,8 @@ import org.junit.Test
 
 class SegmentTrackingTests {
     @Test
-    fun testSuccessfullyAppliesConfigurationValues() {
-        val segmentTracking = SegmentTracking()
-        val maxSegments = 123
-        segmentTracking.configure(true, "{\"maxSegments\": $maxSegments}")
-        assertThat(segmentTracking.config).isNotNull
-        assertThat(segmentTracking.maxSegments).isEqualTo(maxSegments)
-    }
-
-    @Test
-    fun testSuccessfullyUsesDefaultConfigurationValuesForMissingValues() {
-        val segmentTracking = SegmentTracking()
-        segmentTracking.configure(true, "{}")
-        assertThat(segmentTracking.config).isNotNull
-        assertThat(segmentTracking.maxSegments).isEqualTo(SegmentTracking.defaultMaxSegments)
-    }
-
-    @Test
     fun testSuccessfullyUsesDefaultConfigurationValuesIfNoConfigurationIsApplied() {
         val segmentTracking = SegmentTracking()
-        segmentTracking.configure(true, null)
-        assertThat(segmentTracking.config).isNull()
         assertThat(segmentTracking.maxSegments).isEqualTo(SegmentTracking.defaultMaxSegments)
     }
 
@@ -47,7 +28,7 @@ class SegmentTrackingTests {
     fun testSuccessfullyAddsSegmentsAndLimitsQueue() {
         val support = ObservableSupport<OnDownloadFinishedEventListener>()
         val segmentTracking = SegmentTracking(support)
-        segmentTracking.configure(true, "{\"maxSegments\": 3}")
+        segmentTracking.configure(3)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
@@ -66,7 +47,7 @@ class SegmentTrackingTests {
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         assertThat(segmentTracking.segments.size).isEqualTo(4)
-        segmentTracking.configure(true, "{\"maxSegments\": 3}")
+        segmentTracking.configure(3)
         assertThat(segmentTracking.segments.size).isEqualTo(3)
     }
 

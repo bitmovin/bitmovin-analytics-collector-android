@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+### Added
+- Error detail tracking feature
+
 ## Development v1
+
+### Added
+- Error detail tracking feature
 
 ## v2.1.0
 

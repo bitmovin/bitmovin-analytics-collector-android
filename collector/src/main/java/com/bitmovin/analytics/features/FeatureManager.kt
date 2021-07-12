@@ -2,17 +2,17 @@ package com.bitmovin.analytics.features
 
 import android.util.Log
 
-class FeatureManager {
+class FeatureManager<TConfigContainer> {
     companion object {
         val TAG = FeatureManager::class.java.name
     }
-    private val features: MutableList<Feature<*>> = mutableListOf()
+    private val features: MutableList<Feature<TConfigContainer, *>> = mutableListOf()
 
-    fun registerFeature(feature: Feature<*>) {
+    fun registerFeature(feature: Feature<TConfigContainer, *>) {
         features.add(feature)
     }
 
-    fun registerFeatures(features: Collection<Feature<*>>) {
+    fun registerFeatures(features: Collection<Feature<TConfigContainer, *>>) {
         this.features.addAll(features)
     }
 
@@ -21,13 +21,17 @@ class FeatureManager {
         features.clear()
     }
 
-    fun configureFeatures(authenticated: Boolean, settings: Map<String, String>) {
+    fun resetFeatures() {
+        features.forEach { it.reset() }
+    }
+
+    fun configureFeatures(authenticated: Boolean, featureConfigs: TConfigContainer?) {
         val iterator = features.iterator()
         while (iterator.hasNext()) {
             val it = iterator.next()
-            val config = it.configure(authenticated, settings[it.name])
+            val config = it.configure(authenticated, featureConfigs)
             if (!authenticated || config?.enabled != true) {
-                Log.d(TAG, "Disabling feature ${it.name} as it isn't enabled according to license callback.")
+                Log.d(TAG, "Disabling feature ${it.javaClass.simpleName} as it isn't enabled according to license callback.")
                 it.disable()
                 iterator.remove()
             }

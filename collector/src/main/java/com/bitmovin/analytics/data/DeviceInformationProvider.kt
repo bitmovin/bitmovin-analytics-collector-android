@@ -1,8 +1,6 @@
 package com.bitmovin.analytics.data
 
-import android.app.UiModeManager
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
@@ -10,7 +8,7 @@ import com.bitmovin.analytics.utils.Util
 import kotlin.math.roundToInt
 
 open class DeviceInformationProvider(val context: Context, val userAgent: String) {
-    var isTV: Boolean = isTVDevice()
+    var isTV: Boolean = Util.isTVDevice(context)
 
     fun getDeviceInformation(): DeviceInformation {
 
@@ -36,10 +34,5 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
                 screenHeight = height,
                 userAgent = userAgent
         )
-    }
-
-    private fun isTVDevice(): Boolean {
-        val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-        return uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
     }
 }

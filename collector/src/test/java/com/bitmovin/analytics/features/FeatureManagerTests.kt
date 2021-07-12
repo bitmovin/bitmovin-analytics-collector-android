@@ -6,20 +6,24 @@ import io.mockk.verifyOrder
 import org.junit.Test
 
 class FeatureManagerTests {
-    class FeatureConfig1 : FeatureConfig() {
-        var param1: String? = null
-    }
-    class FeatureConfig2 : FeatureConfig()
+    data class ConfigContainer(val feature1: FeatureConfig1?, val feature2: FeatureConfig2?)
+
+    data class FeatureConfig1(override val enabled: Boolean, var param1: String? = null) : FeatureConfig
+    data class FeatureConfig2(override val enabled: Boolean) : FeatureConfig
 
     @Test
     fun testShouldConfigureAllFeaturesBeforeCallingEnabledHook() {
-        val feature1 = spyk(object : Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
-        val feature2 = spyk(object : Feature<FeatureConfig2>("feature2", FeatureConfig2::class) {})
+        val feature1 = spyk(object : Feature<ConfigContainer, FeatureConfig1>() {
+            override fun extractConfig(featureConfigs: ConfigContainer) = featureConfigs.feature1
+        })
+        val feature2 = spyk(object : Feature<ConfigContainer, FeatureConfig2>() {
+            override fun extractConfig(featureConfigs: ConfigContainer) = featureConfigs.feature2
+        })
 
-        val featureManager = FeatureManager()
+        val featureManager = FeatureManager<ConfigContainer>()
         featureManager.registerFeature(feature1)
         featureManager.registerFeature(feature2)
-        featureManager.configureFeatures(true, mapOf("feature1" to "{\"enabled\": true}", "feature2" to "{\"enabled\": true}"))
+        featureManager.configureFeatures(true, ConfigContainer(FeatureConfig1(true), FeatureConfig2(true)))
         verifyOrder {
             feature1.configured(any(), any())
             feature2.configured(any(), any())
@@ -30,45 +34,32 @@ class FeatureManagerTests {
 
     @Test
     fun testShouldDisableFeatureIfNotAuthenticated() {
-        testShouldDisableFeature(false, mapOf())
+        testShouldDisableFeature(false, null)
     }
 
     @Test
     fun testShouldDisableFeatureIfConfigIsntProvided() {
-        testShouldDisableFeature(true, mapOf())
+        testShouldDisableFeature(true, ConfigContainer(null, null))
     }
 
     @Test
-    fun testShouldDisableFeatureIfConfigDoesntContainEnabled() {
-        testShouldDisableFeature(true, mapOf("feature1" to "{}"))
-    }
-
-    @Test
-    fun testShouldDisableFeatureIfConfigHasEnabledFalse() {
-        testShouldDisableFeature(true, mapOf("feature1" to "{\"enabled\": false}"))
-    }
-
-    @Test
-    fun testShouldDisableFeatureIfConfigCantBeDeserialized() {
-        testShouldDisableFeature(true, mapOf("feature1" to "0"))
+    fun testShouldDisableFeatureIfConfigIsDisabled() {
+        testShouldDisableFeature(true, ConfigContainer(FeatureConfig1(false), null))
     }
 
     @Test
     fun testShouldEnableFeatureIfConfigIsPresent() {
-        testShouldEnableFeature(mapOf("feature1" to "{\"enabled\": true, \"param1\": null}"))
+        testShouldEnableFeature(ConfigContainer(FeatureConfig1(true), null))
     }
 
-    @Test
-    fun testShouldEnableFeatureIfConfigIsPresentButNotComplete() {
-        testShouldEnableFeature(mapOf("feature1" to "{\"enabled\": true}"))
-    }
+    private fun testShouldDisableFeature(authenticated: Boolean, configContainer: ConfigContainer?) {
+        val feature1 = spyk(object : Feature<ConfigContainer, FeatureConfig1>() {
+            override fun extractConfig(featureConfigs: ConfigContainer): FeatureConfig1? = featureConfigs.feature1
+        })
 
-    private fun testShouldDisableFeature(authenticated: Boolean, settings: Map<String, String>) {
-        val feature1 = spyk(object : Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
-
-        val featureManager = FeatureManager()
+        val featureManager = FeatureManager<ConfigContainer>()
         featureManager.registerFeature(feature1)
-        featureManager.configureFeatures(authenticated, settings)
+        featureManager.configureFeatures(authenticated, configContainer)
         verifyOrder {
             feature1.configure(any(), any())
             feature1.disabled()
@@ -76,12 +67,14 @@ class FeatureManagerTests {
         verify(exactly = 0) { feature1.enabled() }
     }
 
-    private fun testShouldEnableFeature(settings: Map<String, String>) {
-        val feature1 = spyk(object : Feature<FeatureConfig1>("feature1", FeatureConfig1::class) {})
+    private fun testShouldEnableFeature(configContainer: ConfigContainer?) {
+        val feature1 = spyk(object : Feature<ConfigContainer, FeatureConfig1>() {
+            override fun extractConfig(featureConfigs: ConfigContainer): FeatureConfig1? = featureConfigs.feature1
+        })
 
-        val featureManager = FeatureManager()
+        val featureManager = FeatureManager<ConfigContainer>()
         featureManager.registerFeature(feature1)
-        featureManager.configureFeatures(true, settings)
+        featureManager.configureFeatures(true, configContainer)
         verifyOrder {
             feature1.configured(any(), any())
             feature1.enabled()

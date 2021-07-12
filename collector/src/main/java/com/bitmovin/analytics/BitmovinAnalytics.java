@@ -24,14 +24,13 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureManager;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
+import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.license.LicenseCallback;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.Util;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,11 +38,12 @@ import org.jetbrains.annotations.Nullable;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics implements StateMachineListener, LicenseCallback {
+public class BitmovinAnalytics
+        implements StateMachineListener, LicenseCallback, ImpressionIdProvider {
 
     private static final String TAG = "BitmovinAnalytics";
 
-    private FeatureManager featureManager = new FeatureManager();
+    private FeatureManager<FeatureConfigContainer> featureManager = new FeatureManager<>();
     private EventBus eventBus = new EventBus();
 
     protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
@@ -108,7 +108,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         detachPlayer();
         eventDataDispatcher.enable();
         this.playerAdapter = adapter;
-        Collection<Feature<?>> features = this.playerAdapter.init();
+        Collection<Feature<FeatureConfigContainer, ?>> features = this.playerAdapter.init();
         this.featureManager.registerFeatures(features);
 
         // this.registerEventDataManipulators(prePipelineManipulator);
@@ -351,10 +351,7 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
                     OnErrorDetailEventListener.class,
                     listener ->
                             listener.onError(
-                                    Util.getTimestamp(),
-                                    errorCode.getErrorCode(),
-                                    errorCode.getDescription(),
-                                    null));
+                                    errorCode.getErrorCode(), errorCode.getDescription(), null));
         }
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data);
@@ -365,6 +362,8 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
         if (this.eventDataDispatcher != null) {
             this.eventDataDispatcher.resetSourceRelatedState();
         }
+
+        featureManager.resetFeatures();
         // TODO reset features and prepare for new source
 
         if (this.playerAdapter != null) {
@@ -447,11 +446,9 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
     }
 
     @Override
-    public void configureFeatures(boolean authenticated, @Nullable Map<String, String> settings) {
-        if (settings == null) {
-            settings = new HashMap<>();
-        }
-        featureManager.configureFeatures(authenticated, settings);
+    public void configureFeatures(
+            boolean authenticated, @Nullable FeatureConfigContainer featureConfigs) {
+        featureManager.configureFeatures(authenticated, featureConfigs);
     }
 
     @Override
@@ -467,6 +464,12 @@ public class BitmovinAnalytics implements StateMachineListener, LicenseCallback 
 
     public void removeDebugListener(DebugListener listener) {
         eventBus.get(DebugListener.class).unsubscribe(listener);
+    }
+
+    @NotNull
+    @Override
+    public String getImpressionId() {
+        return this.playerStateMachine.getImpressionId();
     }
 
     public interface DebugListener {

@@ -1,5 +1,8 @@
 package com.bitmovin.analytics.utils;
 
+import android.app.UiModeManager;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -123,5 +126,31 @@ public class Util {
 
     public static long toPrimitiveLong(Double value) {
         return value == null ? 0 : value.longValue();
+    }
+
+    public static String joinUrl(String baseUrl, String relativeUrl) {
+        StringBuilder result = new StringBuilder(baseUrl);
+        if (!baseUrl.endsWith("/")) {
+            result.append('/');
+        }
+
+        if (relativeUrl.startsWith("/")) {
+            relativeUrl = relativeUrl.substring(1);
+        }
+        result.append(relativeUrl);
+        return result.toString();
+    }
+
+    public static Boolean isTVDevice(Context context) {
+        Object untypedUiModeManager = context.getSystemService(Context.UI_MODE_SERVICE);
+        if (untypedUiModeManager instanceof UiModeManager) {
+            UiModeManager uiModeManager = (UiModeManager) untypedUiModeManager;
+            return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+        }
+        return false;
+    }
+
+    public static String getPlatform(Boolean isTV) {
+        return isTV ? "androidTV" : "android";
     }
 }

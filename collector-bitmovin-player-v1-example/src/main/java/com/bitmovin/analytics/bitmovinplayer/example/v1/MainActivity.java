@@ -94,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Step 1: Create your analytics config object with the Local Development Key
         bitmovinAnalyticsConfig =
                 new BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0");
-
         // Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
         bitmovinAnalyticsConfig.setTitle("Android ExoPlayer Video with DASH");
