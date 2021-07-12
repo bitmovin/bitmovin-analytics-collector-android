@@ -42,7 +42,7 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         errorIndex = 0
     }
 
-    override fun onError(timestamp: Long, code: Int?, message: String?, throwable: Throwable?) {
+    override fun onError(code: Int?, message: String?, throwable: Throwable?) {
         if (!isEnabled) {
             return
         }
@@ -50,6 +50,7 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         val errorIndex = errorIndex
         this.errorIndex++
         val platform = Util.getPlatform(Util.isTVDevice(context))
+        val timestamp = Util.getTimestamp()
         val errorDetails = ErrorDetail(platform, analyticsConfig.key, context.packageName, impressionIdProvider.impressionId, errorIndex, timestamp, code, message, throwable?.topOfStacktrace?.toList(), segments)
         backend.send(errorDetails)
     }
