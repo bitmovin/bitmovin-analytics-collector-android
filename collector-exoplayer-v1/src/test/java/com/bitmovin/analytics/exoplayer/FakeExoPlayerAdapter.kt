@@ -8,17 +8,19 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.google.android.exoplayer2.ExoPlayer
 
 class FakeExoPlayerAdapter(
+    exoplayer: ExoPlayer,
+    config: BitmovinAnalyticsConfig,
+    deviceInformationProvider: DeviceInformationProvider,
+    stateMachine: PlayerStateMachine,
+    bitrateEventDataManipulator: BitrateEventDataManipulator
+) : ExoPlayerAdapter(exoplayer, config, deviceInformationProvider, stateMachine, bitrateEventDataManipulator) {
+
+    constructor(
         exoplayer: ExoPlayer,
         config: BitmovinAnalyticsConfig,
         deviceInformationProvider: DeviceInformationProvider,
-        stateMachine: PlayerStateMachine,
-        bitrateEventDataManipulator: BitrateEventDataManipulator
-) : ExoPlayerAdapter(exoplayer, config, deviceInformationProvider, stateMachine, bitrateEventDataManipulator) {
-
-    constructor(exoplayer: ExoPlayer,
-                config: BitmovinAnalyticsConfig,
-                deviceInformationProvider: DeviceInformationProvider,
-                stateMachine: PlayerStateMachine) : this(exoplayer, config, deviceInformationProvider, stateMachine, BitrateEventDataManipulator(exoplayer))
+        stateMachine: PlayerStateMachine
+    ) : this(exoplayer, config, deviceInformationProvider, stateMachine, BitrateEventDataManipulator(exoplayer))
 
     var fakePosition: Long = 0
 
