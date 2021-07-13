@@ -78,7 +78,6 @@ public class ExoPlayerAdapter
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private BitrateEventDataManipulator bitrateEventDataManipulator;
     private boolean isVideoAttemptedPlay = false;
-    private long previousQualityChangeBitrate = 0;
     private boolean isPlaying = false;
     private boolean isPaused = false;
 
@@ -90,14 +89,13 @@ public class ExoPlayerAdapter
             ExoPlayer exoplayer,
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
-            PlayerStateMachine stateMachine,
-            BitrateEventDataManipulator bitrateEventDataManipulator) {
+            PlayerStateMachine stateMachine) {
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
         this.config = config;
         this.deviceInformationProvider = deviceInformationProvider;
-        this.bitrateEventDataManipulator = bitrateEventDataManipulator;
+        this.bitrateEventDataManipulator = new BitrateEventDataManipulator(exoplayer);
         attachAnalyticsListener();
     }
 

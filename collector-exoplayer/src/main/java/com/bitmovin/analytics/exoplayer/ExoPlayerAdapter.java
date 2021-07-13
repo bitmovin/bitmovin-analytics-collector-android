@@ -87,8 +87,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             ExoPlayer exoplayer,
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
-            PlayerStateMachine stateMachine,
-            BitrateEventDataManipulator bitrateEventDataManipulator) {
+            PlayerStateMachine stateMachine) {
         this.defaultAnalyticsListener = createAnalyticsListener();
         this.defaultPlayerEventListener = createPlayerEventListener();
         this.stateMachine = stateMachine;
@@ -96,7 +95,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
         this.exoplayer.addListener(defaultPlayerEventListener);
         this.config = config;
         this.deviceInformationProvider = deviceInformationProvider;
-        this.bitrateEventDataManipulator = bitrateEventDataManipulator;
+        this.bitrateEventDataManipulator = new BitrateEventDataManipulator(exoplayer);
         attachAnalyticsListener();
     }
 

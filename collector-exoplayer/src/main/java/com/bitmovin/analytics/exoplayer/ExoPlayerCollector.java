@@ -4,7 +4,6 @@ import android.content.Context;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
-import com.bitmovin.analytics.exoplayer.manipulators.BitrateEventDataManipulator;
 import com.google.android.exoplayer2.ExoPlayer;
 
 public class ExoPlayerCollector extends BitmovinAnalytics {
@@ -27,8 +26,7 @@ public class ExoPlayerCollector extends BitmovinAnalytics {
                         player,
                         this.bitmovinAnalyticsConfig,
                         deviceInformationProvider,
-                        this.playerStateMachine,
-                        new BitrateEventDataManipulator(player));
+                        this.playerStateMachine);
 
         this.attach(adapter);
     }
