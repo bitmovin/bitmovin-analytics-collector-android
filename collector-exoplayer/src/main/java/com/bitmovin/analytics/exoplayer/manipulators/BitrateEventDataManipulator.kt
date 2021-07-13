@@ -20,10 +20,10 @@ class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataM
     fun hasVideoFormatChanged(newFormat: Format?): Boolean {
         newFormat ?: return false
         val oldFormat = currentVideoFormat
-        return oldFormat == null
-                || newFormat.bitrate.toLong() != oldFormat.bitrate.toLong()
-                || newFormat.width != oldFormat.width
-                || newFormat.height != oldFormat.height
+        return oldFormat == null ||
+                newFormat.bitrate.toLong() != oldFormat.bitrate.toLong() ||
+                newFormat.width != oldFormat.width ||
+                newFormat.height != oldFormat.height
     }
 
     override fun manipulate(data: EventData) {
