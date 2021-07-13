@@ -450,7 +450,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             }
 
             @Override
-            public void onAudioInputFormatChanged(@NotNull EventTime eventTime, @NotNull Format format) {
+            public void onAudioInputFormatChanged(
+                    @NotNull EventTime eventTime, @NotNull Format format) {
                 Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate));
                 try {
                     long videoTime = getPosition();
@@ -470,7 +471,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             }
 
             @Override
-            public void onVideoInputFormatChanged(@NotNull EventTime eventTime, @NotNull Format format) {
+            public void onVideoInputFormatChanged(
+                    @NotNull EventTime eventTime, @NotNull Format format) {
                 Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate));
                 try {
                     long videoTime = getPosition();

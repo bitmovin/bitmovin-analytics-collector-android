@@ -621,7 +621,8 @@ public class ExoPlayerAdapter
             long initializationDurationMs) {}
 
     @Override
-    public void onDecoderInputFormatChanged(@NotNull EventTime eventTime, int trackType, @NotNull Format format) {
+    public void onDecoderInputFormatChanged(
+            @NotNull EventTime eventTime, int trackType, @NotNull Format format) {
         try {
             switch (trackType) {
                 case TRACK_TYPE_AUDIO:
