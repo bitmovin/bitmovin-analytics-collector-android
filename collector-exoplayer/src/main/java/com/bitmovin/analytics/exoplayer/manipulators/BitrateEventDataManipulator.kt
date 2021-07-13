@@ -6,6 +6,7 @@ import com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO
 import com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.SimpleExoPlayer
 
 class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataManipulator {
     var currentAudioFormat: Format? = null
@@ -27,7 +28,6 @@ class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataM
     }
 
     override fun manipulate(data: EventData) {
-        getFormatsFromPlayerIfNull()
         applyVideoFormat(data, currentVideoFormat)
         applyAudioFormat(data, currentAudioFormat)
     }
@@ -55,13 +55,9 @@ class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataM
         data.audioBitrate = audioFormat.bitrate
     }
 
-    private fun getFormatsFromPlayerIfNull() {
-        if (currentVideoFormat == null) {
-            currentVideoFormat = getCurrentFormatFromPlayer(TRACK_TYPE_VIDEO)
-        }
-        if (currentAudioFormat == null) {
-            currentAudioFormat = getCurrentFormatFromPlayer(TRACK_TYPE_AUDIO)
-        }
+    fun setFormatsFromPlayer() {
+        currentVideoFormat = (exoplayer as? SimpleExoPlayer)?.videoFormat ?: getCurrentFormatFromPlayer(TRACK_TYPE_VIDEO)
+        currentAudioFormat = (exoplayer as? SimpleExoPlayer)?.audioFormat ?: getCurrentFormatFromPlayer(TRACK_TYPE_AUDIO)
     }
 
     private fun getCurrentFormatFromPlayer(trackType: Int): Format? {

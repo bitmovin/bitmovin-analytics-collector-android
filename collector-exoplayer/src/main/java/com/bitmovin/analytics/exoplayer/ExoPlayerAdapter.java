@@ -123,6 +123,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     private void startup(long position) {
+        bitrateEventDataManipulator.setFormatsFromPlayer();
         stateMachine.transitionState(PlayerState.STARTUP, position);
         isVideoAttemptedPlay = true;
     }

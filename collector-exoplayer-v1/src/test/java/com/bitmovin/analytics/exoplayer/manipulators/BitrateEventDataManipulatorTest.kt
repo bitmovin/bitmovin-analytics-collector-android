@@ -5,6 +5,7 @@ import com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO
 import com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.trackselection.TrackSelection
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import io.mockk.every
@@ -122,24 +123,6 @@ class BitrateEventDataManipulatorTest {
     }
 
     @Test
-    fun `manipulate will call exoplayer for Format if currentAudioFormat is null`() {
-        // arrange
-        bitrateEventDataManipulator.currentAudioFormat = null
-        bitrateEventDataManipulator.currentVideoFormat = null
-        val data = mockk<EventData>(relaxed = true)
-        val videoFormatFromExo = getVideoFormat(123)
-        val audioFormatFromExo = getAudioFormat(345)
-        prepareExoToReturnFormat(mockExoPlayer, videoFormatFromExo, audioFormatFromExo)
-
-        // act
-        bitrateEventDataManipulator.manipulate(data)
-
-        // assert
-        assertThat(bitrateEventDataManipulator.currentVideoFormat?.bitrate).isEqualTo(videoFormatFromExo.bitrate)
-        assertThat(bitrateEventDataManipulator.currentAudioFormat?.bitrate).isEqualTo(audioFormatFromExo.bitrate)
-    }
-
-    @Test
     fun `manipulate will apply videoBitrate Information`() {
         // arrange
         val videoFormatFromExo = getVideoFormat(123, 234, 345)
@@ -181,6 +164,41 @@ class BitrateEventDataManipulatorTest {
         // assert
         assertThat(bitrateEventDataManipulator.currentAudioFormat?.bitrate).isNull()
         assertThat(bitrateEventDataManipulator.currentVideoFormat?.bitrate).isNull()
+    }
+
+    @Test
+    fun `setFormatsFromPlayer will set currentFormats from exoplayer TrackSelection if exoPlayer is not a SimpleExoPlayer`() {
+        // arrange
+        bitrateEventDataManipulator.currentAudioFormat = null
+        bitrateEventDataManipulator.currentVideoFormat = null
+        val videoFormatFromExo = getVideoFormat(123)
+        val audioFormatFromExo = getAudioFormat(345)
+        prepareExoToReturnFormat(mockExoPlayer, videoFormatFromExo, audioFormatFromExo)
+
+        // act
+        bitrateEventDataManipulator.setFormatsFromPlayer()
+
+        // assert
+        assertThat(bitrateEventDataManipulator.currentVideoFormat?.bitrate).isEqualTo(videoFormatFromExo.bitrate)
+        assertThat(bitrateEventDataManipulator.currentAudioFormat?.bitrate).isEqualTo(audioFormatFromExo.bitrate)
+    }
+
+    @Test
+    fun `setFormatsFromPlayer will set currentFormats from SimpleExoPlayer`() {
+        // arrange
+        val videoFormatFromExo = getVideoFormat(123)
+        val audioFormatFromExo = getAudioFormat(345)
+        val simpleExoPlayer = mockk<SimpleExoPlayer>(relaxed = true)
+        every { simpleExoPlayer.videoFormat } answers { videoFormatFromExo }
+        every { simpleExoPlayer.audioFormat } answers { audioFormatFromExo }
+        val bitrateManipulator = BitrateEventDataManipulator(simpleExoPlayer)
+
+        // act
+        bitrateManipulator.setFormatsFromPlayer()
+
+        // assert
+        assertThat(bitrateManipulator.currentVideoFormat?.bitrate).isEqualTo(videoFormatFromExo.bitrate)
+        assertThat(bitrateManipulator.currentAudioFormat?.bitrate).isEqualTo(audioFormatFromExo.bitrate)
     }
 
     private fun getAudioFormat(bitrate: Int) =
