@@ -678,7 +678,7 @@ public class ExoPlayerAdapter
         long videoTime = getPosition();
         PlayerState originalState = stateMachine.getCurrentState();
         stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
-        bitrateEventDataManipulator.setCurrentAudioFormat(format);
+        bitrateEventDataManipulator.setCurrentVideoFormat(format);
         stateMachine.transitionState(originalState, videoTime);
     }
 
