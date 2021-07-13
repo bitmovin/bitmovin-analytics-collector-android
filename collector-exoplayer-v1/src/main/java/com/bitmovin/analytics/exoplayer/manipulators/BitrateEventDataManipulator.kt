@@ -11,12 +11,14 @@ class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataM
     var currentAudioFormat: Format? = null
     var currentVideoFormat: Format? = null
 
-    fun hasAudioBitrateChanged(newFormat: Format): Boolean {
+    fun hasAudioBitrateChanged(newFormat: Format?): Boolean {
+        newFormat ?: return false
         val oldFormat = currentAudioFormat
         return oldFormat == null || newFormat.bitrate.toLong() != oldFormat.bitrate.toLong()
     }
 
-    fun hasVideoBitrateChanged(newFormat: Format): Boolean {
+    fun hasVideoBitrateChanged(newFormat: Format?): Boolean {
+        newFormat ?: return false
         val oldFormat = currentVideoFormat
         return oldFormat == null || newFormat.bitrate.toLong() != oldFormat.bitrate.toLong()
     }

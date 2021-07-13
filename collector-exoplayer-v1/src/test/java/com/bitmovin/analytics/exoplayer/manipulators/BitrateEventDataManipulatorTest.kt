@@ -25,6 +25,15 @@ class BitrateEventDataManipulatorTest {
     }
 
     @Test
+    fun `hasAudioBitrateChanged should return false if newFormat is null`() {
+        // act
+        val hasAudioBitrateChanged = bitrateEventDataManipulator.hasAudioBitrateChanged(null)
+
+        // assert
+        assertThat(hasAudioBitrateChanged).isFalse()
+    }
+
+    @Test
     fun `hasAudioBitrateChanged should return true if currentAudioBitrate is null`() {
         // arrange
         bitrateEventDataManipulator.currentAudioFormat = null
@@ -47,6 +56,15 @@ class BitrateEventDataManipulatorTest {
 
         // assert
         assertThat(hasAudioBitrateChanged).isTrue()
+    }
+
+    @Test
+    fun `hasVideoBitrateChanged should return false if newFormat is null`() {
+        // act
+        val hasVideoBitrateChanged = bitrateEventDataManipulator.hasVideoBitrateChanged(null)
+
+        // assert
+        assertThat(hasVideoBitrateChanged).isFalse()
     }
 
     @Test
