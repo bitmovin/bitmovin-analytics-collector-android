@@ -24,6 +24,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.exoplayer.manipulators.BitrateEventDataManipulator;
 import com.bitmovin.analytics.features.Feature;
+import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.DownloadSpeedMeter;
@@ -128,7 +129,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     @Override
-    public Collection<Feature<?>> init() {
+    public Collection<Feature<FeatureConfigContainer, ?>> init() {
         this.totalDroppedVideoFrames = 0;
         this.playerIsReady = false;
         this.isInInitialBufferState = false;

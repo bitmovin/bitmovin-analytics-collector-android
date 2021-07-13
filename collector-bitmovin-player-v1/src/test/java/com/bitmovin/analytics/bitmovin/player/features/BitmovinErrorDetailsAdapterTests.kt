@@ -47,6 +47,6 @@ class BitmovinErrorDetailsAdapterTests {
         val listener = mockk<OnErrorDetailEventListener>(relaxed = true)
         adapter.subscribe(listener)
         slot.captured.onError(mockk(relaxed = true))
-        verify { listener.onError(any(), any(), any(), any()) }
+        verify { listener.onError(any(), any(), any()) }
     }
 }

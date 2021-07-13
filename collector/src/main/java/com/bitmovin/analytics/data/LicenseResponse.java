@@ -1,11 +1,11 @@
 package com.bitmovin.analytics.data;
 
-import java.util.Map;
+import com.bitmovin.analytics.license.FeatureConfigContainer;
 
 public class LicenseResponse {
     private String status;
     private String message;
-    private Map<String, String> settings;
+    private FeatureConfigContainer features;
 
     public String getStatus() {
         return status;
@@ -23,11 +23,11 @@ public class LicenseResponse {
         this.message = message;
     }
 
-    public Map<String, String> getSettings() {
-        return settings;
+    public FeatureConfigContainer getFeatures() {
+        return features;
     }
 
-    public void setSettings(Map<String, String> settings) {
-        this.settings = settings;
+    public void setFeatures(FeatureConfigContainer features) {
+        this.features = features;
     }
 }

@@ -68,6 +68,6 @@ class BitmovinAnalyticsTest {
         every { analytics.playerStateMachine.videoStartFailedReason } returns VideoStartFailedReason.TIMEOUT
         analytics.onErrorDetailObservable.subscribe(listener)
         analytics.onVideoStartFailed()
-        verify(exactly = 1) { listener.onError(any(), VideoStartFailedReason.TIMEOUT.errorCode?.errorCode, VideoStartFailedReason.TIMEOUT.errorCode?.description, any()) }
+        verify(exactly = 1) { listener.onError(VideoStartFailedReason.TIMEOUT.errorCode?.errorCode, VideoStartFailedReason.TIMEOUT.errorCode?.description, any()) }
     }
 }

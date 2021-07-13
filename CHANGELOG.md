@@ -11,11 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - ExoPlayer: wrong field to track audioBitrate
 - ExoPlayer: no quality changes if the quality did not change
 
+### Added
+- Error detail tracking feature
+
 ## Development v1
 
 ### Fixed
 - ExoPlayer: wrong field to track audioBitrate
 - ExoPlayer: no quality changes if the quality did not change
+
+### Added
+- Error detail tracking feature
 
 ## v2.1.0
 

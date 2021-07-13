@@ -12,11 +12,11 @@ class BitmovinErrorDetailsAdapter(private val player: Player, private val onAnal
     private val observableSupport = ObservableSupport<OnErrorDetailEventListener>()
 
     private val playerEventErrorListener: (PlayerEvent.Error) -> Unit = { event ->
-        observableSupport.notify { listener -> listener.onError(event.timestamp, event.code.value, event.message, event.data as? Throwable) }
+        observableSupport.notify { listener -> listener.onError(event.code.value, event.message, event.data as? Throwable) }
     }
 
     private val sourceEventErrorListener: (SourceEvent.Error) -> Unit = { event ->
-        observableSupport.notify { listener -> listener.onError(event.timestamp, event.code.value, event.message, event.data as? Throwable) }
+        observableSupport.notify { listener -> listener.onError(event.code.value, event.message, event.data as? Throwable) }
     }
 
     init {

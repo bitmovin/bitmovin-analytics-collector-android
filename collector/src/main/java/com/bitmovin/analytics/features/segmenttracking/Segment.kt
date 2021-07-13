@@ -6,7 +6,11 @@ data class Segment(
     val url: String?,
     val lastRedirectLocation: String?,
     val httpStatus: Int,
+    /**
+     * Total time elapsed since the request was opened (including TTFB).
+     */
     val downloadTime: Double,
-    val size: Long,
+    val timeToFirstByte: Double?,
+    val size: Long?,
     val success: Boolean
 )
