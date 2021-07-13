@@ -449,27 +449,19 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             }
 
             @Override
-            public void onAudioInputFormatChanged(EventTime eventTime, Format format) {
+            public void onAudioInputFormatChanged(@NotNull EventTime eventTime, @NotNull Format format) {
                 Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate));
                 try {
-                    if (stateMachine.getCurrentState() != PlayerState.PLAYING
-                            && stateMachine.getCurrentState() != PlayerState.PAUSE) {
-                        // track correct bitrate within buffering or seeking
-                        bitrateEventDataManipulator.setCurrentAudioFormat(format);
-                        return;
-                    }
-                    if (!stateMachine.isQualityChangeEventEnabled()) {
-                        // track correct bitrate even though events are disabled
-                        bitrateEventDataManipulator.setCurrentAudioFormat(format);
-                        return;
-                    }
-                    if (!bitrateEventDataManipulator.hasAudioFormatChanged(format)) {
-                        return;
-                    }
                     long videoTime = getPosition();
                     PlayerState originalState = stateMachine.getCurrentState();
-                    stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
-                    bitrateEventDataManipulator.setCurrentAudioFormat(format);
+                    try {
+                        if (stateMachine.getCurrentState() != PlayerState.PLAYING) return;
+                        if (!stateMachine.isQualityChangeEventEnabled()) return;
+                        if (!bitrateEventDataManipulator.hasAudioFormatChanged(format)) return;
+                        stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
+                    } finally {
+                        bitrateEventDataManipulator.setCurrentAudioFormat(format);
+                    }
                     stateMachine.transitionState(originalState, videoTime);
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
@@ -477,27 +469,19 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             }
 
             @Override
-            public void onVideoInputFormatChanged(EventTime eventTime, Format format) {
+            public void onVideoInputFormatChanged(@NotNull EventTime eventTime, @NotNull Format format) {
                 Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate));
                 try {
-                    if (stateMachine.getCurrentState() != PlayerState.PLAYING
-                            && stateMachine.getCurrentState() != PlayerState.PAUSE) {
-                        // track correct bitrate within buffering or seeking
-                        bitrateEventDataManipulator.setCurrentVideoFormat(format);
-                        return;
-                    }
-                    if (!stateMachine.isQualityChangeEventEnabled()) {
-                        // track correct bitrate even though events are disabled
-                        bitrateEventDataManipulator.setCurrentVideoFormat(format);
-                        return;
-                    }
-                    if (!bitrateEventDataManipulator.hasVideoFormatChanged(format)) {
-                        return;
-                    }
                     long videoTime = getPosition();
                     PlayerState originalState = stateMachine.getCurrentState();
-                    stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
-                    bitrateEventDataManipulator.setCurrentVideoFormat(format);
+                    try {
+                        if (stateMachine.getCurrentState() != PlayerState.PLAYING) return;
+                        if (!stateMachine.isQualityChangeEventEnabled()) return;
+                        if (!bitrateEventDataManipulator.hasVideoFormatChanged(format)) return;
+                        stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
+                    } finally {
+                        bitrateEventDataManipulator.setCurrentVideoFormat(format);
+                    }
                     stateMachine.transitionState(originalState, videoTime);
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);

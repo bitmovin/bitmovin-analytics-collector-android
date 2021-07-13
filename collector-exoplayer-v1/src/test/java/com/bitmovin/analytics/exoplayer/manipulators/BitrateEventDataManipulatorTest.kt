@@ -121,7 +121,6 @@ class BitrateEventDataManipulatorTest {
         assertThat(hasVideoFormatChanged).isTrue()
     }
 
-
     @Test
     fun `manipulate will call exoplayer for Format if currentAudioFormat is null`() {
         // arrange
