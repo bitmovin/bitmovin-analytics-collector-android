@@ -464,7 +464,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
                         bitrateEventDataManipulator.setCurrentAudioFormat(format);
                         return;
                     }
-                    if (!bitrateEventDataManipulator.hasAudioBitrateChanged(format)) {
+                    if (!bitrateEventDataManipulator.hasAudioFormatChanged(format)) {
                         return;
                     }
                     long videoTime = getPosition();
@@ -492,7 +492,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
                         bitrateEventDataManipulator.setCurrentVideoFormat(format);
                         return;
                     }
-                    if (!bitrateEventDataManipulator.hasVideoBitrateChanged(format)) {
+                    if (!bitrateEventDataManipulator.hasVideoFormatChanged(format)) {
                         return;
                     }
                     long videoTime = getPosition();

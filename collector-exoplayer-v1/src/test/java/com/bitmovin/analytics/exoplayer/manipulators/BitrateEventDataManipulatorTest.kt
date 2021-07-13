@@ -25,72 +25,72 @@ class BitrateEventDataManipulatorTest {
     }
 
     @Test
-    fun `hasAudioBitrateChanged should return false if newFormat is null`() {
+    fun `hasAudioFormatChanged should return false if newFormat is null`() {
         // act
-        val hasAudioBitrateChanged = bitrateEventDataManipulator.hasAudioBitrateChanged(null)
+        val hasAudioFormatChanged = bitrateEventDataManipulator.hasAudioFormatChanged(null)
 
         // assert
-        assertThat(hasAudioBitrateChanged).isFalse()
+        assertThat(hasAudioFormatChanged).isFalse()
     }
 
     @Test
-    fun `hasAudioBitrateChanged should return true if currentAudioBitrate is null`() {
+    fun `hasAudioFormatChanged should return true if currentAudioBitrate is null`() {
         // arrange
         bitrateEventDataManipulator.currentAudioFormat = null
 
         // act
-        val hasAudioBitrateChanged = bitrateEventDataManipulator.hasAudioBitrateChanged(mockk(relaxed = true))
+        val hasAudioFormatChanged = bitrateEventDataManipulator.hasAudioFormatChanged(mockk(relaxed = true))
 
         // assert
-        assertThat(hasAudioBitrateChanged).isTrue()
+        assertThat(hasAudioFormatChanged).isTrue()
     }
 
     @Test
-    fun `hasAudioBitrateChanged should return true if currentAudioBitrate is different from newFormat`() {
+    fun `hasAudioFormatChanged should return true if currentAudioBitrate is different from newFormat`() {
         // arrange
         val newFormat = getAudioFormat(789)
         bitrateEventDataManipulator.currentAudioFormat = getAudioFormat(123)
 
         // act
-        val hasAudioBitrateChanged = bitrateEventDataManipulator.hasAudioBitrateChanged(newFormat)
+        val hasAudioFormatChanged = bitrateEventDataManipulator.hasAudioFormatChanged(newFormat)
 
         // assert
-        assertThat(hasAudioBitrateChanged).isTrue()
+        assertThat(hasAudioFormatChanged).isTrue()
     }
 
     @Test
-    fun `hasVideoBitrateChanged should return false if newFormat is null`() {
+    fun `hasVideoFormatChanged should return false if newFormat is null`() {
         // act
-        val hasVideoBitrateChanged = bitrateEventDataManipulator.hasVideoBitrateChanged(null)
+        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(null)
 
         // assert
-        assertThat(hasVideoBitrateChanged).isFalse()
+        assertThat(hasVideoFormatChanged).isFalse()
     }
 
     @Test
-    fun `hasVideoBitrateChanged should return true if currentVideoFormat is null`() {
+    fun `hasVideoFormatChanged should return true if currentVideoFormat is null`() {
         // arrange
         bitrateEventDataManipulator.currentVideoFormat = null
 
         // act
-        val hasVideoBitrateChanged = bitrateEventDataManipulator.hasVideoBitrateChanged(mockk(relaxed = true))
+        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(mockk(relaxed = true))
 
         // assert
-        assertThat(hasVideoBitrateChanged).isTrue()
+        assertThat(hasVideoFormatChanged).isTrue()
     }
 
     @Test
-    fun `hasVideoBitrateChanged should return true if currentVideoFormat is different from newFormat`() {
+    fun `hasVideoFormatChanged should return true if currentVideoFormat is different from newFormat`() {
         // arrange
         val newFormat = getVideoFormat(789)
         bitrateEventDataManipulator.currentVideoFormat = getVideoFormat(123)
 
         // act
-        val hasVideoBitrateChanged = bitrateEventDataManipulator.hasVideoBitrateChanged(newFormat)
+        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(newFormat)
 
         // assert
 
-        assertThat(hasVideoBitrateChanged).isTrue()
+        assertThat(hasVideoFormatChanged).isTrue()
     }
 
     @Test
