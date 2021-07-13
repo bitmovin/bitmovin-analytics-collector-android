@@ -80,10 +80,38 @@ class BitrateEventDataManipulatorTest {
     }
 
     @Test
-    fun `hasVideoFormatChanged should return true if currentVideoFormat is different from newFormat`() {
+    fun `hasVideoFormatChanged should return true if currentVideoFormat's bitrate is different from newFormat`() {
         // arrange
         val newFormat = Format.Builder().setAverageBitrate(789).build()
         bitrateEventDataManipulator.currentVideoFormat = Format.Builder().setAverageBitrate(123).build()
+
+        // act
+        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(newFormat)
+
+        // assert
+
+        assertThat(hasVideoFormatChanged).isTrue()
+    }
+
+    @Test
+    fun `hasVideoFormatChanged should return true if currentVideoFormat's width is different from newFormat`() {
+        // arrange
+        val newFormat = Format.Builder().setWidth(789).build()
+        bitrateEventDataManipulator.currentVideoFormat = Format.Builder().setWidth(123).build()
+
+        // act
+        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(newFormat)
+
+        // assert
+
+        assertThat(hasVideoFormatChanged).isTrue()
+    }
+
+    @Test
+    fun `hasVideoFormatChanged should return true if currentVideoFormat's height is different from newFormat`() {
+        // arrange
+        val newFormat = Format.Builder().setHeight(789).build()
+        bitrateEventDataManipulator.currentVideoFormat = Format.Builder().setHeight(123).build()
 
         // act
         val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(newFormat)

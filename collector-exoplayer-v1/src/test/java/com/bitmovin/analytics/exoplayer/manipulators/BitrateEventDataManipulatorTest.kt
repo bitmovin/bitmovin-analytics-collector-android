@@ -94,6 +94,35 @@ class BitrateEventDataManipulatorTest {
     }
 
     @Test
+    fun `hasVideoFormatChanged should return true if currentVideoFormat's width is different from newFormat`() {
+        // arrange
+        val newFormat = getVideoFormat(111, 789)
+        bitrateEventDataManipulator.currentVideoFormat = getVideoFormat(111, 123)
+
+        // act
+        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(newFormat)
+
+        // assert
+
+        assertThat(hasVideoFormatChanged).isTrue()
+    }
+
+    @Test
+    fun `hasVideoFormatChanged should return true if currentVideoFormat's height is different from newFormat`() {
+        // arrange
+        val newFormat = getVideoFormat(111, 222, 123)
+        bitrateEventDataManipulator.currentVideoFormat = getVideoFormat(111, 222, 987)
+
+        // act
+        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(newFormat)
+
+        // assert
+
+        assertThat(hasVideoFormatChanged).isTrue()
+    }
+
+
+    @Test
     fun `manipulate will call exoplayer for Format if currentAudioFormat is null`() {
         // arrange
         bitrateEventDataManipulator.currentAudioFormat = null
