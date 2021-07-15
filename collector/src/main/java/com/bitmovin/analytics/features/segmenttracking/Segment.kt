@@ -9,8 +9,8 @@ data class Segment(
     /**
      * Total time elapsed since the request was opened (including TTFB).
      */
-    val downloadTime: Double,
-    val timeToFirstByte: Double?,
+    val downloadTime: Long,
+    val timeToFirstByte: Long?,
     val size: Long?,
     val success: Boolean
 )
