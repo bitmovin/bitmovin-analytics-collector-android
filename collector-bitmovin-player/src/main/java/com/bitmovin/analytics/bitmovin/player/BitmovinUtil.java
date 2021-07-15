@@ -17,7 +17,7 @@ public class BitmovinUtil {
     }
 
     public static long getCurrentTimeInMs(Player player) {
-        long currentTime = Util.toPrimitiveLong(player.getCurrentTime());
-        return currentTime * Util.MILLISECONDS_IN_SECONDS;
+        Double currentTimeMs = Util.multiply(player.getCurrentTime(), Util.MILLISECONDS_IN_SECONDS);
+        return Util.toPrimitiveLong(currentTimeMs);
     }
 }

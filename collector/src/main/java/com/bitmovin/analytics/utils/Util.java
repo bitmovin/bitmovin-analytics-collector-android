@@ -124,4 +124,12 @@ public class Util {
     public static long toPrimitiveLong(Double value) {
         return value == null ? 0 : value.longValue();
     }
+
+    public static Double multiply(Double value, Long multiplicand) {
+        return value == null || multiplicand == null ? null : value * multiplicand;
+    }
+
+    public static Double multiply(Double value, Integer multiplicand) {
+        return value == null || multiplicand == null ? null : value * multiplicand;
+    }
 }

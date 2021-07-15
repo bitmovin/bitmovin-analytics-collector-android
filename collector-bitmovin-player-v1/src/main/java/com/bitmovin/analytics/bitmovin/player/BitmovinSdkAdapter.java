@@ -378,8 +378,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                         // if it's life stream we are using currentPosition of playback as videoTime
                         long videoTime =
                                 (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
-                                        ? Util.toPrimitiveLong(bitmovinPlayer.getDuration())
-                                                * Util.MILLISECONDS_IN_SECONDS
+                                        ? Util.toPrimitiveLong(
+                                                Util.multiply(
+                                                        bitmovinPlayer.getDuration(),
+                                                        Util.MILLISECONDS_IN_SECONDS))
                                         : getPosition();
                         stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                         stateMachine.disableHeartbeat();
@@ -645,8 +647,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                 .toString()
                                 .contains("drm/license")) {
                             drmDownloadTime =
-                                    Util.toPrimitiveLong(downloadFinishedEvent.getDownloadTime())
-                                            * Util.MILLISECONDS_IN_SECONDS;
+                                    Util.toPrimitiveLong(
+                                            Util.multiply(
+                                                    downloadFinishedEvent.getDownloadTime(),
+                                                    Util.MILLISECONDS_IN_SECONDS));
                             drmType =
                                     downloadFinishedEvent
                                             .getDownloadType()

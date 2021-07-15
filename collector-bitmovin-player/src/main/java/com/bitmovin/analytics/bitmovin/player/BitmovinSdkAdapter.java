@@ -188,7 +188,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     data.setLive(true);
                 } else {
                     data.setLive(false);
-                    data.setVideoDuration((long) duration * Util.MILLISECONDS_IN_SECONDS);
+                    data.setVideoDuration(
+                            Util.toPrimitiveLong(
+                                    Util.multiply(duration, Util.MILLISECONDS_IN_SECONDS)));
                 }
             }
 
@@ -378,8 +380,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     Player player = getPlayer();
                     long videoTime =
                             (player.getDuration() != Double.POSITIVE_INFINITY)
-                                    ? Util.toPrimitiveLong(player.getDuration())
-                                            * Util.MILLISECONDS_IN_SECONDS
+                                    ? Util.toPrimitiveLong(
+                                            Util.multiply(
+                                                    player.getDuration(),
+                                                    Util.MILLISECONDS_IN_SECONDS))
                                     : getPosition();
                     stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                     resetSourceRelatedState();
@@ -616,8 +620,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 try {
                     if (event.getDownloadType().toString().contains("drm/license")) {
                         drmDownloadTime =
-                                Util.toPrimitiveLong(event.getDownloadTime())
-                                        * Util.MILLISECONDS_IN_SECONDS;
+                                Util.toPrimitiveLong(
+                                        Util.multiply(
+                                                event.getDownloadTime(),
+                                                Util.MILLISECONDS_IN_SECONDS));
                     }
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
@@ -691,8 +697,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             // source or seeking to another source. In both cases, we set the
                             // videoEndTime to the duration of the old source.
                             long videoEndTimeOfPreviousSource =
-                                    Util.toPrimitiveLong(overrideCurrentSource.getDuration())
-                                            * Util.MILLISECONDS_IN_SECONDS;
+                                    Util.toPrimitiveLong(
+                                            Util.multiply(
+                                                    overrideCurrentSource.getDuration(),
+                                                    Util.MILLISECONDS_IN_SECONDS));
 
                             boolean shouldStartup = getPlayer().isPlaying();
                             stateMachine.sourceChange(
