@@ -25,6 +25,7 @@ import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.features.Feature;
+import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -81,6 +82,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean isInInitialBufferState = false;
     protected final DefaultAnalyticsListener defaultAnalyticsListener;
     protected final DefaultPlayerEventListener defaultPlayerEventListener;
+    private FeatureFactory featureFactory;
 
     private long drmLoadStartTime = 0;
     private Long drmDownloadTime = null;
@@ -90,7 +92,9 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             ExoPlayer exoplayer,
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
-            PlayerStateMachine stateMachine) {
+            PlayerStateMachine stateMachine,
+            FeatureFactory featureFactory) {
+        this.featureFactory = featureFactory;
         this.defaultAnalyticsListener = createAnalyticsListener();
         this.defaultPlayerEventListener = createPlayerEventListener();
         this.stateMachine = stateMachine;
@@ -137,7 +141,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
         this.isVideoAttemptedPlay = false;
         isPlaying = false;
         checkAutoplayStartup();
-        return new ArrayList<>();
+        return featureFactory.createFeatures();
     }
 
     @Override
