@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+### Fixed
+- BitmovinPlayerCollector didn't report some metrics with sub-second granularity
+
 ## Development v1
+
+### Fixed
+- BitmovinPlayerCollector didn't report some metrics with sub-second granularity
 
 ## v2.1.0
 
