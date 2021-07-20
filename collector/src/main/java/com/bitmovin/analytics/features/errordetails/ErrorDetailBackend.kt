@@ -49,7 +49,7 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
         const val MAX_URL_LENGTH = 200
         const val MAX_STRING_LENGTH = 400
 
-        //TODO get platform from utilities
+        // TODO get platform from utilities
         fun ErrorDetail.copyTruncateStringsAndUrls(maxStringLength: Int, maxUrlLength: Int): ErrorDetail = this.copy(
                 message = message?.take(maxStringLength),
                 segments = segments?.map {
