@@ -128,6 +128,18 @@ public class Util {
         return value == null ? 0 : value.longValue();
     }
 
+    public static Double multiply(Double value, Long multiplicand) {
+        return value == null || multiplicand == null ? null : value * multiplicand;
+    }
+
+    public static Double multiply(Double value, Integer multiplicand) {
+        return value == null || multiplicand == null ? null : value * multiplicand;
+    }
+
+    public static long secondsToMillis(Double seconds) {
+        return toPrimitiveLong(multiply(seconds, MILLISECONDS_IN_SECONDS));
+    }
+
     public static String joinUrl(String baseUrl, String relativeUrl) {
         StringBuilder result = new StringBuilder(baseUrl);
         if (!baseUrl.endsWith("/")) {

@@ -189,7 +189,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     data.setLive(true);
                 } else {
                     data.setLive(false);
-                    data.setVideoDuration((long) duration * Util.MILLISECONDS_IN_SECONDS);
+                    data.setVideoDuration(Util.secondsToMillis(duration));
                 }
             }
 
@@ -379,8 +379,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     Player player = getPlayer();
                     long videoTime =
                             (player.getDuration() != Double.POSITIVE_INFINITY)
-                                    ? Util.toPrimitiveLong(player.getDuration())
-                                            * Util.MILLISECONDS_IN_SECONDS
+                                    ? Util.secondsToMillis(player.getDuration())
                                     : getPosition();
                     stateMachine.transitionState(PlayerState.PAUSE, videoTime);
                     resetSourceRelatedState();
@@ -616,9 +615,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             (event) -> {
                 try {
                     if (event.getDownloadType().toString().contains("drm/license")) {
-                        drmDownloadTime =
-                                Util.toPrimitiveLong(event.getDownloadTime())
-                                        * Util.MILLISECONDS_IN_SECONDS;
+                        drmDownloadTime = Util.secondsToMillis(event.getDownloadTime());
                     }
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
@@ -692,8 +689,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             // source or seeking to another source. In both cases, we set the
                             // videoEndTime to the duration of the old source.
                             long videoEndTimeOfPreviousSource =
-                                    Util.toPrimitiveLong(overrideCurrentSource.getDuration())
-                                            * Util.MILLISECONDS_IN_SECONDS;
+                                    Util.secondsToMillis(overrideCurrentSource.getDuration());
 
                             boolean shouldStartup = getPlayer().isPlaying();
                             stateMachine.sourceChange(
