@@ -23,11 +23,12 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
         }
     }
 
-    fun send(errorDetails: ErrorDetail) {
+    fun send(errorDetail: ErrorDetail) {
+        val errorDetailCopy = errorDetail.copyTruncateStringsAndUrls(MAX_STRING_LENGTH, MAX_URL_LENGTH)
         if (enabled) {
-            httpClient.post(backendUrl, DataSerializer.serialize(errorDetails), null)
+            httpClient.post(backendUrl, DataSerializer.serialize(errorDetailCopy), null)
         } else {
-            queue.add(errorDetails)
+            _queue.add(errorDetailCopy)
         }
     }
 
@@ -45,6 +46,20 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
     }
 
     companion object {
+        const val MAX_URL_LENGTH = 200
+        const val MAX_STRING_LENGTH = 400
+
+        //TODO get platform from utilities
+        fun ErrorDetail.copyTruncateStringsAndUrls(maxStringLength: Int, maxUrlLength: Int): ErrorDetail = this.copy(
+                message = message?.take(maxStringLength),
+                segments = segments?.map {
+                    it.copyTruncateUrls(maxUrlLength)
+                })
+
+        private fun Segment.copyTruncateUrls(maxLength: Int) = this.copy(
+                url = url?.take(maxLength),
+                lastRedirectLocation = lastRedirectLocation?.take(maxLength))
+
         fun ErrorDetail.copyTruncateSegments(maxSegments: Int) = this.copy(segments = segments?.take(maxSegments))
     }
 }
