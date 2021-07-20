@@ -27,10 +27,10 @@ class EventData(
     val userAgent: String = deviceInfo.userAgent
     val deviceInformation: DeviceInformationDto = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV)
     val language: String = deviceInfo.locale
-    val analyticsVersion: String = BuildConfig.VERSION_NAME
+    val analyticsVersion: String = Util.getAnalyticsVersion()
     val playerTech: String = Util.PLAYER_TECH
 
-    val domain: String = deviceInfo.packageName
+    val domain: String = deviceInfo.domain
     val screenHeight: Int = deviceInfo.screenHeight
     val screenWidth: Int = deviceInfo.screenWidth
     var isLive: Boolean = false

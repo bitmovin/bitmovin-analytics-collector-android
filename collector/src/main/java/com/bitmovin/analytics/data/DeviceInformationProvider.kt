@@ -29,7 +29,7 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
                 model = Build.MODEL,
                 isTV = isTV,
                 locale = Util.getLocale(),
-                packageName = context.packageName,
+                domain = Util.getDomain(context),
                 screenWidth = width,
                 screenHeight = height,
                 userAgent = userAgent
