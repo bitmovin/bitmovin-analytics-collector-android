@@ -16,7 +16,7 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
         val segmentType = mapHttpRequestType(it.downloadType)
-        val segmentInfo = Segment(Util.getTimestamp(), segmentType, it.url, it.lastRedirectLocation, it.httpStatus, Util.toPrimitiveLong(it.downloadTime * Util.MILLISECONDS_IN_SECONDS), null, it.size, it.isSuccess)
+        val segmentInfo = Segment(Util.getTimestamp(), segmentType, it.url, it.lastRedirectLocation, it.httpStatus, Util.secondsToMillis(it.downloadTime), null, it.size, it.isSuccess)
         observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segmentInfo)) }
     }
 
