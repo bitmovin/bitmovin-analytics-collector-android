@@ -1,5 +1,8 @@
 package com.bitmovin.analytics.utils;
 
+import android.app.UiModeManager;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -20,8 +23,7 @@ public class Util {
     public static final int MILLISECONDS_IN_SECONDS = 1000;
     public static final int VIDEOSTART_TIMEOUT = 1000 * 60; // in milliseconds
     public static final int ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD = 50;
-    public static final int ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL =
-            1000 * 60 * 60; // in milliseconds;
+    public static final int ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL = 1000 * 60 * 60; // in milliseconds;
     public static final int REBUFFERING_TIMEOUT = 1000 * 60 * 2; // in milliseconds
 
     private static final Map<String, String> VIDEO_FORMAT_MIME_TYPE_MAP;
@@ -39,10 +41,12 @@ public class Util {
     }
 
     /**
-     * Returns the time in ms since the system was booted, and guaranteed to be monotonic Details
-     * here: https://developer.android.com/reference/android/os/SystemClock
+     * Returns the time in ms since the system was booted, and guaranteed to be
+     * monotonic Details here:
+     * https://developer.android.com/reference/android/os/SystemClock
      *
-     * @return The time in ms since the system was booted, and guaranteed to be monotonic.
+     * @return The time in ms since the system was booted, and guaranteed to be
+     *         monotonic.
      */
     public static long getElapsedTime() {
         return SystemClock.elapsedRealtime();
@@ -104,8 +108,8 @@ public class Util {
         return new Pair<>(null, null);
     }
 
-    public static boolean getIsLiveFromConfigOrPlayer(
-            boolean isPlayerReady, Boolean isLiveFromConfig, boolean isLiveFromPlayer) {
+    public static boolean getIsLiveFromConfigOrPlayer(boolean isPlayerReady, Boolean isLiveFromConfig,
+            boolean isLiveFromPlayer) {
         if (isPlayerReady) {
             return isLiveFromPlayer;
         }
@@ -135,5 +139,31 @@ public class Util {
 
     public static long secondsToMillis(Double seconds) {
         return toPrimitiveLong(multiply(seconds, MILLISECONDS_IN_SECONDS));
+    }
+
+    public static String joinUrl(String baseUrl, String relativeUrl) {
+        StringBuilder result = new StringBuilder(baseUrl);
+        if (!baseUrl.endsWith("/")) {
+            result.append('/');
+        }
+
+        if (relativeUrl.startsWith("/")) {
+            relativeUrl = relativeUrl.substring(1);
+        }
+        result.append(relativeUrl);
+        return result.toString();
+    }
+
+    public static Boolean isTVDevice(Context context) {
+        Object untypedUiModeManager = context.getSystemService(Context.UI_MODE_SERVICE);
+        if (untypedUiModeManager instanceof UiModeManager) {
+            UiModeManager uiModeManager = (UiModeManager) untypedUiModeManager;
+            return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+        }
+        return false;
+    }
+
+    public static String getPlatform(Boolean isTV) {
+        return isTV ? "androidTV" : "android";
     }
 }

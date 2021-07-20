@@ -6,11 +6,17 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 class FeatureTests {
-    data class TestFeatureConfigNonOptional(val testValue: Int) : FeatureConfig()
-    data class TestFeatureConfigOptional(val testValue: Int?) : FeatureConfig()
+    data class ConfigContainer(val feature1: TestFeatureConfigNonOptional?, val feature2: TestFeatureConfigOptional?)
 
-    class Feature1 : Feature<TestFeatureConfigNonOptional>("feature1", TestFeatureConfigNonOptional::class)
-    class Feature2 : Feature<TestFeatureConfigOptional>("feature2", TestFeatureConfigOptional::class)
+    data class TestFeatureConfigNonOptional(override val enabled: Boolean, val testValue: Int) : FeatureConfig
+    data class TestFeatureConfigOptional(override val enabled: Boolean, val testValue: Int?) : FeatureConfig
+
+    class Feature1 : Feature<ConfigContainer, TestFeatureConfigNonOptional>() {
+        override fun extractConfig(featureConfigs: ConfigContainer) = featureConfigs.feature1
+    }
+    class Feature2 : Feature<ConfigContainer, TestFeatureConfigOptional>() {
+        override fun extractConfig(featureConfigs: ConfigContainer) = featureConfigs.feature2
+    }
 
     @Test
     fun testConfigureWillReturnNullOnNullStringAndCallsConfigureHook() {
@@ -23,7 +29,7 @@ class FeatureTests {
     @Test
     fun testConfigureWillReturnNullOnEmptyConfigAndCallsConfigureHook() {
         val feature = spyk(Feature1())
-        val config = feature.configure(true, "")
+        val config = feature.configure(true, ConfigContainer(null, null))
         assertThat(config).isNull()
         verify(exactly = 1) { feature.configured(true, null) }
     }
@@ -31,7 +37,7 @@ class FeatureTests {
     @Test
     fun testConfigureWillReturnDefaultsOnPartialConfigAndCallsConfigureHook() {
         val feature = spyk(Feature1())
-        val config = feature.configure(true, "{}")
+        val config = feature.configure(true, ConfigContainer(TestFeatureConfigNonOptional(false, 0), null))
         assertThat(config).isNotNull
         assertThat(config?.enabled).isFalse()
         assertThat(config?.testValue).isEqualTo(0)
@@ -41,7 +47,7 @@ class FeatureTests {
     @Test
     fun testConfigureWillReturnDefaultsOnPartialOptionalConfigAndCallsConfigureHook() {
         val feature = spyk(Feature2())
-        val config = feature.configure(true, "{}")
+        val config = feature.configure(true, ConfigContainer(null, TestFeatureConfigOptional(false, null)))
         assertThat(config).isNotNull
         assertThat(config?.enabled).isFalse()
         assertThat(config?.testValue).isNull()
@@ -49,19 +55,9 @@ class FeatureTests {
     }
 
     @Test
-    fun testConfigureWillReturnDefaultsOnInvalidConfigAndCallsConfigureHook() {
-        val feature = spyk(Feature1())
-        val config = feature.configure(true, "{ \"enabled\": \"wrong\" }")
-        assertThat(config).isNotNull
-        assertThat(config?.enabled).isFalse()
-        assertThat(config?.testValue).isEqualTo(0)
-        verify(exactly = 1) { feature.configured(true, config) }
-    }
-
-    @Test
     fun testConfigureWillReturnDisabledConfigAndCallsConfigureHook() {
         val feature = spyk(Feature1())
-        val config = feature.configure(true, "{ \"enabled\": false }")
+        val config = feature.configure(true, ConfigContainer(TestFeatureConfigNonOptional(false, 0), null))
         assertThat(config).isNotNull
         assertThat(config?.enabled).isFalse()
         assertThat(config?.testValue).isEqualTo(0)
@@ -71,7 +67,7 @@ class FeatureTests {
     @Test
     fun testConfigureWillReturnEnabledConfigAndCallsConfigureHook() {
         val feature = spyk(Feature1())
-        val config = feature.configure(true, "{ \"enabled\": true }")
+        val config = feature.configure(true, ConfigContainer(TestFeatureConfigNonOptional(true, 0), null))
         assertThat(config).isNotNull
         assertThat(config?.enabled).isTrue()
         assertThat(config?.testValue).isEqualTo(0)

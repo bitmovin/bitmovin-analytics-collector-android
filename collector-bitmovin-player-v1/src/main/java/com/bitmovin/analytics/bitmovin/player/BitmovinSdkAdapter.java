@@ -14,6 +14,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureFactory;
+import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
@@ -98,7 +99,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.deviceInformationProvider = deviceInformationProvider;
     }
 
-    public Collection<Feature<?>> init() {
+    public Collection<Feature<FeatureConfigContainer, ?>> init() {
         addPlayerListeners();
         checkAutoplayStartup();
         this.totalDroppedVideoFrames = 0;

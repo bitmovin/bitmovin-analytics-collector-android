@@ -6,7 +6,13 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.google.android.exoplayer2.ExoPlayer
 
-class FakeExoPlayerAdapter(exoplayer: ExoPlayer, config: BitmovinAnalyticsConfig, deviceInformationProvider: DeviceInformationProvider, stateMachine: PlayerStateMachine) : ExoPlayerAdapter(exoplayer, config, deviceInformationProvider, stateMachine) {
+class FakeExoPlayerAdapter(
+    exoplayer: ExoPlayer,
+    config: BitmovinAnalyticsConfig,
+    deviceInformationProvider: DeviceInformationProvider,
+    stateMachine: PlayerStateMachine
+) : ExoPlayerAdapter(exoplayer, config, deviceInformationProvider, stateMachine) {
+
     var fakePosition: Long = 0
 
     override fun registerEventDataManipulators(pipeline: EventDataManipulatorPipeline) {
