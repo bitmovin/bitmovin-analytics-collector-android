@@ -687,7 +687,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             // Transitioning can either be triggered by finishing the previous
                             // source or seeking to another source. In both cases, we set the
                             // videoEndTime to the duration of the old source.
-                            long videoEndTimeOfPreviousSource = Util.secondsToMillis(overrideCurrentSource.getDuration());
+                            long videoEndTimeOfPreviousSource =
+                                    Util.secondsToMillis(overrideCurrentSource.getDuration());
 
                             boolean shouldStartup = getPlayer().isPlaying();
                             stateMachine.sourceChange(
