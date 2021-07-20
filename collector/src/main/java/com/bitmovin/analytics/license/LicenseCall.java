@@ -10,6 +10,8 @@ import com.bitmovin.analytics.data.LicenseResponse;
 import com.bitmovin.analytics.utils.ClientFactory;
 import com.bitmovin.analytics.utils.DataSerializer;
 import com.bitmovin.analytics.utils.HttpClient;
+import com.bitmovin.analytics.utils.Util;
+
 import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -39,8 +41,8 @@ public class LicenseCall {
     public void authenticate(final AuthenticationCallback callback) {
         final LicenseCallData data = new LicenseCallData();
         data.setKey(this.config.getKey());
-        data.setAnalyticsVersion(BuildConfig.VERSION_NAME);
-        data.setDomain(context.getPackageName());
+        data.setAnalyticsVersion(Util.getAnalyticsVersion());
+        data.setDomain(Util.getDomain(context));
         String json = DataSerializer.serialize(data);
         httpClient.post(
                 this.backendUrl,
