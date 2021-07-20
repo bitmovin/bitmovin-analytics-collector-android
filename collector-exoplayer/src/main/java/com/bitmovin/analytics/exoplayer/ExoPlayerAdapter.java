@@ -48,7 +48,6 @@ import com.google.android.exoplayer2.source.hls.HlsManifest;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import org.jetbrains.annotations.NotNull;

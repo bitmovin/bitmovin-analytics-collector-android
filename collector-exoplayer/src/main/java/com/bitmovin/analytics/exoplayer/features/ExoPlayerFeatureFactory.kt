@@ -5,8 +5,6 @@ import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
-import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend
-import com.bitmovin.analytics.features.errordetails.ErrorDetailTracking
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.google.android.exoplayer2.ExoPlayer
@@ -16,7 +14,7 @@ class ExoPlayerFeatureFactory(private val analyticsConfig: BitmovinAnalyticsConf
     override fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
         var segmentTracking: SegmentTracking? = null
-        if(player is SimpleExoPlayer) {
+        if (player is SimpleExoPlayer) {
             val segmentTrackingAdapter = ExoPlayerSegmentTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
             segmentTracking = SegmentTracking(segmentTrackingAdapter)
         }
