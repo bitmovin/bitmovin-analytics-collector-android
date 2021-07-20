@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development v2
 
 ### Fixed
-- ExoPlayer: wrong field to track audioBitrate
-- ExoPlayer: no quality changes if the quality did not change
+- BitmovinPlayerCollector didn't report some metrics with sub-second granularity
+- ExoPlayerCollector used wrong field to track audioBitrate
+- ExoPlayerCollector reported `qualitychange` events although the quality did not change
 
 ### Added
 - Error detail tracking feature
@@ -17,8 +18,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development v1
 
 ### Fixed
-- ExoPlayer: wrong field to track audioBitrate
-- ExoPlayer: no quality changes if the quality did not change
+- BitmovinPlayerCollector didn't report some metrics with sub-second granularity
+- ExoPlayerCollector used wrong field to track audioBitrate
+- ExoPlayerCollector reported `qualitychange` events although the quality did not change
 
 ### Added
 - Error detail tracking feature
