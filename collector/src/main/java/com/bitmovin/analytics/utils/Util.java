@@ -132,4 +132,8 @@ public class Util {
     public static Double multiply(Double value, Integer multiplicand) {
         return value == null || multiplicand == null ? null : value * multiplicand;
     }
+
+    public static long secondsToMillis(Double seconds) {
+        return toPrimitiveLong(multiply(seconds, MILLISECONDS_IN_SECONDS));
+    }
 }
