@@ -61,9 +61,9 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
 
     private fun parseErrorData(data: Any?): ErrorData {
         var additionalData: String? = null
-        if(data is Throwable) {
-            if(data.cause != null) {
-                additionalData = DataSerializer.serialize(ErrorData(data.cause?.message,  data.cause?.topOfStacktrace?.toList(), null))
+        if (data is Throwable) {
+            if (data.cause != null) {
+                additionalData = DataSerializer.serialize(ErrorData(data.cause?.message, data.cause?.topOfStacktrace?.toList(), null))
             }
 
             return ErrorData(data.message, data.topOfStacktrace.toList(), additionalData)
@@ -71,7 +71,7 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         try {
             // this might fail due to circular dependencies (infinite recursion) etc.
             additionalData = DataSerializer.serialize(data)
-        } catch(ignored: Exception) { }
+        } catch (ignored: Exception) { }
         return ErrorData(null, null, additionalData)
     }
 }
