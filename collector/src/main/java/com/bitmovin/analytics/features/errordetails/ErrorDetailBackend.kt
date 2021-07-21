@@ -49,9 +49,9 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
         const val MAX_URL_LENGTH = 200
         const val MAX_STRING_LENGTH = 400
 
-        //TODO get platform from utilities
         fun ErrorDetail.copyTruncateStringsAndUrls(maxStringLength: Int, maxUrlLength: Int): ErrorDetail = this.copy(
                 message = message?.take(maxStringLength),
+                data = data.copyTruncateStrings(maxStringLength),
                 segments = segments?.map {
                     it.copyTruncateUrls(maxUrlLength)
                 })
@@ -59,6 +59,11 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
         private fun Segment.copyTruncateUrls(maxLength: Int) = this.copy(
                 url = url?.take(maxLength),
                 lastRedirectLocation = lastRedirectLocation?.take(maxLength))
+
+        private fun ErrorData.copyTruncateStrings(maxStringLength: Int) = this.copy(
+                exceptionMessage = exceptionMessage?.take(maxStringLength),
+                additionalData = additionalData?.take(maxStringLength)
+        )
 
         fun ErrorDetail.copyTruncateSegments(maxSegments: Int) = this.copy(segments = segments?.take(maxSegments))
     }
