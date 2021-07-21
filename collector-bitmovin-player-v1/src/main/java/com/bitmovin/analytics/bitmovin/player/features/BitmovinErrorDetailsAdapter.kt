@@ -10,7 +10,7 @@ import com.bitmovin.player.api.event.listener.OnErrorListener
 class BitmovinErrorDetailsAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnErrorDetailEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnErrorDetailEventListener>()
     private val onErrorListener = OnErrorListener {
-        observableSupport.notify { listener -> listener.onError(it.code, it.message, it.data as? Throwable) }
+        observableSupport.notify { listener -> listener.onError(it.code, it.message, it.data) }
     }
 
     init {
