@@ -7,8 +7,10 @@ import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
+import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.analytics.utils.topOfStacktrace
+import java.lang.Exception
 
 class ErrorDetailTracking(private val context: Context, private val analyticsConfig: BitmovinAnalyticsConfig, private val impressionIdProvider: ImpressionIdProvider, private val backend: ErrorDetailBackend, private val segmentTracking: SegmentTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) :
         Feature<FeatureConfigContainer, ErrorDetailTrackingConfig>(),
@@ -42,7 +44,7 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         errorIndex = 0
     }
 
-    override fun onError(code: Int?, message: String?, throwable: Throwable?) {
+    override fun onError(code: Int?, message: String?, data: Any?) {
         if (!isEnabled) {
             return
         }
@@ -51,7 +53,25 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         this.errorIndex++
         val platform = Util.getPlatform(Util.isTVDevice(context))
         val timestamp = Util.getTimestamp()
-        val errorDetails = ErrorDetail(platform, analyticsConfig.key, Util.getDomain(context), impressionIdProvider.impressionId, errorIndex, timestamp, code, message, throwable?.topOfStacktrace?.toList(), segments)
+
+        val errorData = parseErrorData(data)
+        val errorDetails = ErrorDetail(platform, analyticsConfig.key, Util.getDomain(context), impressionIdProvider.impressionId, errorIndex, timestamp, code, message, errorData, segments)
         backend.send(errorDetails)
+    }
+
+    private fun parseErrorData(data: Any?): ErrorData {
+        var additionalData: String? = null
+        if(data is Throwable) {
+            if(data.cause != null) {
+                additionalData = DataSerializer.serialize(ErrorData(data.cause?.message,  data.cause?.topOfStacktrace?.toList(), null))
+            }
+
+            return ErrorData(data.message, data.topOfStacktrace.toList(), additionalData)
+        }
+        try {
+            // this might fail due to circular dependencies (infinite recursion) etc.
+            additionalData = DataSerializer.serialize(data)
+        } catch(ignored: Exception) { }
+        return ErrorData(null, null, additionalData)
     }
 }
