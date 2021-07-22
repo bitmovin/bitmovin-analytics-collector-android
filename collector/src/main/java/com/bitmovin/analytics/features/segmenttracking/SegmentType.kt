@@ -2,6 +2,7 @@ package com.bitmovin.analytics.features.segmenttracking
 
 enum class SegmentType {
     DRM_LICENSE_WIDEVINE,
+    DRM_OTHER,
     MEDIA_THUMBNAILS,
     MEDIA_VIDEO,
     MEDIA_AUDIO,
