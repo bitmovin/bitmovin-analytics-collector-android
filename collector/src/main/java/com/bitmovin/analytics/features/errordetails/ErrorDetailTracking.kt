@@ -12,6 +12,9 @@ import com.bitmovin.analytics.utils.Util
 import com.bitmovin.analytics.utils.topOfStacktrace
 import java.lang.Exception
 
+// TODO we also need to track errors from other sources, not just the player.
+// Should be streamlined and go through the BitmovinAnalytics class
+
 class ErrorDetailTracking(private val context: Context, private val analyticsConfig: BitmovinAnalyticsConfig, private val impressionIdProvider: ImpressionIdProvider, private val backend: ErrorDetailBackend, private val segmentTracking: SegmentTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) :
         Feature<FeatureConfigContainer, ErrorDetailTrackingConfig>(),
         OnErrorDetailEventListener {

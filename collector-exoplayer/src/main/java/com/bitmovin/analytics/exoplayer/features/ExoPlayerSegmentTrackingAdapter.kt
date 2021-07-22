@@ -31,7 +31,7 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val analyticsListener = object : DefaultAnalyticsListener() {
         override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData) {
-            // status code could maybe be parsed from responseHeaders[null].value = "HTTP/1.1 200 OK"
+            // TODO status code could maybe be parsed from responseHeaders[null].value = "HTTP/1.1 200 OK"
             notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, 0)
         }
 
