@@ -103,9 +103,9 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
         }
 
         private fun mapHlsManifestType(player: SimpleExoPlayer, uri: Uri, eventTime: AnalyticsListener.EventTime): SegmentType {
-            if(!isHlsManifestClassLoaded) return SegmentType.MANIFEST_HLS
+            if (!isHlsManifestClassLoaded) return SegmentType.MANIFEST_HLS
 
-            if(!eventTime.timeline.isEmpty) {
+            if (!eventTime.timeline.isEmpty) {
                 try {
 
                     val window = Timeline.Window()
@@ -124,7 +124,7 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
             // source, we check against the base manifest uri
             val mediaSource = player.mediaSourceFromReflection as? HlsMediaSource?
             val manifestUri = mediaSource?.manifestUriFromReflection as? Uri?
-            if(manifestUri != null) {
+            if (manifestUri != null) {
                 return if (manifestUri == uri) SegmentType.MANIFEST_HLS_MASTER else SegmentType.MANIFEST_HLS_VARIANT
             }
 

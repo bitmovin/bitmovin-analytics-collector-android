@@ -54,7 +54,6 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import org.jetbrains.annotations.NotNull;
@@ -427,10 +426,17 @@ public class ExoPlayerAdapter
             this.stateMachine.setErrorCode(errorCode);
             this.stateMachine.transitionState(PlayerState.ERROR, videoTime);
 
-            // TODO improve exception mapper to also allow passing exception to the error details feature
+            // TODO improve exception mapper to also allow passing exception to the error details
+            // feature
             // Maybe the eventBus should already get the full extracted `ErrorDetail`, instead
             // of parsing and prettifying throwables itself
-            eventBus.notify(OnErrorDetailEventListener.class, listener -> listener.onError(errorCode.getErrorCode(),  errorCode.getDescription(), errorCode.getErrorData()));
+            eventBus.notify(
+                    OnErrorDetailEventListener.class,
+                    listener ->
+                            listener.onError(
+                                    errorCode.getErrorCode(),
+                                    errorCode.getDescription(),
+                                    errorCode.getErrorData()));
         } catch (Exception e) {
             Log.d(TAG, e.getMessage(), e);
         }

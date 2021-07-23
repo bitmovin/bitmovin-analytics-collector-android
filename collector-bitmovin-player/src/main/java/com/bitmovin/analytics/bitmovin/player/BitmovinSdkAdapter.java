@@ -639,7 +639,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 handleErrorEvent(event, exceptionMapper.map(event));
             };
 
-    private void handleErrorEvent(ErrorEvent event,  ErrorCode errorCode) {
+    private void handleErrorEvent(ErrorEvent event, ErrorCode errorCode) {
         try {
             long videoTime = getPosition();
 
@@ -649,7 +649,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             }
             stateMachine.transitionState(PlayerState.ERROR, videoTime);
 
-            eventBus.notify(OnErrorDetailEventListener.class, listener -> listener.onError(event.getCode().getValue(), event.getMessage(), event.getData()));
+            eventBus.notify(
+                    OnErrorDetailEventListener.class,
+                    listener ->
+                            listener.onError(
+                                    event.getCode().getValue(),
+                                    event.getMessage(),
+                                    event.getData()));
         } catch (Exception e) {
             Log.d(TAG, e.getMessage(), e);
         }

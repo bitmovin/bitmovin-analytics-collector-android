@@ -598,10 +598,18 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
                     ExoPlayerAdapter.this.stateMachine.transitionState(
                             PlayerState.ERROR, videoTime);
 
-                    // TODO improve exception mapper to also allow passing exception to the error details feature
-                    // Maybe the eventBus should already get the full extracted `ErrorDetail`, instead
+                    // TODO improve exception mapper to also allow passing exception to the error
+                    // details feature
+                    // Maybe the eventBus should already get the full extracted `ErrorDetail`,
+                    // instead
                     // of parsing and prettifying throwables itself
-                    eventBus.notify(OnErrorDetailEventListener.class, listener -> listener.onError(errorCode.getErrorCode(),  errorCode.getDescription(), errorCode.getErrorData()));
+                    eventBus.notify(
+                            OnErrorDetailEventListener.class,
+                            listener ->
+                                    listener.onError(
+                                            errorCode.getErrorCode(),
+                                            errorCode.getDescription(),
+                                            errorCode.getErrorData()));
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
                 }
