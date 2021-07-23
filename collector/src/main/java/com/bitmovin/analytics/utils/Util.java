@@ -8,6 +8,8 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.SystemClock;
 import android.util.Pair;
+
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -172,5 +174,17 @@ public class Util {
 
     public static String getAnalyticsVersion() {
         return com.bitmovin.analytics.BuildConfig.VERSION_NAME;
+    }
+
+    public static <T> Object getPrivateFieldFromReflection(T source, String fieldName)  {
+        if(source == null) {
+            return null;
+        }
+        try {
+            Field privateField =  source.getClass().getDeclaredField(fieldName);
+            privateField.setAccessible(true);
+            return privateField.get(source);
+        } catch(Exception ignored) { }
+        return null;
     }
 }
