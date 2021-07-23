@@ -1,6 +1,8 @@
 package com.bitmovin.analytics.features.segmenttracking
 
+import android.util.Log
 import com.bitmovin.analytics.Observable
+import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.QueueExtensions.Companion.limit
 import java.util.LinkedList
 import java.util.Queue
@@ -37,6 +39,7 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
     }
 
     override fun onDownloadFinished(event: OnDownloadFinishedEventObject) {
+        Log.d("SegmentTracking", "onDownloadFinished: ${DataSerializer.serialize(event.segment)}")
         addSegment(event.segment)
     }
 
