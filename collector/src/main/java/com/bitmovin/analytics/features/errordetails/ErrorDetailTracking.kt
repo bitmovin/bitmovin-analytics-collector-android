@@ -71,6 +71,10 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
 
             return ErrorData(data.message, data.topOfStacktrace.toList(), additionalData)
         }
+        // TODO rework duplicate ErrorData class
+        else if(data is com.bitmovin.analytics.data.ErrorData) {
+            return ErrorData(data.msg, data.details.toList(), null)
+        }
         try {
             // this might fail due to circular dependencies (infinite recursion) etc.
             additionalData = DataSerializer.serialize(data)
