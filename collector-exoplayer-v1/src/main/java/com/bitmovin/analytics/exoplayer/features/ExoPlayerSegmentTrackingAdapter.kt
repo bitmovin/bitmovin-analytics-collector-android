@@ -5,6 +5,7 @@ import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.exoplayer.DefaultAnalyticsListener
+import com.bitmovin.analytics.exoplayer.features.ExoPlayerSegmentTrackingAdapter.Companion.mediaSourceFromReflection
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.features.segmenttracking.Segment
@@ -15,21 +16,22 @@ import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.analytics.AnalyticsListener
-import com.google.android.exoplayer2.source.LoadEventInfo
-import com.google.android.exoplayer2.source.MediaLoadData
+import com.google.android.exoplayer2.source.MediaSourceEventListener
 import com.google.android.exoplayer2.source.hls.HlsManifest
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import java.io.IOException
 
 class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val analyticsListener = object : DefaultAnalyticsListener() {
-        override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData) {
+
+        override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData) {
             val statusCode = loadEventInfo.responseHeaders.responseCode ?: 0
             notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, statusCode)
         }
 
-        override fun onLoadError(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, error: IOException, wasCanceled: Boolean) {
+        override fun onLoadError(eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData, error: IOException, wasCanceled: Boolean) {
             val statusCode = (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode ?: loadEventInfo.responseHeaders.responseCode ?: 0
             notifyObservable(eventTime, loadEventInfo, mediaLoadData, false, statusCode)
         }
@@ -39,8 +41,8 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
         wireEvents()
     }
 
-    private fun notifyObservable(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, success: Boolean, statusCode: Int) {
-        val segment = mapLoadCompletedArgsToSegment(eventTime, loadEventInfo, mediaLoadData, statusCode, success)
+    private fun notifyObservable(eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData, success: Boolean, statusCode: Int) {
+        val segment = mapLoadCompletedArgsToSegment(player, eventTime, loadEventInfo, mediaLoadData, statusCode, success)
         observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segment)) }
     }
 
@@ -91,27 +93,52 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
                 return null
             }
 
-        private fun mapManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): SegmentType {
+        private fun mapManifestType(player: SimpleExoPlayer, uri: Uri, eventTime: AnalyticsListener.EventTime): SegmentType {
             return when (com.google.android.exoplayer2.util.Util.inferContentType(uri)) {
                 C.TYPE_DASH -> SegmentType.MANIFEST_DASH
-                C.TYPE_HLS -> mapHlsManifestType(uri, eventTime)
+                C.TYPE_HLS -> mapHlsManifestType(player, uri, eventTime)
                 C.TYPE_SS -> SegmentType.MANIFEST_SMOOTH
                 else -> SegmentType.MANIFEST
             }
         }
 
-        private fun mapHlsManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): SegmentType {
-            try {
-                val window = Timeline.Window()
-                // maybe needs currentWindowIndex, currentTimeline
-                eventTime.timeline.getWindow(eventTime.windowIndex, window)
-                val initialPlaylistUri = window.mediaItem.playbackProperties?.uri
-                if (initialPlaylistUri != null) {
-                    return if (initialPlaylistUri == uri) SegmentType.MANIFEST_HLS_MASTER else SegmentType.MANIFEST_HLS_VARIANT
+        private fun mapHlsManifestType(player: SimpleExoPlayer, uri: Uri, eventTime: AnalyticsListener.EventTime): SegmentType {
+            if(!isHlsManifestClassLoaded) return SegmentType.MANIFEST_HLS
+
+            if(!eventTime.timeline.isEmpty) {
+                try {
+
+                    val window = Timeline.Window()
+                    // maybe needs currentWindowIndex, currentTimeline
+                    eventTime.timeline.getWindow(eventTime.windowIndex, window)
+                    val manifest = window.manifest as? HlsManifest?
+                    if (manifest != null) {
+                        return if (manifest.masterPlaylist.baseUri == uri.toString()) SegmentType.MANIFEST_HLS_MASTER else SegmentType.MANIFEST_HLS_VARIANT
+                    }
+                } catch (ignored: Exception) {
                 }
-            } catch (ignored: Exception) {}
+            }
+
+            // While the source is still being prepared, the timeline is still null
+            // so we try to get the current source in preparation, and if it's an HLS
+            // source, we check against the base manifest uri
+            val mediaSource = player.mediaSourceFromReflection as? HlsMediaSource?
+            val manifestUri = mediaSource?.manifestUriFromReflection as? Uri?
+            if(manifestUri != null) {
+                return if (manifestUri == uri) SegmentType.MANIFEST_HLS_MASTER else SegmentType.MANIFEST_HLS_VARIANT
+            }
+
             return SegmentType.MANIFEST_HLS
         }
+        private val HlsMediaSource.manifestUriFromReflection: Any?
+            get() {
+                return Util.getPrivateFieldFromReflection(this, "manifestUri")
+            }
+
+        private val SimpleExoPlayer.mediaSourceFromReflection: Any?
+            get() {
+                return Util.getPrivateFieldFromReflection(this, "mediaSource")
+            }
 
         private fun mapTrackType(trackType: Int): SegmentType = when (trackType) {
             C.TRACK_TYPE_AUDIO -> SegmentType.MEDIA_AUDIO
@@ -142,19 +169,19 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
             return SegmentType.DRM_OTHER
         }
 
-        private fun mapDataType(eventTime: AnalyticsListener.EventTime, uri: Uri, dataType: Int, trackType: Int, trackFormat: Format?): SegmentType {
+        private fun mapDataType(player: SimpleExoPlayer, eventTime: AnalyticsListener.EventTime, uri: Uri, dataType: Int, trackType: Int, trackFormat: Format?): SegmentType {
             when (dataType) {
                 C.DATA_TYPE_DRM -> return mapDrmType(eventTime)
                 C.DATA_TYPE_MEDIA_PROGRESSIVE_LIVE -> return SegmentType.MEDIA_PROGRESSIVE
-                C.DATA_TYPE_MANIFEST -> return mapManifestType(uri, eventTime)
+                C.DATA_TYPE_MANIFEST -> return mapManifestType(player, uri, eventTime)
                 C.DATA_TYPE_MEDIA,
                 C.DATA_TYPE_MEDIA_INITIALIZATION -> return mapTrackType(trackType)
             }
             return SegmentType.UNKNOWN
         }
 
-        private fun mapLoadCompletedArgsToSegment(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, statusCode: Int, success: Boolean): Segment {
-            val segmentType = mapDataType(eventTime, loadEventInfo.uri, mediaLoadData.dataType, mediaLoadData.trackType, mediaLoadData.trackFormat)
+        private fun mapLoadCompletedArgsToSegment(player: SimpleExoPlayer, eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData, statusCode: Int, success: Boolean): Segment {
+            val segmentType = mapDataType(player, eventTime, loadEventInfo.uri, mediaLoadData.dataType, mediaLoadData.trackType, mediaLoadData.trackFormat)
             return Segment(Util.getTimestamp(), segmentType, loadEventInfo.dataSpec.uri.toString(), loadEventInfo.uri.toString(), statusCode, loadEventInfo.loadDurationMs, null, loadEventInfo.bytesLoaded, success)
         }
     }
