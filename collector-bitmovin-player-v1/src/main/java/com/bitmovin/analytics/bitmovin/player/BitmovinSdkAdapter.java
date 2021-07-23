@@ -2,6 +2,7 @@ package com.bitmovin.analytics.bitmovin.player;
 
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.EventBus;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
@@ -14,6 +15,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureFactory;
+import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -82,6 +84,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean playerIsReady;
     private boolean isVideoAttemptedPlay = false;
     private FeatureFactory featureFactory;
+    private final EventBus eventBus;
 
     private Long drmDownloadTime = null;
     private String drmType = null;
@@ -91,12 +94,14 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
-            FeatureFactory featureFactory) {
+            FeatureFactory featureFactory,
+            EventBus eventBus) {
         this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.deviceInformationProvider = deviceInformationProvider;
+        this.eventBus = eventBus;
     }
 
     public Collection<Feature<FeatureConfigContainer, ?>> init() {
@@ -673,6 +678,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                     VideoStartFailedReason.PLAYER_ERROR);
                         }
                         stateMachine.transitionState(PlayerState.ERROR, videoTime);
+
+                        eventBus.notify(OnErrorDetailEventListener.class, listener -> listener.onError(errorEvent.getCode(), errorEvent.getMessage(),  errorEvent.getData()));
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
                     }
