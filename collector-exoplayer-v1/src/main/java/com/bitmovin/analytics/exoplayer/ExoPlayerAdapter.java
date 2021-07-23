@@ -27,6 +27,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.exoplayer.manipulators.BitrateEventDataManipulator;
 import com.bitmovin.analytics.features.Feature;
+import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.stateMachines.PlayerState;
@@ -80,6 +81,7 @@ public class ExoPlayerAdapter
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private BitrateEventDataManipulator bitrateEventDataManipulator;
     private final EventBus eventBus;
+    private final FeatureFactory featureFactory;
     private boolean isVideoAttemptedPlay = false;
     private boolean isPlaying = false;
     private boolean isPaused = false;
@@ -93,7 +95,9 @@ public class ExoPlayerAdapter
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
+            FeatureFactory featureFactory,
             EventBus eventBus) {
+        this.featureFactory = featureFactory;
         this.eventBus = eventBus;
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
@@ -141,7 +145,7 @@ public class ExoPlayerAdapter
         isPlaying = false;
         isPaused = false;
         checkAutoplayStartup();
-        return new ArrayList<>();
+        return featureFactory.createFeatures();
     }
 
     @Override
