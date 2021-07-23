@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.exoplayer.features
 
 import android.net.Uri
-import android.util.Log
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
@@ -13,17 +12,12 @@ import com.bitmovin.analytics.features.segmenttracking.SegmentType
 import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Format
-import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.analytics.AnalyticsListener
-import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.source.LoadEventInfo
 import com.google.android.exoplayer2.source.MediaLoadData
-import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.source.hls.HlsManifest
-import com.google.android.exoplayer2.source.hls.HlsTrackMetadataEntry
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import java.io.IOException
 
@@ -76,7 +70,7 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
         private val String.extractStatusCode: Int?
             get() {
                 val tokens = this.split(' ')
-                if(tokens.size > 1) {
+                if (tokens.size > 1) {
                     val statusCodeString = tokens[1]
                     return statusCodeString.toIntOrNull()
                 }
@@ -87,9 +81,9 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
         private val Map<String, List<String>>.responseCode: Int?
             get() {
                 val nullableKeyMap = this as? Map<*, List<String>> ?: return null
-                if(nullableKeyMap.contains(null)) {
+                if (nullableKeyMap.contains(null)) {
                     val nullEntryList = nullableKeyMap[null] ?: listOf()
-                    if(nullEntryList.isNotEmpty()) {
+                    if (nullEntryList.isNotEmpty()) {
                         val nullEntry = nullEntryList[0]
                         return nullEntry.extractStatusCode
                     }
@@ -115,7 +109,7 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
                 if (initialPlaylistUri != null) {
                     return if (initialPlaylistUri == uri) SegmentType.MANIFEST_HLS_MASTER else SegmentType.MANIFEST_HLS_VARIANT
                 }
-            } catch(ignored: Exception) {}
+            } catch (ignored: Exception) {}
             return SegmentType.MANIFEST_HLS
         }
 
@@ -127,17 +121,17 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
             else -> SegmentType.UNKNOWN
         }
 
-        private const val HLS_MANIFEST_CLASSNAME ="com.google.android.exoplayer2.source.hls.HlsManifest";
+        private const val HLS_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.hls.HlsManifest"
         private val isHlsManifestClassLoaded
             get() = Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, ExoPlayerSegmentTrackingAdapter::class.java.classLoader)
 
         private fun mapDrmType(eventTime: AnalyticsListener.EventTime): SegmentType {
-            if(isHlsManifestClassLoaded) {
+            if (isHlsManifestClassLoaded) {
                 try {
                     val window = Timeline.Window()
                     // maybe needs currentWindowIndex, currentTimeline
                     eventTime.timeline.getWindow(eventTime.windowIndex, window)
-                    if(window.manifest is HlsManifest) {
+                    if (window.manifest is HlsManifest) {
                         return SegmentType.KEY_HLS_AES
                     }
                 } catch (ignored: Exception) {
@@ -148,8 +142,8 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
             return SegmentType.DRM_OTHER
         }
 
-        private fun mapDataType(eventTime: AnalyticsListener.EventTime, uri:Uri, dataType: Int, trackType: Int, trackFormat: Format?): SegmentType {
-            when(dataType) {
+        private fun mapDataType(eventTime: AnalyticsListener.EventTime, uri: Uri, dataType: Int, trackType: Int, trackFormat: Format?): SegmentType {
+            when (dataType) {
                 C.DATA_TYPE_DRM -> return mapDrmType(eventTime)
                 C.DATA_TYPE_MEDIA_PROGRESSIVE_LIVE -> return SegmentType.MEDIA_PROGRESSIVE
                 C.DATA_TYPE_MANIFEST -> return mapManifestType(uri, eventTime)
@@ -160,7 +154,7 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
         }
 
         private fun mapLoadCompletedArgsToSegment(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, statusCode: Int, success: Boolean): Segment {
-            val segmentType = mapDataType(eventTime, loadEventInfo.uri , mediaLoadData.dataType, mediaLoadData.trackType, mediaLoadData.trackFormat)
+            val segmentType = mapDataType(eventTime, loadEventInfo.uri, mediaLoadData.dataType, mediaLoadData.trackType, mediaLoadData.trackFormat)
             return Segment(Util.getTimestamp(), segmentType, loadEventInfo.dataSpec.uri.toString(), loadEventInfo.uri.toString(), statusCode, loadEventInfo.loadDurationMs, null, loadEventInfo.bytesLoaded, success)
         }
     }

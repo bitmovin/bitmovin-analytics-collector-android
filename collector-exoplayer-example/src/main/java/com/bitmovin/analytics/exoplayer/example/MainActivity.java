@@ -1,11 +1,9 @@
 package com.bitmovin.analytics.exoplayer.example;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,19 +21,11 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
-import com.google.android.exoplayer2.drm.DefaultDrmSessionManagerProvider;
-import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
-import com.google.android.exoplayer2.drm.MediaDrmCallback;
-import com.google.android.exoplayer2.offline.DefaultDownloadIndex;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.MediaSourceFactory;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.dash.DashChunkSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -45,7 +35,6 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener, BitmovinAnalytics.DebugListener, Player.EventListener {
@@ -166,11 +155,11 @@ public class MainActivity extends AppCompatActivity
         int type = Util.inferContentType(uri);
         MediaItem.Builder builder = MediaItem.fromUri(uri).buildUpon();
 
-        if(sample.getDrmScheme() != null && sample.getDrmLicenseUri() != null) {
+        if (sample.getDrmScheme() != null && sample.getDrmLicenseUri() != null) {
             builder.setDrmUuid(Util.getDrmUuid(sample.getDrmScheme()));
             builder.setDrmLicenseUri(sample.getDrmLicenseUri());
-//            builder.setDrmPlayClearContentWithoutKey(false);
-//            builder.setDrmForceDefaultLicenseUri(true);
+            //            builder.setDrmPlayClearContentWithoutKey(false);
+            //            builder.setDrmForceDefaultLicenseUri(true);
         }
 
         MediaItem mediaItem = builder.build();
