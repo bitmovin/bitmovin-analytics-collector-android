@@ -31,12 +31,12 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val analyticsListener = object : DefaultAnalyticsListener() {
         override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData) {
-            // TODO status code could maybe be parsed from responseHeaders[null].value = "HTTP/1.1 200 OK"
-            notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, 0)
+            val statusCode = loadEventInfo.responseHeaders.responseCode ?: 0
+            notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, statusCode)
         }
 
         override fun onLoadError(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, error: IOException, wasCanceled: Boolean) {
-            val statusCode = (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode ?: 0
+            val statusCode = (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode ?: loadEventInfo.responseHeaders.responseCode ?: 0
             notifyObservable(eventTime, loadEventInfo, mediaLoadData, false, statusCode)
         }
     }
@@ -73,6 +73,30 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
     }
 
     companion object {
+        private val String.extractStatusCode: Int?
+            get() {
+                val tokens = this.split(' ')
+                if(tokens.size > 1) {
+                    val statusCodeString = tokens[1]
+                    return statusCodeString.toIntOrNull()
+                }
+                return null
+            }
+
+        // TODO write tests
+        private val Map<String, List<String>>.responseCode: Int?
+            get() {
+                val nullableKeyMap = this as? Map<*, List<String>> ?: return null
+                if(nullableKeyMap.contains(null)) {
+                    val nullEntryList = nullableKeyMap[null] ?: listOf()
+                    if(nullEntryList.isNotEmpty()) {
+                        val nullEntry = nullEntryList[0]
+                        return nullEntry.extractStatusCode
+                    }
+                }
+                return null
+            }
+
         private fun mapManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): SegmentType {
             return when (com.google.android.exoplayer2.util.Util.inferContentType(uri)) {
                 C.TYPE_DASH -> SegmentType.MANIFEST_DASH
@@ -119,7 +143,7 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
                 } catch (ignored: Exception) {
                 }
             }
-            // TODO HttpRequestType.DrmLicenseWidevine -> SegmentType.DRM_LICENSE_WIDEVINE
+            // TODO SegmentType.DRM_LICENSE_WIDEVINE
             // maybe using trackFormat.drmInitData?.schemeType == "widevine"
             return SegmentType.DRM_OTHER
         }
