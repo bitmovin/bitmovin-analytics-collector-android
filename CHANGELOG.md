@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Error detail tracking feature
+- `castTech` field
 
 ## Development v1
 
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Error detail tracking feature
+- `castTech` field
 
 ## v2.1.0
 

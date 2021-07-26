@@ -35,6 +35,7 @@ class EventData(
     val screenWidth: Int = deviceInfo.screenWidth
     var isLive: Boolean = false
     var isCasting: Boolean = false
+    var castTech: String? = null
     var videoDuration: Long = 0
     var time: Long = Util.getTimestamp()
     var videoWindowWidth: Int = 0
