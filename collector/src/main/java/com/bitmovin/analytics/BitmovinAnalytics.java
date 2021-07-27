@@ -256,16 +256,12 @@ public class BitmovinAnalytics
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
 
-        switch (playerStateMachine.getCurrentState()) {
-            case PLAYING:
-                data.setPlayed(duration);
-                break;
-            case PAUSE:
-                data.setPaused(duration);
-                break;
-            case BUFFERING:
-                data.setBuffered(duration);
-                break;
+        if (playerStateMachine.getCurrentState() == PlayerState.PLAYING) {
+            data.setPlayed(duration);
+        } else if (playerStateMachine.getCurrentState() == PlayerState.PAUSE) {
+            data.setPaused(duration);
+        } else if (playerStateMachine.getCurrentState() == PlayerState.BUFFERING) {
+            data.setBuffered(duration);
         }
 
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());

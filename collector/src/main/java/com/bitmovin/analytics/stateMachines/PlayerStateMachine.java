@@ -19,7 +19,7 @@ public class PlayerStateMachine {
     private static final String TAG = "PlayerStateMachine";
     private final BitmovinAnalyticsConfig config;
     private List<StateMachineListener> listeners = new ArrayList<StateMachineListener>();
-    private PlayerState currentState;
+    private IPlayerState<?> currentState;
     private long elapsedTimeOnEnter = 0;
     private long startupTime = 0;
     // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
@@ -114,15 +114,21 @@ public class PlayerStateMachine {
     }
 
     public void sourceChange(long oldVideoTime, long newVideoTime, boolean shouldStartup) {
-        transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime);
+        transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime, null);
         resetSourceRelatedState();
 
         if (shouldStartup) {
-            transitionState(PlayerState.STARTUP, newVideoTime);
+            transitionState(PlayerState.STARTUP, newVideoTime, null);
         }
     }
 
-    public synchronized void transitionState(PlayerState destinationPlayerState, long videoTime) {
+    public synchronized <T> void transitionState(
+            IPlayerState<T> destinationPlayerState, long videoTime) {
+        transitionState(destinationPlayerState, videoTime, null);
+    }
+
+    public synchronized <T> void transitionState(
+            IPlayerState<T> destinationPlayerState, long videoTime, T data) {
         if (!this.isTransitionAllowed(currentState, destinationPlayerState)) {
             return;
         }
@@ -140,11 +146,11 @@ public class PlayerStateMachine {
         currentState.onExitState(this, elapsedTime, destinationPlayerState);
         this.elapsedTimeOnEnter = elapsedTime;
         videoTimeStart = videoTimeEnd;
-        destinationPlayerState.onEnterState(this);
+        destinationPlayerState.onEnterState(this, data);
         setCurrentState(destinationPlayerState);
     }
 
-    private boolean isTransitionAllowed(PlayerState currentState, PlayerState destination) {
+    private boolean isTransitionAllowed(IPlayerState<?> currentState, IPlayerState<?> destination) {
         if (destination == this.currentState) {
             return false;
         } else if (this.currentState == PlayerState.EXITBEFOREVIDEOSTART) {
@@ -185,11 +191,11 @@ public class PlayerStateMachine {
         return listeners;
     }
 
-    public PlayerState getCurrentState() {
+    public IPlayerState<?> getCurrentState() {
         return currentState;
     }
 
-    private void setCurrentState(final PlayerState newPlayerState) {
+    private void setCurrentState(final IPlayerState<?> newPlayerState) {
         this.currentState = newPlayerState;
     }
 
@@ -256,7 +262,7 @@ public class PlayerStateMachine {
                 public void onFinish() {
                     Log.d(TAG, "VideoStartTimeout finish");
                     setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
-                    transitionState(PlayerState.EXITBEFOREVIDEOSTART, 0);
+                    transitionState(PlayerState.EXITBEFOREVIDEOSTART, 0, null);
                 }
             };
 
@@ -287,7 +293,7 @@ public class PlayerStateMachine {
 
     public void changeCustomData(
             long position, CustomData customData, CustomDataHelpers.Setter customDataSetter) {
-        PlayerState originalState = this.getCurrentState();
+        IPlayerState originalState = this.getCurrentState();
         boolean shouldTransition =
                 originalState == PlayerState.PLAYING || originalState == PlayerState.PAUSE;
         if (shouldTransition) {
