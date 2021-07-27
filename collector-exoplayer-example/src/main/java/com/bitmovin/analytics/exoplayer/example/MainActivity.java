@@ -14,18 +14,20 @@ import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.enums.CDNProvider;
+import com.bitmovin.analytics.example.shared.Sample;
+import com.bitmovin.analytics.example.shared.Samples;
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
-import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
-import com.google.android.exoplayer2.drm.MediaDrmCallback;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
-import com.google.android.exoplayer2.source.dash.DashChunkSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MediaSourceFactory;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
@@ -33,10 +35,10 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener, BitmovinAnalytics.DebugListener, Player.EventListener {
+
     private SimpleExoPlayer player;
     private PlayerView playerView;
     private Button releaseButton;
@@ -137,15 +139,10 @@ public class MainActivity extends AppCompatActivity
             // Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);
 
-            // DASH example
-            // DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
-            DashMediaSource dashMediaSource =
-                    getSource(
-                            "https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd",
-                            dataSourceFactory);
-            // mediaSource = new ConcatenatingMediaSource(dashMediaSource, dashMediaSource);
+            MediaSource mediaSource = buildMediaSource(Samples.INSTANCE.getHLS_DRM_WIDEVINE());
+            // this.mediaSource = new ConcatenatingMediaSource(mediaSource, mediaSource);
 
-            player.setMediaSource(dashMediaSource);
+            player.setMediaSource(mediaSource);
             player.setPlayWhenReady(false);
             // without prepare() it will not start autoplay
             // prepare also starts preloading data before user clicks play
@@ -153,65 +150,39 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    protected DashMediaSource getDRMSource(DataSource.Factory dataSourceFactory) {
-        DefaultDrmSessionManager drmSesssionManager =
-                getDrmSession(
-                        "https://widevine-proxy.appspot.com/proxy",
-                        C.WIDEVINE_UUID,
-                        Util.getUserAgent(this, "ExoPlayerExample"));
-        Uri dashStatic =
-                Uri.parse(
-                        "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
+    private MediaSource buildMediaSource(Sample sample) {
+        Uri uri = sample.getUri();
+        int type = Util.inferContentType(uri);
+        MediaItem.Builder builder = MediaItem.fromUri(uri).buildUpon();
 
-        // DASH example
-        return getMediaSource(dashStatic, dataSourceFactory, drmSesssionManager);
-    }
-
-    protected DashMediaSource getSource(String url, DataSource.Factory dataSourceFactory) {
-        Uri dashStatic = Uri.parse(url);
-        // DASH example
-        return getMediaSource(dashStatic, dataSourceFactory, null);
-    }
-
-    protected static DefaultDrmSessionManager getDrmSession(
-            String drmLicenseUrl, UUID drmScheme, String userAgent) {
-
-        if (drmLicenseUrl != null && drmScheme != null) {
-            try {
-                DefaultDrmSessionManager.Builder drmBuilder =
-                        new DefaultDrmSessionManager.Builder();
-                MediaDrmCallback mediaDrmCallback =
-                        createMediaDrmCallback(drmLicenseUrl, userAgent);
-                return drmBuilder.build(mediaDrmCallback);
-            } catch (Exception e) {
-                Log.e("Main Application", e.getMessage());
-            }
+        if (sample.getDrmScheme() != null && sample.getDrmLicenseUri() != null) {
+            builder.setDrmUuid(Util.getDrmUuid(sample.getDrmScheme()));
+            builder.setDrmLicenseUri(sample.getDrmLicenseUri());
+            //            builder.setDrmPlayClearContentWithoutKey(false);
+            //            builder.setDrmForceDefaultLicenseUri(true);
         }
-        return null;
-    }
 
-    protected static DashMediaSource getMediaSource(
-            Uri dashStatic,
-            DataSource.Factory dataSourceFactory,
-            DefaultDrmSessionManager drmSession) {
-        DashChunkSource.Factory source = new DefaultDashChunkSource.Factory(dataSourceFactory);
-        DashMediaSource.Factory sourceFactory =
-                new DashMediaSource.Factory(source, dataSourceFactory);
-        if (drmSession != null) {
-            sourceFactory.setDrmSessionManager(drmSession);
+        MediaItem mediaItem = builder.build();
+
+        MediaSourceFactory factory;
+        switch (type) {
+            case C.TYPE_DASH:
+                factory = new DashMediaSource.Factory(dataSourceFactory);
+                break;
+            case C.TYPE_SS:
+                factory = new SsMediaSource.Factory(dataSourceFactory);
+                break;
+            case C.TYPE_HLS:
+                factory = new HlsMediaSource.Factory(dataSourceFactory);
+                break;
+            case C.TYPE_OTHER:
+                factory = new ProgressiveMediaSource.Factory(dataSourceFactory);
+                break;
+            default:
+                throw new IllegalStateException("Unsupported type: " + type);
         }
-        MediaItem mediaItem = MediaItem.fromUri(dashStatic);
-        return sourceFactory.createMediaSource(mediaItem);
-    }
 
-    protected static HttpMediaDrmCallback createMediaDrmCallback(
-            String licenseUrl, String userAgent) {
-        HttpDataSource.Factory licenseDataSourceFactory =
-                new DefaultHttpDataSource.Factory().setUserAgent(userAgent);
-        HttpMediaDrmCallback drmCallback =
-                new HttpMediaDrmCallback(licenseUrl, licenseDataSourceFactory);
-
-        return drmCallback;
+        return factory.createMediaSource(mediaItem);
     }
 
     private void releasePlayer() {
@@ -243,12 +214,12 @@ public class MainActivity extends AppCompatActivity
     private void changeSource() {
         bitmovinAnalytics.detachPlayer();
 
-        DashMediaSource dashMediaSource = getDRMSource(dataSourceFactory);
+        MediaSource mediaSource = buildMediaSource(Samples.INSTANCE.getDASH_DRM_WIDEVINE());
         bitmovinAnalyticsConfig.setVideoId("DRMVideo-id");
         bitmovinAnalyticsConfig.setTitle("DRM Video Title");
 
         bitmovinAnalytics.attachPlayer(player);
-        player.setMediaSource(dashMediaSource);
+        player.setMediaSource(mediaSource);
     }
 
     private void setCustomData() {

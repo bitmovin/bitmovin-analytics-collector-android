@@ -68,6 +68,9 @@ allprojects {
 		}
 		kotlin {
 			target '**/*.kt'
+			targetExclude '**/collector-bitmovin-player-v1-example/**/Samples.kt',
+					'**/collector-exoplayer-example/**/Samples.kt',
+					'**/collector-exoplayer-v1-example/**/Samples.kt'
 			ktlint()   // has its own section below
 			//			ktfmt()    // has its own section below
 			//			prettier() // has its own section below

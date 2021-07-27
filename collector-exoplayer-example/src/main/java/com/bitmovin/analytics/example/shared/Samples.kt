@@ -1,0 +1,1 @@
+../../../../../../../../../collector-bitmovin-player-example/src/main/java/com/bitmovin/analytics/example/shared/Samples.kt
