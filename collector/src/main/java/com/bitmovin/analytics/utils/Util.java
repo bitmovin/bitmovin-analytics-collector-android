@@ -8,9 +8,7 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.SystemClock;
 import android.util.Pair;
-
 import com.bitmovin.analytics.BuildConfig;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +24,8 @@ public class Util {
     public static final int MILLISECONDS_IN_SECONDS = 1000;
     public static final int VIDEOSTART_TIMEOUT = 1000 * 60; // in milliseconds
     public static final int ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD = 50;
-    public static final int ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL = 1000 * 60 * 60; // in milliseconds;
+    public static final int ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL =
+            1000 * 60 * 60; // in milliseconds;
     public static final int REBUFFERING_TIMEOUT = 1000 * 60 * 2; // in milliseconds
 
     private static final Map<String, String> VIDEO_FORMAT_MIME_TYPE_MAP;
@@ -44,12 +43,10 @@ public class Util {
     }
 
     /**
-     * Returns the time in ms since the system was booted, and guaranteed to be
-     * monotonic Details here:
-     * https://developer.android.com/reference/android/os/SystemClock
+     * Returns the time in ms since the system was booted, and guaranteed to be monotonic Details
+     * here: https://developer.android.com/reference/android/os/SystemClock
      *
-     * @return The time in ms since the system was booted, and guaranteed to be
-     *         monotonic.
+     * @return The time in ms since the system was booted, and guaranteed to be monotonic.
      */
     public static long getElapsedTime() {
         return SystemClock.elapsedRealtime();
@@ -111,8 +108,8 @@ public class Util {
         return new Pair<>(null, null);
     }
 
-    public static boolean getIsLiveFromConfigOrPlayer(boolean isPlayerReady, Boolean isLiveFromConfig,
-            boolean isLiveFromPlayer) {
+    public static boolean getIsLiveFromConfigOrPlayer(
+            boolean isPlayerReady, Boolean isLiveFromConfig, boolean isLiveFromPlayer) {
         if (isPlayerReady) {
             return isLiveFromPlayer;
         }
