@@ -5,8 +5,8 @@ import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 
 public class PlayerStates
 {
-    public static IPlayerState<Void> READY =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> READY =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {}
 
@@ -14,10 +14,10 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> destinationPlayerState) {}
+                        PlayerState<?> destinationPlayerState) {}
             };
-    public static IPlayerState<Void> SOURCE_CHANGED =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> SOURCE_CHANGED =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {}
 
@@ -25,10 +25,10 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> desintationPlayerState) {}
+                        PlayerState<?> desintationPlayerState) {}
             };
-    public static IPlayerState<Void> STARTUP =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> STARTUP =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {
                     machine.videoStartTimeout.start();
@@ -38,7 +38,7 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> destinationPlayerState) {
+                        PlayerState<?> destinationPlayerState) {
                     machine.videoStartTimeout.cancel();
                     long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
                     machine.addStartupTime(elapsedTime - elapsedTimeOnEnter);
@@ -51,8 +51,8 @@ public class PlayerStates
                     }
                 }
             };
-    public static IPlayerState<Void> AD =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> AD =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {}
 
@@ -60,10 +60,10 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> destinationPlayerState) {}
+                        PlayerState<?> destinationPlayerState) {}
             };
-    public static IPlayerState<Void> ADFINISHED =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> ADFINISHED =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {}
 
@@ -71,10 +71,10 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> destinationPlayerState) {}
+                        PlayerState<?> destinationPlayerState) {}
             };
-    public static IPlayerState<Void> BUFFERING =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> BUFFERING =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {
                     machine.enableRebufferHeartbeat();
@@ -85,7 +85,7 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> desintationPlayerState) {
+                        PlayerState<?> desintationPlayerState) {
                     machine.disableRebufferHeartbeat();
                     for (StateMachineListener listener : machine.getListeners()) {
                         long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
@@ -94,8 +94,8 @@ public class PlayerStates
                     machine.rebufferingTimeout.cancel();
                 }
             };
-    public static IPlayerState<Void> ERROR =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> ERROR =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {
                     machine.videoStartTimeout.cancel();
@@ -108,12 +108,12 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> desintationPlayerState) {
+                        PlayerState<?> desintationPlayerState) {
                     machine.setVideoStartFailedReason(null);
                 }
             };
-    public static IPlayerState<Void> EXITBEFOREVIDEOSTART =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> EXITBEFOREVIDEOSTART =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {
                     for (StateMachineListener listener : machine.getListeners()) {
@@ -125,12 +125,12 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> desintationPlayerState) {
+                        PlayerState<?> desintationPlayerState) {
                     machine.setVideoStartFailedReason(null);
                 }
             };
-    public static IPlayerState<Void> PLAYING =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> PLAYING =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {
                     machine.enableHeartbeat();
@@ -140,7 +140,7 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> desintationPlayerState) {
+                        PlayerState<?> desintationPlayerState) {
                     for (StateMachineListener listener : machine.getListeners()) {
                         long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
                         listener.onPlayExit(elapsedTime - elapsedTimeOnEnter);
@@ -149,8 +149,8 @@ public class PlayerStates
                     machine.disableHeartbeat();
                 }
             };
-    public static IPlayerState<Void> PAUSE =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> PAUSE =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {}
 
@@ -158,15 +158,15 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> desintationPlayerState) {
+                        PlayerState<?> desintationPlayerState) {
                     for (StateMachineListener listener : machine.getListeners()) {
                         long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
                         listener.onPauseExit(elapsedTime - elapsedTimeOnEnter);
                     }
                 }
             };
-    public static IPlayerState<Void> QUALITYCHANGE =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> QUALITYCHANGE =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {
                     machine.increaseQualityChangeCount();
@@ -179,7 +179,7 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> destinationPlayerState) {
+                        PlayerState<?> destinationPlayerState) {
                     if (machine.isQualityChangeEventEnabled()) {
                         for (StateMachineListener listener : machine.getListeners()) {
                             listener.onQualityChange();
@@ -195,8 +195,8 @@ public class PlayerStates
                     }
                 }
             };
-    public static IPlayerState<Void> CUSTOMDATACHANGE =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> CUSTOMDATACHANGE =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {}
 
@@ -204,10 +204,10 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> destinationPlayerState) {}
+                        PlayerState<?> destinationPlayerState) {}
             };
-    public static IPlayerState<Void> AUDIOTRACKCHANGE =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> AUDIOTRACKCHANGE =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {}
 
@@ -215,14 +215,14 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> destinationPlayerState) {
+                        PlayerState<?> destinationPlayerState) {
                     for (StateMachineListener listener : machine.getListeners()) {
                         listener.onAudioTrackChange();
                     }
                 }
             };
-    public static IPlayerState<Void> SUBTITLECHANGE =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> SUBTITLECHANGE =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {}
 
@@ -230,15 +230,15 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> destinationPlayerState) {
+                        PlayerState<?> destinationPlayerState) {
                     for (StateMachineListener listener : machine.getListeners()) {
                         listener.onSubtitleChange();
                     }
                 }
             };
 
-    public static IPlayerState<Void> SEEKING =
-            new IPlayerState<Void>() {
+    public static PlayerState<Void> SEEKING =
+            new PlayerState<Void>() {
                 @Override
                 public void onEnterState(PlayerStateMachine machine, Void data) {
                     machine.setElapsedTimeSeekStart(machine.getElapsedTimeOnEnter());
@@ -248,7 +248,7 @@ public class PlayerStates
                 public void onExitState(
                         PlayerStateMachine machine,
                         long elapsedTime,
-                        IPlayerState<?> destinationPlayerState) {
+                        PlayerState<?> destinationPlayerState) {
                     for (StateMachineListener listener : machine.getListeners()) {
                         listener.onSeekComplete(elapsedTime - machine.getElapsedTimeSeekStart());
                     }
