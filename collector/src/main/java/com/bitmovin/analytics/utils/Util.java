@@ -8,6 +8,9 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.SystemClock;
 import android.util.Pair;
+
+import com.bitmovin.analytics.BuildConfig;
+
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;
@@ -172,7 +175,7 @@ public class Util {
     }
 
     public static String getAnalyticsVersion() {
-        return com.bitmovin.analytics.BuildConfig.VERSION_NAME;
+        return BuildConfig.COLLECTOR_CORE_VERSION;
     }
 
     public static <T> Object getPrivateFieldFromReflection(T source, String fieldName) {
