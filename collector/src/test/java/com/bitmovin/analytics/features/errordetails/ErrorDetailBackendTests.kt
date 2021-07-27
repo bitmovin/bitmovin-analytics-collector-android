@@ -67,5 +67,5 @@ class ErrorDetailBackendTests {
     }
 
     private fun getErrorDetail(segmentCount: Int?) = ErrorDetail("platform", "key", "domain", "impressionId", 0, 0, null, null, null, if (segmentCount == null) null else (0..segmentCount).map { getSegment() }.toMutableList())
-    private fun getSegment() = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0.0, null, 0, true)
+    private fun getSegment() = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
 }
