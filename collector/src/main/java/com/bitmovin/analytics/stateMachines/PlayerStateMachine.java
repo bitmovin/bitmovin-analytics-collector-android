@@ -110,15 +110,15 @@ public class PlayerStateMachine {
 
     public void resetStateMachine() {
         resetSourceRelatedState();
-        setCurrentState(PlayerState.READY);
+        setCurrentState(PlayerStates.READY);
     }
 
     public void sourceChange(long oldVideoTime, long newVideoTime, boolean shouldStartup) {
-        transitionState(PlayerState.SOURCE_CHANGED, oldVideoTime, null);
+        transitionState(PlayerStates.SOURCE_CHANGED, oldVideoTime, null);
         resetSourceRelatedState();
 
         if (shouldStartup) {
-            transitionState(PlayerState.STARTUP, newVideoTime, null);
+            transitionState(PlayerStates.STARTUP, newVideoTime, null);
         }
     }
 
@@ -153,18 +153,18 @@ public class PlayerStateMachine {
     private boolean isTransitionAllowed(IPlayerState<?> currentState, IPlayerState<?> destination) {
         if (destination == this.currentState) {
             return false;
-        } else if (this.currentState == PlayerState.EXITBEFOREVIDEOSTART) {
+        } else if (this.currentState == PlayerStates.EXITBEFOREVIDEOSTART) {
             return false;
         }
         // no state transitions like PLAYING or PAUSE during AD
-        else if (currentState == PlayerState.AD
-                && (destination != PlayerState.ERROR && destination != PlayerState.ADFINISHED)) {
+        else if (currentState == PlayerStates.AD
+                && (destination != PlayerStates.ERROR && destination != PlayerStates.ADFINISHED)) {
             return false;
-        } else if (currentState == PlayerState.READY
-                && (destination != PlayerState.ERROR
-                        && destination != PlayerState.EXITBEFOREVIDEOSTART
-                        && destination != PlayerState.STARTUP
-                        && destination != PlayerState.AD)) {
+        } else if (currentState == PlayerStates.READY
+                && (destination != PlayerStates.ERROR
+                        && destination != PlayerStates.EXITBEFOREVIDEOSTART
+                        && destination != PlayerStates.STARTUP
+                        && destination != PlayerStates.AD)) {
             return false;
         }
 
@@ -262,20 +262,20 @@ public class PlayerStateMachine {
                 public void onFinish() {
                     Log.d(TAG, "VideoStartTimeout finish");
                     setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
-                    transitionState(PlayerState.EXITBEFOREVIDEOSTART, 0, null);
+                    transitionState(PlayerStates.EXITBEFOREVIDEOSTART, 0, null);
                 }
             };
 
     public void pause(long position) {
         if (isStartupFinished()) {
-            transitionState(PlayerState.PAUSE, position);
+            transitionState(PlayerStates.PAUSE, position);
         } else {
-            transitionState(PlayerState.READY, position);
+            transitionState(PlayerStates.READY, position);
         }
     }
 
     public void startAd(long position) {
-        transitionState(PlayerState.AD, position);
+        transitionState(PlayerStates.AD, position);
         startupTime = 0;
     }
 
@@ -295,9 +295,9 @@ public class PlayerStateMachine {
             long position, CustomData customData, CustomDataHelpers.Setter customDataSetter) {
         IPlayerState originalState = this.getCurrentState();
         boolean shouldTransition =
-                originalState == PlayerState.PLAYING || originalState == PlayerState.PAUSE;
+                originalState == PlayerStates.PLAYING || originalState == PlayerStates.PAUSE;
         if (shouldTransition) {
-            this.transitionState(PlayerState.CUSTOMDATACHANGE, position);
+            this.transitionState(PlayerStates.CUSTOMDATACHANGE, position);
         }
         customDataSetter.setCustomData(customData);
         if (shouldTransition) {
@@ -331,7 +331,7 @@ public class PlayerStateMachine {
                     Log.d(TAG, "rebufferingTimeout finish");
                     setErrorCode(
                             AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.getErrorCode());
-                    transitionState(PlayerState.ERROR, analytics.getPosition());
+                    transitionState(PlayerStates.ERROR, analytics.getPosition());
                     disableRebufferHeartbeat();
                     resetStateMachine();
                 }

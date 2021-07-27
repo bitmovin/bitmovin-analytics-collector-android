@@ -3,7 +3,7 @@ package com.bitmovin.analytics.bitmovin.player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.features.FeatureFactory
-import com.bitmovin.analytics.stateMachines.PlayerState
+import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent
@@ -47,7 +47,7 @@ class BitmovinSdkAdapterTest {
         val event = getListenerWithType<OnAudioPlaybackQualityChangedListener>()
         assert(event != null)
         event!!.onAudioPlaybackQualityChanged(getAudioPlaybackQualityChangedEvent(200, 200))
-        Mockito.verify(stateMachine, Mockito.times(0)).transitionState(ArgumentMatchers.eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+        Mockito.verify(stateMachine, Mockito.times(0)).transitionState(ArgumentMatchers.eq(PlayerStates.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
     private fun getAudioPlaybackQualityChangedEvent(oldBitrate: Int, newBitrate: Int): AudioPlaybackQualityChangedEvent {

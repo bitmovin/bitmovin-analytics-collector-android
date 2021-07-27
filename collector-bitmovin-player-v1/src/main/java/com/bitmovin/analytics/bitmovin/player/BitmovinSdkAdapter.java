@@ -17,7 +17,7 @@ import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
-import com.bitmovin.analytics.stateMachines.PlayerState;
+import com.bitmovin.analytics.stateMachines.PlayerStates;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.utils.Util;
 import com.bitmovin.player.BitmovinPlayer;
@@ -324,7 +324,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     private void startup() {
-        stateMachine.transitionState(PlayerState.STARTUP, getPosition());
+        stateMachine.transitionState(PlayerStates.STARTUP, getPosition());
         if (!bitmovinPlayer.isAd()) {
             // if ad is playing as first thing we prevent from sending the
             // VideoStartFailedReason.PAGE_CLOSED / VideoStartFailedReason.PLAYER_ERROR
@@ -366,7 +366,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             stateMachine.setVideoStartFailedReason(
                                     VideoStartFailedReason.PAGE_CLOSED);
                             stateMachine.transitionState(
-                                    PlayerState.EXITBEFOREVIDEOSTART, getPosition());
+                                    PlayerStates.EXITBEFOREVIDEOSTART, getPosition());
                         }
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
@@ -386,7 +386,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                 (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
                                         ? Util.secondsToMillis(bitmovinPlayer.getDuration())
                                         : getPosition();
-                        stateMachine.transitionState(PlayerState.PAUSE, videoTime);
+                        stateMachine.transitionState(PlayerStates.PAUSE, videoTime);
                         stateMachine.disableHeartbeat();
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
@@ -439,7 +439,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                         Log.d(
                                 TAG,
                                 "On Playing Listener " + stateMachine.getCurrentState().toString());
-                        stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                        stateMachine.transitionState(PlayerStates.PLAYING, getPosition());
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
                     }
@@ -461,7 +461,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     try {
                         Log.d(TAG, "On Seek Listener");
                         if (stateMachine.isStartupFinished()) {
-                            stateMachine.transitionState(PlayerState.SEEKING, getPosition());
+                            stateMachine.transitionState(PlayerStates.SEEKING, getPosition());
                         }
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
@@ -480,11 +480,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                         }
 
                         if (bitmovinPlayer.isPlaying()
-                                && stateMachine.getCurrentState() != PlayerState.PLAYING) {
-                            stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                                && stateMachine.getCurrentState() != PlayerStates.PLAYING) {
+                            stateMachine.transitionState(PlayerStates.PLAYING, getPosition());
                         } else if (bitmovinPlayer.isPaused()
-                                && stateMachine.getCurrentState() != PlayerState.PAUSE) {
-                            stateMachine.transitionState(PlayerState.PAUSE, getPosition());
+                                && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
+                            stateMachine.transitionState(PlayerStates.PAUSE, getPosition());
                         }
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
@@ -502,13 +502,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             return;
                         }
 
-                        if (stateMachine.getCurrentState() != PlayerState.PLAYING
-                                && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                        if (stateMachine.getCurrentState() != PlayerStates.PLAYING
+                                && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
                             return;
                         }
 
-                        PlayerState originalState = stateMachine.getCurrentState();
-                        stateMachine.transitionState(PlayerState.AUDIOTRACKCHANGE, getPosition());
+                        PlayerStates originalState = stateMachine.getCurrentState();
+                        stateMachine.transitionState(PlayerStates.AUDIOTRACKCHANGE, getPosition());
                         stateMachine.transitionState(originalState, getPosition());
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
@@ -526,13 +526,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             return;
                         }
 
-                        if (stateMachine.getCurrentState() != PlayerState.PLAYING
-                                && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                        if (stateMachine.getCurrentState() != PlayerStates.PLAYING
+                                && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
                             return;
                         }
 
-                        PlayerState originalState = stateMachine.getCurrentState();
-                        stateMachine.transitionState(PlayerState.SUBTITLECHANGE, getPosition());
+                        PlayerStates originalState = stateMachine.getCurrentState();
+                        stateMachine.transitionState(PlayerStates.SUBTITLECHANGE, getPosition());
                         stateMachine.transitionState(originalState, getPosition());
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
@@ -552,8 +552,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
                         // if stalling is triggered by a seeking event
                         // we count the buffering time towards the seeking time
-                        if (stateMachine.getCurrentState() != PlayerState.SEEKING) {
-                            stateMachine.transitionState(PlayerState.BUFFERING, getPosition());
+                        if (stateMachine.getCurrentState() != PlayerStates.SEEKING) {
+                            stateMachine.transitionState(PlayerStates.BUFFERING, getPosition());
                         }
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
@@ -576,13 +576,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             return;
                         }
 
-                        if (stateMachine.getCurrentState() != PlayerState.PLAYING
-                                && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                        if (stateMachine.getCurrentState() != PlayerStates.PLAYING
+                                && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
                             return;
                         }
 
-                        PlayerState originalState = stateMachine.getCurrentState();
-                        stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
+                        PlayerStates originalState = stateMachine.getCurrentState();
+                        stateMachine.transitionState(PlayerStates.QUALITYCHANGE, getPosition());
                         stateMachine.transitionState(originalState, getPosition());
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
@@ -617,12 +617,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             return;
                         }
 
-                        if (stateMachine.getCurrentState() != PlayerState.PLAYING
-                                && stateMachine.getCurrentState() != PlayerState.PAUSE) {
+                        if (stateMachine.getCurrentState() != PlayerStates.PLAYING
+                                && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
                             return;
                         }
 
-                        PlayerState originalState = stateMachine.getCurrentState();
+                        PlayerStates originalState = stateMachine.getCurrentState();
                         AudioQuality oldQuality =
                                 audioPlaybackQualityChangedEvent.getOldAudioQuality();
                         AudioQuality newQuality =
@@ -632,7 +632,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                 && oldQuality.getBitrate() == newQuality.getBitrate()) {
                             return;
                         }
-                        stateMachine.transitionState(PlayerState.QUALITYCHANGE, getPosition());
+                        stateMachine.transitionState(PlayerStates.QUALITYCHANGE, getPosition());
                         stateMachine.transitionState(originalState, getPosition());
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
@@ -677,7 +677,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             stateMachine.setVideoStartFailedReason(
                                     VideoStartFailedReason.PLAYER_ERROR);
                         }
-                        stateMachine.transitionState(PlayerState.ERROR, videoTime);
+                        stateMachine.transitionState(PlayerStates.ERROR, videoTime);
 
                         eventBus.notify(
                                 OnErrorDetailEventListener.class,
@@ -709,7 +709,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 @Override
                 public void onAdBreakFinished(AdBreakFinishedEvent adBreakFinishedEvent) {
                     try {
-                        stateMachine.transitionState(PlayerState.ADFINISHED, getPosition());
+                        stateMachine.transitionState(PlayerStates.ADFINISHED, getPosition());
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
                     }
