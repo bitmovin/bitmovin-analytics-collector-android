@@ -8,9 +8,7 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.SystemClock;
 import android.util.Pair;
-
 import com.bitmovin.analytics.BuildConfig;
-
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;

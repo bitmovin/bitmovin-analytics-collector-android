@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.EventBus
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerState
