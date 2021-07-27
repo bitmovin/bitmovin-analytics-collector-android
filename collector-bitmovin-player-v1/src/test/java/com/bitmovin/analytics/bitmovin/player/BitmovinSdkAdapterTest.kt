@@ -3,8 +3,8 @@ package com.bitmovin.analytics.bitmovin.player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.features.FeatureFactory
-import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent
 import com.bitmovin.player.api.event.listener.EventListener

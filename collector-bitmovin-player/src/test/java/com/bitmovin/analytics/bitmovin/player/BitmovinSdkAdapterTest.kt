@@ -1,8 +1,8 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import com.bitmovin.analytics.config.SourceMetadata
-import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.Event
 import com.bitmovin.player.api.event.EventListener
