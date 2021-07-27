@@ -36,7 +36,7 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testErrorDetailLimitSegmentsShouldntFailIfSegmentsAreNull() {
-        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, null, null)
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), null)
         errorDetail.copyTruncateSegments(1)
     }
 
@@ -44,7 +44,7 @@ class ErrorDetailBackendTests {
     fun testErrorDetailLimitSegmentsShouldLimitSegments() {
         val segment1 = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
         val segment2 = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
-        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, null, mutableListOf(segment1, segment2))
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), mutableListOf(segment1, segment2))
         assertThat(errorDetail.segments?.size).isEqualTo(2)
         val copy = errorDetail.copyTruncateSegments(1)
         assertThat(copy.segments?.size).isEqualTo(1)
@@ -54,7 +54,7 @@ class ErrorDetailBackendTests {
     fun testErrorDetailCopyTruncateStringsAndUrlsShouldCorrectlyTruncateStringsAndUrls() {
         val segment1 = Segment(0, SegmentType.MANIFEST_DASH, "0123456789", "0123456789", 0, 0L, null, 0, true)
         val segment2 = Segment(0, SegmentType.MANIFEST_DASH, null, "0123", 0, 0L, null, 0, true)
-        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, "0123456789", null, mutableListOf(segment1, segment2))
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, "0123456789", ErrorData(), mutableListOf(segment1, segment2))
         val copy = errorDetail.copyTruncateStringsAndUrls(5, 5)
         assertThat(copy.analyticsVersion).isEqualTo(errorDetail.analyticsVersion)
         assertThat(copy.code).isEqualTo(errorDetail.code)
@@ -73,7 +73,7 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testErrorDetailCopyTruncateStringsAndUrlsShouldCorrectlyTruncateStringsAndUrlsWithNullSegments() {
-        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, "0123456789", null, null)
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, "0123456789", ErrorData(), null)
         val copy = errorDetail.copyTruncateStringsAndUrls(5, 5)
         assertThat(copy.analyticsVersion).isEqualTo(errorDetail.analyticsVersion)
         assertThat(copy.code).isEqualTo(errorDetail.code)
@@ -90,7 +90,7 @@ class ErrorDetailBackendTests {
     fun testErrorDetailLimitSegmentsShouldRemoveItemsFromEnd() {
         val segment1 = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
         val segment2 = Segment(1, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
-        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, null, mutableListOf(segment1, segment2))
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), mutableListOf(segment1, segment2))
         errorDetail.copyTruncateSegments(1)
         assertThat(errorDetail.segments?.get(0)).isEqualTo(segment1)
         assertThat(errorDetail.segments?.get(0)).isNotEqualTo(segment2)
@@ -130,6 +130,6 @@ class ErrorDetailBackendTests {
         verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
     }
 
-    private fun getErrorDetail(segmentCount: Int?) = ErrorDetail("platform", "key", "domain", "impressionId", 0, 0, null, null, null, if (segmentCount == null) null else (0..segmentCount).map { getSegment() }.toMutableList())
+    private fun getErrorDetail(segmentCount: Int?) = ErrorDetail("platform", "key", "domain", "impressionId", 0, 0, null, null, ErrorData(), if (segmentCount == null) null else (0..segmentCount).map { getSegment() }.toMutableList())
     private fun getSegment() = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
 }
