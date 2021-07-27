@@ -2,9 +2,7 @@ package com.bitmovin.analytics.features.errordetails
 
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
-import com.bitmovin.analytics.features.segmenttracking.Segment
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
-import com.bitmovin.analytics.features.segmenttracking.SegmentType
 import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.mockkObject
