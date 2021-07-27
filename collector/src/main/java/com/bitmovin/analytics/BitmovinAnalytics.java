@@ -26,7 +26,7 @@ import com.bitmovin.analytics.features.FeatureManager;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.license.LicenseCallback;
-import com.bitmovin.analytics.stateMachines.PlayerState;
+import com.bitmovin.analytics.stateMachines.PlayerStates;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
 import com.bitmovin.analytics.utils.Util;
@@ -256,11 +256,11 @@ public class BitmovinAnalytics
         data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
         data.setDuration(duration);
 
-        if (playerStateMachine.getCurrentState() == PlayerState.PLAYING) {
+        if (playerStateMachine.getCurrentState() == PlayerStates.PLAYING) {
             data.setPlayed(duration);
-        } else if (playerStateMachine.getCurrentState() == PlayerState.PAUSE) {
+        } else if (playerStateMachine.getCurrentState() == PlayerStates.PAUSE) {
             data.setPaused(duration);
-        } else if (playerStateMachine.getCurrentState() == PlayerState.BUFFERING) {
+        } else if (playerStateMachine.getCurrentState() == PlayerStates.BUFFERING) {
             data.setBuffered(duration);
         }
 
@@ -412,7 +412,7 @@ public class BitmovinAnalytics
         CustomData currentCustomData = customDataGetter.getCustomData();
         customDataSetter.setCustomData(customData);
         EventData eventData = createEventData();
-        eventData.setState(PlayerState.CUSTOMDATACHANGE.toString().toLowerCase());
+        eventData.setState(PlayerStates.CUSTOMDATACHANGE.toString().toLowerCase());
         sendEventData(eventData);
         customDataSetter.setCustomData(currentCustomData);
     }

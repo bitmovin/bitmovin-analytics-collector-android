@@ -3,7 +3,7 @@ package com.bitmovin.analytics.stateMachines;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 
-public class PlayerState
+public class PlayerStates
 {
     public static IPlayerState<Void> READY =
             new IPlayerState<Void>() {
@@ -42,7 +42,7 @@ public class PlayerState
                     machine.videoStartTimeout.cancel();
                     long elapsedTimeOnEnter = machine.getElapsedTimeOnEnter();
                     machine.addStartupTime(elapsedTime - elapsedTimeOnEnter);
-                    if (destinationPlayerState == PlayerState.PLAYING) {
+                    if (destinationPlayerState == PlayerStates.PLAYING) {
                         long playerStartupTime = machine.getAndResetPlayerStartupTime();
                         for (StateMachineListener listener : machine.getListeners()) {
                             listener.onStartup(machine.getStartupTime(), playerStartupTime);
