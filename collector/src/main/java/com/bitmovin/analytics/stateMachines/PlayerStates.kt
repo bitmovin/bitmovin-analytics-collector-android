@@ -6,7 +6,7 @@ class PlayerStates {
     companion object {
         @JvmField val READY = DefaultPlayerState<Void>()
         @JvmField val SOURCE_CHANGED = DefaultPlayerState<Void>()
-        @JvmField val STARTUP = object: DefaultPlayerState<Void>() {
+        @JvmField val STARTUP = object : DefaultPlayerState<Void>() {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
                 machine.videoStartTimeout.start()
             }
@@ -30,7 +30,7 @@ class PlayerStates {
         }
         @JvmField val AD = DefaultPlayerState<Void>()
         @JvmField val ADFINISHED = DefaultPlayerState<Void>()
-        @JvmField val BUFFERING = object: DefaultPlayerState<Void>() {
+        @JvmField val BUFFERING = object : DefaultPlayerState<Void>() {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
                 machine.enableRebufferHeartbeat()
                 machine.rebufferingTimeout.start()
@@ -49,7 +49,7 @@ class PlayerStates {
                 machine.rebufferingTimeout.cancel()
             }
         }
-        @JvmField val ERROR = object: DefaultPlayerState<Void>() {
+        @JvmField val ERROR = object : DefaultPlayerState<Void>() {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
                 machine.videoStartTimeout.cancel()
                 for (listener in machine.listeners) {
@@ -65,7 +65,7 @@ class PlayerStates {
                 machine.videoStartFailedReason = null
             }
         }
-        @JvmField val EXITBEFOREVIDEOSTART = object: DefaultPlayerState<Void>() {
+        @JvmField val EXITBEFOREVIDEOSTART = object : DefaultPlayerState<Void>() {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
                 for (listener in machine.listeners) {
                     listener.onVideoStartFailed()
@@ -80,7 +80,7 @@ class PlayerStates {
                 machine.videoStartFailedReason = null
             }
         }
-        @JvmField val PLAYING = object: DefaultPlayerState<Void>() {
+        @JvmField val PLAYING = object : DefaultPlayerState<Void>() {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
                 machine.enableHeartbeat()
             }
@@ -97,7 +97,7 @@ class PlayerStates {
                 machine.disableHeartbeat()
             }
         }
-        @JvmField val PAUSE = object: DefaultPlayerState<Void>() {
+        @JvmField val PAUSE = object : DefaultPlayerState<Void>() {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
@@ -109,7 +109,7 @@ class PlayerStates {
                 }
             }
         }
-        @JvmField val QUALITYCHANGE = object: DefaultPlayerState<Void>() {
+        @JvmField val QUALITYCHANGE = object : DefaultPlayerState<Void>() {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
                 machine.increaseQualityChangeCount()
                 if (!machine.isQualityChangeTimerRunning) {
@@ -136,7 +136,7 @@ class PlayerStates {
             }
         }
         @JvmField val CUSTOMDATACHANGE = DefaultPlayerState<Void>()
-        @JvmField val AUDIOTRACKCHANGE = object: DefaultPlayerState<Void>() {
+        @JvmField val AUDIOTRACKCHANGE = object : DefaultPlayerState<Void>() {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
@@ -147,7 +147,7 @@ class PlayerStates {
                 }
             }
         }
-        @JvmField val SUBTITLECHANGE = object: DefaultPlayerState<Void>() {
+        @JvmField val SUBTITLECHANGE = object : DefaultPlayerState<Void>() {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
@@ -159,7 +159,7 @@ class PlayerStates {
             }
         }
 
-        @JvmField val SEEKING = object: DefaultPlayerState<Void>() {
+        @JvmField val SEEKING = object : DefaultPlayerState<Void>() {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
                 machine.elapsedTimeSeekStart = machine.elapsedTimeOnEnter
             }

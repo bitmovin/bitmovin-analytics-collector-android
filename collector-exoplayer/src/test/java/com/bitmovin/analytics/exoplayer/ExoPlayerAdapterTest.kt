@@ -2,8 +2,8 @@ package com.bitmovin.analytics.exoplayer
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
-import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.Timeline
