@@ -3,9 +3,9 @@ package com.bitmovin.analytics.stateMachines
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 
 object PlayerStates {
-    val READY = DefaultPlayerState<Void>()
-    val SOURCE_CHANGED = DefaultPlayerState<Void>()
-    val STARTUP = object: DefaultPlayerState<Void>() {
+    @JvmField val READY = DefaultPlayerState<Void>()
+    @JvmField val SOURCE_CHANGED = DefaultPlayerState<Void>()
+    @JvmField val STARTUP = object: DefaultPlayerState<Void>() {
         override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
             machine.videoStartTimeout.start()
         }
@@ -27,9 +27,9 @@ object PlayerStates {
             }
         }
     }
-    val AD = DefaultPlayerState<Void>()
-    val ADFINISHED = DefaultPlayerState<Void>()
-    val BUFFERING = object: DefaultPlayerState<Void>() {
+    @JvmField val AD = DefaultPlayerState<Void>()
+    @JvmField val ADFINISHED = DefaultPlayerState<Void>()
+    @JvmField val BUFFERING = object: DefaultPlayerState<Void>() {
         override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
             machine.enableRebufferHeartbeat()
             machine.rebufferingTimeout.start()
@@ -48,7 +48,7 @@ object PlayerStates {
             machine.rebufferingTimeout.cancel()
         }
     }
-    val ERROR = object: DefaultPlayerState<Void>() {
+    @JvmField val ERROR = object: DefaultPlayerState<Void>() {
         override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
             machine.videoStartTimeout.cancel()
             for (listener in machine.listeners) {
@@ -64,7 +64,7 @@ object PlayerStates {
             machine.videoStartFailedReason = null
         }
     }
-    val EXITBEFOREVIDEOSTART = object: DefaultPlayerState<Void>() {
+    @JvmField val EXITBEFOREVIDEOSTART = object: DefaultPlayerState<Void>() {
         override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
             for (listener in machine.listeners) {
                 listener.onVideoStartFailed()
@@ -79,7 +79,7 @@ object PlayerStates {
             machine.videoStartFailedReason = null
         }
     }
-    val PLAYING = object: DefaultPlayerState<Void>() {
+    @JvmField val PLAYING = object: DefaultPlayerState<Void>() {
         override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
             machine.enableHeartbeat()
         }
@@ -96,7 +96,7 @@ object PlayerStates {
             machine.disableHeartbeat()
         }
     }
-    val PAUSE = object: DefaultPlayerState<Void>() {
+    @JvmField val PAUSE = object: DefaultPlayerState<Void>() {
         override fun onExitState(
             machine: PlayerStateMachine,
             elapsedTime: Long,
@@ -108,7 +108,7 @@ object PlayerStates {
             }
         }
     }
-    val QUALITYCHANGE = object: DefaultPlayerState<Void>() {
+    @JvmField val QUALITYCHANGE = object: DefaultPlayerState<Void>() {
         override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
             machine.increaseQualityChangeCount()
             if (!machine.isQualityChangeTimerRunning) {
@@ -134,8 +134,8 @@ object PlayerStates {
             }
         }
     }
-    val CUSTOMDATACHANGE = DefaultPlayerState<Void>()
-    val AUDIOTRACKCHANGE = object: DefaultPlayerState<Void>() {
+    @JvmField val CUSTOMDATACHANGE = DefaultPlayerState<Void>()
+    @JvmField val AUDIOTRACKCHANGE = object: DefaultPlayerState<Void>() {
         override fun onExitState(
             machine: PlayerStateMachine,
             elapsedTime: Long,
@@ -146,7 +146,7 @@ object PlayerStates {
             }
         }
     }
-    val SUBTITLECHANGE = object: DefaultPlayerState<Void>() {
+    @JvmField val SUBTITLECHANGE = object: DefaultPlayerState<Void>() {
         override fun onExitState(
             machine: PlayerStateMachine,
             elapsedTime: Long,
@@ -158,7 +158,7 @@ object PlayerStates {
         }
     }
 
-    val SEEKING = object: DefaultPlayerState<Void>() {
+    @JvmField val SEEKING = object: DefaultPlayerState<Void>() {
         override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
             machine.elapsedTimeSeekStart = machine.elapsedTimeOnEnter
         }
