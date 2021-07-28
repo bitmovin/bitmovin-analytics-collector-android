@@ -60,24 +60,4 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         val errorDetails = ErrorDetail(platform, analyticsConfig.key, Util.getDomain(context), impressionIdProvider.impressionId, errorIndex, timestamp, code, message, errorData, segments)
         backend.send(errorDetails)
     }
-
-    private fun parseErrorData(data: Any?): ErrorData {
-        var additionalData: String? = null
-        if (data is Throwable) {
-            if (data.cause != null) {
-                additionalData = DataSerializer.serialize(ErrorData(data.cause?.message, data.cause?.topOfStacktrace?.toList(), null))
-            }
-
-            return ErrorData(data.message, data.topOfStacktrace.toList(), additionalData)
-        }
-        // TODO rework duplicate ErrorData class
-        else if (data is com.bitmovin.analytics.data.ErrorData) {
-            return ErrorData(data.msg, data.details.toList(), null)
-        }
-        try {
-            // this might fail due to circular dependencies (infinite recursion) etc.
-            additionalData = DataSerializer.serialize(data)
-        } catch (ignored: Exception) { }
-        return ErrorData(null, null, additionalData)
-    }
 }
