@@ -12,7 +12,7 @@ class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
         if (event.data is Throwable) {
             val exception = event.data as Throwable
 
-            errorCode.errorData = ErrorData(exception.message
+            errorCode.legacyErrorData = ErrorData(exception.message
                     ?: "", exception.topOfStacktrace)
         }
         return errorCode
