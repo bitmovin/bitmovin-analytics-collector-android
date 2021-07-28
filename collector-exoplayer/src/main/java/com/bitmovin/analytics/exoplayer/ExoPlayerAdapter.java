@@ -595,8 +595,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
                     if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
                         stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
                     }
-                    ExoPlayerAdapter.this.stateMachine.transitionState(
-                            PlayerStates.ERROR, videoTime, errorCode);
+                    ExoPlayerAdapter.this.stateMachine.error(videoTime, errorCode);
 
                     // TODO improve exception mapper to also allow passing exception to the error
                     // details feature

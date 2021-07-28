@@ -7,6 +7,8 @@ import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.CustomDataHelpers;
 import com.bitmovin.analytics.data.CustomData;
+import com.bitmovin.analytics.data.ErrorCode;
+import com.bitmovin.analytics.data.ErrorData;
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.utils.Util;
@@ -169,6 +171,10 @@ public class PlayerStateMachine {
         return true;
     }
 
+    public void error(long videoTime, ErrorCode errorCode) {
+        transitionState(PlayerStates.ERROR,videoTime, errorCode);
+    }
+
     public boolean isStartupFinished() {
         return startupFinished;
     }
@@ -319,9 +325,7 @@ public class PlayerStateMachine {
                 @Override
                 public void onFinish() {
                     Log.d(TAG, "rebufferingTimeout finish");
-                    transitionState(
-                            PlayerStates.ERROR,
-                            analytics.getPosition(),
+                    error(analytics.getPosition(),
                             AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.getErrorCode());
                     disableRebufferHeartbeat();
                     resetStateMachine();

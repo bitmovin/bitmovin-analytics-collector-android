@@ -647,7 +647,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
-            stateMachine.transitionState(PlayerStates.ERROR, videoTime, errorCode);
+            stateMachine.error(videoTime, errorCode);
 
             eventBus.notify(
                     OnErrorDetailEventListener.class,
