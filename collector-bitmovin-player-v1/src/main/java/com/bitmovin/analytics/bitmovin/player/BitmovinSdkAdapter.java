@@ -87,11 +87,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private Long drmDownloadTime = null;
     private String drmType = null;
 
-    public BitmovinSdkAdapter(
-            BitmovinPlayer bitmovinPlayer,
-            BitmovinAnalyticsConfig config,
-            DeviceInformationProvider deviceInformationProvider,
-            PlayerStateMachine stateMachine,
+    public BitmovinSdkAdapter(BitmovinPlayer bitmovinPlayer, BitmovinAnalyticsConfig config,
+            DeviceInformationProvider deviceInformationProvider, PlayerStateMachine stateMachine,
             FeatureFactory featureFactory) {
         this.featureFactory = featureFactory;
         this.config = config;
@@ -185,9 +182,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         }
 
         // isLive
-        data.setLive(
-                Util.getIsLiveFromConfigOrPlayer(
-                        playerIsReady, config.isLive(), bitmovinPlayer.isLive()));
+        data.setLive(Util.getIsLiveFromConfigOrPlayer(playerIsReady, config.isLive(), bitmovinPlayer.isLive()));
 
         // version
         data.setVersion(PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.getPlayerVersion());
@@ -200,8 +195,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.totalDroppedVideoFrames = 0;
 
         // streamFormat, mpdUrl, and m3u8Url
-        if (bitmovinPlayer.getConfig() != null
-                && bitmovinPlayer.getConfig().getSourceItem() != null) {
+        if (bitmovinPlayer.getConfig() != null && bitmovinPlayer.getConfig().getSourceItem() != null) {
             SourceItem sourceItem = bitmovinPlayer.getConfig().getSourceItem();
             switch (sourceItem.getType()) {
                 case HLS:
@@ -217,8 +211,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                     data.setStreamFormat(Util.DASH_STREAM_FORMAT);
                     break;
                 case PROGRESSIVE:
-                    if (sourceItem.getProgressiveSources() != null
-                            && sourceItem.getProgressiveSources().size() > 0) {
+                    if (sourceItem.getProgressiveSources() != null && sourceItem.getProgressiveSources().size() > 0) {
                         data.setProgUrl(sourceItem.getProgressiveSources().get(0).getUrl());
                     }
                     data.setStreamFormat(Util.PROGRESSIVE_STREAM_FORMAT);
@@ -248,8 +241,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         // Subtitle info
         SubtitleTrack subtitle = bitmovinPlayer.getSubtitle();
         if (subtitle != null && subtitle.getId() != null) {
-            data.setSubtitleLanguage(
-                    subtitle.getLanguage() != null ? subtitle.getLanguage() : subtitle.getLabel());
+            data.setSubtitleLanguage(subtitle.getLanguage() != null ? subtitle.getLanguage() : subtitle.getLabel());
             data.setSubtitleEnabled(true);
         }
 
@@ -274,7 +266,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     @Override
     public void resetSourceRelatedState() {
-        // no Playlist transition event in older version of Bitmovin Player collector (v1)
+        // no Playlist transition event in older version of Bitmovin Player collector
+        // (v1)
     }
 
     @Override
@@ -298,7 +291,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     @Override
-    public void clearValues() {}
+    public void clearValues() {
+    }
 
     /*
      * Because of the late initialization of the Adapter we do not get the first
@@ -307,12 +301,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
      */
     private void checkAutoplayStartup() {
         if (bitmovinPlayer.getConfig() != null) {
-            PlaybackConfiguration playbackConfiguration =
-                    bitmovinPlayer.getConfig().getPlaybackConfiguration();
+            PlaybackConfiguration playbackConfiguration = bitmovinPlayer.getConfig().getPlaybackConfiguration();
             SourceConfiguration source = bitmovinPlayer.getConfig().getSourceConfiguration();
-            if (playbackConfiguration != null
-                    && source != null
-                    && source.getFirstSourceItem() != null
+            if (playbackConfiguration != null && source != null && source.getFirstSourceItem() != null
                     && playbackConfiguration.isAutoplayEnabled()) {
                 startup();
             }
@@ -330,376 +321,333 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     }
 
     /** Player Listeners */
-    private OnSourceLoadedListener onSourceLoadedListener =
-            new OnSourceLoadedListener() {
-                @Override
-                public void onSourceLoaded(SourceLoadedEvent sourceLoadedEvent) {
-                    Log.d(TAG, "On Source Loaded");
-                    isVideoAttemptedPlay = false;
+    private OnSourceLoadedListener onSourceLoadedListener = new OnSourceLoadedListener() {
+        @Override
+        public void onSourceLoaded(SourceLoadedEvent sourceLoadedEvent) {
+            Log.d(TAG, "On Source Loaded");
+            isVideoAttemptedPlay = false;
+        }
+    };
+
+    private OnSourceUnloadedListener onSourceUnloadedListener = new OnSourceUnloadedListener() {
+        @Override
+        public void onSourceUnloaded(SourceUnloadedEvent sourceUnloadedEvent) {
+            try {
+                Log.d(TAG, "On Source Unloaded");
+                stateMachine.resetStateMachine();
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
+
+    private OnDestroyListener onDestroyedListener = new OnDestroyListener() {
+        @Override
+        public void onDestroy(DestroyEvent destroyEvent) {
+            try {
+                Log.d(TAG, "On Destroy");
+                if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
+                    stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PAGE_CLOSED);
+                    stateMachine.transitionState(PlayerStates.EXITBEFOREVIDEOSTART, getPosition());
                 }
-            };
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
 
-    private OnSourceUnloadedListener onSourceUnloadedListener =
-            new OnSourceUnloadedListener() {
-                @Override
-                public void onSourceUnloaded(SourceUnloadedEvent sourceUnloadedEvent) {
-                    try {
-                        Log.d(TAG, "On Source Unloaded");
-                        stateMachine.resetStateMachine();
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+    private OnPlaybackFinishedListener onPlaybackFinishedListener = new OnPlaybackFinishedListener() {
+        @Override
+        public void onPlaybackFinished(PlaybackFinishedEvent playbackFinishedEvent) {
+            try {
+                Log.d(TAG, "On Playback Finished Listener");
+
+                // if it's life stream we are using currentPosition of playback as videoTime
+                long videoTime = (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
+                        ? Util.secondsToMillis(bitmovinPlayer.getDuration())
+                        : getPosition();
+                stateMachine.transitionState(PlayerStates.PAUSE, videoTime);
+                stateMachine.disableHeartbeat();
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
+
+    private OnReadyListener onReadyListener = new OnReadyListener() {
+        @Override
+        public void onReady(ReadyEvent readyEvent) {
+            Log.d(TAG, "On Ready Listener");
+            playerIsReady = true;
+        }
+    };
+
+    private OnPausedListener onPausedListener = new OnPausedListener() {
+        @Override
+        public void onPaused(PausedEvent pausedEvent) {
+            try {
+                Log.d(TAG, "On Pause Listener");
+                stateMachine.pause(getPosition());
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
+
+    private OnPlayListener onPlayListener = new OnPlayListener() {
+        @Override
+        public void onPlay(PlayEvent playEvent) {
+            try {
+                Log.d(TAG, "On Play Listener");
+                if (!stateMachine.isStartupFinished()) {
+                    startup();
                 }
-            };
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
 
-    private OnDestroyListener onDestroyedListener =
-            new OnDestroyListener() {
-                @Override
-                public void onDestroy(DestroyEvent destroyEvent) {
-                    try {
-                        Log.d(TAG, "On Destroy");
-                        if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-                            stateMachine.setVideoStartFailedReason(
-                                    VideoStartFailedReason.PAGE_CLOSED);
-                            stateMachine.transitionState(
-                                    PlayerStates.EXITBEFOREVIDEOSTART, getPosition());
-                        }
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+    private OnPlayingListener onPlayingListener = new OnPlayingListener() {
+        @Override
+        public void onPlaying(PlayingEvent playingEvent) {
+            try {
+                Log.d(TAG, "On Playing Listener " + stateMachine.getCurrentState().toString());
+                stateMachine.transitionState(PlayerStates.PLAYING, getPosition());
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
+
+    private OnSeekedListener onSeekedListener = new OnSeekedListener() {
+        @Override
+        public void onSeeked(SeekedEvent seekedEvent) {
+            Log.d(TAG, "On Seeked Listener");
+        }
+    };
+
+    private OnSeekListener onSeekListener = new OnSeekListener() {
+        @Override
+        public void onSeek(SeekEvent seekEvent) {
+            try {
+                Log.d(TAG, "On Seek Listener");
+                if (stateMachine.isStartupFinished()) {
+                    stateMachine.transitionState(PlayerStates.SEEKING, getPosition());
                 }
-            };
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
 
-    private OnPlaybackFinishedListener onPlaybackFinishedListener =
-            new OnPlaybackFinishedListener() {
-                @Override
-                public void onPlaybackFinished(PlaybackFinishedEvent playbackFinishedEvent) {
-                    try {
-                        Log.d(TAG, "On Playback Finished Listener");
-
-                        // if it's life stream we are using currentPosition of playback as videoTime
-                        long videoTime =
-                                (bitmovinPlayer.getDuration() != Double.POSITIVE_INFINITY)
-                                        ? Util.secondsToMillis(bitmovinPlayer.getDuration())
-                                        : getPosition();
-                        stateMachine.transitionState(PlayerStates.PAUSE, videoTime);
-                        stateMachine.disableHeartbeat();
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+    private OnStallEndedListener onStallEndedListener = new OnStallEndedListener() {
+        @Override
+        public void onStallEnded(StallEndedEvent stallEndedEvent) {
+            try {
+                Log.d(TAG, "On Stall Ended: " + bitmovinPlayer.isPlaying());
+                if (!stateMachine.isStartupFinished()) {
+                    return;
                 }
-            };
 
-    private OnReadyListener onReadyListener =
-            new OnReadyListener() {
-                @Override
-                public void onReady(ReadyEvent readyEvent) {
-                    Log.d(TAG, "On Ready Listener");
-                    playerIsReady = true;
+                if (bitmovinPlayer.isPlaying() && stateMachine.getCurrentState() != PlayerStates.PLAYING) {
+                    stateMachine.transitionState(PlayerStates.PLAYING, getPosition());
+                } else if (bitmovinPlayer.isPaused() && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
+                    stateMachine.transitionState(PlayerStates.PAUSE, getPosition());
                 }
-            };
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
 
-    private OnPausedListener onPausedListener =
-            new OnPausedListener() {
-                @Override
-                public void onPaused(PausedEvent pausedEvent) {
-                    try {
-                        Log.d(TAG, "On Pause Listener");
-                        stateMachine.pause(getPosition());
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+    private OnAudioChangedListener onAudioChangedListener = new OnAudioChangedListener() {
+        @Override
+        public void onAudioChanged(AudioChangedEvent audioChangedEvent) {
+            try {
+                Log.d(TAG, "On AudioChanged");
+                if (!stateMachine.isStartupFinished()) {
+                    return;
                 }
-            };
 
-    private OnPlayListener onPlayListener =
-            new OnPlayListener() {
-                @Override
-                public void onPlay(PlayEvent playEvent) {
-                    try {
-                        Log.d(TAG, "On Play Listener");
-                        if (!stateMachine.isStartupFinished()) {
-                            startup();
-                        }
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+                if (stateMachine.getCurrentState() != PlayerStates.PLAYING
+                        && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
+                    return;
                 }
-            };
 
-    private OnPlayingListener onPlayingListener =
-            new OnPlayingListener() {
-                @Override
-                public void onPlaying(PlayingEvent playingEvent) {
-                    try {
-                        Log.d(
-                                TAG,
-                                "On Playing Listener " + stateMachine.getCurrentState().toString());
-                        stateMachine.transitionState(PlayerStates.PLAYING, getPosition());
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+                PlayerState<?> originalState = stateMachine.getCurrentState();
+                stateMachine.transitionState(PlayerStates.AUDIOTRACKCHANGE, getPosition());
+                stateMachine.transitionState(originalState, getPosition());
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
+
+    private OnSubtitleChangedListener onSubtitleChangedListener = new OnSubtitleChangedListener() {
+        @Override
+        public void onSubtitleChanged(SubtitleChangedEvent event) {
+            try {
+                Log.d(TAG, "On SubtitleChanged");
+                if (!stateMachine.isStartupFinished()) {
+                    return;
                 }
-            };
 
-    private OnSeekedListener onSeekedListener =
-            new OnSeekedListener() {
-                @Override
-                public void onSeeked(SeekedEvent seekedEvent) {
-                    Log.d(TAG, "On Seeked Listener");
+                if (stateMachine.getCurrentState() != PlayerStates.PLAYING
+                        && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
+                    return;
                 }
-            };
 
-    private OnSeekListener onSeekListener =
-            new OnSeekListener() {
-                @Override
-                public void onSeek(SeekEvent seekEvent) {
-                    try {
-                        Log.d(TAG, "On Seek Listener");
-                        if (stateMachine.isStartupFinished()) {
-                            stateMachine.transitionState(PlayerStates.SEEKING, getPosition());
-                        }
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+                PlayerState<?> originalState = stateMachine.getCurrentState();
+                stateMachine.transitionState(PlayerStates.SUBTITLECHANGE, getPosition());
+                stateMachine.transitionState(originalState, getPosition());
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
+
+    private OnStallStartedListener onStallStartedListener = new OnStallStartedListener() {
+        @Override
+        public void onStallStarted(StallStartedEvent stallStartedEvent) {
+            try {
+                Log.d(TAG, "On Stall Started Listener");
+                if (!stateMachine.isStartupFinished()) {
+                    return;
                 }
-            };
 
-    private OnStallEndedListener onStallEndedListener =
-            new OnStallEndedListener() {
-                @Override
-                public void onStallEnded(StallEndedEvent stallEndedEvent) {
-                    try {
-                        Log.d(TAG, "On Stall Ended: " + bitmovinPlayer.isPlaying());
-                        if (!stateMachine.isStartupFinished()) {
-                            return;
-                        }
-
-                        if (bitmovinPlayer.isPlaying()
-                                && stateMachine.getCurrentState() != PlayerStates.PLAYING) {
-                            stateMachine.transitionState(PlayerStates.PLAYING, getPosition());
-                        } else if (bitmovinPlayer.isPaused()
-                                && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
-                            stateMachine.transitionState(PlayerStates.PAUSE, getPosition());
-                        }
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+                // if stalling is triggered by a seeking event
+                // we count the buffering time towards the seeking time
+                if (stateMachine.getCurrentState() != PlayerStates.SEEKING) {
+                    stateMachine.transitionState(PlayerStates.BUFFERING, getPosition());
                 }
-            };
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
 
-    private OnAudioChangedListener onAudioChangedListener =
-            new OnAudioChangedListener() {
-                @Override
-                public void onAudioChanged(AudioChangedEvent audioChangedEvent) {
-                    try {
-                        Log.d(TAG, "On AudioChanged");
-                        if (!stateMachine.isStartupFinished()) {
-                            return;
-                        }
-
-                        if (stateMachine.getCurrentState() != PlayerStates.PLAYING
-                                && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
-                            return;
-                        }
-
-                        PlayerState<?> originalState = stateMachine.getCurrentState();
-                        stateMachine.transitionState(PlayerStates.AUDIOTRACKCHANGE, getPosition());
-                        stateMachine.transitionState(originalState, getPosition());
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+    private OnVideoPlaybackQualityChangedListener onVideoPlaybackQualityChangedListener = new OnVideoPlaybackQualityChangedListener() {
+        @Override
+        public void onVideoPlaybackQualityChanged(VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
+            try {
+                Log.d(TAG, "On Video Quality Changed");
+                if (!stateMachine.isStartupFinished()) {
+                    return;
                 }
-            };
 
-    private OnSubtitleChangedListener onSubtitleChangedListener =
-            new OnSubtitleChangedListener() {
-                @Override
-                public void onSubtitleChanged(SubtitleChangedEvent event) {
-                    try {
-                        Log.d(TAG, "On SubtitleChanged");
-                        if (!stateMachine.isStartupFinished()) {
-                            return;
-                        }
-
-                        if (stateMachine.getCurrentState() != PlayerStates.PLAYING
-                                && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
-                            return;
-                        }
-
-                        PlayerState<?> originalState = stateMachine.getCurrentState();
-                        stateMachine.transitionState(PlayerStates.SUBTITLECHANGE, getPosition());
-                        stateMachine.transitionState(originalState, getPosition());
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+                if (!stateMachine.isQualityChangeEventEnabled()) {
+                    return;
                 }
-            };
 
-    private OnStallStartedListener onStallStartedListener =
-            new OnStallStartedListener() {
-                @Override
-                public void onStallStarted(StallStartedEvent stallStartedEvent) {
-                    try {
-                        Log.d(TAG, "On Stall Started Listener");
-                        if (!stateMachine.isStartupFinished()) {
-                            return;
-                        }
-
-                        // if stalling is triggered by a seeking event
-                        // we count the buffering time towards the seeking time
-                        if (stateMachine.getCurrentState() != PlayerStates.SEEKING) {
-                            stateMachine.transitionState(PlayerStates.BUFFERING, getPosition());
-                        }
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+                if (stateMachine.getCurrentState() != PlayerStates.PLAYING
+                        && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
+                    return;
                 }
-            };
 
-    private OnVideoPlaybackQualityChangedListener onVideoPlaybackQualityChangedListener =
-            new OnVideoPlaybackQualityChangedListener() {
-                @Override
-                public void onVideoPlaybackQualityChanged(
-                        VideoPlaybackQualityChangedEvent videoPlaybackQualityChangedEvent) {
-                    try {
-                        Log.d(TAG, "On Video Quality Changed");
-                        if (!stateMachine.isStartupFinished()) {
-                            return;
-                        }
+                PlayerState<?> originalState = stateMachine.getCurrentState();
+                stateMachine.transitionState(PlayerStates.QUALITYCHANGE, getPosition());
+                stateMachine.transitionState(originalState, getPosition());
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
 
-                        if (!stateMachine.isQualityChangeEventEnabled()) {
-                            return;
-                        }
+    private OnDroppedVideoFramesListener onDroppedVideoFramesListener = new OnDroppedVideoFramesListener() {
+        @Override
+        public void onDroppedVideoFrames(DroppedVideoFramesEvent droppedVideoFramesEvent) {
+            try {
+                totalDroppedVideoFrames += droppedVideoFramesEvent.getDroppedFrames();
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
 
-                        if (stateMachine.getCurrentState() != PlayerStates.PLAYING
-                                && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
-                            return;
-                        }
-
-                        PlayerState<?> originalState = stateMachine.getCurrentState();
-                        stateMachine.transitionState(PlayerStates.QUALITYCHANGE, getPosition());
-                        stateMachine.transitionState(originalState, getPosition());
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+    private OnAudioPlaybackQualityChangedListener onAudioPlaybackQualityChangedListener = new OnAudioPlaybackQualityChangedListener() {
+        @Override
+        public void onAudioPlaybackQualityChanged(AudioPlaybackQualityChangedEvent audioPlaybackQualityChangedEvent) {
+            try {
+                Log.d(TAG, "On Audio Quality Changed");
+                if (!stateMachine.isStartupFinished()) {
+                    return;
                 }
-            };
 
-    private OnDroppedVideoFramesListener onDroppedVideoFramesListener =
-            new OnDroppedVideoFramesListener() {
-                @Override
-                public void onDroppedVideoFrames(DroppedVideoFramesEvent droppedVideoFramesEvent) {
-                    try {
-                        totalDroppedVideoFrames += droppedVideoFramesEvent.getDroppedFrames();
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+                if (!stateMachine.isQualityChangeEventEnabled()) {
+                    return;
                 }
-            };
 
-    private OnAudioPlaybackQualityChangedListener onAudioPlaybackQualityChangedListener =
-            new OnAudioPlaybackQualityChangedListener() {
-                @Override
-                public void onAudioPlaybackQualityChanged(
-                        AudioPlaybackQualityChangedEvent audioPlaybackQualityChangedEvent) {
-                    try {
-                        Log.d(TAG, "On Audio Quality Changed");
-                        if (!stateMachine.isStartupFinished()) {
-                            return;
-                        }
-
-                        if (!stateMachine.isQualityChangeEventEnabled()) {
-                            return;
-                        }
-
-                        if (stateMachine.getCurrentState() != PlayerStates.PLAYING
-                                && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
-                            return;
-                        }
-
-                        PlayerState<?> originalState = stateMachine.getCurrentState();
-                        AudioQuality oldQuality =
-                                audioPlaybackQualityChangedEvent.getOldAudioQuality();
-                        AudioQuality newQuality =
-                                audioPlaybackQualityChangedEvent.getNewAudioQuality();
-                        if (oldQuality != null
-                                && newQuality != null
-                                && oldQuality.getBitrate() == newQuality.getBitrate()) {
-                            return;
-                        }
-                        stateMachine.transitionState(PlayerStates.QUALITYCHANGE, getPosition());
-                        stateMachine.transitionState(originalState, getPosition());
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+                if (stateMachine.getCurrentState() != PlayerStates.PLAYING
+                        && stateMachine.getCurrentState() != PlayerStates.PAUSE) {
+                    return;
                 }
-            };
 
-    private OnDownloadFinishedListener onDownloadFinishedListener =
-            new OnDownloadFinishedListener() {
-                @Override
-                public void onDownloadFinished(DownloadFinishedEvent downloadFinishedEvent) {
-                    try {
-                        if (downloadFinishedEvent
-                                .getDownloadType()
-                                .toString()
-                                .contains("drm/license")) {
-                            drmDownloadTime =
-                                    Util.secondsToMillis(downloadFinishedEvent.getDownloadTime());
-                            drmType =
-                                    downloadFinishedEvent
-                                            .getDownloadType()
-                                            .toString()
-                                            .replace("drm/license/", "");
-                        }
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+                PlayerState<?> originalState = stateMachine.getCurrentState();
+                AudioQuality oldQuality = audioPlaybackQualityChangedEvent.getOldAudioQuality();
+                AudioQuality newQuality = audioPlaybackQualityChangedEvent.getNewAudioQuality();
+                if (oldQuality != null && newQuality != null && oldQuality.getBitrate() == newQuality.getBitrate()) {
+                    return;
                 }
-            };
+                stateMachine.transitionState(PlayerStates.QUALITYCHANGE, getPosition());
+                stateMachine.transitionState(originalState, getPosition());
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
 
-    private OnErrorListener onErrorListener =
-            new OnErrorListener() {
-                @Override
-                public void onError(ErrorEvent errorEvent) {
-                    try {
-                        Log.d(TAG, "onPlayerError");
-                        long videoTime = getPosition();
-                        ErrorCode errorCode = exceptionMapper.map(errorEvent);
-
-                        if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
-                            stateMachine.setVideoStartFailedReason(
-                                    VideoStartFailedReason.PLAYER_ERROR);
-                        }
-                        stateMachine.error(videoTime, errorCode);
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+    private OnDownloadFinishedListener onDownloadFinishedListener = new OnDownloadFinishedListener() {
+        @Override
+        public void onDownloadFinished(DownloadFinishedEvent downloadFinishedEvent) {
+            try {
+                if (downloadFinishedEvent.getDownloadType().toString().contains("drm/license")) {
+                    drmDownloadTime = Util.secondsToMillis(downloadFinishedEvent.getDownloadTime());
+                    drmType = downloadFinishedEvent.getDownloadType().toString().replace("drm/license/", "");
                 }
-            };
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
 
-    private OnAdBreakStartedListener onAdBreakStartedListener =
-            new OnAdBreakStartedListener() {
-                @Override
-                public void onAdBreakStarted(AdBreakStartedEvent adBreakStartedEvent) {
-                    try {
-                        stateMachine.startAd(getPosition());
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
-                }
-            };
+    private OnErrorListener onErrorListener = new OnErrorListener() {
+        @Override
+        public void onError(ErrorEvent errorEvent) {
+            try {
+                Log.d(TAG, "onPlayerError");
+                long videoTime = getPosition();
+                ErrorCode errorCode = exceptionMapper.map(errorEvent);
 
-    private OnAdBreakFinishedListener onAdBreakFinishedListener =
-            new OnAdBreakFinishedListener() {
-                @Override
-                public void onAdBreakFinished(AdBreakFinishedEvent adBreakFinishedEvent) {
-                    try {
-                        stateMachine.transitionState(PlayerStates.ADFINISHED, getPosition());
-                    } catch (Exception e) {
-                        Log.d(TAG, e.getMessage(), e);
-                    }
+                if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
+                    stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
                 }
-            };
+                stateMachine.error(videoTime, errorCode);
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
+
+    private OnAdBreakStartedListener onAdBreakStartedListener = new OnAdBreakStartedListener() {
+        @Override
+        public void onAdBreakStarted(AdBreakStartedEvent adBreakStartedEvent) {
+            try {
+                stateMachine.startAd(getPosition());
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
+
+    private OnAdBreakFinishedListener onAdBreakFinishedListener = new OnAdBreakFinishedListener() {
+        @Override
+        public void onAdBreakFinished(AdBreakFinishedEvent adBreakFinishedEvent) {
+            try {
+                stateMachine.transitionState(PlayerStates.ADFINISHED, getPosition());
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage(), e);
+            }
+        }
+    };
 }
