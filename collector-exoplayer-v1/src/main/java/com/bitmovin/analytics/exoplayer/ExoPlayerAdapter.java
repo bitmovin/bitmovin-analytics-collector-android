@@ -30,6 +30,7 @@ import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
+import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.PlayerStates;
 import com.bitmovin.analytics.utils.DownloadSpeedMeter;
@@ -660,7 +661,7 @@ public class ExoPlayerAdapter
     private void handleAudioInputFormatChanged(Format format) {
         Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate));
         long videoTime = getPosition();
-        PlayerStates originalState = stateMachine.getCurrentState();
+        PlayerState<?> originalState = stateMachine.getCurrentState();
         try {
             if (stateMachine.getCurrentState() != PlayerStates.PLAYING) return;
             if (!stateMachine.isQualityChangeEventEnabled()) return;
@@ -675,7 +676,7 @@ public class ExoPlayerAdapter
     private void handleVideoInputFormatChanged(Format format) {
         Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate));
         long videoTime = getPosition();
-        PlayerStates originalState = stateMachine.getCurrentState();
+        PlayerState<?> originalState = stateMachine.getCurrentState();
         try {
             if (stateMachine.getCurrentState() != PlayerStates.PLAYING) return;
             if (!stateMachine.isQualityChangeEventEnabled()) return;
