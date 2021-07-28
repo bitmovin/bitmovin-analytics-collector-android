@@ -52,7 +52,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean isVideoAttemptedPlay = false;
     private FeatureFactory featureFactory;
     private final Map<Source, SourceMetadata> sourceMetadataMap;
-    private final EventBus eventBus;
 
     // When transitioning in a Playlist, BitmovinPlayer will already return the
     // new source in `getSource`, but we are still interested in sending a sample
@@ -67,15 +66,13 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
             FeatureFactory featureFactory,
-            Map<Source, SourceMetadata> sourceMetadataMap,
-            EventBus eventBus) {
+            Map<Source, SourceMetadata> sourceMetadataMap) {
         this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.deviceInformationProvider = deviceInformationProvider;
         this.sourceMetadataMap = sourceMetadataMap;
-        this.eventBus = eventBus;
     }
 
     public Collection<Feature<FeatureConfigContainer, ?>> init() {

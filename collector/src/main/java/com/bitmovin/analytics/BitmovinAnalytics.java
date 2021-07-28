@@ -44,7 +44,7 @@ public class BitmovinAnalytics
     private static final String TAG = "BitmovinAnalytics";
 
     private FeatureManager<FeatureConfigContainer> featureManager = new FeatureManager<>();
-    protected EventBus eventBus = new EventBus();
+    private final EventBus eventBus = new EventBus();
 
     protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
     protected PlayerAdapter playerAdapter;

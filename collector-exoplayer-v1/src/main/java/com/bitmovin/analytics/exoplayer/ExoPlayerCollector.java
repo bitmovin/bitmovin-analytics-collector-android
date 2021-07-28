@@ -41,8 +41,7 @@ public class ExoPlayerCollector extends BitmovinAnalytics {
                         this.bitmovinAnalyticsConfig,
                         deviceInformationProvider,
                         this.playerStateMachine,
-                        featureFactory,
-                        eventBus);
+                        featureFactory);
 
         this.attach(adapter);
     }

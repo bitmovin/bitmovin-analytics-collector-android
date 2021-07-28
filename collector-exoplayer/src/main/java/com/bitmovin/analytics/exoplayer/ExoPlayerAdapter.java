@@ -82,7 +82,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     protected final DefaultAnalyticsListener defaultAnalyticsListener;
     protected final DefaultPlayerEventListener defaultPlayerEventListener;
     private FeatureFactory featureFactory;
-    private final EventBus eventBus;
 
     private long drmLoadStartTime = 0;
     private Long drmDownloadTime = null;
@@ -93,9 +92,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
-            FeatureFactory featureFactory,
-            EventBus eventBus) {
-        this.eventBus = eventBus;
+            FeatureFactory featureFactory) {
         this.featureFactory = featureFactory;
         this.defaultAnalyticsListener = createAnalyticsListener();
         this.defaultPlayerEventListener = createPlayerEventListener();

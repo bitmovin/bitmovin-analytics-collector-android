@@ -40,8 +40,7 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
                         this.bitmovinAnalyticsConfig,
                         deviceInformationProvider,
                         this.playerStateMachine,
-                        featureFactory,
-                        this.eventBus);
+                        featureFactory);
 
         this.attach(adapter);
 

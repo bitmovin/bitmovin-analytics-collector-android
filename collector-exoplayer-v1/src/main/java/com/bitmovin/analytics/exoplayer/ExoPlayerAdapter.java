@@ -80,7 +80,6 @@ public class ExoPlayerAdapter
     private final DeviceInformationProvider deviceInformationProvider;
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private BitrateEventDataManipulator bitrateEventDataManipulator;
-    private final EventBus eventBus;
     private final FeatureFactory featureFactory;
     private boolean isVideoAttemptedPlay = false;
     private boolean isPlaying = false;
@@ -95,10 +94,8 @@ public class ExoPlayerAdapter
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
-            FeatureFactory featureFactory,
-            EventBus eventBus) {
+            FeatureFactory featureFactory) {
         this.featureFactory = featureFactory;
-        this.eventBus = eventBus;
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);

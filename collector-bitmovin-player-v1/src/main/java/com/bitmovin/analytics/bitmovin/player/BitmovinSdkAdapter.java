@@ -85,7 +85,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean playerIsReady;
     private boolean isVideoAttemptedPlay = false;
     private FeatureFactory featureFactory;
-    private final EventBus eventBus;
 
     private Long drmDownloadTime = null;
     private String drmType = null;
@@ -95,14 +94,12 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
-            FeatureFactory featureFactory,
-            EventBus eventBus) {
+            FeatureFactory featureFactory) {
         this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.deviceInformationProvider = deviceInformationProvider;
-        this.eventBus = eventBus;
     }
 
     public Collection<Feature<FeatureConfigContainer, ?>> init() {
