@@ -13,7 +13,7 @@ object DataSerializer {
     fun <T> trySerialize(data: T?): String? {
         return try {
             serialize(data)
-        } catch(ignored: Exception) { null }
+        } catch (ignored: Exception) { null }
     }
 
     @JvmStatic

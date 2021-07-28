@@ -14,9 +14,9 @@ class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
         val errorData: com.bitmovin.analytics.features.errordetails.ErrorData
 
         val throwable = event.data as? Throwable?
-        if(throwable != null) {
+        if (throwable != null) {
             val cause = throwable.cause
-            if(cause != null) {
+            if (cause != null) {
                 additionalData = DataSerializer.trySerialize(com.bitmovin.analytics.features.errordetails.ErrorData.fromThrowable(cause))
             }
             errorData = com.bitmovin.analytics.features.errordetails.ErrorData.fromThrowable(throwable, additionalData)

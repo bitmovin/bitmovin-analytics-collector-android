@@ -2,7 +2,6 @@ package com.bitmovin.analytics.bitmovin.player;
 
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.EventBus;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
@@ -15,7 +14,6 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureFactory;
-import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;

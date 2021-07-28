@@ -7,10 +7,7 @@ import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
-import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.Util
-import com.bitmovin.analytics.utils.topOfStacktrace
-import java.lang.Exception
 
 // TODO we also need to track errors from other sources, not just the player.
 // Should be streamlined and go through the BitmovinAnalytics class

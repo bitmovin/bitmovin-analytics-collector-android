@@ -43,7 +43,7 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
             }
             else -> legacyErrorData = ErrorData(exception.message ?: "", exception.topOfStacktrace)
         }
-        val errorData = com.bitmovin.analytics.features.errordetails.ErrorData(legacyErrorData.msg,  legacyErrorData.details.toList())
+        val errorData = com.bitmovin.analytics.features.errordetails.ErrorData(legacyErrorData.msg, legacyErrorData.details.toList())
         return ErrorCode(type, message, errorData, legacyErrorData)
     }
 
