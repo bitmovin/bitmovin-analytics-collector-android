@@ -32,7 +32,8 @@ public class PlayerStateMachine {
     private String impressionId;
     private Handler heartbeatHandler = new Handler();
     private int currentRebufferingIntervalIndex = 0;
-    private static List<Integer> rebufferingIntervals = Arrays.asList(3000, 5000, 10000, 30000, 59700);
+    private static List<Integer> rebufferingIntervals =
+            Arrays.asList(3000, 5000, 10000, 30000, 59700);
     private int heartbeatDelay = 59700; // default to 60 seconds
     private final BitmovinAnalytics analytics;
     private VideoStartFailedReason videoStartFailedReason;
@@ -47,12 +48,14 @@ public class PlayerStateMachine {
     }
 
     public void enableHeartbeat() {
-        heartbeatHandler.postDelayed(new Runnable() {
-            public void run() {
-                triggerHeartbeat();
-                heartbeatHandler.postDelayed(this, heartbeatDelay);
-            }
-        }, heartbeatDelay);
+        heartbeatHandler.postDelayed(
+                new Runnable() {
+                    public void run() {
+                        triggerHeartbeat();
+                        heartbeatHandler.postDelayed(this, heartbeatDelay);
+                    }
+                },
+                heartbeatDelay);
     }
 
     public void disableHeartbeat() {
@@ -60,14 +63,19 @@ public class PlayerStateMachine {
     }
 
     public void enableRebufferHeartbeat() {
-        heartbeatHandler.postDelayed(new Runnable() {
-            public void run() {
-                triggerHeartbeat();
-                currentRebufferingIntervalIndex = Math.min(currentRebufferingIntervalIndex + 1,
-                        rebufferingIntervals.size() - 1);
-                heartbeatHandler.postDelayed(this, rebufferingIntervals.get(currentRebufferingIntervalIndex));
-            }
-        }, rebufferingIntervals.get(currentRebufferingIntervalIndex));
+        heartbeatHandler.postDelayed(
+                new Runnable() {
+                    public void run() {
+                        triggerHeartbeat();
+                        currentRebufferingIntervalIndex =
+                                Math.min(
+                                        currentRebufferingIntervalIndex + 1,
+                                        rebufferingIntervals.size() - 1);
+                        heartbeatHandler.postDelayed(
+                                this, rebufferingIntervals.get(currentRebufferingIntervalIndex));
+                    }
+                },
+                rebufferingIntervals.get(currentRebufferingIntervalIndex));
     }
 
     public void disableRebufferHeartbeat() {
@@ -113,11 +121,13 @@ public class PlayerStateMachine {
         }
     }
 
-    public synchronized <T> void transitionState(PlayerState<T> destinationPlayerState, long videoTime) {
+    public synchronized <T> void transitionState(
+            PlayerState<T> destinationPlayerState, long videoTime) {
         transitionState(destinationPlayerState, videoTime, null);
     }
 
-    public synchronized <T> void transitionState(PlayerState<T> destinationPlayerState, long videoTime, T data) {
+    public synchronized <T> void transitionState(
+            PlayerState<T> destinationPlayerState, long videoTime, T data) {
         if (!this.isTransitionAllowed(currentState, destinationPlayerState)) {
             return;
         }
@@ -125,7 +135,12 @@ public class PlayerStateMachine {
         long elapsedTime = Util.getElapsedTime();
         videoTimeEnd = videoTime;
 
-        Log.d(TAG, "Transitioning from " + currentState.toString() + " to " + destinationPlayerState.toString());
+        Log.d(
+                TAG,
+                "Transitioning from "
+                        + currentState.toString()
+                        + " to "
+                        + destinationPlayerState.toString());
 
         currentState.onExitState(this, elapsedTime, destinationPlayerState);
         this.elapsedTimeOnEnter = elapsedTime;
@@ -145,8 +160,10 @@ public class PlayerStateMachine {
                 && (destination != PlayerStates.ERROR && destination != PlayerStates.ADFINISHED)) {
             return false;
         } else if (currentState == PlayerStates.READY
-                && (destination != PlayerStates.ERROR && destination != PlayerStates.EXITBEFOREVIDEOSTART
-                        && destination != PlayerStates.STARTUP && destination != PlayerStates.AD)) {
+                && (destination != PlayerStates.ERROR
+                        && destination != PlayerStates.EXITBEFOREVIDEOSTART
+                        && destination != PlayerStates.STARTUP
+                        && destination != PlayerStates.AD)) {
             return false;
         }
 
@@ -231,18 +248,18 @@ public class PlayerStateMachine {
         this.videoStartFailedReason = videoStartFailedReason;
     }
 
-    protected CountDownTimer videoStartTimeout = new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
+    protected CountDownTimer videoStartTimeout =
+            new CountDownTimer(Util.VIDEOSTART_TIMEOUT, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {}
 
-        @Override
-        public void onFinish() {
-            Log.d(TAG, "VideoStartTimeout finish");
-            setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
-            transitionState(PlayerStates.EXITBEFOREVIDEOSTART, 0, null);
-        }
-    };
+                @Override
+                public void onFinish() {
+                    Log.d(TAG, "VideoStartTimeout finish");
+                    setVideoStartFailedReason(VideoStartFailedReason.TIMEOUT);
+                    transitionState(PlayerStates.EXITBEFOREVIDEOSTART, 0, null);
+                }
+            };
 
     public void pause(long position) {
         if (isStartupFinished()) {
@@ -269,9 +286,11 @@ public class PlayerStateMachine {
         this.qualityChangeCount = 0;
     }
 
-    public void changeCustomData(long position, CustomData customData, CustomDataHelpers.Setter customDataSetter) {
+    public void changeCustomData(
+            long position, CustomData customData, CustomDataHelpers.Setter customDataSetter) {
         PlayerState originalState = this.getCurrentState();
-        boolean shouldTransition = originalState == PlayerStates.PLAYING || originalState == PlayerStates.PAUSE;
+        boolean shouldTransition =
+                originalState == PlayerStates.PLAYING || originalState == PlayerStates.PAUSE;
         if (shouldTransition) {
             this.transitionState(PlayerStates.CUSTOMDATACHANGE, position);
         }
@@ -281,33 +300,35 @@ public class PlayerStateMachine {
         }
     }
 
-    protected CountDownTimer qualityChangeResetTimeout = new CountDownTimer(
-            Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL, 1000) {
+    protected CountDownTimer qualityChangeResetTimeout =
+            new CountDownTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL, 1000) {
 
-        @Override
-        public void onTick(long millisUntilFinished) {
-            isQualityChangeTimerRunning = true;
-        }
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    isQualityChangeTimerRunning = true;
+                }
 
-        @Override
-        public void onFinish() {
-            Log.d(TAG, "qualityChangeResetTimeout finish");
-            resetQualityChangeCount();
-            isQualityChangeTimerRunning = false;
-        }
-    };
+                @Override
+                public void onFinish() {
+                    Log.d(TAG, "qualityChangeResetTimeout finish");
+                    resetQualityChangeCount();
+                    isQualityChangeTimerRunning = false;
+                }
+            };
 
-    protected CountDownTimer rebufferingTimeout = new CountDownTimer(Util.REBUFFERING_TIMEOUT, 1000) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
+    protected CountDownTimer rebufferingTimeout =
+            new CountDownTimer(Util.REBUFFERING_TIMEOUT, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {}
 
-        @Override
-        public void onFinish() {
-            Log.d(TAG, "rebufferingTimeout finish");
-            error(analytics.getPosition(), AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.getErrorCode());
-            disableRebufferHeartbeat();
-            resetStateMachine();
-        }
-    };
+                @Override
+                public void onFinish() {
+                    Log.d(TAG, "rebufferingTimeout finish");
+                    error(
+                            analytics.getPosition(),
+                            AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.getErrorCode());
+                    disableRebufferHeartbeat();
+                    resetStateMachine();
+                }
+            };
 }
