@@ -180,7 +180,7 @@ public class BitmovinAnalytics
     public void onPauseExit(long duration) {
         Log.d(TAG, String.format("onPauseExit %s", playerStateMachine.getImpressionId()));
         EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState(playerStateMachine.getCurrentState().getName());
         data.setDuration(duration);
         data.setPaused(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
@@ -192,7 +192,7 @@ public class BitmovinAnalytics
     public void onPlayExit(long duration) {
         Log.d(TAG, String.format("onPlayExit %s", playerStateMachine.getImpressionId()));
         EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState(playerStateMachine.getCurrentState().getName());
         data.setDuration(duration);
         data.setPlayed(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
@@ -204,7 +204,7 @@ public class BitmovinAnalytics
     public void onRebuffering(long duration) {
         Log.d(TAG, String.format("onRebuffering %s", playerStateMachine.getImpressionId()));
         EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState(playerStateMachine.getCurrentState().getName());
         data.setDuration(duration);
         data.setBuffered(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
@@ -216,7 +216,7 @@ public class BitmovinAnalytics
     public void onError(ErrorCode errorCode) {
         Log.d(TAG, String.format("onError %s", playerStateMachine.getImpressionId()));
         EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState(playerStateMachine.getCurrentState().getName());
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
         data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
 
@@ -236,7 +236,7 @@ public class BitmovinAnalytics
     public void onSeekComplete(long duration) {
         Log.d(TAG, String.format("onSeekComplete %s", playerStateMachine.getImpressionId()));
         EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState(playerStateMachine.getCurrentState().getName());
         data.setSeeked(duration);
         data.setDuration(duration);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
@@ -250,10 +250,10 @@ public class BitmovinAnalytics
                 TAG,
                 String.format(
                         "onHeartbeat %s %s",
-                        playerStateMachine.getCurrentState().toString().toLowerCase(),
+                        playerStateMachine.getCurrentState().getName(),
                         playerStateMachine.getImpressionId()));
         EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState(playerStateMachine.getCurrentState().getName());
         data.setDuration(duration);
 
         if (playerStateMachine.getCurrentState() == PlayerStates.PLAYING) {
@@ -293,7 +293,7 @@ public class BitmovinAnalytics
     public void onQualityChange() {
         Log.d(TAG, String.format("onQualityChange %s", playerStateMachine.getImpressionId()));
         EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState(playerStateMachine.getCurrentState().getName());
         data.setDuration(0);
         sendEventData(data);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
@@ -309,7 +309,7 @@ public class BitmovinAnalytics
     public void onSubtitleChange() {
         Log.d(TAG, String.format("onSubtitleChange %s", playerStateMachine.getImpressionId()));
         EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState(playerStateMachine.getCurrentState().getName());
         data.setDuration(0);
         sendEventData(data);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
@@ -320,7 +320,7 @@ public class BitmovinAnalytics
     public void onAudioTrackChange() {
         Log.d(TAG, String.format("onAudioTrackChange %s", playerStateMachine.getImpressionId()));
         EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState(playerStateMachine.getCurrentState().getName());
         data.setDuration(0);
         sendEventData(data);
         data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
@@ -336,7 +336,7 @@ public class BitmovinAnalytics
         }
 
         EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().toString().toLowerCase());
+        data.setState(playerStateMachine.getCurrentState().getName());
         data.setVideoStartFailed(true);
         ErrorCode errorCode = videoStartFailedReason.getErrorCode();
         if (errorCode != null) {
@@ -412,7 +412,7 @@ public class BitmovinAnalytics
         CustomData currentCustomData = customDataGetter.getCustomData();
         customDataSetter.setCustomData(customData);
         EventData eventData = createEventData();
-        eventData.setState(PlayerStates.CUSTOMDATACHANGE.toString().toLowerCase());
+        eventData.setState(PlayerStates.CUSTOMDATACHANGE.getName());
         sendEventData(eventData);
         customDataSetter.setCustomData(currentCustomData);
     }
