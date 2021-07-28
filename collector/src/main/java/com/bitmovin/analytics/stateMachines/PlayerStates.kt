@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.stateMachines
 
+import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 
 class PlayerStates {
@@ -49,11 +50,11 @@ class PlayerStates {
                 machine.rebufferingTimeout.cancel()
             }
         }
-        @JvmField val ERROR = object : DefaultPlayerState<Void>() {
-            override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
+        @JvmField val ERROR = object : DefaultPlayerState<ErrorCode>() {
+            override fun onEnterState(machine: PlayerStateMachine, data: ErrorCode?) {
                 machine.videoStartTimeout.cancel()
                 for (listener in machine.listeners) {
-                    listener.onError(machine.errorCode)
+                    listener.onError(data)
                 }
             }
 

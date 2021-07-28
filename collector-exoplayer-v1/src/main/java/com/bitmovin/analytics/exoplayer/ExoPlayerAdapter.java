@@ -424,8 +424,7 @@ public class ExoPlayerAdapter
             if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
-            this.stateMachine.setErrorCode(errorCode);
-            this.stateMachine.transitionState(PlayerStates.ERROR, videoTime);
+            this.stateMachine.transitionState(PlayerStates.ERROR, videoTime, errorCode);
 
             // TODO improve exception mapper to also allow passing exception to the error details
             // feature

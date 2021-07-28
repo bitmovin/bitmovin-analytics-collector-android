@@ -7,7 +7,6 @@ import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.CustomDataHelpers;
 import com.bitmovin.analytics.data.CustomData;
-import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.utils.Util;
@@ -29,7 +28,6 @@ public class PlayerStateMachine {
     private long elapsedTimeSeekStart = 0;
     private long videoTimeStart;
     private long videoTimeEnd;
-    private ErrorCode errorCode;
     private String impressionId;
     private Handler heartbeatHandler = new Handler();
     private int currentRebufferingIntervalIndex = 0;
@@ -237,14 +235,6 @@ public class PlayerStateMachine {
         this.elapsedTimeSeekStart = elapsedTimeSeekStart;
     }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
-
-    public void setErrorCode(ErrorCode errorCode) {
-        this.errorCode = errorCode;
-    }
-
     public VideoStartFailedReason getVideoStartFailedReason() {
         return videoStartFailedReason;
     }
@@ -329,9 +319,10 @@ public class PlayerStateMachine {
                 @Override
                 public void onFinish() {
                     Log.d(TAG, "rebufferingTimeout finish");
-                    setErrorCode(
+                    transitionState(
+                            PlayerStates.ERROR,
+                            analytics.getPosition(),
                             AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.getErrorCode());
-                    transitionState(PlayerStates.ERROR, analytics.getPosition());
                     disableRebufferHeartbeat();
                     resetStateMachine();
                 }
