@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.exoplayer
 
 import com.bitmovin.analytics.data.ErrorCode
-import com.bitmovin.analytics.data.ErrorData
+import com.bitmovin.analytics.data.LegacyErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.utils.topOfStacktrace
 import com.google.android.exoplayer2.ExoPlaybackException
@@ -22,26 +22,26 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
 
         val type = getExceptionType(throwable)
         var message = errorMessages[type] ?: "Unknown Error"
-        val legacyErrorData: ErrorData
+        val legacyErrorData: LegacyErrorData
 
         when (val exception = throwable.cause ?: throwable) {
             is HttpDataSource.InvalidResponseCodeException -> {
                 message += ": InvalidResponseCodeException"
-                legacyErrorData = ErrorData("Data Source request failed with HTTP status: " + exception.responseCode + " - " + exception.dataSpec.uri, exception.topOfStacktrace)
+                legacyErrorData = LegacyErrorData("Data Source request failed with HTTP status: " + exception.responseCode + " - " + exception.dataSpec.uri, exception.topOfStacktrace)
             }
             is HttpDataSource.InvalidContentTypeException -> {
                 message += ": InvalidContentTypeException"
-                legacyErrorData = ErrorData("Invalid Content Type: " + exception.contentType, exception.topOfStacktrace)
+                legacyErrorData = LegacyErrorData("Invalid Content Type: " + exception.contentType, exception.topOfStacktrace)
             }
             is HttpDataSource.HttpDataSourceException -> {
                 message += ": HttpDataSourceException"
-                legacyErrorData = ErrorData("Unable to connect: " + exception.dataSpec.uri, exception.topOfStacktrace)
+                legacyErrorData = LegacyErrorData("Unable to connect: " + exception.dataSpec.uri, exception.topOfStacktrace)
             }
             is BehindLiveWindowException -> {
                 message += ": BehindLiveWindowException"
-                legacyErrorData = ErrorData("Behind live window: required segments not available", exception.topOfStacktrace)
+                legacyErrorData = LegacyErrorData("Behind live window: required segments not available", exception.topOfStacktrace)
             }
-            else -> legacyErrorData = ErrorData(exception.message ?: "", exception.topOfStacktrace)
+            else -> legacyErrorData = LegacyErrorData(exception.message ?: "", exception.topOfStacktrace)
         }
         val errorData = com.bitmovin.analytics.features.errordetails.ErrorData(legacyErrorData.msg, legacyErrorData.details.toList())
         return ErrorCode(type, message, errorData, legacyErrorData)

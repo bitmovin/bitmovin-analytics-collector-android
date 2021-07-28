@@ -4,7 +4,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.BuildConfig
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.ErrorCode
-import com.bitmovin.analytics.data.ErrorData
+import com.bitmovin.analytics.data.LegacyErrorData
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import io.mockk.every
@@ -23,7 +23,7 @@ class DataSerializerTest {
         val userIdProvider = mockk<SecureSettingsAndroidIdUserIdProvider>()
         every { userIdProvider.userId() } returns userId
 
-        val errorCode = ErrorCode(1000, "Error Description", ErrorData("Error Data Message", arrayOf("first line of details", "second line of details")))
+        val errorCode = ErrorCode(1000, "Error Description", LegacyErrorData("Error Data Message", arrayOf("first line of details", "second line of details")))
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig(analyticsLicenseKey, playerLicenseKey)
         val eventData = EventDataFactory(bitmovinAnalyticsConfig, userIdProvider).create(impressionId, null, deviceInformation)
 

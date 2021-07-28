@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import com.bitmovin.analytics.data.ErrorCode
-import com.bitmovin.analytics.data.ErrorData
+import com.bitmovin.analytics.data.LegacyErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.topOfStacktrace
@@ -9,7 +9,7 @@ import com.bitmovin.player.api.deficiency.ErrorEvent
 
 class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
     override fun map(event: ErrorEvent): ErrorCode {
-        var legacyErrorData: ErrorData? = null
+        var legacyErrorData: LegacyErrorData? = null
         var additionalData: String? = null
         val errorData: com.bitmovin.analytics.features.errordetails.ErrorData
 
@@ -20,7 +20,7 @@ class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
                 additionalData = DataSerializer.trySerialize(com.bitmovin.analytics.features.errordetails.ErrorData.fromThrowable(cause))
             }
             errorData = com.bitmovin.analytics.features.errordetails.ErrorData.fromThrowable(throwable, additionalData)
-            legacyErrorData = ErrorData(throwable.message ?: "", throwable.topOfStacktrace)
+            legacyErrorData = LegacyErrorData(throwable.message ?: "", throwable.topOfStacktrace)
         } else {
             additionalData = DataSerializer.trySerialize(event.data)
             errorData = com.bitmovin.analytics.features.errordetails.ErrorData(additionalData = additionalData)
