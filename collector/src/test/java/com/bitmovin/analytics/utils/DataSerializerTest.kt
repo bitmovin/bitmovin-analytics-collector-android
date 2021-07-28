@@ -4,8 +4,8 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.BuildConfig
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.ErrorCode
-import com.bitmovin.analytics.data.LegacyErrorData
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.LegacyErrorData
 import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import io.mockk.every
 import io.mockk.mockk
