@@ -8,6 +8,7 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.SystemClock;
 import android.util.Pair;
+import com.bitmovin.analytics.BuildConfig;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -164,5 +165,13 @@ public class Util {
 
     public static String getPlatform(Boolean isTV) {
         return isTV ? "androidTV" : "android";
+    }
+
+    public static String getDomain(Context context) {
+        return context.getPackageName();
+    }
+
+    public static String getAnalyticsVersion() {
+        return BuildConfig.COLLECTOR_CORE_VERSION;
     }
 }

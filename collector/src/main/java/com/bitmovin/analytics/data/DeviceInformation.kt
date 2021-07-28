@@ -6,7 +6,7 @@ data class DeviceInformation(
     val isTV: Boolean,
     val userAgent: String,
     val locale: String,
-    val packageName: String,
+    val domain: String,
     val screenHeight: Int,
     val screenWidth: Int
 )
