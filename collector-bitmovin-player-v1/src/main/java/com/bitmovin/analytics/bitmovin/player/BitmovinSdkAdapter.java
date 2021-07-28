@@ -17,6 +17,7 @@ import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
+import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.PlayerStates;
 import com.bitmovin.analytics.utils.Util;
@@ -507,7 +508,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             return;
                         }
 
-                        PlayerStates originalState = stateMachine.getCurrentState();
+                        PlayerState<?> originalState = stateMachine.getCurrentState();
                         stateMachine.transitionState(PlayerStates.AUDIOTRACKCHANGE, getPosition());
                         stateMachine.transitionState(originalState, getPosition());
                     } catch (Exception e) {
@@ -531,7 +532,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             return;
                         }
 
-                        PlayerStates originalState = stateMachine.getCurrentState();
+                        PlayerState<?> originalState = stateMachine.getCurrentState();
                         stateMachine.transitionState(PlayerStates.SUBTITLECHANGE, getPosition());
                         stateMachine.transitionState(originalState, getPosition());
                     } catch (Exception e) {
@@ -581,7 +582,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             return;
                         }
 
-                        PlayerStates originalState = stateMachine.getCurrentState();
+                        PlayerState<?> originalState = stateMachine.getCurrentState();
                         stateMachine.transitionState(PlayerStates.QUALITYCHANGE, getPosition());
                         stateMachine.transitionState(originalState, getPosition());
                     } catch (Exception e) {
@@ -622,7 +623,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                             return;
                         }
 
-                        PlayerStates originalState = stateMachine.getCurrentState();
+                        PlayerState<?> originalState = stateMachine.getCurrentState();
                         AudioQuality oldQuality =
                                 audioPlaybackQualityChangedEvent.getOldAudioQuality();
                         AudioQuality newQuality =
