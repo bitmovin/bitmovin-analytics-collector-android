@@ -3,6 +3,7 @@ package com.bitmovin.analytics.exoplayer
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.LegacyErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
+import com.bitmovin.analytics.features.errordetails.ErrorData
 import com.bitmovin.analytics.utils.topOfStacktrace
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.source.BehindLiveWindowException
@@ -44,7 +45,7 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
             else -> legacyErrorData = LegacyErrorData(exception.message ?: "", exception.topOfStacktrace)
         }
 
-        val errorData = com.bitmovin.analytics.features.errordetails.ErrorData(legacyErrorData.msg, legacyErrorData.details.toList())
+        val errorData = ErrorData(legacyErrorData.msg, legacyErrorData.details.toList())
         return ErrorCode(type, message, errorData, legacyErrorData)
     }
 
