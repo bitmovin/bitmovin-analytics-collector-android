@@ -678,14 +678,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                                     VideoStartFailedReason.PLAYER_ERROR);
                         }
                         stateMachine.error(videoTime, errorCode);
-
-                        eventBus.notify(
-                                OnErrorDetailEventListener.class,
-                                listener ->
-                                        listener.onError(
-                                                errorEvent.getCode(),
-                                                errorEvent.getMessage(),
-                                                errorEvent.getData()));
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage(), e);
                     }
