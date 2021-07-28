@@ -22,29 +22,29 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
 
         val type = getExceptionType(throwable)
         var message = errorMessages[type] ?: "Unknown Error"
-        var errorData: ErrorData? = null
+        val legacyErrorData: ErrorData
 
         when (val exception = throwable.cause ?: throwable) {
             is HttpDataSource.InvalidResponseCodeException -> {
                 message += ": InvalidResponseCodeException"
-                errorData = ErrorData("Data Source request failed with HTTP status: " + exception.responseCode + " - " + exception.dataSpec.uri, exception.topOfStacktrace)
+                legacyErrorData = ErrorData("Data Source request failed with HTTP status: " + exception.responseCode + " - " + exception.dataSpec.uri, exception.topOfStacktrace)
             }
             is HttpDataSource.InvalidContentTypeException -> {
                 message += ": InvalidContentTypeException"
-                errorData = ErrorData("Invalid Content Type: " + exception.contentType, exception.topOfStacktrace)
+                legacyErrorData = ErrorData("Invalid Content Type: " + exception.contentType, exception.topOfStacktrace)
             }
             is HttpDataSource.HttpDataSourceException -> {
                 message += ": HttpDataSourceException"
-                errorData = ErrorData("Unable to connect: " + exception.dataSpec.uri, exception.topOfStacktrace)
+                legacyErrorData = ErrorData("Unable to connect: " + exception.dataSpec.uri, exception.topOfStacktrace)
             }
             is BehindLiveWindowException -> {
                 message += ": BehindLiveWindowException"
-                errorData = ErrorData("Behind live window: required segments not available", exception.topOfStacktrace)
+                legacyErrorData = ErrorData("Behind live window: required segments not available", exception.topOfStacktrace)
             }
-            else -> errorData = ErrorData(exception.message ?: "", exception.topOfStacktrace)
+            else -> legacyErrorData = ErrorData(exception.message ?: "", exception.topOfStacktrace)
         }
-
-        return ErrorCode(type, message, errorData)
+        val errorData = com.bitmovin.analytics.features.errordetails.ErrorData(legacyErrorData.msg,  legacyErrorData.details.toList())
+        return ErrorCode(type, message, errorData, legacyErrorData)
     }
 
     private fun getExceptionType(throwable: Throwable): Int {
