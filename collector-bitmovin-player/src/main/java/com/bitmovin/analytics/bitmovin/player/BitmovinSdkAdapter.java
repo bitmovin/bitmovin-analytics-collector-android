@@ -415,7 +415,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<PlayerEvent.Playing> playerEventPlayingListener =
             (event) -> {
                 try {
-                    Log.d(TAG, "On Playing Listener " + stateMachine.getCurrentState().toString());
+                    Log.d(TAG, "On Playing Listener " + stateMachine.getCurrentState().getName());
                     stateMachine.transitionState(PlayerStates.PLAYING, getPosition());
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
