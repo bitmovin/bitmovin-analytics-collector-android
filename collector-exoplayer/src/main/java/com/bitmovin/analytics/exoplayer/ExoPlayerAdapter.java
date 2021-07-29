@@ -610,7 +610,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
                                     listener.onError(
                                             errorCode.getErrorCode(),
                                             errorCode.getDescription(),
-                                            errorCode.getErrorData()));
+                                            errorCode.getLegacyErrorData()));
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
                 }
