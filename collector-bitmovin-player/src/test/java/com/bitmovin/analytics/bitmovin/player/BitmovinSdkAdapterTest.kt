@@ -3,6 +3,7 @@ package com.bitmovin.analytics.bitmovin.player
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.Event
 import com.bitmovin.player.api.event.EventListener
@@ -57,10 +58,10 @@ class BitmovinSdkAdapterTest {
         val listenerSlot = slot<EventListener<PlayerEvent.AudioPlaybackQualityChanged>>()
         every { player.on(PlayerEvent.AudioPlaybackQualityChanged::class.java, capture(listenerSlot)) } answers { }
         every { player.currentTime } returns 0.0
-        every { playerStateMachine.currentState } returns PlayerState.PLAYING
+        every { playerStateMachine.currentState } returns PlayerStates.PLAYING
         every { playerStateMachine.isStartupFinished } returns true
         every { playerStateMachine.isQualityChangeEventEnabled } returns true
-        every { playerStateMachine.transitionState(any(), any()) } answers {}
+        every { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) } answers {}
 
         // act
         bitmovinSdkAdapter.init()
@@ -72,8 +73,8 @@ class BitmovinSdkAdapterTest {
         verify { playerStateMachine.isStartupFinished }
         verify { playerStateMachine.isQualityChangeEventEnabled }
 
-        verify(exactly = 1) { playerStateMachine.transitionState(PlayerState.QUALITYCHANGE, any()) }
-        verify(exactly = 1) { playerStateMachine.transitionState(PlayerState.PLAYING, any()) }
+        verify(exactly = 1) { playerStateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
+        verify(exactly = 1) { playerStateMachine.transitionState(PlayerStates.PLAYING, any()) }
     }
 
     @Test
@@ -82,10 +83,10 @@ class BitmovinSdkAdapterTest {
         val listenerSlot = slot<EventListener<PlayerEvent.AudioPlaybackQualityChanged>>()
         every { player.on(PlayerEvent.AudioPlaybackQualityChanged::class.java, capture(listenerSlot)) } answers { }
         every { player.currentTime } returns 0.0
-        every { playerStateMachine.currentState } returns PlayerState.PLAYING
+        every { playerStateMachine.currentState } returns PlayerStates.PLAYING
         every { playerStateMachine.isStartupFinished } returns true
         every { playerStateMachine.isQualityChangeEventEnabled } returns true
-        every { playerStateMachine.transitionState(any(), any()) } answers {}
+        every { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) } answers {}
 
         // act
         bitmovinSdkAdapter.init()
@@ -98,6 +99,6 @@ class BitmovinSdkAdapterTest {
         verify { playerStateMachine.isStartupFinished }
         verify { playerStateMachine.isQualityChangeEventEnabled }
 
-        verify(exactly = 0) { playerStateMachine.transitionState(any(), any()) }
+        verify(exactly = 0) { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) }
     }
 }

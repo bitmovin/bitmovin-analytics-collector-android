@@ -32,6 +32,7 @@ import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
+import com.bitmovin.analytics.stateMachines.PlayerStates;
 import com.bitmovin.analytics.utils.DownloadSpeedMeter;
 import com.bitmovin.analytics.utils.Util;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -132,7 +133,7 @@ public class ExoPlayerAdapter
 
     private void startup(long position) {
         bitrateEventDataManipulator.setFormatsFromPlayer();
-        stateMachine.transitionState(PlayerState.STARTUP, position);
+        stateMachine.transitionState(PlayerStates.STARTUP, position);
         isVideoAttemptedPlay = true;
     }
 
@@ -179,7 +180,7 @@ public class ExoPlayerAdapter
                 Log.d(
                         TAG,
                         "Collector was attached while media source was already playing, transitioning to playing state");
-                stateMachine.transitionState(PlayerState.PLAYING, position);
+                stateMachine.transitionState(PlayerStates.PLAYING, position);
             }
         }
     }
@@ -357,7 +358,7 @@ public class ExoPlayerAdapter
             switch (playbackState) {
                 case Player.STATE_READY:
                     if (this.isPlaying) {
-                        stateMachine.transitionState(PlayerState.PLAYING, getPosition());
+                        stateMachine.transitionState(PlayerStates.PLAYING, getPosition());
                     }
                     break;
                 case Player.STATE_BUFFERING:
@@ -369,19 +370,19 @@ public class ExoPlayerAdapter
                         }
                     } else {
                         if (!this.isPaused
-                                && stateMachine.getCurrentState() != PlayerState.SEEKING) {
-                            this.stateMachine.transitionState(PlayerState.BUFFERING, videoTime);
+                                && stateMachine.getCurrentState() != PlayerStates.SEEKING) {
+                            this.stateMachine.transitionState(PlayerStates.BUFFERING, videoTime);
                         }
                     }
                     break;
                 case Player.STATE_IDLE:
                     // TODO check what this state could mean for analytics?
-                    this.stateMachine.transitionState(PlayerState.READY, videoTime);
+                    this.stateMachine.transitionState(PlayerStates.READY, videoTime);
                     break;
                 case Player.STATE_ENDED:
                     // TODO this is equivalent to BMPs PlaybackFinished Event
                     // should we setup new impression here
-                    this.stateMachine.transitionState(PlayerState.PAUSE, videoTime);
+                    this.stateMachine.transitionState(PlayerStates.PAUSE, videoTime);
                     break;
                 default:
                     Log.d(TAG, "Unknown Player PlayerState encountered");
@@ -424,7 +425,7 @@ public class ExoPlayerAdapter
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
             this.stateMachine.setErrorCode(errorCode);
-            this.stateMachine.transitionState(PlayerState.ERROR, videoTime);
+            this.stateMachine.transitionState(PlayerStates.ERROR, videoTime);
 
             // TODO improve exception mapper to also allow passing exception to the error details
             // feature
@@ -484,7 +485,7 @@ public class ExoPlayerAdapter
         try {
             Log.d(TAG, "onSeekStarted on position: " + eventTime.currentPlaybackPositionMs);
             long videoTime = getPosition();
-            this.stateMachine.transitionState(PlayerState.SEEKING, videoTime);
+            this.stateMachine.transitionState(PlayerStates.SEEKING, videoTime);
         } catch (Exception e) {
             Log.d(TAG, e.getMessage(), e);
         }
@@ -660,12 +661,12 @@ public class ExoPlayerAdapter
     private void handleAudioInputFormatChanged(Format format) {
         Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate));
         long videoTime = getPosition();
-        PlayerState originalState = stateMachine.getCurrentState();
+        PlayerState<?> originalState = stateMachine.getCurrentState();
         try {
-            if (stateMachine.getCurrentState() != PlayerState.PLAYING) return;
+            if (stateMachine.getCurrentState() != PlayerStates.PLAYING) return;
             if (!stateMachine.isQualityChangeEventEnabled()) return;
             if (!bitrateEventDataManipulator.hasAudioFormatChanged(format)) return;
-            stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
+            stateMachine.transitionState(PlayerStates.QUALITYCHANGE, videoTime);
         } finally {
             bitrateEventDataManipulator.setCurrentAudioFormat(format);
         }
@@ -675,12 +676,12 @@ public class ExoPlayerAdapter
     private void handleVideoInputFormatChanged(Format format) {
         Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate));
         long videoTime = getPosition();
-        PlayerState originalState = stateMachine.getCurrentState();
+        PlayerState<?> originalState = stateMachine.getCurrentState();
         try {
-            if (stateMachine.getCurrentState() != PlayerState.PLAYING) return;
+            if (stateMachine.getCurrentState() != PlayerStates.PLAYING) return;
             if (!stateMachine.isQualityChangeEventEnabled()) return;
             if (!bitrateEventDataManipulator.hasVideoFormatChanged(format)) return;
-            stateMachine.transitionState(PlayerState.QUALITYCHANGE, videoTime);
+            stateMachine.transitionState(PlayerStates.QUALITYCHANGE, videoTime);
         } finally {
             bitrateEventDataManipulator.setCurrentVideoFormat(format);
         }

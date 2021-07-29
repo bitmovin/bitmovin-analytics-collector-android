@@ -2,8 +2,8 @@ package com.bitmovin.analytics.exoplayer
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
-import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO
 import com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO
 import com.google.android.exoplayer2.ExoPlayer
@@ -38,7 +38,7 @@ class ExoPlayerAdapterTest {
     fun `no state transition to QualityChange if audio bitrate did not change`() {
         // arrange
         val bitrate = 3000
-        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
+        `when`(stateMachine.currentState).thenReturn(PlayerStates.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
         adapter.fakePosition = 20
 
@@ -46,20 +46,20 @@ class ExoPlayerAdapterTest {
         adapter.onDecoderInputFormatChanged(getEventTime(20L), TRACK_TYPE_AUDIO, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
 
         // assert
-        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+        verify(stateMachine, times(1)).transitionState(eq(PlayerStates.QUALITYCHANGE), ArgumentMatchers.anyLong())
 
         // act
         adapter.onDecoderInputFormatChanged(getEventTime(30L), TRACK_TYPE_AUDIO, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
 
         // assert
-        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+        verify(stateMachine, times(1)).transitionState(eq(PlayerStates.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
     @Test
     fun `no state transition to QualityChange if video bitrate did not change`() {
         // arrange
         val bitrate = 3000
-        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
+        `when`(stateMachine.currentState).thenReturn(PlayerStates.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
         adapter.fakePosition = 20
 
@@ -67,20 +67,20 @@ class ExoPlayerAdapterTest {
         adapter.onDecoderInputFormatChanged(getEventTime(20L), TRACK_TYPE_VIDEO, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
 
         // assert
-        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+        verify(stateMachine, times(1)).transitionState(eq(PlayerStates.QUALITYCHANGE), ArgumentMatchers.anyLong())
 
         // act
         adapter.onDecoderInputFormatChanged(getEventTime(30L), TRACK_TYPE_VIDEO, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
 
         // assert
-        verify(stateMachine, times(1)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+        verify(stateMachine, times(1)).transitionState(eq(PlayerStates.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
     @Test
     fun `no state transition to QualityChange if quality change limit reached`() {
         // arrange
         val bitrate = 3000
-        `when`(stateMachine.currentState).thenReturn(PlayerState.PLAYING)
+        `when`(stateMachine.currentState).thenReturn(PlayerStates.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
         adapter.fakePosition = 20
 
@@ -89,7 +89,7 @@ class ExoPlayerAdapterTest {
         adapter.onDecoderInputFormatChanged(getEventTime(20L), TRACK_TYPE_AUDIO, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
 
         // assert
-        verify(stateMachine, times(0)).transitionState(eq(PlayerState.QUALITYCHANGE), ArgumentMatchers.anyLong())
+        verify(stateMachine, times(0)).transitionState(eq(PlayerStates.QUALITYCHANGE), ArgumentMatchers.anyLong())
     }
 
     private fun getEventTime(realTime: Long): AnalyticsListener.EventTime {
