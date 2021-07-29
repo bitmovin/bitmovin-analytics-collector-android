@@ -2,6 +2,7 @@ package com.bitmovin.analytics.bitmovin.player;
 
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.EventBus;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
@@ -15,6 +16,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureFactory;
+import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -49,6 +51,7 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean isVideoAttemptedPlay = false;
     private FeatureFactory featureFactory;
     private final Map<Source, SourceMetadata> sourceMetadataMap;
+    private final EventBus eventBus;
 
     // When transitioning in a Playlist, BitmovinPlayer will already return the
     // new source in `getSource`, but we are still interested in sending a sample
@@ -63,13 +66,15 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
             FeatureFactory featureFactory,
-            Map<Source, SourceMetadata> sourceMetadataMap) {
+            Map<Source, SourceMetadata> sourceMetadataMap,
+            EventBus eventBus) {
         this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
         this.deviceInformationProvider = deviceInformationProvider;
         this.sourceMetadataMap = sourceMetadataMap;
+        this.eventBus = eventBus;
     }
 
     public Collection<Feature<FeatureConfigContainer, ?>> init() {
@@ -625,16 +630,16 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private final EventListener<PlayerEvent.Error> playerErrorEventListener =
             (event) -> {
                 Log.d(TAG, "onPlayerError");
-                handleErrorEvent(exceptionMapper.map(event));
+                handleErrorEvent(event, exceptionMapper.map(event));
             };
 
     private final EventListener<SourceEvent.Error> sourceErrorEventListener =
             (event) -> {
                 Log.d(TAG, "onSourceError");
-                handleErrorEvent(exceptionMapper.map(event));
+                handleErrorEvent(event, exceptionMapper.map(event));
             };
 
-    private void handleErrorEvent(ErrorCode errorCode) {
+    private void handleErrorEvent(ErrorEvent event, ErrorCode errorCode) {
         try {
             long videoTime = getPosition();
 
@@ -643,6 +648,14 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
             stateMachine.transitionState(PlayerState.ERROR, videoTime);
+
+            eventBus.notify(
+                    OnErrorDetailEventListener.class,
+                    listener ->
+                            listener.onError(
+                                    event.getCode().getValue(),
+                                    event.getMessage(),
+                                    event.getData()));
         } catch (Exception e) {
             Log.d(TAG, e.getMessage(), e);
         }

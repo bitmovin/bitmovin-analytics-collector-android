@@ -7,6 +7,7 @@ import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventLi
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.features.segmenttracking.Segment
 import com.bitmovin.analytics.features.segmenttracking.SegmentType
+import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.SourceEvent
 import com.bitmovin.player.api.network.HttpRequestType
@@ -16,7 +17,7 @@ class BitmovinSegmentTrackingAdapter(private val player: Player, private val onA
 
     private val sourceEventDownloadFinishedListener: (SourceEvent.DownloadFinished) -> Unit = { event ->
         val segmentType = mapHttpRequestType(event.downloadType)
-        val segmentInfo = Segment(event.timestamp, segmentType, event.url, event.lastRedirectLocation, event.httpStatus, event.downloadTime, null, event.size, event.isSuccess)
+        val segmentInfo = Segment(Util.getTimestamp(), segmentType, event.url, event.lastRedirectLocation, event.httpStatus, Util.secondsToMillis(event.downloadTime), null, event.size, event.isSuccess)
         observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segmentInfo)) }
     }
 
