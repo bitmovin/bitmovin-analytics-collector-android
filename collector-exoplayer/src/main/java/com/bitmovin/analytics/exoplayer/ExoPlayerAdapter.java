@@ -10,6 +10,7 @@ import static com.google.android.exoplayer2.C.WIDEVINE_UUID;
 import android.util.Log;
 import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.EventBus;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
@@ -24,6 +25,8 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.exoplayer.manipulators.BitrateEventDataManipulator;
 import com.bitmovin.analytics.features.Feature;
+import com.bitmovin.analytics.features.FeatureFactory;
+import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -47,7 +50,6 @@ import com.google.android.exoplayer2.source.hls.HlsManifest;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import org.jetbrains.annotations.NotNull;
@@ -78,6 +80,8 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     private boolean isInInitialBufferState = false;
     protected final DefaultAnalyticsListener defaultAnalyticsListener;
     protected final DefaultPlayerEventListener defaultPlayerEventListener;
+    private FeatureFactory featureFactory;
+    private final EventBus eventBus;
 
     private long drmLoadStartTime = 0;
     private Long drmDownloadTime = null;
@@ -87,7 +91,11 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             ExoPlayer exoplayer,
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
-            PlayerStateMachine stateMachine) {
+            PlayerStateMachine stateMachine,
+            FeatureFactory featureFactory,
+            EventBus eventBus) {
+        this.eventBus = eventBus;
+        this.featureFactory = featureFactory;
         this.defaultAnalyticsListener = createAnalyticsListener();
         this.defaultPlayerEventListener = createPlayerEventListener();
         this.stateMachine = stateMachine;
@@ -136,7 +144,7 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
         this.isVideoAttemptedPlay = false;
         isPlaying = false;
         checkAutoplayStartup();
-        return new ArrayList<>();
+        return featureFactory.createFeatures();
     }
 
     @Override
@@ -589,6 +597,19 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
                     ExoPlayerAdapter.this.stateMachine.setErrorCode(errorCode);
                     ExoPlayerAdapter.this.stateMachine.transitionState(
                             PlayerState.ERROR, videoTime);
+
+                    // TODO improve exception mapper to also allow passing exception to the error
+                    // details feature
+                    // Maybe the eventBus should already get the full extracted `ErrorDetail`,
+                    // instead
+                    // of parsing and prettifying throwables itself
+                    eventBus.notify(
+                            OnErrorDetailEventListener.class,
+                            listener ->
+                                    listener.onError(
+                                            errorCode.getErrorCode(),
+                                            errorCode.getDescription(),
+                                            errorCode.getErrorData()));
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage(), e);
                 }
