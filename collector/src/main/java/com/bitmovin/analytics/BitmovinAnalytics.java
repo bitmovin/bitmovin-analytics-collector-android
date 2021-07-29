@@ -228,7 +228,7 @@ public class BitmovinAnalytics
 
         data.setErrorCode(errorCode.getErrorCode());
         data.setErrorMessage(errorCode.getDescription());
-        data.setErrorData(serialize(errorCode.getErrorData()));
+        data.setErrorData(serialize(errorCode.getLegacyErrorData()));
         sendEventData(data);
     }
 
@@ -346,7 +346,7 @@ public class BitmovinAnalytics
         if (errorCode != null) {
             data.setErrorCode(errorCode.getErrorCode());
             data.setErrorMessage(errorCode.getDescription());
-            data.setErrorData(serialize(errorCode.getErrorData()));
+            data.setErrorData(serialize(errorCode.getLegacyErrorData()));
             eventBus.notify(
                     OnErrorDetailEventListener.class,
                     listener ->

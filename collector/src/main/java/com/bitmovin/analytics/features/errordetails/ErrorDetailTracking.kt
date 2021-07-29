@@ -72,7 +72,7 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
             return ErrorData(data.message, data.topOfStacktrace.toList(), additionalData)
         }
         // TODO rework duplicate ErrorData class
-        else if (data is com.bitmovin.analytics.data.ErrorData) {
+        else if (data is com.bitmovin.analytics.data.LegacyErrorData) {
             return ErrorData(data.msg, data.details.toList(), null)
         }
         try {
