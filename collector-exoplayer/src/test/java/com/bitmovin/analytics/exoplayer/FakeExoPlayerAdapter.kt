@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.exoplayer
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.EventBus
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
 import com.bitmovin.analytics.features.FeatureFactory
@@ -13,9 +12,8 @@ class FakeExoPlayerAdapter(
     config: BitmovinAnalyticsConfig,
     deviceInformationProvider: DeviceInformationProvider,
     stateMachine: PlayerStateMachine,
-    featureFactory: FeatureFactory,
-    eventBus: EventBus
-) : ExoPlayerAdapter(exoplayer, config, deviceInformationProvider, stateMachine, featureFactory, eventBus) {
+    featureFactory: FeatureFactory
+) : ExoPlayerAdapter(exoplayer, config, deviceInformationProvider, stateMachine, featureFactory) {
 
     var fakePosition: Long = 0
 

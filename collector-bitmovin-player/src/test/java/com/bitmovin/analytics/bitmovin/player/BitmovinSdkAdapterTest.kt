@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import com.bitmovin.analytics.config.SourceMetadata
+import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.player.api.Player
@@ -34,7 +35,7 @@ class BitmovinSdkAdapterTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), mockk(), playerStateMachine, mockk(relaxed = true), sourceMap, mockk())
+        bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), mockk(), playerStateMachine, mockk(relaxed = true), sourceMap)
     }
 
     @Test
@@ -60,7 +61,7 @@ class BitmovinSdkAdapterTest {
         every { playerStateMachine.currentState } returns PlayerStates.PLAYING
         every { playerStateMachine.isStartupFinished } returns true
         every { playerStateMachine.isQualityChangeEventEnabled } returns true
-        every { playerStateMachine.transitionState(any(), any()) } answers {}
+        every { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) } answers {}
 
         // act
         bitmovinSdkAdapter.init()
@@ -85,7 +86,7 @@ class BitmovinSdkAdapterTest {
         every { playerStateMachine.currentState } returns PlayerStates.PLAYING
         every { playerStateMachine.isStartupFinished } returns true
         every { playerStateMachine.isQualityChangeEventEnabled } returns true
-        every { playerStateMachine.transitionState(any(), any()) } answers {}
+        every { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) } answers {}
 
         // act
         bitmovinSdkAdapter.init()
@@ -98,6 +99,6 @@ class BitmovinSdkAdapterTest {
         verify { playerStateMachine.isStartupFinished }
         verify { playerStateMachine.isQualityChangeEventEnabled }
 
-        verify(exactly = 0) { playerStateMachine.transitionState(any(), any()) }
+        verify(exactly = 0) { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) }
     }
 }
