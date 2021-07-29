@@ -5,7 +5,7 @@ import com.bitmovin.analytics.utils.DataSerializer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
-class ErrorDataTest {
+class LegacyErrorDataTest {
     @Test
     fun serializeErrorData() {
         val errorData = LegacyErrorData("Our message", arrayOf("stack1", "stack2"))

@@ -150,19 +150,15 @@ public class ExoPlayerAdapter
     }
 
     /*
-     * Because of the late initialization of the Adapter we do not get the first
-     * couple of events so in case the player starts a video due to autoplay=true we
-     * need to transition into startup state manually
-     */
+     Because of the late initialization of the Adapter we do not get the first couple of events
+     so in case the player starts a video due to autoplay=true we need to transition into startup state manually
+    */
     private void checkAutoplayStartup() {
         int playbackState = exoplayer.getPlaybackState();
 
         boolean isBufferingAndWillAutoPlay =
                 exoplayer.getPlayWhenReady() && playbackState == Player.STATE_BUFFERING;
-        /*
-         * Even if flag was set as `player.setPlayWhenReady(false)`, when player is
-         * playing, flags is returned as `true`
-         */
+        /* Even if flag was set as `player.setPlayWhenReady(false)`, when player is playing, flags is returned as `true` */
         boolean isAlreadyPlaying =
                 exoplayer.getPlayWhenReady() && playbackState == Player.STATE_READY;
 
@@ -314,10 +310,7 @@ public class ExoPlayerAdapter
     @Override
     public void onTimelineChanged(
             Timeline timeline, @androidx.annotation.Nullable Object manifest, int reason) {
-        /*
-         * On some devices ExoPlayer crashes if not every method is overridden, despite
-         * a default implementation in their code.
-         */
+        /* On some devices ExoPlayer crashes if not every method is overridden, despite a default implementation in their code. */
     }
 
     @Override
@@ -333,10 +326,7 @@ public class ExoPlayerAdapter
     @Override
     public void onPlayerStateChanged(
             EventTime eventTime, boolean playWhenReady, int playbackState) {
-        /*
-         * On some devices ExoPlayer crashes if not every method is overridden, despite
-         * a default implementation in their code.
-         */
+        /* On some devices ExoPlayer crashes if not every method is overridden, despite a default implementation in their code. */
     }
 
     @Override
@@ -460,10 +450,7 @@ public class ExoPlayerAdapter
 
     @Override
     public void onIsPlayingChanged(boolean isPlaying) {
-        /*
-         * On some devices ExoPlayer crashes if not every method is overridden, despite
-         * a default implementation in their code.
-         */
+        /* On some devices ExoPlayer crashes if not every method is overridden, despite a default implementation in their code. */
     }
 
     @Override
