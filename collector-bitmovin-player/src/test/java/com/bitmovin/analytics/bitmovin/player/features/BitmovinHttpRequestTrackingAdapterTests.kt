@@ -22,7 +22,7 @@ class BitmovinHttpRequestTrackingAdapterTests {
         val player = mockk<Player>(relaxed = true)
 
         // act
-        val adapter = BitmovinSegmentTrackingAdapter(player, analyticsReleasing)
+        val adapter = BitmovinHttpRequestTrackingAdapter(player, analyticsReleasing)
 
         // arrange
         verify { analyticsReleasing.subscribe(adapter) }
@@ -34,7 +34,7 @@ class BitmovinHttpRequestTrackingAdapterTests {
         // arrange
         val analyticsReleasing = ObservableSupport<OnAnalyticsReleasingEventListener>()
         val player = mockk<Player>(relaxed = true)
-        val adapter = BitmovinSegmentTrackingAdapter(player, analyticsReleasing)
+        val adapter = BitmovinHttpRequestTrackingAdapter(player, analyticsReleasing)
         mockkObject(adapter)
 
         // act
@@ -57,7 +57,7 @@ class BitmovinHttpRequestTrackingAdapterTests {
         val player = mockk<Player>(relaxed = true)
         val slot = slot<(SourceEvent.DownloadFinished) -> Unit>()
         every { player.on(any(), capture(slot)) }.answers {}
-        val adapter = BitmovinSegmentTrackingAdapter(player, mockk(relaxed = true))
+        val adapter = BitmovinHttpRequestTrackingAdapter(player, mockk(relaxed = true))
 
         // act
         val adapterSubscribeListener = mockk<OnDownloadFinishedEventListener>(relaxed = true)
