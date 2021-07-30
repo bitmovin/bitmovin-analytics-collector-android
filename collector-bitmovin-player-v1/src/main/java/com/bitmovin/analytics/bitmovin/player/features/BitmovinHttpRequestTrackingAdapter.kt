@@ -9,6 +9,7 @@ import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
+import com.bitmovin.player.config.network.HttpRequestType
 
 class BitmovinHttpRequestTrackingAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
@@ -24,17 +25,17 @@ class BitmovinHttpRequestTrackingAdapter(private val player: BitmovinPlayer, pri
 
     private fun mapHttpRequestType(requestType: HttpRequestType?): com.bitmovin.analytics.features.httprequesttracking.HttpRequestType {
         return when (requestType) {
-            HttpRequestType.DRM_LICENSE_WIDEVINE -> HttpRequestType.DRM_LICENSE_WIDEVINE
-            HttpRequestType.MEDIA_THUMBNAILS -> HttpRequestType.MEDIA_THUMBNAILS
-            HttpRequestType.MANIFEST_DASH -> HttpRequestType.MANIFEST_DASH
-            HttpRequestType.MANIFEST_HLS_MASTER -> HttpRequestType.MANIFEST_HLS_MASTER
-            HttpRequestType.MANIFEST_HLS_VARIANT -> HttpRequestType.MANIFEST_HLS_VARIANT
-            HttpRequestType.MANIFEST_SMOOTH -> HttpRequestType.MANIFEST_SMOOTH
-            HttpRequestType.KEY_HLS_AES -> HttpRequestType.KEY_HLS_AES
-            HttpRequestType.MEDIA_AUDIO -> HttpRequestType.MEDIA_AUDIO
-            HttpRequestType.MEDIA_SUBTITLES -> HttpRequestType.MEDIA_SUBTITLES
-            HttpRequestType.MEDIA_VIDEO -> HttpRequestType.MEDIA_VIDEO
-            else -> HttpRequestType.UNKNOWN
+            HttpRequestType.DRM_LICENSE_WIDEVINE -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.DRM_LICENSE_WIDEVINE
+            HttpRequestType.MEDIA_THUMBNAILS -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.MEDIA_THUMBNAILS
+            HttpRequestType.MANIFEST_DASH -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.MANIFEST_DASH
+            HttpRequestType.MANIFEST_HLS_MASTER -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.MANIFEST_HLS_MASTER
+            HttpRequestType.MANIFEST_HLS_VARIANT -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.MANIFEST_HLS_VARIANT
+            HttpRequestType.MANIFEST_SMOOTH -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.MANIFEST_SMOOTH
+            HttpRequestType.KEY_HLS_AES -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.KEY_HLS_AES
+            HttpRequestType.MEDIA_AUDIO -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.MEDIA_AUDIO
+            HttpRequestType.MEDIA_SUBTITLES -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.MEDIA_SUBTITLES
+            HttpRequestType.MEDIA_VIDEO -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.MEDIA_VIDEO
+            else -> com.bitmovin.analytics.features.httprequesttracking.HttpRequestType.UNKNOWN
         }
     }
 
