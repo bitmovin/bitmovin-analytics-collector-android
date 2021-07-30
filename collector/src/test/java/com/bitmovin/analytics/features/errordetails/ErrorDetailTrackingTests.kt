@@ -56,19 +56,19 @@ class ErrorDetailTrackingTests {
     fun testLimitsQueuedItemsAfterConfiguringFeature() {
         val support = ObservableSupport<OnErrorDetailEventListener>()
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val segmentTracking = HttpRequestTracking()
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking, support)
+        val httpRequestTracking = HttpRequestTracking()
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking, support)
         errorDetailTracking.configured(true, ErrorDetailTrackingConfig(true, 100))
-        verify { backend.limitHttpRequestsInQueue(segmentTracking.maxRequests) }
+        verify { backend.limitHttpRequestsInQueue(httpRequestTracking.maxRequests) }
     }
 
     @Test
     fun testAddsSegmentsOnError() {
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val segmentTracking = HttpRequestTracking()
-        segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
-        segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking)
+        val httpRequestTracking = HttpRequestTracking()
+        httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
+        httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking)
         errorDetailTracking.onError(null, null, ErrorData())
         val slot = slot<ErrorDetail>()
         verify { backend.send(capture(slot)) }
@@ -79,11 +79,11 @@ class ErrorDetailTrackingTests {
     @Test
     fun testDoesntAddSegmentsOnErrorIfSegmentTrackingIsDisabled() {
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val segmentTracking = HttpRequestTracking()
-        segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
-        segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
-        segmentTracking.disable()
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking)
+        val httpRequestTracking = HttpRequestTracking()
+        httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
+        httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
+        httpRequestTracking.disable()
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking)
         errorDetailTracking.onError(null, null, ErrorData())
         val slot = slot<ErrorDetail>()
         verify { backend.send(capture(slot)) }
