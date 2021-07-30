@@ -8,59 +8,59 @@ import org.junit.Test
 class HttpRequestTrackingTests {
     @Test
     fun testSuccessfullyUsesDefaultConfigurationValuesIfNoConfigurationIsApplied() {
-        val segmentTracking = HttpRequestTracking()
-        assertThat(segmentTracking.maxRequests).isEqualTo(HttpRequestTracking.defaultMaxRequests)
+        val httpRequestTracking = HttpRequestTracking()
+        assertThat(httpRequestTracking.maxRequests).isEqualTo(HttpRequestTracking.defaultMaxRequests)
     }
 
     @Test
     fun testSuccessfullyAddsSegmentsFromMultipleSources() {
         val support1 = ObservableSupport<OnDownloadFinishedEventListener>()
         val support2 = ObservableSupport<OnDownloadFinishedEventListener>()
-        val segmentTracking = HttpRequestTracking(support1, support2)
+        val httpRequestTracking = HttpRequestTracking(support1, support2)
         support1.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support1.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support2.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support2.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.httpRequests.size).isEqualTo(4)
+        assertThat(httpRequestTracking.httpRequests.size).isEqualTo(4)
     }
 
     @Test
     fun testSuccessfullyAddsSegmentsAndLimitsQueue() {
         val support = ObservableSupport<OnDownloadFinishedEventListener>()
-        val segmentTracking = HttpRequestTracking(support)
-        segmentTracking.configure(3)
+        val httpRequestTracking = HttpRequestTracking(support)
+        httpRequestTracking.configure(3)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.httpRequests.size).isEqualTo(3)
+        assertThat(httpRequestTracking.httpRequests.size).isEqualTo(3)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.httpRequests.size).isEqualTo(3)
+        assertThat(httpRequestTracking.httpRequests.size).isEqualTo(3)
     }
 
     @Test
     fun testSuccessfullyLimitsQueueOnConfiguring() {
         val support = ObservableSupport<OnDownloadFinishedEventListener>()
-        val segmentTracking = HttpRequestTracking(support)
+        val httpRequestTracking = HttpRequestTracking(support)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.httpRequests.size).isEqualTo(4)
-        segmentTracking.configure(3)
-        assertThat(segmentTracking.httpRequests.size).isEqualTo(3)
+        assertThat(httpRequestTracking.httpRequests.size).isEqualTo(4)
+        httpRequestTracking.configure(3)
+        assertThat(httpRequestTracking.httpRequests.size).isEqualTo(3)
     }
 
     @Test
     fun testSuccessfullyRemovesSourcesAndClearsQueueOnDisabling() {
         val support = ObservableSupport<OnDownloadFinishedEventListener>()
-        val segmentTracking = HttpRequestTracking(support)
+        val httpRequestTracking = HttpRequestTracking(support)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.httpRequests.size).isEqualTo(2)
-        segmentTracking.disable()
-        assertThat(segmentTracking.httpRequests.size).isEqualTo(0)
+        assertThat(httpRequestTracking.httpRequests.size).isEqualTo(2)
+        httpRequestTracking.disable()
+        assertThat(httpRequestTracking.httpRequests.size).isEqualTo(0)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.httpRequests.size).isEqualTo(0)
+        assertThat(httpRequestTracking.httpRequests.size).isEqualTo(0)
     }
 }
