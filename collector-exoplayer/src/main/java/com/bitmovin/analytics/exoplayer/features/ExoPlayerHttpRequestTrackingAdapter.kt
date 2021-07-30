@@ -5,10 +5,10 @@ import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.exoplayer.DefaultAnalyticsListener
-import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
-import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestType
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Format

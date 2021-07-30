@@ -1,8 +1,8 @@
 package com.bitmovin.analytics.features.errordetails
 
 import com.bitmovin.analytics.ObservableSupport
-import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
 import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.mockkObject
