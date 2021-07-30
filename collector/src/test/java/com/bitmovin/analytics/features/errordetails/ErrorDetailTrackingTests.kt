@@ -72,8 +72,8 @@ class ErrorDetailTrackingTests {
         errorDetailTracking.onError(null, null, ErrorData())
         val slot = slot<ErrorDetail>()
         verify { backend.send(capture(slot)) }
-        assertThat(slot.captured.segments).isNotNull
-        assertThat(slot.captured.segments?.size).isEqualTo(2)
+        assertThat(slot.captured.httpRequests).isNotNull
+        assertThat(slot.captured.httpRequests?.size).isEqualTo(2)
     }
 
     @Test
@@ -87,6 +87,6 @@ class ErrorDetailTrackingTests {
         errorDetailTracking.onError(null, null, ErrorData())
         val slot = slot<ErrorDetail>()
         verify { backend.send(capture(slot)) }
-        assertThat(slot.captured.segments?.size ?: 0).isEqualTo(0)
+        assertThat(slot.captured.httpRequests?.size ?: 0).isEqualTo(0)
     }
 }

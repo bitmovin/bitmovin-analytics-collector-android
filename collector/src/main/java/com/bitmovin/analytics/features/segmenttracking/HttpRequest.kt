@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.features.segmenttracking
 
-data class Segment(
+data class HttpRequest(
     val timestamp: Long,
     val segmentType: SegmentType,
     val url: String?,

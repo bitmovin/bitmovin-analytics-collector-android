@@ -48,7 +48,7 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         if (!isEnabled) {
             return
         }
-        val segments = segmentTracking?.segments?.toMutableList()
+        val segments = segmentTracking?.httpRequests?.toMutableList()
         val errorIndex = errorIndex
         this.errorIndex++
         val platform = Util.getPlatform(Util.isTVDevice(context))

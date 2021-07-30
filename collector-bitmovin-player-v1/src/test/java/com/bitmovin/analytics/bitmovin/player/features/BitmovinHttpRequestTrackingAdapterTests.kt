@@ -14,7 +14,7 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Test
 
-class BitmovinSegmentTrackingAdapterTests {
+class BitmovinHttpRequestTrackingAdapterTests {
     @Test
     fun testWiresToEvents() {
         val analyticsReleasing = mockk<Observable<OnAnalyticsReleasingEventListener>>(relaxed = true)

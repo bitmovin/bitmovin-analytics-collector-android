@@ -2,7 +2,7 @@ package com.bitmovin.analytics.features.errordetails
 
 import android.content.Context
 import com.bitmovin.analytics.CollectorConfig
-import com.bitmovin.analytics.features.segmenttracking.Segment
+import com.bitmovin.analytics.features.segmenttracking.HttpRequest
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.HttpClient
 import com.bitmovin.analytics.utils.Util
@@ -52,11 +52,11 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
         fun ErrorDetail.copyTruncateStringsAndUrls(maxStringLength: Int, maxUrlLength: Int): ErrorDetail = this.copy(
                 message = message?.take(maxStringLength),
                 data = data.copyTruncateStrings(maxStringLength),
-                segments = segments?.map {
+                httpRequests = httpRequests?.map {
                     it.copyTruncateUrls(maxUrlLength)
                 })
 
-        private fun Segment.copyTruncateUrls(maxLength: Int) = this.copy(
+        private fun HttpRequest.copyTruncateUrls(maxLength: Int) = this.copy(
                 url = url?.take(maxLength),
                 lastRedirectLocation = lastRedirectLocation?.take(maxLength))
 
@@ -65,6 +65,6 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
                 additionalData = additionalData?.take(maxStringLength)
         )
 
-        fun ErrorDetail.copyTruncateSegments(maxSegments: Int) = this.copy(segments = segments?.take(maxSegments))
+        fun ErrorDetail.copyTruncateSegments(maxSegments: Int) = this.copy(httpRequests = httpRequests?.take(maxSegments))
     }
 }

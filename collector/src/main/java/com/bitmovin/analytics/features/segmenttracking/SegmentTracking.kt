@@ -12,13 +12,13 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
     companion object {
         const val defaultMaxSegments = 10
     }
-    private val segmentQueue: Queue<Segment> = LinkedList()
+    private val httpRequestQueue: Queue<HttpRequest> = LinkedList()
 
     var maxSegments = defaultMaxSegments
         private set
 
-    val segments: Collection<Segment>
-        get() = segmentQueue
+    val httpRequests: Collection<HttpRequest>
+        get() = httpRequestQueue
 
     init {
         observables.forEach { it.subscribe(this) }
@@ -26,25 +26,25 @@ class SegmentTracking(private vararg val observables: Observable<OnDownloadFinis
 
     fun configure(maxSegments: Int) {
         this.maxSegments = maxSegments
-        segmentQueue.limit(maxSegments)
+        httpRequestQueue.limit(maxSegments)
     }
 
     fun disable() {
         observables.forEach { it.unsubscribe(this) }
-        segmentQueue.clear()
+        httpRequestQueue.clear()
     }
 
     fun reset() {
-        segmentQueue.clear()
+        httpRequestQueue.clear()
     }
 
     override fun onDownloadFinished(event: OnDownloadFinishedEventObject) {
-        Log.d("SegmentTracking", "onDownloadFinished: ${DataSerializer.serialize(event.segment)}")
-        addSegment(event.segment)
+        Log.d("SegmentTracking", "onDownloadFinished: ${DataSerializer.serialize(event.httpRequest)}")
+        addSegment(event.httpRequest)
     }
 
-    private fun addSegment(segment: Segment) {
-        segmentQueue.offer(segment)
-        segmentQueue.limit(maxSegments)
+    private fun addSegment(httpRequest: HttpRequest) {
+        httpRequestQueue.offer(httpRequest)
+        httpRequestQueue.limit(maxSegments)
     }
 }

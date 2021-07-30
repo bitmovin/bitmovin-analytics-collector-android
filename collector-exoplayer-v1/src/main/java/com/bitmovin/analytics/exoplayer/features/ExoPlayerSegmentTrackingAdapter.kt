@@ -5,10 +5,9 @@ import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.exoplayer.DefaultAnalyticsListener
-import com.bitmovin.analytics.exoplayer.features.ExoPlayerSegmentTrackingAdapter.Companion.mediaSourceFromReflection
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
-import com.bitmovin.analytics.features.segmenttracking.Segment
+import com.bitmovin.analytics.features.segmenttracking.HttpRequest
 import com.bitmovin.analytics.features.segmenttracking.SegmentType
 import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.C
@@ -180,9 +179,9 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
             return SegmentType.UNKNOWN
         }
 
-        private fun mapLoadCompletedArgsToSegment(player: SimpleExoPlayer, eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData, statusCode: Int, success: Boolean): Segment {
+        private fun mapLoadCompletedArgsToSegment(player: SimpleExoPlayer, eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData, statusCode: Int, success: Boolean): HttpRequest {
             val segmentType = mapDataType(player, eventTime, loadEventInfo.uri, mediaLoadData.dataType, mediaLoadData.trackType, mediaLoadData.trackFormat)
-            return Segment(Util.getTimestamp(), segmentType, loadEventInfo.dataSpec.uri.toString(), loadEventInfo.uri.toString(), statusCode, loadEventInfo.loadDurationMs, null, loadEventInfo.bytesLoaded, success)
+            return HttpRequest(Util.getTimestamp(), segmentType, loadEventInfo.dataSpec.uri.toString(), loadEventInfo.uri.toString(), statusCode, loadEventInfo.loadDurationMs, null, loadEventInfo.bytesLoaded, success)
         }
     }
 }

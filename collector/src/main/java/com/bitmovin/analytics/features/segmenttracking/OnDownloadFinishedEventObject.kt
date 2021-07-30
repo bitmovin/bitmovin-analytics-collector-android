@@ -1,3 +1,3 @@
 package com.bitmovin.analytics.features.segmenttracking
 
-data class OnDownloadFinishedEventObject(val segment: Segment)
+data class OnDownloadFinishedEventObject(val httpRequest: HttpRequest)

@@ -5,7 +5,7 @@ import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
-class SegmentTrackingTests {
+class HttpRequestTrackingTests {
     @Test
     fun testSuccessfullyUsesDefaultConfigurationValuesIfNoConfigurationIsApplied() {
         val segmentTracking = SegmentTracking()
@@ -21,7 +21,7 @@ class SegmentTrackingTests {
         support1.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support2.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support2.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.segments.size).isEqualTo(4)
+        assertThat(segmentTracking.httpRequests.size).isEqualTo(4)
     }
 
     @Test
@@ -33,9 +33,9 @@ class SegmentTrackingTests {
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.segments.size).isEqualTo(3)
+        assertThat(segmentTracking.httpRequests.size).isEqualTo(3)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.segments.size).isEqualTo(3)
+        assertThat(segmentTracking.httpRequests.size).isEqualTo(3)
     }
 
     @Test
@@ -46,9 +46,9 @@ class SegmentTrackingTests {
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.segments.size).isEqualTo(4)
+        assertThat(segmentTracking.httpRequests.size).isEqualTo(4)
         segmentTracking.configure(3)
-        assertThat(segmentTracking.segments.size).isEqualTo(3)
+        assertThat(segmentTracking.httpRequests.size).isEqualTo(3)
     }
 
     @Test
@@ -57,10 +57,10 @@ class SegmentTrackingTests {
         val segmentTracking = SegmentTracking(support)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.segments.size).isEqualTo(2)
+        assertThat(segmentTracking.httpRequests.size).isEqualTo(2)
         segmentTracking.disable()
-        assertThat(segmentTracking.segments.size).isEqualTo(0)
+        assertThat(segmentTracking.httpRequests.size).isEqualTo(0)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
-        assertThat(segmentTracking.segments.size).isEqualTo(0)
+        assertThat(segmentTracking.httpRequests.size).isEqualTo(0)
     }
 }
