@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.features.httprequesttracking
 
-enum class SegmentType {
+enum class HttpRequestType {
     DRM_LICENSE_WIDEVINE,
     DRM_OTHER,
     MEDIA_THUMBNAILS,

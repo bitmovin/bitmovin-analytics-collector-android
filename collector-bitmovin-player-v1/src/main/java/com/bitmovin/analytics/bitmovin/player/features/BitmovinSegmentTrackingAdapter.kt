@@ -6,11 +6,9 @@ import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
-import com.bitmovin.analytics.features.httprequesttracking.SegmentType
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
-import com.bitmovin.player.config.network.HttpRequestType
 
 class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
@@ -24,19 +22,19 @@ class BitmovinSegmentTrackingAdapter(private val player: BitmovinPlayer, private
         wireEvents()
     }
 
-    private fun mapHttpRequestType(requestType: HttpRequestType?): SegmentType {
+    private fun mapHttpRequestType(requestType: HttpRequestType?): com.bitmovin.analytics.features.httprequesttracking.HttpRequestType {
         return when (requestType) {
-            HttpRequestType.DRM_LICENSE_WIDEVINE -> SegmentType.DRM_LICENSE_WIDEVINE
-            HttpRequestType.MEDIA_THUMBNAILS -> SegmentType.MEDIA_THUMBNAILS
-            HttpRequestType.MANIFEST_DASH -> SegmentType.MANIFEST_DASH
-            HttpRequestType.MANIFEST_HLS_MASTER -> SegmentType.MANIFEST_HLS_MASTER
-            HttpRequestType.MANIFEST_HLS_VARIANT -> SegmentType.MANIFEST_HLS_VARIANT
-            HttpRequestType.MANIFEST_SMOOTH -> SegmentType.MANIFEST_SMOOTH
-            HttpRequestType.KEY_HLS_AES -> SegmentType.KEY_HLS_AES
-            HttpRequestType.MEDIA_AUDIO -> SegmentType.MEDIA_AUDIO
-            HttpRequestType.MEDIA_SUBTITLES -> SegmentType.MEDIA_SUBTITLES
-            HttpRequestType.MEDIA_VIDEO -> SegmentType.MEDIA_VIDEO
-            else -> SegmentType.UNKNOWN
+            HttpRequestType.DRM_LICENSE_WIDEVINE -> HttpRequestType.DRM_LICENSE_WIDEVINE
+            HttpRequestType.MEDIA_THUMBNAILS -> HttpRequestType.MEDIA_THUMBNAILS
+            HttpRequestType.MANIFEST_DASH -> HttpRequestType.MANIFEST_DASH
+            HttpRequestType.MANIFEST_HLS_MASTER -> HttpRequestType.MANIFEST_HLS_MASTER
+            HttpRequestType.MANIFEST_HLS_VARIANT -> HttpRequestType.MANIFEST_HLS_VARIANT
+            HttpRequestType.MANIFEST_SMOOTH -> HttpRequestType.MANIFEST_SMOOTH
+            HttpRequestType.KEY_HLS_AES -> HttpRequestType.KEY_HLS_AES
+            HttpRequestType.MEDIA_AUDIO -> HttpRequestType.MEDIA_AUDIO
+            HttpRequestType.MEDIA_SUBTITLES -> HttpRequestType.MEDIA_SUBTITLES
+            HttpRequestType.MEDIA_VIDEO -> HttpRequestType.MEDIA_VIDEO
+            else -> HttpRequestType.UNKNOWN
         }
     }
 

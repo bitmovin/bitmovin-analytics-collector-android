@@ -2,7 +2,7 @@ package com.bitmovin.analytics.features.httprequesttracking
 
 data class HttpRequest(
     val timestamp: Long,
-    val segmentType: SegmentType,
+    val type: HttpRequestType,
     val url: String?,
     val lastRedirectLocation: String?,
     val httpStatus: Int,
