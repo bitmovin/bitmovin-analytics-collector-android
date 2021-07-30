@@ -17,9 +17,9 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
 
     var enabled: Boolean = false
 
-    fun limitSegmentsInQueue(max: Int) {
+    fun limitHttpRequestsInQueue(max: Int) {
         for ((index, detail) in _queue.withIndex()) {
-            _queue.set(index, detail.copyTruncateSegments(max))
+            _queue.set(index, detail.copyTruncateHttpRequests(max))
         }
     }
 
@@ -65,6 +65,6 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
                 additionalData = additionalData?.take(maxStringLength)
         )
 
-        fun ErrorDetail.copyTruncateSegments(maxSegments: Int) = this.copy(httpRequests = httpRequests?.take(maxSegments))
+        fun ErrorDetail.copyTruncateHttpRequests(maxRequests: Int) = this.copy(httpRequests = httpRequests?.take(maxRequests))
     }
 }

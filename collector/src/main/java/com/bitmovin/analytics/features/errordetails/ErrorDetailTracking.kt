@@ -23,9 +23,9 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
     override fun extractConfig(featureConfigs: FeatureConfigContainer) = featureConfigs.errorSegments
 
     override fun configured(authenticated: Boolean, config: ErrorDetailTrackingConfig?) {
-        val maxSegments = config?.numberOfSegments ?: 0
-        httpRequestTracking?.configure(maxSegments)
-        backend.limitSegmentsInQueue(maxSegments)
+        val maxRequests = config?.numberOfSegments ?: 0
+        httpRequestTracking?.configure(maxRequests)
+        backend.limitHttpRequestsInQueue(maxRequests)
     }
 
     override fun enabled() {
@@ -48,13 +48,13 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         if (!isEnabled) {
             return
         }
-        val segments = httpRequestTracking?.httpRequests?.toMutableList()
+        val httpRequests = httpRequestTracking?.httpRequests?.toMutableList()
         val errorIndex = errorIndex
         this.errorIndex++
         val platform = Util.getPlatform(Util.isTVDevice(context))
         val timestamp = Util.getTimestamp()
 
-        val errorDetails = ErrorDetail(platform, analyticsConfig.key, Util.getDomain(context), impressionIdProvider.impressionId, errorIndex, timestamp, code, message, errorData ?: ErrorData(), segments)
+        val errorDetails = ErrorDetail(platform, analyticsConfig.key, Util.getDomain(context), impressionIdProvider.impressionId, errorIndex, timestamp, code, message, errorData ?: ErrorData(), httpRequests)
         backend.send(errorDetails)
     }
 }

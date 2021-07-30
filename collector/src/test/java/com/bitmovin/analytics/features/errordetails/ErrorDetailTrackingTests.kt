@@ -59,7 +59,7 @@ class ErrorDetailTrackingTests {
         val segmentTracking = HttpRequestTracking()
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking, support)
         errorDetailTracking.configured(true, ErrorDetailTrackingConfig(true, 100))
-        verify { backend.limitSegmentsInQueue(segmentTracking.maxSegments) }
+        verify { backend.limitHttpRequestsInQueue(segmentTracking.maxRequests) }
     }
 
     @Test

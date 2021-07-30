@@ -10,11 +10,11 @@ import java.util.Queue
 class HttpRequestTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) :
         OnDownloadFinishedEventListener {
     companion object {
-        const val defaultMaxSegments = 10
+        const val defaultMaxRequests = 10
     }
     private val httpRequestQueue: Queue<HttpRequest> = LinkedList()
 
-    var maxSegments = defaultMaxSegments
+    var maxRequests = defaultMaxRequests
         private set
 
     val httpRequests: Collection<HttpRequest>
@@ -24,9 +24,9 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
         observables.forEach { it.subscribe(this) }
     }
 
-    fun configure(maxSegments: Int) {
-        this.maxSegments = maxSegments
-        httpRequestQueue.limit(maxSegments)
+    fun configure(maxRequests: Int) {
+        this.maxRequests = maxRequests
+        httpRequestQueue.limit(maxRequests)
     }
 
     fun disable() {
@@ -39,12 +39,12 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
     }
 
     override fun onDownloadFinished(event: OnDownloadFinishedEventObject) {
-        Log.d("SegmentTracking", "onDownloadFinished: ${DataSerializer.serialize(event.httpRequest)}")
-        addSegment(event.httpRequest)
+        Log.d("HttpRequestTracking", "onDownloadFinished: ${DataSerializer.serialize(event.httpRequest)}")
+        addRequest(event.httpRequest)
     }
 
-    private fun addSegment(httpRequest: HttpRequest) {
+    private fun addRequest(httpRequest: HttpRequest) {
         httpRequestQueue.offer(httpRequest)
-        httpRequestQueue.limit(maxSegments)
+        httpRequestQueue.limit(maxRequests)
     }
 }

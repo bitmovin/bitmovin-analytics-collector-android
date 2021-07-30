@@ -9,7 +9,7 @@ class HttpRequestTrackingTests {
     @Test
     fun testSuccessfullyUsesDefaultConfigurationValuesIfNoConfigurationIsApplied() {
         val segmentTracking = HttpRequestTracking()
-        assertThat(segmentTracking.maxSegments).isEqualTo(HttpRequestTracking.defaultMaxSegments)
+        assertThat(segmentTracking.maxRequests).isEqualTo(HttpRequestTracking.defaultMaxRequests)
     }
 
     @Test
