@@ -20,10 +20,10 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         observables.forEach { it.subscribe(this) }
     }
 
-    override fun extractConfig(featureConfigs: FeatureConfigContainer) = featureConfigs.errorSegments
+    override fun extractConfig(featureConfigs: FeatureConfigContainer) = featureConfigs.errorDetails
 
     override fun configured(authenticated: Boolean, config: ErrorDetailTrackingConfig?) {
-        val maxRequests = config?.numberOfSegments ?: 0
+        val maxRequests = config?.numberOfHttpRequests ?: 0
         httpRequestTracking?.configure(maxRequests)
         backend.limitHttpRequestsInQueue(maxRequests)
     }
