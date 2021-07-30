@@ -14,7 +14,7 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Test
 
-class BitmovinSegmentTrackingAdapterTests {
+class BitmovinHttpRequestTrackingAdapterTests {
     @Test
     fun `init wires events`() {
         // arrange

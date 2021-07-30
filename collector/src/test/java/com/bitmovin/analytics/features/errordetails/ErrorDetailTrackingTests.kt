@@ -2,7 +2,7 @@ package com.bitmovin.analytics.features.errordetails
 
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
-import com.bitmovin.analytics.features.httprequesttracking.SegmentTracking
+import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
 import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -56,7 +56,7 @@ class ErrorDetailTrackingTests {
     fun testLimitsQueuedItemsAfterConfiguringFeature() {
         val support = ObservableSupport<OnErrorDetailEventListener>()
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val segmentTracking = SegmentTracking()
+        val segmentTracking = HttpRequestTracking()
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking, support)
         errorDetailTracking.configured(true, ErrorDetailTrackingConfig(true, 100))
         verify { backend.limitSegmentsInQueue(segmentTracking.maxSegments) }
@@ -65,7 +65,7 @@ class ErrorDetailTrackingTests {
     @Test
     fun testAddsSegmentsOnError() {
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val segmentTracking = SegmentTracking()
+        val segmentTracking = HttpRequestTracking()
         segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
         segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking)
@@ -79,7 +79,7 @@ class ErrorDetailTrackingTests {
     @Test
     fun testDoesntAddSegmentsOnErrorIfSegmentTrackingIsDisabled() {
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val segmentTracking = SegmentTracking()
+        val segmentTracking = HttpRequestTracking()
         segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
         segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
         segmentTracking.disable()

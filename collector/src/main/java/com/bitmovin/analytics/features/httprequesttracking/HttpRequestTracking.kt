@@ -7,7 +7,7 @@ import com.bitmovin.analytics.utils.QueueExtensions.Companion.limit
 import java.util.LinkedList
 import java.util.Queue
 
-class SegmentTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) :
+class HttpRequestTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) :
         OnDownloadFinishedEventListener {
     companion object {
         const val defaultMaxSegments = 10

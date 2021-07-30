@@ -8,15 +8,15 @@ import org.junit.Test
 class HttpRequestTrackingTests {
     @Test
     fun testSuccessfullyUsesDefaultConfigurationValuesIfNoConfigurationIsApplied() {
-        val segmentTracking = SegmentTracking()
-        assertThat(segmentTracking.maxSegments).isEqualTo(SegmentTracking.defaultMaxSegments)
+        val segmentTracking = HttpRequestTracking()
+        assertThat(segmentTracking.maxSegments).isEqualTo(HttpRequestTracking.defaultMaxSegments)
     }
 
     @Test
     fun testSuccessfullyAddsSegmentsFromMultipleSources() {
         val support1 = ObservableSupport<OnDownloadFinishedEventListener>()
         val support2 = ObservableSupport<OnDownloadFinishedEventListener>()
-        val segmentTracking = SegmentTracking(support1, support2)
+        val segmentTracking = HttpRequestTracking(support1, support2)
         support1.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support1.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support2.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
@@ -27,7 +27,7 @@ class HttpRequestTrackingTests {
     @Test
     fun testSuccessfullyAddsSegmentsAndLimitsQueue() {
         val support = ObservableSupport<OnDownloadFinishedEventListener>()
-        val segmentTracking = SegmentTracking(support)
+        val segmentTracking = HttpRequestTracking(support)
         segmentTracking.configure(3)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
@@ -41,7 +41,7 @@ class HttpRequestTrackingTests {
     @Test
     fun testSuccessfullyLimitsQueueOnConfiguring() {
         val support = ObservableSupport<OnDownloadFinishedEventListener>()
-        val segmentTracking = SegmentTracking(support)
+        val segmentTracking = HttpRequestTracking(support)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
@@ -54,7 +54,7 @@ class HttpRequestTrackingTests {
     @Test
     fun testSuccessfullyRemovesSourcesAndClearsQueueOnDisabling() {
         val support = ObservableSupport<OnDownloadFinishedEventListener>()
-        val segmentTracking = SegmentTracking(support)
+        val segmentTracking = HttpRequestTracking(support)
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         assertThat(segmentTracking.httpRequests.size).isEqualTo(2)

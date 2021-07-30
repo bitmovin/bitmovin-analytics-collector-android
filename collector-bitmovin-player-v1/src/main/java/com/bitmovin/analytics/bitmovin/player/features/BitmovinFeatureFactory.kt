@@ -7,7 +7,7 @@ import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend
 import com.bitmovin.analytics.features.errordetails.ErrorDetailTracking
-import com.bitmovin.analytics.features.httprequesttracking.SegmentTracking
+import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.player.BitmovinPlayer
 
@@ -15,7 +15,7 @@ class BitmovinFeatureFactory(private val analyticsConfig: BitmovinAnalyticsConfi
     override fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
         val segmentTrackingAdapter = BitmovinSegmentTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
-        val segmentTracking = SegmentTracking(segmentTrackingAdapter)
+        val segmentTracking = HttpRequestTracking(segmentTrackingAdapter)
         val errorDetailsBackend = ErrorDetailBackend(analyticsConfig.config, context)
         var errorDetailTracking = ErrorDetailTracking(context, analyticsConfig, analytics, errorDetailsBackend, segmentTracking, analytics.onErrorDetailObservable)
         features.add(errorDetailTracking)
