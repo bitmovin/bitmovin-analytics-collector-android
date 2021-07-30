@@ -13,7 +13,7 @@ class HttpRequestTrackingTests {
     }
 
     @Test
-    fun testSuccessfullyAddsSegmentsFromMultipleSources() {
+    fun testSuccessfullyAddsHttpRequestsFromMultipleSources() {
         val support1 = ObservableSupport<OnDownloadFinishedEventListener>()
         val support2 = ObservableSupport<OnDownloadFinishedEventListener>()
         val httpRequestTracking = HttpRequestTracking(support1, support2)
@@ -25,7 +25,7 @@ class HttpRequestTrackingTests {
     }
 
     @Test
-    fun testSuccessfullyAddsSegmentsAndLimitsQueue() {
+    fun testSuccessfullyAddsHttpRequestsAndLimitsQueue() {
         val support = ObservableSupport<OnDownloadFinishedEventListener>()
         val httpRequestTracking = HttpRequestTracking(support)
         httpRequestTracking.configure(3)

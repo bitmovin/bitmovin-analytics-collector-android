@@ -40,8 +40,8 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
     }
 
     private fun notifyObservable(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, success: Boolean, statusCode: Int) {
-        val segment = mapLoadCompletedArgsToSegment(eventTime, loadEventInfo, mediaLoadData, statusCode, success)
-        observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segment)) }
+        val httpRequest = mapLoadCompletedArgsToHttpRequest(eventTime, loadEventInfo, mediaLoadData, statusCode, success)
+        observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(httpRequest)) }
     }
 
     private fun wireEvents() {
@@ -137,7 +137,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
                 } catch (ignored: Exception) {
                 }
             }
-            // TODO SegmentType.DRM_LICENSE_WIDEVINE
+            // TODO HttpRequestType.DRM_LICENSE_WIDEVINE
             // maybe using trackFormat.drmInitData?.schemeType == "widevine"
             return HttpRequestType.DRM_OTHER
         }
@@ -153,9 +153,9 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
             return HttpRequestType.UNKNOWN
         }
 
-        private fun mapLoadCompletedArgsToSegment(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, statusCode: Int, success: Boolean): HttpRequest {
-            val segmentType = mapDataType(eventTime, loadEventInfo.uri, mediaLoadData.dataType, mediaLoadData.trackType, mediaLoadData.trackFormat)
-            return HttpRequest(Util.getTimestamp(), segmentType, loadEventInfo.dataSpec.uri.toString(), loadEventInfo.uri.toString(), statusCode, loadEventInfo.loadDurationMs, null, loadEventInfo.bytesLoaded, success)
+        private fun mapLoadCompletedArgsToHttpRequest(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, statusCode: Int, success: Boolean): HttpRequest {
+            val requestType = mapDataType(eventTime, loadEventInfo.uri, mediaLoadData.dataType, mediaLoadData.trackType, mediaLoadData.trackFormat)
+            return HttpRequest(Util.getTimestamp(), requestType, loadEventInfo.dataSpec.uri.toString(), loadEventInfo.uri.toString(), statusCode, loadEventInfo.loadDurationMs, null, loadEventInfo.bytesLoaded, success)
         }
     }
 }

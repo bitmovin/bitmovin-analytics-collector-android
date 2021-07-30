@@ -14,9 +14,9 @@ import com.bitmovin.player.config.network.HttpRequestType
 class BitmovinHttpRequestTrackingAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
-        val segmentType = mapHttpRequestType(it.downloadType)
-        val segmentInfo = HttpRequest(Util.getTimestamp(), segmentType, it.url, it.lastRedirectLocation, it.httpStatus, Util.secondsToMillis(it.downloadTime), null, it.size, it.isSuccess)
-        observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(segmentInfo)) }
+        val requestType = mapHttpRequestType(it.downloadType)
+        val httpRequest = HttpRequest(Util.getTimestamp(), requestType, it.url, it.lastRedirectLocation, it.httpStatus, Util.secondsToMillis(it.downloadTime), null, it.size, it.isSuccess)
+        observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(httpRequest)) }
     }
 
     init {

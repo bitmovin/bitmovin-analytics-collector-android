@@ -63,7 +63,7 @@ class ErrorDetailTrackingTests {
     }
 
     @Test
-    fun testAddsSegmentsOnError() {
+    fun testAddsHttpRequestsOnError() {
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
         val httpRequestTracking = HttpRequestTracking()
         httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
@@ -77,7 +77,7 @@ class ErrorDetailTrackingTests {
     }
 
     @Test
-    fun testDoesntAddSegmentsOnErrorIfSegmentTrackingIsDisabled() {
+    fun testDoesntAddHttpRequestsOnErrorIfHttpReqeustTrackingTrackingIsDisabled() {
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
         val httpRequestTracking = HttpRequestTracking()
         httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
