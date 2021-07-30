@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.features.segmenttracking
+package com.bitmovin.analytics.features.httprequesttracking
 
 import android.util.Log
 import com.bitmovin.analytics.Observable

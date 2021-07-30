@@ -3,10 +3,10 @@ package com.bitmovin.analytics.bitmovin.player.features
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
-import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
-import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
-import com.bitmovin.analytics.features.segmenttracking.HttpRequest
-import com.bitmovin.analytics.features.segmenttracking.SegmentType
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
+import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
+import com.bitmovin.analytics.features.httprequesttracking.SegmentType
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener

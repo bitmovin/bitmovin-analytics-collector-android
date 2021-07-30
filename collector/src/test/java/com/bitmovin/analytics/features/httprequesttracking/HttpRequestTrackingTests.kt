@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.features.segmenttracking
+package com.bitmovin.analytics.features.httprequesttracking
 
 import com.bitmovin.analytics.ObservableSupport
 import io.mockk.mockk

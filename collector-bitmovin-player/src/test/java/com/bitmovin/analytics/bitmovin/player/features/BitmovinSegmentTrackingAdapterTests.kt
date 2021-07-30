@@ -3,7 +3,7 @@ package com.bitmovin.analytics.bitmovin.player.features
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
-import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.SourceEvent
 import io.mockk.clearMocks

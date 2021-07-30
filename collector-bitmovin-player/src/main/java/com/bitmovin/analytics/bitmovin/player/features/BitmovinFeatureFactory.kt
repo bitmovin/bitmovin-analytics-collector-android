@@ -7,7 +7,7 @@ import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend
 import com.bitmovin.analytics.features.errordetails.ErrorDetailTracking
-import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
+import com.bitmovin.analytics.features.httprequesttracking.SegmentTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.player.api.Player
 

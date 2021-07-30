@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.features.segmenttracking
+package com.bitmovin.analytics.features.httprequesttracking
 
 enum class SegmentType {
     DRM_LICENSE_WIDEVINE,
