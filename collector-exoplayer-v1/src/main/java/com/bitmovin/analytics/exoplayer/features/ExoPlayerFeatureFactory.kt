@@ -17,8 +17,8 @@ class ExoPlayerFeatureFactory(private val analyticsConfig: BitmovinAnalyticsConf
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
         var httpRequestTracking: HttpRequestTracking? = null
         if (player is SimpleExoPlayer) {
-            val segmentTrackingAdapter = ExoPlayerSegmentTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
-            httpRequestTracking = HttpRequestTracking(segmentTrackingAdapter)
+            val requestTrackingAdapter = ExoPlayerHttpRequestTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
+            httpRequestTracking = HttpRequestTracking(requestTrackingAdapter)
         }
         val errorDetailsBackend = ErrorDetailBackend(analyticsConfig.config, context)
         var errorDetailTracking = ErrorDetailTracking(context, analyticsConfig, analytics, errorDetailsBackend, httpRequestTracking, analytics.onErrorDetailObservable)

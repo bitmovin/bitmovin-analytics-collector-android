@@ -21,7 +21,7 @@ import com.google.android.exoplayer2.source.hls.HlsManifest
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import java.io.IOException
 
-class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
+class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val analyticsListener = object : DefaultAnalyticsListener() {
         override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData) {
@@ -123,7 +123,7 @@ class ExoPlayerSegmentTrackingAdapter(private val player: SimpleExoPlayer, priva
 
         private const val HLS_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.hls.HlsManifest"
         private val isHlsManifestClassLoaded
-            get() = Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, ExoPlayerSegmentTrackingAdapter::class.java.classLoader)
+            get() = Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, ExoPlayerHttpRequestTrackingAdapter::class.java.classLoader)
 
         private fun mapDrmType(eventTime: AnalyticsListener.EventTime): HttpRequestType {
             if (isHlsManifestClassLoaded) {
