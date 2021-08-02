@@ -45,9 +45,7 @@ public class BitmovinPlayerCollector extends DefaultCollector<Player> implements
             Player player,
             @NotNull BitmovinAnalytics analytics,
             @NotNull DeviceInformationProvider deviceInformationProvider) {
-        FeatureFactory featureFactory =
-                new BitmovinFeatureFactory(
-                        analytics.getConfig(), analytics, player, analytics.getContext());
+        FeatureFactory featureFactory = new BitmovinFeatureFactory(analytics, player);
         return new BitmovinSdkAdapter(
                 player,
                 analytics.getConfig(),

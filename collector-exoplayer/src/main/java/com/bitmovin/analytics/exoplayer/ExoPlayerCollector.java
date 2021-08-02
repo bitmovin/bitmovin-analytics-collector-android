@@ -31,9 +31,7 @@ public class ExoPlayerCollector extends DefaultCollector<ExoPlayer>
             ExoPlayer exoPlayer,
             @NotNull BitmovinAnalytics analytics,
             @NotNull DeviceInformationProvider deviceInformationProvider) {
-        FeatureFactory featureFactory =
-                new ExoPlayerFeatureFactory(
-                        analytics.getConfig(), analytics, exoPlayer, analytics.getContext());
+        FeatureFactory featureFactory = new ExoPlayerFeatureFactory(analytics, exoPlayer);
         return new ExoPlayerAdapter(
                 exoPlayer,
                 analytics.getConfig(),
