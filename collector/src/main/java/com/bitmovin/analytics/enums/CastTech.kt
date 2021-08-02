@@ -1,5 +1,5 @@
 package com.bitmovin.analytics.enums
 
-enum class CastTech {
-    GoogleCast
+enum class CastTech(val value: String) {
+    GoogleCast("GoogleCast")
 }

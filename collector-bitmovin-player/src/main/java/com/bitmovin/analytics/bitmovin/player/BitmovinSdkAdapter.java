@@ -240,8 +240,8 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
         // isCasting
         data.setCasting(bitmovinPlayer.isCasting());
-        if (bitmovinPlayer.isCasting()) {
-            data.setCastTech(CastTech.GoogleCast.name());
+        if (bitmovinPlayer.isCasting() || 1==1) {
+            data.setCastTech(CastTech.GoogleCast.getValue());
         }
 
         // DroppedVideoFrames
