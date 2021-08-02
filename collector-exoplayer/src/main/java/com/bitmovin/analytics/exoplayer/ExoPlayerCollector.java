@@ -3,12 +3,17 @@ package com.bitmovin.analytics.exoplayer;
 import android.content.Context;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.Collector;
+import com.bitmovin.analytics.DefaultCollector;
+import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.exoplayer.features.ExoPlayerFeatureFactory;
 import com.bitmovin.analytics.features.FeatureFactory;
 import com.google.android.exoplayer2.ExoPlayer;
+import org.jetbrains.annotations.NotNull;
 
-public class ExoPlayerCollector extends BitmovinAnalytics {
+public class ExoPlayerCollector extends DefaultCollector<ExoPlayer>
+        implements Collector<ExoPlayer> {
 
     /**
      * Bitmovin Analytics
@@ -20,19 +25,26 @@ public class ExoPlayerCollector extends BitmovinAnalytics {
         super(bitmovinAnalyticsConfig, context);
     }
 
-    public void attachPlayer(ExoPlayer player) {
-        DeviceInformationProvider deviceInformationProvider =
-                new DeviceInformationProvider(context, ExoUtil.getUserAgent(context));
+    @NotNull
+    @Override
+    protected PlayerAdapter createAdapter(
+            ExoPlayer exoPlayer,
+            @NotNull BitmovinAnalytics analytics,
+            @NotNull DeviceInformationProvider deviceInformationProvider) {
         FeatureFactory featureFactory =
-                new ExoPlayerFeatureFactory(bitmovinAnalyticsConfig, this, player, context);
-        ExoPlayerAdapter adapter =
-                new ExoPlayerAdapter(
-                        player,
-                        this.bitmovinAnalyticsConfig,
-                        deviceInformationProvider,
-                        this.playerStateMachine,
-                        featureFactory);
+                new ExoPlayerFeatureFactory(
+                        analytics.getConfig(), analytics, exoPlayer, analytics.getContext());
+        return new ExoPlayerAdapter(
+                exoPlayer,
+                analytics.getConfig(),
+                deviceInformationProvider,
+                analytics.getPlayerStateMachine(),
+                featureFactory);
+    }
 
-        this.attach(adapter);
+    @NotNull
+    @Override
+    protected String getUserAgent(@NotNull Context context) {
+        return ExoUtil.getUserAgent(context);
     }
 }

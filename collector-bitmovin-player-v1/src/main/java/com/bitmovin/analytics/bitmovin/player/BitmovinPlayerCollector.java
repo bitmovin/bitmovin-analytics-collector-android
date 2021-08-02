@@ -5,14 +5,22 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import com.bitmovin.analytics.BitmovinAdAnalytics;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.Collector;
+import com.bitmovin.analytics.DefaultCollector;
+import com.bitmovin.analytics.adapters.AdAdapter;
+import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.player.BitmovinPlayer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class BitmovinPlayerCollector extends BitmovinAnalytics {
+public class BitmovinPlayerCollector extends DefaultCollector<BitmovinPlayer>
+        implements Collector<BitmovinPlayer> {
 
     /**
      * Bitmovin Analytics
@@ -29,28 +37,33 @@ public class BitmovinPlayerCollector extends BitmovinAnalytics {
         this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
     }
 
-    public void attachPlayer(BitmovinPlayer player) {
-        DeviceInformationProvider deviceInformationProvider =
-                new DeviceInformationProvider(context, getUserAgent(context));
+    @NotNull
+    @Override
+    protected PlayerAdapter createAdapter(
+            BitmovinPlayer bitmovinPlayer,
+            @NotNull BitmovinAnalytics analytics,
+            @NotNull DeviceInformationProvider deviceInformationProvider) {
         FeatureFactory featureFactory =
-                new BitmovinFeatureFactory(bitmovinAnalyticsConfig, this, player, context);
-        BitmovinSdkAdapter adapter =
-                new BitmovinSdkAdapter(
-                        player,
-                        this.bitmovinAnalyticsConfig,
-                        deviceInformationProvider,
-                        this.playerStateMachine,
-                        featureFactory);
-
-        this.attach(adapter);
-
-        if (this.adAnalytics != null) {
-            BitmovinSdkAdAdapter adAdapter = new BitmovinSdkAdAdapter(player, this.adAnalytics);
-            this.attachAd(adAdapter);
-        }
+                new BitmovinFeatureFactory(
+                        analytics.getConfig(), analytics, bitmovinPlayer, analytics.getContext());
+        return new BitmovinSdkAdapter(
+                bitmovinPlayer,
+                analytics.getConfig(),
+                deviceInformationProvider,
+                analytics.getPlayerStateMachine(),
+                featureFactory);
     }
 
-    private String getUserAgent(Context context) {
+    @Nullable
+    @Override
+    protected AdAdapter createAdAdapter(
+            BitmovinPlayer bitmovinPlayer, @NotNull BitmovinAdAnalytics adAnalytics) {
+        return new BitmovinSdkAdAdapter(bitmovinPlayer, adAnalytics);
+    }
+
+    @Override
+    @NotNull
+    protected String getUserAgent(Context context) {
         ApplicationInfo applicationInfo = context.getApplicationInfo();
         int stringId = applicationInfo.labelRes;
         String applicationName = "Unknown";
