@@ -98,6 +98,18 @@ public class BitmovinAnalytics
         this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
     }
 
+    public Context getContext() {
+        return context;
+    }
+
+    public BitmovinAnalyticsConfig getConfig() {
+        return bitmovinAnalyticsConfig;
+    }
+
+    public PlayerStateMachine getPlayerStateMachine() {
+        return playerStateMachine;
+    }
+
     /**
      * Attach a player instance to this analytics plugin. After this is completed, BitmovinAnalytics
      * will start monitoring and sending analytics data based on the attached player adapter.
