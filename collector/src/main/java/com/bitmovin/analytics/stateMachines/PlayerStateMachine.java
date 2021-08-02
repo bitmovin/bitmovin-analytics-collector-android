@@ -29,7 +29,6 @@ public class PlayerStateMachine {
     private long elapsedTimeSeekStart = 0;
     private long videoTimeStart;
     private long videoTimeEnd;
-    private ErrorCode errorCode;
     private String impressionId;
     private Handler heartbeatHandler = new Handler();
     private int currentRebufferingIntervalIndex = 0;
@@ -171,6 +170,10 @@ public class PlayerStateMachine {
         return true;
     }
 
+    public void error(long videoTime, ErrorCode errorCode) {
+        transitionState(PlayerStates.ERROR, videoTime, errorCode);
+    }
+
     public boolean isStartupFinished() {
         return startupFinished;
     }
@@ -235,14 +238,6 @@ public class PlayerStateMachine {
 
     public void setElapsedTimeSeekStart(long elapsedTimeSeekStart) {
         this.elapsedTimeSeekStart = elapsedTimeSeekStart;
-    }
-
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
-
-    public void setErrorCode(ErrorCode errorCode) {
-        this.errorCode = errorCode;
     }
 
     public VideoStartFailedReason getVideoStartFailedReason() {
@@ -329,9 +324,9 @@ public class PlayerStateMachine {
                 @Override
                 public void onFinish() {
                     Log.d(TAG, "rebufferingTimeout finish");
-                    setErrorCode(
+                    error(
+                            analytics.getPosition(),
                             AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.getErrorCode());
-                    transitionState(PlayerStates.ERROR, analytics.getPosition());
                     disableRebufferHeartbeat();
                     resetStateMachine();
                 }

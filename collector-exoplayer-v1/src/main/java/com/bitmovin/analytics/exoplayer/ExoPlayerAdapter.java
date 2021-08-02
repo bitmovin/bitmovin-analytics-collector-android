@@ -12,7 +12,6 @@ import static com.google.android.exoplayer2.C.WIDEVINE_UUID;
 import android.util.Log;
 import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.EventBus;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
@@ -28,7 +27,6 @@ import com.bitmovin.analytics.error.ExceptionMapper;
 import com.bitmovin.analytics.exoplayer.manipulators.BitrateEventDataManipulator;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureFactory;
-import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 import com.bitmovin.analytics.stateMachines.PlayerState;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
@@ -80,7 +78,6 @@ public class ExoPlayerAdapter
     private final DeviceInformationProvider deviceInformationProvider;
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private BitrateEventDataManipulator bitrateEventDataManipulator;
-    private final EventBus eventBus;
     private final FeatureFactory featureFactory;
     private boolean isVideoAttemptedPlay = false;
     private boolean isPlaying = false;
@@ -95,10 +92,8 @@ public class ExoPlayerAdapter
             BitmovinAnalyticsConfig config,
             DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
-            FeatureFactory featureFactory,
-            EventBus eventBus) {
+            FeatureFactory featureFactory) {
         this.featureFactory = featureFactory;
-        this.eventBus = eventBus;
         this.stateMachine = stateMachine;
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
@@ -424,20 +419,7 @@ public class ExoPlayerAdapter
             if (!stateMachine.isStartupFinished() && isVideoAttemptedPlay) {
                 stateMachine.setVideoStartFailedReason(VideoStartFailedReason.PLAYER_ERROR);
             }
-            this.stateMachine.setErrorCode(errorCode);
-            this.stateMachine.transitionState(PlayerStates.ERROR, videoTime);
-
-            // TODO improve exception mapper to also allow passing exception to the error details
-            // feature
-            // Maybe the eventBus should already get the full extracted `ErrorDetail`, instead
-            // of parsing and prettifying throwables itself
-            eventBus.notify(
-                    OnErrorDetailEventListener.class,
-                    listener ->
-                            listener.onError(
-                                    errorCode.getErrorCode(),
-                                    errorCode.getDescription(),
-                                    errorCode.getLegacyErrorData()));
+            this.stateMachine.error(videoTime, errorCode);
         } catch (Exception e) {
             Log.d(TAG, e.getMessage(), e);
         }

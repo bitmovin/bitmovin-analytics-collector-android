@@ -11,7 +11,6 @@ import com.bitmovin.player.api.event.listener.EventListener
 import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener
 import com.bitmovin.player.config.PlayerConfiguration
 import com.bitmovin.player.config.quality.AudioQuality
-import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,7 +37,7 @@ class BitmovinSdkAdapterTest {
     fun setup() {
         Mockito.`when`(fakePlayer.addEventListener(ArgumentMatchers.any())).then { invocation -> eventListener.add(invocation.getArgument(0)) }
         Mockito.`when`(fakePlayer.getConfig()).thenReturn(Mockito.mock(PlayerConfiguration::class.java))
-        adapter = BitmovinSdkAdapter(fakePlayer, Mockito.mock(BitmovinAnalyticsConfig::class.java), Mockito.mock(DeviceInformationProvider::class.java), stateMachine, Mockito.mock(FeatureFactory::class.java), mockk())
+        adapter = BitmovinSdkAdapter(fakePlayer, Mockito.mock(BitmovinAnalyticsConfig::class.java), Mockito.mock(DeviceInformationProvider::class.java), stateMachine, Mockito.mock(FeatureFactory::class.java))
         adapter.init()
     }
 

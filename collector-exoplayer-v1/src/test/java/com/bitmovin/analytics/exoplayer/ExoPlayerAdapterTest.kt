@@ -31,7 +31,7 @@ class ExoPlayerAdapterTest {
     private lateinit var stateMachine: PlayerStateMachine
     @Before
     fun setup() {
-        adapter = FakeExoPlayerAdapter(mock(ExoPlayer::class.java), mock(BitmovinAnalyticsConfig::class.java), mock(DeviceInformationProvider::class.java), stateMachine, mockk(relaxed = true), mockk(relaxed = true))
+        adapter = FakeExoPlayerAdapter(mock(ExoPlayer::class.java), mock(BitmovinAnalyticsConfig::class.java), mock(DeviceInformationProvider::class.java), stateMachine, mockk(relaxed = true))
     }
 
     @Test

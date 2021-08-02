@@ -3,6 +3,7 @@ package com.bitmovin.analytics.exoplayer
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.LegacyErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
+import com.bitmovin.analytics.features.errordetails.ErrorData
 import com.bitmovin.analytics.utils.topOfStacktrace
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.source.BehindLiveWindowException
@@ -22,7 +23,7 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
 
         val type = getExceptionType(throwable)
         var message = errorMessages[type] ?: "Unknown Error"
-        var legacyErrorData: LegacyErrorData? = null
+        val legacyErrorData: LegacyErrorData
 
         when (val exception = throwable.cause ?: throwable) {
             is HttpDataSource.InvalidResponseCodeException -> {
@@ -43,8 +44,8 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
             }
             else -> legacyErrorData = LegacyErrorData(exception.message ?: "", exception.topOfStacktrace)
         }
-
-        return ErrorCode(type, message, legacyErrorData)
+        val errorData = ErrorData(legacyErrorData.msg, legacyErrorData.details.toList())
+        return ErrorCode(type, message, errorData, legacyErrorData)
     }
 
     private fun getExceptionType(throwable: Throwable): Int {

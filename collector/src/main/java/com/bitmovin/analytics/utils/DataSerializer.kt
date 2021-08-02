@@ -10,6 +10,13 @@ object DataSerializer {
     }
 
     @JvmStatic
+    fun <T> trySerialize(data: T?): String? {
+        return try {
+            serialize(data)
+        } catch (ignored: Exception) { null }
+    }
+
+    @JvmStatic
     fun <T> deserialize(input: String?, classOfT: Class<T>?): T? {
         return input?.let {
             return try {

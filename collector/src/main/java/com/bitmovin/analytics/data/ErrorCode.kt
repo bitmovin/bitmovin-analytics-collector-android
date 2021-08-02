@@ -1,6 +1,8 @@
 package com.bitmovin.analytics.data
 
-class ErrorCode(val errorCode: Int, var description: String, var legacyErrorData: LegacyErrorData? = null) {
+import com.bitmovin.analytics.features.errordetails.ErrorData
+
+data class ErrorCode(val errorCode: Int, val description: String, val errorData: ErrorData, val legacyErrorData: LegacyErrorData? = null) {
 
     @Override
     override fun toString(): String {

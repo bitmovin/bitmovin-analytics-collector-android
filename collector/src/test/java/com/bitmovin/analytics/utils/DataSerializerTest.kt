@@ -7,6 +7,7 @@ import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.LegacyErrorData
 import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
+import com.bitmovin.analytics.features.errordetails.ErrorData
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -23,7 +24,7 @@ class DataSerializerTest {
         val userIdProvider = mockk<SecureSettingsAndroidIdUserIdProvider>()
         every { userIdProvider.userId() } returns userId
 
-        val errorCode = ErrorCode(1000, "Error Description", LegacyErrorData("Error Data Message", arrayOf("first line of details", "second line of details")))
+        val errorCode = ErrorCode(1000, "Error Description", ErrorData(), LegacyErrorData("Error Data Message", arrayOf("first line of details", "second line of details")))
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig(analyticsLicenseKey, playerLicenseKey)
         val eventData = EventDataFactory(bitmovinAnalyticsConfig, userIdProvider).create(impressionId, null, deviceInformation)
 
@@ -46,7 +47,7 @@ class DataSerializerTest {
         val userIdProvider = mockk<SecureSettingsAndroidIdUserIdProvider>()
         every { userIdProvider.userId() } returns userId
 
-        val errorCode = ErrorCode(1000, "Error Description", null)
+        val errorCode = ErrorCode(1000, "Error Description", ErrorData(), null)
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig(analyticsLicenseKey, playerLicenseKey)
         val eventData = EventDataFactory(bitmovinAnalyticsConfig, userIdProvider).create(impressionId, null, deviceInformation)
 

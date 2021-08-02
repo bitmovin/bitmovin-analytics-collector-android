@@ -3,18 +3,29 @@ package com.bitmovin.analytics.bitmovin.player
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.LegacyErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
+import com.bitmovin.analytics.features.errordetails.ErrorData
+import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.topOfStacktrace
 import com.bitmovin.player.api.event.data.ErrorEvent
 
 class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
     override fun map(event: ErrorEvent): ErrorCode {
-        val errorCode = ErrorCode(event.code, event.message)
-        if (event.data is Throwable) {
-            val exception = event.data as Throwable
+        var legacyErrorData: LegacyErrorData? = null
+        var additionalData: String? = null
+        val errorData: ErrorData
 
-            errorCode.legacyErrorData = LegacyErrorData(exception.message
-                    ?: "", exception.topOfStacktrace)
+        val throwable = event.data as? Throwable?
+        if (throwable != null) {
+            val cause = throwable.cause
+            if (cause != null) {
+                additionalData = DataSerializer.trySerialize(ErrorData.fromThrowable(cause))
+            }
+            errorData = ErrorData.fromThrowable(throwable, additionalData)
+            legacyErrorData = LegacyErrorData(throwable.message ?: "", throwable.topOfStacktrace)
+        } else {
+            additionalData = DataSerializer.trySerialize(event.data)
+            errorData = ErrorData(additionalData = additionalData)
         }
-        return errorCode
+        return ErrorCode(event.code, event.message, errorData, legacyErrorData)
     }
 }

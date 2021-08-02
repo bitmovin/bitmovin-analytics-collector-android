@@ -44,7 +44,7 @@ public class BitmovinAnalytics
     private static final String TAG = "BitmovinAnalytics";
 
     private FeatureManager<FeatureConfigContainer> featureManager = new FeatureManager<>();
-    protected EventBus eventBus = new EventBus();
+    private final EventBus eventBus = new EventBus();
 
     protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
     protected PlayerAdapter playerAdapter;
@@ -230,6 +230,14 @@ public class BitmovinAnalytics
         data.setErrorMessage(errorCode.getDescription());
         data.setErrorData(serialize(errorCode.getLegacyErrorData()));
         sendEventData(data);
+
+        eventBus.notify(
+                OnErrorDetailEventListener.class,
+                listener ->
+                        listener.onError(
+                                errorCode.getErrorCode(),
+                                errorCode.getDescription(),
+                                errorCode.getErrorData()));
     }
 
     @Override
@@ -347,7 +355,9 @@ public class BitmovinAnalytics
                     OnErrorDetailEventListener.class,
                     listener ->
                             listener.onError(
-                                    errorCode.getErrorCode(), errorCode.getDescription(), null));
+                                    errorCode.getErrorCode(),
+                                    errorCode.getDescription(),
+                                    errorCode.getErrorData()));
         }
         data.setVideoStartFailedReason(videoStartFailedReason.getReason());
         sendEventData(data);
