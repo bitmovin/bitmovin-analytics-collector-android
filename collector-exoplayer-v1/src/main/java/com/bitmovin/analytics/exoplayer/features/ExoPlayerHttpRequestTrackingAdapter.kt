@@ -27,14 +27,14 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
     private val analyticsListener = object : DefaultAnalyticsListener() {
 
         override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData) {
-            logException("Exception occurred in onLoadCompleted") {
+            catchAndLogException("Exception occurred in onLoadCompleted") {
                 val statusCode = loadEventInfo.responseHeaders.responseCode ?: 0
                 notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, statusCode)
             }
         }
 
         override fun onLoadError(eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData, error: IOException, wasCanceled: Boolean) {
-            logException("Exception occurred in onLoadError") {
+            catchAndLogException("Exception occurred in onLoadError") {
                 val statusCode = (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode ?: loadEventInfo.responseHeaders.responseCode ?: 0
                 notifyObservable(eventTime, loadEventInfo, mediaLoadData, false, statusCode)
             }
@@ -75,7 +75,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
     companion object {
         private val TAG = ExoPlayerHttpRequestTrackingAdapter::class.java.name
 
-        private fun logException(msg: String, block: () -> Unit) {
+        private fun catchAndLogException(msg: String, block: () -> Unit) {
             // As ExoPlayer sometimes has breaking changes, we want to make sure that an optional feature isn't breaking our collector
             try {
                 block()
