@@ -61,22 +61,22 @@ class LicenseCallTests {
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithErrorTracking() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorSegments\": {} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(false)))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(false)))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithDisabledErrorTracking() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorSegments\": {\"enabled\": false} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(false)))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": false} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(false)))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEnabledErrorTracking() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorSegments\": {\"enabled\": true, \"numberOfSegments\": 12} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(true, 12)))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfHttpRequests\": 12} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(true, 12)))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEnabledErrorTrackingAndTypo() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorSegments\": {\"enabled\": true, \"numberOfSeeegments\": 12} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(true)))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfSeeegments\": 12} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(true)))
     }
 
     @Test

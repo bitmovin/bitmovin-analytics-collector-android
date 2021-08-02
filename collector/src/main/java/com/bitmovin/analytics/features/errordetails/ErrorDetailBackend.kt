@@ -2,7 +2,7 @@ package com.bitmovin.analytics.features.errordetails
 
 import android.content.Context
 import com.bitmovin.analytics.CollectorConfig
-import com.bitmovin.analytics.features.segmenttracking.Segment
+import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.HttpClient
 import com.bitmovin.analytics.utils.Util
@@ -17,9 +17,9 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
 
     var enabled: Boolean = false
 
-    fun limitSegmentsInQueue(max: Int) {
+    fun limitHttpRequestsInQueue(max: Int) {
         for ((index, detail) in _queue.withIndex()) {
-            _queue.set(index, detail.copyTruncateSegments(max))
+            _queue.set(index, detail.copyTruncateHttpRequests(max))
         }
     }
 
@@ -52,11 +52,11 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
         fun ErrorDetail.copyTruncateStringsAndUrls(maxStringLength: Int, maxUrlLength: Int): ErrorDetail = this.copy(
                 message = message?.take(maxStringLength),
                 data = data.copyTruncateStrings(maxStringLength),
-                segments = segments?.map {
+                httpRequests = httpRequests?.map {
                     it.copyTruncateUrls(maxUrlLength)
                 })
 
-        private fun Segment.copyTruncateUrls(maxLength: Int) = this.copy(
+        private fun HttpRequest.copyTruncateUrls(maxLength: Int) = this.copy(
                 url = url?.take(maxLength),
                 lastRedirectLocation = lastRedirectLocation?.take(maxLength))
 
@@ -65,6 +65,6 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
                 additionalData = additionalData?.take(maxStringLength)
         )
 
-        fun ErrorDetail.copyTruncateSegments(maxSegments: Int) = this.copy(segments = segments?.take(maxSegments))
+        fun ErrorDetail.copyTruncateHttpRequests(maxRequests: Int) = this.copy(httpRequests = httpRequests?.take(maxRequests))
     }
 }

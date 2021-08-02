@@ -5,14 +5,14 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.ImpressionIdProvider
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
+import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.utils.Util
 
 // TODO we also need to track errors from other sources, not just the player.
 // Should be streamlined and go through the BitmovinAnalytics class
 
-class ErrorDetailTracking(private val context: Context, private val analyticsConfig: BitmovinAnalyticsConfig, private val impressionIdProvider: ImpressionIdProvider, private val backend: ErrorDetailBackend, private val segmentTracking: SegmentTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) :
+class ErrorDetailTracking(private val context: Context, private val analyticsConfig: BitmovinAnalyticsConfig, private val impressionIdProvider: ImpressionIdProvider, private val backend: ErrorDetailBackend, private val httpRequestTracking: HttpRequestTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) :
         Feature<FeatureConfigContainer, ErrorDetailTrackingConfig>(),
         OnErrorDetailEventListener {
     private var errorIndex: Long = 0
@@ -20,12 +20,12 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         observables.forEach { it.subscribe(this) }
     }
 
-    override fun extractConfig(featureConfigs: FeatureConfigContainer) = featureConfigs.errorSegments
+    override fun extractConfig(featureConfigs: FeatureConfigContainer) = featureConfigs.errorDetails
 
     override fun configured(authenticated: Boolean, config: ErrorDetailTrackingConfig?) {
-        val maxSegments = config?.numberOfSegments ?: 0
-        segmentTracking?.configure(maxSegments)
-        backend.limitSegmentsInQueue(maxSegments)
+        val maxRequests = config?.numberOfHttpRequests ?: 0
+        httpRequestTracking?.configure(maxRequests)
+        backend.limitHttpRequestsInQueue(maxRequests)
     }
 
     override fun enabled() {
@@ -34,13 +34,13 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
     }
 
     override fun disabled() {
-        segmentTracking?.disable()
+        httpRequestTracking?.disable()
         backend.clear()
         observables.forEach { it.unsubscribe(this) }
     }
 
     override fun reset() {
-        segmentTracking?.reset()
+        httpRequestTracking?.reset()
         errorIndex = 0
     }
 
@@ -48,13 +48,13 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         if (!isEnabled) {
             return
         }
-        val segments = segmentTracking?.segments?.toMutableList()
+        val httpRequests = httpRequestTracking?.httpRequests?.toMutableList()
         val errorIndex = errorIndex
         this.errorIndex++
         val platform = Util.getPlatform(Util.isTVDevice(context))
         val timestamp = Util.getTimestamp()
 
-        val errorDetails = ErrorDetail(platform, analyticsConfig.key, Util.getDomain(context), impressionIdProvider.impressionId, errorIndex, timestamp, code, message, errorData ?: ErrorData(), segments)
+        val errorDetails = ErrorDetail(platform, analyticsConfig.key, Util.getDomain(context), impressionIdProvider.impressionId, errorIndex, timestamp, code, message, errorData ?: ErrorData(), httpRequests)
         backend.send(errorDetails)
     }
 }

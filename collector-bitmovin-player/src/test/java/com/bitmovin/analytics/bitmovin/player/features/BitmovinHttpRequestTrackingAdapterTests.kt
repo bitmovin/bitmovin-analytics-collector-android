@@ -3,7 +3,7 @@ package com.bitmovin.analytics.bitmovin.player.features
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
-import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.SourceEvent
 import io.mockk.clearMocks
@@ -14,7 +14,7 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Test
 
-class BitmovinSegmentTrackingAdapterTests {
+class BitmovinHttpRequestTrackingAdapterTests {
     @Test
     fun `init wires events`() {
         // arrange
@@ -22,7 +22,7 @@ class BitmovinSegmentTrackingAdapterTests {
         val player = mockk<Player>(relaxed = true)
 
         // act
-        val adapter = BitmovinSegmentTrackingAdapter(player, analyticsReleasing)
+        val adapter = BitmovinHttpRequestTrackingAdapter(player, analyticsReleasing)
 
         // arrange
         verify { analyticsReleasing.subscribe(adapter) }
@@ -34,7 +34,7 @@ class BitmovinSegmentTrackingAdapterTests {
         // arrange
         val analyticsReleasing = ObservableSupport<OnAnalyticsReleasingEventListener>()
         val player = mockk<Player>(relaxed = true)
-        val adapter = BitmovinSegmentTrackingAdapter(player, analyticsReleasing)
+        val adapter = BitmovinHttpRequestTrackingAdapter(player, analyticsReleasing)
         mockkObject(adapter)
 
         // act
@@ -57,7 +57,7 @@ class BitmovinSegmentTrackingAdapterTests {
         val player = mockk<Player>(relaxed = true)
         val slot = slot<(SourceEvent.DownloadFinished) -> Unit>()
         every { player.on(any(), capture(slot)) }.answers {}
-        val adapter = BitmovinSegmentTrackingAdapter(player, mockk(relaxed = true))
+        val adapter = BitmovinHttpRequestTrackingAdapter(player, mockk(relaxed = true))
 
         // act
         val adapterSubscribeListener = mockk<OnDownloadFinishedEventListener>(relaxed = true)

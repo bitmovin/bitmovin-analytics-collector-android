@@ -1,8 +1,8 @@
 package com.bitmovin.analytics.features.errordetails
 
 import com.bitmovin.analytics.ObservableSupport
-import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventObject
-import com.bitmovin.analytics.features.segmenttracking.SegmentTracking
+import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
 import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -56,37 +56,37 @@ class ErrorDetailTrackingTests {
     fun testLimitsQueuedItemsAfterConfiguringFeature() {
         val support = ObservableSupport<OnErrorDetailEventListener>()
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val segmentTracking = SegmentTracking()
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking, support)
+        val httpRequestTracking = HttpRequestTracking()
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking, support)
         errorDetailTracking.configured(true, ErrorDetailTrackingConfig(true, 100))
-        verify { backend.limitSegmentsInQueue(segmentTracking.maxSegments) }
+        verify { backend.limitHttpRequestsInQueue(httpRequestTracking.maxRequests) }
     }
 
     @Test
-    fun testAddsSegmentsOnError() {
+    fun testAddsHttpRequestsOnError() {
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val segmentTracking = SegmentTracking()
-        segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
-        segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking)
+        val httpRequestTracking = HttpRequestTracking()
+        httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
+        httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking)
         errorDetailTracking.onError(null, null, ErrorData())
         val slot = slot<ErrorDetail>()
         verify { backend.send(capture(slot)) }
-        assertThat(slot.captured.segments).isNotNull
-        assertThat(slot.captured.segments?.size).isEqualTo(2)
+        assertThat(slot.captured.httpRequests).isNotNull
+        assertThat(slot.captured.httpRequests?.size).isEqualTo(2)
     }
 
     @Test
-    fun testDoesntAddSegmentsOnErrorIfSegmentTrackingIsDisabled() {
+    fun testDoesntAddHttpRequestsOnErrorIfHttpReqeustTrackingTrackingIsDisabled() {
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val segmentTracking = SegmentTracking()
-        segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
-        segmentTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
-        segmentTracking.disable()
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, segmentTracking)
+        val httpRequestTracking = HttpRequestTracking()
+        httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
+        httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
+        httpRequestTracking.disable()
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking)
         errorDetailTracking.onError(null, null, ErrorData())
         val slot = slot<ErrorDetail>()
         verify { backend.send(capture(slot)) }
-        assertThat(slot.captured.segments?.size ?: 0).isEqualTo(0)
+        assertThat(slot.captured.httpRequests?.size ?: 0).isEqualTo(0)
     }
 }

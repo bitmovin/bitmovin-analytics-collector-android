@@ -3,7 +3,7 @@ package com.bitmovin.analytics.bitmovin.player.features
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
-import com.bitmovin.analytics.features.segmenttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.listener.OnDownloadFinishedListener
 import io.mockk.clearMocks
@@ -14,12 +14,12 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Test
 
-class BitmovinSegmentTrackingAdapterTests {
+class BitmovinHttpRequestTrackingAdapterTests {
     @Test
     fun testWiresToEvents() {
         val analyticsReleasing = mockk<Observable<OnAnalyticsReleasingEventListener>>(relaxed = true)
         val player = mockk<BitmovinPlayer>(relaxed = true)
-        val adapter = BitmovinSegmentTrackingAdapter(player, analyticsReleasing)
+        val adapter = BitmovinHttpRequestTrackingAdapter(player, analyticsReleasing)
         verify { analyticsReleasing.subscribe(adapter) }
         verify { player.addEventListener(any<OnDownloadFinishedListener>()) }
     }
@@ -28,7 +28,7 @@ class BitmovinSegmentTrackingAdapterTests {
     fun testUnwiresEventsOnAnalyticsReleasing() {
         val analyticsReleasing = ObservableSupport<OnAnalyticsReleasingEventListener>()
         val player = mockk<BitmovinPlayer>(relaxed = true)
-        val adapter = BitmovinSegmentTrackingAdapter(player, analyticsReleasing)
+        val adapter = BitmovinHttpRequestTrackingAdapter(player, analyticsReleasing)
         mockkObject(adapter)
         analyticsReleasing.notify { it.onReleasing() }
         verify { adapter.onReleasing() }
@@ -43,7 +43,7 @@ class BitmovinSegmentTrackingAdapterTests {
         val player = mockk<BitmovinPlayer>(relaxed = true)
         val slot = slot<OnDownloadFinishedListener>()
         every { player.addEventListener(capture(slot)) } answers { }
-        val adapter = BitmovinSegmentTrackingAdapter(player, mockk(relaxed = true))
+        val adapter = BitmovinHttpRequestTrackingAdapter(player, mockk(relaxed = true))
         val listener = mockk<OnDownloadFinishedEventListener>(relaxed = true)
         adapter.subscribe(listener)
         slot.captured.onDownloadFinished(mockk(relaxed = true))

@@ -1,10 +1,10 @@
 package com.bitmovin.analytics.features.errordetails
 
 import com.bitmovin.analytics.CollectorConfig
-import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend.Companion.copyTruncateSegments
+import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend.Companion.copyTruncateHttpRequests
 import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend.Companion.copyTruncateStringsAndUrls
-import com.bitmovin.analytics.features.segmenttracking.Segment
-import com.bitmovin.analytics.features.segmenttracking.SegmentType
+import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
+import com.bitmovin.analytics.features.httprequesttracking.HttpRequestType
 import com.bitmovin.analytics.utils.HttpClient
 import io.mockk.mockk
 import io.mockk.mockkConstructor
@@ -20,7 +20,7 @@ class ErrorDetailBackendTests {
     }
 
     @Test
-    fun testCorrectlyLimitsSegmentsInQueue() {
+    fun testCorrectlyLimitsHttpRequestsInQueue() {
         val backend = ErrorDetailBackend(mockk(relaxed = true), mockk())
         val d1 = getErrorDetail(5)
         val d2 = getErrorDetail(5)
@@ -28,33 +28,33 @@ class ErrorDetailBackendTests {
         backend.send(d1)
         backend.send(d2)
         backend.send(d3)
-        backend.limitSegmentsInQueue(2)
-        assertThat(backend.queue.getOrNull(0)?.segments?.size).isLessThanOrEqualTo(2)
-        assertThat(backend.queue.getOrNull(1)?.segments?.size).isLessThanOrEqualTo(2)
-        assertThat(backend.queue.getOrNull(2)?.segments?.size).isNull()
+        backend.limitHttpRequestsInQueue(2)
+        assertThat(backend.queue.getOrNull(0)?.httpRequests?.size).isLessThanOrEqualTo(2)
+        assertThat(backend.queue.getOrNull(1)?.httpRequests?.size).isLessThanOrEqualTo(2)
+        assertThat(backend.queue.getOrNull(2)?.httpRequests?.size).isNull()
     }
 
     @Test
-    fun testErrorDetailLimitSegmentsShouldntFailIfSegmentsAreNull() {
+    fun testErrorDetailLimitHttpRequestsShouldntFailIfHttpRequestsAreNull() {
         val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), null)
-        errorDetail.copyTruncateSegments(1)
+        errorDetail.copyTruncateHttpRequests(1)
     }
 
     @Test
-    fun testErrorDetailLimitSegmentsShouldLimitSegments() {
-        val segment1 = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
-        val segment2 = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
-        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), mutableListOf(segment1, segment2))
-        assertThat(errorDetail.segments?.size).isEqualTo(2)
-        val copy = errorDetail.copyTruncateSegments(1)
-        assertThat(copy.segments?.size).isEqualTo(1)
+    fun testErrorDetailLimitHttpRequestsShouldLimitHttpRequests() {
+        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
+        val httpRequest2 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), mutableListOf(httpRequest1, httpRequest2))
+        assertThat(errorDetail.httpRequests?.size).isEqualTo(2)
+        val copy = errorDetail.copyTruncateHttpRequests(1)
+        assertThat(copy.httpRequests?.size).isEqualTo(1)
     }
 
     @Test
     fun testErrorDetailCopyTruncateStringsAndUrlsShouldCorrectlyTruncateStringsAndUrls() {
-        val segment1 = Segment(0, SegmentType.MANIFEST_DASH, "0123456789", "0123456789", 0, 0L, null, 0, true)
-        val segment2 = Segment(0, SegmentType.MANIFEST_DASH, null, "0123", 0, 0L, null, 0, true)
-        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, "0123456789", ErrorData(), mutableListOf(segment1, segment2))
+        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, "0123456789", "0123456789", 0, 0L, null, 0, true)
+        val httpRequest2 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, "0123", 0, 0L, null, 0, true)
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, "0123456789", ErrorData(), mutableListOf(httpRequest1, httpRequest2))
         val copy = errorDetail.copyTruncateStringsAndUrls(5, 5)
         assertThat(copy.analyticsVersion).isEqualTo(errorDetail.analyticsVersion)
         assertThat(copy.code).isEqualTo(errorDetail.code)
@@ -64,15 +64,15 @@ class ErrorDetailBackendTests {
         assertThat(copy.licenseKey).isEqualTo(errorDetail.licenseKey)
         assertThat(copy.message).isEqualTo("01234")
         assertThat(copy.platform).isEqualTo(errorDetail.platform)
-        assertThat(copy.segments?.size).isEqualTo(errorDetail.segments?.size)
-        assertThat(copy.segments?.get(0)?.url).isEqualTo("01234")
-        assertThat(copy.segments?.get(0)?.lastRedirectLocation).isEqualTo("01234")
-        assertThat(copy.segments?.get(1)?.url).isEqualTo(null)
-        assertThat(copy.segments?.get(1)?.lastRedirectLocation).isEqualTo("0123")
+        assertThat(copy.httpRequests?.size).isEqualTo(errorDetail.httpRequests?.size)
+        assertThat(copy.httpRequests?.get(0)?.url).isEqualTo("01234")
+        assertThat(copy.httpRequests?.get(0)?.lastRedirectLocation).isEqualTo("01234")
+        assertThat(copy.httpRequests?.get(1)?.url).isEqualTo(null)
+        assertThat(copy.httpRequests?.get(1)?.lastRedirectLocation).isEqualTo("0123")
     }
 
     @Test
-    fun testErrorDetailCopyTruncateStringsAndUrlsShouldCorrectlyTruncateStringsAndUrlsWithNullSegments() {
+    fun testErrorDetailCopyTruncateStringsAndUrlsShouldCorrectlyTruncateStringsAndUrlsWithNullHttpRequests() {
         val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, "0123456789", ErrorData(), null)
         val copy = errorDetail.copyTruncateStringsAndUrls(5, 5)
         assertThat(copy.analyticsVersion).isEqualTo(errorDetail.analyticsVersion)
@@ -83,17 +83,17 @@ class ErrorDetailBackendTests {
         assertThat(copy.licenseKey).isEqualTo(errorDetail.licenseKey)
         assertThat(copy.message).isEqualTo("01234")
         assertThat(copy.platform).isEqualTo(errorDetail.platform)
-        assertThat(copy.segments?.size).isEqualTo(errorDetail.segments?.size)
+        assertThat(copy.httpRequests?.size).isEqualTo(errorDetail.httpRequests?.size)
     }
 
     @Test
-    fun testErrorDetailLimitSegmentsShouldRemoveItemsFromEnd() {
-        val segment1 = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
-        val segment2 = Segment(1, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
-        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), mutableListOf(segment1, segment2))
-        errorDetail.copyTruncateSegments(1)
-        assertThat(errorDetail.segments?.get(0)).isEqualTo(segment1)
-        assertThat(errorDetail.segments?.get(0)).isNotEqualTo(segment2)
+    fun testErrorDetailLimitHttpRequestsShouldRemoveItemsFromEnd() {
+        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
+        val httpRequest2 = HttpRequest(1, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), mutableListOf(httpRequest1, httpRequest2))
+        errorDetail.copyTruncateHttpRequests(1)
+        assertThat(errorDetail.httpRequests?.get(0)).isEqualTo(httpRequest1)
+        assertThat(errorDetail.httpRequests?.get(0)).isNotEqualTo(httpRequest2)
     }
 
     @Test
@@ -130,6 +130,6 @@ class ErrorDetailBackendTests {
         verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
     }
 
-    private fun getErrorDetail(segmentCount: Int?) = ErrorDetail("platform", "key", "domain", "impressionId", 0, 0, null, null, ErrorData(), if (segmentCount == null) null else (0..segmentCount).map { getSegment() }.toMutableList())
-    private fun getSegment() = Segment(0, SegmentType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
+    private fun getErrorDetail(httpRequestCount: Int?) = ErrorDetail("platform", "key", "domain", "impressionId", 0, 0, null, null, ErrorData(), if (httpRequestCount == null) null else (0..httpRequestCount).map { getHttpRequest() }.toMutableList())
+    private fun getHttpRequest() = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
 }
