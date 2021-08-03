@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Error detail tracking feature
 
+### Removed
+- Unintended public methods from Collector classes
+
 ## Development v1
 
 ### Fixed
@@ -24,6 +27,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Error detail tracking feature
+
+### Removed
+- Unintended public methods from Collector classes
 
 ## v2.1.0
 
