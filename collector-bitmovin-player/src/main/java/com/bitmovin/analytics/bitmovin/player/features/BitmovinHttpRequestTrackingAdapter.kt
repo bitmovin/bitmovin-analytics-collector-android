@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
+import android.util.Log
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
@@ -15,9 +16,12 @@ class BitmovinHttpRequestTrackingAdapter(private val player: Player, private val
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
 
     private val sourceEventDownloadFinishedListener: (SourceEvent.DownloadFinished) -> Unit = { event ->
-        val requestType = mapHttpRequestType(event.downloadType)
-        val httpRequest = HttpRequest(Util.getTimestamp(), requestType, event.url, event.lastRedirectLocation, event.httpStatus, Util.secondsToMillis(event.downloadTime), null, event.size, event.isSuccess)
-        observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(httpRequest)) }
+        catchAndLogException("Exception occurred in SourceEvent.DownloadFinished") {
+            val requestType = mapHttpRequestType(event.downloadType)
+            val httpRequest =
+                HttpRequest(Util.getTimestamp(), requestType, event.url, event.lastRedirectLocation, event.httpStatus, Util.secondsToMillis(event.downloadTime), null, event.size, event.isSuccess)
+            observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(httpRequest)) }
+        }
     }
 
     init {
@@ -61,5 +65,17 @@ class BitmovinHttpRequestTrackingAdapter(private val player: Player, private val
 
     override fun onReleasing() {
         unwireEvents()
+    }
+
+    companion object {
+        private val TAG = BitmovinHttpRequestTrackingAdapter::class.java.name
+
+        private fun catchAndLogException(msg: String, block: () -> Unit) {
+            try {
+                block()
+            } catch (e: Exception) {
+                Log.e(TAG, msg, e)
+            }
+        }
     }
 }
