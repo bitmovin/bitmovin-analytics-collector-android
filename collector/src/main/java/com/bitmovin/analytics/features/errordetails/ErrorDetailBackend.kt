@@ -52,11 +52,11 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
         fun ErrorDetail.copyTruncateStringsAndUrls(maxStringLength: Int, maxUrlLength: Int): ErrorDetail = this.copy(
                 message = message?.take(maxStringLength),
                 data = data.copyTruncateStrings(maxStringLength),
-                httpRequests = httpRequests?.map {
+                httpRequests = httpRequests?.mapNotNull {
                     it.copyTruncateUrls(maxUrlLength)
                 })
 
-        private fun HttpRequest.copyTruncateUrls(maxLength: Int) = this.copy(
+        private fun HttpRequest?.copyTruncateUrls(maxLength: Int) = this?.copy(
                 url = url?.take(maxLength),
                 lastRedirectLocation = lastRedirectLocation?.take(maxLength))
 
