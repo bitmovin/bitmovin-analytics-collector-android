@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.exoplayer
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO
@@ -10,6 +9,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.analytics.AnalyticsListener
+import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
@@ -26,12 +26,20 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class ExoPlayerAdapterTest {
 
-    private lateinit var adapter: FakeExoPlayerAdapter
+    private lateinit var player: ExoPlayer
+    private lateinit var adapter: ExoPlayerAdapter
     @Mock
     private lateinit var stateMachine: PlayerStateMachine
     @Before
     fun setup() {
-        adapter = FakeExoPlayerAdapter(mock(ExoPlayer::class.java), mock(BitmovinAnalyticsConfig::class.java), mock(DeviceInformationProvider::class.java), stateMachine, mockk(relaxed = true))
+        player = mockk(relaxed = true)
+        every { player.currentWindowIndex } returns 0
+        val timeline = mockk<Timeline>(relaxed = true) {
+            every { windowCount } returns 1
+            every { periodCount } returns 1
+        }
+        every { player.currentTimeline } returns timeline
+        adapter = ExoPlayerAdapter(player, mock(BitmovinAnalyticsConfig::class.java), stateMachine, mockk(relaxed = true))
     }
 
     @Test
@@ -40,7 +48,7 @@ class ExoPlayerAdapterTest {
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerStates.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
-        adapter.fakePosition = 20
+        every { player.currentPosition } returns 20
 
         // act
         adapter.onDecoderInputFormatChanged(getEventTime(20L), TRACK_TYPE_AUDIO, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
@@ -61,7 +69,7 @@ class ExoPlayerAdapterTest {
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerStates.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(true)
-        adapter.fakePosition = 20
+        every { player.currentPosition } returns 20
 
         // act
         adapter.onDecoderInputFormatChanged(getEventTime(20L), TRACK_TYPE_VIDEO, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
@@ -82,7 +90,7 @@ class ExoPlayerAdapterTest {
         val bitrate = 3000
         `when`(stateMachine.currentState).thenReturn(PlayerStates.PLAYING)
         `when`(stateMachine.isQualityChangeEventEnabled).thenReturn(false)
-        adapter.fakePosition = 20
+        every { player.currentPosition } returns 20
 
         // act
         adapter.onDecoderInputFormatChanged(getEventTime(20L), TRACK_TYPE_VIDEO, Format.createVideoSampleFormat(null, null, null, bitrate, 1, 300, 300, 64F, null, null))
