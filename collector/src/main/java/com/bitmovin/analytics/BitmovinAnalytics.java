@@ -48,7 +48,7 @@ public class BitmovinAnalytics
     private final EventBus eventBus = new EventBus();
 
     private final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
-    private PlayerAdapter playerAdapter;
+    @Nullable private PlayerAdapter playerAdapter;
     private PlayerStateMachine playerStateMachine;
     private BitmovinAdAnalytics adAnalytics;
     private IEventDataDispatcher eventDataDispatcher;
@@ -66,7 +66,7 @@ public class BitmovinAnalytics
     public BitmovinAnalytics(
             BitmovinAnalyticsConfig bitmovinAnalyticsConfig,
             Context context,
-            DeviceInformationProvider deviceInformationProvider) {
+            @NotNull DeviceInformationProvider deviceInformationProvider) {
         if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }
@@ -89,23 +89,6 @@ public class BitmovinAnalytics
         if (this.bitmovinAnalyticsConfig.getAds()) {
             this.adAnalytics = new BitmovinAdAnalytics(this);
         }
-    }
-
-    /**
-     * Bitmovin Analytics
-     *
-     * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
-     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass
-     *     {@link Context} seperately.
-     */
-    @Deprecated
-    public BitmovinAnalytics(
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig,
-            DeviceInformationProvider deviceInformationProvider) {
-        this(
-                bitmovinAnalyticsConfig,
-                bitmovinAnalyticsConfig.getContext(),
-                deviceInformationProvider);
     }
 
     public Context getContext() {
@@ -463,7 +446,9 @@ public class BitmovinAnalytics
 
     public void sendEventData(EventData data) {
         this.eventDataDispatcher.add(data);
-        this.playerAdapter.clearValues();
+        if (this.playerAdapter != null) {
+            this.playerAdapter.clearValues();
+        }
     }
 
     public void sendAdEventData(AdEventData data) {
