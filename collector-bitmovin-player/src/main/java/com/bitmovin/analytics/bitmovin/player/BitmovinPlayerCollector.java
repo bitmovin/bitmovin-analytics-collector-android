@@ -9,7 +9,6 @@ import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.Collector;
 import com.bitmovin.analytics.DefaultCollector;
-import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory;
 import com.bitmovin.analytics.config.SourceMetadata;
@@ -52,12 +51,6 @@ public class BitmovinPlayerCollector extends DefaultCollector<Player> implements
                 analytics.getPlayerStateMachine(),
                 featureFactory,
                 sourceMetadataMap);
-    }
-
-    @NotNull
-    @Override
-    protected AdAdapter createAdAdapter(Player player) {
-        return new BitmovinSdkAdAdapter(player);
     }
 
     public void addSourceMetadata(Source playerSource, SourceMetadata sourceMetadata) {

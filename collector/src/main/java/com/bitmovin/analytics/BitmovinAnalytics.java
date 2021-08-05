@@ -128,13 +128,19 @@ public class BitmovinAnalytics
                 new ManifestUrlEventDataManipulator(
                         this.playerAdapter, this.bitmovinAnalyticsConfig));
         // this.registerEventDataManipulators(postPipelineManipulator);
+
+        tryAttachAd(adapter);
     }
 
-    protected void attachAd(AdAdapter adapter) {
-        detachAd();
-        if (adAnalytics != null && adapter != null) {
-            adAnalytics.attachAdapter(adapter);
+    private void tryAttachAd(PlayerAdapter adapter) {
+        if (adAnalytics == null) {
+            return;
         }
+        AdAdapter adAdapter = adapter.createAdAdapter();
+        if (adAdapter == null) {
+            return;
+        }
+        adAnalytics.attachAdapter(adAdapter);
     }
 
     /** Detach the current player that is being used with Bitmovin Analytics. */
