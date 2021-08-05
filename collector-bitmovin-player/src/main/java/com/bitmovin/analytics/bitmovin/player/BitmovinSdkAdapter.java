@@ -5,7 +5,6 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator;
@@ -44,7 +43,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final Player bitmovinPlayer;
-    private final DeviceInformationProvider deviceInformationProvider;
     private PlayerStateMachine stateMachine;
     private ExceptionMapper<ErrorEvent> exceptionMapper = new BitmovinPlayerExceptionMapper();
     private int totalDroppedVideoFrames;
@@ -62,7 +60,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     public BitmovinSdkAdapter(
             Player bitmovinPlayer,
             BitmovinAnalyticsConfig config,
-            DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
             FeatureFactory featureFactory,
             Map<Source, SourceMetadata> sourceMetadataMap) {
@@ -70,7 +67,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
         this.config = config;
         this.stateMachine = stateMachine;
         this.bitmovinPlayer = bitmovinPlayer;
-        this.deviceInformationProvider = deviceInformationProvider;
         this.sourceMetadataMap = sourceMetadataMap;
     }
 
@@ -307,11 +303,6 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
     @Override
     public Long getDRMDownloadTime() {
         return drmDownloadTime;
-    }
-
-    @Override
-    public DeviceInformationProvider getDeviceInformationProvider() {
-        return this.deviceInformationProvider;
     }
 
     @Override
