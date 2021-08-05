@@ -12,7 +12,6 @@ import com.bitmovin.analytics.DefaultCollector;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory;
 import com.bitmovin.analytics.config.SourceMetadata;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.player.api.Player;
 import com.bitmovin.player.api.source.Source;
@@ -26,12 +25,20 @@ public class BitmovinPlayerCollector extends DefaultCollector<Player> implements
      * Bitmovin Analytics
      *
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
+     * @param context {@link Context}
      */
     public BitmovinPlayerCollector(
             BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
-        super(bitmovinAnalyticsConfig, context);
+        super(bitmovinAnalyticsConfig, context, getUserAgent(context));
     }
 
+    /**
+     * Bitmovin Analytics
+     *
+     * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
+     * @deprecated Please use {@link #BitmovinPlayerCollector(BitmovinAnalyticsConfig, Context)} and
+     *     pass {@link Context} separately.
+     */
     @Deprecated
     public BitmovinPlayerCollector(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
         this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
@@ -39,15 +46,11 @@ public class BitmovinPlayerCollector extends DefaultCollector<Player> implements
 
     @NotNull
     @Override
-    protected PlayerAdapter createAdapter(
-            Player player,
-            @NotNull BitmovinAnalytics analytics,
-            @NotNull DeviceInformationProvider deviceInformationProvider) {
+    protected PlayerAdapter createAdapter(Player player, @NotNull BitmovinAnalytics analytics) {
         FeatureFactory featureFactory = new BitmovinFeatureFactory(analytics, player);
         return new BitmovinSdkAdapter(
                 player,
                 analytics.getConfig(),
-                deviceInformationProvider,
                 analytics.getPlayerStateMachine(),
                 featureFactory,
                 sourceMetadataMap);
@@ -58,8 +61,7 @@ public class BitmovinPlayerCollector extends DefaultCollector<Player> implements
     }
 
     @NotNull
-    @Override
-    protected String getUserAgent(Context context) {
+    private static String getUserAgent(Context context) {
         ApplicationInfo applicationInfo = context.getApplicationInfo();
         int stringId = applicationInfo.labelRes;
         String applicationName = "Unknown";
