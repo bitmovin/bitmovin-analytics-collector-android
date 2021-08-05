@@ -11,6 +11,7 @@ import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
 import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
+import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
@@ -54,6 +55,7 @@ public class BitmovinAnalytics
     protected Context context;
     private final UserIdProvider userIdProvider;
     private final EventDataFactory eventDataFactory;
+    private final DeviceInformationProvider deviceInformationProvider;
 
     /**
      * Bitmovin Analytics
@@ -61,12 +63,16 @@ public class BitmovinAnalytics
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
      * @param context {@link Context}
      */
-    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
+    public BitmovinAnalytics(
+            BitmovinAnalyticsConfig bitmovinAnalyticsConfig,
+            Context context,
+            DeviceInformationProvider deviceInformationProvider) {
         if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }
         Log.d(TAG, "Initializing Bitmovin Analytics with Key: " + bitmovinAnalyticsConfig.getKey());
         this.context = context;
+        this.deviceInformationProvider = deviceInformationProvider;
         this.userIdProvider =
                 bitmovinAnalyticsConfig.getRandomizeUserId()
                         ? new RandomizedUserIdIdProvider()
@@ -93,8 +99,13 @@ public class BitmovinAnalytics
      *     {@link Context} seperately.
      */
     @Deprecated
-    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
-        this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
+    public BitmovinAnalytics(
+            BitmovinAnalyticsConfig bitmovinAnalyticsConfig,
+            DeviceInformationProvider deviceInformationProvider) {
+        this(
+                bitmovinAnalyticsConfig,
+                bitmovinAnalyticsConfig.getContext(),
+                deviceInformationProvider);
     }
 
     public Context getContext() {
@@ -177,7 +188,7 @@ public class BitmovinAnalytics
         return eventDataFactory.create(
                 playerStateMachine.getImpressionId(),
                 playerAdapter.getCurrentSourceMetadata(),
-                playerAdapter.getDeviceInformationProvider().getDeviceInformation());
+                deviceInformationProvider.getDeviceInformation());
     }
 
     @Override
