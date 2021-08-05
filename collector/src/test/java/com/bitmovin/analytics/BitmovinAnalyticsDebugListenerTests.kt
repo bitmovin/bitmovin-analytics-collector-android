@@ -21,14 +21,14 @@ class BitmovinAnalyticsDebugListenerTests {
     fun setup() {
         mockkConstructor(BackendFactory::class)
         every { anyConstructed<BackendFactory>().createBackend(any(), any()) } returns mockk(relaxed = true)
-        analytics = BitmovinAnalytics(config, Activity())
+        analytics = BitmovinAnalytics(config, Activity(), mockk())
     }
 
     @Test
     fun testShouldCallOnDispatchEventData() {
         val listener = mock<BitmovinAnalytics.DebugListener>()
         analytics.addDebugListener(listener)
-        analytics.eventDataDispatcher.add(mockk(relaxed = true))
+        analytics.sendEventData(mockk(relaxed = true))
         verify(listener, times(1)).onDispatchEventData(any())
     }
 
@@ -36,7 +36,7 @@ class BitmovinAnalyticsDebugListenerTests {
     fun testShouldCallOnDispatchAdEventData() {
         val listener = mock<BitmovinAnalytics.DebugListener>()
         analytics.addDebugListener(listener)
-        analytics.eventDataDispatcher.addAd(mockk(relaxed = true))
+        analytics.sendAdEventData(mockk(relaxed = true))
         verify(listener, times(1)).onDispatchAdEventData(any())
     }
 
@@ -45,7 +45,7 @@ class BitmovinAnalyticsDebugListenerTests {
         val listener = mock<BitmovinAnalytics.DebugListener>()
         analytics.addDebugListener(listener)
         analytics.removeDebugListener(listener)
-        analytics.eventDataDispatcher.add(mockk(relaxed = true))
+        analytics.sendEventData(mockk(relaxed = true))
         verify(listener, never()).onDispatchEventData(any())
     }
 }

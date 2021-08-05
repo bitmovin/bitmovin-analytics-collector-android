@@ -40,19 +40,19 @@ class BitmovinAnalyticsTest {
     @Test(expected = IllegalArgumentException::class)
     fun testDeprecatedConstructorChecksForNullInConfiguration() {
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("foo-bar")
-        BitmovinAnalytics(bitmovinAnalyticsConfig)
+        BitmovinAnalytics(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context, mockk())
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun testNewDefaultConstructorChecksForNull() {
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("foo-bar")
-        BitmovinAnalytics(bitmovinAnalyticsConfig, null)
+        BitmovinAnalytics(bitmovinAnalyticsConfig, null, mockk())
     }
 
     @Test
     fun testDetachPlayerShouldCallOnAnalyticsReleasingEventListener() {
         val listener = mockk<OnAnalyticsReleasingEventListener>(relaxed = true)
-        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, Activity())
+        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, Activity(), mockk())
         analytics.onAnalyticsReleasingObservable.subscribe(listener)
         analytics.detachPlayer()
         verify(exactly = 1) { listener.onReleasing() }
@@ -62,10 +62,10 @@ class BitmovinAnalyticsTest {
     fun testOnVideoStartFailedShouldCallOnErrorDetailEventListener() {
         val listener = mockk<OnErrorDetailEventListener>(relaxed = true)
         mockkConstructor(PlayerStateMachine::class)
-        val analytics = spyk(BitmovinAnalytics(bitmovinAnalyticsConfig, Activity()))
+        val analytics = spyk(BitmovinAnalytics(bitmovinAnalyticsConfig, Activity(), mockk()))
         every { analytics.sendEventData(any()) } answers {}
         every { analytics.createEventData() }.returns(mockk(relaxed = true))
-        every { analytics.playerStateMachine.videoStartFailedReason } returns VideoStartFailedReason.TIMEOUT
+        analytics.playerStateMachine.videoStartFailedReason = VideoStartFailedReason.TIMEOUT
         analytics.onErrorDetailObservable.subscribe(listener)
         analytics.onVideoStartFailed()
         verify(exactly = 1) { listener.onError(VideoStartFailedReason.TIMEOUT.errorCode?.errorCode, VideoStartFailedReason.TIMEOUT.errorCode?.description, any()) }
