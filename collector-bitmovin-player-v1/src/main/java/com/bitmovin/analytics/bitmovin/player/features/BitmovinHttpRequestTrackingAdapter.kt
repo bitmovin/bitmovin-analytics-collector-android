@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
+import android.util.Log
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
@@ -14,9 +15,11 @@ import com.bitmovin.player.config.network.HttpRequestType
 class BitmovinHttpRequestTrackingAdapter(private val player: BitmovinPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val onDownloadFinishedListener = OnDownloadFinishedListener {
-        val requestType = mapHttpRequestType(it.downloadType)
-        val httpRequest = HttpRequest(Util.getTimestamp(), requestType, it.url, it.lastRedirectLocation, it.httpStatus, Util.secondsToMillis(it.downloadTime), null, it.size, it.isSuccess)
-        observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(httpRequest)) }
+        catchAndLogException("Exception occurred in OnDownloadFinishedListener") {
+            val requestType = mapHttpRequestType(it.downloadType)
+            val httpRequest = HttpRequest(Util.getTimestamp(), requestType, it.url, it.lastRedirectLocation, it.httpStatus, Util.secondsToMillis(it.downloadTime), null, it.size, it.isSuccess)
+            observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(httpRequest)) }
+        }
     }
 
     init {
@@ -59,5 +62,17 @@ class BitmovinHttpRequestTrackingAdapter(private val player: BitmovinPlayer, pri
 
     override fun onReleasing() {
         unwireEvents()
+    }
+
+    companion object {
+        private val TAG = BitmovinHttpRequestTrackingAdapter::class.java.name
+
+        private fun catchAndLogException(msg: String, block: () -> Unit) {
+            try {
+                block()
+            } catch (e: Exception) {
+                Log.e(TAG, msg, e)
+            }
+        }
     }
 }

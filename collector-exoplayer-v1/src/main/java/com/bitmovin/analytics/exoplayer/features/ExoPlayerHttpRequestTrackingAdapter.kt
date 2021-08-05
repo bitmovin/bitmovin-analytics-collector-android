@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.exoplayer.features
 
 import android.net.Uri
+import android.util.Log
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
@@ -26,13 +27,17 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
     private val analyticsListener = object : DefaultAnalyticsListener() {
 
         override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData) {
-            val statusCode = loadEventInfo.responseHeaders.responseCode ?: 0
-            notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, statusCode)
+            catchAndLogException("Exception occurred in onLoadCompleted") {
+                val statusCode = loadEventInfo.responseHeaders.responseCode ?: 0
+                notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, statusCode)
+            }
         }
 
         override fun onLoadError(eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData, error: IOException, wasCanceled: Boolean) {
-            val statusCode = (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode ?: loadEventInfo.responseHeaders.responseCode ?: 0
-            notifyObservable(eventTime, loadEventInfo, mediaLoadData, false, statusCode)
+            catchAndLogException("Exception occurred in onLoadError") {
+                val statusCode = (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode ?: loadEventInfo.responseHeaders.responseCode ?: 0
+                notifyObservable(eventTime, loadEventInfo, mediaLoadData, false, statusCode)
+            }
         }
     }
 
@@ -68,6 +73,17 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
     }
 
     companion object {
+        private val TAG = ExoPlayerHttpRequestTrackingAdapter::class.java.name
+
+        private fun catchAndLogException(msg: String, block: () -> Unit) {
+            // As ExoPlayer sometimes has breaking changes, we want to make sure that an optional feature isn't breaking our collector
+            try {
+                block()
+            } catch (e: Exception) {
+                Log.e(TAG, msg, e)
+            }
+        }
+
         private val String.extractStatusCode: Int?
             get() {
                 val tokens = this.split(' ')
