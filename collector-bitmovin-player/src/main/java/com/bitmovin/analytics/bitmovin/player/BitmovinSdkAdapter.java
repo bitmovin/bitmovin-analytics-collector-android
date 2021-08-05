@@ -9,6 +9,7 @@ import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
+import com.bitmovin.analytics.enums.CastTech;
 import com.bitmovin.analytics.enums.DRMType;
 import com.bitmovin.analytics.enums.PlayerType;
 import com.bitmovin.analytics.enums.VideoStartFailedReason;
@@ -240,6 +241,9 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
         // isCasting
         data.setCasting(bitmovinPlayer.isCasting());
+        if (bitmovinPlayer.isCasting()) {
+            data.setCastTech(CastTech.GoogleCast.getValue());
+        }
 
         // DroppedVideoFrames
         data.setDroppedFrames(this.totalDroppedVideoFrames);
