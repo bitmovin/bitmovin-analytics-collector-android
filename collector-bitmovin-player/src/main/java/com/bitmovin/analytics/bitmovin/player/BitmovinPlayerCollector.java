@@ -5,7 +5,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import com.bitmovin.analytics.BitmovinAdAnalytics;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.Collector;
@@ -57,8 +56,8 @@ public class BitmovinPlayerCollector extends DefaultCollector<Player> implements
 
     @NotNull
     @Override
-    protected AdAdapter createAdAdapter(Player player, @NotNull BitmovinAdAnalytics adAnalytics) {
-        return new BitmovinSdkAdAdapter(player, adAnalytics);
+    protected AdAdapter createAdAdapter(Player player) {
+        return new BitmovinSdkAdAdapter(player);
     }
 
     public void addSourceMetadata(Source playerSource, SourceMetadata sourceMetadata) {

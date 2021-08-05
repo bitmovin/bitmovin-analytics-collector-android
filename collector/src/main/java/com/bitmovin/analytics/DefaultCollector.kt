@@ -36,7 +36,7 @@ protected constructor(config: BitmovinAnalyticsConfig, context: Context) {
     protected abstract fun getUserAgent(context: Context): String
     protected abstract fun createAdapter(player: TPlayer, analytics: BitmovinAnalytics, deviceInformationProvider: DeviceInformationProvider): PlayerAdapter
 
-    protected open fun createAdAdapter(player: TPlayer, adAnalytics: BitmovinAdAnalytics): AdAdapter? = null
+    protected open fun createAdAdapter(player: TPlayer): AdAdapter? = null
 
     fun attachPlayer(player: TPlayer) {
         val context = analytics.context
@@ -45,7 +45,7 @@ protected constructor(config: BitmovinAnalyticsConfig, context: Context) {
         analytics.attach(adapter)
 
         if (analytics.adAnalytics != null) {
-            createAdAdapter(player, analytics.adAnalytics)?.let {
+            createAdAdapter(player)?.let {
                 analytics.attachAd(it)
             }
         }

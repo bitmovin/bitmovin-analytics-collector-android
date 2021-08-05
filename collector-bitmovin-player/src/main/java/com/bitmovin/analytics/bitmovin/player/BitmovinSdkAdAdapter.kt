@@ -1,8 +1,9 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import android.util.Log
-import com.bitmovin.analytics.BitmovinAdAnalytics
+import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.AdAdapter
+import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
 import com.bitmovin.analytics.bitmovin.player.utils.AdBreakMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdQuartileFactory
@@ -13,8 +14,8 @@ import com.bitmovin.player.api.event.PlayerEvent
 /**
  * An adapter that maps the Ad Events to the BitmovinAdAnalytics class
  */
-class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: BitmovinAdAnalytics) : AdAdapter {
-
+class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
+    private val observableSupport = ObservableSupport<AdAnalyticsEventListener>()
     private val adMapper: AdMapper = AdMapper()
     private val adBreakMapper: AdBreakMapper = AdBreakMapper()
     private val adQuartileFactory: AdQuartileFactory = AdQuartileFactory()
@@ -23,7 +24,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
     private val playerEventAdStartedListener: (PlayerEvent.AdStarted) -> Unit = method@{ event ->
         try {
             val ad = event.ad ?: return@method
-            adAnalytics.onAdStarted(adMapper.fromPlayerAd(ad))
+            observableSupport.notify { it.onAdStarted(adMapper.fromPlayerAd(ad)) }
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Started", e)
         }
@@ -31,7 +32,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
 
     private val playerEventAdFinishedListener: (PlayerEvent.AdFinished) -> Unit = {
         try {
-            adAnalytics.onAdFinished()
+            observableSupport.notify { it.onAdFinished() }
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Finished", e)
         }
@@ -40,7 +41,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
     private val playerEventAdBreakStartedListener: (PlayerEvent.AdBreakStarted) -> Unit = method@{ event ->
         try {
             val adBreak = event.adBreak ?: return@method
-            adAnalytics.onAdBreakStarted(adBreakMapper.fromPlayerAdConfiguration(adBreak))
+            observableSupport.notify { it.onAdBreakStarted(adBreakMapper.fromPlayerAdConfiguration(adBreak)) }
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Break Started", e)
         }
@@ -48,7 +49,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
 
     private val playerEventAdBreakFinishedListener: (PlayerEvent.AdBreakFinished) -> Unit = {
         try {
-            adAnalytics.onAdBreakFinished()
+            observableSupport.notify { it.onAdBreakFinished() }
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Break Finished", e)
         }
@@ -56,7 +57,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
 
     private val playerEventAdClickedListener: (PlayerEvent.AdClicked) -> Unit = { event ->
         try {
-            adAnalytics.onAdClicked(event.clickThroughUrl)
+            observableSupport.notify { it.onAdClicked(event.clickThroughUrl) }
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Clicked", e)
         }
@@ -65,10 +66,12 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
     private val playerEventAdErrorListener: (PlayerEvent.AdError) -> Unit = method@{ event ->
         try {
             val adConf = event.adConfig ?: return@method
-            adAnalytics.onAdError(
+            observableSupport.notify {
+                it.onAdError(
                     adBreakMapper.fromPlayerAdConfiguration(adConf),
                     event.code,
                     event.message)
+            }
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Error", e)
         }
@@ -76,7 +79,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
 
     private val playerEventAdSkippedListener: (PlayerEvent.AdSkipped) -> Unit = {
         try {
-            adAnalytics.onAdSkipped()
+            observableSupport.notify { it.onAdSkipped() }
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Skipped", e)
         }
@@ -85,7 +88,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
     private val playerEventAdManifestLoadedListener: (PlayerEvent.AdManifestLoaded) -> Unit = method@{ event ->
         try {
             val adBreak = event.adBreak ?: return@method
-            adAnalytics.onAdManifestLoaded(adBreakMapper.fromPlayerAdConfiguration(adBreak), event.downloadTime)
+            observableSupport.notify { it.onAdManifestLoaded(adBreakMapper.fromPlayerAdConfiguration(adBreak), event.downloadTime) }
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Manifest Loaded", e)
         }
@@ -101,7 +104,7 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
 
     private val playerEventAdQuartileListener: (PlayerEvent.AdQuartile) -> Unit = { event ->
         try {
-            adAnalytics.onAdQuartile(adQuartileFactory.FromPlayerAdQuartile(event.quartile))
+            observableSupport.notify { it.onAdQuartile(adQuartileFactory.FromPlayerAdQuartile(event.quartile)) }
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Quartile Listener ", e)
         }
@@ -142,4 +145,12 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player, val adAnalytics: Bitmovin
         get() = AdModuleInformation("DefaultAdvertisingService", BitmovinUtil.getPlayerVersion())
     override val isAutoplayEnabled: Boolean?
         get() = bitmovinPlayer.config.playbackConfig?.isAutoplayEnabled
+
+    override fun subscribe(listener: AdAnalyticsEventListener) {
+        observableSupport.subscribe(listener)
+    }
+
+    override fun unsubscribe(listener: AdAnalyticsEventListener) {
+        observableSupport.unsubscribe(listener)
+    }
 }
