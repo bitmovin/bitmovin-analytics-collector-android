@@ -47,12 +47,12 @@ public class BitmovinAnalytics
     private FeatureManager<FeatureConfigContainer> featureManager = new FeatureManager<>();
     private final EventBus eventBus = new EventBus();
 
-    protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
-    protected PlayerAdapter playerAdapter;
-    protected PlayerStateMachine playerStateMachine;
-    protected BitmovinAdAnalytics adAnalytics;
-    protected IEventDataDispatcher eventDataDispatcher;
-    protected Context context;
+    private final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
+    private PlayerAdapter playerAdapter;
+    private PlayerStateMachine playerStateMachine;
+    private BitmovinAdAnalytics adAnalytics;
+    private IEventDataDispatcher eventDataDispatcher;
+    private final Context context;
     private final UserIdProvider userIdProvider;
     private final EventDataFactory eventDataFactory;
     private final DeviceInformationProvider deviceInformationProvider;
