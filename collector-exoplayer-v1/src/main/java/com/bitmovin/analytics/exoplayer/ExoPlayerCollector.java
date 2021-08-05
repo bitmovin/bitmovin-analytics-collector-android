@@ -21,7 +21,9 @@ public class ExoPlayerCollector extends DefaultCollector<ExoPlayer>
      * @param context {@link Context}
      */
     public ExoPlayerCollector(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
-        super(bitmovinAnalyticsConfig, context, ExoUtil.getUserAgent(context));
+        super(
+                Companion.createAnalytics(
+                        bitmovinAnalyticsConfig, context, ExoUtil.getUserAgent(context)));
     }
 
     /**

@@ -26,7 +26,7 @@ public class BitmovinPlayerCollector extends DefaultCollector<BitmovinPlayer>
      */
     public BitmovinPlayerCollector(
             BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
-        super(bitmovinAnalyticsConfig, context, getUserAgent(context));
+        super(Companion.createAnalytics(bitmovinAnalyticsConfig, context, getUserAgent(context)));
     }
 
     /**
