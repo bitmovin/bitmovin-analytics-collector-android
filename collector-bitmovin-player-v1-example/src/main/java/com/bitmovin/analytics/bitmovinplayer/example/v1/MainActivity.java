@@ -8,6 +8,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector;
 import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.enums.CDNProvider;
+import com.bitmovin.analytics.example.shared.Samples;
 import com.bitmovin.player.BitmovinPlayer;
 import com.bitmovin.player.BitmovinPlayerView;
 import com.bitmovin.player.config.PlaybackConfiguration;
@@ -40,10 +41,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
 
     private final SourceItem sintelSource =
-            new SourceItem("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd");
+            new SourceItem(Samples.INSTANCE.getDASH_LIVE().getUri().toString());
     private final SourceItem corruptedSource =
-            new SourceItem(
-                    "https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd");
+            new SourceItem(Samples.INSTANCE.getCORRUPT_DASH().getUri().toString());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

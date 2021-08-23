@@ -18,4 +18,17 @@ object Samples {
     val HLS_DRM_WIDEVINE = Sample("Hls + Widevine", "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/m3u8s/widevine-hls.m3u8", "widevine", "https://widevine-proxy.appspot.com/proxy")
     val HLS_DRM_WIDEVINE_ENCRYPTED = Sample("Encrypted Hls + Widevine", "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/m3u8s/11331.m3u8", "widevine", "https://widevine-proxy.appspot.com/proxy")
     val DASH_DRM_WIDEVINE = Sample("Dash + Widevine", "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd", "widevine", "https://widevine-proxy.appspot.com/proxy")
+
+    val HLS_REDBULL = Sample("HLSRedbulll", "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8")
+    val DASH_LIVE = Sample("DashLive", "https://livesim.dashif.org/livesim/testpic_2s/Manifest.mpd")
+    val DASH_SINTEL = Sample("DashSintel", "https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd")
+
+    // Dash stream with corrupted first sample
+    val CORRUPT_DASH = Sample("CorruptRedBull", "https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd")
+
+    // These are IMA Sample Tags from https://developers.google.com/interactive-media-ads/docs/sdks/android/tags
+    val IMA_AD_SOURCE_1 = Sample("ImaAdSource1", "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=")
+    val IMA_AD_SOURCE_2 = Sample("ImaAdSource2", "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=")
+    val IMA_AD_SOURCE_3 = Sample("ImaAdSource3", "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=")
+    val IMA_AD_SOURCE_4 = Sample("ImaAdSource4", "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator=")
 }
