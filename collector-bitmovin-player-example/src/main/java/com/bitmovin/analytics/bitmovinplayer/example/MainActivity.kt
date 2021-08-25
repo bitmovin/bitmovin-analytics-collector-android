@@ -8,6 +8,7 @@ import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.enums.CDNProvider
+import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.player.PlayerView
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
@@ -115,7 +116,7 @@ class MainActivity : AppCompatActivity() {
 
         val liveSimMetadata = SourceMetadata(
             videoId = "source-video-id",
-            title = "redbull")
+            title = "livesims")
         bitmovinPlayerCollector?.addSourceMetadata(liveSimSource, liveSimMetadata)
 
         bitmovinPlayerCollector!!.attachPlayer(player)
@@ -160,10 +161,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val liveSimSource = Source.create(SourceConfig.fromUrl("https://livesim.dashif.org/livesim/testpic_2s/Manifest.mpd"))
-        private val redbullSource = Source.create(SourceConfig.fromUrl("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8"))
-        private val sintelSource = Source.create(SourceConfig.fromUrl("https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd"))
-        private val corruptedSource = Source.create(SourceConfig.fromUrl("https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd"))
+        private val liveSimSource = Source.create(SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()))
+        private val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()))
+        private val sintelSource = Source.create(SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()))
+        private val corruptedSource = Source.create(SourceConfig.fromUrl(Samples.CORRUPT_DASH.uri.toString()))
 
         private fun createBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {
             /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
@@ -200,18 +201,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         private fun createAdvertisingConfig(): AdvertisingConfig {
-            // These are IMA Sample Tags from
-            // https://developers.google.com/interactive-media-ads/docs/sdks/android/tags
-            val AD_SOURCE_1 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator="
-            val AD_SOURCE_2 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="
-            val AD_SOURCE_3 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator="
-            val AD_SOURCE_4 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator="
 
             // Create AdSources
-            val firstAdSource = AdSource(AdSourceType.Ima, AD_SOURCE_1)
-            val secondAdSource = AdSource(AdSourceType.Ima, AD_SOURCE_2)
-            val thirdAdSource = AdSource(AdSourceType.Ima, AD_SOURCE_3)
-            val fourthAdSource = AdSource(AdSourceType.Ima, AD_SOURCE_4)
+            val firstAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_1.uri.toString())
+            val secondAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_2.uri.toString())
+            val thirdAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_3.uri.toString())
+            val fourthAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_4.uri.toString())
 
             // Set up a pre-roll ad
             val preRoll = AdItem("pre", thirdAdSource)
