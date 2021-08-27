@@ -5,23 +5,7 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.DeviceInformationProvider
 
-abstract class DefaultCollector<TPlayer>
-/**
- * Bitmovin Analytics
- *
- * @param config {@link BitmovinAnalyticsConfig}
- */
-protected constructor(config: BitmovinAnalyticsConfig, context: Context) {
-    private val analytics = BitmovinAnalytics(config, context)
-
-    /**
-     * Bitmovin Analytics
-     *
-     * @param config [BitmovinAnalyticsConfig]
-     */
-    @Deprecated("Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass {@link Context} separately.")
-    protected constructor(config: BitmovinAnalyticsConfig) : this(config, config.context)
-
+abstract class DefaultCollector<TPlayer> protected constructor(private val analytics: BitmovinAnalytics) {
     var customData: CustomData
         get() = analytics.customData
         set(value) { analytics.customData = value }
@@ -32,13 +16,10 @@ protected constructor(config: BitmovinAnalyticsConfig, context: Context) {
     val config: BitmovinAnalyticsConfig
         get() = analytics.config
 
-    protected abstract fun getUserAgent(context: Context): String
-    protected abstract fun createAdapter(player: TPlayer, analytics: BitmovinAnalytics, deviceInformationProvider: DeviceInformationProvider): PlayerAdapter
+    protected abstract fun createAdapter(player: TPlayer, analytics: BitmovinAnalytics): PlayerAdapter
 
     fun attachPlayer(player: TPlayer) {
-        val context = analytics.context
-        val deviceInformationProvider = DeviceInformationProvider(context, getUserAgent(context))
-        val adapter = createAdapter(player, analytics, deviceInformationProvider)
+        val adapter = createAdapter(player, analytics)
         analytics.attach(adapter)
     }
 
@@ -56,5 +37,12 @@ protected constructor(config: BitmovinAnalyticsConfig, context: Context) {
 
     fun removeDebugListener(listener: BitmovinAnalytics.DebugListener) {
         analytics.removeDebugListener(listener)
+    }
+
+    companion object {
+        fun createAnalytics(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context, userAgent: String): BitmovinAnalytics {
+            val deviceInformationProvider = DeviceInformationProvider(context, userAgent)
+            return BitmovinAnalytics(bitmovinAnalyticsConfig, context, deviceInformationProvider)
+        }
     }
 }

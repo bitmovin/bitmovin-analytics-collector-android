@@ -12,7 +12,6 @@ import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.SpeedMeasurement;
@@ -72,7 +71,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     private String manifestUrl;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
     private BitrateEventDataManipulator bitrateEventDataManipulator;
-    private final DeviceInformationProvider deviceInformationProvider;
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private boolean isVideoAttemptedPlay = false;
     private boolean isPlaying = false;
@@ -88,7 +86,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     public ExoPlayerAdapter(
             ExoPlayer exoplayer,
             BitmovinAnalyticsConfig config,
-            DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
             FeatureFactory featureFactory) {
         this.featureFactory = featureFactory;
@@ -98,7 +95,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(defaultPlayerEventListener);
         this.config = config;
-        this.deviceInformationProvider = deviceInformationProvider;
         this.bitrateEventDataManipulator = new BitrateEventDataManipulator(exoplayer);
         attachAnalyticsListener();
     }
@@ -295,11 +291,6 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     @Override
     public Long getDRMDownloadTime() {
         return drmDownloadTime;
-    }
-
-    @Override
-    public DeviceInformationProvider getDeviceInformationProvider() {
-        return this.deviceInformationProvider;
     }
 
     @Override

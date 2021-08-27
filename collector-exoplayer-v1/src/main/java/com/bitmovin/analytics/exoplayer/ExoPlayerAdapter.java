@@ -14,7 +14,6 @@ import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.SpeedMeasurement;
@@ -75,7 +74,6 @@ public class ExoPlayerAdapter
     private boolean playerIsReady;
     private String manifestUrl;
     private ExceptionMapper<Throwable> exceptionMapper = new ExoPlayerExceptionMapper();
-    private final DeviceInformationProvider deviceInformationProvider;
     private DownloadSpeedMeter meter = new DownloadSpeedMeter();
     private BitrateEventDataManipulator bitrateEventDataManipulator;
     private final FeatureFactory featureFactory;
@@ -90,7 +88,6 @@ public class ExoPlayerAdapter
     public ExoPlayerAdapter(
             ExoPlayer exoplayer,
             BitmovinAnalyticsConfig config,
-            DeviceInformationProvider deviceInformationProvider,
             PlayerStateMachine stateMachine,
             FeatureFactory featureFactory) {
         this.featureFactory = featureFactory;
@@ -98,7 +95,6 @@ public class ExoPlayerAdapter
         this.exoplayer = exoplayer;
         this.exoplayer.addListener(this);
         this.config = config;
-        this.deviceInformationProvider = deviceInformationProvider;
         this.bitrateEventDataManipulator = new BitrateEventDataManipulator(exoplayer);
         attachAnalyticsListener();
     }
@@ -290,11 +286,6 @@ public class ExoPlayerAdapter
     @Override
     public Long getDRMDownloadTime() {
         return drmDownloadTime;
-    }
-
-    @Override
-    public DeviceInformationProvider getDeviceInformationProvider() {
-        return this.deviceInformationProvider;
     }
 
     @Override

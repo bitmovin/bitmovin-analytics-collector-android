@@ -11,6 +11,7 @@ import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
 import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
+import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
@@ -46,14 +47,15 @@ public class BitmovinAnalytics
     private FeatureManager<FeatureConfigContainer> featureManager = new FeatureManager<>();
     private final EventBus eventBus = new EventBus();
 
-    protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
-    protected PlayerAdapter playerAdapter;
-    protected PlayerStateMachine playerStateMachine;
-    protected BitmovinAdAnalytics adAnalytics;
-    protected IEventDataDispatcher eventDataDispatcher;
-    protected Context context;
+    private final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
+    @Nullable private PlayerAdapter playerAdapter;
+    private PlayerStateMachine playerStateMachine;
+    private BitmovinAdAnalytics adAnalytics;
+    private IEventDataDispatcher eventDataDispatcher;
+    private final Context context;
     private final UserIdProvider userIdProvider;
     private final EventDataFactory eventDataFactory;
+    private final DeviceInformationProvider deviceInformationProvider;
 
     /**
      * Bitmovin Analytics
@@ -61,12 +63,16 @@ public class BitmovinAnalytics
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
      * @param context {@link Context}
      */
-    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
+    public BitmovinAnalytics(
+            BitmovinAnalyticsConfig bitmovinAnalyticsConfig,
+            Context context,
+            @NotNull DeviceInformationProvider deviceInformationProvider) {
         if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }
         Log.d(TAG, "Initializing Bitmovin Analytics with Key: " + bitmovinAnalyticsConfig.getKey());
         this.context = context;
+        this.deviceInformationProvider = deviceInformationProvider;
         this.userIdProvider =
                 bitmovinAnalyticsConfig.getRandomizeUserId()
                         ? new RandomizedUserIdIdProvider()
@@ -83,18 +89,6 @@ public class BitmovinAnalytics
         if (this.bitmovinAnalyticsConfig.getAds()) {
             this.adAnalytics = new BitmovinAdAnalytics(this);
         }
-    }
-
-    /**
-     * Bitmovin Analytics
-     *
-     * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
-     * @deprecated Please use {@link #BitmovinAnalytics(BitmovinAnalyticsConfig, Context)} and pass
-     *     {@link Context} seperately.
-     */
-    @Deprecated
-    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig) {
-        this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.getContext());
     }
 
     public Context getContext() {
@@ -177,7 +171,7 @@ public class BitmovinAnalytics
         return eventDataFactory.create(
                 playerStateMachine.getImpressionId(),
                 playerAdapter.getCurrentSourceMetadata(),
-                playerAdapter.getDeviceInformationProvider().getDeviceInformation());
+                deviceInformationProvider.getDeviceInformation());
     }
 
     @Override
@@ -452,7 +446,9 @@ public class BitmovinAnalytics
 
     public void sendEventData(EventData data) {
         this.eventDataDispatcher.add(data);
-        this.playerAdapter.clearValues();
+        if (this.playerAdapter != null) {
+            this.playerAdapter.clearValues();
+        }
     }
 
     public void sendAdEventData(AdEventData data) {
