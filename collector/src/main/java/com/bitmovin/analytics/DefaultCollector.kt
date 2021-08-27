@@ -1,7 +1,6 @@
 package com.bitmovin.analytics
 
 import android.content.Context
-import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.DeviceInformationProvider
@@ -36,19 +35,11 @@ protected constructor(config: BitmovinAnalyticsConfig, context: Context) {
     protected abstract fun getUserAgent(context: Context): String
     protected abstract fun createAdapter(player: TPlayer, analytics: BitmovinAnalytics, deviceInformationProvider: DeviceInformationProvider): PlayerAdapter
 
-    protected open fun createAdAdapter(player: TPlayer, adAnalytics: BitmovinAdAnalytics): AdAdapter? = null
-
     fun attachPlayer(player: TPlayer) {
         val context = analytics.context
         val deviceInformationProvider = DeviceInformationProvider(context, getUserAgent(context))
         val adapter = createAdapter(player, analytics, deviceInformationProvider)
         analytics.attach(adapter)
-
-        if (analytics.adAnalytics != null) {
-            createAdAdapter(player, analytics.adAnalytics)?.let {
-                analytics.attachAd(it)
-            }
-        }
     }
 
     fun detachPlayer() {

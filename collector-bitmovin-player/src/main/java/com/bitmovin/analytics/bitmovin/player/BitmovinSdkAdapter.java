@@ -2,6 +2,7 @@ package com.bitmovin.analytics.bitmovin.player;
 
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
@@ -319,6 +320,11 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
 
     @Override
     public void clearValues() {}
+
+    @Override
+    public AdAdapter createAdAdapter() {
+        return new BitmovinSdkAdAdapter(this.bitmovinPlayer);
+    }
 
     /*
      * Because of the late initialization of the Adapter we do not get the first

@@ -5,19 +5,16 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import com.bitmovin.analytics.BitmovinAdAnalytics;
 import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.Collector;
 import com.bitmovin.analytics.DefaultCollector;
-import com.bitmovin.analytics.adapters.AdAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.features.FeatureFactory;
 import com.bitmovin.player.BitmovinPlayer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class BitmovinPlayerCollector extends DefaultCollector<BitmovinPlayer>
         implements Collector<BitmovinPlayer> {
@@ -50,13 +47,6 @@ public class BitmovinPlayerCollector extends DefaultCollector<BitmovinPlayer>
                 deviceInformationProvider,
                 analytics.getPlayerStateMachine(),
                 featureFactory);
-    }
-
-    @Nullable
-    @Override
-    protected AdAdapter createAdAdapter(
-            BitmovinPlayer bitmovinPlayer, @NotNull BitmovinAdAnalytics adAnalytics) {
-        return new BitmovinSdkAdAdapter(bitmovinPlayer, adAnalytics);
     }
 
     @Override

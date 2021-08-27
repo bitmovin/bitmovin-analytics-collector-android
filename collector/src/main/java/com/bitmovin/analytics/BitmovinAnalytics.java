@@ -48,7 +48,6 @@ public class BitmovinAnalytics
 
     protected final BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
     protected PlayerAdapter playerAdapter;
-    protected AdAdapter adAdapter;
     protected PlayerStateMachine playerStateMachine;
     protected BitmovinAdAnalytics adAnalytics;
     protected IEventDataDispatcher eventDataDispatcher;
@@ -129,11 +128,19 @@ public class BitmovinAnalytics
                 new ManifestUrlEventDataManipulator(
                         this.playerAdapter, this.bitmovinAnalyticsConfig));
         // this.registerEventDataManipulators(postPipelineManipulator);
+
+        tryAttachAd(adapter);
     }
 
-    protected void attachAd(AdAdapter adapter) {
-        detachAd();
-        this.adAdapter = adapter;
+    private void tryAttachAd(PlayerAdapter adapter) {
+        if (adAnalytics == null) {
+            return;
+        }
+        AdAdapter adAdapter = adapter.createAdAdapter();
+        if (adAdapter == null) {
+            return;
+        }
+        adAnalytics.attachAdapter(adAdapter);
     }
 
     /** Detach the current player that is being used with Bitmovin Analytics. */
@@ -157,12 +164,16 @@ public class BitmovinAnalytics
     }
 
     private void detachAd() {
-        if (adAdapter != null) {
-            adAdapter.release();
+        if (adAnalytics != null) {
+            adAnalytics.detachAdapter();
         }
     }
 
+    @Nullable
     public EventData createEventData() {
+        if (playerAdapter == null) {
+            return null;
+        }
         return eventDataFactory.create(
                 playerStateMachine.getImpressionId(),
                 playerAdapter.getCurrentSourceMetadata(),

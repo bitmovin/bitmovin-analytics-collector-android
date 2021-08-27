@@ -1,5 +1,7 @@
 package com.bitmovin.analytics
 
+import com.bitmovin.analytics.adapters.AdAdapter
+import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
 import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdQuartile
@@ -8,7 +10,8 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.AdSample
 import com.bitmovin.analytics.utils.Util
 
-class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
+// TODO instead of having the full analytics, only pass an interface that has both `createEventData` and `sendAdEventData`
+class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalyticsEventListener {
     private var activeAdBreak: AdBreak? = null
     private var activeAdSample: AdSample? = null
     private var adPodPosition: Int = 0
@@ -16,6 +19,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     private var elapsedTimeBeginPlaying: Long? = null
     private var isPlaying: Boolean = false
     private val adManifestDownloadTimes: HashMap<String, Long> = hashMapOf()
+    private var adapter: AdAdapter? = null
 
     private var currentTime: Long? = null
         get() = if (this.isPlaying) {
@@ -28,7 +32,18 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
             field
         }
 
-    fun onAdStarted(ad: Ad) {
+    fun attachAdapter(adapter: AdAdapter) {
+        this.adapter = adapter
+        this.adapter?.subscribe(this)
+    }
+
+    fun detachAdapter() {
+        this.adapter?.unsubscribe(this)
+        this.adapter?.release()
+        adapter = null
+    }
+
+    override fun onAdStarted(ad: Ad) {
         if (!ad.isLinear) {
             return
         }
@@ -43,7 +58,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         this.startAd(adSample)
     }
 
-    fun onAdFinished() {
+    override fun onAdFinished() {
         val activeAdSample = this.activeAdSample ?: return
         val activeAdBreak = this.activeAdBreak ?: return
 
@@ -53,18 +68,18 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         this.completeAd(activeAdBreak, adSample, adSample.ad.duration)
     }
 
-    fun onAdBreakStarted(adBreak: AdBreak) {
+    override fun onAdBreakStarted(adBreak: AdBreak) {
         this.adPodPosition = 0
         this.activeAdBreak = adBreak
         this.elapsedTimeAdStartup = Util.getElapsedTime()
     }
 
-    fun onAdBreakFinished() {
+    override fun onAdBreakFinished() {
         this.resetActiveAd()
         this.activeAdBreak = null
     }
 
-    fun onAdClicked(clickThroughUrl: String?) {
+    override fun onAdClicked(clickThroughUrl: String?) {
         val activeAdSample = this.activeAdSample ?: return
 
         activeAdSample.ad.clickThroughUrl = clickThroughUrl
@@ -73,7 +88,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         activeAdSample.clickPercentage = Util.calculatePercentage(activeAdSample.clickPosition, activeAdSample.ad.duration, true)
     }
 
-    fun onAdError(adBreak: AdBreak, code: Int?, message: String?) {
+    override fun onAdError(adBreak: AdBreak, code: Int?, message: String?) {
         val adSample = this.activeAdSample ?: AdSample()
 
         if (adSample.ad.id != null && adBreak.ads.any { ad -> ad.id == adSample.ad.id }) {
@@ -86,23 +101,23 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         this.completeAd(adBreak, adSample, adSample.errorPosition ?: 0)
     }
 
-    fun onAdManifestLoaded(adBreak: AdBreak, downloadTime: Long) {
+    override fun onAdManifestLoaded(adBreak: AdBreak, downloadTime: Long) {
         this.adManifestDownloadTimes[adBreak.id] = downloadTime
         if (adBreak.tagType == AdTagType.VMAP) {
             this.sendAnalyticsRequest(adBreak)
         }
     }
 
-    fun onPlay() {
-        if (this.analytics.adAdapter != null && this.analytics.adAdapter.isLinearAdActive && this.activeAdSample != null) {
+    override fun onPlay() {
+        if (adapter?.isLinearAdActive == true && this.activeAdSample != null) {
             val elapsedTime = Util.getElapsedTime()
             this.elapsedTimeBeginPlaying = elapsedTime
             this.isPlaying = true
         }
     }
 
-    fun onPause() {
-        if (this.analytics.adAdapter != null && this.analytics.adAdapter.isLinearAdActive && this.activeAdSample != null) {
+    override fun onPause() {
+        if (adapter?.isLinearAdActive == true && this.activeAdSample != null) {
             if (this.currentTime != null) {
                 this.currentTime = this.currentTime
             }
@@ -110,7 +125,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         }
     }
 
-    fun onAdSkipped() {
+    override fun onAdSkipped() {
         val activeAdBreak = this.activeAdBreak ?: return
         val activeAdSample = this.activeAdSample ?: return
 
@@ -122,7 +137,7 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
         this.completeAd(activeAdBreak, activeAdSample, activeAdSample.skipPosition)
     }
 
-    fun onAdQuartile(quartile: AdQuartile) {
+    override fun onAdQuartile(quartile: AdQuartile) {
         val activeAdSample = this.activeAdSample ?: return
         when {
             quartile === AdQuartile.FIRST_QUARTILE -> activeAdSample.quartile1 = 1
@@ -166,28 +181,25 @@ class BitmovinAdAnalytics(var analytics: BitmovinAnalytics) {
     }
 
     private fun sendAnalyticsRequest(adBreak: AdBreak, adSample: AdSample? = null) {
-        if (analytics.playerAdapter == null) {
-            return
-        }
+        val eventData = analytics.createEventData() ?: return
+        val adEventData = AdEventData()
 
-        val eventData = AdEventData()
-
-        eventData.analyticsVersion = Util.getAnalyticsVersion()
-        val moduleInfo = analytics.adAdapter?.moduleInformation
+        adEventData.analyticsVersion = Util.getAnalyticsVersion()
+        val moduleInfo = adapter?.moduleInformation
         if (moduleInfo != null) {
-            eventData.adModule = moduleInfo.name
-            eventData.adModuleVersion = moduleInfo.version
+            adEventData.adModule = moduleInfo.name
+            adEventData.adModuleVersion = moduleInfo.version
         }
-        eventData.manifestDownloadTime = getAdManifestDownloadTime(adBreak)
-        eventData.playerStartupTime = 1
-        eventData.autoplay = this.analytics.adAdapter.isAutoplayEnabled
+        adEventData.manifestDownloadTime = getAdManifestDownloadTime(adBreak)
+        adEventData.playerStartupTime = 1
+        adEventData.autoplay = adapter?.isAutoplayEnabled
 
-        eventData.setEventData(analytics.createEventData())
-        eventData.setAdBreak(adBreak)
-        eventData.setAdSample(adSample)
+        adEventData.setEventData(eventData)
+        adEventData.setAdBreak(adBreak)
+        adEventData.setAdSample(adSample)
 
-        eventData.time = Util.getTimestamp()
-        eventData.adImpressionId = Util.getUUID()
-        analytics.sendAdEventData(eventData)
+        adEventData.time = Util.getTimestamp()
+        adEventData.adImpressionId = Util.getUUID()
+        analytics.sendAdEventData(adEventData)
     }
 }

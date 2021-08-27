@@ -25,4 +25,8 @@ public interface PlayerAdapter {
     void clearValues();
 
     SourceMetadata getCurrentSourceMetadata();
+
+    default AdAdapter createAdAdapter() {
+        return null;
+    }
 }
