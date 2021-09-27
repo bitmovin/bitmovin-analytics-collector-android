@@ -54,6 +54,7 @@ dependencies {
 	} else {
 		implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
 	}
+	implementation project(':example-shared')
 
 	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
 	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"

@@ -55,4 +55,5 @@ dependencies {
 	} else {
 		implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
 	}
+	implementation project(':example-shared')
 }
