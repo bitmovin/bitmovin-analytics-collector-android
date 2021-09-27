@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Error detail tracking feature
 - `castTech` field
+- [Internal] example-shared project
 
 ### Removed
 - Unintended public methods from Collector classes
@@ -29,6 +30,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Error detail tracking feature
 - `castTech` field
+- [Internal] example-shared project
 
 ### Removed
 - Unintended public methods from Collector classes
