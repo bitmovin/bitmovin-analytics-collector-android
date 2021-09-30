@@ -63,5 +63,6 @@ dependencies {
 		// v1 collector artifact is published without '-v1' suffix
 		implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
 	}
+	implementation project(':example-shared')
 }
 

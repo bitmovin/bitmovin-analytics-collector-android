@@ -8,3 +8,4 @@ include ':collector-exoplayer-example'
 include 'collector-exoplayer-v1'
 include ':collector-exoplayer-v1-example'
 
+include ':example-shared'
