@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+## Development v1
+
+## v2.2.0
+
 ### Fixed
 - BitmovinPlayerCollector didn't report some metrics with sub-second granularity
 - ExoPlayerCollector used wrong field to track audioBitrate
@@ -20,7 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - Unintended public methods from Collector classes
 
-## Development v1
+## v1.26.0
 
 ### Fixed
 - BitmovinPlayerCollector didn't report some metrics with sub-second granularity
