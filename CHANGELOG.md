@@ -7,15 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
-### Added
-- customData 8-25 fields
-
-
 ## Development v1
 
+## v2.3.0
+
 ### Added
 - customData 8-25 fields
 
+## v1.27.0
+
+### Added
+- customData 8-25 fields
 
 ## v2.2.0
 
