@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+## Development v1
+
+## v2.4.0
+
 ### Added
 - `version` property on Collector classes
 
-## Development v1
+## v1.28.0
 
 ### Added
 - `version` property on Collector classes
