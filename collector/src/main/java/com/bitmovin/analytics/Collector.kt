@@ -6,6 +6,7 @@ interface Collector<TPlayer> {
     var customData: CustomData
     val impressionId: String
     val config: BitmovinAnalyticsConfig
+    val version: String
 
     fun attachPlayer(player: TPlayer)
     fun detachPlayer()
