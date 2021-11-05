@@ -4,6 +4,7 @@ import android.content.Context
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.DeviceInformationProvider
+import com.bitmovin.analytics.utils.Util
 
 abstract class DefaultCollector<TPlayer> protected constructor(private val analytics: BitmovinAnalytics) {
     var customData: CustomData
@@ -15,6 +16,9 @@ abstract class DefaultCollector<TPlayer> protected constructor(private val analy
 
     val config: BitmovinAnalyticsConfig
         get() = analytics.config
+
+    val version: String
+        get() = Util.getAnalyticsVersion()
 
     protected abstract fun createAdapter(player: TPlayer, analytics: BitmovinAnalytics): PlayerAdapter
 
