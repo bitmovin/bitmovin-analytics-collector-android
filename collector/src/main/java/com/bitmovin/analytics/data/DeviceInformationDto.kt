@@ -6,5 +6,6 @@ data class DeviceInformationDto(
     val isTV: Boolean,
     val operatingSystem: String? = null,
     val operatingSystemMajor: String? = null,
-    val operatingSystemMinor: String? = null
+    val operatingSystemMinor: String? = null,
+    val deviceClass: DeviceClass? = null
 )

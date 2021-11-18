@@ -42,7 +42,7 @@ class EventData(
     var player: String?
 ) {
     val userAgent: String = deviceInfo.userAgent
-    val deviceInformation: DeviceInformationDto = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV, deviceInfo.operatingSystem, deviceInfo.operatingSystemMajor, deviceInfo.operatingSystemMinor)
+    val deviceInformation: DeviceInformationDto = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV, deviceInfo.operatingSystem, deviceInfo.operatingSystemMajor, deviceInfo.operatingSystemMinor, deviceInfo.deviceClass)
     val language: String = deviceInfo.locale
     val analyticsVersion: String = Util.getAnalyticsVersion()
     val playerTech: String = Util.PLAYER_TECH
