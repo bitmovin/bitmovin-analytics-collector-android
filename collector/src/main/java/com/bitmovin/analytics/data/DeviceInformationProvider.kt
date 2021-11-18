@@ -28,12 +28,12 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
         var operatingSystem: String? = null
         var operatingSystemMajor: String? = null
         val operatingSystemMinor: String? = null
-        var deviceClass: DeviceClass? = if(isTV) DeviceClass.TV else null
+        var deviceClass: DeviceClass? = if (isTV) DeviceClass.TV else null
 
         if (isFireOS(context.packageManager)) {
             operatingSystem = "Fire OS"
             operatingSystemMajor = fireOSVersion
-            if(isFireTablet) {
+            if (isFireTablet) {
                 deviceClass = DeviceClass.Tablet
             } else if (isFireTV(context.packageManager)) {
                 deviceClass = DeviceClass.TV
