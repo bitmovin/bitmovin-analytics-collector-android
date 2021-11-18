@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+### Added
+- Detection of FireOS devices
+
 ## Development v1
+
+### Added
+- Detection of FireOS devices
 
 ## v2.4.0
 
