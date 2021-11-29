@@ -8,5 +8,9 @@ data class DeviceInformation(
     val locale: String,
     val domain: String,
     val screenHeight: Int,
-    val screenWidth: Int
+    val screenWidth: Int,
+    val operatingSystem: String? = null,
+    val operatingSystemMajor: String? = null,
+    val operatingSystemMinor: String? = null,
+    val deviceClass: DeviceClass? = null
 )
