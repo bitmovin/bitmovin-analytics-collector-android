@@ -1,7 +1,5 @@
 package com.bitmovin.analytics;
 
-import static com.bitmovin.analytics.utils.DataSerializer.serialize;
-
 import android.content.Context;
 import android.util.Log;
 import com.bitmovin.analytics.adapters.AdAdapter;
@@ -12,7 +10,6 @@ import com.bitmovin.analytics.data.BackendFactory;
 import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
 import com.bitmovin.analytics.data.DeviceInformationProvider;
-import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
@@ -21,7 +18,6 @@ import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider;
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher;
 import com.bitmovin.analytics.data.UserIdProvider;
 import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator;
-import com.bitmovin.analytics.enums.VideoStartFailedReason;
 import com.bitmovin.analytics.features.Feature;
 import com.bitmovin.analytics.features.FeatureManager;
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener;
@@ -30,7 +26,6 @@ import com.bitmovin.analytics.license.LicenseCallback;
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine;
 import com.bitmovin.analytics.stateMachines.PlayerStates;
 import com.bitmovin.analytics.stateMachines.StateMachineListener;
-import com.bitmovin.analytics.utils.Util;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,8 +34,7 @@ import org.jetbrains.annotations.Nullable;
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
  * supports analytics of ExoPlayer video players
  */
-public class BitmovinAnalytics
-        implements StateMachineListener, LicenseCallback, ImpressionIdProvider {
+public class BitmovinAnalytics implements LicenseCallback, ImpressionIdProvider {
 
     private static final String TAG = "BitmovinAnalytics";
 
@@ -56,6 +50,7 @@ public class BitmovinAnalytics
     private final UserIdProvider userIdProvider;
     private final EventDataFactory eventDataFactory;
     private final DeviceInformationProvider deviceInformationProvider;
+    private final StateMachineListener stateMachineListener;
 
     /**
      * Bitmovin Analytics
@@ -80,7 +75,8 @@ public class BitmovinAnalytics
         this.bitmovinAnalyticsConfig = bitmovinAnalyticsConfig;
         this.eventDataFactory = new EventDataFactory(bitmovinAnalyticsConfig, this.userIdProvider);
         this.playerStateMachine = new PlayerStateMachine(this.bitmovinAnalyticsConfig, this);
-        this.playerStateMachine.addListener(this);
+        this.stateMachineListener = new DefaultStateMachineListener(this);
+        this.playerStateMachine.addListener(this.stateMachineListener);
         IEventDataDispatcher innerEventDataDispatcher =
                 new SimpleEventDataDispatcher(
                         this.bitmovinAnalyticsConfig, this.context, this, new BackendFactory());
@@ -101,6 +97,15 @@ public class BitmovinAnalytics
 
     public PlayerStateMachine getPlayerStateMachine() {
         return playerStateMachine;
+    }
+
+    @Nullable
+    public PlayerAdapter getPlayerAdapter() {
+        return this.playerAdapter;
+    }
+
+    public EventBus getEventBus() {
+        return eventBus;
     }
 
     /**
@@ -172,213 +177,6 @@ public class BitmovinAnalytics
                 playerStateMachine.getImpressionId(),
                 playerAdapter.getCurrentSourceMetadata(),
                 deviceInformationProvider.getDeviceInformation());
-    }
-
-    @Override
-    public void onStartup(long videoStartupTime, long playerStartupTime) {
-        Log.d(TAG, String.format("onStartup %s", playerStateMachine.getImpressionId()));
-        EventData data = createEventData();
-        data.setSupportedVideoCodecs(Util.getSupportedVideoFormats());
-        data.setState("startup");
-        data.setDuration(videoStartupTime + playerStartupTime);
-        data.setVideoStartupTime(videoStartupTime);
-
-        data.setDrmLoadTime(playerAdapter.getDRMDownloadTime());
-
-        data.setPlayerStartupTime(playerStartupTime);
-        data.setStartupTime(videoStartupTime + playerStartupTime);
-
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data);
-    }
-
-    @Override
-    public void onPauseExit(long duration) {
-        Log.d(TAG, String.format("onPauseExit %s", playerStateMachine.getImpressionId()));
-        EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().getName());
-        data.setDuration(duration);
-        data.setPaused(duration);
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data);
-    }
-
-    @Override
-    public void onPlayExit(long duration) {
-        Log.d(TAG, String.format("onPlayExit %s", playerStateMachine.getImpressionId()));
-        EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().getName());
-        data.setDuration(duration);
-        data.setPlayed(duration);
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data);
-    }
-
-    @Override
-    public void onRebuffering(long duration) {
-        Log.d(TAG, String.format("onRebuffering %s", playerStateMachine.getImpressionId()));
-        EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().getName());
-        data.setDuration(duration);
-        data.setBuffered(duration);
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data);
-    }
-
-    @Override
-    public void onError(ErrorCode errorCode) {
-        Log.d(TAG, String.format("onError %s", playerStateMachine.getImpressionId()));
-        EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().getName());
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-
-        if (playerStateMachine.getVideoStartFailedReason() != null) {
-            data.setVideoStartFailedReason(
-                    playerStateMachine.getVideoStartFailedReason().getReason());
-            data.setVideoStartFailed(true);
-        }
-
-        data.setErrorCode(errorCode.getErrorCode());
-        data.setErrorMessage(errorCode.getDescription());
-        data.setErrorData(serialize(errorCode.getLegacyErrorData()));
-        sendEventData(data);
-
-        eventBus.notify(
-                OnErrorDetailEventListener.class,
-                listener ->
-                        listener.onError(
-                                errorCode.getErrorCode(),
-                                errorCode.getDescription(),
-                                errorCode.getErrorData()));
-    }
-
-    @Override
-    public void onSeekComplete(long duration) {
-        Log.d(TAG, String.format("onSeekComplete %s", playerStateMachine.getImpressionId()));
-        EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().getName());
-        data.setSeeked(duration);
-        data.setDuration(duration);
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data);
-    }
-
-    @Override
-    public void onHeartbeat(long duration) {
-        Log.d(
-                TAG,
-                String.format(
-                        "onHeartbeat %s %s",
-                        playerStateMachine.getCurrentState().getName(),
-                        playerStateMachine.getImpressionId()));
-        EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().getName());
-        data.setDuration(duration);
-
-        if (playerStateMachine.getCurrentState() == PlayerStates.PLAYING) {
-            data.setPlayed(duration);
-        } else if (playerStateMachine.getCurrentState() == PlayerStates.PAUSE) {
-            data.setPaused(duration);
-        } else if (playerStateMachine.getCurrentState() == PlayerStates.BUFFERING) {
-            data.setBuffered(duration);
-        }
-
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-        sendEventData(data);
-    }
-
-    @Override
-    public void onAd() {
-        Log.d(TAG, "onAd");
-    }
-
-    @Override
-    public void onMute() {
-        Log.d(TAG, "onMute");
-    }
-
-    @Override
-    public void onUnmute() {
-        Log.d(TAG, "onUnmute");
-    }
-
-    @Override
-    public void onUpdateSample() {
-        Log.d(TAG, "onUpdateSample");
-    }
-
-    @Override
-    public void onQualityChange() {
-        Log.d(TAG, String.format("onQualityChange %s", playerStateMachine.getImpressionId()));
-        EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().getName());
-        data.setDuration(0);
-        sendEventData(data);
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeEnd());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-    }
-
-    @Override
-    public void onVideoChange() {
-        Log.d(TAG, "onVideoChange");
-    }
-
-    @Override
-    public void onSubtitleChange() {
-        Log.d(TAG, String.format("onSubtitleChange %s", playerStateMachine.getImpressionId()));
-        EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().getName());
-        data.setDuration(0);
-        sendEventData(data);
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-    }
-
-    @Override
-    public void onAudioTrackChange() {
-        Log.d(TAG, String.format("onAudioTrackChange %s", playerStateMachine.getImpressionId()));
-        EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().getName());
-        data.setDuration(0);
-        sendEventData(data);
-        data.setVideoTimeStart(playerStateMachine.getVideoTimeStart());
-        data.setVideoTimeEnd(playerStateMachine.getVideoTimeEnd());
-    }
-
-    @Override
-    public void onVideoStartFailed() {
-        VideoStartFailedReason videoStartFailedReason =
-                playerStateMachine.getVideoStartFailedReason();
-        if (videoStartFailedReason == null) {
-            videoStartFailedReason = VideoStartFailedReason.UNKNOWN;
-        }
-
-        EventData data = createEventData();
-        data.setState(playerStateMachine.getCurrentState().getName());
-        data.setVideoStartFailed(true);
-        ErrorCode errorCode = videoStartFailedReason.getErrorCode();
-        if (errorCode != null) {
-            data.setErrorCode(errorCode.getErrorCode());
-            data.setErrorMessage(errorCode.getDescription());
-            data.setErrorData(serialize(errorCode.getLegacyErrorData()));
-            eventBus.notify(
-                    OnErrorDetailEventListener.class,
-                    listener ->
-                            listener.onError(
-                                    errorCode.getErrorCode(),
-                                    errorCode.getDescription(),
-                                    errorCode.getErrorData()));
-        }
-        data.setVideoStartFailedReason(videoStartFailedReason.getReason());
-        sendEventData(data);
-        this.detachPlayer();
     }
 
     public final void resetSourceRelatedState() {
