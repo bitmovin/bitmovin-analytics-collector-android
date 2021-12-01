@@ -35,7 +35,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         }
 
     fun attachAdapter(playerAdapter: PlayerAdapter, adAdapter: AdAdapter) {
-        this.playerAdapter = playerAdapter;
+        this.playerAdapter = playerAdapter
         this.adAdapter = adAdapter
         this.adAdapter?.subscribe(this)
     }

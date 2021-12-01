@@ -55,7 +55,8 @@ import java.util.Collection;
 import java.util.Date;
 import org.jetbrains.annotations.NotNull;
 
-public class ExoPlayerAdapter extends DefaultPlayerAdapter implements PlayerAdapter, EventDataManipulator {
+public class ExoPlayerAdapter extends DefaultPlayerAdapter
+        implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "ExoPlayerAdapter";
 
     private static final String DASH_MANIFEST_CLASSNAME =

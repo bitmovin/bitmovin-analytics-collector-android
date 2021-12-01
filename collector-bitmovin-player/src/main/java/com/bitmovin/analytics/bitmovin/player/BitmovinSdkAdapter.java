@@ -43,7 +43,8 @@ import java.util.Collection;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
-public class BitmovinSdkAdapter extends DefaultPlayerAdapter implements PlayerAdapter, EventDataManipulator {
+public class BitmovinSdkAdapter extends DefaultPlayerAdapter
+        implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final Player bitmovinPlayer;

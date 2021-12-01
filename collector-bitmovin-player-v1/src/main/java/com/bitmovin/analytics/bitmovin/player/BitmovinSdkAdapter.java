@@ -76,7 +76,8 @@ import com.bitmovin.player.config.track.SubtitleTrack;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 
-public class BitmovinSdkAdapter extends DefaultPlayerAdapter implements PlayerAdapter, EventDataManipulator {
+public class BitmovinSdkAdapter extends DefaultPlayerAdapter
+        implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final BitmovinPlayer bitmovinPlayer;
