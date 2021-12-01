@@ -8,8 +8,6 @@ import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.FeatureManager
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
-import com.bitmovin.analytics.stateMachines.PlayerStates
-import com.bitmovin.analytics.stateMachines.StateMachineListener
 import com.bitmovin.analytics.utils.DataSerializer.serialize
 import com.bitmovin.analytics.utils.Util
 
