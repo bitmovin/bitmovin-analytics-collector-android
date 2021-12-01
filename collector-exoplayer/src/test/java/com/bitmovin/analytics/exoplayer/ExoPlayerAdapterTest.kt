@@ -38,7 +38,7 @@ class ExoPlayerAdapterTest {
             every { periodCount } returns 1
         }
         every { player.currentTimeline } returns timeline
-        adapter = spyk(ExoPlayerAdapter(player, mock(BitmovinAnalyticsConfig::class.java), stateMachine, mockk(relaxed = true)))
+        adapter = spyk(ExoPlayerAdapter(player, mock(BitmovinAnalyticsConfig::class.java), stateMachine, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)))
     }
 
     @Test

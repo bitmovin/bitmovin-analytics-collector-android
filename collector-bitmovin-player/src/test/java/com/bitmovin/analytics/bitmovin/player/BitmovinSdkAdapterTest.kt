@@ -35,7 +35,7 @@ class BitmovinSdkAdapterTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), playerStateMachine, mockk(relaxed = true), sourceMap)
+        bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), playerStateMachine, mockk(relaxed = true), sourceMap, mockk(relaxed = true), mockk(relaxed = true))
     }
 
     @Test

@@ -21,7 +21,7 @@ class BitmovinAnalyticsDebugListenerTests {
     fun setup() {
         mockkConstructor(BackendFactory::class)
         every { anyConstructed<BackendFactory>().createBackend(any(), any()) } returns mockk(relaxed = true)
-        analytics = BitmovinAnalytics(config, Activity(), mockk())
+        analytics = BitmovinAnalytics(config, Activity())
     }
 
     @Test
