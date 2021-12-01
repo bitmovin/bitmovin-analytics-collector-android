@@ -1,6 +1,7 @@
 package com.bitmovin.analytics
 
 import android.util.Log
+import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.FeatureManager
@@ -11,20 +12,20 @@ import com.bitmovin.analytics.stateMachines.StateMachineListener
 import com.bitmovin.analytics.utils.DataSerializer.serialize
 import com.bitmovin.analytics.utils.Util
 
-class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : StateMachineListener {
+class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, private val playerAdapter: PlayerAdapter, private val errorDetailObservable: ObservableSupport<OnErrorDetailEventListener>) : StateMachineListener {
     companion object {
         private val TAG = FeatureManager::class.java.name
     }
 
     override fun onStartup(stateMachine: PlayerStateMachine, videoStartupTime: Long, playerStartupTime: Long) {
         Log.d(TAG, String.format("onStartup %s", stateMachine.impressionId))
-        val data = analytics.createEventData() ?: return
+        val data = playerAdapter.createEventData()
         data.supportedVideoCodecs = Util.getSupportedVideoFormats()
         data.state = "startup"
         data.duration = videoStartupTime + playerStartupTime
         data.videoStartupTime = videoStartupTime
 
-        data.drmLoadTime = analytics.playerAdapter?.drmDownloadTime
+        data.drmLoadTime = playerAdapter.drmDownloadTime
 
         data.playerStartupTime = playerStartupTime
         data.startupTime = videoStartupTime + playerStartupTime
@@ -36,7 +37,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
 
     override fun onPauseExit(stateMachine: PlayerStateMachine, duration: Long) {
         Log.d(TAG, String.format("onPauseExit %s", stateMachine.impressionId))
-        val data = analytics.createEventData() ?: return
+        val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = duration
         data.paused = duration
@@ -47,7 +48,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
 
     override fun onPlayExit(stateMachine: PlayerStateMachine, duration: Long) {
         Log.d(TAG, String.format("onPlayExit %s", stateMachine.impressionId))
-        val data = analytics.createEventData() ?: return
+        val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = duration
         data.played = duration
@@ -63,7 +64,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
                 stateMachine.impressionId
             )
         )
-        val data = analytics.createEventData() ?: return
+        val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = duration
 
@@ -82,8 +83,8 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
 
     override fun onRebuffering(stateMachine: PlayerStateMachine, duration: Long) {
         Log.d(TAG, String.format("onRebuffering %s", stateMachine.impressionId))
-        val data = analytics.createEventData() ?: return
-        data.state = stateMachine.getCurrentState().name
+        val data = playerAdapter.createEventData()
+        data.state = stateMachine.currentState.name
         data.duration = duration
         data.buffered = duration
         data.videoTimeStart = stateMachine.videoTimeStart
@@ -93,7 +94,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
 
     override fun onError(stateMachine: PlayerStateMachine, errorCode: ErrorCode?) {
         Log.d(TAG, String.format("onError %s", stateMachine.impressionId))
-        val data = analytics.createEventData() ?: return
+        val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.videoTimeStart = stateMachine.videoTimeEnd
         data.videoTimeEnd = stateMachine.videoTimeEnd
@@ -111,7 +112,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
         }
 
         analytics.sendEventData(data)
-        analytics.eventBus.notify(OnErrorDetailEventListener::class) {
+        errorDetailObservable.notify {
             it.onError(
                 errorCode?.errorCode,
                 errorCode?.description,
@@ -122,7 +123,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
 
     override fun onSeekComplete(stateMachine: PlayerStateMachine, duration: Long) {
         Log.d(TAG, String.format("onSeekComplete %s", stateMachine.impressionId))
-        val data = analytics.createEventData() ?: return
+        val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.seeked = duration
         data.duration = duration
@@ -149,7 +150,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
 
     override fun onQualityChange(stateMachine: PlayerStateMachine) {
         Log.d(TAG, String.format("onQualityChange %s", stateMachine.impressionId))
-        val data = analytics.createEventData() ?: return
+        val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = 0
         analytics.sendEventData(data)
@@ -163,7 +164,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
 
     override fun onSubtitleChange(stateMachine: PlayerStateMachine) {
         Log.d(TAG, String.format("onSubtitleChange %s", stateMachine.impressionId))
-        val data = analytics.createEventData() ?: return
+        val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = 0
         analytics.sendEventData(data)
@@ -173,7 +174,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
 
     override fun onAudioTrackChange(stateMachine: PlayerStateMachine) {
         Log.d(TAG, String.format("onAudioTrackChange %s", stateMachine.impressionId))
-        val data = analytics.createEventData() ?: return
+        val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = 0
         analytics.sendEventData(data)
@@ -187,7 +188,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
             videoStartFailedReason = VideoStartFailedReason.UNKNOWN
         }
 
-        val data = analytics.createEventData() ?: return
+        val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.videoStartFailed = true
         val errorCode = videoStartFailedReason.errorCode
@@ -195,7 +196,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics) : St
             data.errorCode = errorCode.errorCode
             data.errorMessage = errorCode.description
             data.errorData = serialize(errorCode.legacyErrorData)
-            analytics.eventBus.notify(OnErrorDetailEventListener::class) {
+            errorDetailObservable.notify {
                 it.onError(
                     errorCode.errorCode,
                     errorCode.description,
