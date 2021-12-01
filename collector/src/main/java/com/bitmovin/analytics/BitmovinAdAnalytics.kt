@@ -2,6 +2,7 @@ package com.bitmovin.analytics
 
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
+import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdQuartile
@@ -19,6 +20,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
     private var elapsedTimeBeginPlaying: Long? = null
     private var isPlaying: Boolean = false
     private val adManifestDownloadTimes: HashMap<String, Long> = hashMapOf()
+    private var playerAdapter: PlayerAdapter? = null
     private var adAdapter: AdAdapter? = null
 
     private var currentTime: Long? = null
@@ -32,14 +34,14 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
             field
         }
 
-    fun attachAdapter(adapter: AdAdapter) {
-        this.adapter = adapter
-        this.adapter?.subscribe(this)
+    fun attachAdapter(playerAdapter: PlayerAdapter, adAdapter: AdAdapter) {
+        this.playerAdapter = playerAdapter;
         this.adAdapter = adAdapter
         this.adAdapter?.subscribe(this)
     }
 
     fun detachAdapter() {
+        this.playerAdapter = null
         this.adAdapter?.unsubscribe(this)
         this.adAdapter?.release()
         this.adAdapter = null
@@ -183,7 +185,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
     }
 
     private fun sendAnalyticsRequest(adBreak: AdBreak, adSample: AdSample? = null) {
-        val eventData = analytics.createEventData() ?: return
+        val eventData = playerAdapter?.createEventData() ?: return
         val adEventData = AdEventData()
 
         adEventData.analyticsVersion = Util.getAnalyticsVersion()
