@@ -52,9 +52,9 @@ public class BitmovinPlayerCollector extends DefaultCollector<Player> implements
                 getAnalytics().getConfig(),
                 getAnalytics().getPlayerStateMachine(),
                 featureFactory,
+                sourceMetadataMap,
                 getAnalytics().getEventDataFactory(),
-                getDeviceInformationProvider(),
-                sourceMetadataMap);
+                getDeviceInformationProvider());
     }
 
     public void addSourceMetadata(Source playerSource, SourceMetadata sourceMetadata) {

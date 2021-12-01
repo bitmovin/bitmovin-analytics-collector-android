@@ -67,9 +67,9 @@ public class BitmovinSdkAdapter extends DefaultPlayerAdapter
             BitmovinAnalyticsConfig config,
             PlayerStateMachine stateMachine,
             FeatureFactory featureFactory,
+            Map<Source, SourceMetadata> sourceMetadataMap,
             EventDataFactory eventDataFactory,
-            DeviceInformationProvider deviceInformationProvider,
-            Map<Source, SourceMetadata> sourceMetadataMap) {
+            DeviceInformationProvider deviceInformationProvider) {
         super(eventDataFactory, stateMachine, deviceInformationProvider);
         this.featureFactory = featureFactory;
         this.config = config;
