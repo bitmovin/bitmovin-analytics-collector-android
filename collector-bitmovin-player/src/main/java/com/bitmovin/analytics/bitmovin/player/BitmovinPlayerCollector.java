@@ -53,6 +53,8 @@ public class BitmovinPlayerCollector extends DefaultCollector<Player> implements
                 analytics.getConfig(),
                 analytics.getPlayerStateMachine(),
                 featureFactory,
+                analytics.getEventDataFactory(),
+                analytics.getDeviceInformationProvider(),
                 sourceMetadataMap);
     }
 

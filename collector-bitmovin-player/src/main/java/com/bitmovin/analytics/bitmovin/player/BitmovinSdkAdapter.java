@@ -3,10 +3,13 @@ package com.bitmovin.analytics.bitmovin.player;
 import android.util.Log;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.adapters.AdAdapter;
+import com.bitmovin.analytics.adapters.DefaultPlayerAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
+import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
+import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
 import com.bitmovin.analytics.enums.CastTech;
@@ -40,7 +43,7 @@ import java.util.Collection;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
-public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
+public class BitmovinSdkAdapter extends DefaultPlayerAdapter implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "BitmovinPlayerAdapter";
     private final BitmovinAnalyticsConfig config;
     private final Player bitmovinPlayer;
@@ -63,7 +66,10 @@ public class BitmovinSdkAdapter implements PlayerAdapter, EventDataManipulator {
             BitmovinAnalyticsConfig config,
             PlayerStateMachine stateMachine,
             FeatureFactory featureFactory,
+            EventDataFactory eventDataFactory,
+            DeviceInformationProvider deviceInformationProvider,
             Map<Source, SourceMetadata> sourceMetadataMap) {
+        super(eventDataFactory, stateMachine, deviceInformationProvider);
         this.featureFactory = featureFactory;
         this.config = config;
         this.stateMachine = stateMachine;

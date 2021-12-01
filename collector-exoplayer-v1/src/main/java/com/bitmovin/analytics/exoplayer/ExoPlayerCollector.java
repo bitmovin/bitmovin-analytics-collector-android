@@ -47,6 +47,8 @@ public class ExoPlayerCollector extends DefaultCollector<ExoPlayer>
                 exoPlayer,
                 analytics.getConfig(),
                 analytics.getPlayerStateMachine(),
-                featureFactory);
+                featureFactory,
+                analytics.getEventDataFactory(),
+                analytics.getDeviceInformationProvider());
     }
 }
