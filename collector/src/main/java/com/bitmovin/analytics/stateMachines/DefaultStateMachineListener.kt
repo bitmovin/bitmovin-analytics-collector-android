@@ -1,12 +1,13 @@
-package com.bitmovin.analytics
+package com.bitmovin.analytics.stateMachines
 
 import android.util.Log
+import com.bitmovin.analytics.BitmovinAnalytics
+import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.FeatureManager
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
-import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
 import com.bitmovin.analytics.utils.DataSerializer.serialize
@@ -58,7 +59,8 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
     }
 
     override fun onHeartbeat(stateMachine: PlayerStateMachine, duration: Long) {
-        Log.d(TAG, String.format(
+        Log.d(
+            TAG, String.format(
                 "onHeartbeat %s %s",
                 stateMachine.currentState.name,
                 stateMachine.impressionId
