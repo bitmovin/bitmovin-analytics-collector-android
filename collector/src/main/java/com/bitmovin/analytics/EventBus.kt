@@ -31,12 +31,12 @@ class EventBus {
         support.unsubscribe(listener)
     }
 
-    fun <TEventListener : Any> get(type: Class<TEventListener>): Observable<TEventListener> {
+    fun <TEventListener : Any> get(type: Class<TEventListener>): ObservableSupport<TEventListener> {
         return get(type.kotlin)
     }
 
-    operator fun <TEventListener : Any> get(type: KClass<TEventListener>): Observable<TEventListener> {
+    operator fun <TEventListener : Any> get(type: KClass<TEventListener>): ObservableSupport<TEventListener> {
         observableMap[type] = observableMap[type] ?: ObservableSupport<TEventListener>()
-        return observableMap[type] as Observable<TEventListener>
+        return observableMap[type] as ObservableSupport<TEventListener>
     }
 }
