@@ -87,7 +87,7 @@ public class PlayerStateMachine {
         long elapsedTime = Util.getElapsedTime();
         videoTimeEnd = analytics.getPosition();
         for (StateMachineListener listener : getListeners()) {
-            listener.onHeartbeat(elapsedTime - elapsedTimeOnEnter);
+            listener.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter);
         }
         elapsedTimeOnEnter = elapsedTime;
         videoTimeStart = videoTimeEnd;
