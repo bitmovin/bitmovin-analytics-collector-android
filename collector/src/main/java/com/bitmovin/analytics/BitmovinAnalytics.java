@@ -168,17 +168,6 @@ public class BitmovinAnalytics implements LicenseCallback, ImpressionIdProvider 
         }
     }
 
-    @Nullable
-    public EventData createEventData() {
-        if (playerAdapter == null) {
-            return null;
-        }
-        return eventDataFactory.create(
-                playerStateMachine.getImpressionId(),
-                playerAdapter.getCurrentSourceMetadata(),
-                deviceInformationProvider.getDeviceInformation());
-    }
-
     public final void resetSourceRelatedState() {
         if (this.eventDataDispatcher != null) {
             this.eventDataDispatcher.resetSourceRelatedState();
@@ -236,7 +225,7 @@ public class BitmovinAnalytics implements LicenseCallback, ImpressionIdProvider 
 
         CustomData currentCustomData = customDataGetter.getCustomData();
         customDataSetter.setCustomData(customData);
-        EventData eventData = createEventData();
+        EventData eventData = playerAdapter.createEventData();
         eventData.setState(PlayerStates.CUSTOMDATACHANGE.getName());
         sendEventData(eventData);
         customDataSetter.setCustomData(currentCustomData);
