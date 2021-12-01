@@ -6,7 +6,10 @@ import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.utils.Util
 
-abstract class DefaultCollector<TPlayer> protected constructor(private val analytics: BitmovinAnalytics) {
+abstract class DefaultCollector<TPlayer> protected constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context, userAgent: String) {
+    protected val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, context)
+    protected val deviceInformationProvider = DeviceInformationProvider(context, userAgent)
+
     var customData: CustomData
         get() = analytics.customData
         set(value) { analytics.customData = value }
@@ -20,10 +23,10 @@ abstract class DefaultCollector<TPlayer> protected constructor(private val analy
     val version: String
         get() = Util.getAnalyticsVersion()
 
-    protected abstract fun createAdapter(player: TPlayer, analytics: BitmovinAnalytics): PlayerAdapter
+    protected abstract fun createAdapter(player: TPlayer): PlayerAdapter
 
     fun attachPlayer(player: TPlayer) {
-        val adapter = createAdapter(player, analytics)
+        val adapter = createAdapter(player)
         analytics.attach(adapter)
     }
 
@@ -41,12 +44,5 @@ abstract class DefaultCollector<TPlayer> protected constructor(private val analy
 
     fun removeDebugListener(listener: BitmovinAnalytics.DebugListener) {
         analytics.removeDebugListener(listener)
-    }
-
-    companion object {
-        fun createAnalytics(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context, userAgent: String): BitmovinAnalytics {
-            val deviceInformationProvider = DeviceInformationProvider(context, userAgent)
-            return BitmovinAnalytics(bitmovinAnalyticsConfig, context, deviceInformationProvider)
-        }
     }
 }

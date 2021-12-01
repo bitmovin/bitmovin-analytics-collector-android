@@ -5,7 +5,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.Collector;
 import com.bitmovin.analytics.DefaultCollector;
@@ -26,7 +25,7 @@ public class BitmovinPlayerCollector extends DefaultCollector<BitmovinPlayer>
      */
     public BitmovinPlayerCollector(
             BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
-        super(Companion.createAnalytics(bitmovinAnalyticsConfig, context, getUserAgent(context)));
+        super(bitmovinAnalyticsConfig, context, getUserAgent(context));
     }
 
     /**
@@ -43,16 +42,15 @@ public class BitmovinPlayerCollector extends DefaultCollector<BitmovinPlayer>
 
     @NotNull
     @Override
-    protected PlayerAdapter createAdapter(
-            BitmovinPlayer bitmovinPlayer, @NotNull BitmovinAnalytics analytics) {
-        FeatureFactory featureFactory = new BitmovinFeatureFactory(analytics, bitmovinPlayer);
+    protected PlayerAdapter createAdapter(BitmovinPlayer bitmovinPlayer) {
+        FeatureFactory featureFactory = new BitmovinFeatureFactory(getAnalytics(), bitmovinPlayer);
         return new BitmovinSdkAdapter(
                 bitmovinPlayer,
-                analytics.getConfig(),
-                analytics.getPlayerStateMachine(),
+                getAnalytics().getConfig(),
+                getAnalytics().getPlayerStateMachine(),
                 featureFactory,
-                analytics.getEventDataFactory(),
-                analytics.getDeviceInformationProvider());
+                getAnalytics().getEventDataFactory(),
+                getDeviceInformationProvider());
     }
 
     @NotNull

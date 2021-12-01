@@ -9,7 +9,6 @@ import com.bitmovin.analytics.data.AdEventData;
 import com.bitmovin.analytics.data.BackendFactory;
 import com.bitmovin.analytics.data.CustomData;
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher;
-import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.EventData;
 import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.IEventDataDispatcher;
@@ -50,7 +49,6 @@ public class BitmovinAnalytics implements LicenseCallback, ImpressionIdProvider 
     private final Context context;
     private final UserIdProvider userIdProvider;
     private final EventDataFactory eventDataFactory;
-    private final DeviceInformationProvider deviceInformationProvider;
 
     private BitmovinAdAnalytics adAnalytics;
 
@@ -60,16 +58,12 @@ public class BitmovinAnalytics implements LicenseCallback, ImpressionIdProvider 
      * @param bitmovinAnalyticsConfig {@link BitmovinAnalyticsConfig}
      * @param context {@link Context}
      */
-    public BitmovinAnalytics(
-            BitmovinAnalyticsConfig bitmovinAnalyticsConfig,
-            Context context,
-            @NotNull DeviceInformationProvider deviceInformationProvider) {
+    public BitmovinAnalytics(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
         if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }
         Log.d(TAG, "Initializing Bitmovin Analytics with Key: " + bitmovinAnalyticsConfig.getKey());
         this.context = context;
-        this.deviceInformationProvider = deviceInformationProvider;
         this.userIdProvider =
                 bitmovinAnalyticsConfig.getRandomizeUserId()
                         ? new RandomizedUserIdIdProvider()
@@ -99,10 +93,6 @@ public class BitmovinAnalytics implements LicenseCallback, ImpressionIdProvider 
         return playerStateMachine;
     }
 
-    public DeviceInformationProvider getDeviceInformationProvider() {
-        return deviceInformationProvider;
-    }
-
     public EventDataFactory getEventDataFactory() {
         return eventDataFactory;
     }
@@ -116,7 +106,9 @@ public class BitmovinAnalytics implements LicenseCallback, ImpressionIdProvider 
     protected void attach(PlayerAdapter adapter) {
         detachPlayer();
 
-        this.stateMachineListener = new DefaultStateMachineListener(this, adapter, eventBus.get(OnErrorDetailEventListener.class));
+        this.stateMachineListener =
+                new DefaultStateMachineListener(
+                        this, adapter, eventBus.get(OnErrorDetailEventListener.class));
         this.playerStateMachine.addListener(this.stateMachineListener);
 
         eventDataDispatcher.enable();
@@ -159,7 +151,7 @@ public class BitmovinAnalytics implements LicenseCallback, ImpressionIdProvider 
         }
 
         if (playerStateMachine != null) {
-            if(stateMachineListener != null) {
+            if (stateMachineListener != null) {
                 playerStateMachine.removeListener(stateMachineListener);
             }
 
