@@ -46,10 +46,6 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     val isQualityChangeEventEnabled: Boolean
         get() = qualityChangeCount <= Util.ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD
 
-    init {
-        resetStateMachine()
-    }
-
     fun enableHeartbeat() {
         heartbeatHandler.postDelayed(
             object : Runnable {
@@ -250,6 +246,12 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
             disableRebufferHeartbeat()
             resetStateMachine()
         }
+    }
+
+    // This should be defined at the bottom, so we make sure
+    // that all fields are assigned already
+    init {
+        resetStateMachine()
     }
 
     companion object {
