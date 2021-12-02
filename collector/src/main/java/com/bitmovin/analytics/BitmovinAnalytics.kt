@@ -70,8 +70,9 @@ class BitmovinAnalytics
      */
     fun attach(adapter: PlayerAdapter) {
         detachPlayer()
-        stateMachineListener = DefaultStateMachineListener(this, adapter, eventBus[OnErrorDetailEventListener::class])
+        val stateMachineListener = DefaultStateMachineListener(this, adapter, eventBus[OnErrorDetailEventListener::class])
         playerStateMachine.addListener(stateMachineListener)
+        this.stateMachineListener = stateMachineListener
         eventDataDispatcher.enable()
         playerAdapter = adapter
         val features = adapter.init()

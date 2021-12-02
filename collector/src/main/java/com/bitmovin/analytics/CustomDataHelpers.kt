@@ -2,7 +2,7 @@ package com.bitmovin.analytics
 
 import com.bitmovin.analytics.data.CustomData
 
-internal class CustomDataHelpers {
+class CustomDataHelpers {
     interface Getter {
         fun getCustomData(): CustomData
     }
