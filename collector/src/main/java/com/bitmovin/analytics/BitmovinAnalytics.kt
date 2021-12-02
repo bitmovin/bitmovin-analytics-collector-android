@@ -122,17 +122,12 @@ class BitmovinAnalytics
             return sourceMetadata?.getCustomData() ?: config.customData
         }
         set(customData) {
-            var customDataSetter: (CustomData) -> Unit = config::setCustomData
+            var setCustomDataFunction: (CustomData) -> Unit = config::setCustomData
             val sourceMetadata = playerAdapter?.currentSourceMetadata
             if (sourceMetadata != null) {
-                customDataSetter = { sourceMetadata.setCustomData(it) }
+                setCustomDataFunction = { sourceMetadata.setCustomData(it) }
             }
-            val toBeRemovedOnceStateMachineIsKotlin = object : CustomDataHelpers.Setter {
-                override fun setCustomData(customData: CustomData) {
-                    customDataSetter(customData)
-                }
-            }
-            playerStateMachine.changeCustomData(position, customData, toBeRemovedOnceStateMachineIsKotlin)
+            playerStateMachine.changeCustomData(position, customData, setCustomDataFunction)
         }
 
     fun setCustomDataOnce(customData: CustomData) {
@@ -141,19 +136,19 @@ class BitmovinAnalytics
             Log.d(TAG, "Custom data could not be set because player is not attached")
             return
         }
-        var customDataGetter: () -> CustomData = config::getCustomData
-        var customDataSetter: (CustomData) -> Unit = config::setCustomData
+        var getCustomDataFunction: () -> CustomData = config::getCustomData
+        var setCustomDataFunction: (CustomData) -> Unit = config::setCustomData
         val sourceMetadata = playerAdapter.currentSourceMetadata
         if (sourceMetadata != null) {
-            customDataGetter = { sourceMetadata.getCustomData() }
-            customDataSetter = { sourceMetadata.setCustomData(it) }
+            getCustomDataFunction = { sourceMetadata.getCustomData() }
+            setCustomDataFunction = { sourceMetadata.setCustomData(it) }
         }
-        val currentCustomData = customDataGetter()
-        customDataSetter(customData)
+        val currentCustomData = getCustomDataFunction()
+        setCustomDataFunction(customData)
         val eventData = playerAdapter.createEventData()
         eventData.state = PlayerStates.CUSTOMDATACHANGE.name
         sendEventData(eventData)
-        customDataSetter(currentCustomData)
+        setCustomDataFunction(currentCustomData)
     }
 
     fun sendEventData(data: EventData) {

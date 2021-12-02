@@ -6,7 +6,6 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason
 import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
-import com.bitmovin.analytics.CustomDataHelpers
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
@@ -213,15 +212,13 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         qualityChangeCount = 0
     }
 
-    fun changeCustomData(
-        position: Long, customData: CustomData, customDataSetter: CustomDataHelpers.Setter
-    ) {
+    fun changeCustomData(position: Long, customData: CustomData, setCustomDataFunction: (CustomData) -> Unit) {
         val originalState = currentState
         val shouldTransition = originalState === PlayerStates.PLAYING || originalState === PlayerStates.PAUSE
         if (shouldTransition) {
             this.transitionState(PlayerStates.CUSTOMDATACHANGE, position)
         }
-        customDataSetter.setCustomData(customData)
+        setCustomDataFunction(customData)
         if (shouldTransition) {
             this.transitionState(originalState, position)
         }
