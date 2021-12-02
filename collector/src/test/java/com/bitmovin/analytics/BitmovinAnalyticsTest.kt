@@ -43,12 +43,6 @@ class BitmovinAnalyticsTest {
         BitmovinAnalytics(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context)
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun testNewDefaultConstructorChecksForNull() {
-        val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("foo-bar")
-        BitmovinAnalytics(bitmovinAnalyticsConfig, null)
-    }
-
     @Test
     fun testDetachPlayerShouldCallOnAnalyticsReleasingEventListener() {
         val listener = mockk<OnAnalyticsReleasingEventListener>(relaxed = true)
