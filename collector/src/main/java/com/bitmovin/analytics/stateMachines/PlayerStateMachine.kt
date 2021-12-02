@@ -1,14 +1,14 @@
 package com.bitmovin.analytics.stateMachines
 
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.BitmovinAnalytics
-import com.bitmovin.analytics.enums.VideoStartFailedReason
 import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
+import com.bitmovin.analytics.BitmovinAnalytics
+import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
+import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.utils.Util
 
 class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics: BitmovinAnalytics) {
@@ -138,13 +138,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         }
         val elapsedTime = Util.getElapsedTime()
         videoTimeEnd = videoTime
-        Log.d(
-            TAG,
-            "Transitioning from "
-                    + currentState.toString()
-                    + " to "
-                    + destinationPlayerState.toString()
-        )
+        Log.d(TAG, "Transitioning from $currentState to $destinationPlayerState")
         currentState.onExitState(this, elapsedTime, destinationPlayerState)
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
@@ -157,12 +151,12 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
             return false
         } else if (this.currentState === PlayerStates.EXITBEFOREVIDEOSTART) {
             return false
-        } else if (currentState === PlayerStates.AD
-            && destination !== PlayerStates.ERROR && destination !== PlayerStates.ADFINISHED
+        } else if (currentState === PlayerStates.AD &&
+            destination !== PlayerStates.ERROR && destination !== PlayerStates.ADFINISHED
         ) {
             return false
-        } else if (currentState === PlayerStates.READY
-            && destination !== PlayerStates.ERROR && destination !== PlayerStates.EXITBEFOREVIDEOSTART && destination !== PlayerStates.STARTUP && destination !== PlayerStates.AD
+        } else if (currentState === PlayerStates.READY &&
+            destination !== PlayerStates.ERROR && destination !== PlayerStates.EXITBEFOREVIDEOSTART && destination !== PlayerStates.STARTUP && destination !== PlayerStates.AD
         ) {
             return false
         }
