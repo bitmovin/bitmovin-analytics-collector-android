@@ -114,14 +114,6 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         currentState = PlayerStates.READY
     }
 
-    fun sourceChange(oldVideoTime: Long, newVideoTime: Long, shouldStartup: Boolean) {
-        transitionState(PlayerStates.SOURCE_CHANGED, oldVideoTime, null)
-        resetSourceRelatedState()
-        if (shouldStartup) {
-            transitionState(PlayerStates.STARTUP, newVideoTime, null)
-        }
-    }
-
     @Synchronized
     fun <T> transitionState(destinationPlayerState: PlayerState<T>, videoTime: Long) {
         transitionState(destinationPlayerState, videoTime, null)
@@ -159,10 +151,6 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         return true
     }
 
-    fun error(videoTime: Long, errorCode: ErrorCode) {
-        transitionState(PlayerStates.ERROR, videoTime, errorCode)
-    }
-
     fun addListener(toAdd: StateMachineListener) {
         mutableListeners.add(toAdd)
     }
@@ -181,6 +169,26 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         return playerStartupTime
     }
 
+    fun increaseQualityChangeCount() {
+        qualityChangeCount++
+    }
+
+    private fun resetQualityChangeCount() {
+        qualityChangeCount = 0
+    }
+
+    fun error(videoTime: Long, errorCode: ErrorCode) {
+        transitionState(PlayerStates.ERROR, videoTime, errorCode)
+    }
+
+    fun sourceChange(oldVideoTime: Long, newVideoTime: Long, shouldStartup: Boolean) {
+        transitionState(PlayerStates.SOURCE_CHANGED, oldVideoTime, null)
+        resetSourceRelatedState()
+        if (shouldStartup) {
+            transitionState(PlayerStates.STARTUP, newVideoTime, null)
+        }
+    }
+
     fun pause(position: Long) {
         if (isStartupFinished) {
             transitionState(PlayerStates.PAUSE, position)
@@ -192,14 +200,6 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     fun startAd(position: Long) {
         transitionState(PlayerStates.AD, position)
         startupTime = 0
-    }
-
-    fun increaseQualityChangeCount() {
-        qualityChangeCount++
-    }
-
-    private fun resetQualityChangeCount() {
-        qualityChangeCount = 0
     }
 
     fun changeCustomData(position: Long, customData: CustomData, setCustomDataFunction: (CustomData) -> Unit) {
