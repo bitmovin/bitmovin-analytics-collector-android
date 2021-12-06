@@ -37,7 +37,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         private set
     private val heartbeatHandler = Handler()
     private var currentRebufferingIntervalIndex = 0
-    private var heartbeatDelay = config.heartbeatInterval // default to 60 seconds
+    private val heartbeatDelay = config.heartbeatInterval.toLong() // default to 60 seconds
     var videoStartFailedReason: VideoStartFailedReason? = null
     private var qualityChangeCount = 0
     var isQualityChangeTimerRunning = false
@@ -51,10 +51,10 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
             object : Runnable {
                 override fun run() {
                     triggerHeartbeat()
-                    heartbeatHandler.postDelayed(this, heartbeatDelay.toLong())
+                    heartbeatHandler.postDelayed(this, heartbeatDelay)
                 }
             },
-            heartbeatDelay.toLong()
+            heartbeatDelay
         )
     }
 
