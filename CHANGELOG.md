@@ -10,10 +10,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Detection of FireOS devices
 
+### Changed
+- [Internal] Extracted `StateMachineListener` from `BitmovinAnalytics`
+
 ## Development v1
 
 ### Added
 - Detection of FireOS devices
+
+### Changed
+- [Internal] Extracted `StateMachineListener` from `BitmovinAnalytics`
 
 ## v2.4.0
 
