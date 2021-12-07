@@ -14,6 +14,7 @@ import com.bitmovin.analytics.utils.Util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerStateMachine {
     private static final String TAG = "PlayerStateMachine";
@@ -87,7 +88,7 @@ public class PlayerStateMachine {
         long elapsedTime = Util.getElapsedTime();
         videoTimeEnd = analytics.getPosition();
         for (StateMachineListener listener : getListeners()) {
-            listener.onHeartbeat(elapsedTime - elapsedTimeOnEnter);
+            listener.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter);
         }
         elapsedTimeOnEnter = elapsedTime;
         videoTimeStart = videoTimeEnd;
@@ -240,6 +241,7 @@ public class PlayerStateMachine {
         this.elapsedTimeSeekStart = elapsedTimeSeekStart;
     }
 
+    @Nullable
     public VideoStartFailedReason getVideoStartFailedReason() {
         return videoStartFailedReason;
     }

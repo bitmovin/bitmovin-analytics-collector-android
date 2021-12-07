@@ -10,10 +10,13 @@ import static com.google.android.exoplayer2.C.WIDEVINE_UUID;
 import android.util.Log;
 import android.view.Surface;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.adapters.DefaultPlayerAdapter;
 import com.bitmovin.analytics.adapters.PlayerAdapter;
 import com.bitmovin.analytics.config.SourceMetadata;
+import com.bitmovin.analytics.data.DeviceInformationProvider;
 import com.bitmovin.analytics.data.ErrorCode;
 import com.bitmovin.analytics.data.EventData;
+import com.bitmovin.analytics.data.EventDataFactory;
 import com.bitmovin.analytics.data.SpeedMeasurement;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator;
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline;
@@ -52,7 +55,8 @@ import java.util.Collection;
 import java.util.Date;
 import org.jetbrains.annotations.NotNull;
 
-public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
+public class ExoPlayerAdapter extends DefaultPlayerAdapter
+        implements PlayerAdapter, EventDataManipulator {
     private static final String TAG = "ExoPlayerAdapter";
 
     private static final String DASH_MANIFEST_CLASSNAME =
@@ -87,7 +91,10 @@ public class ExoPlayerAdapter implements PlayerAdapter, EventDataManipulator {
             ExoPlayer exoplayer,
             BitmovinAnalyticsConfig config,
             PlayerStateMachine stateMachine,
-            FeatureFactory featureFactory) {
+            FeatureFactory featureFactory,
+            EventDataFactory eventDataFactory,
+            DeviceInformationProvider deviceInformationProvider) {
+        super(eventDataFactory, stateMachine, deviceInformationProvider);
         this.featureFactory = featureFactory;
         this.defaultAnalyticsListener = createAnalyticsListener();
         this.defaultPlayerEventListener = createPlayerEventListener();

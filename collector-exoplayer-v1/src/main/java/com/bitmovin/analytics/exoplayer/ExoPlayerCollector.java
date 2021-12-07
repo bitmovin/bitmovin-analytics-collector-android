@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.exoplayer;
 
 import android.content.Context;
-import com.bitmovin.analytics.BitmovinAnalytics;
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.Collector;
 import com.bitmovin.analytics.DefaultCollector;
@@ -21,9 +20,7 @@ public class ExoPlayerCollector extends DefaultCollector<ExoPlayer>
      * @param context {@link Context}
      */
     public ExoPlayerCollector(BitmovinAnalyticsConfig bitmovinAnalyticsConfig, Context context) {
-        super(
-                Companion.createAnalytics(
-                        bitmovinAnalyticsConfig, context, ExoUtil.getUserAgent(context)));
+        super(bitmovinAnalyticsConfig, context, ExoUtil.getUserAgent(context));
     }
 
     /**
@@ -40,13 +37,14 @@ public class ExoPlayerCollector extends DefaultCollector<ExoPlayer>
 
     @NotNull
     @Override
-    protected PlayerAdapter createAdapter(
-            ExoPlayer exoPlayer, @NotNull BitmovinAnalytics analytics) {
-        FeatureFactory featureFactory = new ExoPlayerFeatureFactory(analytics, exoPlayer);
+    protected PlayerAdapter createAdapter(ExoPlayer exoPlayer) {
+        FeatureFactory featureFactory = new ExoPlayerFeatureFactory(getAnalytics(), exoPlayer);
         return new ExoPlayerAdapter(
                 exoPlayer,
-                analytics.getConfig(),
-                analytics.getPlayerStateMachine(),
-                featureFactory);
+                getAnalytics().getConfig(),
+                getAnalytics().getPlayerStateMachine(),
+                featureFactory,
+                getAnalytics().getEventDataFactory(),
+                getDeviceInformationProvider());
     }
 }

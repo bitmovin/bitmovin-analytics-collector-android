@@ -4,35 +4,35 @@ import com.bitmovin.analytics.data.ErrorCode;
 
 public interface StateMachineListener {
 
-    void onStartup(long videoStartupTime, long playerStartupTime);
+    void onStartup(PlayerStateMachine stateMachine, long videoStartupTime, long playerStartupTime);
 
-    void onPauseExit(long duration);
+    void onPauseExit(PlayerStateMachine stateMachine, long duration);
 
-    void onPlayExit(long duration);
+    void onPlayExit(PlayerStateMachine stateMachine, long duration);
 
-    void onHeartbeat(long duration);
+    void onHeartbeat(PlayerStateMachine stateMachine, long duration);
 
-    void onRebuffering(long duration);
+    void onRebuffering(PlayerStateMachine stateMachine, long duration);
 
-    void onError(ErrorCode errorCode);
+    void onError(PlayerStateMachine stateMachine, ErrorCode errorCode);
 
-    void onSeekComplete(long duration);
+    void onSeekComplete(PlayerStateMachine stateMachine, long duration);
 
-    void onAd();
+    void onAd(PlayerStateMachine stateMachine);
 
-    void onMute();
+    void onMute(PlayerStateMachine stateMachine);
 
-    void onUnmute();
+    void onUnmute(PlayerStateMachine stateMachine);
 
-    void onUpdateSample();
+    void onUpdateSample(PlayerStateMachine stateMachine);
 
-    void onQualityChange();
+    void onQualityChange(PlayerStateMachine stateMachine);
 
-    void onVideoChange();
+    void onVideoChange(PlayerStateMachine stateMachine);
 
-    void onSubtitleChange();
+    void onSubtitleChange(PlayerStateMachine stateMachine);
 
-    void onAudioTrackChange();
+    void onAudioTrackChange(PlayerStateMachine stateMachine);
 
-    void onVideoStartFailed();
+    void onVideoStartFailed(PlayerStateMachine stateMachine);
 }

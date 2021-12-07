@@ -23,7 +23,7 @@ class PlayerStates {
                 if (destinationPlayerState === PlayerStates.PLAYING) {
                     val playerStartupTime = machine.andResetPlayerStartupTime
                     for (listener in machine.listeners) {
-                        listener.onStartup(machine.startupTime, playerStartupTime)
+                        listener.onStartup(machine, machine.startupTime, playerStartupTime)
                     }
                     machine.isStartupFinished = true
                 }
@@ -45,7 +45,7 @@ class PlayerStates {
                 machine.disableRebufferHeartbeat()
                 for (listener in machine.listeners) {
                     val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
-                    listener.onRebuffering(elapsedTime - elapsedTimeOnEnter)
+                    listener.onRebuffering(machine, elapsedTime - elapsedTimeOnEnter)
                 }
                 machine.rebufferingTimeout.cancel()
             }
@@ -54,7 +54,7 @@ class PlayerStates {
             override fun onEnterState(machine: PlayerStateMachine, data: ErrorCode?) {
                 machine.videoStartTimeout.cancel()
                 for (listener in machine.listeners) {
-                    listener.onError(data)
+                    listener.onError(machine, data)
                 }
             }
 
@@ -69,7 +69,7 @@ class PlayerStates {
         @JvmField val EXITBEFOREVIDEOSTART = object : DefaultPlayerState<Void>("exitbeforevideostart") {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
                 for (listener in machine.listeners) {
-                    listener.onVideoStartFailed()
+                    listener.onVideoStartFailed(machine)
                 }
             }
 
@@ -93,7 +93,7 @@ class PlayerStates {
             ) {
                 for (listener in machine.listeners) {
                     val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
-                    listener.onPlayExit(elapsedTime - elapsedTimeOnEnter)
+                    listener.onPlayExit(machine, elapsedTime - elapsedTimeOnEnter)
                 }
                 machine.disableHeartbeat()
             }
@@ -106,7 +106,7 @@ class PlayerStates {
             ) {
                 for (listener in machine.listeners) {
                     val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
-                    listener.onPauseExit(elapsedTime - elapsedTimeOnEnter)
+                    listener.onPauseExit(machine, elapsedTime - elapsedTimeOnEnter)
                 }
             }
         }
@@ -125,13 +125,13 @@ class PlayerStates {
             ) {
                 if (machine.isQualityChangeEventEnabled) {
                     for (listener in machine.listeners) {
-                        listener.onQualityChange()
+                        listener.onQualityChange(machine)
                     }
                 } else {
                     val errorCode = AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED
                         .errorCode
                     for (listener in machine.listeners) {
-                        listener.onError(errorCode)
+                        listener.onError(machine, errorCode)
                     }
                 }
             }
@@ -144,7 +144,7 @@ class PlayerStates {
                 destinationPlayerState: PlayerState<*>
             ) {
                 for (listener in machine.listeners) {
-                    listener.onAudioTrackChange()
+                    listener.onAudioTrackChange(machine)
                 }
             }
         }
@@ -155,7 +155,7 @@ class PlayerStates {
                 destinationPlayerState: PlayerState<*>
             ) {
                 for (listener in machine.listeners) {
-                    listener.onSubtitleChange()
+                    listener.onSubtitleChange(machine)
                 }
             }
         }
@@ -171,7 +171,7 @@ class PlayerStates {
                 destinationPlayerState: PlayerState<*>
             ) {
                 for (listener in machine.listeners) {
-                    listener.onSeekComplete(elapsedTime - machine.elapsedTimeSeekStart)
+                    listener.onSeekComplete(machine, elapsedTime - machine.elapsedTimeSeekStart)
                 }
                 machine.elapsedTimeSeekStart = 0
             }
