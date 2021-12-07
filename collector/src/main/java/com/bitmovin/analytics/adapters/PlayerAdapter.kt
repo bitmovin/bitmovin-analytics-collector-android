@@ -5,7 +5,6 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.license.FeatureConfigContainer
-import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 
 interface PlayerAdapter {
     val position: Long
