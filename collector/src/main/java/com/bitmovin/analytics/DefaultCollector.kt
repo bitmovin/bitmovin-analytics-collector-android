@@ -6,43 +6,43 @@ import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.utils.Util
 
-abstract class DefaultCollector<TPlayer> protected constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context, userAgent: String) {
+abstract class DefaultCollector<TPlayer> protected constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context, userAgent: String) : Collector<TPlayer> {
     protected val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, context)
     protected val deviceInformationProvider = DeviceInformationProvider(context, userAgent)
 
-    var customData: CustomData
+    override var customData: CustomData
         get() = analytics.customData
         set(value) { analytics.customData = value }
 
-    val impressionId: String
+    override val impressionId: String
         get() = analytics.impressionId
 
-    val config: BitmovinAnalyticsConfig
+    override val config: BitmovinAnalyticsConfig
         get() = analytics.config
 
-    val version: String
+    override val version: String
         get() = Util.getAnalyticsVersion()
 
     protected abstract fun createAdapter(player: TPlayer): PlayerAdapter
 
-    fun attachPlayer(player: TPlayer) {
+    override fun attachPlayer(player: TPlayer) {
         val adapter = createAdapter(player)
         analytics.attach(adapter)
     }
 
-    fun detachPlayer() {
+    override fun detachPlayer() {
         analytics.detachPlayer()
     }
 
-    fun setCustomDataOnce(customData: CustomData) {
+    override fun setCustomDataOnce(customData: CustomData) {
         analytics.setCustomDataOnce(customData)
     }
 
-    fun addDebugListener(listener: BitmovinAnalytics.DebugListener) {
+    override fun addDebugListener(listener: BitmovinAnalytics.DebugListener) {
         analytics.addDebugListener(listener)
     }
 
-    fun removeDebugListener(listener: BitmovinAnalytics.DebugListener) {
+    override fun removeDebugListener(listener: BitmovinAnalytics.DebugListener) {
         analytics.removeDebugListener(listener)
     }
 }

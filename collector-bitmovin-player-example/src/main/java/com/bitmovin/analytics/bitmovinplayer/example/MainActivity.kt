@@ -63,15 +63,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.change_source).setOnClickListener {
-            bitmovinPlayerCollector!!.detachPlayer()
+            bitmovinPlayerCollector?.detachPlayer()
+            val player = this.player ?: return@setOnClickListener
 
             val bitmovinAnalyticsConfig = createBitmovinAnalyticsConfig()
             bitmovinAnalyticsConfig.videoId = "DRMVideo-id"
             bitmovinAnalyticsConfig.title = "DRM Video Title"
-            bitmovinPlayerCollector = BitmovinPlayerCollector(bitmovinAnalyticsConfig, applicationContext)
+            val collector = BitmovinPlayerCollector(bitmovinAnalyticsConfig, applicationContext)
+            this.bitmovinPlayerCollector = collector
 
-            bitmovinPlayerCollector!!.attachPlayer(player)
-            player!!.load(createDRMSourceConfig())
+            collector.attachPlayer(player)
+            player.load(createDRMSourceConfig())
         }
         findViewById<Button>(R.id.seek_second_source).setOnClickListener {
             val secondSource = player?.playlist?.sources?.get(1) ?: return@setOnClickListener
@@ -87,68 +89,64 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeBitmovinPlayer() {
-        if (bitmovinPlayerCollector != null) {
-            bitmovinPlayerCollector!!.detachPlayer()
-        }
-
-        if (player != null) {
-            player!!.destroy()
-        }
+        bitmovinPlayerCollector?.detachPlayer()
+        player?.destroy()
 
         val playbackConfig = PlaybackConfig()
         playbackConfig.isMuted = false
         playbackConfig.isAutoplayEnabled = false
         val playerConfig = PlayerConfig(playbackConfig = playbackConfig)
 //        playerConfig.advertisingConfig = createAdvertisingConfig()
-        player = Player.create(applicationContext, playerConfig)
-
-        bitmovinPlayerCollector = BitmovinPlayerCollector(createBitmovinAnalyticsConfig(), applicationContext)
+        val player = Player.create(applicationContext, playerConfig)
+        this.player = player
+        val collector = BitmovinPlayerCollector(createBitmovinAnalyticsConfig(), applicationContext)
+        this.bitmovinPlayerCollector = collector
 
         val redbullMetadata = SourceMetadata(
                 videoId = "source-video-id",
                 title = "redbull")
-        bitmovinPlayerCollector?.addSourceMetadata(redbullSource, redbullMetadata)
+        collector.addSourceMetadata(redbullSource, redbullMetadata)
 
         val sintelMetadata = SourceMetadata(
             videoId = "source-video-id-2",
             title = "sintel")
-        bitmovinPlayerCollector?.addSourceMetadata(sintelSource, sintelMetadata)
+        collector.addSourceMetadata(sintelSource, sintelMetadata)
 
         val liveSimMetadata = SourceMetadata(
             videoId = "source-video-id",
             title = "livesims")
-        bitmovinPlayerCollector?.addSourceMetadata(liveSimSource, liveSimMetadata)
+        collector.addSourceMetadata(liveSimSource, liveSimMetadata)
 
-        bitmovinPlayerCollector!!.attachPlayer(player)
+        collector.attachPlayer(player)
 
         val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource), PlaylistOptions())
-        player!!.load(playlistConfig)
+        player.load(playlistConfig)
 
-        playerView!!.player = player
+        playerView?.player = player
     }
 
     override fun onStart() {
-        playerView!!.onStart()
+        playerView?.onStart()
         super.onStart()
     }
 
     override fun onResume() {
         super.onResume()
-        playerView!!.onResume()
+        playerView?.onResume()
     }
 
     override fun onPause() {
-        playerView!!.onPause()
+        playerView?.onPause()
         super.onPause()
     }
 
     override fun onStop() {
-        playerView!!.onStop()
+        playerView?.onStop()
         super.onStop()
     }
 
     override fun onDestroy() {
-        playerView!!.onDestroy()
+        playerView?.onDestroy()
         super.onDestroy()
     }
 

@@ -21,7 +21,7 @@ class PlayerStates {
                 val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
                 machine.addStartupTime(elapsedTime - elapsedTimeOnEnter)
                 if (destinationPlayerState === PlayerStates.PLAYING) {
-                    val playerStartupTime = machine.andResetPlayerStartupTime
+                    val playerStartupTime = machine.getAndResetPlayerStartupTime()
                     for (listener in machine.listeners) {
                         listener.onStartup(machine, machine.startupTime, playerStartupTime)
                     }

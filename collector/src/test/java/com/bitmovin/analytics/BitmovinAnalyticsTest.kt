@@ -37,16 +37,10 @@ class BitmovinAnalyticsTest {
         every { anyConstructed<BackendFactory>().createBackend(any(), any()) } returns mockk(relaxed = true)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = IllegalStateException::class)
     fun testDeprecatedConstructorChecksForNullInConfiguration() {
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("foo-bar")
         BitmovinAnalytics(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context)
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun testNewDefaultConstructorChecksForNull() {
-        val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("foo-bar")
-        BitmovinAnalytics(bitmovinAnalyticsConfig, null)
     }
 
     @Test
