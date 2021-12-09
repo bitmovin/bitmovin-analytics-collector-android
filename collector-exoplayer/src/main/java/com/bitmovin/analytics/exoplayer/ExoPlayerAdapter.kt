@@ -40,6 +40,8 @@ import com.google.android.exoplayer2.source.MediaLoadData
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.source.dash.manifest.DashManifest
 import com.google.android.exoplayer2.source.hls.HlsManifest
+import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist
+import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import java.lang.Exception
 import java.util.Date
@@ -163,21 +165,14 @@ class ExoPlayerAdapter(
         val manifest = exoplayer.currentManifest
         if (isDashManifestClassLoaded && manifest is DashManifest) {
             data.streamFormat = Util.DASH_STREAM_FORMAT
-            if (manifest.location == null) {
-                data.mpdUrl = manifestUrl
-            } else {
-                data.mpdUrl = manifest.location.toString()
-            }
+            data.mpdUrl = manifest.location?.toString() ?: manifestUrl
         } else if (isHlsManifestClassLoaded && manifest is HlsManifest) {
-            val masterPlaylist = manifest.masterPlaylist
-            val mediaPlaylist = manifest.mediaPlaylist
+            // The nullability changed in the ExoPlayer source code, that's
+            // why we manually declare the playlists nullable
+            val masterPlaylist: HlsMasterPlaylist? = manifest.masterPlaylist
+            val mediaPlaylist: HlsMediaPlaylist? = manifest.mediaPlaylist
             data.streamFormat = Util.HLS_STREAM_FORMAT
-            // TODO check if this is a problem with Kotlin
-            if (masterPlaylist != null && masterPlaylist?.baseUri != null) {
-                data.m3u8Url = masterPlaylist.baseUri
-            } else if (mediaPlaylist != null) {
-                data.m3u8Url = mediaPlaylist.baseUri
-            }
+            data.m3u8Url = masterPlaylist?.baseUri ?: mediaPlaylist?.baseUri
         }
         data.downloadSpeedInfo = meter.getInfo()
 
@@ -346,11 +341,11 @@ class ExoPlayerAdapter(
             ) {
                 try {
                     if (mediaLoadData.dataType == C.DATA_TYPE_MANIFEST) {
-                        manifestUrl = loadEventInfo.dataSpec.uri.toString()
+                        manifestUrl = loadEventInfo.dataSpec?.uri?.toString()
                     } else if (mediaLoadData.dataType == C.DATA_TYPE_MEDIA && mediaLoadData.trackFormat?.drmInitData != null && drmType == null) {
                         addDrmType(mediaLoadData)
                     }
-                    if (mediaLoadData.trackFormat != null && mediaLoadData.trackFormat?.containerMimeType?.startsWith("video") == true) {
+                    if (mediaLoadData.trackFormat?.containerMimeType?.startsWith("video") == true) {
                         addSpeedMeasurement(loadEventInfo)
                     }
                 } catch (e: Exception) {
