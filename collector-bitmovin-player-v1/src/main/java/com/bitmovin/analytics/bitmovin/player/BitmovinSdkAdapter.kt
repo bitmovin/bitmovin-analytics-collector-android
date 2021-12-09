@@ -157,7 +157,7 @@ class BitmovinSdkAdapter(
         data.droppedFrames = totalDroppedVideoFrames
         totalDroppedVideoFrames = 0
 
-        val sourceItem = bitmovinPlayer.config.sourceItem
+        val sourceItem = bitmovinPlayer.config?.sourceItem
         // streamFormat, mpdUrl, and m3u8Url
         if (sourceItem != null) {
             when (sourceItem.type) {
@@ -201,7 +201,7 @@ class BitmovinSdkAdapter(
         // Subtitle info
         val subtitle = bitmovinPlayer.subtitle
         if (subtitle?.id != null) {
-            data.subtitleLanguage = if (subtitle.language != null) subtitle.language else subtitle.label
+            data.subtitleLanguage = subtitle.language ?: subtitle.label
             data.subtitleEnabled = true
         }
 
@@ -471,8 +471,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
-    private val onDownloadFinishedListener: OnDownloadFinishedListener = object : OnDownloadFinishedListener {
-        override fun onDownloadFinished(downloadFinishedEvent: DownloadFinishedEvent) {
+    private val onDownloadFinishedListener: OnDownloadFinishedListener = OnDownloadFinishedListener { downloadFinishedEvent: DownloadFinishedEvent ->
             try {
                 if (downloadFinishedEvent
                         .downloadType
@@ -489,7 +488,6 @@ class BitmovinSdkAdapter(
                 Log.d(TAG, e.message, e)
             }
         }
-    }
     private val onErrorListener = OnErrorListener { errorEvent ->
         try {
             Log.d(TAG, "onPlayerError")
