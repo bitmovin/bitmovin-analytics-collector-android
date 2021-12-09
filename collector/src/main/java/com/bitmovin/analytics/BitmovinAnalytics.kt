@@ -2,6 +2,8 @@ package com.bitmovin.analytics
 
 import android.content.Context
 import android.util.Log
+import com.bitmovin.analytics.BitmovinAnalyticsConfigExtension.Companion.getCustomData
+import com.bitmovin.analytics.BitmovinAnalyticsConfigExtension.Companion.setCustomData
 import com.bitmovin.analytics.SourceMetadataExtension.Companion.getCustomData
 import com.bitmovin.analytics.SourceMetadataExtension.Companion.setCustomData
 import com.bitmovin.analytics.adapters.PlayerAdapter
@@ -119,10 +121,10 @@ class BitmovinAnalytics
     var customData: CustomData
         get() {
             val sourceMetadata = playerAdapter?.currentSourceMetadata
-            return sourceMetadata?.getCustomData() ?: config.customData
+            return sourceMetadata?.getCustomData() ?: config.getCustomData()
         }
         set(customData) {
-            var setCustomDataFunction: (CustomData) -> Unit = config::setCustomData
+            var setCustomDataFunction: (CustomData) -> Unit = { config.setCustomData(it) }
             val sourceMetadata = playerAdapter?.currentSourceMetadata
             if (sourceMetadata != null) {
                 setCustomDataFunction = { sourceMetadata.setCustomData(it) }
@@ -136,8 +138,8 @@ class BitmovinAnalytics
             Log.d(TAG, "Custom data could not be set because player is not attached")
             return
         }
-        var getCustomDataFunction: () -> CustomData = config::getCustomData
-        var setCustomDataFunction: (CustomData) -> Unit = config::setCustomData
+        var getCustomDataFunction: () -> CustomData = { config.getCustomData() }
+        var setCustomDataFunction: (CustomData) -> Unit = { config.setCustomData(it) }
         val sourceMetadata = playerAdapter.currentSourceMetadata
         if (sourceMetadata != null) {
             getCustomDataFunction = { sourceMetadata.getCustomData() }
