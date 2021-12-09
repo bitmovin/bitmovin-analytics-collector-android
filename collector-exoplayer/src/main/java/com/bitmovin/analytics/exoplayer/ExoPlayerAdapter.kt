@@ -47,7 +47,7 @@ import java.util.Date
 class ExoPlayerAdapter(
     private val exoplayer: ExoPlayer,
     private val config: BitmovinAnalyticsConfig,
-    private val stateMachine: PlayerStateMachine,
+    stateMachine: PlayerStateMachine,
     private val featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider
