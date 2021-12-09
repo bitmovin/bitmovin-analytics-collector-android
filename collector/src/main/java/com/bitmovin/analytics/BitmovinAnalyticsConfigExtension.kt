@@ -1,6 +1,5 @@
 package com.bitmovin.analytics
 
-import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.CustomData
 
 internal class BitmovinAnalyticsConfigExtension {

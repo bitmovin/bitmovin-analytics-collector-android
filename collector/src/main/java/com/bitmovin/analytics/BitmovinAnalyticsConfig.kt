@@ -1,10 +1,9 @@
 package com.bitmovin.analytics
 
 import android.content.Context
+import android.os.Parcel
 import android.os.Parcelable
 import com.bitmovin.analytics.enums.PlayerType
-import android.os.Parcel
-import com.bitmovin.analytics.data.CustomData
 
 class BitmovinAnalyticsConfig : Parcelable {
     constructor(key: String, playerKey: String) {
@@ -12,7 +11,7 @@ class BitmovinAnalyticsConfig : Parcelable {
         this.playerKey = playerKey
     }
 
-    constructor(key: String): this(key, "")
+    constructor(key: String) : this(key, "")
 
     @Deprecated("")
     constructor(key: String, context: Context?) : this(key) {
