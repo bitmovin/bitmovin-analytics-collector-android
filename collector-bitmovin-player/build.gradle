@@ -27,6 +27,10 @@ android {
 		targetCompatibility rootProject.ext.targetCompatibility
 	}
 
+	kotlinOptions {
+		jvmTarget = rootProject.ext.jvmTarget
+	}
+
 	buildTypes {
 		release {
 			minifyEnabled false

@@ -106,6 +106,7 @@ ext {
 
 	sourceCompatibility = JavaVersion.VERSION_1_8
 	targetCompatibility = JavaVersion.VERSION_1_8
+	jvmTarget = JavaVersion.VERSION_1_8.toString()
 
 	bitmovinPlayer2Version = '2.45.0'
 	bitmovinPlayerVersion = '3.0.0'
