@@ -53,8 +53,12 @@ class ExoPlayerAdapter(
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider
 ) : DefaultPlayerAdapter(eventDataFactory, stateMachine, deviceInformationProvider), Player.EventListener, AnalyticsListener, EventDataManipulator {
-    private val isHlsManifestClassLoaded = Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, this.javaClass.classLoader)
-    private val isDashManifestClassLoaded = Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
+    private val isHlsManifestClassLoaded by lazy {
+        Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, this.javaClass.classLoader)
+    }
+    private val isDashManifestClassLoaded by lazy {
+        Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
+    }
     private val exceptionMapper: ExceptionMapper<Throwable> = ExoPlayerExceptionMapper()
     private val meter = DownloadSpeedMeter()
     private val bitrateEventDataManipulator = BitrateEventDataManipulator(exoplayer)
