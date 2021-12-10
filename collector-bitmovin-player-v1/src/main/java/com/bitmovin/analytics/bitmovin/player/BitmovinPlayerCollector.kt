@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
@@ -44,19 +45,16 @@ class BitmovinPlayerCollector
 
     companion object {
         private fun getUserAgent(context: Context): String {
-            val applicationInfo = context.applicationInfo
-            val stringId = applicationInfo.labelRes
-            val applicationName = "Unknown"
-            if (stringId == 0 && applicationInfo.nonLocalizedLabel != null) {
-                applicationInfo.nonLocalizedLabel.toString()
-            }
-            val versionName: String = try {
+            val applicationInfo: ApplicationInfo? = context.applicationInfo
+            val stringId = applicationInfo?.labelRes
+            val applicationName = if (stringId == 0) applicationInfo?.nonLocalizedLabel?.toString() else null ?: "Unknown"
+            val versionName = try {
                 val packageName = context.packageName
-                val info = context.packageManager.getPackageInfo(packageName, 0)
-                info.versionName
+                val info = context.packageManager?.getPackageInfo(packageName, 0)
+                info?.versionName
             } catch (var5: PackageManager.NameNotFoundException) {
-                "?"
-            }
+                null
+            } ?: "?"
             return (applicationName +
                     "/" +
                     versionName +
