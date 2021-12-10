@@ -217,6 +217,8 @@ class BitmovinAnalyticsConfig : Parcelable {
     /**
      * Mark the stream as live before stream metadata is available.
      */
+    @set:JvmName("setIsLive")
+    @get:JvmName("getIsLive")
     var isLive: Boolean? = null
 
     /**

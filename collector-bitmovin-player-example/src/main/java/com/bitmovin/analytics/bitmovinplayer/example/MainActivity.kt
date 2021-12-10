@@ -183,7 +183,7 @@ class MainActivity : AppCompatActivity() {
             bitmovinAnalyticsConfig.path = "/vod/new/"
             bitmovinAnalyticsConfig.heartbeatInterval = 59700
             bitmovinAnalyticsConfig.ads = false
-            bitmovinAnalyticsConfig.setIsLive(false)
+            bitmovinAnalyticsConfig.isLive = false
 
             return bitmovinAnalyticsConfig
         }
