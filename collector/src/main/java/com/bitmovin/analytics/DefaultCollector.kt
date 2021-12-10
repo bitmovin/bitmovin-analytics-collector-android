@@ -7,8 +7,8 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.utils.Util
 
 abstract class DefaultCollector<TPlayer> protected constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context, userAgent: String) : Collector<TPlayer> {
-    protected val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, context)
-    protected val deviceInformationProvider = DeviceInformationProvider(context, userAgent)
+    protected val analytics by lazy { BitmovinAnalytics(bitmovinAnalyticsConfig, context) }
+    protected val deviceInformationProvider by lazy { DeviceInformationProvider(context, userAgent) }
 
     override var customData: CustomData
         get() = analytics.customData
