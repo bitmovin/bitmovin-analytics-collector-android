@@ -63,8 +63,9 @@ class ExoPlayerAdapter(
     private val exceptionMapper: ExceptionMapper<Throwable> = ExoPlayerExceptionMapper()
     private val bitrateEventDataManipulator = BitrateEventDataManipulator(exoplayer)
     private val meter = DownloadSpeedMeter()
-    private val defaultAnalyticsListener = createAnalyticsListener()
-    private val defaultPlayerEventListener = createPlayerEventListener()
+    // TODO inject those from the outside, as this is not really testable
+    internal val defaultAnalyticsListener = createAnalyticsListener()
+    internal val defaultPlayerEventListener = createPlayerEventListener()
 
     private var totalDroppedVideoFrames = 0
     private var playerIsReady = false
