@@ -28,7 +28,7 @@ class BitmovinPlayerCollector
         """Please use {@link #BitmovinPlayerCollector(BitmovinAnalyticsConfig, Context)} and
           pass {@link Context} separately."""
     )
-    constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) : this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context) {
+    constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) : this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context ?: throw IllegalArgumentException("Context cannot be null")) {
     }
 
     override fun createAdapter(bitmovinPlayer: BitmovinPlayer): PlayerAdapter {
