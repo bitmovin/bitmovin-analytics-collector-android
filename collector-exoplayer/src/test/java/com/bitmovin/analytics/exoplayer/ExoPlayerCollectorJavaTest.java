@@ -5,8 +5,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class ExoPlayerCollectorJavaTest
-{
+public class ExoPlayerCollectorJavaTest {
     @Test
     public void testDeprecatedConstructorSucceedsWithValidContext() {
         BitmovinAnalyticsConfig config =
