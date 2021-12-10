@@ -1,8 +1,7 @@
 package com.bitmovin.analytics
 
-import android.os.Parcelable
 import android.os.Parcel
-import com.bitmovin.analytics.CollectorConfig
+import android.os.Parcelable
 
 class CollectorConfig() : Parcelable {
     /**
