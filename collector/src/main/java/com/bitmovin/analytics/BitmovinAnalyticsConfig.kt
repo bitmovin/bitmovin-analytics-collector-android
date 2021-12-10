@@ -5,8 +5,8 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.bitmovin.analytics.enums.PlayerType
 
-class BitmovinAnalyticsConfig : Parcelable {
-    constructor(key: String, playerKey: String) {
+class BitmovinAnalyticsConfig() : Parcelable {
+    constructor(key: String, playerKey: String) : this() {
         this.key = key
         this.playerKey = playerKey
     }
@@ -232,7 +232,7 @@ class BitmovinAnalyticsConfig : Parcelable {
     var config = CollectorConfig()
         private set
 
-    private constructor(parcel: Parcel) {
+    private constructor(parcel: Parcel) : this() {
         cdnProvider = parcel.readString()
         customData1 = parcel.readString()
         customData2 = parcel.readString()
