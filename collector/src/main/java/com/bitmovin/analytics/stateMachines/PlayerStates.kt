@@ -22,8 +22,8 @@ class PlayerStates {
                 machine.addStartupTime(elapsedTime - elapsedTimeOnEnter)
                 if (destinationPlayerState === PlayerStates.PLAYING) {
                     val playerStartupTime = machine.getAndResetPlayerStartupTime()
-                    for (listener in machine.listeners) {
-                        listener.onStartup(machine, machine.startupTime, playerStartupTime)
+                    machine.listeners.notify {
+                        it.onStartup(machine, machine.startupTime, playerStartupTime)
                     }
                     machine.isStartupFinished = true
                 }
@@ -43,9 +43,9 @@ class PlayerStates {
                 destinationPlayerState: PlayerState<*>
             ) {
                 machine.disableRebufferHeartbeat()
-                for (listener in machine.listeners) {
-                    val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
-                    listener.onRebuffering(machine, elapsedTime - elapsedTimeOnEnter)
+                val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
+                machine.listeners.notify {
+                    it.onRebuffering(machine, elapsedTime - elapsedTimeOnEnter)
                 }
                 machine.bufferingTimeoutTimer.cancel()
             }
@@ -53,9 +53,7 @@ class PlayerStates {
         @JvmField val ERROR = object : DefaultPlayerState<ErrorCode>("error") {
             override fun onEnterState(machine: PlayerStateMachine, data: ErrorCode?) {
                 machine.videoStartTimeoutTimer.cancel()
-                for (listener in machine.listeners) {
-                    listener.onError(machine, data)
-                }
+                machine.listeners.notify { it.onError(machine, data) }
             }
 
             override fun onExitState(
@@ -68,9 +66,7 @@ class PlayerStates {
         }
         @JvmField val EXITBEFOREVIDEOSTART = object : DefaultPlayerState<Void>("exitbeforevideostart") {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
-                for (listener in machine.listeners) {
-                    listener.onVideoStartFailed(machine)
-                }
+                machine.listeners.notify { it.onVideoStartFailed(machine) }
             }
 
             override fun onExitState(
@@ -91,9 +87,9 @@ class PlayerStates {
                 elapsedTime: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                for (listener in machine.listeners) {
-                    val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
-                    listener.onPlayExit(machine, elapsedTime - elapsedTimeOnEnter)
+                val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
+                machine.listeners.notify {
+                    it.onPlayExit(machine, elapsedTime - elapsedTimeOnEnter)
                 }
                 machine.disableHeartbeat()
             }
@@ -104,9 +100,9 @@ class PlayerStates {
                 elapsedTime: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                for (listener in machine.listeners) {
-                    val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
-                    listener.onPauseExit(machine, elapsedTime - elapsedTimeOnEnter)
+                val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
+                machine.listeners.notify {
+                    it.onPauseExit(machine, elapsedTime - elapsedTimeOnEnter)
                 }
             }
         }
@@ -124,15 +120,10 @@ class PlayerStates {
                 destinationPlayerState: PlayerState<*>
             ) {
                 if (machine.isQualityChangeEventEnabled) {
-                    for (listener in machine.listeners) {
-                        listener.onQualityChange(machine)
-                    }
+                    machine.listeners.notify { it.onQualityChange(machine) }
                 } else {
-                    val errorCode = AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED
-                        .errorCode
-                    for (listener in machine.listeners) {
-                        listener.onError(machine, errorCode)
-                    }
+                    val errorCode = AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode
+                    machine.listeners.notify { it.onError(machine, errorCode) }
                 }
             }
         }
@@ -143,9 +134,7 @@ class PlayerStates {
                 elapsedTime: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                for (listener in machine.listeners) {
-                    listener.onAudioTrackChange(machine)
-                }
+                machine.listeners.notify { it.onAudioTrackChange(machine) }
             }
         }
         @JvmField val SUBTITLECHANGE = object : DefaultPlayerState<Void>("subtitlechange") {
@@ -154,9 +143,7 @@ class PlayerStates {
                 elapsedTime: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                for (listener in machine.listeners) {
-                    listener.onSubtitleChange(machine)
-                }
+                machine.listeners.notify { it.onSubtitleChange(machine) }
             }
         }
 
@@ -170,8 +157,8 @@ class PlayerStates {
                 elapsedTime: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                for (listener in machine.listeners) {
-                    listener.onSeekComplete(machine, elapsedTime - machine.elapsedTimeSeekStart)
+                machine.listeners.notify {
+                    it.onSeekComplete(machine, elapsedTime - machine.elapsedTimeSeekStart)
                 }
                 machine.elapsedTimeSeekStart = 0
             }

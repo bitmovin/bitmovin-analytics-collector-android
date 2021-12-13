@@ -13,6 +13,10 @@ class ObservableSupport<TListener> : Observable<TListener> {
         listeners.remove(listener)
     }
 
+    fun clear() {
+        listeners.clear()
+    }
+
     // Helper method for inline Java calls
     fun notify(action: EventListenerNotifier<TListener>) {
         notify { action.notify(it) }

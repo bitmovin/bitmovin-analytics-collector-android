@@ -6,7 +6,6 @@ import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.enums.VideoStartFailedReason
-import com.bitmovin.analytics.features.FeatureManager
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.utils.DataSerializer.serialize
 import com.bitmovin.analytics.utils.Util

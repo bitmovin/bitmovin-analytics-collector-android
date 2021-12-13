@@ -4,6 +4,7 @@ import android.os.Handler
 import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
@@ -11,10 +12,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.utils.Util
 
 class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics: BitmovinAnalytics, internal val bufferingTimeoutTimer: ObservableTimer, internal val qualityChangeCountResetTimer: ObservableTimer, internal val videoStartTimeoutTimer: ObservableTimer) {
-    private val mutableListeners = mutableListOf<StateMachineListener>()
-    // We don't want to allow someone to add listeners from the outside
-    val listeners: List<StateMachineListener>
-        get() = mutableListeners
+    internal val listeners = ObservableSupport<StateMachineListener>()
 
     var currentState: PlayerState<*> = PlayerStates.READY
         private set
@@ -85,9 +83,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     private fun triggerHeartbeat() {
         val elapsedTime = Util.getElapsedTime()
         videoTimeEnd = analytics.position
-        for (listener in mutableListeners) {
-            listener.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter)
-        }
+        listeners.notify { it.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter) }
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
     }
@@ -148,20 +144,12 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         return true
     }
 
-    fun addListener(toAdd: StateMachineListener) {
-        mutableListeners.add(toAdd)
-    }
-
-    fun removeListener(toRemove: StateMachineListener) {
-        mutableListeners.remove(toRemove)
-    }
-
-    fun clearListeners() {
-        mutableListeners.clear()
+    fun subscribe(listener: StateMachineListener) {
+        listeners.subscribe(listener)
     }
 
     fun release() {
-        clearListeners()
+        listeners.clear()
         bufferingTimeoutTimer.unsubscribe(::onRebufferingTimerFinished)
         qualityChangeCountResetTimer.unsubscribe(::onQualityChangeResetTimerFinished)
         videoStartTimeoutTimer.unsubscribe(::onVideoStartTimeoutTimerFinished)
