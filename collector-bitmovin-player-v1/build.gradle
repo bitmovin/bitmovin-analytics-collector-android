@@ -56,7 +56,7 @@ dependencies {
 
 
 	testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-	testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+	testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
 
 	if (rootProject.ext.developLocal) {
 		api project(':collector')
