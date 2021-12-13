@@ -4,7 +4,7 @@ import android.os.CountDownTimer
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 
-class ObservableTimer(millisInFuture: Long, countDownInterval: Long): Observable<ObservableTimer.OnFinishedEventListener> {
+class ObservableTimer(millisInFuture: Long, countDownInterval: Long) : Observable<ObservableTimer.OnFinishedEventListener> {
     fun interface OnFinishedEventListener {
         fun onFinished()
     }

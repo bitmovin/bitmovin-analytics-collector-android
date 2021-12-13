@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.stateMachines
 
-import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
