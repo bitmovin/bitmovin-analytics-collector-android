@@ -37,12 +37,6 @@ class BitmovinAnalyticsTest {
         every { anyConstructed<BackendFactory>().createBackend(any(), any()) } returns mockk(relaxed = true)
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun testDeprecatedConstructorChecksForNullInConfiguration() {
-        val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("foo-bar")
-        BitmovinAnalytics(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context)
-    }
-
     @Test
     fun testDetachPlayerShouldCallOnAnalyticsReleasingEventListener() {
         val listener = mockk<OnAnalyticsReleasingEventListener>(relaxed = true)

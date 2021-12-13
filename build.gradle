@@ -5,7 +5,7 @@ buildscript {
 		google()
 		jcenter()
 		maven { url "https://plugins.gradle.org/m2/" }
-		maven { url 'http://bitmovin.bintray.com/maven' }
+		maven { url 'https://artifacts.bitmovin.com/artifactory/public-releases' }
 		mavenCentral()
 	}
 
@@ -36,7 +36,7 @@ allprojects {
 		mavenLocal()
 		google()
 		jcenter()
-		maven { url 'http://bitmovin.bintray.com/maven' }
+		maven { url 'https://artifacts.bitmovin.com/artifactory/public-releases' }
 		maven {
 			credentials {
 				username bitmovinProperties.getProperty('artifactoryUser')
@@ -106,6 +106,7 @@ ext {
 
 	sourceCompatibility = JavaVersion.VERSION_1_8
 	targetCompatibility = JavaVersion.VERSION_1_8
+	jvmTarget = JavaVersion.VERSION_1_8.toString()
 
 	bitmovinPlayer2Version = '2.45.0'
 	bitmovinPlayerVersion = '3.0.0'

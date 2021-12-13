@@ -6,24 +6,20 @@ import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import java.net.SocketTimeoutException
 import java.util.Calendar
 import java.util.Date
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyLong
-import org.mockito.Mockito
 
 class RetryBackendTest {
 
     private val config = BitmovinAnalyticsConfig()
-    private val backendMock = mock<CallbackBackend>()
-    private val handlerMock = mock<Handler>()
+    private val backendMock = mockk<CallbackBackend>(relaxed = true)
+    private val handlerMock = mockk<Handler>(relaxed = true)
     private val deviceInformation = DeviceInformation("manufacturer", "model", false, "userAgentString", "locale", "packageName", 0, 0)
 
     private val firstDate = Date()
@@ -36,31 +32,31 @@ class RetryBackendTest {
     @Test
     fun sampleShouldBeProcessedAfterHttpRequestTimeout() {
 
-        whenever(backendMock.send(any(), any())).thenAnswer {
-            (it.arguments[1] as OnFailureCallback).onFailure(SocketTimeoutException("Timeout"), {})
+        every { backendMock.send(any(), any()) } answers {
+            (it.invocation.args[1] as OnFailureCallback).onFailure(SocketTimeoutException("Timeout")) {}
         }
 
-        val retryBacked = Mockito.spy(RetryBackend(backendMock, handlerMock))
-        retryBacked.send(setupEventData(1))
+        val retryBackend = spyk(RetryBackend(backendMock, handlerMock))
+        retryBackend.send(setupEventData(1))
 
-        verify(retryBacked, times(1)).processQueuedSamples()
+        verify(exactly = 1) { retryBackend.processQueuedSamples() }
     }
 
     @Test
     fun handlerShouldBeCanceledIfSampleWithSmallerScheduledTimeArrives() {
-        val handler = Mockito.spy(Handler())
+        val handler = spyk(Handler())
 
-        val retryBacked = Mockito.spy(RetryBackend(backendMock, handler))
+        val retryBacked = spyk(RetryBackend(backendMock, handler))
 
-        Mockito.`when`(retryBacked.getNextScheduledTime()).thenAnswer { secondDate }.thenAnswer { firstDate }
-
-        retryBacked.processQueuedSamples()
-
-        verify(handler, times(1)).postAtTime(any(), any(), anyLong())
+        every { retryBacked.getNextScheduledTime() } answers { secondDate } andThen(firstDate)
 
         retryBacked.processQueuedSamples()
-        verify(handler, times(1)).removeCallbacks(any(), any())
-        verify(handler, times(2)).postAtTime(any(), any(), anyLong())
+
+        verify(exactly = 1) { handler.postAtTime(any(), any(), any()) }
+
+        retryBacked.processQueuedSamples()
+        verify(exactly = 1) { handler.removeCallbacks(any(), any()) }
+        verify(exactly = 2) { handler.postAtTime(any(), any(), any()) }
     }
 
     private fun setupEventData(sequenceNumber: Int): EventData {

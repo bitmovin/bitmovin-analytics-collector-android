@@ -8,7 +8,7 @@ import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 
 interface PlayerAdapter {
-    val playerStateMachine: PlayerStateMachine
+    val stateMachine: PlayerStateMachine
     val position: Long
     val drmDownloadTime: Long?
     val currentSourceMetadata: SourceMetadata?

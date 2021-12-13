@@ -25,8 +25,7 @@ class ExoPlayerCollector
         """Please use {@link #ExoPlayerCollector(BitmovinAnalyticsConfig, Context)} and pass
           {@link Context} separately."""
     )
-    constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) : this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context) {
-    }
+    constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) : this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context ?: throw IllegalArgumentException("Context cannot be null"))
 
     override fun createAdapter(exoPlayer: ExoPlayer): PlayerAdapter {
         val featureFactory: FeatureFactory = ExoPlayerFeatureFactory(analytics, exoPlayer)

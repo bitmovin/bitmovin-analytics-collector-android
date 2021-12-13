@@ -23,7 +23,7 @@ class UtilTest {
     @Throws(Exception::class)
     fun testGetIsLiveFromConfigOrPlayer_ReturnsConfigValueTrueIfPlayerNotReady() {
         val config = BitmovinAnalyticsConfig()
-        config.setIsLive(true)
+        config.isLive = true
 
         val isLive = Util.getIsLiveFromConfigOrPlayer(false, config.isLive, false)
         assertThat(isLive).isTrue()
@@ -33,7 +33,7 @@ class UtilTest {
     @Throws(Exception::class)
     fun testGetIsLiveFromConfigOrPlayer_ReturnsConfigValueFalseIfPlayerNotReady() {
         val config = BitmovinAnalyticsConfig()
-        config.setIsLive(false)
+        config.isLive = false
 
         val isLive = Util.getIsLiveFromConfigOrPlayer(false, config.isLive, false)
         assertThat(isLive).isFalse()
@@ -43,7 +43,7 @@ class UtilTest {
     @Throws(Exception::class)
     fun testGetIsLiveFromConfigOrPlayer_ReturnsPlayerIsLiveTrueIfPlayerReady() {
         val config = BitmovinAnalyticsConfig()
-        config.setIsLive(true)
+        config.isLive = true
 
         val isLive = Util.getIsLiveFromConfigOrPlayer(true, config.isLive, true)
         assertThat(isLive).isTrue()
@@ -53,7 +53,7 @@ class UtilTest {
     @Throws(Exception::class)
     fun testGetIsLiveFromConfigOrPlayer_ReturnsPlayerIsLiveFalseIfPlayerReady() {
         val config = BitmovinAnalyticsConfig()
-        config.setIsLive(true)
+        config.isLive = true
 
         val isLive = Util.getIsLiveFromConfigOrPlayer(true, config.isLive, false)
         assertThat(isLive).isFalse()
