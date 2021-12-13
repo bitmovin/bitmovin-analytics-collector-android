@@ -4,11 +4,17 @@ import android.content.Context
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.DeviceInformationProvider
+import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.RandomizedUserIdIdProvider
+import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
+import com.bitmovin.analytics.data.UserIdProvider
+import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.Util
 
-abstract class DefaultCollector<TPlayer> protected constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context, userAgent: String) : Collector<TPlayer> {
-    protected val analytics by lazy { BitmovinAnalytics(bitmovinAnalyticsConfig, context) }
-    protected val deviceInformationProvider by lazy { DeviceInformationProvider(context, userAgent) }
+abstract class DefaultCollector<TPlayer> protected constructor(final override val config: BitmovinAnalyticsConfig, context: Context, userAgent: String) : Collector<TPlayer> {
+    private val analytics by lazy { BitmovinAnalytics(config, context) }
+    private val deviceInformationProvider by lazy { DeviceInformationProvider(context, userAgent) }
+    private val userIdProvider: UserIdProvider = if (config.randomizeUserId) RandomizedUserIdIdProvider() else SecureSettingsAndroidIdUserIdProvider(context)
 
     override var customData: CustomData
         get() = analytics.customData
@@ -17,16 +23,15 @@ abstract class DefaultCollector<TPlayer> protected constructor(bitmovinAnalytics
     override val impressionId: String?
         get() = analytics.impressionId
 
-    override val config: BitmovinAnalyticsConfig
-        get() = analytics.config
-
     override val version: String
         get() = Util.getAnalyticsVersion()
 
-    protected abstract fun createAdapter(player: TPlayer): PlayerAdapter
+    protected abstract fun createAdapter(player: TPlayer, analytics: BitmovinAnalytics, stateMachine: PlayerStateMachine, deviceInformationProvider: DeviceInformationProvider, eventDataFactory: EventDataFactory): PlayerAdapter
 
     override fun attachPlayer(player: TPlayer) {
-        val adapter = createAdapter(player)
+        val stateMachine = PlayerStateMachine(config, analytics)
+        val eventDataFactory = EventDataFactory(config, userIdProvider)
+        val adapter = createAdapter(player, analytics, stateMachine, deviceInformationProvider, eventDataFactory)
         analytics.attach(adapter)
     }
 
