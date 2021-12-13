@@ -13,7 +13,7 @@ import com.bitmovin.analytics.utils.Util
 
 class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, private val playerAdapter: PlayerAdapter, private val errorDetailObservable: ObservableSupport<OnErrorDetailEventListener>) : StateMachineListener {
     companion object {
-        private val TAG = FeatureManager::class.java.name
+        private val TAG = DefaultStateMachineListener::class.java.name
     }
 
     override fun onStartup(stateMachine: PlayerStateMachine, videoStartupTime: Long, playerStartupTime: Long) {
