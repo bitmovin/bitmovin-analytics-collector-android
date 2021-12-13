@@ -10,7 +10,6 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.SpeedMeasurement
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
-import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
 import com.bitmovin.analytics.enums.DRMType
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.VideoStartFailedReason
@@ -48,12 +47,12 @@ import java.util.Date
 
 class ExoPlayerAdapter(
     private val exoplayer: ExoPlayer,
-    private val config: BitmovinAnalyticsConfig,
+    config: BitmovinAnalyticsConfig,
     stateMachine: PlayerStateMachine,
-    private val featureFactory: FeatureFactory,
+    featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider
-) : DefaultPlayerAdapter(eventDataFactory, stateMachine, deviceInformationProvider), EventDataManipulator {
+) : DefaultPlayerAdapter(config, eventDataFactory, stateMachine, featureFactory, deviceInformationProvider), EventDataManipulator {
     private val isDashManifestClassLoaded by lazy {
         Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, this.javaClass.classLoader)
     }
@@ -91,19 +90,22 @@ class ExoPlayerAdapter(
     }
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
+        val features = super.init()
         totalDroppedVideoFrames = 0
         playerIsReady = false
         isInInitialBufferState = false
         isVideoAttemptedPlay = false
         isPlaying = false
         checkAutoplayStartup()
-        return featureFactory.createFeatures()
+        return features
     }
 
     /* Adapter doesn't support source-specific metadata */
     override val currentSourceMetadata: SourceMetadata?
         get() = /* Adapter doesn't support source-specific metadata */
             null
+
+    override val eventDataManipulators: Collection<EventDataManipulator> by lazy { listOf(this, bitrateEventDataManipulator) }
 
     /*
      * Because of the late initialization of the Adapter we do not get the first
@@ -199,11 +201,6 @@ class ExoPlayerAdapter(
         drmType = null
         bitrateEventDataManipulator.reset()
         // no Playlist transition event in older version of collector (v1)
-    }
-
-    override fun registerEventDataManipulators(pipeline: EventDataManipulatorPipeline) {
-        pipeline.registerEventDataManipulator(this)
-        pipeline.registerEventDataManipulator(bitrateEventDataManipulator)
     }
 
     override val position: Long

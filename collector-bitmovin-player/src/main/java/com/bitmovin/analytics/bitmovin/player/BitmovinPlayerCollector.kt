@@ -4,12 +4,16 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory
 import com.bitmovin.analytics.config.SourceMetadata
+import com.bitmovin.analytics.data.DeviceInformationProvider
+import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.source.Source
 import java.util.HashMap
@@ -35,15 +39,15 @@ class BitmovinPlayerCollector
     )
     constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) : this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context ?: throw IllegalArgumentException("Context cannot be null"))
 
-    override fun createAdapter(player: Player): PlayerAdapter {
+    override fun createAdapter(player: Player, analytics: BitmovinAnalytics, stateMachine: PlayerStateMachine, deviceInformationProvider: DeviceInformationProvider, eventDataFactory: EventDataFactory): PlayerAdapter {
         val featureFactory: FeatureFactory = BitmovinFeatureFactory(analytics, player)
         return BitmovinSdkAdapter(
             player,
-            analytics.config,
-            analytics.playerStateMachine,
+            config,
+            stateMachine,
             featureFactory,
             sourceMetadataMap,
-            analytics.eventDataFactory,
+            eventDataFactory,
             deviceInformationProvider
         )
     }

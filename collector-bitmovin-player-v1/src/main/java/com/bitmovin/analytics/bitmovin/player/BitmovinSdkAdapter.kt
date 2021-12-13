@@ -9,7 +9,6 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
-import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
 import com.bitmovin.analytics.enums.CastTech
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.VideoStartFailedReason
@@ -49,12 +48,12 @@ import java.lang.Exception
 
 class BitmovinSdkAdapter(
     private val bitmovinPlayer: BitmovinPlayer,
-    private val config: BitmovinAnalyticsConfig,
+    config: BitmovinAnalyticsConfig,
     stateMachine: PlayerStateMachine,
-    private val featureFactory: FeatureFactory,
+    featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider
-) : DefaultPlayerAdapter(eventDataFactory, stateMachine, deviceInformationProvider), EventDataManipulator {
+) : DefaultPlayerAdapter(config, eventDataFactory, stateMachine, featureFactory, deviceInformationProvider), EventDataManipulator {
     private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
     private var totalDroppedVideoFrames = 0
     private var playerIsReady = false
@@ -62,18 +61,22 @@ class BitmovinSdkAdapter(
     override var drmDownloadTime: Long? = null
         private set
     private var drmType: String? = null
+
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
+        val features = super.init()
         addPlayerListeners()
         checkAutoplayStartup()
         totalDroppedVideoFrames = 0
         playerIsReady = false
-        return featureFactory.createFeatures()
+        return features
     }
 
     /* Adapter doesn't support source-specific metadata */
     override val currentSourceMetadata: SourceMetadata?
         get() = /* Adapter doesn't support source-specific metadata */
             null
+
+    override val eventDataManipulators: Collection<EventDataManipulator> by lazy { listOf(this) }
 
     private fun addPlayerListeners() {
         Log.d(TAG, "Adding Player Listeners")
@@ -224,10 +227,6 @@ class BitmovinSdkAdapter(
     override fun resetSourceRelatedState() {
         // no Playlist transition event in older version of Bitmovin Player collector
         // (v1)
-    }
-
-    override fun registerEventDataManipulators(pipeline: EventDataManipulatorPipeline) {
-        pipeline.registerEventDataManipulator(this)
     }
 
     override val position: Long

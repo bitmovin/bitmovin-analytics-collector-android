@@ -1,11 +1,15 @@
 package com.bitmovin.analytics.exoplayer
 
 import android.content.Context
+import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
 import com.bitmovin.analytics.adapters.PlayerAdapter
+import com.bitmovin.analytics.data.DeviceInformationProvider
+import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.exoplayer.features.ExoPlayerFeatureFactory
 import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.google.android.exoplayer2.ExoPlayer
 
 class ExoPlayerCollector
@@ -27,14 +31,14 @@ class ExoPlayerCollector
     )
     constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) : this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context ?: throw IllegalArgumentException("Context cannot be null"))
 
-    override fun createAdapter(exoPlayer: ExoPlayer): PlayerAdapter {
+    override fun createAdapter(exoPlayer: ExoPlayer, analytics: BitmovinAnalytics, stateMachine: PlayerStateMachine, deviceInformationProvider: DeviceInformationProvider, eventDataFactory: EventDataFactory): PlayerAdapter {
         val featureFactory: FeatureFactory = ExoPlayerFeatureFactory(analytics, exoPlayer)
         return ExoPlayerAdapter(
             exoPlayer,
-            analytics.config,
-            analytics.playerStateMachine,
+            config,
+            stateMachine,
             featureFactory,
-            analytics.eventDataFactory,
+            eventDataFactory,
             deviceInformationProvider
         )
     }
