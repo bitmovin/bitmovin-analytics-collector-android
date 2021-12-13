@@ -27,6 +27,6 @@ abstract class DefaultPlayerAdapter(protected val config: BitmovinAnalyticsConfi
 
     override fun release() {
         eventDataFactory.clearEventDataManipulators()
-        stateMachine.clearListeners()
+        stateMachine.release()
     }
 }

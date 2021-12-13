@@ -9,7 +9,7 @@ class PlayerStates {
         @JvmField val SOURCE_CHANGED = DefaultPlayerState<Void>("source_changed")
         @JvmField val STARTUP = object : DefaultPlayerState<Void>("startup") {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
-                machine.videoStartTimeout.start()
+                machine.videoStartTimeoutTimer.start()
             }
 
             override fun onExitState(
@@ -17,7 +17,7 @@ class PlayerStates {
                 elapsedTime: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                machine.videoStartTimeout.cancel()
+                machine.videoStartTimeoutTimer.cancel()
                 val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
                 machine.addStartupTime(elapsedTime - elapsedTimeOnEnter)
                 if (destinationPlayerState === PlayerStates.PLAYING) {
@@ -34,7 +34,7 @@ class PlayerStates {
         @JvmField val BUFFERING = object : DefaultPlayerState<Void>("buffering") {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
                 machine.enableRebufferHeartbeat()
-                machine.rebufferingTimeout.start()
+                machine.bufferingTimeoutTimer.start()
             }
 
             override fun onExitState(
@@ -47,12 +47,12 @@ class PlayerStates {
                     val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
                     listener.onRebuffering(machine, elapsedTime - elapsedTimeOnEnter)
                 }
-                machine.rebufferingTimeout.cancel()
+                machine.bufferingTimeoutTimer.cancel()
             }
         }
         @JvmField val ERROR = object : DefaultPlayerState<ErrorCode>("error") {
             override fun onEnterState(machine: PlayerStateMachine, data: ErrorCode?) {
-                machine.videoStartTimeout.cancel()
+                machine.videoStartTimeoutTimer.cancel()
                 for (listener in machine.listeners) {
                     listener.onError(machine, data)
                 }
@@ -113,8 +113,8 @@ class PlayerStates {
         @JvmField val QUALITYCHANGE = object : DefaultPlayerState<Void>("qualitychange") {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
                 machine.increaseQualityChangeCount()
-                if (!machine.isQualityChangeTimerRunning) {
-                    machine.qualityChangeResetTimeout.start()
+                if (!machine.qualityChangeCountResetTimer.isRunning) {
+                    machine.qualityChangeCountResetTimer.start()
                 }
             }
 
