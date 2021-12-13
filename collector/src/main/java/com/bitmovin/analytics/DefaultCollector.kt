@@ -14,7 +14,7 @@ abstract class DefaultCollector<TPlayer> protected constructor(bitmovinAnalytics
         get() = analytics.customData
         set(value) { analytics.customData = value }
 
-    override val impressionId: String
+    override val impressionId: String?
         get() = analytics.impressionId
 
     override val config: BitmovinAnalyticsConfig

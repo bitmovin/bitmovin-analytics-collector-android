@@ -187,8 +187,8 @@ class BitmovinAnalytics
         eventBus[DebugListener::class].unsubscribe(listener)
     }
 
-    override val impressionId: String
-        get() = playerStateMachine.impressionId
+    val impressionId: String?
+        get() = playerAdapter?.stateMachine?.impressionId
 
     interface DebugListener {
         fun onDispatchEventData(data: EventData)

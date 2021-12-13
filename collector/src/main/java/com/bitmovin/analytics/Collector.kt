@@ -4,7 +4,7 @@ import com.bitmovin.analytics.data.CustomData
 
 interface Collector<TPlayer> {
     var customData: CustomData
-    val impressionId: String
+    val impressionId: String?
     val config: BitmovinAnalyticsConfig
     val version: String
 
