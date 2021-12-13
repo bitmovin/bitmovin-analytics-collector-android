@@ -114,6 +114,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
         analytics.sendEventData(data)
         errorDetailObservable.notify {
             it.onError(
+                stateMachine.impressionId,
                 errorCode?.errorCode,
                 errorCode?.description,
                 errorCode?.errorData
@@ -198,6 +199,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
             data.errorData = serialize(errorCode.legacyErrorData)
             errorDetailObservable.notify {
                 it.onError(
+                    stateMachine.impressionId,
                     errorCode.errorCode,
                     errorCode.description,
                     errorCode.errorData)
