@@ -12,18 +12,12 @@ import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.data.EventDataFactory
-import com.bitmovin.analytics.data.RandomizedUserIdIdProvider
-import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher
-import com.bitmovin.analytics.data.UserIdProvider
-import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator
 import com.bitmovin.analytics.features.FeatureManager
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
-import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
 
