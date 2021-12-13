@@ -15,11 +15,11 @@ class PlayerStates {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
+                durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
                 machine.videoStartTimeoutTimer.cancel()
-                val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
-                machine.addStartupTime(elapsedTime - elapsedTimeOnEnter)
+                machine.addStartupTime(durationInState)
                 if (destinationPlayerState === PlayerStates.PLAYING) {
                     val playerStartupTime = machine.getAndResetPlayerStartupTime()
                     machine.listeners.notify {
@@ -40,13 +40,11 @@ class PlayerStates {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
+                durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
                 machine.disableRebufferHeartbeat()
-                val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
-                machine.listeners.notify {
-                    it.onRebuffering(machine, elapsedTime - elapsedTimeOnEnter)
-                }
+                machine.listeners.notify { it.onRebuffering(machine, durationInState) }
                 machine.bufferingTimeoutTimer.cancel()
             }
         }
@@ -59,6 +57,7 @@ class PlayerStates {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
+                durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
                 machine.videoStartFailedReason = null
@@ -72,6 +71,7 @@ class PlayerStates {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
+                durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
                 machine.videoStartFailedReason = null
@@ -85,12 +85,10 @@ class PlayerStates {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
+                durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
-                machine.listeners.notify {
-                    it.onPlayExit(machine, elapsedTime - elapsedTimeOnEnter)
-                }
+                machine.listeners.notify { it.onPlayExit(machine, durationInState) }
                 machine.disableHeartbeat()
             }
         }
@@ -98,12 +96,10 @@ class PlayerStates {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
+                durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                val elapsedTimeOnEnter = machine.elapsedTimeOnEnter
-                machine.listeners.notify {
-                    it.onPauseExit(machine, elapsedTime - elapsedTimeOnEnter)
-                }
+                machine.listeners.notify { it.onPauseExit(machine, durationInState) }
             }
         }
         @JvmField val QUALITYCHANGE = object : DefaultPlayerState<Void>("qualitychange") {
@@ -117,6 +113,7 @@ class PlayerStates {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
+                durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
                 if (machine.isQualityChangeEventEnabled) {
@@ -132,6 +129,7 @@ class PlayerStates {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
+                durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
                 machine.listeners.notify { it.onAudioTrackChange(machine) }
@@ -141,6 +139,7 @@ class PlayerStates {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
+                durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
                 machine.listeners.notify { it.onSubtitleChange(machine) }
@@ -148,19 +147,13 @@ class PlayerStates {
         }
 
         @JvmField val SEEKING = object : DefaultPlayerState<Void>("seeking") {
-            override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
-                machine.elapsedTimeSeekStart = machine.elapsedTimeOnEnter
-            }
-
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
+                durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                machine.listeners.notify {
-                    it.onSeekComplete(machine, elapsedTime - machine.elapsedTimeSeekStart)
-                }
-                machine.elapsedTimeSeekStart = 0
+                machine.listeners.notify { it.onSeekComplete(machine, durationInState) }
             }
         }
     }

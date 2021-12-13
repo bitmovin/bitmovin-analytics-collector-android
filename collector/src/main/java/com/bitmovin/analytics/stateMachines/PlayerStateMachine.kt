@@ -16,16 +16,15 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
 
     var currentState: PlayerState<*> = PlayerStates.READY
         private set
-    var elapsedTimeOnEnter: Long = 0
-        private set
     var startupTime: Long = 0
         private set
 
     // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
     // first startup sample, in case the collector supports multiple sources)
     private var playerStartupTime = 1L
+    private var elapsedTimeOnEnter: Long = 0
     var isStartupFinished = false
-    var elapsedTimeSeekStart: Long = 0
+
     var videoTimeStart: Long = 0
         private set
     var videoTimeEnd: Long = 0
@@ -120,7 +119,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         val elapsedTime = Util.getElapsedTime()
         videoTimeEnd = videoTime
         Log.d(TAG, "Transitioning from $currentState to $destinationPlayerState")
-        currentState.onExitState(this, elapsedTime, destinationPlayerState)
+        currentState.onExitState(this, elapsedTime, elapsedTime - elapsedTimeOnEnter, destinationPlayerState)
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
         destinationPlayerState.onEnterState(this, data)
