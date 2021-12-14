@@ -11,7 +11,7 @@ import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.utils.Util
 
-class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics: BitmovinAnalytics, internal val bufferingTimeoutTimer: ObservableTimer, internal val qualityChangeCountResetTimer: ObservableTimer, internal val videoStartTimeoutTimer: ObservableTimer, private val heartbeatHandler: Handler = Handler()) {
+class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics: BitmovinAnalytics, internal val bufferingTimeoutTimer: ObservableTimer, internal val qualityChangeEventLimiter: QualityChangeEventLimiter, internal val videoStartTimeoutTimer: ObservableTimer, private val heartbeatHandler: Handler = Handler()) {
     internal val listeners = ObservableSupport<StateMachineListener>()
 
     var currentState: PlayerState<*> = PlayerStates.READY
@@ -35,10 +35,6 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     private var currentRebufferingIntervalIndex = 0
     private val heartbeatDelay = config.heartbeatInterval.toLong() // default to 60 seconds
     var videoStartFailedReason: VideoStartFailedReason? = null
-    private var qualityChangeCount = 0
-
-    val isQualityChangeEventEnabled: Boolean
-        get() = qualityChangeCount <= Util.ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD
 
     fun enableHeartbeat() {
         heartbeatHandler.postDelayed(
@@ -95,9 +91,8 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         startupTime = 0
         isStartupFinished = false
         videoStartTimeoutTimer.cancel()
-        qualityChangeCountResetTimer.cancel()
         bufferingTimeoutTimer.cancel()
-        resetQualityChangeCount()
+        qualityChangeEventLimiter.reset()
         analytics.resetSourceRelatedState()
     }
 
@@ -149,8 +144,8 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
 
     fun release() {
         listeners.clear()
+        qualityChangeEventLimiter.release()
         bufferingTimeoutTimer.unsubscribe(::onRebufferingTimerFinished)
-        qualityChangeCountResetTimer.unsubscribe(::onQualityChangeResetTimerFinished)
         videoStartTimeoutTimer.unsubscribe(::onVideoStartTimeoutTimerFinished)
     }
 
@@ -162,14 +157,6 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         val playerStartupTime = playerStartupTime
         this.playerStartupTime = 0
         return playerStartupTime
-    }
-
-    fun increaseQualityChangeCount() {
-        qualityChangeCount++
-    }
-
-    private fun resetQualityChangeCount() {
-        qualityChangeCount = 0
     }
 
     fun error(videoTime: Long, errorCode: ErrorCode) {
@@ -215,11 +202,6 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         transitionState(PlayerStates.EXITBEFOREVIDEOSTART, 0, null)
     }
 
-    private fun onQualityChangeResetTimerFinished() {
-        Log.d(TAG, "qualityChangeResetTimeout finish")
-        resetQualityChangeCount()
-    }
-
     private fun onRebufferingTimerFinished() {
         Log.d(TAG, "rebufferingTimeout finish")
         error(
@@ -234,7 +216,6 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     // that all fields are assigned already
     init {
         bufferingTimeoutTimer.subscribe(::onRebufferingTimerFinished)
-        qualityChangeCountResetTimer.subscribe(::onQualityChangeResetTimerFinished)
         videoStartTimeoutTimer.subscribe(::onVideoStartTimeoutTimerFinished)
         resetStateMachine()
     }

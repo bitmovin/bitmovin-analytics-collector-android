@@ -104,10 +104,7 @@ class PlayerStates {
         }
         @JvmField val QUALITYCHANGE = object : DefaultPlayerState<Void>("qualitychange") {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {
-                machine.increaseQualityChangeCount()
-                if (!machine.qualityChangeCountResetTimer.isRunning) {
-                    machine.qualityChangeCountResetTimer.start()
-                }
+                machine.qualityChangeEventLimiter.onQualityChange()
             }
 
             override fun onExitState(
@@ -116,7 +113,7 @@ class PlayerStates {
                 durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                if (machine.isQualityChangeEventEnabled) {
+                if (machine.qualityChangeEventLimiter.isQualityChangeEventEnabled) {
                     machine.listeners.notify { it.onQualityChange(machine) }
                 } else {
                     val errorCode = AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode
