@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.stateMachines
 
 import com.bitmovin.analytics.data.ErrorCode
+import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 
 class PlayerStates {
@@ -132,14 +133,14 @@ class PlayerStates {
                 machine.listeners.notify { it.onAudioTrackChange(machine) }
             }
         }
-        @JvmField val SUBTITLECHANGE = object : DefaultPlayerState<Void>("subtitlechange") {
+        @JvmField val SUBTITLECHANGE = object : DefaultPlayerState<SubtitleDto>("subtitlechange") {
             override fun onExitState(
                 machine: PlayerStateMachine,
                 elapsedTime: Long,
                 durationInState: Long,
                 destinationPlayerState: PlayerState<*>
             ) {
-                machine.listeners.notify { it.onSubtitleChange(machine) }
+                machine.listeners.notify { it.onSubtitleChange(machine, dataOnEnter) }
             }
         }
 
