@@ -20,9 +20,6 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     var startupTime: Long = 0
         private set
 
-    // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
-    // first startup sample, in case the collector supports multiple sources)
-    private var playerStartupTime = 1L
     private var elapsedTimeOnEnter: Long = 0
     var isStartupFinished = false
 
@@ -154,11 +151,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         startupTime += elapsedTime
     }
 
-    fun getAndResetPlayerStartupTime(): Long {
-        val playerStartupTime = playerStartupTime
-        this.playerStartupTime = 0
-        return playerStartupTime
-    }
+    fun getAndResetPlayerStartupTime() = analytics.getAndResetPlayerStartupTime()
 
     fun error(videoTime: Long, errorCode: ErrorCode) {
         transitionState(PlayerStates.ERROR, videoTime, errorCode)

@@ -54,6 +54,15 @@ class BitmovinAnalytics
     private var stateMachineListener: StateMachineListener? = null
     private val adAnalytics: BitmovinAdAnalytics? = if (config.ads) BitmovinAdAnalytics(this) else null
 
+    // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
+    // first startup sample, in case the collector supports multiple sources)
+    private var playerStartupTime = 1L
+
+    fun getAndResetPlayerStartupTime(): Long {
+        val playerStartupTime = playerStartupTime
+        this.playerStartupTime = 0
+        return playerStartupTime
+    }
     /**
      * Attach a player instance to this analytics plugin. After this is completed, BitmovinAnalytics
      * will start monitoring and sending analytics data based on the attached player adapter.
