@@ -419,20 +419,10 @@ class BitmovinSdkAdapter(
     private val onVideoPlaybackQualityChangedListener = OnVideoPlaybackQualityChangedListener {
         try {
             Log.d(TAG, "On Video Quality Changed")
-            if (!stateMachine.isStartupFinished) {
-                return@OnVideoPlaybackQualityChangedListener
-            }
-            if (!stateMachine.isQualityChangeEventEnabled) {
-                return@OnVideoPlaybackQualityChangedListener
-            }
-            if (stateMachine.currentState !== PlayerStates.PLAYING &&
-                stateMachine.currentState !== PlayerStates.PAUSE
-            ) {
-                return@OnVideoPlaybackQualityChangedListener
-            }
-            val originalState = stateMachine.currentState
-            stateMachine.transitionState(PlayerStates.QUALITYCHANGE, position)
-            stateMachine.transitionState(originalState, position)
+            // TODO check if any value actually changed
+            // Maybe the didQualityChange can actually deeply compare two objects
+            // that already have all the properties that we later need (codec, bitrate, etc)
+            stateMachine.videoQualityChanged(position, true) {}
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
@@ -447,25 +437,10 @@ class BitmovinSdkAdapter(
     private val onAudioPlaybackQualityChangedListener = OnAudioPlaybackQualityChangedListener { audioPlaybackQualityChangedEvent ->
         try {
             Log.d(TAG, "On Audio Quality Changed")
-            if (!stateMachine.isStartupFinished) {
-                return@OnAudioPlaybackQualityChangedListener
-            }
-            if (!stateMachine.isQualityChangeEventEnabled) {
-                return@OnAudioPlaybackQualityChangedListener
-            }
-            if (stateMachine.currentState !== PlayerStates.PLAYING &&
-                stateMachine.currentState !== PlayerStates.PAUSE
-            ) {
-                return@OnAudioPlaybackQualityChangedListener
-            }
-            val originalState = stateMachine.currentState
             val oldQuality = audioPlaybackQualityChangedEvent.oldAudioQuality
             val newQuality = audioPlaybackQualityChangedEvent.newAudioQuality
-            if (oldQuality != null && newQuality != null && oldQuality.bitrate == newQuality.bitrate) {
-                return@OnAudioPlaybackQualityChangedListener
-            }
-            stateMachine.transitionState(PlayerStates.QUALITYCHANGE, position)
-            stateMachine.transitionState(originalState, position)
+            val didQualityChange = oldQuality == null || newQuality == null || oldQuality.bitrate != newQuality.bitrate
+            stateMachine.audioQualityChanged(position, didQualityChange) {}
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }

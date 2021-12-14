@@ -365,17 +365,7 @@ class ExoPlayerAdapter(
             ) {
                 Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate))
                 try {
-                    val videoTime = position
-                    val originalState = stateMachine.currentState
-                    try {
-                        if (stateMachine.currentState !== PlayerStates.PLAYING) return
-                        if (!stateMachine.isQualityChangeEventEnabled) return
-                        if (!bitrateEventDataManipulator.hasAudioFormatChanged(format)) return
-                        stateMachine.transitionState(PlayerStates.QUALITYCHANGE, videoTime)
-                    } finally {
-                        bitrateEventDataManipulator.currentAudioFormat = format
-                    }
-                    stateMachine.transitionState(originalState, videoTime)
+                    stateMachine.videoQualityChanged(position, bitrateEventDataManipulator.hasAudioFormatChanged(format)) { bitrateEventDataManipulator.currentAudioFormat = format }
                 } catch (e: Exception) {
                     Log.d(TAG, e.message, e)
                 }
@@ -387,17 +377,7 @@ class ExoPlayerAdapter(
             ) {
                 Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate))
                 try {
-                    val videoTime = position
-                    val originalState = stateMachine.currentState
-                    try {
-                        if (stateMachine.currentState !== PlayerStates.PLAYING) return
-                        if (!stateMachine.isQualityChangeEventEnabled) return
-                        if (!bitrateEventDataManipulator.hasVideoFormatChanged(format)) return
-                        stateMachine.transitionState(PlayerStates.QUALITYCHANGE, videoTime)
-                    } finally {
-                        bitrateEventDataManipulator.currentVideoFormat = format
-                    }
-                    stateMachine.transitionState(originalState, videoTime)
+                    stateMachine.videoQualityChanged(position, bitrateEventDataManipulator.hasVideoFormatChanged(format)) { bitrateEventDataManipulator.currentVideoFormat = format }
                 } catch (e: Exception) {
                     Log.d(TAG, e.message, e)
                 }

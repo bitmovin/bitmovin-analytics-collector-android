@@ -186,7 +186,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
 
     fun changeCustomData(position: Long, customData: CustomData, setCustomDataFunction: (CustomData) -> Unit) {
         val originalState = currentState
-        val shouldTransition = originalState === PlayerStates.PLAYING || originalState === PlayerStates.PAUSE
+        val shouldTransition = isPlayingOrPaused
         if (shouldTransition) {
             this.transitionState(PlayerStates.CUSTOMDATACHANGE, position)
         }
@@ -195,6 +195,32 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
             this.transitionState(originalState, position)
         }
     }
+
+    fun videoQualityChanged(videoTime: Long, didQualityChange: Boolean, setQualityFunction: () -> Unit) {
+        qualityChanged(videoTime, didQualityChange, setQualityFunction)
+    }
+
+    fun audioQualityChanged(videoTime: Long, didQualityChange: Boolean, setQualityFunction: () -> Unit) {
+        qualityChanged(videoTime, didQualityChange, setQualityFunction)
+    }
+
+    private fun qualityChanged(videoTime: Long, didQualityChange: Boolean, setQualityFunction: () -> Unit) {
+        val originalState = currentState
+        try {
+            if (!isStartupFinished) return
+            if (!qualityChangeEventLimiter.isQualityChangeEventEnabled) return
+            if (!isPlayingOrPaused) return
+            if (!didQualityChange) return
+            transitionState(PlayerStates.QUALITYCHANGE, videoTime)
+        } finally {
+            // we always want to set the new quality, no matter if we transitioned states
+            setQualityFunction()
+        }
+        transitionState(originalState, videoTime)
+    }
+
+    private val isPlayingOrPaused
+        get() = currentState === PlayerStates.PLAYING || currentState === PlayerStates.PAUSE
 
     private fun onVideoStartTimeoutTimerFinished() {
         Log.d(TAG, "VideoStartTimeout finish")
