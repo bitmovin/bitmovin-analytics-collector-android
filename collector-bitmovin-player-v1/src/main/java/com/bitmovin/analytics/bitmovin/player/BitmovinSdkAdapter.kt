@@ -247,7 +247,7 @@ class BitmovinSdkAdapter(
         if (bitmovinPlayer.config != null) {
             val playbackConfiguration = bitmovinPlayer.config.playbackConfiguration
             val source = bitmovinPlayer.config.sourceConfiguration
-            if (playbackConfiguration != null && source != null && source.firstSourceItem != null && playbackConfiguration.isAutoplayEnabled
+            if (playbackConfiguration != null && source?.firstSourceItem != null && playbackConfiguration.isAutoplayEnabled
             ) {
                 startup()
             }
