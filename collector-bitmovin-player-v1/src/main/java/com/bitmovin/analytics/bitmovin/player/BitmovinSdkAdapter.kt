@@ -473,16 +473,10 @@ class BitmovinSdkAdapter(
     }
     private val onDownloadFinishedListener: OnDownloadFinishedListener = OnDownloadFinishedListener { downloadFinishedEvent: DownloadFinishedEvent ->
             try {
-                if (downloadFinishedEvent
-                        .downloadType
-                        .toString()
-                        .contains("drm/license")
-                ) {
+                val downloadType = downloadFinishedEvent.downloadType.toString()
+                if (downloadType.contains("drm/license")) {
                     drmDownloadTime = Util.secondsToMillis(downloadFinishedEvent.downloadTime)
-                    drmType = downloadFinishedEvent
-                        .downloadType
-                        .toString()
-                        .replace("drm/license/", "")
+                    drmType = downloadType.replace("drm/license/", "")
                 }
             } catch (e: Exception) {
                 Log.d(TAG, e.message, e)
