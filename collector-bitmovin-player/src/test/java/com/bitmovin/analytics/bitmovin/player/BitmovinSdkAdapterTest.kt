@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import com.bitmovin.analytics.config.SourceMetadata
-import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.QualityChangeEventLimiter
@@ -11,11 +10,13 @@ import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.media.audio.quality.AudioQuality
 import com.bitmovin.player.api.source.Source
 import io.mockk.MockKAnnotations
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.spyk
 import io.mockk.verify
 import kotlin.reflect.KClass
 import org.assertj.core.api.Assertions.assertThat
@@ -37,8 +38,8 @@ class BitmovinSdkAdapterTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
+        playerStateMachine = spyk(PlayerStateMachine(mockk(), mockk(), mockk(), qualityChangeEventLimiter, mockk(), mockk()), recordPrivateCalls = true)
         bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), playerStateMachine, mockk(relaxed = true), sourceMap, mockk(relaxed = true), mockk(relaxed = true))
-        playerStateMachine = PlayerStateMachine(mockk(), mockk(), mockk(), qualityChangeEventLimiter, mockk(), mockk())
     }
 
     @Test
@@ -61,10 +62,10 @@ class BitmovinSdkAdapterTest {
         val listenerSlot = slot<(PlayerEvent.AudioPlaybackQualityChanged) -> Unit>()
         every { player.on(PlayerEvent.AudioPlaybackQualityChanged::class, capture(listenerSlot)) } answers { }
         every { player.currentTime } returns 0.0
-        every { playerStateMachine.currentState } returns PlayerStates.PLAYING
-        every { playerStateMachine.isStartupFinished } returns true
         every { qualityChangeEventLimiter.isQualityChangeEventEnabled } returns true
-        every { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) } answers {}
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        clearMocks(playerStateMachine)
 
         // act
         bitmovinSdkAdapter.init()
@@ -72,10 +73,6 @@ class BitmovinSdkAdapterTest {
         listenerSlot.captured(audioPlaybackQualityChangedEvent)
 
         // asset
-        verify { playerStateMachine.currentState }
-        verify { playerStateMachine.isStartupFinished }
-        verify { qualityChangeEventLimiter.isQualityChangeEventEnabled }
-
         verify(exactly = 1) { playerStateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
         verify(exactly = 1) { playerStateMachine.transitionState(PlayerStates.PLAYING, any()) }
     }
@@ -86,10 +83,10 @@ class BitmovinSdkAdapterTest {
         val listenerSlot = slot<(PlayerEvent.AudioPlaybackQualityChanged) -> Unit>()
         every { player.on(PlayerEvent.AudioPlaybackQualityChanged::class, capture(listenerSlot)) } answers { }
         every { player.currentTime } returns 0.0
-        every { playerStateMachine.currentState } returns PlayerStates.PLAYING
-        every { playerStateMachine.isStartupFinished } returns true
         every { qualityChangeEventLimiter.isQualityChangeEventEnabled } returns true
-        every { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) } answers {}
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        clearMocks(playerStateMachine)
 
         // act
         bitmovinSdkAdapter.init()
@@ -98,10 +95,6 @@ class BitmovinSdkAdapterTest {
         listenerSlot.captured(audioPlaybackQualityChangedEvent)
 
         // asset
-        verify { playerStateMachine.currentState }
-        verify { playerStateMachine.isStartupFinished }
-        verify { qualityChangeEventLimiter.isQualityChangeEventEnabled }
-
-        verify(exactly = 0) { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) }
+        verify(inverse = true) { playerStateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
     }
 }
