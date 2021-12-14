@@ -4,6 +4,7 @@ import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.stateMachines.PlayerState
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
+import com.bitmovin.analytics.stateMachines.QualityChangeEventLimiter
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.Event
 import com.bitmovin.player.api.event.PlayerEvent
@@ -22,9 +23,10 @@ import org.junit.Before
 import org.junit.Test
 
 class BitmovinSdkAdapterTest {
+    private lateinit var playerStateMachine: PlayerStateMachine
 
     @MockK
-    private lateinit var playerStateMachine: PlayerStateMachine
+    private lateinit var qualityChangeEventLimiter: QualityChangeEventLimiter
 
     @RelaxedMockK
     private lateinit var player: Player
@@ -36,6 +38,7 @@ class BitmovinSdkAdapterTest {
     fun setup() {
         MockKAnnotations.init(this)
         bitmovinSdkAdapter = BitmovinSdkAdapter(player, mockk(relaxed = true), playerStateMachine, mockk(relaxed = true), sourceMap, mockk(relaxed = true), mockk(relaxed = true))
+        playerStateMachine = PlayerStateMachine(mockk(), mockk(), mockk(), qualityChangeEventLimiter, mockk(), mockk())
     }
 
     @Test
@@ -60,7 +63,7 @@ class BitmovinSdkAdapterTest {
         every { player.currentTime } returns 0.0
         every { playerStateMachine.currentState } returns PlayerStates.PLAYING
         every { playerStateMachine.isStartupFinished } returns true
-        every { playerStateMachine.isQualityChangeEventEnabled } returns true
+        every { qualityChangeEventLimiter.isQualityChangeEventEnabled } returns true
         every { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) } answers {}
 
         // act
@@ -71,7 +74,7 @@ class BitmovinSdkAdapterTest {
         // asset
         verify { playerStateMachine.currentState }
         verify { playerStateMachine.isStartupFinished }
-        verify { playerStateMachine.isQualityChangeEventEnabled }
+        verify { qualityChangeEventLimiter.isQualityChangeEventEnabled }
 
         verify(exactly = 1) { playerStateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
         verify(exactly = 1) { playerStateMachine.transitionState(PlayerStates.PLAYING, any()) }
@@ -85,7 +88,7 @@ class BitmovinSdkAdapterTest {
         every { player.currentTime } returns 0.0
         every { playerStateMachine.currentState } returns PlayerStates.PLAYING
         every { playerStateMachine.isStartupFinished } returns true
-        every { playerStateMachine.isQualityChangeEventEnabled } returns true
+        every { qualityChangeEventLimiter.isQualityChangeEventEnabled } returns true
         every { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) } answers {}
 
         // act
@@ -97,7 +100,7 @@ class BitmovinSdkAdapterTest {
         // asset
         verify { playerStateMachine.currentState }
         verify { playerStateMachine.isStartupFinished }
-        verify { playerStateMachine.isQualityChangeEventEnabled }
+        verify { qualityChangeEventLimiter.isQualityChangeEventEnabled }
 
         verify(exactly = 0) { playerStateMachine.transitionState(any<PlayerState<*>>(), any()) }
     }
