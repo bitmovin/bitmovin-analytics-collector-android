@@ -168,7 +168,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = 0
-        if(oldValue != null) {
+        if (oldValue != null) {
             data.subtitleEnabled = oldValue.subtitleEnabled
             data.subtitleLanguage = oldValue.subtitleLanguage
         }

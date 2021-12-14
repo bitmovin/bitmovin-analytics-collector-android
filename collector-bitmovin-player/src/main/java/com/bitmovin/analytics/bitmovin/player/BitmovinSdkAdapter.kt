@@ -226,7 +226,7 @@ class BitmovinSdkAdapter(
         }
     }
 
-    private fun getSubtitleDto(subtitleTrack: SubtitleTrack?): SubtitleDto = SubtitleDto(subtitleTrack?.id != null, if(subtitleTrack?.id != null) (subtitleTrack.language ?: subtitleTrack.label) else null)
+    private fun getSubtitleDto(subtitleTrack: SubtitleTrack?): SubtitleDto = SubtitleDto(subtitleTrack?.id != null, if (subtitleTrack?.id != null) (subtitleTrack.language ?: subtitleTrack.label) else null)
 
     override fun release() {
         removePlayerListener()
