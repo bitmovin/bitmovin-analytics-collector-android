@@ -7,6 +7,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.ErrorCode
+import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.utils.Util
@@ -194,6 +195,17 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         if (shouldTransition) {
             this.transitionState(originalState, position)
         }
+    }
+
+    // This can be used as a template for all the quality changed methods,
+    // as it is correctly setting the old values in the StateMachineListener
+    fun subtitleChanged(videoTime: Long, oldValue: SubtitleDto?, newValue: SubtitleDto?) {
+        if (!isStartupFinished) return
+        if (!isPlayingOrPaused) return
+        if (oldValue?.equals(newValue) == true) return
+        val originalState = currentState
+        transitionState(PlayerStates.SUBTITLECHANGE, videoTime, oldValue)
+        transitionState(originalState, videoTime)
     }
 
     fun videoQualityChanged(videoTime: Long, didQualityChange: Boolean, setQualityFunction: () -> Unit) {

@@ -5,6 +5,7 @@ import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.ErrorCode
+import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.utils.DataSerializer.serialize
@@ -162,11 +163,15 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
         Log.d(TAG, "onVideoChange")
     }
 
-    override fun onSubtitleChange(stateMachine: PlayerStateMachine) {
+    override fun onSubtitleChange(stateMachine: PlayerStateMachine, oldValue: SubtitleDto?) {
         Log.d(TAG, String.format("onSubtitleChange %s", stateMachine.impressionId))
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = 0
+        if(oldValue != null) {
+            data.subtitleEnabled = oldValue.subtitleEnabled
+            data.subtitleLanguage = oldValue.subtitleLanguage
+        }
         analytics.sendEventData(data)
         data.videoTimeStart = stateMachine.videoTimeStart
         data.videoTimeEnd = stateMachine.videoTimeEnd

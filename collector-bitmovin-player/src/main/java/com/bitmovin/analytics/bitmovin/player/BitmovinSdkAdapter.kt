@@ -9,6 +9,7 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.CastTech
 import com.bitmovin.analytics.enums.DRMType
@@ -28,6 +29,7 @@ import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.event.SourceEvent
 import com.bitmovin.player.api.event.on
+import com.bitmovin.player.api.media.subtitle.SubtitleTrack
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceType
 import java.lang.Exception
@@ -213,11 +215,9 @@ class BitmovinSdkAdapter(
         }
 
         // Subtitle info
-        val subtitle = player.subtitle
-        if (subtitle?.id != null) {
-            data.subtitleLanguage = subtitle.language ?: subtitle.label
-            data.subtitleEnabled = true
-        }
+        val subtitle = getSubtitleDto(player.subtitle)
+        data.subtitleLanguage = subtitle.subtitleLanguage
+        data.subtitleEnabled = subtitle.subtitleEnabled
 
         // Audio language
         val audioTrack = player.audio
@@ -225,6 +225,8 @@ class BitmovinSdkAdapter(
             data.audioLanguage = audioTrack.language
         }
     }
+
+    private fun getSubtitleDto(subtitleTrack: SubtitleTrack?): SubtitleDto = SubtitleDto(subtitleTrack?.id != null, if(subtitleTrack?.id != null) (subtitleTrack.language ?: subtitleTrack.label) else null)
 
     override fun release() {
         removePlayerListener()
@@ -399,17 +401,7 @@ class BitmovinSdkAdapter(
     private fun onSourceEventSubtitleChanged(event: SourceEvent.SubtitleChanged) {
         try {
             Log.d(TAG, "On SubtitleChanged")
-            if (!stateMachine.isStartupFinished) {
-                return
-            }
-            if (stateMachine.currentState !== PlayerStates.PLAYING &&
-                stateMachine.currentState !== PlayerStates.PAUSE
-            ) {
-                return
-            }
-            val originalState = stateMachine.currentState
-            stateMachine.transitionState(PlayerStates.SUBTITLECHANGE, position)
-            stateMachine.transitionState(originalState, position)
+            stateMachine.subtitleChanged(position, getSubtitleDto(event.oldSubtitleTrack), getSubtitleDto(event.newSubtitleTrack))
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
