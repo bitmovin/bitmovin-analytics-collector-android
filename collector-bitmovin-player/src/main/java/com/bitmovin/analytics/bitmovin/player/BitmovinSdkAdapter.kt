@@ -4,14 +4,12 @@ import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
-import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
-import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
 import com.bitmovin.analytics.enums.CastTech
 import com.bitmovin.analytics.enums.DRMType
 import com.bitmovin.analytics.enums.PlayerType
@@ -36,13 +34,13 @@ import java.lang.Exception
 
 class BitmovinSdkAdapter(
     private val player: Player,
-    private val config: BitmovinAnalyticsConfig,
+    config: BitmovinAnalyticsConfig,
     stateMachine: PlayerStateMachine,
-    private val featureFactory: FeatureFactory,
+    featureFactory: FeatureFactory,
     private val sourceMetadataMap: Map<Source, SourceMetadata>,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider
-) : DefaultPlayerAdapter(eventDataFactory, stateMachine, deviceInformationProvider), PlayerAdapter, EventDataManipulator {
+) : DefaultPlayerAdapter(config, eventDataFactory, stateMachine, featureFactory, deviceInformationProvider), EventDataManipulator {
     private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
     private var totalDroppedVideoFrames = 0
     private var isVideoAttemptedPlay = false
@@ -54,11 +52,14 @@ class BitmovinSdkAdapter(
     override var drmDownloadTime: Long? = null
         private set
 
+    override val eventDataManipulators: Collection<EventDataManipulator> by lazy { listOf(this) }
+
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
+        val features = super.init()
         resetSourceRelatedState()
         addPlayerListeners()
         checkAutoplayStartup()
-        return featureFactory.createFeatures()
+        return features
     }
 
     private fun addPlayerListeners() {
@@ -236,10 +237,6 @@ class BitmovinSdkAdapter(
         totalDroppedVideoFrames = 0
         drmDownloadTime = null
         isVideoAttemptedPlay = false
-    }
-
-    override fun registerEventDataManipulators(pipeline: EventDataManipulatorPipeline) {
-        pipeline.registerEventDataManipulator(this)
     }
 
     override val position: Long

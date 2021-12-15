@@ -12,18 +12,12 @@ import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.data.EventDataFactory
-import com.bitmovin.analytics.data.RandomizedUserIdIdProvider
-import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher
-import com.bitmovin.analytics.data.UserIdProvider
-import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator
 import com.bitmovin.analytics.features.FeatureManager
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
-import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
 
@@ -38,7 +32,7 @@ class BitmovinAnalytics
      * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
      * @param context [Context]
      */
-    (val config: BitmovinAnalyticsConfig, val context: Context) : LicenseCallback, ImpressionIdProvider {
+    (val config: BitmovinAnalyticsConfig, val context: Context) : LicenseCallback {
     private val debugCallback: DebugCallback = object : DebugCallback {
         override fun dispatchEventData(data: EventData) {
             eventBus.notify(DebugListener::class) { it.onDispatchEventData(data) }
@@ -55,13 +49,10 @@ class BitmovinAnalytics
     private val featureManager = FeatureManager<FeatureConfigContainer>()
     private val eventBus = EventBus()
     private val eventDataDispatcher = DebuggingEventDataDispatcher(SimpleEventDataDispatcher(config, this.context, this, BackendFactory()), debugCallback)
-    private val userIdProvider: UserIdProvider = if (config.randomizeUserId) RandomizedUserIdIdProvider() else SecureSettingsAndroidIdUserIdProvider(context)
+
     private var playerAdapter: PlayerAdapter? = null
     private var stateMachineListener: StateMachineListener? = null
     private val adAnalytics: BitmovinAdAnalytics? = if (config.ads) BitmovinAdAnalytics(this) else null
-
-    val playerStateMachine = PlayerStateMachine(config, this)
-    val eventDataFactory = EventDataFactory(config, userIdProvider)
 
     /**
      * Attach a player instance to this analytics plugin. After this is completed, BitmovinAnalytics
@@ -73,17 +64,12 @@ class BitmovinAnalytics
     fun attach(adapter: PlayerAdapter) {
         detachPlayer()
         val stateMachineListener = DefaultStateMachineListener(this, adapter, eventBus[OnErrorDetailEventListener::class])
-        playerStateMachine.addListener(stateMachineListener)
+        adapter.stateMachine.addListener(stateMachineListener)
         this.stateMachineListener = stateMachineListener
         eventDataDispatcher.enable()
         playerAdapter = adapter
         val features = adapter.init()
         featureManager.registerFeatures(features)
-
-        // this.registerEventDataManipulators(prePipelineManipulator);
-        adapter.registerEventDataManipulators(eventDataFactory)
-        eventDataFactory.registerEventDataManipulator(ManifestUrlEventDataManipulator(adapter, config))
-        // this.registerEventDataManipulators(postPipelineManipulator);
         tryAttachAd(adapter)
     }
 
@@ -99,12 +85,7 @@ class BitmovinAnalytics
         featureManager.unregisterFeatures()
         eventBus.notify(OnAnalyticsReleasingEventListener::class) { it.onReleasing() }
         playerAdapter?.release()
-        if (stateMachineListener != null) {
-            playerStateMachine.removeListener(stateMachineListener)
-        }
-        playerStateMachine.resetStateMachine()
         eventDataDispatcher.disable()
-        eventDataFactory.clearEventDataManipulators()
     }
 
     private fun detachAd() {
@@ -129,7 +110,7 @@ class BitmovinAnalytics
             if (sourceMetadata != null) {
                 setCustomDataFunction = { sourceMetadata.setCustomData(it) }
             }
-            playerStateMachine.changeCustomData(position, customData, setCustomDataFunction)
+            playerAdapter?.stateMachine?.changeCustomData(position, customData, setCustomDataFunction)
         }
 
     fun setCustomDataOnce(customData: CustomData) {
@@ -187,8 +168,8 @@ class BitmovinAnalytics
         eventBus[DebugListener::class].unsubscribe(listener)
     }
 
-    override val impressionId: String
-        get() = playerStateMachine.impressionId
+    val impressionId: String?
+        get() = playerAdapter?.stateMachine?.impressionId
 
     interface DebugListener {
         fun onDispatchEventData(data: EventData)

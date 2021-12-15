@@ -155,8 +155,12 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         mutableListeners.add(toAdd)
     }
 
-    fun removeListener(toRemove: StateMachineListener?) {
+    fun removeListener(toRemove: StateMachineListener) {
         mutableListeners.remove(toRemove)
+    }
+
+    fun clearListeners() {
+        mutableListeners.clear()
     }
 
     fun addStartupTime(elapsedTime: Long) {

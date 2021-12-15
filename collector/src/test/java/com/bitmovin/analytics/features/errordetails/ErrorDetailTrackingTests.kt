@@ -17,36 +17,36 @@ class ErrorDetailTrackingTests {
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
         val support1 = ObservableSupport<OnErrorDetailEventListener>()
         val support2 = ObservableSupport<OnErrorDetailEventListener>()
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, null, support1, support2)
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, null, support1, support2)
         mockkObject(errorDetailTracking)
-        support1.notify { it.onError(null, null, ErrorData()) }
-        support1.notify { it.onError(null, null, ErrorData()) }
-        support2.notify { it.onError(null, null, ErrorData()) }
-        support2.notify { it.onError(null, null, ErrorData()) }
+        support1.notify { it.onError("", null, null, ErrorData()) }
+        support1.notify { it.onError("", null, null, ErrorData()) }
+        support2.notify { it.onError("", null, null, ErrorData()) }
+        support2.notify { it.onError("", null, null, ErrorData()) }
 
-        verify(exactly = 4) { errorDetailTracking.onError(any(), any(), any()) }
+        verify(exactly = 4) { errorDetailTracking.onError(any(), any(), any(), any()) }
     }
 
     @Test
     fun testSuccessfullyUnsubscribesFromSourcesAndClearsBackendOnDisabling() {
         val support = ObservableSupport<OnErrorDetailEventListener>()
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, null, support)
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, null, support)
         mockkObject(errorDetailTracking)
-        support.notify { it.onError(null, null, ErrorData()) }
-        verify { errorDetailTracking.onError(any(), any(), any()) }
+        support.notify { it.onError("", null, null, ErrorData()) }
+        verify { errorDetailTracking.onError(any(), any(), any(), any()) }
         clearMocks(errorDetailTracking)
         errorDetailTracking.disable()
         verify { backend.clear() }
-        support.notify { it.onError(null, null, ErrorData()) }
-        verify(exactly = 0) { errorDetailTracking.onError(any(), any(), any()) }
+        support.notify { it.onError("", null, null, ErrorData()) }
+        verify(exactly = 0) { errorDetailTracking.onError(any(), any(), any(), any()) }
     }
 
     @Test
     fun testEnablesAndFlushesBackendAfterEnablingFeature() {
         val support = ObservableSupport<OnErrorDetailEventListener>()
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, null, support)
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, null, support)
         errorDetailTracking.enabled()
         verify { backend.enabled = true }
         verify { backend.flush() }
@@ -57,7 +57,7 @@ class ErrorDetailTrackingTests {
         val support = ObservableSupport<OnErrorDetailEventListener>()
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
         val httpRequestTracking = HttpRequestTracking()
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking, support)
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking, support)
         errorDetailTracking.configured(true, ErrorDetailTrackingConfig(true, 100))
         verify { backend.limitHttpRequestsInQueue(httpRequestTracking.maxRequests) }
     }
@@ -68,8 +68,8 @@ class ErrorDetailTrackingTests {
         val httpRequestTracking = HttpRequestTracking()
         httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
         httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking)
-        errorDetailTracking.onError(null, null, ErrorData())
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking)
+        errorDetailTracking.onError("", null, null, ErrorData())
         val slot = slot<ErrorDetail>()
         verify { backend.send(capture(slot)) }
         assertThat(slot.captured.httpRequests).isNotNull
@@ -83,8 +83,8 @@ class ErrorDetailTrackingTests {
         httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
         httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
         httpRequestTracking.disable()
-        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking)
-        errorDetailTracking.onError(null, null, ErrorData())
+        val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking)
+        errorDetailTracking.onError("", null, null, ErrorData())
         val slot = slot<ErrorDetail>()
         verify { backend.send(capture(slot)) }
         assertThat(slot.captured.httpRequests?.size ?: 0).isEqualTo(0)
