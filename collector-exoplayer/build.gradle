@@ -27,6 +27,9 @@ android {
 		targetCompatibility rootProject.ext.targetCompatibility
 	}
 
+	kotlinOptions {
+		jvmTarget = rootProject.ext.jvmTarget
+	}
 
 	buildTypes {
 		release {
@@ -54,7 +57,7 @@ dependencies {
 
 	testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
 	androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-	testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+	testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
 	androidTestImplementation "org.mockito:mockito-android:${rootProject.ext.mockitoCoreVersion}"
 	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 
