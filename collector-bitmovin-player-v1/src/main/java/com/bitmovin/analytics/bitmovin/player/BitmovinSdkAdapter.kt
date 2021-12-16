@@ -8,6 +8,7 @@ import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.CastTech
 import com.bitmovin.analytics.enums.PlayerType
@@ -44,6 +45,7 @@ import com.bitmovin.player.api.event.listener.OnStallStartedListener
 import com.bitmovin.player.api.event.listener.OnSubtitleChangedListener
 import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener
 import com.bitmovin.player.config.media.MediaSourceType
+import com.bitmovin.player.config.track.SubtitleTrack
 import java.lang.Exception
 
 class BitmovinSdkAdapter(
@@ -202,11 +204,9 @@ class BitmovinSdkAdapter(
         }
 
         // Subtitle info
-        val subtitle = bitmovinPlayer.subtitle
-        if (subtitle?.id != null) {
-            data.subtitleLanguage = subtitle.language ?: subtitle.label
-            data.subtitleEnabled = true
-        }
+        val subtitle = getSubtitleDto(bitmovinPlayer.subtitle)
+        data.subtitleLanguage = subtitle.subtitleLanguage
+        data.subtitleEnabled = subtitle.subtitleEnabled
 
         // Audio language
         val audioTrack = bitmovinPlayer.audio
@@ -216,6 +216,11 @@ class BitmovinSdkAdapter(
 
         // DRM Information
         data.drmType = drmType
+    }
+
+    private fun getSubtitleDto(subtitleTrack: SubtitleTrack?): SubtitleDto {
+        val isEnabled = subtitleTrack?.id != null && subtitleTrack.id != "bitmovin-off"
+        return SubtitleDto(isEnabled, if (isEnabled) subtitleTrack?.language ?: subtitleTrack?.label else null)
     }
 
     override fun release() {
@@ -385,17 +390,7 @@ class BitmovinSdkAdapter(
     private val onSubtitleChangedListener = OnSubtitleChangedListener {
         try {
             Log.d(TAG, "On SubtitleChanged")
-            if (!stateMachine.isStartupFinished) {
-                return@OnSubtitleChangedListener
-            }
-            if (stateMachine.currentState !== PlayerStates.PLAYING &&
-                stateMachine.currentState !== PlayerStates.PAUSE
-            ) {
-                return@OnSubtitleChangedListener
-            }
-            val originalState = stateMachine.currentState
-            stateMachine.transitionState(PlayerStates.SUBTITLECHANGE, position)
-            stateMachine.transitionState(originalState, position)
+            stateMachine.subtitleChanged(position, getSubtitleDto(it.oldSubtitleTrack), getSubtitleDto(it.newSubtitleTrack))
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
@@ -419,20 +414,10 @@ class BitmovinSdkAdapter(
     private val onVideoPlaybackQualityChangedListener = OnVideoPlaybackQualityChangedListener {
         try {
             Log.d(TAG, "On Video Quality Changed")
-            if (!stateMachine.isStartupFinished) {
-                return@OnVideoPlaybackQualityChangedListener
-            }
-            if (!stateMachine.isQualityChangeEventEnabled) {
-                return@OnVideoPlaybackQualityChangedListener
-            }
-            if (stateMachine.currentState !== PlayerStates.PLAYING &&
-                stateMachine.currentState !== PlayerStates.PAUSE
-            ) {
-                return@OnVideoPlaybackQualityChangedListener
-            }
-            val originalState = stateMachine.currentState
-            stateMachine.transitionState(PlayerStates.QUALITYCHANGE, position)
-            stateMachine.transitionState(originalState, position)
+            // TODO check if any value actually changed
+            // Maybe the didQualityChange can actually deeply compare two objects
+            // that already have all the properties that we later need (codec, bitrate, etc)
+            stateMachine.videoQualityChanged(position, true) {}
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
@@ -447,25 +432,10 @@ class BitmovinSdkAdapter(
     private val onAudioPlaybackQualityChangedListener = OnAudioPlaybackQualityChangedListener { audioPlaybackQualityChangedEvent ->
         try {
             Log.d(TAG, "On Audio Quality Changed")
-            if (!stateMachine.isStartupFinished) {
-                return@OnAudioPlaybackQualityChangedListener
-            }
-            if (!stateMachine.isQualityChangeEventEnabled) {
-                return@OnAudioPlaybackQualityChangedListener
-            }
-            if (stateMachine.currentState !== PlayerStates.PLAYING &&
-                stateMachine.currentState !== PlayerStates.PAUSE
-            ) {
-                return@OnAudioPlaybackQualityChangedListener
-            }
-            val originalState = stateMachine.currentState
             val oldQuality = audioPlaybackQualityChangedEvent.oldAudioQuality
             val newQuality = audioPlaybackQualityChangedEvent.newAudioQuality
-            if (oldQuality != null && newQuality != null && oldQuality.bitrate == newQuality.bitrate) {
-                return@OnAudioPlaybackQualityChangedListener
-            }
-            stateMachine.transitionState(PlayerStates.QUALITYCHANGE, position)
-            stateMachine.transitionState(originalState, position)
+            val didQualityChange = oldQuality == null || newQuality == null || oldQuality.bitrate != newQuality.bitrate
+            stateMachine.audioQualityChanged(position, didQualityChange) {}
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }

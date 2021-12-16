@@ -527,32 +527,12 @@ class ExoPlayerAdapter(
 
     private fun handleAudioInputFormatChanged(format: Format) {
         Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate))
-        val videoTime = position
-        val originalState = stateMachine.currentState
-        try {
-            if (stateMachine.currentState !== PlayerStates.PLAYING) return
-            if (!stateMachine.isQualityChangeEventEnabled) return
-            if (!bitrateEventDataManipulator.hasAudioFormatChanged(format)) return
-            stateMachine.transitionState(PlayerStates.QUALITYCHANGE, videoTime)
-        } finally {
-            bitrateEventDataManipulator.currentAudioFormat = format
-        }
-        stateMachine.transitionState(originalState, videoTime)
+        stateMachine.audioQualityChanged(position, bitrateEventDataManipulator.hasAudioFormatChanged(format)) { bitrateEventDataManipulator.currentAudioFormat = format }
     }
 
     private fun handleVideoInputFormatChanged(format: Format) {
         Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate))
-        val videoTime = position
-        val originalState = stateMachine.currentState
-        try {
-            if (stateMachine.currentState !== PlayerStates.PLAYING) return
-            if (!stateMachine.isQualityChangeEventEnabled) return
-            if (!bitrateEventDataManipulator.hasVideoFormatChanged(format)) return
-            stateMachine.transitionState(PlayerStates.QUALITYCHANGE, videoTime)
-        } finally {
-            bitrateEventDataManipulator.currentVideoFormat = format
-        }
-        stateMachine.transitionState(originalState, videoTime)
+        stateMachine.videoQualityChanged(position, bitrateEventDataManipulator.hasVideoFormatChanged(format)) { bitrateEventDataManipulator.currentVideoFormat = format }
     }
 
     override fun onDecoderDisabled(

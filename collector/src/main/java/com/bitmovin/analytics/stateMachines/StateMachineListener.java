@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.stateMachines;
 
 import com.bitmovin.analytics.data.ErrorCode;
+import com.bitmovin.analytics.data.SubtitleDto;
 
 public interface StateMachineListener {
 
@@ -30,7 +31,7 @@ public interface StateMachineListener {
 
     void onVideoChange(PlayerStateMachine stateMachine);
 
-    void onSubtitleChange(PlayerStateMachine stateMachine);
+    void onSubtitleChange(PlayerStateMachine stateMachine, SubtitleDto oldValue);
 
     void onAudioTrackChange(PlayerStateMachine stateMachine);
 

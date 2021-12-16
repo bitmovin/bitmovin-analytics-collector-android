@@ -1,5 +1,5 @@
 buildscript {
-	ext.kotlin_version = '1.3.50'
+	ext.kotlin_version = '1.4.0'
 
 	repositories {
 		google()
@@ -71,7 +71,10 @@ allprojects {
 			targetExclude '**/collector-bitmovin-player-v1-example/**/Samples.kt',
 					'**/collector-exoplayer-example/**/Samples.kt',
 					'**/collector-exoplayer-v1-example/**/Samples.kt'
-			ktlint()   // has its own section below
+
+			// TODO Remove disabled rules and apply to develop
+			ktlint("0.43.2").userData(["disabled_rules": "indent,import-ordering"])
+			// has its own section below
 			//			ktfmt()    // has its own section below
 			//			prettier() // has its own section below
 			//        licenseHeader '/* (C)$YEAR */' // or licenseHeaderFile

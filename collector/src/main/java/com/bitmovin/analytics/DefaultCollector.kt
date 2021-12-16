@@ -8,7 +8,9 @@ import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.RandomizedUserIdIdProvider
 import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import com.bitmovin.analytics.data.UserIdProvider
+import com.bitmovin.analytics.stateMachines.ObservableTimer
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.QualityChangeEventLimiter
 import com.bitmovin.analytics.utils.Util
 
 abstract class DefaultCollector<TPlayer> protected constructor(final override val config: BitmovinAnalyticsConfig, context: Context, userAgent: String) : Collector<TPlayer> {
@@ -29,7 +31,12 @@ abstract class DefaultCollector<TPlayer> protected constructor(final override va
     protected abstract fun createAdapter(player: TPlayer, analytics: BitmovinAnalytics, stateMachine: PlayerStateMachine, deviceInformationProvider: DeviceInformationProvider, eventDataFactory: EventDataFactory): PlayerAdapter
 
     override fun attachPlayer(player: TPlayer) {
-        val stateMachine = PlayerStateMachine(config, analytics)
+        val bufferingTimeoutTimer = ObservableTimer(Util.REBUFFERING_TIMEOUT.toLong(), 1000)
+        val qualityChangeCountResetTimer = ObservableTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL.toLong(), 1000)
+        val qualityChangeEventLimiter = QualityChangeEventLimiter(qualityChangeCountResetTimer)
+        val videoStartTimeoutTimer = ObservableTimer(Util.VIDEOSTART_TIMEOUT.toLong(), 1000)
+
+        val stateMachine = PlayerStateMachine(config, analytics, bufferingTimeoutTimer, qualityChangeEventLimiter, videoStartTimeoutTimer)
         val eventDataFactory = EventDataFactory(config, userIdProvider)
         val adapter = createAdapter(player, analytics, stateMachine, deviceInformationProvider, eventDataFactory)
         analytics.attach(adapter)

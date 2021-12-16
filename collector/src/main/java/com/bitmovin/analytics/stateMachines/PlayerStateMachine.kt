@@ -1,50 +1,38 @@
 package com.bitmovin.analytics.stateMachines
 
-import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.ErrorCode
+import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.utils.Util
 
-class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics: BitmovinAnalytics) {
-    private val mutableListeners = mutableListOf<StateMachineListener>()
-    // We don't want to allow someone to add listeners from the outside
-    val listeners: List<StateMachineListener>
-        get() = mutableListeners
+class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics: BitmovinAnalytics, internal val bufferingTimeoutTimer: ObservableTimer, internal val qualityChangeEventLimiter: QualityChangeEventLimiter, internal val videoStartTimeoutTimer: ObservableTimer, private val heartbeatHandler: Handler = Handler()) {
+    internal val listeners = ObservableSupport<StateMachineListener>()
 
     var currentState: PlayerState<*> = PlayerStates.READY
-        private set
-    var elapsedTimeOnEnter: Long = 0
         private set
     var startupTime: Long = 0
         private set
 
-    // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
-    // first startup sample, in case the collector supports multiple sources)
-    private var playerStartupTime = 1L
+    private var elapsedTimeOnEnter: Long = 0
     var isStartupFinished = false
-    var elapsedTimeSeekStart: Long = 0
+
     var videoTimeStart: Long = 0
         private set
     var videoTimeEnd: Long = 0
         private set
     lateinit var impressionId: String
         private set
-    private val heartbeatHandler = Handler()
+
     private var currentRebufferingIntervalIndex = 0
     private val heartbeatDelay = config.heartbeatInterval.toLong() // default to 60 seconds
     var videoStartFailedReason: VideoStartFailedReason? = null
-    private var qualityChangeCount = 0
-    var isQualityChangeTimerRunning = false
-        private set
-
-    val isQualityChangeEventEnabled: Boolean
-        get() = qualityChangeCount <= Util.ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD
 
     fun enableHeartbeat() {
         heartbeatHandler.postDelayed(
@@ -88,9 +76,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     private fun triggerHeartbeat() {
         val elapsedTime = Util.getElapsedTime()
         videoTimeEnd = analytics.position
-        for (listener in mutableListeners) {
-            listener.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter)
-        }
+        listeners.notify { it.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter) }
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
     }
@@ -102,10 +88,9 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         videoStartFailedReason = null
         startupTime = 0
         isStartupFinished = false
-        videoStartTimeout.cancel()
-        qualityChangeResetTimeout.cancel()
-        rebufferingTimeout.cancel()
-        resetQualityChangeCount()
+        videoStartTimeoutTimer.cancel()
+        bufferingTimeoutTimer.cancel()
+        qualityChangeEventLimiter.reset()
         analytics.resetSourceRelatedState()
     }
 
@@ -127,7 +112,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         val elapsedTime = Util.getElapsedTime()
         videoTimeEnd = videoTime
         Log.d(TAG, "Transitioning from $currentState to $destinationPlayerState")
-        currentState.onExitState(this, elapsedTime, destinationPlayerState)
+        currentState.onExitState(this, elapsedTime, elapsedTime - elapsedTimeOnEnter, destinationPlayerState)
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
         destinationPlayerState.onEnterState(this, data)
@@ -151,35 +136,22 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         return true
     }
 
-    fun addListener(toAdd: StateMachineListener) {
-        mutableListeners.add(toAdd)
+    fun subscribe(listener: StateMachineListener) {
+        listeners.subscribe(listener)
     }
 
-    fun removeListener(toRemove: StateMachineListener) {
-        mutableListeners.remove(toRemove)
-    }
-
-    fun clearListeners() {
-        mutableListeners.clear()
+    fun release() {
+        listeners.clear()
+        qualityChangeEventLimiter.release()
+        bufferingTimeoutTimer.unsubscribe(::onRebufferingTimerFinished)
+        videoStartTimeoutTimer.unsubscribe(::onVideoStartTimeoutTimerFinished)
     }
 
     fun addStartupTime(elapsedTime: Long) {
         startupTime += elapsedTime
     }
 
-    fun getAndResetPlayerStartupTime(): Long {
-        val playerStartupTime = playerStartupTime
-        this.playerStartupTime = 0
-        return playerStartupTime
-    }
-
-    fun increaseQualityChangeCount() {
-        qualityChangeCount++
-    }
-
-    private fun resetQualityChangeCount() {
-        qualityChangeCount = 0
-    }
+    fun getAndResetPlayerStartupTime() = analytics.getAndResetPlayerStartupTime()
 
     fun error(videoTime: Long, errorCode: ErrorCode) {
         transitionState(PlayerStates.ERROR, videoTime, errorCode)
@@ -208,7 +180,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
 
     fun changeCustomData(position: Long, customData: CustomData, setCustomDataFunction: (CustomData) -> Unit) {
         val originalState = currentState
-        val shouldTransition = originalState === PlayerStates.PLAYING || originalState === PlayerStates.PAUSE
+        val shouldTransition = isPlayingOrPaused
         if (shouldTransition) {
             this.transitionState(PlayerStates.CUSTOMDATACHANGE, position)
         }
@@ -218,43 +190,64 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         }
     }
 
-    val videoStartTimeout: CountDownTimer = object : CountDownTimer(Util.VIDEOSTART_TIMEOUT.toLong(), 1000) {
-        override fun onTick(millisUntilFinished: Long) {}
-        override fun onFinish() {
-            Log.d(TAG, "VideoStartTimeout finish")
-            videoStartFailedReason = VideoStartFailedReason.TIMEOUT
-            transitionState(PlayerStates.EXITBEFOREVIDEOSTART, 0, null)
-        }
+    // This can be used as a template for all the quality changed methods,
+    // as it is correctly setting the old values in the StateMachineListener
+    fun subtitleChanged(videoTime: Long, oldValue: SubtitleDto?, newValue: SubtitleDto?) {
+        if (!isStartupFinished) return
+        if (!isPlayingOrPaused) return
+        if (oldValue?.equals(newValue) == true) return
+        val originalState = currentState
+        transitionState(PlayerStates.SUBTITLECHANGE, videoTime, oldValue)
+        transitionState(originalState, videoTime)
     }
 
-    val qualityChangeResetTimeout: CountDownTimer = object : CountDownTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL.toLong(), 1000) {
-        override fun onTick(millisUntilFinished: Long) {
-            isQualityChangeTimerRunning = true
-        }
-
-        override fun onFinish() {
-            Log.d(TAG, "qualityChangeResetTimeout finish")
-            resetQualityChangeCount()
-            isQualityChangeTimerRunning = false
-        }
+    fun videoQualityChanged(videoTime: Long, didQualityChange: Boolean, setQualityFunction: () -> Unit) {
+        qualityChanged(videoTime, didQualityChange, setQualityFunction)
     }
 
-    val rebufferingTimeout: CountDownTimer = object : CountDownTimer(Util.REBUFFERING_TIMEOUT.toLong(), 1000) {
-        override fun onTick(millisUntilFinished: Long) {}
-        override fun onFinish() {
-            Log.d(TAG, "rebufferingTimeout finish")
-            error(
-                analytics.position,
-                AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.errorCode
-            )
-            disableRebufferHeartbeat()
-            resetStateMachine()
+    fun audioQualityChanged(videoTime: Long, didQualityChange: Boolean, setQualityFunction: () -> Unit) {
+        qualityChanged(videoTime, didQualityChange, setQualityFunction)
+    }
+
+    private fun qualityChanged(videoTime: Long, didQualityChange: Boolean, setQualityFunction: () -> Unit) {
+        val originalState = currentState
+        try {
+            if (!isStartupFinished) return
+            if (!qualityChangeEventLimiter.isQualityChangeEventEnabled) return
+            if (!isPlayingOrPaused) return
+            if (!didQualityChange) return
+            transitionState(PlayerStates.QUALITYCHANGE, videoTime)
+        } finally {
+            // we always want to set the new quality, no matter if we transitioned states
+            setQualityFunction()
         }
+        transitionState(originalState, videoTime)
+    }
+
+    private val isPlayingOrPaused
+        get() = currentState === PlayerStates.PLAYING || currentState === PlayerStates.PAUSE
+
+    private fun onVideoStartTimeoutTimerFinished() {
+        Log.d(TAG, "VideoStartTimeout finish")
+        videoStartFailedReason = VideoStartFailedReason.TIMEOUT
+        transitionState(PlayerStates.EXITBEFOREVIDEOSTART, 0, null)
+    }
+
+    private fun onRebufferingTimerFinished() {
+        Log.d(TAG, "rebufferingTimeout finish")
+        error(
+            analytics.position,
+            AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.errorCode
+        )
+        disableRebufferHeartbeat()
+        resetStateMachine()
     }
 
     // This should be defined at the bottom, so we make sure
     // that all fields are assigned already
     init {
+        bufferingTimeoutTimer.subscribe(::onRebufferingTimerFinished)
+        videoStartTimeoutTimer.subscribe(::onVideoStartTimeoutTimerFinished)
         resetStateMachine()
     }
 
