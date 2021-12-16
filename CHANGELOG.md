@@ -10,10 +10,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Detection of FireOS devices
 
+### Changed
+- [Internal] Changed gradle player dependencies from `implementation` to `api` so they are included in the published pom file
+
 ## Development v1
 
 ### Added
 - Detection of FireOS devices
+
+### Changed
+- [Internal] Changed gradle player dependencies from `implementation` to `api` so they are included in the published pom file
 
 ## v2.4.0
 

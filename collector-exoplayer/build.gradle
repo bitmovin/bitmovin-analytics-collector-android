@@ -63,7 +63,9 @@ dependencies {
 	} else {
 		api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
 	}
-	implementation "com.google.android.exoplayer:exoplayer:2.12.0"
+	// This could theoretically be `implementation`, but the MavenPublication process will
+	// only add `api` dependencies to the resulting pom file.
+	api "com.google.android.exoplayer:exoplayer:2.12.0"
 }
 
 publishing {

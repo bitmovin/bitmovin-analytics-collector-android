@@ -59,7 +59,9 @@ dependencies {
 	} else {
 		api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
 	}
-	implementation "com.bitmovin.player:playercore:${rootProject.ext.bitmovinPlayer2Version}"
+	// This could theoretically be `implementation`, but the MavenPublication process will
+	// only add `api` dependencies to the resulting pom file.
+	api "com.bitmovin.player:playercore:${rootProject.ext.bitmovinPlayer2Version}"
 
 	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 }
