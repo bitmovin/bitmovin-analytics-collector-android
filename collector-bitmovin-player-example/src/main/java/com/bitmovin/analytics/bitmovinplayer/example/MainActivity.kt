@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.bitmovinplayer.example
 
 import android.os.Bundle
+import android.view.Menu
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
@@ -22,17 +23,22 @@ import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
+import com.bitmovin.player.casting.BitmovinCastManager
+import com.google.android.gms.cast.framework.CastButtonFactory
 
 class MainActivity : AppCompatActivity() {
     private var playerView: PlayerView? = null
     private var player: Player? = null
+    private var currentPlaylistItemIndex = 0
 
     private var bitmovinPlayerCollector: BitmovinPlayerCollector? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        // it's necessary to update applicationId for casting to work
+        BitmovinCastManager.initialize("7ECF03AB", "urn:x-cast:com.bitmovin.analytics")
+        BitmovinCastManager.getInstance().updateContext(this)
         findViewById<Button>(R.id.release_button).setOnClickListener {
             player?.unload()
             bitmovinPlayerCollector?.detachPlayer()
@@ -73,9 +79,11 @@ class MainActivity : AppCompatActivity() {
             bitmovinPlayerCollector!!.attachPlayer(player)
             player!!.load(createDRMSourceConfig())
         }
-        findViewById<Button>(R.id.seek_second_source).setOnClickListener {
-            val secondSource = player?.playlist?.sources?.get(1) ?: return@setOnClickListener
-            player?.playlist?.seek(secondSource, 10.0)
+        findViewById<Button>(R.id.seek_next_source).setOnClickListener {
+            currentPlaylistItemIndex++
+            val nextSource = player?.playlist?.sources?.get(currentPlaylistItemIndex)
+                ?: return@setOnClickListener
+            player?.playlist?.seek(nextSource, 10.0)
         }
         findViewById<Button>(R.id.setCustomData).setOnClickListener {
             setCustomData()
@@ -84,6 +92,17 @@ class MainActivity : AppCompatActivity() {
         playerView = findViewById(R.id.playerView)
 
         initializeBitmovinPlayer()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.menu_acitvity_main, menu)
+        CastButtonFactory.setUpMediaRouteButton(
+            applicationContext,
+            menu,
+            R.id.media_route_menu_item
+        )
+        return true
     }
 
     private fun initializeBitmovinPlayer() {
@@ -121,6 +140,8 @@ class MainActivity : AppCompatActivity() {
 
         bitmovinPlayerCollector!!.attachPlayer(player)
 
+        // playlistConfig for casting
+        // val playlistConfig = PlaylistConfig(listOf(bbbSource, progresiveSource), PlaylistOptions())
         val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource), PlaylistOptions())
         player!!.load(playlistConfig)
 
@@ -165,6 +186,8 @@ class MainActivity : AppCompatActivity() {
         private val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()))
         private val sintelSource = Source.create(SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()))
         private val corruptedSource = Source.create(SourceConfig.fromUrl(Samples.CORRUPT_DASH.uri.toString()))
+        private val bbbSource = Source.create(SourceConfig.fromUrl(Samples.BBB.uri.toString()))
+        private val progresiveSource = Source.create(SourceConfig.fromUrl(Samples.PROGRESSIVE.uri.toString()))
 
         private fun createBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {
             /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
