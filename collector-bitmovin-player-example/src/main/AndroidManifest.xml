@@ -27,6 +27,13 @@
         <meta-data
             android:name="com.google.android.gms.ads.AD_MANAGER_APP"
             android:value="true"/>
+
+        <meta-data
+            android:name=
+                "com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+            android:value="com.bitmovin.player.casting.BitmovinCastOptionsProvider"
+            />
+
     </application>
 
 </manifest>

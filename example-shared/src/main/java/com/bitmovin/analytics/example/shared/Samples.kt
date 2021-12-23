@@ -15,6 +15,7 @@ object Samples {
     val HLS_REDBULL = Sample("HLSRedbulll", "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8")
     val DASH_LIVE = Sample("DashLive", "https://livesim.dashif.org/livesim/testpic_2s/Manifest.mpd")
     val DASH_SINTEL = Sample("DashSintel", "https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd")
+    val BBB = Sample("BBB", "https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/mp4/BigBuckBunny.mp4")
 
     // Dash stream with corrupted first sample
     val CORRUPT_DASH = Sample("CorruptRedBull", "https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd")
