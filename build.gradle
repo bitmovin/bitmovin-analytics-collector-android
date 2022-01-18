@@ -3,6 +3,7 @@ buildscript {
 
 	repositories {
 		google()
+		jcenter()
 		maven { url "https://plugins.gradle.org/m2/" }
 		maven { url 'https://artifacts.bitmovin.com/artifactory/public-releases' }
 		mavenCentral()
@@ -34,6 +35,7 @@ allprojects {
 	repositories {
 		mavenLocal()
 		google()
+		jcenter()
 		maven { url 'https://artifacts.bitmovin.com/artifactory/public-releases' }
 		maven {
 			credentials {
@@ -106,7 +108,7 @@ ext {
 	targetCompatibility = JavaVersion.VERSION_1_8
 
 	bitmovinPlayer2Version = '2.45.0'
-	bitmovinPlayerVersion = '3.1.0'
+	bitmovinPlayerVersion = '3.2.0'
 
 	exoplayerCollectorV1Version = '2.11.8'
 	exoplayerVersion = '2.13.2'
