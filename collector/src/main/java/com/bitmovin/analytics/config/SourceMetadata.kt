@@ -33,5 +33,10 @@ data class SourceMetadata(
     var customData22: String? = null,
     var customData23: String? = null,
     var customData24: String? = null,
-    var customData25: String? = null
+    var customData25: String? = null,
+    var customData26: String? = null,
+    var customData27: String? = null,
+    var customData28: String? = null,
+    var customData29: String? = null,
+    var customData30: String? = null
 )

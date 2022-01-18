@@ -44,6 +44,11 @@ class EventDataFactory(private val config: BitmovinAnalyticsConfig, private val 
                 if (sourceMetadata == null) config.customData23 else sourceMetadata.customData23,
                 if (sourceMetadata == null) config.customData24 else sourceMetadata.customData24,
                 if (sourceMetadata == null) config.customData25 else sourceMetadata.customData25,
+                if (sourceMetadata == null) config.customData26 else sourceMetadata.customData26,
+                if (sourceMetadata == null) config.customData27 else sourceMetadata.customData27,
+                if (sourceMetadata == null) config.customData28 else sourceMetadata.customData28,
+                if (sourceMetadata == null) config.customData29 else sourceMetadata.customData29,
+                if (sourceMetadata == null) config.customData30 else sourceMetadata.customData30,
 
                 if (sourceMetadata == null) config.path else sourceMetadata.path,
                 if (sourceMetadata == null) config.experimentName else sourceMetadata.experimentName,

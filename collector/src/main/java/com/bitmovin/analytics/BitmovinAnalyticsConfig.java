@@ -34,6 +34,11 @@ public class BitmovinAnalyticsConfig implements Parcelable {
     private String customData23;
     private String customData24;
     private String customData25;
+    private String customData26;
+    private String customData27;
+    private String customData28;
+    private String customData29;
+    private String customData30;
 
     private String customUserId;
     private String experimentName;
@@ -114,6 +119,11 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         customData23 = in.readString();
         customData24 = in.readString();
         customData25 = in.readString();
+        customData26 = in.readString();
+        customData27 = in.readString();
+        customData28 = in.readString();
+        customData29 = in.readString();
+        customData30 = in.readString();
         customUserId = in.readString();
         experimentName = in.readString();
         mpdUrl = in.readString();
@@ -161,6 +171,11 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         dest.writeString(customData23);
         dest.writeString(customData24);
         dest.writeString(customData25);
+        dest.writeString(customData26);
+        dest.writeString(customData27);
+        dest.writeString(customData28);
+        dest.writeString(customData29);
+        dest.writeString(customData30);
         dest.writeString(customUserId);
         dest.writeString(experimentName);
         dest.writeString(mpdUrl);
@@ -555,6 +570,71 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         return customData25;
     }
 
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     *
+     * @param customData26
+     */
+    public void setCustomData26(String customData26) {
+        this.customData26 = customData26;
+    }
+
+    public String getCustomData26() {
+        return customData26;
+    }
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     *
+     * @param customData27
+     */
+    public void setCustomData27(String customData27) {
+        this.customData27 = customData27;
+    }
+
+    public String getCustomData27() {
+        return customData27;
+    }
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     *
+     * @param customData28
+     */
+    public void setCustomData28(String customData28) {
+        this.customData28 = customData28;
+    }
+
+    public String getCustomData28() {
+        return customData28;
+    }
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     *
+     * @param customData29
+     */
+    public void setCustomData29(String customData29) {
+        this.customData29 = customData29;
+    }
+
+    public String getCustomData29() {
+        return customData29;
+    }
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     *
+     * @param customData30
+     */
+    public void setCustomData30(String customData30) {
+        this.customData30 = customData30;
+    }
+
+    public String getCustomData30() {
+        return customData30;
+    }
+
     public String getExperimentName() {
         return experimentName;
     }
@@ -743,6 +823,11 @@ public class BitmovinAnalyticsConfig implements Parcelable {
                 this.getCustomData23(),
                 this.getCustomData24(),
                 this.getCustomData25(),
+                this.getCustomData26(),
+                this.getCustomData27(),
+                this.getCustomData28(),
+                this.getCustomData29(),
+                this.getCustomData30(),
                 this.getExperimentName());
     }
 
@@ -772,6 +857,11 @@ public class BitmovinAnalyticsConfig implements Parcelable {
         this.setCustomData23(customData.getCustomData23());
         this.setCustomData24(customData.getCustomData24());
         this.setCustomData25(customData.getCustomData25());
+        this.setCustomData26(customData.getCustomData26());
+        this.setCustomData27(customData.getCustomData27());
+        this.setCustomData28(customData.getCustomData28());
+        this.setCustomData29(customData.getCustomData29());
+        this.setCustomData30(customData.getCustomData30());
         this.setExperimentName(customData.getExperimentName());
     }
 }
