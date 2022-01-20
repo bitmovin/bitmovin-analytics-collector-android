@@ -11,15 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - custom data fields 26-30
 
 ### Changed
-- updates bitmovinPlayer to 3.2.0
+- updates BitmovinPlayer to 3.2.0
 
 ## Development v1
+
+## v1.30.0
 
 ### Added
 - custom data fields 26-30
 
 ### Changed
-- updates bitmovinPlayer to 3.2.0
+- updates BitmovinPlayer to 3.2.0
 
 ## v2.5.0
 
