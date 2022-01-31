@@ -192,7 +192,7 @@ class MainActivity : AppCompatActivity() {
             val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
 
             bitmovinAnalyticsConfig.videoId = "androidVideoDASHStatic"
-            bitmovinAnalyticsConfig.title = "Android ExoPlayer Video with DASH"
+            bitmovinAnalyticsConfig.title = "Android Bitmovin player video with DASH"
             bitmovinAnalyticsConfig.customUserId = "customBitmovinUserId1"
             bitmovinAnalyticsConfig.cdnProvider = CDNProvider.BITMOVIN
             bitmovinAnalyticsConfig.experimentName = "experiment-1"
@@ -213,11 +213,10 @@ class MainActivity : AppCompatActivity() {
 
         private fun createDRMSourceConfig(): SourceConfig {
             // Create a new source config
-            val sourceConfig = SourceConfig.fromUrl(
-                    "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd")
+            val sourceConfig = SourceConfig.fromUrl(Samples.DASH_DRM_WIDEVINE.uri.toString())
 
             // Attach DRM handling to the source config
-            sourceConfig.drmConfig = WidevineConfig("https://widevine-proxy.appspot.com/proxy")
+            sourceConfig.drmConfig = WidevineConfig(Samples.DASH_DRM_WIDEVINE.drmLicenseUri.toString())
             return sourceConfig
         }
 
