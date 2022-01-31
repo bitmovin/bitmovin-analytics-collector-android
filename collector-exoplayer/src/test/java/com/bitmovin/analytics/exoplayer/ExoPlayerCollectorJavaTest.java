@@ -3,6 +3,7 @@ package com.bitmovin.analytics.exoplayer;
 import static org.mockito.ArgumentMatchers.any;
 
 import android.content.Context;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import org.junit.Test;
 import org.mockito.Mockito;
 

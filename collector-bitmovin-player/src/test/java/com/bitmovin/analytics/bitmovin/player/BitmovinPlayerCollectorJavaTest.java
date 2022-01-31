@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player;
 
 import android.content.Context;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import org.junit.Test;
 import org.mockito.Mockito;
 
