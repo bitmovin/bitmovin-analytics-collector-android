@@ -51,7 +51,9 @@ dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 	implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
 
-	implementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
+	// This could theoretically be `implementation`, but the MavenPublication process will
+	// only add `api` dependencies to the resulting pom file.
+	api "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
 
 	if (rootProject.ext.developLocal) {
 		api project(':collector')

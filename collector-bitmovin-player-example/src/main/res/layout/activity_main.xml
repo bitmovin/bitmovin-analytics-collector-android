@@ -76,11 +76,11 @@
                 android:text="Change Source" />
 
             <Button
-                android:id="@+id/seek_second_source"
+                android:id="@+id/seek_next_source"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Second Source" />
+                android:text="Seek to Next Source" />
 
             <Button
                 android:id="@+id/setCustomData"

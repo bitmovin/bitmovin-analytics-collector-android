@@ -22,7 +22,7 @@ For Bitmovin Player v2:
 
 ```
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.28.0'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.30.0'
 }
 ```
 
@@ -30,7 +30,7 @@ For Bitmovin Player v3:
 
 ```
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.4.0'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.6.0'
 }
 ```
 
@@ -38,7 +38,7 @@ For ExoPlayer < v2.12.0:
 
 ```
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:1.28.0'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:1.30.0'
 }
 ```
 
@@ -46,7 +46,7 @@ For ExoPlayer >= v2.12.0:
 
 ```
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:2.4.0'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:2.6.0'
 }
 ```
 
@@ -122,3 +122,6 @@ bitmovinAnalyticsConfig.setHeartbeatInterval(59700); // value is in ms
 ```
 
 A [full example app](https://github.com/bitmovin/bitmovin-analytics-collector-android/tree/main/collector-bitmovin-player-example) can be seen in the github repo
+
+## Support
+If you have any questions or issues with this Analytics Collector or its examples, or you require other technical support for our services, please login to your Bitmovin Dashboard at https://bitmovin.com/dashboard and create a new support case. Our team will get back to you as soon as possible 👍

@@ -7,19 +7,38 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
-### Added
-- Detection of FireOS devices
-
 ### Changed
+
 - [Internal] Extracted `StateMachineListener` from `BitmovinAnalytics`
 
 ## Development v1
 
+### Changed
+
+- [Internal] Changed gradle player dependencies from `implementation` to `api` so they are included in the published pom file
+
+## v2.6.0
+
+### Added
+- custom data fields 26-30
+
+### Changed
+- updates BitmovinPlayer to 3.2.0
+
+## v1.30.0
+
+### Added
+- custom data fields 26-30
+
+## v2.5.0
+
 ### Added
 - Detection of FireOS devices
 
-### Changed
-- [Internal] Extracted `StateMachineListener` from `BitmovinAnalytics`
+## v1.29.0
+
+### Added
+- Detection of FireOS devices
 
 ## v2.4.0
 

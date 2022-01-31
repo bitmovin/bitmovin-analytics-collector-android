@@ -163,6 +163,31 @@ class BitmovinAnalyticsConfig() : Parcelable {
     var customData25: String? = null
 
     /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData26: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData27: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData28: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData29: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData30: String? = null
+
+    /**
      * User-ID in the Customer System
      */
     var customUserId: String? = null
@@ -259,6 +284,11 @@ class BitmovinAnalyticsConfig() : Parcelable {
         customData23 = parcel.readString()
         customData24 = parcel.readString()
         customData25 = parcel.readString()
+        customData26 = parcel.readString()
+        customData27 = parcel.readString()
+        customData28 = parcel.readString()
+        customData29 = parcel.readString()
+        customData30 = parcel.readString()
         customUserId = parcel.readString()
         experimentName = parcel.readString()
         mpdUrl = parcel.readString()
@@ -303,6 +333,11 @@ class BitmovinAnalyticsConfig() : Parcelable {
         dest.writeString(customData23)
         dest.writeString(customData24)
         dest.writeString(customData25)
+        dest.writeString(customData26)
+        dest.writeString(customData27)
+        dest.writeString(customData28)
+        dest.writeString(customData29)
+        dest.writeString(customData30)
         dest.writeString(customUserId)
         dest.writeString(experimentName)
         dest.writeString(mpdUrl)
