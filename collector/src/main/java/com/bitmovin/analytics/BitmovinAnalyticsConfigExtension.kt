@@ -30,6 +30,11 @@ internal class BitmovinAnalyticsConfigExtension {
             customData23 = customData.customData23
             customData24 = customData.customData24
             customData25 = customData.customData25
+            customData26 = customData.customData26
+            customData27 = customData.customData27
+            customData28 = customData.customData28
+            customData29 = customData.customData29
+            customData30 = customData.customData30
             experimentName = customData.experimentName
         }
 
@@ -60,6 +65,11 @@ internal class BitmovinAnalyticsConfigExtension {
                 customData23,
                 customData24,
                 customData25,
+                customData26,
+                customData27,
+                customData28,
+                customData29,
+                customData30,
                 experimentName
             )
         }
