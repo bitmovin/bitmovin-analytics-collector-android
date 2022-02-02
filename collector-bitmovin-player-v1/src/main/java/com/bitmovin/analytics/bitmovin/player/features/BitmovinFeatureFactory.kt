@@ -15,7 +15,7 @@ class BitmovinFeatureFactory(private val analytics: BitmovinAnalytics, private v
         val httpRequestTrackingAdapter = BitmovinHttpRequestTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
         val httpRequestTracking = HttpRequestTracking(httpRequestTrackingAdapter)
         val errorDetailsBackend = ErrorDetailBackend(analytics.config.config, analytics.context)
-        var errorDetailTracking = ErrorDetailTracking(analytics.context, analytics.config, analytics, errorDetailsBackend, httpRequestTracking, analytics.onErrorDetailObservable)
+        var errorDetailTracking = ErrorDetailTracking(analytics.context, analytics.config, errorDetailsBackend, httpRequestTracking, analytics.onErrorDetailObservable)
         features.add(errorDetailTracking)
         return features
     }

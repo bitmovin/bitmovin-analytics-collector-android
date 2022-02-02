@@ -27,7 +27,7 @@ class DownloadSpeedMeter {
     }
 
     fun getInfo(): DownloadSpeedInfo {
-        var info = DownloadSpeedInfo()
+        val info = DownloadSpeedInfo()
         info.segmentsDownloadCount = measures.size
         info.segmentsDownloadSize = measures.map { it.downloadSize }.sum()
         info.segmentsDownloadTime = totalTime()
@@ -39,7 +39,7 @@ class DownloadSpeedMeter {
     }
 
     private fun avgSpeed(): Float {
-        if (measures.size === 0) {
+        if (measures.isEmpty()) {
             return 0.0f
         }
         val totalSpeed = measures.map { it.speed }.sum()
@@ -48,7 +48,7 @@ class DownloadSpeedMeter {
     }
 
     private fun minSpeed(): Float? {
-        if (measures.size === 0) {
+        if (measures.isEmpty()) {
             return 0.0f
         }
         // the slowest one to download
@@ -56,7 +56,7 @@ class DownloadSpeedMeter {
     }
 
     private fun maxSpeed(): Float? {
-        if (measures.size === 0) {
+        if (measures.isEmpty()) {
             return 0.0f
         }
         // the fastest one to download
@@ -64,14 +64,14 @@ class DownloadSpeedMeter {
     }
 
     private fun totalTime(): Long {
-        if (this.measures.size === 0) {
+        if (this.measures.isEmpty()) {
             return 0
         }
         return this.measures.map { it.duration }.sum()
     }
 
     private fun avgTimeToFirstByte(): Float {
-        if (measures.size === 0) {
+        if (measures.isEmpty()) {
             return 0.0f
         }
 

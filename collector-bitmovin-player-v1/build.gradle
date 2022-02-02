@@ -27,6 +27,10 @@ android {
 		targetCompatibility rootProject.ext.targetCompatibility
 	}
 
+	kotlinOptions {
+		jvmTarget = rootProject.ext.jvmTarget
+	}
+
 	buildTypes {
 		release {
 			minifyEnabled false
@@ -52,7 +56,7 @@ dependencies {
 
 
 	testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-	testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+	testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
 
 	if (rootProject.ext.developLocal) {
 		api project(':collector')

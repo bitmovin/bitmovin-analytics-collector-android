@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BitmovinAnalyticsConfig bitmovinAnalyticsConfig;
 
     private final SourceItem sintelSource =
-            new SourceItem(Samples.INSTANCE.getDASH_LIVE().getUri().toString());
+            new SourceItem(Samples.INSTANCE.getDASH().getUri().toString());
     private final SourceItem corruptedSource =
             new SourceItem(Samples.INSTANCE.getCORRUPT_DASH().getUri().toString());
 
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0");
         // Step 2: Add optional parameters
         bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
-        bitmovinAnalyticsConfig.setTitle("Android ExoPlayer Video with DASH");
+        bitmovinAnalyticsConfig.setTitle("Android Bitmovin player video with DASH");
         bitmovinAnalyticsConfig.setCustomUserId("customBitmovinUserId1");
         bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
         bitmovinAnalyticsConfig.setExperimentName("experiment-1");
@@ -129,11 +129,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Create a new source configuration
         SourceConfiguration sourceConfiguration = new SourceConfiguration();
         SourceItem sourceItem =
-                new SourceItem(
-                        "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd");
+                new SourceItem(Samples.INSTANCE.getDASH_DRM_WIDEVINE().getUri().toString());
 
         // setup DRM handling
-        String drmLicenseUrl = "https://widevine-proxy.appspot.com/proxy";
+        String drmLicenseUrl =
+                Samples.INSTANCE.getDASH_DRM_WIDEVINE().getDrmLicenseUri().toString();
         UUID drmSchemeUuid = DRMSystems.WIDEVINE_UUID;
         sourceItem.addDRMConfiguration(drmSchemeUuid, drmLicenseUrl);
 

@@ -1,24 +1,19 @@
 package com.bitmovin.analytics.bitmovin.player
 
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.api.event.data.AudioPlaybackQualityChangedEvent
 import com.bitmovin.player.api.event.listener.EventListener
 import com.bitmovin.player.api.event.listener.OnAudioPlaybackQualityChangedListener
-import com.bitmovin.player.config.PlayerConfiguration
 import com.bitmovin.player.config.quality.AudioQuality
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner::class)
 class BitmovinSdkAdapterTest {
 
     val eventListener = mutableListOf<EventListener<*>>()
@@ -26,17 +21,15 @@ class BitmovinSdkAdapterTest {
         return eventListener.find { it is T } as? T
     }
 
-    @Mock
-    private lateinit var stateMachine: PlayerStateMachine
+    private val stateMachine: PlayerStateMachine = mockk(relaxed = true)
     private lateinit var adapter: BitmovinSdkAdapter
-    @Mock
-    private lateinit var fakePlayer: BitmovinPlayer
+    private val fakePlayer: BitmovinPlayer = mockk(relaxed = true)
 
     @Before
     fun setup() {
-        Mockito.`when`(fakePlayer.addEventListener(ArgumentMatchers.any())).then { invocation -> eventListener.add(invocation.getArgument(0)) }
-        Mockito.`when`(fakePlayer.getConfig()).thenReturn(Mockito.mock(PlayerConfiguration::class.java))
-        adapter = BitmovinSdkAdapter(fakePlayer, Mockito.mock(BitmovinAnalyticsConfig::class.java), stateMachine, Mockito.mock(FeatureFactory::class.java))
+        justRun { fakePlayer.addEventListener(capture(eventListener)) }
+        every { fakePlayer.config } returns mockk(relaxed = true)
+        adapter = BitmovinSdkAdapter(fakePlayer, mockk(relaxed = true), stateMachine, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
         adapter.init()
     }
 
@@ -45,7 +38,7 @@ class BitmovinSdkAdapterTest {
         val event = getListenerWithType<OnAudioPlaybackQualityChangedListener>()
         assert(event != null)
         event!!.onAudioPlaybackQualityChanged(getAudioPlaybackQualityChangedEvent(200, 200))
-        Mockito.verify(stateMachine, Mockito.times(0)).transitionState(ArgumentMatchers.eq(PlayerStates.QUALITYCHANGE), ArgumentMatchers.anyLong())
+        verify(exactly = 0) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
     }
 
     private fun getAudioPlaybackQualityChangedEvent(oldBitrate: Int, newBitrate: Int): AudioPlaybackQualityChangedEvent {
