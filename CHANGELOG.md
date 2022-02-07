@@ -10,12 +10,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - [Internal] Extracted `StateMachineListener` from `BitmovinAnalytics`
+- player and kotlin dependency to latest versions
 
 ## Development v1
 
 ### Changed
 
 - [Internal] Changed gradle player dependencies from `implementation` to `api` so they are included in the published pom file
+- player and kotlin dependency to latest versions
 
 ## v2.6.0
 
