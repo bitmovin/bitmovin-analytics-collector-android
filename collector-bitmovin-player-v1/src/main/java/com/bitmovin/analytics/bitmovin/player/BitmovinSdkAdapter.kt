@@ -248,9 +248,10 @@ class BitmovinSdkAdapter(
      * need to transition into startup state manually
      */
     private fun checkAutoplayStartup() {
-        if (bitmovinPlayer.config != null) {
-            val playbackConfiguration = bitmovinPlayer.config.playbackConfiguration
-            val source = bitmovinPlayer.config.sourceConfiguration
+        val playerConfig = bitmovinPlayer.config
+        if (playerConfig != null) {
+            val playbackConfiguration = playerConfig.playbackConfiguration
+            val source = playerConfig.sourceConfiguration
             if (playbackConfiguration != null && source?.firstSourceItem != null && playbackConfiguration.isAutoplayEnabled
             ) {
                 startup()

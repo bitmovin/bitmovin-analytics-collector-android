@@ -40,7 +40,7 @@ class DownloadSpeedMeterTest {
         meter.addMeasurement(measurement4)
         meter.addMeasurement(measurement5)
 
-        var info = meter.getInfo()
+        val info = meter.getInfo()
         // total of 5 measurements
         Assertions.assertThat(info.segmentsDownloadCount).isEqualTo(5)
         // sum of all durations

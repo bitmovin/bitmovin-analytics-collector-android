@@ -108,8 +108,9 @@ public class MainActivity extends AppCompatActivity
             player.addListener(this);
 
             // Step 1: Create your analytics config object
+            /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
             bitmovinAnalyticsConfig =
-                    new BitmovinAnalyticsConfig("e73a3577-d91c-4214-9e6d-938fb936818a");
+                    new BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0");
 
             // Step 2: Add optional parameters
             bitmovinAnalyticsConfig.setVideoId("androidVideoDASHStatic");
