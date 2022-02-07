@@ -10,7 +10,7 @@ Add this to your top level `build.gradle`
 allprojects {
     repositories {
 		maven {
-			url  'http://bitmovin.bintray.com/maven'
+			url  'https://artifacts.bitmovin.com/artifactory/public-releases'
 		}
 	}
 }
