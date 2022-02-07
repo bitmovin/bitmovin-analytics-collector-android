@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Development v1
+
 ## Development v2
 
 ### Changed
@@ -12,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Extracted `StateMachineListener` from `BitmovinAnalytics`
 - player and kotlin dependency to latest versions
 
-## Development v1
+## v1.30.1
 
 ### Changed
 
