@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+## v2.6.1-beta1
+
 ### Changed
 
 - [Internal] Extracted `StateMachineListener` from `BitmovinAnalytics`
