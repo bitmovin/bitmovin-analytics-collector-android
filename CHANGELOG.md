@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Extracted `StateMachineListener` from `BitmovinAnalytics`
 - player and kotlin dependency to latest versions
 
-## v1.30.1
+## v1.30.1-beta1
 
 ### Changed
 
