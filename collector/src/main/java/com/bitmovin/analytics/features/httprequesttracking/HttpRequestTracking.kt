@@ -11,6 +11,7 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
         OnDownloadFinishedEventListener {
     companion object {
         const val defaultMaxRequests = 10
+        private const val TAG = "HttpRequestTracking"
     }
     private val httpRequestQueue: Queue<HttpRequest> = LinkedList()
 
@@ -25,8 +26,12 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
     }
 
     fun configure(maxRequests: Int) {
-        this.maxRequests = maxRequests
-        httpRequestQueue.limit(maxRequests)
+        try {
+            this.maxRequests = maxRequests
+            httpRequestQueue.limit(maxRequests)
+        } catch (e: Exception) {
+            Log.d(TAG, "Exception happened while configuring http request tracking: ${e.message}")
+        }
     }
 
     fun disable() {
@@ -39,12 +44,16 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
     }
 
     override fun onDownloadFinished(event: OnDownloadFinishedEventObject) {
-        Log.d("HttpRequestTracking", "onDownloadFinished: ${DataSerializer.serialize(event.httpRequest)}")
+        Log.d(TAG, "onDownloadFinished: ${DataSerializer.serialize(event.httpRequest)}")
         addRequest(event.httpRequest)
     }
 
     private fun addRequest(httpRequest: HttpRequest) {
-        httpRequestQueue.offer(httpRequest)
-        httpRequestQueue.limit(maxRequests)
+        try {
+            httpRequestQueue.offer(httpRequest)
+            httpRequestQueue.limit(maxRequests)
+        } catch (e: Exception) {
+            Log.d(TAG, "Exception happened while adding http request: ${e.message}")
+        }
     }
 }

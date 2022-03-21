@@ -19,4 +19,10 @@ class QueueExtensionsTests {
         queue.limit(0)
         assertThat(queue.size).isEqualTo(0)
     }
+
+    @Test
+    fun `limit doesn't throw exception if queue is empty`() {
+        val queue: Queue<String> = LinkedList<String>()
+        queue.limit(2)
+    }
 }

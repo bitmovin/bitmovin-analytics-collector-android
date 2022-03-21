@@ -19,6 +19,7 @@ object Samples {
 
     // Dash stream with corrupted first sample
     val CORRUPT_DASH = Sample("CorruptRedBull", "https://bitmovin-a.akamaihd.net/content/analytics-teststreams/redbull-parkour/corrupted_first_segment.mpd")
+    val MISSING_SEGMENT = Sample("RedBullMissingSegment", "https://storage.googleapis.com/bitmovin-analytics-test-assets/corrupted-assets/redbull-parkour/stream_segment_not_found.mpd")
 
     // These are IMA Sample Tags from https://developers.google.com/interactive-media-ads/docs/sdks/android/tags
     val IMA_AD_SOURCE_1 = Sample("ImaAdSource1", "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator=")

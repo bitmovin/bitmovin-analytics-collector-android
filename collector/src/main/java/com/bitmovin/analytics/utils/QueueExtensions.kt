@@ -6,7 +6,8 @@ class QueueExtensions {
     companion object {
         fun <T> Queue<T>.limit(maxSize: Int) {
             while (size > maxSize) {
-                remove()
+                // poll is used because it doesn't throw exception if queue is empty
+                poll()
             }
         }
     }

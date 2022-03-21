@@ -63,4 +63,22 @@ class HttpRequestTrackingTests {
         support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
         assertThat(httpRequestTracking.httpRequests.size).isEqualTo(0)
     }
+
+    @Test
+    fun testSuccessfullyAddsRequestsAfterQueueIsCleared() {
+        val support = ObservableSupport<OnDownloadFinishedEventListener>()
+        val httpRequestTracking = HttpRequestTracking(support)
+        httpRequestTracking.configure(3)
+        support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
+        support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
+        support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
+        support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
+        assertThat(httpRequestTracking.httpRequests.size).isEqualTo(3)
+        httpRequestTracking.reset()
+        support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
+        support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
+        support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
+        support.notify { it.onDownloadFinished(OnDownloadFinishedEventObject(mockk())) }
+        assertThat(httpRequestTracking.httpRequests.size).isEqualTo(3)
+    }
 }
