@@ -188,18 +188,6 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
         return bitmovinAnalyticsConfig
     }
 
-// test case for RTL when concatinatedMediaSoruce is used
-    // and collector is attached only on second source
-    override fun onMediaItemTransition(
-        mediaItem: MediaItem?,
-        @Player.MediaItemTransitionReason reason: Int
-    ) {
-        if (reason == 1) {
-//            bitmovinAnalytics!!.attachPlayer(player!!)
-//            player!!.seekTo(player!!.currentWindowIndex, 100)
-        }
-    }
-
     private var oldIndex = 0
     override fun onPositionDiscontinuity(reason: Int) {
         val sourceIndex = player!!.currentWindowIndex
@@ -229,8 +217,10 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
     }
 
     override fun onDispatchAdEventData(data: AdEventData) {
+        TODO("Not yet implemented")
     }
 
     override fun onMessage(message: String) {
+        TODO("Not yet implemented")
     }
 }

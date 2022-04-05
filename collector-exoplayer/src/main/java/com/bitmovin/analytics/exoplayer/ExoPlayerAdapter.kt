@@ -254,9 +254,7 @@ class ExoPlayerAdapter(
                     } else if (stateMachine.currentState !== PlayerStates.SEEKING &&
                         stateMachine.currentState !== PlayerStates.BUFFERING
                     ) {
-                        stateMachine.transitionState(
-                            PlayerStates.PAUSE, position
-                        )
+                        stateMachine.pause(position)
                     }
                 } catch (e: Exception) {
                     Log.d(TAG, e.message, e)

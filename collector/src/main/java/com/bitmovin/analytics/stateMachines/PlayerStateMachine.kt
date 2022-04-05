@@ -132,7 +132,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
             destination !== PlayerStates.ERROR && destination !== PlayerStates.STARTUP && destination !== PlayerStates.AD
         ) {
             return false
-        } else if (currentState === PlayerStates.STARTUP &&
+        } else if (currentState === PlayerStates.STARTUP && destination !== PlayerStates.READY &&
             destination !== PlayerStates.ERROR && destination !== PlayerStates.EXITBEFOREVIDEOSTART && destination !== PlayerStates.PLAYING && destination !== PlayerStates.AD
         ) {
             return false
