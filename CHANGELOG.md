@@ -5,14 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Development v2
+
+### Fixed
+- Wrong transitions from `startup` state to `paused` state
+
 ## Development v1
+
+### Fixed
+- Wrong transitions from `startup` state to `paused` state
 
 ## v2.6.1
 
 ### Changed
 - improved exception handing on error detail tracking feature
-
-## Development v2
 
 ## v1.30.1
 
