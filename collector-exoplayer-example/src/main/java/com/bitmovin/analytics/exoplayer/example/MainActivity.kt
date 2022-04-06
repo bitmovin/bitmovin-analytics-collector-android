@@ -33,7 +33,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.util.Util
 
-class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
+class MainActivity : AppCompatActivity(), DebugListener, Player.EventListener {
 
     private var player: SimpleExoPlayer? = null
     private var playerView: PlayerView? = null
