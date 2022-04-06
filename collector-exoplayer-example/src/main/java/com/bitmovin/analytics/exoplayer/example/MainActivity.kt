@@ -11,9 +11,7 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Sample
-import com.bitmovin.analytics.example.shared.Samples.CORRUPT_DASH
 import com.bitmovin.analytics.example.shared.Samples.DASH_DRM_WIDEVINE
-import com.bitmovin.analytics.example.shared.Samples.HLS_DRM_WIDEVINE
 import com.bitmovin.analytics.example.shared.Samples.HLS_REDBULL
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector
 import com.google.android.exoplayer2.C
@@ -111,7 +109,7 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
         val concatenatingMediaSource = ConcatenatingMediaSource()
         var mediaSource: MediaSource = buildMediaSource(HLS_REDBULL)
         concatenatingMediaSource.addMediaSource(mediaSource)
-        mediaSource = buildMediaSource(CORRUPT_DASH)
+        mediaSource = buildMediaSource(HLS_REDBULL)
         concatenatingMediaSource.addMediaSource(mediaSource)
         return concatenatingMediaSource
     }
@@ -144,7 +142,7 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
             // Step 4: Create, prepare, and play media source
             playerView!!.player = player
 
-            val mediaSource = buildMediaSource(HLS_DRM_WIDEVINE)
+            val mediaSource = buildMediaSource(HLS_REDBULL)
             player!!.setMediaSource(mediaSource)
 
 //            val concatenatingMediaSource: ConcatenatingMediaSource = buildConcatenatingMediaSource()
@@ -217,10 +215,8 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
     }
 
     override fun onDispatchAdEventData(data: AdEventData) {
-        TODO("Not yet implemented")
     }
 
     override fun onMessage(message: String) {
-        TODO("Not yet implemented")
     }
 }
