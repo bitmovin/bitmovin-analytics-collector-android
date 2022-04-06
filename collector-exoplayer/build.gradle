@@ -6,11 +6,11 @@ apply plugin: 'maven-publish'
 apply from: '../bitmovinpropertiesloader.gradle'
 
 android {
-	compileSdkVersion rootProject.ext.compileSdkVersion
+	compileSdkVersion 31
 
 	defaultConfig {
 		minSdkVersion rootProject.ext.minSdkVersion
-		targetSdkVersion rootProject.ext.targetSdkVersion
+		targetSdkVersion 31
 		versionCode rootProject.ext.versionCode
 		versionName rootProject.ext.version
 
@@ -68,7 +68,7 @@ dependencies {
 	}
 	// This could theoretically be `implementation`, but the MavenPublication process will
 	// only add `api` dependencies to the resulting pom file.
-	api "com.google.android.exoplayer:exoplayer:2.12.0"
+	api "com.google.android.exoplayer:exoplayer:2.17.0"
 }
 
 publishing {
