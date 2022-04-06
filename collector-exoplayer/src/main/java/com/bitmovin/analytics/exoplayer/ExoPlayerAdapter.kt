@@ -274,12 +274,16 @@ class ExoPlayerAdapter(
                     )
                     when (state) {
                         Player.STATE_READY -> // if autoplay is enabled startup state is not yet finished
-                            if (!stateMachine.isStartupFinished &&
-                                (stateMachine.currentState !== PlayerStates.STARTUP &&
-                                        exoplayer.playWhenReady)
-                            ) {
-                                stateMachine.transitionState(PlayerStates.READY, position)
-                            }
+                            // if collector is attached late or ConcatenatingMediaSource is used we miss other events
+                            // for transitioning out from READY state
+                                if (!stateMachine.isStartupFinished && exoplayer.playWhenReady) {
+                                     if (stateMachine.currentState == PlayerStates.READY) {
+                                         startup(videoTime)
+                                     } else if (stateMachine.currentState !== PlayerStates.STARTUP && stateMachine.currentState !== PlayerStates.READY) {
+                                         stateMachine.transitionState(PlayerStates.READY, position)
+                                     }
+                                }
+
                         Player.STATE_BUFFERING -> if (!stateMachine.isStartupFinished) {
                             // this is the case when there is no preloading
                             // player is now starting to get content before playing it
