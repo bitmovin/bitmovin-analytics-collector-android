@@ -1,9 +1,8 @@
 package com.bitmovin.analytics.exoplayer
 
-import android.view.Surface
-import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.audio.AudioAttributes
@@ -22,11 +21,12 @@ import java.lang.Exception
  * our own default implementation as well.
  */
 abstract class DefaultAnalyticsListener : AnalyticsListener {
+
     override fun onSeekProcessed(eventTime: AnalyticsListener.EventTime) {}
 
     override fun onIsLoadingChanged(eventTime: AnalyticsListener.EventTime, isLoading: Boolean) {}
 
-    override fun onPlayerError(eventTime: AnalyticsListener.EventTime, error: ExoPlaybackException) {}
+    override fun onPlayerError(eventTime: AnalyticsListener.EventTime, error: PlaybackException) {}
 
     override fun onSeekStarted(eventTime: AnalyticsListener.EventTime) {}
 
@@ -52,7 +52,7 @@ abstract class DefaultAnalyticsListener : AnalyticsListener {
 
     override fun onDecoderInputFormatChanged(eventTime: AnalyticsListener.EventTime, trackType: Int, format: Format) {}
 
-    override fun onAudioSessionId(eventTime: AnalyticsListener.EventTime, audioSessionId: Int) {}
+    override fun onAudioSessionIdChanged(eventTime: AnalyticsListener.EventTime, audioSessionId: Int) {}
 
     override fun onVideoInputFormatChanged(eventTime: AnalyticsListener.EventTime, format: Format) {}
 
@@ -90,7 +90,7 @@ abstract class DefaultAnalyticsListener : AnalyticsListener {
 
     override fun onVideoDecoderInitialized(eventTime: AnalyticsListener.EventTime, decoderName: String, initializationDurationMs: Long) {}
 
-    override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime, surface: Surface?) {}
+    override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime, output: Any, renderTimeMs: Long) {}
 
     override fun onBandwidthEstimate(eventTime: AnalyticsListener.EventTime, totalLoadTimeMs: Int, totalBytesLoaded: Long, bitrateEstimate: Long) {}
 

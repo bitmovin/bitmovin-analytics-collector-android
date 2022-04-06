@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.exoplayer
 
 import android.util.Log
-import android.view.Surface
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.config.SourceMetadata
@@ -23,9 +22,9 @@ import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -423,10 +422,7 @@ class ExoPlayerAdapter(
                 )
             }
 
-            override fun onRenderedFirstFrame(
-                eventTime: AnalyticsListener.EventTime,
-                surface: Surface?
-            ) {
+            override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime, output: Any, renderTimeMs: Long) {
                 playerIsReady = true
             }
 
@@ -468,7 +464,7 @@ class ExoPlayerAdapter(
                 Log.d(TAG, "onShuffleModeEnabledChanged")
             }
 
-            override fun onPlayerError(error: ExoPlaybackException) {
+            override fun onPlayerError(error: PlaybackException) {
                 try {
                     Log.d(TAG, "onPlayerError")
                     val videoTime = position
