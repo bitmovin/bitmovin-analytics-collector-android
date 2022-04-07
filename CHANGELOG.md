@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Wrong transitions from `startup` state to `paused` state
 
+### Removed
+- Support for SimpleExoPlayer class
+
 ## Development v1
 
 ### Fixed
