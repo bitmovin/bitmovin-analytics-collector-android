@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-	compileSdkVersion rootProject.ext.compileSdkVersion
+	compileSdkVersion 31
 
 	defaultConfig {
 		applicationId "com.bitmovin.analytics.exoplayer.example"
 		minSdkVersion rootProject.ext.minSdkVersion
-		targetSdkVersion rootProject.ext.targetSdkVersion
+		targetSdkVersion 31
 		versionCode rootProject.ext.versionCode
 		versionName rootProject.ext.version
 
