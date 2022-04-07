@@ -27,7 +27,6 @@ import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.audio.AudioAttributes
@@ -76,9 +75,7 @@ class ExoPlayerAdapter(
     private var drmType: String? = null
 
     private fun attachAnalyticsListener() {
-        if (exoplayer is SimpleExoPlayer) {
-            exoplayer.addAnalyticsListener(defaultAnalyticsListener)
-        }
+        exoplayer.addAnalyticsListener(defaultAnalyticsListener)
     }
 
     private fun startup(position: Long) {
@@ -183,9 +180,7 @@ class ExoPlayerAdapter(
         isInInitialBufferState = false
         manifestUrl = null
         exoplayer.removeListener(defaultPlayerEventListener)
-        if (exoplayer is SimpleExoPlayer) {
-            exoplayer.removeAnalyticsListener(defaultAnalyticsListener)
-        }
+        exoplayer.removeAnalyticsListener(defaultAnalyticsListener)
         meter.reset()
         bitrateEventDataManipulator.reset()
         stateMachine.resetStateMachine()

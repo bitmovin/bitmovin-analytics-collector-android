@@ -8,16 +8,14 @@ import com.bitmovin.analytics.features.errordetails.ErrorDetailTracking
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.SimpleExoPlayer
 
 class ExoPlayerFeatureFactory(private val analytics: BitmovinAnalytics, private val player: ExoPlayer) : FeatureFactory {
     override fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
         var httpRequestTracking: HttpRequestTracking? = null
-        if (player is SimpleExoPlayer) {
-            val httpRequestTrackingAdapter = ExoPlayerHttpRequestTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
-            httpRequestTracking = HttpRequestTracking(httpRequestTrackingAdapter)
-        }
+        val httpRequestTrackingAdapter = ExoPlayerHttpRequestTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
+        httpRequestTracking = HttpRequestTracking(httpRequestTrackingAdapter)
+
         val errorDetailsBackend = ErrorDetailBackend(analytics.config.config, analytics.context)
         val errorDetailTracking = ErrorDetailTracking(analytics.context, analytics.config, errorDetailsBackend, httpRequestTracking, analytics.onErrorDetailObservable)
         features.add(errorDetailTracking)
