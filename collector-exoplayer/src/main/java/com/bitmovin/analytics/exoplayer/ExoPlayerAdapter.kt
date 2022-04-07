@@ -38,8 +38,7 @@ import com.google.android.exoplayer2.source.MediaLoadData
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.source.dash.manifest.DashManifest
 import com.google.android.exoplayer2.source.hls.HlsManifest
-import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist
-import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist
+import com.google.android.exoplayer2.source.hls.playlist.HlsMultivariantPlaylist
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import java.lang.Exception
 import java.util.Date
@@ -153,7 +152,7 @@ class ExoPlayerAdapter(
 
         // isLive
         data.isLive = Util.getIsLiveFromConfigOrPlayer(
-            playerIsReady, config.isLive, exoplayer.isCurrentWindowDynamic
+            playerIsReady, config.isLive, exoplayer.isCurrentMediaItemDynamic
         )
 
         // version
@@ -169,12 +168,9 @@ class ExoPlayerAdapter(
             data.streamFormat = Util.DASH_STREAM_FORMAT
             data.mpdUrl = manifest.location?.toString() ?: manifestUrl
         } else if (isHlsManifestClassLoaded && manifest is HlsManifest) {
-            // The nullability changed in the ExoPlayer source code, that's
-            // why we manually declare the playlists nullable
-            val masterPlaylist: HlsMasterPlaylist? = manifest.masterPlaylist
-            val mediaPlaylist: HlsMediaPlaylist? = manifest.mediaPlaylist
+            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
             data.streamFormat = Util.HLS_STREAM_FORMAT
-            data.m3u8Url = masterPlaylist?.baseUri ?: mediaPlaylist?.baseUri
+            data.m3u8Url = masterPlaylist.baseUri
         }
         data.downloadSpeedInfo = meter.getInfo()
 
@@ -205,7 +201,7 @@ class ExoPlayerAdapter(
     override val position: Long
         get() {
             val timeline = exoplayer.currentTimeline
-            val currentWindowIndex = exoplayer.currentWindowIndex
+            val currentWindowIndex = exoplayer.currentMediaItemIndex
             if (currentWindowIndex >= 0 && currentWindowIndex < timeline.windowCount) {
                 val currentWindow = Timeline.Window()
                 timeline.getWindow(currentWindowIndex, currentWindow)
@@ -357,7 +353,7 @@ class ExoPlayerAdapter(
             }
 
             override fun onMetadata(eventTime: AnalyticsListener.EventTime, metadata: Metadata) {
-                Log.d(TAG, String.format("DRM Session aquired %d", eventTime.realtimeMs))
+                Log.d(TAG, String.format("DRM Session acquired %d", eventTime.realtimeMs))
             }
 
             override fun onAudioInputFormatChanged(
