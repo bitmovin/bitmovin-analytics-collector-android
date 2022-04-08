@@ -332,9 +332,9 @@ class ExoPlayerAdapter(
             }
 
             override fun onAudioInputFormatChanged(
-                    eventTime: AnalyticsListener.EventTime,
-                    format: Format,
-                    decoderReuseEvaluation: DecoderReuseEvaluation?
+                eventTime: AnalyticsListener.EventTime,
+                format: Format,
+                decoderReuseEvaluation: DecoderReuseEvaluation?
             ) {
                 Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate))
                 try {
@@ -345,9 +345,9 @@ class ExoPlayerAdapter(
             }
 
             override fun onVideoInputFormatChanged(
-                    eventTime: AnalyticsListener.EventTime,
-                    format: Format,
-                    decoderReuseEvaluation: DecoderReuseEvaluation?
+                eventTime: AnalyticsListener.EventTime,
+                format: Format,
+                decoderReuseEvaluation: DecoderReuseEvaluation?
             ) {
                 Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate))
                 try {
