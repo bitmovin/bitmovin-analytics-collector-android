@@ -24,7 +24,7 @@ class ExoPlayerAdapterTest {
 
     @Before
     fun setup() {
-        every { player.currentWindowIndex } returns 0
+        every { player.currentMediaItemIndex } returns 0
         val timeline = mockk<Timeline>(relaxed = true) {
             every { windowCount } returns 1
             every { periodCount } returns 1
@@ -43,13 +43,13 @@ class ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build())
+        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
 
         // assert
         verify(exactly = 1) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
 
         // act
-        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build())
+        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build(), null)
 
         // assert
         verify(exactly = 1) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
@@ -64,13 +64,13 @@ class ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build())
+        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
 
         // assert
         verify(exactly = 1) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
 
         // act
-        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build())
+        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build(), null)
 
         // assert
         verify(exactly = 1) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
@@ -85,7 +85,7 @@ class ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build())
+        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
 
         // assert
         verify(exactly = 0) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
@@ -100,7 +100,7 @@ class ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build())
+        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
 
         // assert
         verify(exactly = 0) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
