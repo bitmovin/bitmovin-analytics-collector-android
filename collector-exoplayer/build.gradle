@@ -5,11 +5,11 @@ apply plugin: 'maven-publish'
 apply from: '../bitmovinpropertiesloader.gradle'
 
 android {
-	compileSdkVersion rootProject.ext.compileSdkVersion
+	compileSdkVersion 31
 
 	defaultConfig {
 		minSdkVersion rootProject.ext.minSdkVersion
-		targetSdkVersion rootProject.ext.targetSdkVersion
+		targetSdkVersion 31
 		versionCode rootProject.ext.versionCode
 		versionName rootProject.ext.version
 
