@@ -35,7 +35,7 @@ import com.google.android.exoplayer2.source.MediaLoadData
 import com.google.android.exoplayer2.source.dash.manifest.DashManifest
 import com.google.android.exoplayer2.source.hls.HlsManifest
 import com.google.android.exoplayer2.source.hls.playlist.HlsMultivariantPlaylist
-import java.util.*
+import java.util.Date
 
 class ExoPlayerAdapter(
     private val exoplayer: ExoPlayer,
