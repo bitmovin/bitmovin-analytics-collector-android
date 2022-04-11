@@ -24,7 +24,7 @@ For Bitmovin Player v2:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.30.2'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.31.0'
 }
 ```
 
@@ -32,7 +32,7 @@ For Bitmovin Player v3:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.6.2'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.7.0'
 }
 ```
 
@@ -40,7 +40,7 @@ For ExoPlayer < v2.12.0:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:1.30.2'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:1.31.0'
 }
 ```
 
@@ -48,7 +48,7 @@ For ExoPlayer >= v2.12.0:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:2.6.2'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:2.7.0'
 }
 ```
 

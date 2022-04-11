@@ -12,8 +12,7 @@ import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEve
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.Format
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.source.LoadEventInfo
@@ -22,7 +21,7 @@ import com.google.android.exoplayer2.source.hls.HlsManifest
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import java.io.IOException
 
-class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
+class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val analyticsListener = object : DefaultAnalyticsListener() {
         override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData) {
@@ -121,7 +120,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
                 val window = Timeline.Window()
                 // maybe needs currentWindowIndex, currentTimeline
                 eventTime.timeline.getWindow(eventTime.windowIndex, window)
-                val initialPlaylistUri = window.mediaItem.playbackProperties?.uri
+                val initialPlaylistUri = window.mediaItem.localConfiguration?.uri
                 if (initialPlaylistUri != null) {
                     return if (initialPlaylistUri == uri) HttpRequestType.MANIFEST_HLS_MASTER else HttpRequestType.MANIFEST_HLS_VARIANT
                 }
@@ -158,7 +157,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
             return HttpRequestType.DRM_OTHER
         }
 
-        private fun mapDataType(eventTime: AnalyticsListener.EventTime, uri: Uri, dataType: Int, trackType: Int, trackFormat: Format?): HttpRequestType {
+        private fun mapDataType(eventTime: AnalyticsListener.EventTime, uri: Uri, dataType: Int, trackType: Int): HttpRequestType {
             when (dataType) {
                 C.DATA_TYPE_DRM -> return mapDrmType(eventTime)
                 C.DATA_TYPE_MEDIA_PROGRESSIVE_LIVE -> return HttpRequestType.MEDIA_PROGRESSIVE
@@ -170,7 +169,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
         }
 
         private fun mapLoadCompletedArgsToHttpRequest(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, statusCode: Int, success: Boolean): HttpRequest {
-            val requestType = mapDataType(eventTime, loadEventInfo.uri, mediaLoadData.dataType, mediaLoadData.trackType, mediaLoadData.trackFormat)
+            val requestType = mapDataType(eventTime, loadEventInfo.uri, mediaLoadData.dataType, mediaLoadData.trackType)
             return HttpRequest(Util.getTimestamp(), requestType, loadEventInfo.dataSpec.uri.toString(), loadEventInfo.uri.toString(), statusCode, loadEventInfo.loadDurationMs, null, loadEventInfo.bytesLoaded, success)
         }
     }

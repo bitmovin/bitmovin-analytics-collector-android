@@ -31,10 +31,10 @@ class ExoPlayerCollector
     )
     constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) : this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context ?: throw IllegalArgumentException("Context cannot be null"))
 
-    override fun createAdapter(exoPlayer: ExoPlayer, analytics: BitmovinAnalytics, stateMachine: PlayerStateMachine, deviceInformationProvider: DeviceInformationProvider, eventDataFactory: EventDataFactory): PlayerAdapter {
-        val featureFactory: FeatureFactory = ExoPlayerFeatureFactory(analytics, exoPlayer)
+    override fun createAdapter(player: ExoPlayer, analytics: BitmovinAnalytics, stateMachine: PlayerStateMachine, deviceInformationProvider: DeviceInformationProvider, eventDataFactory: EventDataFactory): PlayerAdapter {
+        val featureFactory: FeatureFactory = ExoPlayerFeatureFactory(analytics, player)
         return ExoPlayerAdapter(
-            exoPlayer,
+            player,
             config,
             stateMachine,
             featureFactory,

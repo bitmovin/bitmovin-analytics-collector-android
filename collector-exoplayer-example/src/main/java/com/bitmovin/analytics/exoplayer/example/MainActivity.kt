@@ -2,6 +2,7 @@ package com.bitmovin.analytics.exoplayer.example
 
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,28 +16,27 @@ import com.bitmovin.analytics.example.shared.Samples.DASH_DRM_WIDEVINE
 import com.bitmovin.analytics.example.shared.Samples.HLS_REDBULL
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.MediaSourceFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.dash.DashMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
+import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.util.Util
 
-class MainActivity : AppCompatActivity(), DebugListener, Player.EventListener {
+class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
 
-    private var player: SimpleExoPlayer? = null
-    private var playerView: PlayerView? = null
+    private var player: ExoPlayer? = null
+    private var playerView: StyledPlayerView? = null
     private var dataSourceFactory: DataSource.Factory? = null
     private var bitmovinAnalytics: ExoPlayerCollector? = null
     private var bitmovinAnalyticsConfig: BitmovinAnalyticsConfig? = null
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.EventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         eventLogView = findViewById(R.id.eventLog)
-        dataSourceFactory = DefaultDataSourceFactory(this, buildHttpDataSourceFactory())
+        dataSourceFactory = DefaultDataSource.Factory(this, buildHttpDataSourceFactory())
 
         findViewById<Button>(R.id.release_button).setOnClickListener {
             if (player != null) {
@@ -83,14 +83,21 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.EventListener {
         val uri = sample.uri
         val type = Util.inferContentType(uri)
         val builder = MediaItem.fromUri(uri).buildUpon()
-        if (sample.drmScheme != null && sample.drmLicenseUri != null) {
-            builder.setDrmUuid(Util.getDrmUuid(sample.drmScheme!!))
-            builder.setDrmLicenseUri(sample.drmLicenseUri)
-            //            builder.setDrmPlayClearContentWithoutKey(false);
-            //            builder.setDrmForceDefaultLicenseUri(true);
+
+        val sampleDrmLicenseUri = sample.drmLicenseUri
+        if (sample.drmScheme != null && sampleDrmLicenseUri != null) {
+            val sampleDrmSchemeUUID = Util.getDrmUuid(sample.drmScheme!!)
+            if (sampleDrmSchemeUUID != null) {
+                val drmConfiguration = MediaItem.DrmConfiguration.Builder(sampleDrmSchemeUUID)
+                        .setLicenseUri(sampleDrmLicenseUri)
+    //                    .setPlayClearContentWithoutKey(false)
+    //                    .setForceDefaultLicenseUri(true)
+                        .build()
+                builder.setDrmConfiguration(drmConfiguration)
+            }
         }
         val mediaItem = builder.build()
-        val factory: MediaSourceFactory = when (type) {
+        val factory: MediaSource.Factory = when (type) {
             C.TYPE_DASH -> DashMediaSource.Factory(dataSourceFactory!!)
             C.TYPE_SS -> SsMediaSource.Factory(dataSourceFactory!!)
             C.TYPE_HLS -> HlsMediaSource.Factory(dataSourceFactory!!)
@@ -118,7 +125,7 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.EventListener {
         if (player == null) {
             val bandwidthMeter = DefaultBandwidthMeter.Builder(this).build()
 
-            val exoBuilder = SimpleExoPlayer.Builder(this)
+            val exoBuilder = ExoPlayer.Builder(this)
             exoBuilder.setBandwidthMeter(bandwidthMeter)
 
             player = exoBuilder.build()
@@ -188,12 +195,12 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.EventListener {
 
     private var oldIndex = 0
     override fun onPositionDiscontinuity(reason: Int) {
-        val sourceIndex = player!!.currentWindowIndex
+        val sourceIndex = player!!.currentMediaItemIndex
         if (sourceIndex != oldIndex) {
             if (oldIndex >= 0) {
                 mediaSource!!.removeMediaSource(
                     oldIndex,
-                    Handler()
+                    Handler(Looper.getMainLooper())
                 ) {
                     println("Mainactivity isPlaying: " + player!!.isPlaying)
                     println("Mainactivity playbackState: " + player!!.playbackState)

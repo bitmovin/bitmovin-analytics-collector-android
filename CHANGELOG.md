@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v1
 
+## v2.7.0
+
+### Changed
+- updates ExoPlayer to `2.17.0`
+
+### Removed
+- Support for SimpleExoPlayer class
+
+## v1.31.0
+
+### Deprecated
+- `ExoPlayerCollector`
+
 ## v2.6.2
 
 ### Fixed

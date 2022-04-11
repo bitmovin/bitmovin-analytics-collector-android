@@ -12,6 +12,9 @@ import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.google.android.exoplayer2.ExoPlayer
 
+@Deprecated(
+        """Please update version to v2"""
+)
 class ExoPlayerCollector
 /**
  * Bitmovin Analytics
