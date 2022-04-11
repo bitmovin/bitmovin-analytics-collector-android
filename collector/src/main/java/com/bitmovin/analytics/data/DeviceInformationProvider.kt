@@ -21,8 +21,8 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
         if (windowManager != null) {
             windowManager.defaultDisplay.getMetrics(displayMetrics)
 
-            width = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
-            height = (displayMetrics.heightPixels / displayMetrics.density).roundToInt()
+            width = displayMetrics.widthPixels
+            height = displayMetrics.heightPixels
         }
 
         var operatingSystem: String? = null
