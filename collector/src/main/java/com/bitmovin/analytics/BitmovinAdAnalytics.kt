@@ -166,7 +166,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         adSample.timePlayed = exitPosition
         adSample.playPercentage = Util.calculatePercentage(adSample.timePlayed, adSample.ad.duration, true)
 
-        // reset elapseedTimeAdStartup for the next ad, in case there are multiple ads in one ad break
+        // reset elapsedTimeAdStartup for the next ad, in case there are multiple ads in one ad break
         this.elapsedTimeAdStartup = Util.getElapsedTime()
         this.isPlaying = false
         this.sendAnalyticsRequest(adBreak, adSample)

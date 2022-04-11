@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.exoplayer
 
 import android.util.Log
-import android.view.Surface
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.config.SourceMetadata
@@ -23,26 +22,19 @@ import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
-import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.analytics.AnalyticsListener
-import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.decoder.DecoderReuseEvaluation
 import com.google.android.exoplayer2.drm.DrmInitData
-import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.source.LoadEventInfo
 import com.google.android.exoplayer2.source.MediaLoadData
-import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.source.dash.manifest.DashManifest
 import com.google.android.exoplayer2.source.hls.HlsManifest
-import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist
-import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
-import java.lang.Exception
+import com.google.android.exoplayer2.source.hls.playlist.HlsMultivariantPlaylist
 import java.util.Date
 
 class ExoPlayerAdapter(
@@ -78,9 +70,7 @@ class ExoPlayerAdapter(
     private var drmType: String? = null
 
     private fun attachAnalyticsListener() {
-        if (exoplayer is SimpleExoPlayer) {
-            exoplayer.addAnalyticsListener(defaultAnalyticsListener)
-        }
+        exoplayer.addAnalyticsListener(defaultAnalyticsListener)
     }
 
     private fun startup(position: Long) {
@@ -154,7 +144,7 @@ class ExoPlayerAdapter(
 
         // isLive
         data.isLive = Util.getIsLiveFromConfigOrPlayer(
-            playerIsReady, config.isLive, exoplayer.isCurrentWindowDynamic
+            playerIsReady, config.isLive, exoplayer.isCurrentMediaItemDynamic
         )
 
         // version
@@ -170,12 +160,9 @@ class ExoPlayerAdapter(
             data.streamFormat = Util.DASH_STREAM_FORMAT
             data.mpdUrl = manifest.location?.toString() ?: manifestUrl
         } else if (isHlsManifestClassLoaded && manifest is HlsManifest) {
-            // The nullability changed in the ExoPlayer source code, that's
-            // why we manually declare the playlists nullable
-            val masterPlaylist: HlsMasterPlaylist? = manifest.masterPlaylist
-            val mediaPlaylist: HlsMediaPlaylist? = manifest.mediaPlaylist
+            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
             data.streamFormat = Util.HLS_STREAM_FORMAT
-            data.m3u8Url = masterPlaylist?.baseUri ?: mediaPlaylist?.baseUri
+            data.m3u8Url = masterPlaylist.baseUri
         }
         data.downloadSpeedInfo = meter.getInfo()
 
@@ -188,9 +175,7 @@ class ExoPlayerAdapter(
         isInInitialBufferState = false
         manifestUrl = null
         exoplayer.removeListener(defaultPlayerEventListener)
-        if (exoplayer is SimpleExoPlayer) {
-            exoplayer.removeAnalyticsListener(defaultAnalyticsListener)
-        }
+        exoplayer.removeAnalyticsListener(defaultAnalyticsListener)
         meter.reset()
         bitrateEventDataManipulator.reset()
         stateMachine.resetStateMachine()
@@ -206,7 +191,7 @@ class ExoPlayerAdapter(
     override val position: Long
         get() {
             val timeline = exoplayer.currentTimeline
-            val currentWindowIndex = exoplayer.currentWindowIndex
+            val currentWindowIndex = exoplayer.currentMediaItemIndex
             if (currentWindowIndex >= 0 && currentWindowIndex < timeline.windowCount) {
                 val currentWindow = Timeline.Window()
                 timeline.getWindow(currentWindowIndex, currentWindow)
@@ -314,14 +299,7 @@ class ExoPlayerAdapter(
                 }
             }
 
-            override fun onPositionDiscontinuity(eventTime: AnalyticsListener.EventTime, reason: Int) {
-                Log.d(TAG, "onPositionDiscontinuity")
-            }
-
-            override fun onTimelineChanged(eventTime: AnalyticsListener.EventTime, reason: Int) {
-                Log.d(TAG, "onTimelineChanged")
-            }
-
+            // TODO Refactor code to work in new method
             override fun onSeekStarted(eventTime: AnalyticsListener.EventTime) {
                 try {
                     Log.d(TAG, "onSeekStarted on position: " + eventTime.currentPlaybackPositionMs)
@@ -353,17 +331,10 @@ class ExoPlayerAdapter(
                 }
             }
 
-            override fun onSurfaceSizeChanged(eventTime: AnalyticsListener.EventTime, width: Int, height: Int) {
-                Log.d(TAG, "onSurfaceSizeChanged")
-            }
-
-            override fun onMetadata(eventTime: AnalyticsListener.EventTime, metadata: Metadata) {
-                Log.d(TAG, String.format("DRM Session aquired %d", eventTime.realtimeMs))
-            }
-
             override fun onAudioInputFormatChanged(
                 eventTime: AnalyticsListener.EventTime,
-                format: Format
+                format: Format,
+                decoderReuseEvaluation: DecoderReuseEvaluation?
             ) {
                 Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate))
                 try {
@@ -375,7 +346,8 @@ class ExoPlayerAdapter(
 
             override fun onVideoInputFormatChanged(
                 eventTime: AnalyticsListener.EventTime,
-                format: Format
+                format: Format,
+                decoderReuseEvaluation: DecoderReuseEvaluation?
             ) {
                 Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate))
                 try {
@@ -383,17 +355,6 @@ class ExoPlayerAdapter(
                 } catch (e: Exception) {
                     Log.d(TAG, e.message, e)
                 }
-            }
-
-            override fun onAudioAttributesChanged(
-                eventTime: AnalyticsListener.EventTime,
-                audioAttributes: AudioAttributes
-            ) {
-                Log.d(TAG, "onAudioAttributesChanged")
-            }
-
-            override fun onVolumeChanged(eventTime: AnalyticsListener.EventTime, volume: Float) {
-                Log.d(TAG, "onVolumeChanged")
             }
 
             override fun onDroppedVideoFrames(
@@ -408,29 +369,11 @@ class ExoPlayerAdapter(
                 }
             }
 
-            override fun onVideoSizeChanged(
-                eventTime: AnalyticsListener.EventTime,
-                width: Int,
-                height: Int,
-                unappliedRotationDegrees: Int,
-                pixelWidthHeightRatio: Float
-            ) {
-                Log.d(
-                    TAG, String.format(
-                        "On Video Sized Changed: %d x %d Rotation Degrees: %d, PixelRation: %f",
-                        width, height, unappliedRotationDegrees, pixelWidthHeightRatio
-                    )
-                )
-            }
-
-            override fun onRenderedFirstFrame(
-                eventTime: AnalyticsListener.EventTime,
-                surface: Surface?
-            ) {
+            override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime, output: Any, renderTimeMs: Long) {
                 playerIsReady = true
             }
 
-            override fun onDrmSessionAcquired(eventTime: AnalyticsListener.EventTime) {
+            override fun onDrmSessionAcquired(eventTime: AnalyticsListener.EventTime, state: Int) {
                 try {
                     drmLoadStartTime = eventTime.realtimeMs
                     Log.d(TAG, String.format("DRM Session aquired %d", eventTime.realtimeMs))
@@ -447,28 +390,13 @@ class ExoPlayerAdapter(
                     Log.d(TAG, e.message, e)
                 }
             }
-
-            override fun onDrmKeysRestored(eventTime: AnalyticsListener.EventTime) {
-                Log.d(TAG, String.format("DRM Keys restored %d", eventTime.realtimeMs))
-            }
-
-            override fun onDrmSessionReleased(eventTime: AnalyticsListener.EventTime) {
-                Log.d(TAG, "onDrmSessionReleased")
-            }
         }
     }
 
     private fun createPlayerEventListener(): DefaultPlayerEventListener {
         return object : DefaultPlayerEventListener() {
-            override fun onRepeatModeChanged(repeatMode: Int) {
-                Log.d(TAG, "onRepeatModeChanged")
-            }
 
-            override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-                Log.d(TAG, "onShuffleModeEnabledChanged")
-            }
-
-            override fun onPlayerError(error: ExoPlaybackException) {
+            override fun onPlayerError(error: PlaybackException) {
                 try {
                     Log.d(TAG, "onPlayerError")
                     val videoTime = position
@@ -481,33 +409,6 @@ class ExoPlayerAdapter(
                 } catch (e: Exception) {
                     Log.d(TAG, e.message, e)
                 }
-            }
-
-            override fun onPositionDiscontinuity(reason: Int) {
-                Log.d(TAG, "onPositionDiscontinuity")
-            }
-
-            override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
-                Log.d(TAG, "onPlaybackParametersChanged")
-            }
-
-            override fun onPlaybackSuppressionReasonChanged(playbackSuppressionReason: Int) {
-                Log.d(TAG, "onPlaybackSuppressionReasonChanged $playbackSuppressionReason")
-            }
-
-            override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-                Log.d(TAG, "onTimelineChanged")
-            }
-
-            override fun onTracksChanged(
-                trackGroups: TrackGroupArray,
-                trackSelections: TrackSelectionArray
-            ) {
-                Log.d(TAG, "onTracksChanged")
-            }
-
-            override fun onIsLoadingChanged(isLoading: Boolean) {
-                Log.d(TAG, "onIsLoadingChanged")
             }
         }
     }

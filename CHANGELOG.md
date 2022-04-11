@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+### Changed
+- updates ExoPlayer to `2.17.0`
+
 ### Fixed
 - Wrong transitions from `startup` state to `paused` state
+
+### Removed
+- Support for SimpleExoPlayer class
 
 ## Development v1
 

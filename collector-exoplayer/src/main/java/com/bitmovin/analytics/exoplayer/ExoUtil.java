@@ -26,8 +26,8 @@ public class ExoUtil {
         try {
             Field versionField = ExoPlayerLibraryInfo.class.getField("VERSION");
             return (String) versionField.get(null);
-        } catch (NoSuchFieldException e) {
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException ignored) {
+        } catch (IllegalAccessException ignored) {
         }
         return "unknown";
     }
