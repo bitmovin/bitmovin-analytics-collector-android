@@ -14,9 +14,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - updates ExoPlayer to `2.17.0`
 
-### Fixed
-- Wrong transitions from `startup` state to `paused` state
-
 ### Removed
 - Support for SimpleExoPlayer class
 
@@ -24,6 +21,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Deprecated
 - `ExoPlayerCollector`
+
+## v2.6.2
+
+### Fixed
+- Wrong transitions from `startup` state to `paused` state
+
+## v1.30.2
 
 ### Fixed
 - Wrong transitions from `startup` state to `paused` state
