@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+## Development v1
+
+## v2.6.2
+
 ### Fixed
 - Wrong transitions from `startup` state to `paused` state
 
-## Development v1
+## v1.30.2
 
 ### Fixed
 - Wrong transitions from `startup` state to `paused` state
