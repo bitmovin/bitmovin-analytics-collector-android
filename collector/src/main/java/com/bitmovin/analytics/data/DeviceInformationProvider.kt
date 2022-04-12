@@ -6,7 +6,6 @@ import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import com.bitmovin.analytics.utils.Util
-import kotlin.math.roundToInt
 
 open class DeviceInformationProvider(val context: Context, val userAgent: String) {
     var isTV: Boolean = Util.isTVDevice(context)
