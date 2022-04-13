@@ -6,10 +6,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
+
+## Development v1
+
+## v2.7.1
+
 ### Fixed
 - displayed wrong screen size for devices with a logical display density != 1
 
-## Development v1
+## v1.31.1
+
 ### Fixed
 - displayed wrong screen size for devices with a logical display density != 1
 
