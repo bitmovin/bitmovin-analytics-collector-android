@@ -6,7 +6,6 @@ import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import com.bitmovin.analytics.utils.Util
-import kotlin.math.roundToInt
 
 open class DeviceInformationProvider(val context: Context, val userAgent: String) {
     var isTV: Boolean = Util.isTVDevice(context)
@@ -21,8 +20,8 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
         if (windowManager != null) {
             windowManager.defaultDisplay.getMetrics(displayMetrics)
 
-            width = (displayMetrics.widthPixels / displayMetrics.density).roundToInt()
-            height = (displayMetrics.heightPixels / displayMetrics.density).roundToInt()
+            width = displayMetrics.widthPixels
+            height = displayMetrics.heightPixels
         }
 
         var operatingSystem: String? = null
