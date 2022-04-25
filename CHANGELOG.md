@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+### Added
+- expose used `userId` on Collector
+
 ## Development v1
+
+### Added
+- expose used `userId` on Collector
 
 ## v2.7.1
 
