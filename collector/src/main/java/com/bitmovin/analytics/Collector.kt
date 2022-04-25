@@ -7,6 +7,7 @@ interface Collector<TPlayer> {
     val impressionId: String?
     val config: BitmovinAnalyticsConfig
     val version: String
+    val userId: String
 
     fun attachPlayer(player: TPlayer)
     fun detachPlayer()

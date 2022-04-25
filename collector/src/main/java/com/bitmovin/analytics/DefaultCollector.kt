@@ -28,6 +28,9 @@ abstract class DefaultCollector<TPlayer> protected constructor(final override va
     override val version: String
         get() = Util.getAnalyticsVersion()
 
+    override val userId: String
+        get() = userIdProvider.userId()
+
     protected abstract fun createAdapter(player: TPlayer, analytics: BitmovinAnalytics, stateMachine: PlayerStateMachine, deviceInformationProvider: DeviceInformationProvider, eventDataFactory: EventDataFactory): PlayerAdapter
 
     override fun attachPlayer(player: TPlayer) {
