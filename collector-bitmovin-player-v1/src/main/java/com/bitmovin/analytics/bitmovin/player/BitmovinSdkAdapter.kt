@@ -46,7 +46,6 @@ import com.bitmovin.player.api.event.listener.OnSubtitleChangedListener
 import com.bitmovin.player.api.event.listener.OnVideoPlaybackQualityChangedListener
 import com.bitmovin.player.config.media.MediaSourceType
 import com.bitmovin.player.config.track.SubtitleTrack
-import java.lang.Exception
 
 class BitmovinSdkAdapter(
     private val bitmovinPlayer: BitmovinPlayer,
@@ -216,6 +215,11 @@ class BitmovinSdkAdapter(
 
         // DRM Information
         data.drmType = drmType
+
+        // Player Key
+        if (config.playerKey.isBlank()) {
+            data.playerKey = bitmovinPlayer.config?.key
+        }
     }
 
     private fun getSubtitleDto(subtitleTrack: SubtitleTrack?): SubtitleDto {
