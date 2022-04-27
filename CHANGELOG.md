@@ -9,11 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - expose used `userId` on Collector
+- BitmovinPlayer: if `playerKey` is not set on `BitmovinAnalyticsConfig` we set the value from the player
 
 ## Development v1
 
 ### Added
 - expose used `userId` on Collector
+- BitmovinPlayer: if `playerKey` is not set on `BitmovinAnalyticsConfig` we set the value from the player
 
 ## v2.7.1
 
