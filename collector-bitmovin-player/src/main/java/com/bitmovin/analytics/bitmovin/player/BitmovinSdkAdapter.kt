@@ -32,7 +32,6 @@ import com.bitmovin.player.api.event.on
 import com.bitmovin.player.api.media.subtitle.SubtitleTrack
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceType
-import java.lang.Exception
 
 class BitmovinSdkAdapter(
     private val player: Player,
@@ -223,6 +222,10 @@ class BitmovinSdkAdapter(
         val audioTrack = player.audio
         if (audioTrack?.id != null) {
             data.audioLanguage = audioTrack.language
+        }
+
+        if (config.playerKey.isBlank()) {
+            data.playerKey = player.config.key
         }
     }
 

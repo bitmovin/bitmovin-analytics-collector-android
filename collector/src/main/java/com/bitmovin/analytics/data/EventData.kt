@@ -7,7 +7,7 @@ class EventData(
     val impressionId: String,
     val userId: String,
     val key: String?,
-    val playerKey: String?,
+    var playerKey: String?,
     val videoId: String?,
     val videoTitle: String?,
     val customUserId: String?,
