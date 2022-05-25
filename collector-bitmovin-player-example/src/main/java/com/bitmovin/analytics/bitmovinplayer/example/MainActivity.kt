@@ -204,7 +204,6 @@ class MainActivity : AppCompatActivity() {
             bitmovinAnalyticsConfig.customData6 = "customData6"
             bitmovinAnalyticsConfig.customData7 = "customData7"
             bitmovinAnalyticsConfig.path = "/vod/new/"
-            bitmovinAnalyticsConfig.heartbeatInterval = 59700
             bitmovinAnalyticsConfig.ads = false
             bitmovinAnalyticsConfig.isLive = false
 

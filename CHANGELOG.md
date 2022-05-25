@@ -11,11 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - expose used `userId` on Collector
 - BitmovinPlayer: if `playerKey` is not set on `BitmovinAnalyticsConfig` we set the value from the player
 
+### Removed
+- Heartbeat interval duration configuration on `BitmovinAnalyticsConfig`
+
 ## Development v1
 
 ### Added
 - expose used `userId` on Collector
 - BitmovinPlayer: if `playerKey` is not set on `BitmovinAnalyticsConfig` we set the value from the player
+
+### Removed
+- Heartbeat interval duration configuration on `BitmovinAnalyticsConfig`
 
 ## v2.7.1
 

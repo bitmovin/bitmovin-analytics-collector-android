@@ -120,7 +120,6 @@ bitmovinAnalyticsConfig.setCustomData5("customData5");
 bitmovinAnalyticsConfig.setCustomData6("customData6");
 bitmovinAnalyticsConfig.setCustomData7("customData7");
 bitmovinAnalyticsConfig.setIsLive(false);
-bitmovinAnalyticsConfig.setHeartbeatInterval(59700); // value is in ms
 ```
 
 A [full example app](https://github.com/bitmovin/bitmovin-analytics-collector-android/tree/main/collector-bitmovin-player-example) can be seen in the github repo

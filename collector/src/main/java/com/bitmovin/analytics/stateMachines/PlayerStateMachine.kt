@@ -11,6 +11,7 @@ import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.utils.Util
+import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
 
 class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics: BitmovinAnalytics, internal val bufferingTimeoutTimer: ObservableTimer, internal val qualityChangeEventLimiter: QualityChangeEventLimiter, internal val videoStartTimeoutTimer: ObservableTimer, private val heartbeatHandler: Handler = Handler()) {
     internal val listeners = ObservableSupport<StateMachineListener>()
@@ -31,7 +32,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         private set
 
     private var currentRebufferingIntervalIndex = 0
-    private val heartbeatDelay = config.heartbeatInterval.toLong() // default to 60 seconds
+    private val heartbeatDelay = HEARTBEAT_INTERVAL.toLong() // 60 seconds
     var videoStartFailedReason: VideoStartFailedReason? = null
 
     fun enableHeartbeat() {

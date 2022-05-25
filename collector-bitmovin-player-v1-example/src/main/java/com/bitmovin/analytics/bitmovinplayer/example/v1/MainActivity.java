@@ -108,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmovinAnalyticsConfig.setCustomData6("customData6");
         bitmovinAnalyticsConfig.setCustomData7("customData7");
         bitmovinAnalyticsConfig.setPath("/vod/new/");
-        bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
         bitmovinAnalyticsConfig.setAds(false);
         bitmovinAnalyticsConfig.setIsLive(false);
 
