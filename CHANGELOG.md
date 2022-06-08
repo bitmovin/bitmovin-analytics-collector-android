@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - Heartbeat interval duration configuration on `BitmovinAnalyticsConfig`
 
+### Changed
+- [INTERNAL] upgrades gradle and gradle plugin to latest version
+
 ## Development v1
 
 ### Added
@@ -22,6 +25,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 - Heartbeat interval duration configuration on `BitmovinAnalyticsConfig`
+
+### Changed
+- [INTERNAL] upgrades gradle and gradle plugin to latest version
 
 ## v2.7.1
 
