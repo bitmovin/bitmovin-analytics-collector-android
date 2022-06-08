@@ -10,7 +10,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:4.2.2'
+		classpath 'com.android.tools.build:gradle:7.2.1'
 		classpath "com.diffplug.spotless:spotless-plugin-gradle:5.9.0"
 		classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.8"
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
