@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+## Development v1
+
+## v2.8.0
+
 ### Added
 - expose used `userId` on Collector
 - BitmovinPlayer: if `playerKey` is not set on `BitmovinAnalyticsConfig` we set the value from the player
@@ -17,7 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - [INTERNAL] upgrades gradle and gradle plugin to latest version
 
-## Development v1
+## v1.32.0
 
 ### Added
 - expose used `userId` on Collector
