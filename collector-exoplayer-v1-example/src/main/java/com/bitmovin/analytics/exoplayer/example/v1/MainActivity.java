@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity
             // Step 5: Create, prepare, and play media source
             playerView.setPlayer(player);
 
-            MediaSource mediaSource = buildMediaSource(Samples.INSTANCE.getHLS_DRM_WIDEVINE());
+            MediaSource mediaSource = buildMediaSource(Samples.INSTANCE.getHLS());
             // mediaSource = new ConcatenatingMediaSource(dashMediaSource, dashMediaSource);
 
             player.prepare(mediaSource);
