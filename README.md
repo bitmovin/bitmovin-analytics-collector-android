@@ -44,14 +44,21 @@ dependencies {
 }
 ```
 
-For ExoPlayer >= v2.12.0:
+For ExoPlayer version between >= v2.12.0 and < v2.17.0:
+
+```gradle
+dependencies {
+    implementation 'com.bitmovin.analytics:collector-exoplayer:2.6.2'
+}
+```
+
+For ExoPlayer version between >= v2.17.0 and < v2.18.0:
 
 ```gradle
 dependencies {
     implementation 'com.bitmovin.analytics:collector-exoplayer:2.7.1'
 }
 ```
-
 ## Examples
 
 The following example creates a BitmovinAnalytics object and attaches an Bitmovin Native SDK instance to it.
