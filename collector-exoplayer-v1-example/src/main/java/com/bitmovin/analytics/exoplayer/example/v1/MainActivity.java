@@ -126,7 +126,6 @@ public class MainActivity extends AppCompatActivity
             bitmovinAnalyticsConfig.setCustomData6("customData6");
             bitmovinAnalyticsConfig.setCustomData7("customData7");
             bitmovinAnalyticsConfig.setPath("/vod/new/");
-            bitmovinAnalyticsConfig.setHeartbeatInterval(59700);
             bitmovinAnalyticsConfig.setIsLive(false);
             bitmovinAnalyticsConfig.getConfig().setTryResendDataOnFailedConnection(true);
 

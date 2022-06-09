@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
 import com.bitmovin.analytics.enums.PlayerType
+import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
 
 class BitmovinAnalyticsConfig() : Parcelable {
     constructor(key: String, playerKey: String) : this() {
@@ -212,7 +213,8 @@ class BitmovinAnalyticsConfig() : Parcelable {
     /**
      * The frequency that heartbeats should be sent, in milliseconds
      */
-    var heartbeatInterval = 59700
+    @Deprecated("No longer possible to change default value of 59700ms")
+    var heartbeatInterval = HEARTBEAT_INTERVAL
 
     /**
      * Human readable title of the video asset currently playing

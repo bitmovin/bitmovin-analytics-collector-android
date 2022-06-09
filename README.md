@@ -24,7 +24,7 @@ For Bitmovin Player v2:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.31.1'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:1.32.0'
 }
 ```
 
@@ -32,7 +32,7 @@ For Bitmovin Player v3:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.7.1'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.8.0'
 }
 ```
 
@@ -40,7 +40,7 @@ For ExoPlayer < v2.12.0:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:1.31.1'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:1.32.0'
 }
 ```
 
@@ -56,7 +56,7 @@ For ExoPlayer version between >= v2.17.0 and < v2.18.0:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:2.7.1'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:2.8.0'
 }
 ```
 ## Examples
@@ -127,7 +127,6 @@ bitmovinAnalyticsConfig.setCustomData5("customData5");
 bitmovinAnalyticsConfig.setCustomData6("customData6");
 bitmovinAnalyticsConfig.setCustomData7("customData7");
 bitmovinAnalyticsConfig.setIsLive(false);
-bitmovinAnalyticsConfig.setHeartbeatInterval(59700); // value is in ms
 ```
 
 A [full example app](https://github.com/bitmovin/bitmovin-analytics-collector-android/tree/main/collector-bitmovin-player-example) can be seen in the github repo
