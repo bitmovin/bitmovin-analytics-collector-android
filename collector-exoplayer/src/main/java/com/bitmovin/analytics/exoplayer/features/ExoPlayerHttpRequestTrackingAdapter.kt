@@ -5,7 +5,6 @@ import android.util.Log
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
-import com.bitmovin.analytics.exoplayer.DefaultAnalyticsListener
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestType
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
@@ -23,7 +22,7 @@ import java.io.IOException
 
 class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
-    private val analyticsListener = object : DefaultAnalyticsListener() {
+    private val analyticsListener = object : AnalyticsListener {
         override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData) {
             catchAndLogException("Exception occurred in onLoadCompleted") {
                 val statusCode = loadEventInfo.responseHeaders.responseCode ?: 0
