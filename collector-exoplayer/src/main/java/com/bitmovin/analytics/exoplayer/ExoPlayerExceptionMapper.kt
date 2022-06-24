@@ -30,15 +30,15 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
 
         when (val exception = throwable.cause ?: throwable) {
             is HttpDataSource.InvalidResponseCodeException -> {
-                errorCodeDescription = "$prefix: InvalidResponseCodeException"
+                errorCodeDescription = "$prefix: InvalidResponseCodeException (Status Code: ${exception.responseCode}, URI: ${exception.dataSpec.uri})"
                 errorMessage = "Data Source request failed with HTTP status: ${exception.responseCode} - ${exception.dataSpec.uri}"
             }
             is HttpDataSource.InvalidContentTypeException -> {
-                errorCodeDescription = "$prefix: InvalidContentTypeException"
+                errorCodeDescription = "$prefix: InvalidContentTypeException (ContentType: ${exception.contentType})"
                 errorMessage = "Invalid Content Type: ${exception.contentType}"
             }
             is HttpDataSource.HttpDataSourceException -> {
-                errorCodeDescription = "$prefix: HttpDataSourceException"
+                errorCodeDescription = "$prefix: HttpDataSourceException (URI: ${exception.dataSpec.uri})"
                 errorMessage = "Unable to connect: ${exception.dataSpec.uri}"
             }
             is BehindLiveWindowException -> {
@@ -46,8 +46,8 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
                 errorMessage = "Behind live window: required segments not available"
             }
             else -> {
-                errorMessage = exceptionMessage
                 errorCodeDescription = "$prefix: $exceptionMessage"
+                errorMessage = exceptionMessage
             }
         }
         val legacyErrorData = LegacyErrorData(errorMessage, exceptionDetails)
