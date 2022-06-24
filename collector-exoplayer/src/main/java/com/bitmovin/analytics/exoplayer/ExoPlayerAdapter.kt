@@ -216,8 +216,8 @@ class ExoPlayerAdapter(
         meter.reset()
     }
 
-    private fun createAnalyticsListener(): DefaultAnalyticsListener {
-        return object : DefaultAnalyticsListener() {
+    private fun createAnalyticsListener(): AnalyticsListener {
+        return object : AnalyticsListener {
             override fun onPlayWhenReadyChanged(eventTime: AnalyticsListener.EventTime, playWhenReady: Boolean, reason: Int) {
                 Log.d(TAG, String.format("onPlayWhenReadyChanged: %b, %d", playWhenReady, reason))
                 // if player preload is setup without autoplay being enabled
@@ -393,8 +393,8 @@ class ExoPlayerAdapter(
         }
     }
 
-    private fun createPlayerEventListener(): DefaultPlayerEventListener {
-        return object : DefaultPlayerEventListener() {
+    private fun createPlayerEventListener(): Player.Listener {
+        return object : Player.Listener {
 
             override fun onPlayerError(error: PlaybackException) {
                 try {
@@ -416,10 +416,13 @@ class ExoPlayerAdapter(
     private fun addDrmType(mediaLoadData: MediaLoadData) {
         var drmType: String? = null
         var i = 0
-        while (drmType == null && i < mediaLoadData.trackFormat?.drmInitData?.schemeDataCount ?: 0) {
-            val data = mediaLoadData.trackFormat?.drmInitData?.get(i)
-            drmType = getDrmTypeFromSchemeData(data)
-            i++
+        val drmInitData = mediaLoadData.trackFormat?.drmInitData
+        if (drmInitData != null) {
+            while (drmType == null && i < drmInitData.schemeDataCount) {
+                val data = drmInitData.get(i)
+                drmType = getDrmTypeFromSchemeData(data)
+                i++
+            }
         }
         this.drmType = drmType
     }

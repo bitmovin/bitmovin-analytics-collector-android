@@ -20,33 +20,41 @@ class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
             4 to "Out of memory Error")
 
     override fun map(throwable: Throwable): ErrorCode {
+        val exceptionType = getExceptionType(throwable)
+        val exceptionMessage = throwable.message ?: ""
+        val exceptionDetails = throwable.topOfStacktrace
+        val prefix = errorMessages[exceptionType] ?: "Unknown Error"
 
-        val type = getExceptionType(throwable)
-        var message = errorMessages[type] ?: "Unknown Error"
-        val legacyErrorData: LegacyErrorData
+        val errorMessage: String
+        val errorCodeDescription: String
 
         when (val exception = throwable.cause ?: throwable) {
             is HttpDataSource.InvalidResponseCodeException -> {
-                message += ": InvalidResponseCodeException"
-                legacyErrorData = LegacyErrorData("Data Source request failed with HTTP status: " + exception.responseCode + " - " + exception.dataSpec.uri, exception.topOfStacktrace)
+                errorCodeDescription = "$prefix: InvalidResponseCodeException (Status Code: ${exception.responseCode}, URI: ${exception.dataSpec.uri})"
+                errorMessage = "Data Source request failed with HTTP status: ${exception.responseCode} - ${exception.dataSpec.uri}"
             }
             is HttpDataSource.InvalidContentTypeException -> {
-                message += ": InvalidContentTypeException"
-                legacyErrorData = LegacyErrorData("Invalid Content Type: " + exception.contentType, exception.topOfStacktrace)
+                errorCodeDescription = "$prefix: InvalidContentTypeException (ContentType: ${exception.contentType})"
+                errorMessage = "Invalid Content Type: ${exception.contentType}"
             }
             is HttpDataSource.HttpDataSourceException -> {
-                message += ": HttpDataSourceException"
-                legacyErrorData = LegacyErrorData("Unable to connect: " + exception.dataSpec.uri, exception.topOfStacktrace)
+                errorCodeDescription = "$prefix: HttpDataSourceException (URI: ${exception.dataSpec.uri})"
+                errorMessage = "Unable to connect: ${exception.dataSpec.uri}"
             }
             is BehindLiveWindowException -> {
-                message += ": BehindLiveWindowException"
-                legacyErrorData = LegacyErrorData("Behind live window: required segments not available", exception.topOfStacktrace)
+                errorCodeDescription = "$prefix: BehindLiveWindowException"
+                errorMessage = "Behind live window: required segments not available"
             }
-            else -> legacyErrorData = LegacyErrorData(exception.message ?: "", exception.topOfStacktrace)
+            else -> {
+                errorCodeDescription = "$prefix: $exceptionMessage"
+                errorMessage = exceptionMessage
+            }
         }
 
-        val errorData = ErrorData(legacyErrorData.msg, legacyErrorData.details.toList())
-        return ErrorCode(type, message, errorData, legacyErrorData)
+        val legacyErrorData = LegacyErrorData(errorMessage, exceptionDetails)
+
+        val errorData = ErrorData(errorMessage, exceptionDetails.toList())
+        return ErrorCode(exceptionType, errorCodeDescription, errorData, legacyErrorData)
     }
 
     private fun getExceptionType(throwable: Throwable): Int {
