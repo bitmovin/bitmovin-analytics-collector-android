@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v1
 
+## v2.9.0
+
+### Added
+- Add exception message to `error_message` field of sample for ExoPlayer collector
+
+## v1.33.0
+
+### Added
+- Add exception message to `error_message` field of sample for ExoPlayer collector
+
 ## v2.8.0
 
 ### Added
