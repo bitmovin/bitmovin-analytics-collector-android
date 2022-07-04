@@ -12,7 +12,6 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Sample
-import com.bitmovin.analytics.example.shared.Samples.DASH_DRM_WIDEVINE
 import com.bitmovin.analytics.example.shared.Samples.HLS_REDBULL
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector
 import com.google.android.exoplayer2.C
@@ -27,10 +26,10 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.HttpDataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSource
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.google.android.exoplayer2.util.Util
 
 class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
@@ -60,14 +59,15 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
         findViewById<Button>(R.id.create_button).setOnClickListener { initializeExoPlayer() }
 
         findViewById<Button>(R.id.source_change_button).setOnClickListener {
-            bitmovinAnalytics!!.detachPlayer()
-
-            val mediaSource = buildMediaSource(DASH_DRM_WIDEVINE)
-            bitmovinAnalyticsConfig!!.videoId = "DRMVideo-id"
-            bitmovinAnalyticsConfig!!.title = "DRM Video Title"
-
-            bitmovinAnalytics!!.attachPlayer(player!!)
-            player!!.setMediaSource(mediaSource)
+//            bitmovinAnalytics!!.detachPlayer()
+//
+//            val mediaSource = buildMediaSource(DASH_DRM_WIDEVINE)
+//            bitmovinAnalyticsConfig!!.videoId = "DRMVideo-id"
+//            bitmovinAnalyticsConfig!!.title = "DRM Video Title"
+//
+//            bitmovinAnalytics!!.attachPlayer(player!!)
+//            player!!.setMediaSource(mediaSource)
+            bitmovinAnalytics?.attachPlayer(player!!)
         }
 
         findViewById<Button>(R.id.set_custom_data).setOnClickListener {
@@ -144,7 +144,7 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
             bitmovinAnalytics = bitmovinAnalytics
 
             // Step 3: Attach ExoPlayer
-            bitmovinAnalytics?.attachPlayer(player!!)
+//            bitmovinAnalytics?.attachPlayer(player!!)
 
             // Step 4: Create, prepare, and play media source
             playerView!!.player = player
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
 //            val concatenatingMediaSource: ConcatenatingMediaSource = buildConcatenatingMediaSource()
 //            player!!.setMediaSource(concatenatingMediaSource)
 
-            player!!.playWhenReady = false
+            player!!.playWhenReady = true
             // without prepare() it will not start autoplay
             // prepare also starts preloading data before user clicks play
             player!!.prepare()
