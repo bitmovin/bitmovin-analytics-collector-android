@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+### Changed
+- updates ExoPlayer to `2.18.X`
+
 ## Development v1
 
 ## v2.9.0
