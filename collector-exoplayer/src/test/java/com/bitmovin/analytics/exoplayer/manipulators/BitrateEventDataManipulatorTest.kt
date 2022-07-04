@@ -5,7 +5,7 @@ import com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO
 import com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
-import com.google.android.exoplayer2.TracksInfo
+import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.source.TrackGroup
 import io.mockk.every
 import io.mockk.mockk
@@ -208,15 +208,15 @@ class BitrateEventDataManipulatorTest {
     }
 
     private fun prepareExoToReturnFormat(exoPlayer: ExoPlayer, videoFormat: Format = mockk(), audioFormat: Format = mockk()) {
-        every { exoPlayer.currentTracksInfo } answers { TracksInfo(arrayListOf(buildMockTrackSelection(videoFormat, TRACK_TYPE_VIDEO), buildMockTrackSelection(audioFormat, TRACK_TYPE_AUDIO))) }
+        every { exoPlayer.currentTracks } answers { Tracks(arrayListOf(buildMockTrackSelection(videoFormat, TRACK_TYPE_VIDEO), buildMockTrackSelection(audioFormat, TRACK_TYPE_AUDIO))) }
     }
 
-    private fun buildMockTrackSelection(format: Format, trackType: Int): TracksInfo.TrackGroupInfo {
-        val mockTrackGroupInfo = mockk<TracksInfo.TrackGroupInfo>(relaxed = true)
-        every { mockTrackGroupInfo.trackType } answers { trackType }
+    private fun buildMockTrackSelection(format: Format, trackType: Int): Tracks.Group {
+        val mockTrackGroupInfo = mockk<Tracks.Group>(relaxed = true)
+        every { mockTrackGroupInfo.type } answers { trackType }
         val mockTrackGroup = mockk<TrackGroup>(relaxed = true)
         every { mockTrackGroup.getFormat(0) } answers { format }
-        every { mockTrackGroupInfo.trackGroup } answers { mockTrackGroup }
+        every { mockTrackGroupInfo.mediaTrackGroup } answers { mockTrackGroup }
         return mockTrackGroupInfo
     }
 }

@@ -60,14 +60,11 @@ class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataM
     }
 
     private fun getCurrentFormatFromPlayer(trackType: Int): Format? {
-        if (exoplayer.currentTracksInfo == null) {
-            return null
-        }
 
-        val trackInfo = exoplayer.currentTracksInfo.trackGroupInfos.firstOrNull { track -> track.trackType == trackType }
+        val trackInfo = exoplayer.currentTracks.groups.firstOrNull { track -> track.type == trackType }
                 ?: return null
 
-        var format = trackInfo.trackGroup.getFormat(0) ?: null
+        var format = trackInfo.mediaTrackGroup.getFormat(0)
         try {
             val getSelectedFormatMethod = trackInfo.javaClass.getMethod("getSelectedFormat")
             format = getSelectedFormatMethod.invoke(trackInfo) as Format
