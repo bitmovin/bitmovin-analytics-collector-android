@@ -123,6 +123,9 @@ class ExoPlayerAdapter(
                     TAG,
                     "Collector was attached while media source was already playing, transitioning to playing state"
                 )
+
+                // We need to wait just a little to not run into videoStartupTime = 0
+                Thread.sleep(1)
                 stateMachine.transitionState(PlayerStates.PLAYING, position)
             }
         }
