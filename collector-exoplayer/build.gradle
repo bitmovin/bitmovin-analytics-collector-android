@@ -69,7 +69,7 @@ dependencies {
 	// only add `api` dependencies to the resulting pom file.
 	api("com.google.android.exoplayer:exoplayer") {
 		version {
-			strictly "[2.17.0, 2.18.0["
+			strictly "[2.18.0, 2.19.0["
 		}
 	}
 }
