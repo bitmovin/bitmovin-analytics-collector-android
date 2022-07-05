@@ -43,7 +43,6 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMasterPlaylist
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import java.io.IOException
-import java.lang.Exception
 import java.util.Date
 
 class ExoPlayerAdapter(
@@ -126,6 +125,9 @@ class ExoPlayerAdapter(
                     TAG,
                     "Collector was attached while media source was already playing, transitioning to playing state"
                 )
+
+                // We need to add at least one ms here to not run into videoStartupTime = 0
+                stateMachine.addStartupTime(1)
                 stateMachine.transitionState(PlayerStates.PLAYING, position)
             }
         }
