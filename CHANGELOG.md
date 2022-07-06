@@ -7,13 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+## Development v1
+
+## v2.10.0
+
 ### Changed
-- updates ExoPlayer to `2.18.X`
+- updates ExoPlayer to `2.18.x`
 
 ### Fixed
 - fixed issue where late attaching of collector caused `videoStartupTime` = 0
 
-## Development v1
+## v1.33.1
+
+### Fixed
+- fixed issue where late attaching of collector caused `videoStartupTime` = 0
 
 ## v2.9.0
 
