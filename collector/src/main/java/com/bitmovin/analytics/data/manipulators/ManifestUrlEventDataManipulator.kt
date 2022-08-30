@@ -20,12 +20,18 @@ open class ManifestUrlEventDataManipulator(
             if (currentSourceMetadata.mpdUrl != null) {
                 data.mpdUrl = currentSourceMetadata.mpdUrl
             }
+            if (currentSourceMetadata.progUrl != null) {
+                data.progUrl = currentSourceMetadata.progUrl
+            }
         } else {
             if (bitmovinAnalyticsConfig.m3u8Url != null) {
                 data.m3u8Url = bitmovinAnalyticsConfig.m3u8Url
             }
             if (bitmovinAnalyticsConfig.mpdUrl != null) {
                 data.mpdUrl = bitmovinAnalyticsConfig.mpdUrl
+            }
+            if (bitmovinAnalyticsConfig.progUrl != null) {
+                data.progUrl = bitmovinAnalyticsConfig.progUrl
             }
         }
     }

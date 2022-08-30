@@ -7,6 +7,7 @@ data class SourceMetadata(
     var experimentName: String? = null,
     val mpdUrl: String? = null,
     val m3u8Url: String? = null,
+    val progUrl: String? = null,
     val path: String? = null,
     val isLive: Boolean? = null,
     var customData1: String? = null,

@@ -18,7 +18,6 @@ import org.mockito.junit.MockitoJUnitRunner
 class ManifestUrlEventDataManipulatorTest {
     private val licenseKey = UUID.randomUUID().toString()
     private val impressionId = UUID.randomUUID().toString()
-    private val userId = UUID.randomUUID().toString()
 
     private lateinit var deviceInformation: DeviceInformation
 
@@ -28,7 +27,7 @@ class ManifestUrlEventDataManipulatorTest {
     }
 
     @Test
-    fun `manipulate overrides m3u8Url from BitmovinAnalyticsConfig if set`() {
+    fun `manipulate overrides m3u8Url with value from BitmovinAnalyticsConfig if set`() {
         // #region Mocking
         val bitmovinAnalyticsConfigMock = BitmovinAnalyticsConfig(licenseKey)
         bitmovinAnalyticsConfigMock.m3u8Url = "https://www.my-domain.com/file.m3u8"
@@ -42,11 +41,12 @@ class ManifestUrlEventDataManipulatorTest {
         val manipulator = ManifestUrlEventDataManipulator(adapter, bitmovinAnalyticsConfigMock)
         manipulator.manipulate(eventData)
 
+        // value from BitmovinAnalyticsConfig should overwrite if there is something set by adapter
         Assertions.assertThat(eventData.m3u8Url).isEqualTo("https://www.my-domain.com/file.m3u8")
     }
 
     @Test
-    fun `manipulate overrides mpdUrl from BitmovinAnalyticsConfig if set`() {
+    fun `manipulate overrides mpdUrl with value from BitmovinAnalyticsConfig if set`() {
         // #region Mocking
         val bitmovinAnalyticsConfigMock = BitmovinAnalyticsConfig(licenseKey)
         bitmovinAnalyticsConfigMock.mpdUrl = "https://www.my-domain.com/file.mpd"
@@ -60,11 +60,31 @@ class ManifestUrlEventDataManipulatorTest {
         val manipulator = ManifestUrlEventDataManipulator(adapter, bitmovinAnalyticsConfigMock)
         manipulator.manipulate(eventData)
 
+        // value from BitmovinAnalyticsConfig should overwrite if there is something set by adapter
         Assertions.assertThat(eventData.mpdUrl).isEqualTo("https://www.my-domain.com/file.mpd")
     }
 
     @Test
-    fun `manipulate overrides m3u8Url from SourceMetadata if set`() {
+    fun `manipulate overrides progUrl with value from BitmovinAnalyticsConfig if set`() {
+        // #region Mocking
+        val bitmovinAnalyticsConfigMock = BitmovinAnalyticsConfig(licenseKey)
+        bitmovinAnalyticsConfigMock.progUrl = "https://www.my-domain.com/file.mp4"
+        val adapter = mockk<PlayerAdapter>(relaxed = true)
+        every { adapter.currentSourceMetadata } returns null
+
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
+        eventData.progUrl = "foo"
+        // #endregion
+
+        val manipulator = ManifestUrlEventDataManipulator(adapter, bitmovinAnalyticsConfigMock)
+        manipulator.manipulate(eventData)
+
+        // value from BitmovinAnalyticsConfig should overwrite if there is something set by adapter
+        Assertions.assertThat(eventData.progUrl).isEqualTo("https://www.my-domain.com/file.mp4")
+    }
+
+    @Test
+    fun `manipulate overrides m3u8Url with value from SourceMetadata if set`() {
         // #region Mocking
         val bitmovinAnalyticsConfigMock = BitmovinAnalyticsConfig(licenseKey)
         bitmovinAnalyticsConfigMock.m3u8Url = "https://www.my-domain.com/file.m3u8"
@@ -79,11 +99,12 @@ class ManifestUrlEventDataManipulatorTest {
         val manipulator = ManifestUrlEventDataManipulator(adapter, bitmovinAnalyticsConfigMock)
         manipulator.manipulate(eventData)
 
+        // value from SourceMetadata should overwrite if there is something set by adapter or bitmovinAnalyticsConfig
         Assertions.assertThat(eventData.m3u8Url).isEqualTo(sourceMetadata.m3u8Url)
     }
 
     @Test
-    fun `manipulate overrides mpdUrl from SourceMetadata if set`() {
+    fun `manipulate overrides mpdUrl with value from SourceMetadata if set`() {
         // #region Mocking
         val bitmovinAnalyticsConfigMock = BitmovinAnalyticsConfig(licenseKey)
         bitmovinAnalyticsConfigMock.mpdUrl = "https://www.my-domain.com/file.m3u8"
@@ -98,6 +119,27 @@ class ManifestUrlEventDataManipulatorTest {
         val manipulator = ManifestUrlEventDataManipulator(adapter, bitmovinAnalyticsConfigMock)
         manipulator.manipulate(eventData)
 
+        // value from SourceMetadata should overwrite if there is something set by adapter or bitmovinAnalyticsConfig
         Assertions.assertThat(eventData.mpdUrl).isEqualTo(sourceMetadata.mpdUrl)
+    }
+
+    @Test
+    fun `manipulate overrides progUrl with value from SourceMetadata if set`() {
+        // #region Mocking
+        val bitmovinAnalyticsConfigMock = BitmovinAnalyticsConfig(licenseKey)
+        bitmovinAnalyticsConfigMock.progUrl = "https://www.my-domain.com/file.mp4"
+        val adapter = mockk<PlayerAdapter>(relaxed = true)
+        val sourceMetadata = SourceMetadata(progUrl = "bar")
+        every { adapter.currentSourceMetadata } returns sourceMetadata
+
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
+        eventData.progUrl = "foo"
+        // #endregion
+
+        val manipulator = ManifestUrlEventDataManipulator(adapter, bitmovinAnalyticsConfigMock)
+        manipulator.manipulate(eventData)
+
+        // value from SourceMetadata should overwrite if there is something set by adapter or bitmovinAnalyticsConfig
+        Assertions.assertThat(eventData.progUrl).isEqualTo(sourceMetadata.progUrl)
     }
 }

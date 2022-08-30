@@ -168,6 +168,7 @@ class ExoPlayerAdapter(
             data.streamFormat = Util.HLS_STREAM_FORMAT
             data.m3u8Url = masterPlaylist.baseUri
         }
+
         data.downloadSpeedInfo = meter.getInfo()
 
         // DRM Information

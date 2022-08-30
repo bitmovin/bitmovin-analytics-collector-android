@@ -211,6 +211,12 @@ class BitmovinAnalyticsConfig() : Parcelable {
     var m3u8Url: String? = null
 
     /**
+     * Set progUrl URL recorded in analytics. If not set explicitly the collector will retrieve
+     * available information from the player.
+     */
+    var progUrl: String? = null
+
+    /**
      * The frequency that heartbeats should be sent, in milliseconds
      */
     @Deprecated("No longer possible to change default value of 59700ms")
@@ -306,6 +312,7 @@ class BitmovinAnalyticsConfig() : Parcelable {
         config = parcel.readParcelable(CollectorConfig::class.java.classLoader) ?: CollectorConfig()
         ads = parcel.readInt() == 1
         randomizeUserId = parcel.readSerializable() as Boolean
+        progUrl = parcel.readString()
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
@@ -355,6 +362,7 @@ class BitmovinAnalyticsConfig() : Parcelable {
         dest.writeParcelable(config, config.describeContents())
         dest.writeInt(if (ads) 1 else 0)
         dest.writeSerializable(randomizeUserId)
+        dest.writeString(progUrl)
     }
 
     override fun describeContents(): Int {
