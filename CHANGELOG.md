@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 
+## Development v1
+
+## v2.11.0
+
 ### Added
 - `progUrl` to `BitmovinAnalyticsConfig` and `SourceMetadata`
 
-## Development v1
+## v1.34.0
 
 ### Added
 - `progUrl` to `BitmovinAnalyticsConfig` and `SourceMetadata`
