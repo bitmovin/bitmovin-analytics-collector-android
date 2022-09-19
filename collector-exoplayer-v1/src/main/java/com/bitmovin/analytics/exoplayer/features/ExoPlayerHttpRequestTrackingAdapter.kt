@@ -26,17 +26,37 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val analyticsListener = object : DefaultAnalyticsListener() {
 
-        override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData) {
+        override fun onLoadCompleted(
+            eventTime: AnalyticsListener.EventTime,
+            loadEventInfo: MediaSourceEventListener.LoadEventInfo,
+            mediaLoadData: MediaSourceEventListener.MediaLoadData
+        ) {
             catchAndLogException("Exception occurred in onLoadCompleted") {
-                val statusCode = loadEventInfo.responseHeaders.responseCode ?: 0
+                // we have to consider LoadEventInfo as nullable, because it comes from java, to prevent NPE and fail before notify is called
+                val statusCode = loadEventInfo?.extractStatusCode ?: 0
                 notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, statusCode)
             }
         }
 
-        override fun onLoadError(eventTime: AnalyticsListener.EventTime, loadEventInfo: MediaSourceEventListener.LoadEventInfo, mediaLoadData: MediaSourceEventListener.MediaLoadData, error: IOException, wasCanceled: Boolean) {
+        override fun onLoadError(
+            eventTime: AnalyticsListener.EventTime,
+            loadEventInfo: MediaSourceEventListener.LoadEventInfo,
+            mediaLoadData: MediaSourceEventListener.MediaLoadData,
+            error: IOException,
+            wasCanceled: Boolean
+        ) {
             catchAndLogException("Exception occurred in onLoadError") {
-                val statusCode = (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode ?: loadEventInfo.responseHeaders.responseCode ?: 0
-                notifyObservable(eventTime, loadEventInfo, mediaLoadData, false, statusCode)
+                // we have to consider LoadEventInfo as nullable, because it comes from java, to prevent NPE and fail before notify is called
+                val loadEventInfoStatusCode = loadEventInfo?.extractStatusCode ?: 0
+                val errorResponseCode =
+                    (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode
+                notifyObservable(
+                    eventTime,
+                    loadEventInfo,
+                    mediaLoadData,
+                    false,
+                    errorResponseCode ?: loadEventInfoStatusCode
+                )
             }
         }
     }
@@ -95,15 +115,12 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: SimpleExoPlayer, p
             }
 
         // TODO write tests
-        private val Map<String, List<String>>.responseCode: Int?
+        private val MediaSourceEventListener.LoadEventInfo.extractStatusCode: Int?
             get() {
-                val nullableKeyMap = this as? Map<*, List<String>> ?: return null
+                val nullableKeyMap = this.responseHeaders as? Map<*, List<String>> ?: return null
                 if (nullableKeyMap.contains(null)) {
                     val nullEntryList = nullableKeyMap[null] ?: listOf()
-                    if (nullEntryList.isNotEmpty()) {
-                        val nullEntry = nullEntryList[0]
-                        return nullEntry.extractStatusCode
-                    }
+                    return nullEntryList.firstOrNull()?.extractStatusCode
                 }
                 return null
             }
