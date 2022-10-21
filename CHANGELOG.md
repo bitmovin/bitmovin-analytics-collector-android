@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development v2
 - improve null checks when extracting Status code from `LoadEventInfo` in `ExoPlayerHttpRequestTrackingAdapter`
+- Fixes concurrency bug that could cause issues in certain edge cases where many http requests are sent by the player
 
 ## Development v1
 - improve null checks when extracting Status code from `LoadEventInfo` in `ExoPlayerHttpRequestTrackingAdapter` 
+- Fixes concurrency bug that could cause issues in certain edge cases where many http requests are sent by the player
 
 ## v2.11.0
 

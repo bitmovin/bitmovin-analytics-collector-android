@@ -9,3 +9,4 @@ include 'collector-exoplayer-v1'
 include ':collector-exoplayer-v1-example'
 
 include ':example-shared'
+include ':collector-bitmovin-player-tv-example'

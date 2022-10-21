@@ -15,11 +15,18 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
     }
     private val httpRequestQueue: Queue<HttpRequest> = LinkedList()
 
+    private val lock = Object()
+
     var maxRequests = defaultMaxRequests
         private set
 
     val httpRequests: Collection<HttpRequest>
-        get() = httpRequestQueue
+        get() {
+            // threadsafe copy of the linked list
+            synchronized(lock) {
+            return LinkedList(httpRequestQueue)
+            }
+        }
 
     init {
         observables.forEach { it.subscribe(this) }
@@ -28,7 +35,10 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
     fun configure(maxRequests: Int) {
         try {
             this.maxRequests = maxRequests
-            httpRequestQueue.limit(maxRequests)
+
+            synchronized(lock) {
+                httpRequestQueue.limit(maxRequests)
+            }
         } catch (e: Exception) {
             Log.d(TAG, "Exception happened while configuring http request tracking: ${e.message}")
         }
@@ -50,8 +60,12 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
 
     private fun addRequest(httpRequest: HttpRequest) {
         try {
-            httpRequestQueue.offer(httpRequest)
-            httpRequestQueue.limit(maxRequests)
+            // This method is called from different threads, thus we need synchronization here
+            // lock fixes https://bitmovin.atlassian.net/browse/AN-3061
+            synchronized(lock) {
+                httpRequestQueue.offer(httpRequest)
+                httpRequestQueue.limit(maxRequests)
+            }
         } catch (e: Exception) {
             Log.d(TAG, "Exception happened while adding http request: ${e.message}")
         }
