@@ -5,11 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Development v2
+## v2.12.0
+
+### Fixed
 - improve null checks when extracting Status code from `LoadEventInfo` in `ExoPlayerHttpRequestTrackingAdapter`
 - Fixes concurrency bug that could cause issues in certain edge cases where many http requests are sent by the player
 
-## Development v1
+## v1.35.0
+
+### Fixed
 - improve null checks when extracting Status code from `LoadEventInfo` in `ExoPlayerHttpRequestTrackingAdapter` 
 - Fixes concurrency bug that could cause issues in certain edge cases where many http requests are sent by the player
 
