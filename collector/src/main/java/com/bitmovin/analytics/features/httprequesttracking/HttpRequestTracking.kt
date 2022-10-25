@@ -46,11 +46,15 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
 
     fun disable() {
         observables.forEach { it.unsubscribe(this) }
-        httpRequestQueue.clear()
+        synchronized(lock) {
+            httpRequestQueue.clear()
+        }
     }
 
     fun reset() {
-        httpRequestQueue.clear()
+        synchronized(lock) {
+            httpRequestQueue.clear()
+        }
     }
 
     override fun onDownloadFinished(event: OnDownloadFinishedEventObject) {

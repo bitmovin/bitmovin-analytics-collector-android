@@ -141,10 +141,12 @@ class MainActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_DPAD_RIGHT,
             KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
                 player.seekForward()
+                return true
             }
             KeyEvent.KEYCODE_DPAD_LEFT,
             KeyEvent.KEYCODE_MEDIA_REWIND -> {
                 player.seekBackward()
+                return true
             }
         }
 
@@ -213,7 +215,7 @@ private fun Player.stopPlayback() {
 
 private fun Player.seekForward() = seek(this.currentTime + SEEKING_OFFSET)
 
-private fun Player.seekBackward() = seek(currentTime - SEEKING_OFFSET)
+private fun Player.seekBackward() = seek(this.currentTime - SEEKING_OFFSET)
 
 private fun createPlayerConfig() = PlayerConfig(
     // Here a custom bitmovinplayer-ui.js is loaded which utilizes the Cast-UI as this

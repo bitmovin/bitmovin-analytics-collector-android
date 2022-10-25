@@ -103,19 +103,19 @@ ext {
 	 */
 	version = System.getProperty("version", "0.0.0") + (developLocal ? '-local' : '')
 
-	compileSdkVersion = 28
+	compileSdkVersion = 32
 	minSdkVersion = 16
-	targetSdkVersion = 28
+	targetSdkVersion = 32
 
 	sourceCompatibility = JavaVersion.VERSION_1_8
 	targetCompatibility = JavaVersion.VERSION_1_8
 	jvmTarget = JavaVersion.VERSION_1_8.toString()
 
 	bitmovinPlayer2Version = '2.70.0'
-	bitmovinPlayerVersion = '3.12.0'
+	bitmovinPlayerVersion = '3.25.1'
 
 	exoplayerCollectorV1Version = '2.11.8'
-	exoplayerVersion = '2.18.0'
+	exoplayerVersion = '2.18.1'
 
 	constraintLayoutVersion = '1.0.2'
 	junitVersion = '4.12'
