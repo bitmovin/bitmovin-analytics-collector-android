@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v2.12.0
 
+### Changed
+- updates ExoPlayer to `2.18.1`
+- updates BitmovinPlayer to `3.25.1`
+
 ### Fixed
 - improve null checks when extracting Status code from `LoadEventInfo` in `ExoPlayerHttpRequestTrackingAdapter`
 - Fixes concurrency bug that could cause issues in certain edge cases where many http requests are sent by the player
