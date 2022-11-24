@@ -1,5 +1,5 @@
 buildscript {
-	ext.kotlin_version = '1.6.10'
+	ext.kotlin_version = '1.7.20'
 
 	repositories {
 		google()
@@ -10,7 +10,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:7.2.1'
+		classpath 'com.android.tools.build:gradle:7.3.1'
 		classpath "com.diffplug.spotless:spotless-plugin-gradle:5.9.0"
 		classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.28.3"
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -103,9 +103,9 @@ ext {
 	 */
 	version = System.getProperty("version", "0.0.0") + (developLocal ? '-local' : '')
 
-	compileSdkVersion = 32
+	compileSdkVersion = 33
 	minSdkVersion = 16
-	targetSdkVersion = 32
+	targetSdkVersion = 33
 
 	sourceCompatibility = JavaVersion.VERSION_1_8
 	targetCompatibility = JavaVersion.VERSION_1_8

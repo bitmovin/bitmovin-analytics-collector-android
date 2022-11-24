@@ -8,24 +8,24 @@ class FeatureManager<TConfigContainer> {
     }
     private val features: MutableList<Feature<TConfigContainer, *>> = mutableListOf()
 
-    fun registerFeature(feature: Feature<TConfigContainer, *>) {
+    @Synchronized fun registerFeature(feature: Feature<TConfigContainer, *>) {
         features.add(feature)
     }
 
-    fun registerFeatures(features: Collection<Feature<TConfigContainer, *>>) {
+    @Synchronized fun registerFeatures(features: Collection<Feature<TConfigContainer, *>>) {
         this.features.addAll(features)
     }
 
-    fun unregisterFeatures() {
+    @Synchronized fun unregisterFeatures() {
         features.forEach { it.disable() }
         features.clear()
     }
 
-    fun resetFeatures() {
+    @Synchronized fun resetFeatures() {
         features.forEach { it.reset() }
     }
 
-    fun configureFeatures(authenticated: Boolean, featureConfigs: TConfigContainer?) {
+    @Synchronized fun configureFeatures(authenticated: Boolean, featureConfigs: TConfigContainer?) {
         val iterator = features.iterator()
         while (iterator.hasNext()) {
             val it = iterator.next()
