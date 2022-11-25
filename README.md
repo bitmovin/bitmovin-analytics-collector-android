@@ -52,7 +52,7 @@ dependencies {
 }
 ```
 
-For ExoPlayer version between >= v2.17.0 and < v2.18.0:
+For ExoPlayer version between >= v2.17.0 and <= v2.18.1:
 
 ```gradle
 dependencies {
@@ -86,10 +86,10 @@ analyticsCollector.detachPlayer();
 // Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key
 BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>");
 
-Create Analytics Collector for ExoPlayer
+// Create Analytics Collector for ExoPlayer
 ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
 
-//Attach your ExoPlayer instance
+// Attach your ExoPlayer instance
 bitmovinAnalytics.attachPlayer(player);
 
 // Detach your player when you are done. For example, call this method when you call ExoPlayer's release() method

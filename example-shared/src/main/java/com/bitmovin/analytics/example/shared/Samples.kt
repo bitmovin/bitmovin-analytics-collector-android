@@ -10,7 +10,7 @@ object Samples {
 
     val HLS_DRM_WIDEVINE = Sample("Hls + Widevine", "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/m3u8s/widevine-hls.m3u8", "widevine", "https://widevine-proxy.appspot.com/proxy")
     val HLS_DRM_WIDEVINE_ENCRYPTED = Sample("Encrypted Hls + Widevine", "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/m3u8s/11331.m3u8", "widevine", "https://widevine-proxy.appspot.com/proxy")
-    val DASH_DRM_WIDEVINE = Sample("Dash + Widevine", "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd", "widevine", "https://widevine-proxy.appspot.com/proxy")
+    val DASH_DRM_WIDEVINE = Sample("Dash + Widevine", "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd", "widevine", "https://cwip-shaka-proxy.appspot.com/no_auth")
 
     val HLS_REDBULL = Sample("HLSRedbulll", "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8")
     val DASH_LIVE = Sample("DashLive", "https://livesim.dashif.org/livesim/testpic_2s/Manifest.mpd")

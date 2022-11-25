@@ -44,7 +44,7 @@ dependencies {
 	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
 	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
 	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
-
+	implementation 'androidx.work:work-runtime-ktx:2.7.1'
 
 	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
 	implementation "com.bitmovin.player:playercore:${rootProject.ext.bitmovinPlayer2Version}"

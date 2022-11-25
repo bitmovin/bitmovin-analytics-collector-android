@@ -6,11 +6,11 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
+import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Samples
-import com.bitmovin.player.PlayerView
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -23,49 +23,51 @@ import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
-import com.bitmovin.player.casting.BitmovinCastManager
 import com.google.android.gms.cast.framework.CastButtonFactory
 
 class MainActivity : AppCompatActivity() {
-    private var playerView: PlayerView? = null
-    private var player: Player? = null
-    private var currentPlaylistItemIndex = 0
 
+    private lateinit var player: Player
+    private lateinit var binding: ActivityMainBinding
     private var bitmovinPlayerCollector: BitmovinPlayerCollector? = null
+    private var currentPlaylistItemIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         // it's necessary to update applicationId for casting to work
-        BitmovinCastManager.initialize("7ECF03AB", "urn:x-cast:com.bitmovin.analytics")
-        BitmovinCastManager.getInstance().updateContext(this)
+        // BitmovinCastManager.initialize("7ECF03AB", "urn:x-cast:com.bitmovin.analytics")
+        // BitmovinCastManager.getInstance().updateContext(this)
+
         findViewById<Button>(R.id.release_button).setOnClickListener {
-            player?.unload()
+            player.unload()
             bitmovinPlayerCollector?.detachPlayer()
         }
 
-        findViewById<Button>(R.id.create_button).setOnClickListener { initializeBitmovinPlayer() }
+        findViewById<Button>(R.id.create_button).setOnClickListener {
+            initializeBitmovinPlayer()
+        }
 
         findViewById<Button>(R.id.change_audio).setOnClickListener {
-            if (player == null) {
-                return@setOnClickListener
+            val audioTracks = player.source?.availableAudioTracks
+            val index = audioTracks?.indexOf(player.source?.selectedAudioTrack)
+            val nextIndex = (index?.plus(1))?.rem(audioTracks.size)
+            if (nextIndex !== null) {
+                val id = audioTracks[nextIndex].id
+                player.source?.setAudioTrack(id)
             }
-            val audioTracks = player!!.availableAudio
-            val index = audioTracks.indexOf(player!!.audio)
-            val nextIndex = (index + 1) % audioTracks.size
-            val id = audioTracks[nextIndex].id
-            player!!.setAudio(id!!)
         }
 
         findViewById<Button>(R.id.change_subtitle).setOnClickListener {
-            if (player == null) {
-                return@setOnClickListener
+            val subtitleTracks = player.source?.availableSubtitleTracks
+            val index = subtitleTracks?.indexOf(player.source?.selectedSubtitleTrack)
+            val nextIndex = (index?.plus(1))?.rem(subtitleTracks.size)
+            if (nextIndex !== null) {
+                val id = subtitleTracks[nextIndex].id
+                player.source?.setSubtitleTrack(id)
             }
-            val subtitleTracks = player!!.availableSubtitles
-            val index = subtitleTracks.indexOf(player!!.subtitle)
-            val nextIndex = (index + 1) % subtitleTracks.size
-            val id = subtitleTracks[nextIndex].id
-            player!!.setSubtitle(id)
         }
 
         findViewById<Button>(R.id.change_source).setOnClickListener {
@@ -81,17 +83,17 @@ class MainActivity : AppCompatActivity() {
             collector.attachPlayer(player)
             player.load(createDRMSourceConfig())
         }
+
         findViewById<Button>(R.id.seek_next_source).setOnClickListener {
             currentPlaylistItemIndex++
-            val nextSource = player?.playlist?.sources?.get(currentPlaylistItemIndex)
+            val nextSource = player.playlist.sources[currentPlaylistItemIndex]
                 ?: return@setOnClickListener
-            player?.playlist?.seek(nextSource, 10.0)
+            player.playlist.seek(nextSource, 10.0)
         }
+
         findViewById<Button>(R.id.setCustomData).setOnClickListener {
             setCustomData()
         }
-
-        playerView = findViewById(R.id.playerView)
 
         initializeBitmovinPlayer()
     }
@@ -108,16 +110,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeBitmovinPlayer() {
-        bitmovinPlayerCollector?.detachPlayer()
-        player?.destroy()
-
         val playbackConfig = PlaybackConfig()
         playbackConfig.isMuted = false
         playbackConfig.isAutoplayEnabled = false
         val playerConfig = PlayerConfig(playbackConfig = playbackConfig)
-//        playerConfig.advertisingConfig = createAdvertisingConfig()
-        val player = Player.create(applicationContext, playerConfig)
-        this.player = player
+        // playerConfig.advertisingConfig = createAdvertisingConfig()
+
+        player = Player.create(this, playerConfig).also { binding.playerView.player = it }
+
         val collector = BitmovinPlayerCollector(createBitmovinAnalyticsConfig(), applicationContext)
         this.bitmovinPlayerCollector = collector
 
@@ -141,33 +141,31 @@ class MainActivity : AppCompatActivity() {
         // playlistConfig for casting
         // val playlistConfig = PlaylistConfig(listOf(bbbSource, progresiveSource), PlaylistOptions())
         val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource), PlaylistOptions())
-        player.load(playlistConfig)
-
-        playerView?.player = player
+        player.load(redbullSource)
     }
 
     override fun onStart() {
-        playerView?.onStart()
         super.onStart()
+        binding.playerView.onStart()
     }
 
     override fun onResume() {
         super.onResume()
-        playerView?.onResume()
+        binding.playerView.onResume()
     }
 
     override fun onPause() {
-        playerView?.onPause()
+        binding.playerView.onPause()
         super.onPause()
     }
 
     override fun onStop() {
-        playerView?.onStop()
+        binding.playerView.onStop()
         super.onStop()
     }
 
     override fun onDestroy() {
-        playerView?.onDestroy()
+        binding.playerView.onDestroy()
         super.onDestroy()
     }
 

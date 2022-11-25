@@ -9,11 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Made FeatureManager threadsafe
-- 
+
 ### Changed
 - Upgraded kotlin version to 1.7.20
 - Upgraded targetSdkVersion and compileSdkVersion to 33
 - Upgraded to gradle 7.3.1
+- [INTERNAL] updated example apps
 
 ## Development v1
 
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded kotlin version to 1.7.20
 - Upgraded targetSdkVersion and compileSdkVersion to 33
 - Upgraded to gradle 7.3.1
+- [INTERNAL] updated example apps
 
 ## v2.12.0
 
