@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Development v2
+## v2.12.1
 
 ### Fixed
 - Made FeatureManager threadsafe
@@ -14,9 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded kotlin version to 1.7.20
 - Upgraded targetSdkVersion and compileSdkVersion to 33
 - Upgraded to gradle 7.3.1
-- [INTERNAL] updated example apps
+- Updated example apps
 
-## Development v1
+## v1.35.1
 
 ### Fixed
 - Made FeatureManager threadsafe
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded kotlin version to 1.7.20
 - Upgraded targetSdkVersion and compileSdkVersion to 33
 - Upgraded to gradle 7.3.1
-- [INTERNAL] updated example apps
+- Updated example apps
 
 ## v2.12.0
 
