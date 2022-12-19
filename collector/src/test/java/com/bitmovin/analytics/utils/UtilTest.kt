@@ -14,7 +14,7 @@ class UtilTest {
             throw RuntimeException("RUNTIMEEXCEPTION")
         } catch (e: Exception) {
             val top = e.topOfStacktrace
-            assertThat(top).hasSize(10)
+            assertThat(top.size).isLessThanOrEqualTo(50)
             assertThat(top).anySatisfy { element -> assertThat(element).contains("testTopOfStacktrace") }
         }
     }

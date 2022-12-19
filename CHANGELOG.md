@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
+## Development
+
+### Changed
+- increases error stacktrace size to 50 lines
+- [internal] changed from sonarQube to sonarCloud
 
 ## v2.12.1
 
