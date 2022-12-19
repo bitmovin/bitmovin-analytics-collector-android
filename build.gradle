@@ -171,7 +171,7 @@ sonarqube {
 		property "sonar.host.url", "https://sonarcloud.io"
 		property "sonar.organization", "bitmovin-engineering"
 		property "sonar.projectName", "Analytics Collector Android"
-		property "sonar.projectKey", "bitmovin-engineering_analytics-collector-android"
+		property "sonar.projectKey", "bitmovin-engineering_bitmovin-analytics-collector-android-internal"
 		property "sonar.tests", ["src/test/java"]
 		property "sonar.test.inclusions", "**/*Test*/**"
 		property "sonar.sourceEncoding", "UTF-8"
