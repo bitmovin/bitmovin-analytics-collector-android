@@ -168,7 +168,7 @@ task createPrePushHook() {
 
 sonarqube {
 	properties {
-		property "sonar.host.url", "https://sonar.bitmovin.com"
+		property "sonar.host.url", "https://sonarcloud.io"
 		property "sonar.projectName", "Analytics Collector Android"
 		property "sonar.projectKey", "analytics-collector-android"
 		property "sonar.tests", ["src/test/java"]
