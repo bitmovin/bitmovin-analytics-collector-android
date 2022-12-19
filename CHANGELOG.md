@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - increases error stacktrace size to 50 lines
+- [internal] changed from sonarQube to sonarCloud
 
 ## v2.12.1
 
