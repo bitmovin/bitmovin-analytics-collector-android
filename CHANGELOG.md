@@ -6,7 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v2.12.2
+
 ### Changed
+- increases error stacktrace size to 50 lines
+- [internal] changed from sonarQube to sonarCloud
+
+## v1.35.2
 - increases error stacktrace size to 50 lines
 - [internal] changed from sonarQube to sonarCloud
 
