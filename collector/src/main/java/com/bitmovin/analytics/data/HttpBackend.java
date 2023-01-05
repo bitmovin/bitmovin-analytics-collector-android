@@ -55,8 +55,8 @@ public class HttpBackend implements Backend, CallbackBackend {
                 String.format(
                         "Sending sample: %s (state: %s, videoId: %s, startupTime: %d, videoStartupTime: %d, buffered: %d, audioLanguage: %s)",
                         eventData.getImpressionId(),
-                        eventData.getVideoId(),
                         eventData.getState(),
+                        eventData.getVideoId(),
                         eventData.getStartupTime(),
                         eventData.getVideoStartupTime(),
                         eventData.getBuffered(),

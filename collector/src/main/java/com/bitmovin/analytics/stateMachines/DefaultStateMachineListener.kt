@@ -133,8 +133,15 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
         analytics.sendEventData(data)
     }
 
-    override fun onAd(stateMachine: PlayerStateMachine) {
+    override fun onAd(stateMachine: PlayerStateMachine, duration: Long) {
         Log.d(TAG, "onAd")
+        val data = playerAdapter.createEventData()
+        data.state = stateMachine.currentState.name
+        data.duration = duration
+        data.ad = 1
+        data.videoTimeStart = stateMachine.videoTimeStart
+        data.videoTimeEnd = stateMachine.videoTimeEnd
+        analytics.sendEventData(data)
     }
 
     override fun onMute(stateMachine: PlayerStateMachine) {

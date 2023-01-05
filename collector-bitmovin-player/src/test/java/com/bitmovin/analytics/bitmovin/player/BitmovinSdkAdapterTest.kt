@@ -97,4 +97,46 @@ class BitmovinSdkAdapterTest {
         // asset
         verify(inverse = true) { playerStateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
     }
+
+    @Test
+    fun `playerStateMachine does not transition to pause if player is transitioning to ads`() {
+        // arrange
+        val listenerSlot = slot<(PlayerEvent.Paused) -> Unit>()
+        every { player.on(PlayerEvent.Paused::class, capture(listenerSlot)) } answers { }
+        every { player.currentTime } returns 0.0
+        every { player.isAd } returns true
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        clearMocks(playerStateMachine)
+
+        // act
+        bitmovinSdkAdapter.init()
+        val pausedEvent = PlayerEvent.Paused(5.00)
+        listenerSlot.captured(pausedEvent)
+
+        // asset
+        verify(inverse = true) { playerStateMachine.transitionState(PlayerStates.PAUSE, any()) }
+        verify(exactly = 1) { playerStateMachine.transitionState(PlayerStates.AD, 5000) } // 5000 because we convert to ms
+    }
+
+    @Test
+    fun `playerStateMachine transitions to pause if no ads are being played`() {
+        // arrange
+        val listenerSlot = slot<(PlayerEvent.Paused) -> Unit>()
+        every { player.on(PlayerEvent.Paused::class, capture(listenerSlot)) } answers { }
+        every { player.currentTime } returns 0.0
+        every { player.isAd } returns false
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        clearMocks(playerStateMachine)
+
+        // act
+        bitmovinSdkAdapter.init()
+        val pausedEvent = PlayerEvent.Paused(5.00)
+        listenerSlot.captured(pausedEvent)
+
+        // asset
+        verify(exactly = 1) { playerStateMachine.transitionState(PlayerStates.PAUSE, 5000) } // 5000 because we convert to ms
+        verify(inverse = true) { playerStateMachine.transitionState(PlayerStates.AD, any()) }
+    }
 }

@@ -30,7 +30,16 @@ class PlayerStates {
                 }
             }
         }
-        @JvmField val AD = DefaultPlayerState<Void>("ad")
+        @JvmField val AD = object : DefaultPlayerState<Void>("ad") {
+            override fun onExitState(
+                machine: PlayerStateMachine,
+                elapsedTime: Long,
+                durationInState: Long,
+                destinationPlayerState: PlayerState<*>
+            ) {
+                machine.listeners.notify { it.onAd(machine, durationInState) }
+            }
+        }
         @JvmField val ADFINISHED = DefaultPlayerState<Void>("adfinished")
         @JvmField val BUFFERING = object : DefaultPlayerState<Void>("buffering") {
             override fun onEnterState(machine: PlayerStateMachine, data: Void?) {

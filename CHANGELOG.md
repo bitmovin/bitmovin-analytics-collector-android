@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v2
+
+### Changed
+- BitmovinPlayer: Improved ad tracking
+
+## v1
+
+### Changed
+- BitmovinPlayer: Improved ad tracking
+
+
 ## v2.12.2
 
 ### Changed

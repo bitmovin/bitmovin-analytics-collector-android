@@ -6,9 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
 import com.bitmovin.analytics.enums.CDNProvider
-import com.bitmovin.analytics.example.shared.Samples.CORRUPT_DASH
-import com.bitmovin.analytics.example.shared.Samples.DASH
-import com.bitmovin.analytics.example.shared.Samples.DASH_DRM_WIDEVINE
+import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.player.BitmovinPlayer
 import com.bitmovin.player.BitmovinPlayerView
 import com.bitmovin.player.config.PlaybackConfiguration
@@ -22,7 +20,6 @@ import com.bitmovin.player.config.media.SourceConfiguration
 import com.bitmovin.player.config.media.SourceItem
 
 class MainActivity : AppCompatActivity() {
-    private var config: PlayerConfiguration? = null
     private var bitmovinPlayer: BitmovinPlayer? = null
     private var bitmovinAnalytics: BitmovinPlayerCollector? = null
     private var bitmovinPlayerView: BitmovinPlayerView? = null
@@ -87,14 +84,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeBitmovinPlayer() {
-        config = PlayerConfiguration()
+        val config = PlayerConfiguration()
 
         val source: SourceConfiguration = this.createSourceConfig(sintelSource)
         // val source = this.createDRMSourceConfiguration();
-        config?.sourceConfiguration = source
-        // config?.advertisingConfiguration = initializeAds(config!!);
+        config.sourceConfiguration = source
+        config.advertisingConfiguration = initializeAds(config)
 
-        val playbackConfiguration: PlaybackConfiguration? = config?.playbackConfiguration
+        val playbackConfiguration: PlaybackConfiguration? = config.playbackConfiguration
+
         playbackConfiguration?.isMuted = true
         playbackConfiguration?.isAutoplayEnabled = false
         bitmovinPlayer = BitmovinPlayer(applicationContext, config)
@@ -116,10 +114,10 @@ class MainActivity : AppCompatActivity() {
     private fun createDRMSourceConfiguration(): SourceConfiguration {
         // Create a new source configuration
         val sourceConfiguration = SourceConfiguration()
-        val sourceItem = SourceItem(DASH_DRM_WIDEVINE.uri.toString())
+        val sourceItem = SourceItem(Samples.DASH_DRM_WIDEVINE.uri.toString())
 
         // setup DRM handling
-        val drmLicenseUrl = DASH_DRM_WIDEVINE.drmLicenseUri.toString()
+        val drmLicenseUrl = Samples.DASH_DRM_WIDEVINE.drmLicenseUri.toString()
         val drmSchemeUuid = DRMSystems.WIDEVINE_UUID
         sourceItem.addDRMConfiguration(drmSchemeUuid, drmLicenseUrl)
 
@@ -151,40 +149,29 @@ class MainActivity : AppCompatActivity() {
         return bitmovinAnalyticsConfig
     }
 
-    private fun initializeAds(config: PlayerConfiguration): AdvertisingConfiguration? {
+    private fun initializeAds(config: PlayerConfiguration): AdvertisingConfiguration {
         // Create AdSources
-        val firstAdSource = AdSource(AdSourceType.IMA, AD_SOURCE_1)
-        val secondAdSource = AdSource(AdSourceType.IMA, AD_SOURCE_2)
-        val thirdAdSource = AdSource(AdSourceType.IMA, AD_SOURCE_3)
-        val fourthAdSource = AdSource(AdSourceType.IMA, AD_SOURCE_4)
-        val fifthAdSource = AdSource(AdSourceType.IMA, AD_SOURCE_5)
+        val firstAdSource = AdSource(AdSourceType.IMA, Samples.IMA_AD_SOURCE_1.uri.toString())
+        val secondAdSource = AdSource(AdSourceType.IMA, Samples.IMA_AD_SOURCE_2.uri.toString())
+        val thirdAdSource = AdSource(AdSourceType.IMA, Samples.IMA_AD_SOURCE_3.uri.toString())
+        val fourthAdSource = AdSource(AdSourceType.IMA, Samples.IMA_AD_SOURCE_4.uri.toString())
 
         // Setup a pre-roll ad
-        val preRoll = AdItem("pre", firstAdSource)
+        val preRoll = AdItem("pre", thirdAdSource)
 
         // Setup a mid-roll waterfalling ad at 10% of the content duration
         // NOTE: AdItems containing more than one AdSource, will be executed as waterfalling ad
-        val midRoll = AdItem("10%", firstAdSource, secondAdSource)
+        val midRoll = AdItem("10%", fourthAdSource)
 
         // Setup a post-roll ad
-        val postRoll = AdItem("post", fourthAdSource)
+        val postRoll = AdItem("post", firstAdSource)
 
         // Add the AdItems to the AdvertisingConfiguration
         return AdvertisingConfiguration(preRoll, midRoll, postRoll)
     }
 
     companion object {
-        private val sintelSource = SourceItem(DASH.uri.toString())
-        private val corruptedSource = SourceItem(CORRUPT_DASH.uri.toString())
-        private const val AD_SOURCE_1 =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator="
-        private const val AD_SOURCE_2 =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="
-        private const val AD_SOURCE_3 =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator="
-        private const val AD_SOURCE_4 =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator="
-        private const val AD_SOURCE_5 =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator="
+        private val sintelSource = SourceItem(Samples.DASH.uri.toString())
+        private val corruptedSource = SourceItem(Samples.CORRUPT_DASH.uri.toString())
     }
 }

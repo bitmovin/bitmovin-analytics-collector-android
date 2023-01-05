@@ -19,7 +19,7 @@ public interface StateMachineListener {
 
     void onSeekComplete(PlayerStateMachine stateMachine, long duration);
 
-    void onAd(PlayerStateMachine stateMachine);
+    void onAd(PlayerStateMachine stateMachine, long duration);
 
     void onMute(PlayerStateMachine stateMachine);
 

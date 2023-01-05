@@ -51,10 +51,8 @@ dependencies {
 
 	// only needed if ads are used
 	implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-	implementation "com.google.ads.interactivemedia.v3:interactivemedia:3.11.3"
-	implementation "com.google.android.gms:play-services-ads:17.1.2"
-	/** required because of play-services-ads:17.1.2 SDK 26 dependencies */
-	implementation 'androidx.browser:browser:1.0.0'
+	implementation "com.google.ads.interactivemedia.v3:interactivemedia:${rootProject.ext.imaSdkVersion}"
+	implementation "com.google.android.gms:play-services-ads:${rootProject.ext.playServicesAdsVersion}"
 
 	if (rootProject.ext.developLocal) {
 		implementation project(':collector-bitmovin-player-v1')
@@ -63,5 +61,8 @@ dependencies {
 		implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
 	}
 	implementation project(':example-shared')
+
+	implementation "com.google.android.gms:play-services-cast-framework:19.0.0" //only needed if Chromecast is used
+	implementation 'androidx.mediarouter:mediarouter:1.0.0'
 }
 

@@ -179,11 +179,6 @@ class BitmovinSdkAdapter(
         }
         data.player = PlayerType.BITMOVIN.toString()
 
-        // ad
-        if (player.isAd) {
-            data.ad = 1
-        }
-
         // version
         data.version = PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.getPlayerVersion()
 
@@ -319,7 +314,14 @@ class BitmovinSdkAdapter(
     private fun onPlayerEventPaused(event: PlayerEvent.Paused) {
         try {
             Log.d(TAG, "On Pause Listener")
-            stateMachine.pause(position)
+            // used value from event instead of player.currentTime because in case player is transitioning to ads
+            // player.currentTime will be 0 and mess videoTimeEnd measurement
+            val videoPosition = Util.secondsToMillis(event.time)
+            if (player.isAd) {
+                stateMachine.startAd(videoPosition)
+            } else {
+                stateMachine.pause(videoPosition)
+            }
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
@@ -497,7 +499,7 @@ class BitmovinSdkAdapter(
     }
     private fun onPlayerEventAdBreakFinished(event: PlayerEvent.AdBreakFinished) {
         try {
-            stateMachine.transitionState(PlayerStates.ADFINISHED, position)
+            stateMachine.endAd()
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }

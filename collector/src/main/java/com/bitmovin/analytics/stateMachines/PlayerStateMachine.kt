@@ -183,6 +183,12 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         startupTime = 0
     }
 
+    fun endAd() {
+        // we don't need position here because during ads it would reflect videoTime of the ad and not
+        // of the video being played
+        transitionState(PlayerStates.ADFINISHED, videoTimeEnd)
+    }
+
     fun changeCustomData(position: Long, customData: CustomData, setCustomDataFunction: (CustomData) -> Unit) {
         val originalState = currentState
         val shouldTransition = isPlayingOrPaused
