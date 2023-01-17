@@ -11,10 +11,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - BitmovinPlayer: Improved ad tracking
 
+### Added
+- Detection of FireOS 8
+
+### Fixed
+- Detection of UHD screens on AndroidTVs
+
 ## v1
 
 ### Changed
 - BitmovinPlayer: Improved ad tracking
+
+### Added
+- Detection of FireOS 8
+
+### Fixed
+- Detection of UHD screens on AndroidTVs
 
 
 ## v2.12.2

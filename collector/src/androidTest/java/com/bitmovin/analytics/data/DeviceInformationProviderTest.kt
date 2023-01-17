@@ -2,23 +2,10 @@ package com.bitmovin.analytics.data
 
 import android.os.Build
 import androidx.test.InstrumentationRegistry
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import java.util.UUID
 import org.assertj.core.api.Assertions
-import org.junit.Before
 import org.junit.Test
 
 class DeviceInformationProviderTest {
-    private val playerKey = UUID.randomUUID().toString()
-    private val licenseKey = UUID.randomUUID().toString()
-
-    private lateinit var bitmovinAnalyticsConfig: BitmovinAnalyticsConfig
-
-    @Before
-    fun setup() {
-        bitmovinAnalyticsConfig = BitmovinAnalyticsConfig(licenseKey, playerKey)
-    }
-
     @Test
     fun testContainsBuildModelAndManufacturer() {
         // #region Mocking
