@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - BitmovinPlayer: Improved ad tracking
+- Deprecated v1 Collector
 
 ### Added
 - Detection of FireOS 8

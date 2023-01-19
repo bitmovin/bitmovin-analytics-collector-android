@@ -15,6 +15,9 @@ import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.player.BitmovinPlayer
 
+@Deprecated(
+    "Upgrade to v2 of com.bitmovin.analytics:collector-bitmovin-player"
+)
 class BitmovinPlayerCollector
 /**
  * Bitmovin Analytics
