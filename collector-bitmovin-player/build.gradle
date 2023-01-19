@@ -46,7 +46,7 @@ android {
 dependencies {
 	implementation fileTree(dir: 'libs', include: ['*.jar'])
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
-	implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
+	implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
 
 	// This could theoretically be `implementation`, but the MavenPublication process will
 	// only add `api` dependencies to the resulting pom file.

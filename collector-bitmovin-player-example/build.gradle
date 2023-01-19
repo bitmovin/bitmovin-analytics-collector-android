@@ -43,7 +43,7 @@ configurations {
 dependencies {
 	implementation fileTree(dir: 'libs', include: ['*.jar'])
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
-	implementation "androidx.appcompat:appcompat:${rootProject.ext.androidXVersion}"
+	implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
 	implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
 	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
 	implementation 'androidx.legacy:legacy-support-v4:1.0.0'
