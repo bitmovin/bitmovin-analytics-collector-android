@@ -5,7 +5,7 @@ import androidx.test.InstrumentationRegistry
 import org.assertj.core.api.Assertions
 import org.junit.Test
 
-class DeviceInformationProviderTest {
+class DeviceInformationProviderInstrumentedTest {
     @Test
     fun testContainsBuildModelAndManufacturer() {
         // #region Mocking

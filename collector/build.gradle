@@ -33,6 +33,11 @@ android {
 
 	testOptions {
 		unitTests.returnDefaultValues = true
+
+		// robolectric setting
+		unitTests {
+			includeAndroidResources = true
+		}
 	}
 
 	buildTypes {
@@ -61,6 +66,9 @@ dependencies {
 	implementation 'com.squareup.okhttp3:okhttp:3.12.1'
 	implementation 'com.google.code.gson:gson:2.8.5'
 	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
+
+	testImplementation 'org.robolectric:robolectric:4.9'
+	testImplementation 'androidx.test:core:1.5.0'
 }
 
 publishing {
