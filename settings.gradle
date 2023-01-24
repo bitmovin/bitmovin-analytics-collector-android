@@ -1,12 +1,8 @@
 include ':collector'
 include 'collector-bitmovin-player'
 include ':collector-bitmovin-player-example'
-include 'collector-bitmovin-player-v1'
-include ':collector-bitmovin-player-v1-example'
 include 'collector-exoplayer'
 include ':collector-exoplayer-example'
-include 'collector-exoplayer-v1'
-include ':collector-exoplayer-v1-example'
 
 include ':example-shared'
 include ':collector-bitmovin-player-tv-example'

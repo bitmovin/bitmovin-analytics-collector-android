@@ -70,12 +70,6 @@ echo "Enter the version (without leading 'v')":
 read VERSION
 echo ""
 
-if [[ $VERSION =~ ^1. ]]; then
-  IS_V1_RELEASE=true
-else
-  IS_V1_RELEASE=false
-fi
-
 echo "---------- Summary ----------"
 echo 'ANALYTICS_GH_TOKEN='$ANALYTICS_GH_TOKEN
 echo 'ANALYTICS_API_RELEASE_TOKEN='$ANALYTICS_API_RELEASE_TOKEN
@@ -83,13 +77,8 @@ echo 'VERSION='$VERSION
 echo ""
 echo "Artifacts to publish:"
 echo "  - com.bitmovin.analytics:collector:$VERSION (:collector project)"
-if $IS_V1_RELEASE; then
-  echo "  - com.bitmovin.analytics:collector-bitmovin-player:$VERSION (:collector-bitmovin-player-v1 project)"
-  echo "  - com.bitmovin.analytics:collector-exoplayer:$VERSION (:collector-exoplayer-v1 project)"
-else
-  echo "  - com.bitmovin.analytics:collector-bitmovin-player:$VERSION (:collector-bitmovin-player project)"
-  echo "  - com.bitmovin.analytics:collector-exoplayer:$VERSION (:collector-exoplayer project)"
-fi
+echo "  - com.bitmovin.analytics:collector-bitmovin-player:$VERSION (:collector-bitmovin-player project)"
+echo "  - com.bitmovin.analytics:collector-exoplayer:$VERSION (:collector-exoplayer project)"
 echo "\nAre all tokens, artifacts and versions correct ?"
 read -p "(Press enter to continue)"
 
@@ -112,39 +101,21 @@ echo "\n:collector project build and publishing..."
 ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector:publishToMavenLocal || exit
 echo "\n:collector project built and published!"
 
-if $IS_V1_RELEASE; then
-  echo "\n:collector-bitmovin-player-v1 project build and publishing..."
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player-v1:clean || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player-v1:build || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player-v1:assembleRelease || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player-v1:artifactoryPublish || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player-v1:publishToMavenLocal || exit
-  echo "\n:collector-bitmovin-player-v1 project built and published!"
+echo "\n:collector-bitmovin-player project build and publishing..."
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player:clean || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player:build || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player:assembleRelease || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player:artifactoryPublish || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player:publishToMavenLocal || exit
+echo "\n:collector-bitmovin-player project built and published!"
 
-  echo "\n:collector-exoplayer-v1 project build and publishing..."
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer-v1:clean || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer-v1:build || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer-v1:assembleRelease || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer-v1:artifactoryPublish || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer-v1:publishToMavenLocal || exit
-  echo "\n:collector-exoplayer-v1 project built and published!"
-else
-  echo "\n:collector-bitmovin-player project build and publishing..."
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player:clean || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player:build || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player:assembleRelease || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player:artifactoryPublish || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-bitmovin-player:publishToMavenLocal || exit
-  echo "\n:collector-bitmovin-player project built and published!"
-
-  echo "\n:collector-exoplayer project build and publishing..."
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:clean || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:build || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:assembleRelease || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:artifactoryPublish || exit
-  ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:publishToMavenLocal || exit
-  echo "\n:collector-exoplayer project built and published!"
-fi
+echo "\n:collector-exoplayer project build and publishing..."
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:clean || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:build || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:assembleRelease || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:artifactoryPublish || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:publishToMavenLocal || exit
+echo "\n:collector-exoplayer project built and published!"
 
 echo "\nGit release"
 echo "\nGit Checkout and pull 'main' branch..."

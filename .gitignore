@@ -10,6 +10,5 @@
 bitmovin.properties
 
 *.exec
-collector-bitmovin-player-v1-example/src/main/java/com/bitmovin/analytics/example/shared/Samples.kt
 collector-exoplayer-example/src/main/java/com/bitmovin/analytics/example/shared/Samples.kt
-collector-exoplayer-v1-example/src/main/java/com/bitmovin/analytics/example/shared/Samples.kt
+

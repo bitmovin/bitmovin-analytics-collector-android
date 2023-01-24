@@ -68,9 +68,7 @@ allprojects {
 		}
 		kotlin {
 			target '**/*.kt'
-			targetExclude '**/collector-bitmovin-player-v1-example/**/Samples.kt',
-					'**/collector-exoplayer-example/**/Samples.kt',
-					'**/collector-exoplayer-v1-example/**/Samples.kt'
+			targetExclude '**/collector-exoplayer-example/**/Samples.kt'
 
 			// TODO Remove disabled rules and apply to develop
 			ktlint("0.43.2").userData(["disabled_rules": "indent,import-ordering"])
@@ -96,11 +94,6 @@ ext {
 	 */
 	versionCode = 122003
 
-	/**
-	 * In local development one version is used across all gradle modules. But in production/release,
-	 * we set version property to '1.X' or '2.X' in 'publish.sh' script and based on that we release
-	 * and publish correct collectors v1 or v2.
-	 */
 	version = System.getProperty("version", "0.0.0") + (developLocal ? '-local' : '')
 
 	compileSdkVersion = 33
@@ -111,10 +104,7 @@ ext {
 	targetCompatibility = JavaVersion.VERSION_1_8
 	jvmTarget = JavaVersion.VERSION_1_8.toString()
 
-	bitmovinPlayer2Version = '2.70.0'
 	bitmovinPlayerVersion = '3.25.1'
-
-	exoplayerCollectorV1Version = '2.11.8'
 	exoplayerVersion = '2.18.1'
 
 	constraintLayoutVersion = '1.0.2'
@@ -189,18 +179,14 @@ project(":collector-exoplayer-example") {
 		skipProject = true
 	}
 }
-project(":collector-exoplayer-v1-example") {
-	sonarqube {
-		skipProject = true
-	}
-}
 project(":collector-bitmovin-player-example") {
 	sonarqube {
 		skipProject = true
 	}
 }
-project(":collector-bitmovin-player-v1-example") {
+project(":collector-bitmovin-player-tv-example") {
 	sonarqube {
 		skipProject = true
 	}
 }
+
