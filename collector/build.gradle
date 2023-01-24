@@ -55,20 +55,18 @@ dependencies {
 	implementation fileTree(dir: 'libs', include: ['*.jar'])
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 	implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
-	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
-	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
-	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
-
-
-	testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-	androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-	testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
 	implementation 'com.squareup.okhttp3:okhttp:3.12.1'
 	implementation 'com.google.code.gson:gson:2.8.5'
-	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 
+	testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+	testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
+	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 	testImplementation 'org.robolectric:robolectric:4.9'
 	testImplementation 'androidx.test:core:1.5.0'
+
+	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+	androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
 }
 
 publishing {

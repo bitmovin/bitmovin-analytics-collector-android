@@ -47,15 +47,10 @@ dependencies {
 	implementation fileTree(dir: 'libs', include: ['*.jar'])
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 	implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
-	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
-	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
-	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
 
-
-	testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-	androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
 	testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
-	androidTestImplementation "org.mockito:mockito-android:${rootProject.ext.mockitoCoreVersion}"
+	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+	testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
 	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 
 	if (rootProject.ext.developLocal) {

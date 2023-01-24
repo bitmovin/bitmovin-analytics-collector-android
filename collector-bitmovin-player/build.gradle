@@ -62,8 +62,6 @@ dependencies {
 	testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
 	testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
 	testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
-	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
-	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
 }
 
 publishing {

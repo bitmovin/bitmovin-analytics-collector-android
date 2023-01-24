@@ -60,10 +60,6 @@ dependencies {
 	}
 	implementation project(':example-shared')
 
-	testImplementation "junit:junit:${rootProject.ext.junitVersion}"
-	androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
-	androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
-
 	implementation "com.google.android.gms:play-services-cast-framework:19.0.0" //only needed if Chromecast is used
 	implementation 'androidx.mediarouter:mediarouter:1.0.0'  //only needed if Chromecast is used
 	implementation 'androidx.legacy:legacy-support-v4:1.0.0'  //only needed if Chromecast is used

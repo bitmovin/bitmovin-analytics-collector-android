@@ -68,8 +68,6 @@ allprojects {
 		}
 		kotlin {
 			target '**/*.kt'
-			targetExclude '**/collector-exoplayer-example/**/Samples.kt'
-
 			// TODO Remove disabled rules and apply to develop
 			ktlint("0.43.2").userData(["disabled_rules": "indent,import-ordering"])
 			// has its own section below
@@ -89,7 +87,8 @@ ext {
 	developLocal = System.getProperty("developLocal", "true").toBoolean()
 	packageGroupId = 'com.bitmovin.analytics'
 
-	/** Not relevant for us as versionCode is used only by PlayStore to indicate updates of apps,
+	/**
+	 * Not relevant for us as versionCode is used only by PlayStore to indicate updates of apps,
 	 * but we publish artifacts to maven repositories
 	 */
 	versionCode = 122003
@@ -110,7 +109,6 @@ ext {
 	constraintLayoutVersion = '1.0.2'
 	junitVersion = '4.13.2'
 	testRunnerVersion = '1.0.1'
-	espressoCoreVersion = '3.4.0'
 	assertjCoreVersion = '3.11.1'
 	mockitoCoreVersion = '3.5.0'
 	appCompatVersion = '1.1.0'

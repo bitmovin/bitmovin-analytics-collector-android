@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Removed
-- v1 Collectors 
+- [internal] v1 Collectors
+- [internal] obsolete dependencies
 
 ## v2.13.0
 
