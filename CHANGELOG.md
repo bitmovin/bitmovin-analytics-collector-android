@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
-## v2
+## v2.13.0
 
 ### Changed
 - BitmovinPlayer: Improved ad tracking
@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Detection of UHD screens on AndroidTVs
 
-## v1
+## v1.36.0
 
 ### Changed
 - BitmovinPlayer: Improved ad tracking
