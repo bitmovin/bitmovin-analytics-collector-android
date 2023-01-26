@@ -5,13 +5,13 @@ import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
 import io.mockk.mockk
-import java.util.Calendar
-import java.util.Date
-import java.util.concurrent.TimeUnit
 import org.assertj.core.api.Assertions
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import java.util.Calendar
+import java.util.Date
+import java.util.concurrent.TimeUnit
 
 class RetryQueueTest {
     private val config = BitmovinAnalyticsConfig()
@@ -31,7 +31,6 @@ class RetryQueueTest {
 
     @Test
     fun sampleShouldBeDiscardedIfMaxRetryTimeExceeded() {
-
         val retryQueue = Mockito.spy(RetryQueue())
 
         val firstSample = setupEventData(1)
@@ -43,7 +42,6 @@ class RetryQueueTest {
 
     @Test
     fun sampleShouldBeDiscardedIfMaxNumberOfSamplesReached() {
-
         val retryQueue = Mockito.spy(RetryQueue())
 
         `when`(retryQueue.getMaxSampleNumber()).thenAnswer { 3 }
@@ -76,7 +74,6 @@ class RetryQueueTest {
 
     @Test
     fun getSamplesShouldNotReturnSamplesWithFutureScheduledTime() {
-
         val retryQueue = Mockito.spy(RetryQueue())
         val firstSample = setupEventData(1)
 

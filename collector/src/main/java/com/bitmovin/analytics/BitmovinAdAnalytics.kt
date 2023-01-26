@@ -11,7 +11,6 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.AdSample
 import com.bitmovin.analytics.utils.Util
 
-// TODO instead of having the full analytics, only pass an interface that has both `createEventData` and `sendAdEventData`
 class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalyticsEventListener {
     private var activeAdBreak: AdBreak? = null
     private var activeAdSample: AdSample? = null

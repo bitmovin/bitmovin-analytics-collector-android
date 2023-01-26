@@ -19,7 +19,7 @@ class ExoPlayerCollector
  * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
  * @param context [Context]
  */
-    (bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : DefaultCollector<ExoPlayer>(bitmovinAnalyticsConfig, context, ExoUtil.getUserAgent(context)) {
+(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : DefaultCollector<ExoPlayer>(bitmovinAnalyticsConfig, context, ExoUtil.getUserAgent(context)) {
     /**
      * Bitmovin Analytics
      *
@@ -27,7 +27,7 @@ class ExoPlayerCollector
      */
     @Deprecated(
         """Please use {@link #ExoPlayerCollector(BitmovinAnalyticsConfig, Context)} and pass
-          {@link Context} separately."""
+          {@link Context} separately.""",
     )
     constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) : this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context ?: throw IllegalArgumentException("Context cannot be null"))
 
@@ -39,7 +39,7 @@ class ExoPlayerCollector
             stateMachine,
             featureFactory,
             eventDataFactory,
-            deviceInformationProvider
+            deviceInformationProvider,
         )
     }
 }

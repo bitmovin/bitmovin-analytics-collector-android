@@ -113,7 +113,9 @@ class ExoPlayerAdapterTest {
     }
 
     private fun getEventTime(realTime: Long): AnalyticsListener.EventTime {
-        return AnalyticsListener.EventTime(realTime, Timeline.EMPTY, 0, null, 0, Timeline.EMPTY,
-                0, null, 0, 0)
+        return AnalyticsListener.EventTime(
+            realTime, Timeline.EMPTY, 0, null, 0, Timeline.EMPTY,
+            0, null, 0, 0,
+        )
     }
 }

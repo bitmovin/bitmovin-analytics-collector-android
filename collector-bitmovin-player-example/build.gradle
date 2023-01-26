@@ -64,4 +64,3 @@ dependencies {
 	implementation 'androidx.mediarouter:mediarouter:1.0.0'  //only needed if Chromecast is used
 	implementation 'androidx.legacy:legacy-support-v4:1.0.0'  //only needed if Chromecast is used
 }
-

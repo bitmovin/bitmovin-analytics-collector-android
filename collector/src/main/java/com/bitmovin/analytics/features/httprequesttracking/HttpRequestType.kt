@@ -15,5 +15,5 @@ enum class HttpRequestType {
     MANIFEST_SMOOTH,
     MANIFEST,
     KEY_HLS_AES,
-    UNKNOWN
+    UNKNOWN,
 }

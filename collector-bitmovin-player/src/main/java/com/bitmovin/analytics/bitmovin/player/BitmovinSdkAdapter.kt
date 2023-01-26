@@ -40,7 +40,7 @@ class BitmovinSdkAdapter(
     featureFactory: FeatureFactory,
     private val sourceMetadataMap: Map<Source, SourceMetadata>,
     eventDataFactory: EventDataFactory,
-    deviceInformationProvider: DeviceInformationProvider
+    deviceInformationProvider: DeviceInformationProvider,
 ) : DefaultPlayerAdapter(config, eventDataFactory, stateMachine, featureFactory, deviceInformationProvider), EventDataManipulator {
     private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
     private var totalDroppedVideoFrames = 0
@@ -389,7 +389,7 @@ class BitmovinSdkAdapter(
     private fun onSourceEventAudioChanged(event: SourceEvent.AudioChanged) {
         try {
             Log.d(TAG, "On AudioChanged")
-            // TODO add a audio track changed to the statemachine that will check if
+            // TODO AN-3298 add a audio track changed to the statemachine that will check if
             // tranistion is allowed
             // and make sure the old sample is send with the old audio track value
             if (!stateMachine.isStartupFinished) {
@@ -434,7 +434,7 @@ class BitmovinSdkAdapter(
     private fun onPlayerEventVideoPlaybackQualityChanged(event: PlayerEvent.VideoPlaybackQualityChanged) {
         try {
             Log.d(TAG, "On Video Quality Changed")
-            // TODO check if any value actually changed
+            // TODO AN-3299 check if any value actually changed
             // Maybe the didQualityChange can actually deeply compare two objects
             // that already have all the properties that we later need (codec, bitrate, etc)
             stateMachine.videoQualityChanged(position, true) {}
@@ -509,10 +509,10 @@ class BitmovinSdkAdapter(
             Log.d(
                 TAG,
                 "Event PlaylistTransition" +
-                        " from: " +
-                        event.from.config.url +
-                        " to: " +
-                        event.to.config.url
+                    " from: " +
+                    event.from.config.url +
+                    " to: " +
+                    event.to.config.url,
             )
 
             // The `sourceChange` will send the remaining sample from the previous

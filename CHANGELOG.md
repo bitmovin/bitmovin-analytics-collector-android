@@ -2,13 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/) 
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Removed
 - [internal] v1 Collectors
 - [internal] obsolete dependencies
+- [internal] unnecessary TODOs
+
+### Changed
+- [internal] updated gradle plugin and dependencies
+- [internal] updated spotless config
 
 ## v2.13.0
 
@@ -79,7 +84,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## v1.35.0
 
 ### Fixed
-- improve null checks when extracting Status code from `LoadEventInfo` in `ExoPlayerHttpRequestTrackingAdapter` 
+- improve null checks when extracting Status code from `LoadEventInfo` in `ExoPlayerHttpRequestTrackingAdapter`
 - Fixes concurrency bug that could cause issues in certain edge cases where many http requests are sent by the player
 
 ## v2.11.0
@@ -322,8 +327,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support for ExoPlayer version >= 2.12
 
 - [Internal] Separated BitmovinPlayer v2 and v3 collectors and example modules
-    - example apps (v1 and latest) package and id renaming
-    - example apps (v1 and latest) icons and colors change
+	- example apps (v1 and latest) package and id renaming
+	- example apps (v1 and latest) icons and colors change
 - [Internal] Separated exoplayer collector projects
 - [Internal] Added new sample app for testing older versions of exoplayer collector
 - [Internal] `FeatureManager` allows dynamically adding and disabling features based on player support.
@@ -385,10 +390,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## v1.17.0
 
 ### Changed
-- tracking of video startup times when having autoplay enabled to be consistent with web platform 
+- tracking of video startup times when having autoplay enabled to be consistent with web platform
 
 ### Fixed
-- `CountDownTimer` potentially continues running after the player adapter is released (AN-1595) 
+- `CountDownTimer` potentially continues running after the player adapter is released (AN-1595)
 
 ## v1.16.0
 
@@ -478,14 +483,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v1.11.0
 
-### Added 
+### Added
 
 - added `customData6` and `customData7` to the EventData and AdEventData
 
 ### Fixed
 
 - player started state transition before the player was ready
-- pause state activated heartbeat and sent out unnecessary payload 
+- pause state activated heartbeat and sent out unnecessary payload
 
 ## v1.10.0
 
@@ -496,7 +501,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Known Issues
 
-- tracking of metrics `percentageInViewport` and `timeInView` not possible in Android 
+- tracking of metrics `percentageInViewport` and `timeInView` not possible in Android
 
 ## v1.9.0
 ### Fixed
@@ -577,7 +582,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Changed `title` property in payload to `videoTitle`
-- In some cases the collector reported the player version it was compiled against, not the version in use (both Exoplayer and Bitmovin Player) 
+- In some cases the collector reported the player version it was compiled against, not the version in use (both Exoplayer and Bitmovin Player)
 
 ## v1.4.2
 

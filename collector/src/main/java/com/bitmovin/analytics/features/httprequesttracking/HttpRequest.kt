@@ -12,5 +12,5 @@ data class HttpRequest(
     val downloadTime: Long,
     val timeToFirstByte: Long?,
     val size: Long?,
-    val success: Boolean
+    val success: Boolean,
 )

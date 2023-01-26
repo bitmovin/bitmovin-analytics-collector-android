@@ -34,5 +34,5 @@ data class AdSample(
     var errorCode: Int? = null,
     var errorData: String? = null,
     var errorMessage: String? = null,
-    var ad: Ad = Ad()
+    var ad: Ad = Ad(),
 )

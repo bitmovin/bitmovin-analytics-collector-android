@@ -7,5 +7,5 @@ data class DeviceInformationDto(
     val operatingSystem: String? = null,
     val operatingSystemMajor: String? = null,
     val operatingSystemMinor: String? = null,
-    val deviceClass: DeviceClass? = null
+    val deviceClass: DeviceClass? = null,
 )

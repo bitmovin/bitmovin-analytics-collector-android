@@ -21,9 +21,10 @@ abstract class DefaultPlayerAdapter(protected val config: BitmovinAnalyticsConfi
 
     override fun createEventData() =
         eventDataFactory.create(
-                stateMachine.impressionId,
-                currentSourceMetadata,
-                deviceInformationProvider.getDeviceInformation())
+            stateMachine.impressionId,
+            currentSourceMetadata,
+            deviceInformationProvider.getDeviceInformation(),
+        )
 
     override fun release() {
         eventDataFactory.clearEventDataManipulators()

@@ -70,7 +70,8 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
                 it.onAdError(
                     adBreakMapper.fromPlayerAdConfiguration(adConf),
                     event.code,
-                    event.message)
+                    event.message,
+                )
             }
         } catch (e: Exception) {
             Log.d(TAG, "On Ad Error", e)

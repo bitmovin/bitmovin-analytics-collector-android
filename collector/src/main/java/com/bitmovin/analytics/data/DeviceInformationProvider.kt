@@ -82,17 +82,17 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
         }
 
         return DeviceInformation(
-                manufacturer = Build.MANUFACTURER,
-                model = Build.MODEL,
-                isTV = isTV,
-                locale = Util.getLocale(),
-                domain = Util.getDomain(context),
-                screenWidth = width,
-                screenHeight = height,
-                userAgent = userAgent,
-                operatingSystem = operatingSystem,
-                operatingSystemMajor = operatingSystemMajor,
-                deviceClass = deviceClass
+            manufacturer = Build.MANUFACTURER,
+            model = Build.MODEL,
+            isTV = isTV,
+            locale = Util.getLocale(),
+            domain = Util.getDomain(context),
+            screenWidth = width,
+            screenHeight = height,
+            userAgent = userAgent,
+            operatingSystem = operatingSystem,
+            operatingSystemMajor = operatingSystemMajor,
+            deviceClass = deviceClass,
         )
     }
 
@@ -177,7 +177,8 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
 
         if ("Sony" == Build.MANUFACTURER &&
             Build.MODEL.startsWith("BRAVIA") &&
-            context.packageManager.hasSystemFeature("com.sony.dtv.hardware.panel.qfhd")) {
+            context.packageManager.hasSystemFeature("com.sony.dtv.hardware.panel.qfhd")
+        ) {
             outSize.x = 3840
             outSize.y = 2160
             return

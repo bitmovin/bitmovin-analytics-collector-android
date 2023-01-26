@@ -26,13 +26,13 @@ import com.bitmovin.analytics.stateMachines.StateMachineListener
  * supports analytics of ExoPlayer video players
  */
 class BitmovinAnalytics
-    /**
-     * Bitmovin Analytics
-     *
-     * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
-     * @param context [Context]
-     */
-    (val config: BitmovinAnalyticsConfig, val context: Context) : LicenseCallback {
+/**
+ * Bitmovin Analytics
+ *
+ * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
+ * @param context [Context]
+ */
+(val config: BitmovinAnalyticsConfig, val context: Context) : LicenseCallback {
     private val debugCallback: DebugCallback = object : DebugCallback {
         override fun dispatchEventData(data: EventData) {
             eventBus.notify(DebugListener::class) { it.onDispatchEventData(data) }
@@ -63,6 +63,7 @@ class BitmovinAnalytics
         this.playerStartupTime = 0
         return playerStartupTime
     }
+
     /**
      * Attach a player instance to this analytics plugin. After this is completed, BitmovinAnalytics
      * will start monitoring and sending analytics data based on the attached player adapter.

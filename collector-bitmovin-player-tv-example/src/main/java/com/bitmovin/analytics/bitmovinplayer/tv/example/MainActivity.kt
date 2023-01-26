@@ -54,17 +54,20 @@ class MainActivity : AppCompatActivity() {
 
         val redbullMetadata = SourceMetadata(
             videoId = "source-video-id",
-            title = "redbull")
+            title = "redbull",
+        )
         collector.addSourceMetadata(redbullSource, redbullMetadata)
 
         val sintelMetadata = SourceMetadata(
             videoId = "source-video-id-2",
-            title = "sintel")
+            title = "sintel",
+        )
         collector.addSourceMetadata(sintelSource, sintelMetadata)
 
         val liveSimMetadata = SourceMetadata(
             videoId = "source-video-id",
-            title = "livesims")
+            title = "livesims",
+        )
         collector.addSourceMetadata(liveSimSource, liveSimMetadata)
 
         collector.attachPlayer(player)
@@ -123,7 +126,8 @@ class MainActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_ENTER,
             KeyEvent.KEYCODE_NUMPAD_ENTER,
             KeyEvent.KEYCODE_SPACE,
-            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+            -> {
                 player.togglePlay()
                 true
             }
@@ -140,12 +144,14 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             KeyEvent.KEYCODE_DPAD_RIGHT,
-            KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
+            KeyEvent.KEYCODE_MEDIA_FAST_FORWARD,
+            -> {
                 player.seekForward()
                 true
             }
             KeyEvent.KEYCODE_DPAD_LEFT,
-            KeyEvent.KEYCODE_MEDIA_REWIND -> {
+            KeyEvent.KEYCODE_MEDIA_REWIND,
+            -> {
                 player.seekBackward()
                 true
             }
@@ -197,7 +203,7 @@ class MainActivity : AppCompatActivity() {
         // I.e. UI controls get shown / hidden whenever the Player API is called.
         // This is needed due to the fact that on Android TV no touch events are received
         styleConfig = StyleConfig(playerUiJs = "file:///android_asset/bitmovinplayer-ui.js"),
-        playbackConfig = PlaybackConfig(isAutoplayEnabled = true)
+        playbackConfig = PlaybackConfig(isAutoplayEnabled = true),
     )
 
     companion object {

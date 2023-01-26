@@ -43,7 +43,7 @@ class ExoPlayerAdapter(
     stateMachine: PlayerStateMachine,
     featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
-    deviceInformationProvider: DeviceInformationProvider
+    deviceInformationProvider: DeviceInformationProvider,
 ) : DefaultPlayerAdapter(config, eventDataFactory, stateMachine, featureFactory, deviceInformationProvider), EventDataManipulator {
     private val isDashManifestClassLoaded by lazy {
         Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, this.javaClass.classLoader)
@@ -54,6 +54,7 @@ class ExoPlayerAdapter(
     private val exceptionMapper: ExceptionMapper<Throwable> = ExoPlayerExceptionMapper()
     private val bitrateEventDataManipulator = BitrateEventDataManipulator(exoplayer)
     private val meter = DownloadSpeedMeter()
+
     // TODO inject those from the outside, as this is not really testable
     internal val defaultAnalyticsListener = createAnalyticsListener()
     internal val defaultPlayerEventListener = createPlayerEventListener()
@@ -115,13 +116,13 @@ class ExoPlayerAdapter(
             val position = position
             Log.d(
                 TAG,
-                "Collector was attached while media source was already loading, transitioning to startup state."
+                "Collector was attached while media source was already loading, transitioning to startup state.",
             )
             startup(position)
             if (playbackState == Player.STATE_READY) {
                 Log.d(
                     TAG,
-                    "Collector was attached while media source was already playing, transitioning to playing state"
+                    "Collector was attached while media source was already playing, transitioning to playing state",
                 )
 
                 // We need to add at least one ms here because code executes so fast that time tracked between startup and played could be 0ms
@@ -148,7 +149,9 @@ class ExoPlayerAdapter(
 
         // isLive
         data.isLive = Util.getIsLiveFromConfigOrPlayer(
-            playerIsReady, config.isLive, exoplayer.isCurrentMediaItemDynamic
+            playerIsReady,
+            config.isLive,
+            exoplayer.isCurrentMediaItemDynamic,
         )
 
         // version
@@ -206,8 +209,10 @@ class ExoPlayerAdapter(
                     firstPeriodInWindowIndex < timeline.periodCount
                 ) {
                     timeline.getPeriod(firstPeriodInWindowIndex, firstPeriodInWindow)
-                    var position = (exoplayer.currentPosition -
-                            firstPeriodInWindow.positionInWindowMs)
+                    var position = (
+                        exoplayer.currentPosition -
+                            firstPeriodInWindow.positionInWindowMs
+                        )
                     if (position < 0) {
                         position = 0
                     }
@@ -255,24 +260,25 @@ class ExoPlayerAdapter(
                 try {
                     val videoTime = position
                     Log.d(
-                        TAG, String.format(
+                        TAG,
+                        String.format(
                             "onPlaybackStateChanged: %s playWhenready: %b isPlaying: %b",
                             ExoUtil.exoStateToString(state),
                             exoplayer.playWhenReady,
-                            exoplayer.isPlaying
-                        )
+                            exoplayer.isPlaying,
+                        ),
                     )
                     when (state) {
                         Player.STATE_READY -> // if autoplay is enabled startup state is not yet finished
                             // if collector is attached late or ConcatenatingMediaSource is used we miss other events
                             // for transitioning out from READY state
-                                if (!stateMachine.isStartupFinished && exoplayer.playWhenReady) {
-                                     if (stateMachine.currentState == PlayerStates.READY) {
-                                         startup(videoTime)
-                                     } else if (stateMachine.currentState !== PlayerStates.STARTUP && stateMachine.currentState !== PlayerStates.READY) {
-                                         stateMachine.transitionState(PlayerStates.READY, position)
-                                     }
+                            if (!stateMachine.isStartupFinished && exoplayer.playWhenReady) {
+                                if (stateMachine.currentState == PlayerStates.READY) {
+                                    startup(videoTime)
+                                } else if (stateMachine.currentState !== PlayerStates.STARTUP && stateMachine.currentState !== PlayerStates.READY) {
+                                    stateMachine.transitionState(PlayerStates.READY, position)
                                 }
+                            }
 
                         Player.STATE_BUFFERING -> if (!stateMachine.isStartupFinished) {
                             // this is the case when there is no preloading
@@ -290,7 +296,8 @@ class ExoPlayerAdapter(
                             stateMachine.currentState !== PlayerStates.SEEKING
                         ) {
                             stateMachine.transitionState(
-                                PlayerStates.BUFFERING, videoTime
+                                PlayerStates.BUFFERING,
+                                videoTime,
                             )
                         }
                         Player.STATE_IDLE -> {
@@ -304,13 +311,14 @@ class ExoPlayerAdapter(
                 }
             }
 
-            // TODO Refactor code to work in new method
+            // TODO AN-3298 Refactor code to work in new method
             override fun onSeekStarted(eventTime: AnalyticsListener.EventTime) {
                 try {
                     Log.d(TAG, "onSeekStarted on position: " + eventTime.currentPlaybackPositionMs)
                     val videoTime = position
                     stateMachine.transitionState(
-                        PlayerStates.SEEKING, videoTime
+                        PlayerStates.SEEKING,
+                        videoTime,
                     )
                 } catch (e: Exception) {
                     Log.d(TAG, e.message, e)
@@ -320,7 +328,7 @@ class ExoPlayerAdapter(
             override fun onLoadCompleted(
                 eventTime: AnalyticsListener.EventTime,
                 loadEventInfo: LoadEventInfo,
-                mediaLoadData: MediaLoadData
+                mediaLoadData: MediaLoadData,
             ) {
                 try {
                     if (mediaLoadData.dataType == C.DATA_TYPE_MANIFEST) {
@@ -339,7 +347,7 @@ class ExoPlayerAdapter(
             override fun onAudioInputFormatChanged(
                 eventTime: AnalyticsListener.EventTime,
                 format: Format,
-                decoderReuseEvaluation: DecoderReuseEvaluation?
+                decoderReuseEvaluation: DecoderReuseEvaluation?,
             ) {
                 Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate))
                 try {
@@ -352,7 +360,7 @@ class ExoPlayerAdapter(
             override fun onVideoInputFormatChanged(
                 eventTime: AnalyticsListener.EventTime,
                 format: Format,
-                decoderReuseEvaluation: DecoderReuseEvaluation?
+                decoderReuseEvaluation: DecoderReuseEvaluation?,
             ) {
                 Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate))
                 try {
@@ -365,7 +373,7 @@ class ExoPlayerAdapter(
             override fun onDroppedVideoFrames(
                 eventTime: AnalyticsListener.EventTime,
                 droppedFrames: Int,
-                elapsedMs: Long
+                elapsedMs: Long,
             ) {
                 try {
                     totalDroppedVideoFrames += droppedFrames

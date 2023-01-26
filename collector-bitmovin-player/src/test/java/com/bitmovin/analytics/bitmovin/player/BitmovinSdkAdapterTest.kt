@@ -18,10 +18,10 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
-import kotlin.reflect.KClass
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
+import kotlin.reflect.KClass
 
 class BitmovinSdkAdapterTest {
     private lateinit var playerStateMachine: PlayerStateMachine

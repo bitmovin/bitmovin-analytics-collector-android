@@ -89,12 +89,12 @@ publishing {
 					configurations[configurationName].allDependencies.each {
 
 						if ((it.group == 'com.google.android.libraries.cast.companionlibrary' && it.name == 'ccl') ||
-						(it.group == 'com.android.support' && it.name == 'mediarouter-v7') ||
-						(it.group == 'com.android.support' && it.name == 'support-v4') ||
-						(it.group == 'com.android.support' && it.name == 'appcompat-v7') ||
-						(it.group == 'com.google.android.gms' && it.name == 'play-services-cast-framework') ||
-						(it.group == 'com.google.ads.interactivemedia.v3' && it.name == 'interactivemedia') ||
-						(it.group == 'com.google.android.gms' && it.name == 'play-services-ads')) {
+								(it.group == 'com.android.support' && it.name == 'mediarouter-v7') ||
+								(it.group == 'com.android.support' && it.name == 'support-v4') ||
+								(it.group == 'com.android.support' && it.name == 'appcompat-v7') ||
+								(it.group == 'com.google.android.gms' && it.name == 'play-services-cast-framework') ||
+								(it.group == 'com.google.ads.interactivemedia.v3' && it.name == 'interactivemedia') ||
+								(it.group == 'com.google.android.gms' && it.name == 'play-services-ads')) {
 							return
 						}
 

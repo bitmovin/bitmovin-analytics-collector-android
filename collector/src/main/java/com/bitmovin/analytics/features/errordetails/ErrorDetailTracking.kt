@@ -12,8 +12,8 @@ import com.bitmovin.analytics.utils.Util
 // Should be streamlined and go through the BitmovinAnalytics class
 
 class ErrorDetailTracking(private val context: Context, private val analyticsConfig: BitmovinAnalyticsConfig, private val backend: ErrorDetailBackend, private val httpRequestTracking: HttpRequestTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) :
-        Feature<FeatureConfigContainer, ErrorDetailTrackingConfig>(),
-        OnErrorDetailEventListener {
+    Feature<FeatureConfigContainer, ErrorDetailTrackingConfig>(),
+    OnErrorDetailEventListener {
     private var errorIndex: Long = 0
     init {
         observables.forEach { it.subscribe(this) }

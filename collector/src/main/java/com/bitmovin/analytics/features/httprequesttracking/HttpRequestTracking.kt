@@ -8,7 +8,7 @@ import java.util.LinkedList
 import java.util.Queue
 
 class HttpRequestTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) :
-        OnDownloadFinishedEventListener {
+    OnDownloadFinishedEventListener {
     companion object {
         const val defaultMaxRequests = 10
         private const val TAG = "HttpRequestTracking"
@@ -24,7 +24,7 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
         get() {
             // threadsafe copy of the linked list
             synchronized(lock) {
-            return LinkedList(httpRequestQueue)
+                return LinkedList(httpRequestQueue)
             }
         }
 

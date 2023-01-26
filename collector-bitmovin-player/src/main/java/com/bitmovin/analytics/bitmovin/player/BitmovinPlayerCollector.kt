@@ -25,7 +25,7 @@ class BitmovinPlayerCollector
  * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
  * @param context [Context]
  */
-    (bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : DefaultCollector<Player>(bitmovinAnalyticsConfig, context, getUserAgent(context)) {
+(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : DefaultCollector<Player>(bitmovinAnalyticsConfig, context, getUserAgent(context)) {
     private val sourceMetadataMap = HashMap<Source, SourceMetadata>()
 
     /**
@@ -35,7 +35,7 @@ class BitmovinPlayerCollector
      */
     @Deprecated(
         """Please use {@link #BitmovinPlayerCollector(BitmovinAnalyticsConfig, Context)} and
-          pass {@link Context} separately."""
+          pass {@link Context} separately.""",
     )
     constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) : this(bitmovinAnalyticsConfig, bitmovinAnalyticsConfig.context ?: throw IllegalArgumentException("Context cannot be null"))
 
@@ -48,7 +48,7 @@ class BitmovinPlayerCollector
             featureFactory,
             sourceMetadataMap,
             eventDataFactory,
-            deviceInformationProvider
+            deviceInformationProvider,
         )
     }
 
@@ -68,14 +68,16 @@ class BitmovinPlayerCollector
             } catch (var5: PackageManager.NameNotFoundException) {
                 null
             } ?: "?"
-            return (applicationName +
+            return (
+                applicationName +
                     "/" +
                     versionName +
                     " (Linux;Android " +
                     Build.VERSION.RELEASE +
                     ") " +
                     "BitmovinPlayer/" +
-                    BitmovinUtil.getPlayerVersion())
+                    BitmovinUtil.getPlayerVersion()
+                )
         }
     }
 }

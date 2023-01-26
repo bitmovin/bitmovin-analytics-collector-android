@@ -6,8 +6,8 @@ import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.HttpClient
 import com.bitmovin.analytics.utils.Util
-import java.util.LinkedList
 import okhttp3.OkHttpClient
+import java.util.LinkedList
 
 class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
     private val backendUrl = Util.joinUrl(collectorConfig.backendUrl, "/analytics/error")
@@ -50,19 +50,21 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
         const val MAX_STRING_LENGTH = 400
 
         fun ErrorDetail.copyTruncateStringsAndUrls(maxStringLength: Int, maxUrlLength: Int): ErrorDetail = this.copy(
-                message = message?.take(maxStringLength),
-                data = data.copyTruncateStrings(maxStringLength),
-                httpRequests = httpRequests?.mapNotNull {
-                    it.copyTruncateUrls(maxUrlLength)
-                })
+            message = message?.take(maxStringLength),
+            data = data.copyTruncateStrings(maxStringLength),
+            httpRequests = httpRequests?.mapNotNull {
+                it.copyTruncateUrls(maxUrlLength)
+            },
+        )
 
         private fun HttpRequest?.copyTruncateUrls(maxLength: Int) = this?.copy(
-                url = url?.take(maxLength),
-                lastRedirectLocation = lastRedirectLocation?.take(maxLength))
+            url = url?.take(maxLength),
+            lastRedirectLocation = lastRedirectLocation?.take(maxLength),
+        )
 
         private fun ErrorData.copyTruncateStrings(maxStringLength: Int) = this.copy(
-                exceptionMessage = exceptionMessage?.take(maxStringLength),
-                additionalData = additionalData?.take(maxStringLength)
+            exceptionMessage = exceptionMessage?.take(maxStringLength),
+            additionalData = additionalData?.take(maxStringLength),
         )
 
         fun ErrorDetail.copyTruncateHttpRequests(maxRequests: Int) = this.copy(httpRequests = httpRequests?.take(maxRequests))

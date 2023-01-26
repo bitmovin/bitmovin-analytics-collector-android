@@ -92,7 +92,6 @@ if ! ./gradlew spotlessCheck --daemon; then
   exit
 fi
 
-#TODO next release: check if version parameter works (for CircleCI, we also need to add libs-release-local from the .m2/settings.xml, so it will build the other bitmovin and exo collectors (otherwise it can't resolve the dependency on collector before distributing to bintray)
 echo "\n:collector project build and publishing..."
 ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector:clean || exit
 ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector:build || exit
@@ -126,9 +125,8 @@ echo "\nGit merge develop..."
 git merge develop
 
 echo "\nGit create tag 'v$VERSION' ..."
-git tag -a v$VERSION -m "v$VERSION" #TODO check if tag exists in the beginning. If yes, ask if the user wants to override the version and force overriding of tag
+git tag -a v$VERSION -m "v$VERSION"
 
-#TODO exit if error
 echo "\n Git push 'main' and tag 'v$VERSION' to internal repo."
 git push origin main v$VERSION
 
@@ -136,7 +134,7 @@ echo "\n Git push 'main' and tag 'v$VERSION' to public repo."
 git push git@github.com:bitmovin/bitmovin-analytics-collector-android.git main v$VERSION
 
 echo "Creating release in public repo."
-#TODO override existing release
+
 curl \
   -u bitAnalyticsCircleCi:$ANALYTICS_GH_TOKEN \
   -X POST \
@@ -157,13 +155,13 @@ else
   echo "$file not found."
 fi
 
-echo "Distributing the artifacts to bintray..."
+echo "Distributing the artifacts to jfrog..."
 
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector/${VERSION}"
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-bitmovin-player/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-bitmovin-player/${VERSION}"
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-exoplayer/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-exoplayer/${VERSION}"
 
-echo "\nDistributed the artifacts to bintray."
+echo "\nDistributed the artifacts to jfrog."
 
 notifyApi "android-bitmovin" $VERSION "collector-bitmovin-player"
 notifyApi "android-exo" $VERSION "collector-exoplayer"

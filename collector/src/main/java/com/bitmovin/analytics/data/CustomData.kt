@@ -31,5 +31,5 @@ data class CustomData(
     var customData28: String? = null,
     var customData29: String? = null,
     var customData30: String? = null,
-    var experimentName: String? = null
+    var experimentName: String? = null,
 )

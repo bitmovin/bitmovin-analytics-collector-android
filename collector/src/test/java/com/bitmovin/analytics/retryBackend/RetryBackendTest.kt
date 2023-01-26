@@ -10,10 +10,10 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import org.junit.Test
 import java.net.SocketTimeoutException
 import java.util.Calendar
 import java.util.Date
-import org.junit.Test
 
 class RetryBackendTest {
 
@@ -31,7 +31,6 @@ class RetryBackendTest {
 
     @Test
     fun sampleShouldBeProcessedAfterHttpRequestTimeout() {
-
         every { backendMock.send(any(), any()) } answers {
             (it.invocation.args[1] as OnFailureCallback).onFailure(SocketTimeoutException("Timeout")) {}
         }

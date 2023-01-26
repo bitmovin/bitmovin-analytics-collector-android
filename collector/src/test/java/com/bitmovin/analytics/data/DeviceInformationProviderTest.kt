@@ -15,10 +15,12 @@ import org.robolectric.shadows.ShadowPackageManager
 import org.robolectric.shadows.ShadowUIModeManager
 
 @RunWith(
-    RobolectricTestRunner::class)
+    RobolectricTestRunner::class,
+)
 class DeviceInformationProviderTest {
 
-    @Test @Config(qualifiers = "fr-rFR-w360dp-h640dp-xhdpi")
+    @Test
+    @Config(qualifiers = "fr-rFR-w360dp-h640dp-xhdpi")
     fun testGetDeviceInformation_Phone_targetAPI_ShouldReturnInfo() {
         // arrange
         val dip = DeviceInformationProvider(ApplicationProvider.getApplicationContext(), "test-ua")
@@ -39,7 +41,8 @@ class DeviceInformationProviderTest {
         Assert.assertEquals(null, deviceInfo.deviceClass)
     }
 
-    @Test @Config(qualifiers = "en-rUS-w1080dp-h1920dp-xhdpi", sdk = [26])
+    @Test
+    @Config(qualifiers = "en-rUS-w1080dp-h1920dp-xhdpi", sdk = [26])
     fun testGetDeviceInformation_4kPhone_API_V26_ShouldReturnInfo() {
         // arrange
         val dip = DeviceInformationProvider(ApplicationProvider.getApplicationContext(), "test")
@@ -54,7 +57,8 @@ class DeviceInformationProviderTest {
         Assert.assertEquals(3840, deviceInfo.screenHeight)
     }
 
-    @Test @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [31])
+    @Test
+    @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [31])
     fun testGetDeviceInformation_4kTV_API_V31_ShouldReturnInfo() {
         // arrange
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -71,7 +75,8 @@ class DeviceInformationProviderTest {
         Assert.assertEquals(3840, deviceInfo.screenHeight)
     }
 
-    @Test @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [30])
+    @Test
+    @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [30])
     fun testGetDeviceInformation_4kTV_API_V30_ShouldReturnInfo() {
         // arrange
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -88,7 +93,8 @@ class DeviceInformationProviderTest {
         Assert.assertEquals(3840, deviceInfo.screenHeight)
     }
 
-    @Test @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [17])
+    @Test
+    @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [17])
     fun testGetDeviceInformation_4kTV_API_V17_ShouldReturnInfo() {
         // arrange
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -105,7 +111,8 @@ class DeviceInformationProviderTest {
         Assert.assertEquals(3840, deviceInfo.screenHeight)
     }
 
-    @Test @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [33])
+    @Test
+    @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [33])
     fun testGetDeviceInformation_FireOS_8_TV_API_V33_ShouldReturnInfo() {
         // arrange
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -127,7 +134,8 @@ class DeviceInformationProviderTest {
         Assert.assertEquals(3840, deviceInfo.screenHeight)
     }
 
-    @Test @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [29])
+    @Test
+    @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [29])
     fun testGetDeviceInformation_FireOS_7_TV_API_V29_ShouldReturnInfo() {
         // arrange
         val context = ApplicationProvider.getApplicationContext<Context>()

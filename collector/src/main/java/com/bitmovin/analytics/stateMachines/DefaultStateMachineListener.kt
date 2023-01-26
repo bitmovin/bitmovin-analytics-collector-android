@@ -58,11 +58,12 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
 
     override fun onHeartbeat(stateMachine: PlayerStateMachine, duration: Long) {
         Log.d(
-            TAG, String.format(
+            TAG,
+            String.format(
                 "onHeartbeat %s %s",
                 stateMachine.currentState.name,
-                stateMachine.impressionId
-            )
+                stateMachine.impressionId,
+            ),
         )
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
@@ -117,7 +118,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
                 stateMachine.impressionId,
                 errorCode?.errorCode,
                 errorCode?.description,
-                errorCode?.errorData
+                errorCode?.errorData,
             )
         }
     }
@@ -213,7 +214,8 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
                     stateMachine.impressionId,
                     errorCode.errorCode,
                     errorCode.description,
-                    errorCode.errorData)
+                    errorCode.errorData,
+                )
             }
         }
         data.videoStartFailedReason = videoStartFailedReason.reason

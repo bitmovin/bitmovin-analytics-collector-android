@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         CastButtonFactory.setUpMediaRouteButton(
             applicationContext,
             menu,
-            R.id.media_route_menu_item
+            R.id.media_route_menu_item,
         )
         return true
     }
@@ -122,18 +122,21 @@ class MainActivity : AppCompatActivity() {
         this.bitmovinPlayerCollector = collector
 
         val redbullMetadata = SourceMetadata(
-                videoId = "source-video-id",
-                title = "redbull")
+            videoId = "source-video-id",
+            title = "redbull",
+        )
         collector.addSourceMetadata(redbullSource, redbullMetadata)
 
         val sintelMetadata = SourceMetadata(
             videoId = "source-video-id-2",
-            title = "sintel")
+            title = "sintel",
+        )
         collector.addSourceMetadata(sintelSource, sintelMetadata)
 
         val liveSimMetadata = SourceMetadata(
             videoId = "source-video-id",
-            title = "livesims")
+            title = "livesims",
+        )
         collector.addSourceMetadata(liveSimSource, liveSimMetadata)
 
         collector.attachPlayer(player)
@@ -218,7 +221,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         private fun createAdvertisingConfig(): AdvertisingConfig {
-
             // Create AdSources
             val firstAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_1.uri.toString())
             val secondAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_2.uri.toString())

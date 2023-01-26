@@ -33,5 +33,5 @@ data class Ad(
     var skippableAfter: Long? = null,
     var skippable: Boolean? = null,
     var duration: Long? = null,
-    var dealId: String? = null
+    var dealId: String? = null,
 )

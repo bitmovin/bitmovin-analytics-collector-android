@@ -12,12 +12,13 @@ import com.google.android.exoplayer2.upstream.HttpDataSource
 class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
 
     private val errorMessages = mapOf(
-            -1 to "Unknown Error",
-            0 to "Source Error",
-            1 to "Render Error",
-            2 to "Unexpected Error",
-            3 to "Remote Error",
-            4 to "Out of memory Error")
+        -1 to "Unknown Error",
+        0 to "Source Error",
+        1 to "Render Error",
+        2 to "Unexpected Error",
+        3 to "Remote Error",
+        4 to "Out of memory Error",
+    )
 
     override fun map(throwable: Throwable): ErrorCode {
         val exceptionType = getExceptionType(throwable)

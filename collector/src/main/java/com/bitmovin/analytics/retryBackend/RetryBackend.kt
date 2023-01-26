@@ -7,12 +7,12 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.EventData
+import okhttp3.internal.http2.StreamResetException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.Date
 import kotlin.Exception
-import okhttp3.internal.http2.StreamResetException
 
 class RetryBackend(private val next: CallbackBackend, private val scheduleSampleHandler: Handler) : Backend {
 

@@ -11,5 +11,5 @@ data class AdBreak(
     var tagType: AdTagType? = null,
     var tagUrl: String? = null,
     var persistent: Boolean? = null,
-    var fallbackIndex: Long = 0
+    var fallbackIndex: Long = 0,
 )

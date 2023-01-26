@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
     }
 
     private fun buildConcatenatingMediaSource() {
-       val mediaSourceFactory = DefaultMediaSourceFactory(applicationContext)
+        val mediaSourceFactory = DefaultMediaSourceFactory(applicationContext)
         this.concatenatingMediaSource = ConcatenatingMediaSource()
         var mediaSource: MediaSource = mediaSourceFactory.createMediaSource(buildMediaItem(HLS_REDBULL))
         concatenatingMediaSource?.addMediaSource(mediaSource)
@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
                     // Step 2: Create Analytics Collector
                     bitmovinAnalytics = ExoPlayerCollector(
                         bitmovinAnalyticsConfig!!,
-                        applicationContext
+                        applicationContext,
                     )
 
                     bitmovinAnalytics?.addDebugListener(this)
@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
             if (oldIndex >= 0) {
                 concatenatingMediaSource?.removeMediaSource(
                     oldIndex,
-                    Handler(Looper.getMainLooper())
+                    Handler(Looper.getMainLooper()),
                 ) {
                     println("Mainactivity isPlaying: " + player?.isPlaying)
                     println("Mainactivity playbackState: " + player?.playbackState)
@@ -213,8 +213,10 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
         eventLogView?.append(
             String.format(
                 "state: %s, duration: %s, time: %s\n",
-                data.state, data.duration, data.time
-            )
+                data.state,
+                data.duration,
+                data.time,
+            ),
         )
     }
 

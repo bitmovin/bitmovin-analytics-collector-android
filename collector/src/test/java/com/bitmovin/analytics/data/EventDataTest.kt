@@ -2,10 +2,10 @@ package com.bitmovin.analytics.data
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import io.mockk.mockk
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
+import java.util.UUID
 
 class EventDataTest {
     private val playerKey = UUID.randomUUID().toString()

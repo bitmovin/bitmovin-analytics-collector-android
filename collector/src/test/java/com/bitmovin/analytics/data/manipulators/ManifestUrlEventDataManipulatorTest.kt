@@ -7,12 +7,12 @@ import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventDataFactory
 import io.mockk.every
 import io.mockk.mockk
-import java.util.UUID
 import org.assertj.core.api.Assertions
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import java.util.UUID
 
 @RunWith(MockitoJUnitRunner::class)
 class ManifestUrlEventDataManipulatorTest {

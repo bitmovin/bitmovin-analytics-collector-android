@@ -9,7 +9,7 @@ import com.bitmovin.analytics.data.EventData
  */
 open class ManifestUrlEventDataManipulator(
     private val playerAdapter: PlayerAdapter,
-    private val bitmovinAnalyticsConfig: BitmovinAnalyticsConfig
+    private val bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
 ) : EventDataManipulator {
     override fun manipulate(data: EventData) {
         val currentSourceMetadata = playerAdapter.currentSourceMetadata

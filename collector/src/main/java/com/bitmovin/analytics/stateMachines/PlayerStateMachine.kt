@@ -43,7 +43,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
                     heartbeatHandler.postDelayed(this, heartbeatDelay)
                 }
             },
-            heartbeatDelay
+            heartbeatDelay,
         )
     }
 
@@ -58,14 +58,15 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
                     triggerHeartbeat()
                     currentRebufferingIntervalIndex = Math.min(
                         currentRebufferingIntervalIndex + 1,
-                        rebufferingIntervals.size - 1
+                        rebufferingIntervals.size - 1,
                     )
                     heartbeatHandler.postDelayed(
-                        this, rebufferingIntervals[currentRebufferingIntervalIndex].toLong()
+                        this,
+                        rebufferingIntervals[currentRebufferingIntervalIndex].toLong(),
                     )
                 }
             },
-            rebufferingIntervals[currentRebufferingIntervalIndex].toLong()
+            rebufferingIntervals[currentRebufferingIntervalIndex].toLong(),
         )
     }
 
@@ -248,7 +249,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         Log.d(TAG, "rebufferingTimeout finish")
         error(
             analytics.position,
-            AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.errorCode
+            AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.errorCode,
         )
         disableRebufferHeartbeat()
         resetStateMachine()

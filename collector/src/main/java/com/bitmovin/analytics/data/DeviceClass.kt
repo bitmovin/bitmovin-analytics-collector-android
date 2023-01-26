@@ -7,5 +7,5 @@ enum class DeviceClass {
     Tablet,
     Wearable,
     Desktop,
-    Console
+    Console,
 }

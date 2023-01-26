@@ -70,7 +70,7 @@ internal class BitmovinAnalyticsConfigExtension {
                 customData28,
                 customData29,
                 customData30,
-                experimentName
+                experimentName,
             )
         }
     }

@@ -21,9 +21,9 @@ class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataM
         newFormat ?: return false
         val oldFormat = currentVideoFormat
         return oldFormat == null ||
-                newFormat.bitrate.toLong() != oldFormat.bitrate.toLong() ||
-                newFormat.width != oldFormat.width ||
-                newFormat.height != oldFormat.height
+            newFormat.bitrate.toLong() != oldFormat.bitrate.toLong() ||
+            newFormat.width != oldFormat.width ||
+            newFormat.height != oldFormat.height
     }
 
     override fun manipulate(data: EventData) {
@@ -60,9 +60,8 @@ class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataM
     }
 
     private fun getCurrentFormatFromPlayer(trackType: Int): Format? {
-
         val trackInfo = exoplayer.currentTracks.groups.firstOrNull { track -> track.type == trackType }
-                ?: return null
+            ?: return null
 
         var format = trackInfo.mediaTrackGroup.getFormat(0)
         try {

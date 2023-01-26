@@ -125,10 +125,10 @@ class BitrateEventDataManipulatorTest {
     fun `manipulate will apply videoBitrate Information`() {
         // arrange
         val videoFormatFromExo = Format.Builder()
-                .setAverageBitrate(123)
-                .setWidth(234)
-                .setHeight(345)
-                .build()
+            .setAverageBitrate(123)
+            .setWidth(234)
+            .setHeight(345)
+            .build()
         bitrateEventDataManipulator.currentVideoFormat = videoFormatFromExo
         val data = mockk<EventData>(relaxed = true)
 
@@ -145,8 +145,8 @@ class BitrateEventDataManipulatorTest {
     fun `manipulate will apply audioBitrate Information`() {
         // arrange
         val audioFormatFromExo = Format.Builder()
-                .setAverageBitrate(123)
-                .build()
+            .setAverageBitrate(123)
+            .build()
         bitrateEventDataManipulator.currentAudioFormat = audioFormatFromExo
         val data = mockk<EventData>(relaxed = true)
 

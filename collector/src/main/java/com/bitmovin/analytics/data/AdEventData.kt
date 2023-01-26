@@ -41,9 +41,9 @@ data class AdEventData(
     var streamFormat: String? = null,
     var surveyUrl: String? = null,
     var time: Long? = null,
-        // TODO var timeHovered: Long? = null,
+    // TODO var timeHovered: Long? = null,
     var timePlayed: Long? = null,
-        // TODO var timeUntilHover: Long? = null,
+    // TODO var timeUntilHover: Long? = null,
     var universalAdIdRegistry: String? = null,
     var universalAdIdValue: String? = null,
     var videoBitrate: Int? = null,
@@ -120,7 +120,7 @@ data class AdEventData(
     var screenHeight: Int? = null,
     var screenWidth: Int? = null,
     var version: String? = null,
-        // TODO var size: String? = null,
+    // TODO var size: String? = null,
     var userId: String? = null,
     var videoId: String? = null,
     var videoTitle: String? = null,
@@ -128,13 +128,13 @@ data class AdEventData(
     var videoWindowWidth: Int? = null,
     var playerStartupTime: Long? = null,
     var analyticsVersion: String? = null,
-        // TODO var pageLoadTime: Long? = null,
-        // TODO var pageLoadType: Long? = null,
+    // TODO var pageLoadTime: Long? = null,
+    // TODO var pageLoadType: Long? = null,
     var autoplay: Boolean? = null,
     var platform: String? = null,
     var audioCodec: String? = null,
     var videoCodec: String? = null,
-    var retryCount: Int = 0
+    var retryCount: Int = 0,
 ) {
 
     fun setEventData(eventData: EventData) {

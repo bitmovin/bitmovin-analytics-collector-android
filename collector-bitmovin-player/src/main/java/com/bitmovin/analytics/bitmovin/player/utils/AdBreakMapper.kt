@@ -18,32 +18,32 @@ class AdBreakMapper {
     }
 
     private fun fromPlayerAdConfiguration(collectorAdBreak: AdBreak, adConfig: AdConfig): AdBreak {
-
         collectorAdBreak.replaceContentDuration = adConfig.replaceContentDuration?.toLong()?.times(1000)
 
-        if (adConfig is com.bitmovin.player.api.advertising.AdBreak)
+        if (adConfig is com.bitmovin.player.api.advertising.AdBreak) {
             fromPlayerAdBreak(collectorAdBreak, adConfig)
+        }
 
         return collectorAdBreak
     }
 
     private fun fromPlayerAdBreak(collectorAdBreak: AdBreak, playerAdBreak: com.bitmovin.player.api.advertising.AdBreak) {
-
         val ads = ArrayList<Ad>(playerAdBreak.ads.size)
-        if (playerAdBreak.ads.isNotEmpty())
+        if (playerAdBreak.ads.isNotEmpty()) {
             playerAdBreak.ads.forEach { ad -> ads.add(AdMapper().fromPlayerAd(Ad(), ad)) }
+        }
 
         collectorAdBreak.id = playerAdBreak.id
         collectorAdBreak.ads = ads
 
         collectorAdBreak.scheduleTime = playerAdBreak.scheduleTime.toLong().times(1000)
 
-        if (playerAdBreak is ImaAdBreak)
+        if (playerAdBreak is ImaAdBreak) {
             fromImaAdBreak(collectorAdBreak, playerAdBreak)
+        }
     }
 
     private fun fromImaAdBreak(collectorAdBreak: AdBreak, imaAdBreak: ImaAdBreak) {
-
         collectorAdBreak.position = getPositionFromPlayerPosition(imaAdBreak.position)
         collectorAdBreak.fallbackIndex = imaAdBreak.currentFallbackIndex?.toLong() ?: 0
         collectorAdBreak.tagType = AdTagFactory().FromPlayerAdTag(imaAdBreak.tag)

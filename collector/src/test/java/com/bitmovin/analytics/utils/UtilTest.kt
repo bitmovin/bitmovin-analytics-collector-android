@@ -1,10 +1,10 @@
 package com.bitmovin.analytics.utils
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import java.lang.Exception
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert
 import org.junit.Test
+import java.lang.Exception
 
 class UtilTest {
 

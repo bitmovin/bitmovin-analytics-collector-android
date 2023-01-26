@@ -26,7 +26,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
         override fun onLoadCompleted(
             eventTime: AnalyticsListener.EventTime,
             loadEventInfo: LoadEventInfo,
-            mediaLoadData: MediaLoadData
+            mediaLoadData: MediaLoadData,
         ) {
             catchAndLogException("Exception occurred in onLoadCompleted") {
                 // we have to consider LoadEventInfo as nullable, because it comes from java, to prevent NPE and fail before notify is called
@@ -40,7 +40,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
             loadEventInfo: LoadEventInfo,
             mediaLoadData: MediaLoadData,
             error: IOException,
-            wasCanceled: Boolean
+            wasCanceled: Boolean,
         ) {
             catchAndLogException("Exception occurred in onLoadError") {
                 // we have to consider LoadEventInfo as nullable, because it comes from java, to prevent NPE and fail before notify is called
@@ -52,7 +52,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
                     loadEventInfo,
                     mediaLoadData,
                     false,
-                    errorResponseCode ?: loadEventInfoStatusCode
+                    errorResponseCode ?: loadEventInfoStatusCode,
                 )
             }
         }
@@ -111,7 +111,6 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
                 return null
             }
 
-        // TODO write tests
         private val LoadEventInfo.extractStatusCode: Int?
             get() {
                 val nullableKeyMap = this.responseHeaders as? Map<*, List<String>> ?: return null
@@ -124,6 +123,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
 
         private fun mapManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): HttpRequestType {
             return when (com.google.android.exoplayer2.util.Util.inferContentType(uri)) {
+//               TODO update to non deprecated values, test with oldest version we support
                 C.TYPE_DASH -> HttpRequestType.MANIFEST_DASH
                 C.TYPE_HLS -> mapHlsManifestType(uri, eventTime)
                 C.TYPE_SS -> HttpRequestType.MANIFEST_SMOOTH
@@ -147,7 +147,8 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
         private fun mapTrackType(trackType: Int): HttpRequestType = when (trackType) {
             C.TRACK_TYPE_AUDIO -> HttpRequestType.MEDIA_AUDIO
             C.TRACK_TYPE_VIDEO,
-            C.TRACK_TYPE_DEFAULT -> HttpRequestType.MEDIA_VIDEO
+            C.TRACK_TYPE_DEFAULT,
+            -> HttpRequestType.MEDIA_VIDEO
             C.TRACK_TYPE_TEXT -> HttpRequestType.MEDIA_SUBTITLES
             else -> HttpRequestType.UNKNOWN
         }
@@ -168,7 +169,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
                 } catch (ignored: Exception) {
                 }
             }
-            // TODO HttpRequestType.DRM_LICENSE_WIDEVINE
+            // TODO AN-3302 HttpRequestType.DRM_LICENSE_WIDEVINE
             // maybe using trackFormat.drmInitData?.schemeType == "widevine"
             return HttpRequestType.DRM_OTHER
         }
@@ -179,7 +180,8 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
                 C.DATA_TYPE_MEDIA_PROGRESSIVE_LIVE -> return HttpRequestType.MEDIA_PROGRESSIVE
                 C.DATA_TYPE_MANIFEST -> return mapManifestType(uri, eventTime)
                 C.DATA_TYPE_MEDIA,
-                C.DATA_TYPE_MEDIA_INITIALIZATION -> return mapTrackType(trackType)
+                C.DATA_TYPE_MEDIA_INITIALIZATION,
+                -> return mapTrackType(trackType)
             }
             return HttpRequestType.UNKNOWN
         }

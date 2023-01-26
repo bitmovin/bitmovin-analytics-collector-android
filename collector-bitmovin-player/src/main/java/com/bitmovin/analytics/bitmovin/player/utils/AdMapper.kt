@@ -12,7 +12,6 @@ class AdMapper {
     }
 
     fun fromPlayerAd(collectorAd: Ad, playerAd: com.bitmovin.player.api.advertising.Ad): Ad {
-
         collectorAd.isLinear = playerAd.isLinear
         collectorAd.width = playerAd.width
         collectorAd.height = playerAd.height
@@ -24,27 +23,28 @@ class AdMapper {
         collectorAd.maxBitrate = playerAd.data?.maxBitrate
         collectorAd.mimeType = playerAd.data?.mimeType
 
-        if (playerAd.data is VastAdData)
+        if (playerAd.data is VastAdData) {
             fromVastAdData(collectorAd, playerAd.data as VastAdData)
+        }
 
-        if (playerAd.data is ImaAdData)
+        if (playerAd.data is ImaAdData) {
             collectorAd.dealId = (playerAd.data as ImaAdData).dealId
+        }
 
-        if (playerAd is LinearAd)
+        if (playerAd is LinearAd) {
             fromLinearAd(collectorAd, playerAd)
+        }
 
         return collectorAd
     }
 
     private fun fromLinearAd(collectorAd: Ad, linearAd: LinearAd) {
-
         collectorAd.duration = linearAd.duration?.toLong()?.times(1000)
         collectorAd.skippable = linearAd.skippableAfter != null
         collectorAd.skippableAfter = linearAd.skippableAfter?.toLong()?.times(1000)
     }
 
     private fun fromVastAdData(collectorAd: Ad, vastData: VastAdData) {
-
         collectorAd.title = vastData.adTitle
         collectorAd.adSystemName = vastData.adSystem?.name
         collectorAd.adSystemVersion = vastData.adSystem?.version

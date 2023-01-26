@@ -4,7 +4,7 @@ import com.bitmovin.analytics.DebugCallback
 
 class DebuggingEventDataDispatcher(
     private val innerEventDataDispatcher: IEventDataDispatcher,
-    private val debugCallback: DebugCallback
+    private val debugCallback: DebugCallback,
 ) : IEventDataDispatcher {
 
     override fun add(data: EventData) {
