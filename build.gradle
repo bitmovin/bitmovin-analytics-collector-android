@@ -102,7 +102,7 @@ ext {
 	targetCompatibility = JavaVersion.VERSION_1_8
 	jvmTarget = JavaVersion.VERSION_1_8.toString()
 
-	//	player versions
+	// player versions
 	bitmovinPlayerVersion = '3.25.1'
 	exoplayerVersion = '2.18.1'
 

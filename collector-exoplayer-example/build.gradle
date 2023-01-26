@@ -36,10 +36,6 @@ android {
 	}
 }
 
-configurations {
-	exoReleaseCompile
-}
-
 dependencies {
 	implementation fileTree(dir: 'libs', include: ['*.jar'])
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"

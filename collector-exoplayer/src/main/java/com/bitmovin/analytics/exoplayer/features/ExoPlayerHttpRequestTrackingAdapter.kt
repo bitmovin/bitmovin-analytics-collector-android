@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.exoplayer.features
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
 import com.bitmovin.analytics.Observable
@@ -121,9 +122,11 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
                 return null
             }
 
+        @SuppressLint("SwitchIntDef")
+        @Suppress("DEPRECATION")
+        // New ContentType names were introduced in exoplayer v2.18.0 but we still support v2.17.0, thus we need to use the deprecated constants for now
         private fun mapManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): HttpRequestType {
             return when (com.google.android.exoplayer2.util.Util.inferContentType(uri)) {
-//               TODO update to non deprecated values, test with oldest version we support
                 C.TYPE_DASH -> HttpRequestType.MANIFEST_DASH
                 C.TYPE_HLS -> mapHlsManifestType(uri, eventTime)
                 C.TYPE_SS -> HttpRequestType.MANIFEST_SMOOTH

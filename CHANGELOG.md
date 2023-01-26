@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] updated spotless config
 - [internal] move to main as default branch
 
+### Fixed
+- Allow exoplayer >= v2.17.0 to be used with the collector
+
 ## v2.13.0
 
 ### Changed
