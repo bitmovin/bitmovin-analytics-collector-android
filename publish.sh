@@ -54,7 +54,7 @@ if [ -z "$ANALYTICS_API_RELEASE_TOKEN" ]; then
   setEnvVariable "ANALYTICS_API_RELEASE_TOKEN" $ANALYTICS_API_RELEASE_TOKEN
 fi
 
-echo "! Before publishing, make sure the version has been already bumped in the 'README.md' and 'CHANGELOG.md' and already merged as release PR into 'develop' branch !"
+echo "! Before publishing, make sure the version has been already bumped in the 'README.md' and 'CHANGELOG.md' and already merged as release PR into 'main' branch !"
 read -p "(Press enter to continue)"
 echo ""
 echo "! Before publishing, make sure you have created 'bitmovin.properties' file with correct credentials (LastPass: 'bitmovin artifactory') !"
@@ -82,13 +82,13 @@ echo "  - com.bitmovin.analytics:collector-exoplayer:$VERSION (:collector-exopla
 echo "\nAre all tokens, artifacts and versions correct ?"
 read -p "(Press enter to continue)"
 
-echo "\nGit Checkout and pull 'develop' branch..."
-git checkout develop
+echo "\nGit Checkout and pull 'main' branch..."
+git checkout main
 git pull
 
 echo "\nCheck correct code style..."
 if ! ./gradlew spotlessCheck --daemon; then
-  echo "Code style violations detected, please fix them first on develop as otherwise the build will fail."
+  echo "Code style violations detected, please fix them first on main as otherwise the build will fail."
   exit
 fi
 
@@ -117,17 +117,10 @@ echo "\n:collector-exoplayer project build and publishing..."
 echo "\n:collector-exoplayer project built and published!"
 
 echo "\nGit release"
-echo "\nGit Checkout and pull 'main' branch..."
-git checkout main
-git pull
-
-echo "\nGit merge develop..."
-git merge develop
-
 echo "\nGit create tag 'v$VERSION' ..."
 git tag -a v$VERSION -m "v$VERSION"
 
-echo "\n Git push 'main' and tag 'v$VERSION' to internal repo."
+echo "\n Git push tag 'v$VERSION' to internal repo."
 git push origin main v$VERSION
 
 echo "\n Git push 'main' and tag 'v$VERSION' to public repo."

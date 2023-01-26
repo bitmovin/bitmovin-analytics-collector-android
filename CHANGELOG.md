@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - [internal] updated gradle plugin and dependencies
 - [internal] updated spotless config
+- [internal] move to main as default branch
 
 ## v2.13.0
 
