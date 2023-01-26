@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         playerView.player.release()
     }
+
     /**
      * Demonstration for what callback APIs are available to Listen for Player events.
      */
@@ -85,10 +86,12 @@ class MainActivity : AppCompatActivity() {
                     Log.i("IVSPlayer", "Current state: $state")
                     when (state) {
                         Player.State.BUFFERING,
-                        Player.State.READY -> {
+                        Player.State.READY,
+                        -> {
                         }
                         Player.State.IDLE,
-                        Player.State.ENDED -> {
+                        Player.State.ENDED,
+                        -> {
                             // no-op
                         }
                         Player.State.PLAYING -> {
