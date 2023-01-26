@@ -189,6 +189,11 @@ project(":collector-bitmovin-player-tv-example") {
 		skipProject = true
 	}
 }
+project(":collector-amazon-ivs-example") {
+	sonarqube {
+		skipProject = true
+	}
+}
 
 java {
 	sourceCompatibility = rootProject.ext.sourceCompatibility

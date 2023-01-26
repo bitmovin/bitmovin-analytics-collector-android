@@ -6,3 +6,4 @@ include ':collector-exoplayer-example'
 
 include ':example-shared'
 include ':collector-bitmovin-player-tv-example'
+include ':collector-amazon-ivs-example'

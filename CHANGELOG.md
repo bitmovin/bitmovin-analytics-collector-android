@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- Example app with Amazon IVS setup
+
 ### Removed
 - [internal] v1 Collectors
 - [internal] obsolete dependencies
