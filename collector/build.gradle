@@ -55,15 +55,15 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttp3Version}"
+    implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
 
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
-    testImplementation 'org.robolectric:robolectric:4.9'
-    testImplementation 'androidx.test:core:1.5.0'
+    testImplementation "org.robolectric:robolectric:${rootProject.ext.robolectricVersion}"
+    testImplementation "androidx.test:core:${rootProject.ext.testCoreXVersion}"
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"

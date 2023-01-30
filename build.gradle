@@ -98,6 +98,8 @@ ext {
 
     // collector dependencies
     appCompatVersion = '1.1.0'
+    gsonVersion = '2.8.9'
+    okhttp3Version = '3.12.1'
 
     // example apps dependencies
     playServicesAdsVersion = '19.7.0'
@@ -112,6 +114,8 @@ ext {
     junitXVersion = '1.1.5'
     mockkVersion = '1.10.6'
     assertjCoreVersion = '3.11.1'
+    robolectricVersion = '4.9'
+    testCoreXVersion = '1.5.0'
 }
 
 task createPrePushHook() {

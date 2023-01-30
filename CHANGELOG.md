@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] updated gradle plugin and dependencies
 - [internal] updated spotless config
 - [internal] move to main as default branch
+- Upgraded gson dependency to v2.8.9
 
 ### Fixed
 - Allow exoplayer >= v2.17.0 to be used with the collector
