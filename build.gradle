@@ -168,22 +168,22 @@ sonarqube {
 
 project(":collector-exoplayer-example") {
     sonarqube {
-        skipProject = true
+        sonar.skipProject = true
     }
 }
 project(":collector-bitmovin-player-example") {
     sonarqube {
-        skipProject = true
+        sonar.skipProject = true
     }
 }
 project(":collector-bitmovin-player-tv-example") {
     sonarqube {
-        skipProject = true
+        sonar.skipProject = true
     }
 }
 project(":collector-amazon-ivs-example") {
     sonarqube {
-        skipProject = true
+        sonar.skipProject = true
     }
 }
 
