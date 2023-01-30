@@ -2,12 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 android {
-	compileSdkVersion 33
-
+	compileSdkVersion 31
+	namespace "com.bitmovin.analytics.amazonivs.example"
 	defaultConfig {
+
 		applicationId "com.bitmovin.analytics.amazonivs.example"
 		minSdkVersion 21
-		targetSdkVersion 33
+		targetSdkVersion 31
 		versionCode 1
 		versionName "1.0"
 	}
@@ -18,13 +19,12 @@ android {
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 		}
 	}
-	namespace 'com.amazonaws.ivs.player.basicplayback'
 }
 
 dependencies {
 	implementation "com.amazonaws:ivs-player:1.16.0"
-	implementation 'androidx.appcompat:appcompat:1.0.2'
-	implementation 'androidx.core:core-ktx:1.0.2'
-	implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-	implementation 'com.google.android.material:material:1.1.0'
+	implementation 'androidx.appcompat:appcompat:1.4.0'
+	implementation 'androidx.core:core-ktx:1.7.0'
+	implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+	implementation 'com.google.android.material:material:1.6.0'
 }
