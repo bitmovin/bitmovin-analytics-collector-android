@@ -2,69 +2,69 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-	compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
-	defaultConfig {
-		applicationId 'com.bitmovin.analytics.bitmovinplayer.example'
-		minSdkVersion rootProject.ext.minSdkVersion
-		targetSdkVersion rootProject.ext.targetSdkVersion
-		versionCode rootProject.ext.versionCode
-		versionName rootProject.ext.version
+    defaultConfig {
+        applicationId 'com.bitmovin.analytics.bitmovinplayer.example'
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.version
 
-		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-		multiDexEnabled true
-	}
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
 
-	lintOptions {
-		abortOnError false
-	}
+    lintOptions {
+        abortOnError false
+    }
 
-	compileOptions {
-		sourceCompatibility rootProject.ext.sourceCompatibility
-		targetCompatibility rootProject.ext.targetCompatibility
-	}
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibility
+        targetCompatibility rootProject.ext.targetCompatibility
+    }
 
-	buildTypes {
-		release {
-			minifyEnabled false
-			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-		}
-	}
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
 
-	buildFeatures{
-		viewBinding = true
-	}
+    buildFeatures{
+        viewBinding = true
+    }
 }
 
 configurations {
-	bitmovinReleaseCompile
+    bitmovinReleaseCompile
 }
 
 dependencies {
-	implementation fileTree(dir: 'libs', include: ['*.jar'])
-	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
-	implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
-	implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
-	implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
-	implementation 'androidx.work:work-runtime-ktx:2.7.1'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
+    implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
+    implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
 
-	implementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
+    implementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
 
-	// dependencies for ads
-	implementation "com.google.ads.interactivemedia.v3:interactivemedia:${rootProject.ext.imaSdkVersion}" // only needed if ads are used
-	implementation "com.google.android.gms:play-services-ads:${rootProject.ext.playServicesAdsVersion}" // only needed if ads are used
+    // dependencies for ads
+    implementation "com.google.ads.interactivemedia.v3:interactivemedia:${rootProject.ext.imaSdkVersion}" // only needed if ads are used
+    implementation "com.google.android.gms:play-services-ads:${rootProject.ext.playServicesAdsVersion}" // only needed if ads are used
 
-	// dependencies for chromecast
-	implementation "com.google.android.gms:play-services-cast-framework:19.0.0" //only needed if Chromecast is used
-	implementation 'androidx.mediarouter:mediarouter:1.0.0'  //only needed if Chromecast is used
+    // dependencies for chromecast
+    implementation "com.google.android.gms:play-services-cast-framework:19.0.0" //only needed if Chromecast is used
+    implementation 'androidx.mediarouter:mediarouter:1.0.0'  //only needed if Chromecast is used
 
-	// dependencies for ads and Chromecast
-	implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    // dependencies for ads and Chromecast
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-	if (rootProject.ext.developLocal) {
-		implementation project(':collector-bitmovin-player')
-	} else {
-		implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
-	}
-	implementation project(':example-shared')
+    if (rootProject.ext.developLocal) {
+        implementation project(':collector-bitmovin-player')
+    } else {
+        implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
+    }
+    implementation project(':example-shared')
 }

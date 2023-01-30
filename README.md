@@ -11,10 +11,10 @@ Add this to your top level `build.gradle`
 ```gradle
 allprojects {
     repositories {
-		maven {
-			url  'https://artifacts.bitmovin.com/artifactory/public-releases'
-		}
-	}
+        maven {
+            url  'https://artifacts.bitmovin.com/artifactory/public-releases'
+        }
+    }
 }
 ```
 

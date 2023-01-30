@@ -1,40 +1,40 @@
 apply plugin: 'jacoco'
 
 jacoco {
-	toolVersion = '0.8.8'
+    toolVersion = '0.8.8'
 }
 
 task jacocoTestReportBitmovinTesting(type: JacocoReport, dependsOn: ['test']) {
-	def coverageSourceDirs = ["src/main/java"]
-	def fileFilter = [
-		'**/R.class',
-		'**/R$*.class',
-		'**/*$ViewInjector*.*',
-		'**/*$ViewBinder*.*',
-		'**/BuildConfig.*',
-		'**/Manifest*.*'
-	]
-	def javaClasses = fileTree(
-			dir: "$buildDir/intermediates/javac/debug/classes/com",
-			excludes: fileFilter
-			)
-	def kotlinClasses = fileTree(
-			dir: "$buildDir/tmp/kotlin-classes/debug/com",
-			excludes: fileFilter
-			)
-	classDirectories.setFrom(files([javaClasses], [kotlinClasses]))
-	additionalSourceDirs.setFrom(files(coverageSourceDirs))
-	sourceDirectories.setFrom(files(coverageSourceDirs))
-	executionData.setFrom(fileTree(dir: ".", includes: [
-		// this file should actually be located at $buildDir/jacoco/ but due to a known issue
-		// https://issuetracker.google.com/issues/67872367 the file is empty and all
-		// coverage is reported directly in "playercore/jacoco.exec".
-		"$buildDir/jacoco/testDebugUnitTest.exec",
-		"jacoco.exec"
-	]))
-	reports {
-		xml.required = true
-		html.required = true
-		csv.required = false
-	}
+    def coverageSourceDirs = ["src/main/java"]
+    def fileFilter = [
+        '**/R.class',
+        '**/R$*.class',
+        '**/*$ViewInjector*.*',
+        '**/*$ViewBinder*.*',
+        '**/BuildConfig.*',
+        '**/Manifest*.*'
+    ]
+    def javaClasses = fileTree(
+            dir: "$buildDir/intermediates/javac/debug/classes/com",
+            excludes: fileFilter
+            )
+    def kotlinClasses = fileTree(
+            dir: "$buildDir/tmp/kotlin-classes/debug/com",
+            excludes: fileFilter
+            )
+    classDirectories.setFrom(files([javaClasses], [kotlinClasses]))
+    additionalSourceDirs.setFrom(files(coverageSourceDirs))
+    sourceDirectories.setFrom(files(coverageSourceDirs))
+    executionData.setFrom(fileTree(dir: ".", includes: [
+        // this file should actually be located at $buildDir/jacoco/ but due to a known issue
+        // https://issuetracker.google.com/issues/67872367 the file is empty and all
+        // coverage is reported directly in "playercore/jacoco.exec".
+        "$buildDir/jacoco/testDebugUnitTest.exec",
+        "jacoco.exec"
+    ]))
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
 }

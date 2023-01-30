@@ -21,8 +21,11 @@ jobs:
           name: Code style spotlessCheck
           command: ./gradlew spotlessCheck
       - run:
-          name: Run Lint and Tests
-          command: ./gradlew lint test
+          name: Run Lint
+          command: ./gradlew lint
+      - run:
+          name: Run Tests
+          command: ./gradlew test
       - run:
           name: SonarQube
           command: ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN

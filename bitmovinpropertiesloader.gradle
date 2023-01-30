@@ -1,7 +1,7 @@
 ext.bitmovinProperties = new Properties()
 def propertiesFile = new File(rootProject.projectDir, "bitmovin.properties")
 if (propertiesFile.exists()) {
-	file(propertiesFile).withInputStream { stream ->
-		bitmovinProperties.load(stream)
-	}
+    file(propertiesFile).withInputStream { stream ->
+        bitmovinProperties.load(stream)
+    }
 }
