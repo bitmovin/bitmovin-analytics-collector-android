@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Example app with Amazon IVS setup
+- Amazon IVS adapter
 
 ### Removed
 - [internal] v1 Collectors

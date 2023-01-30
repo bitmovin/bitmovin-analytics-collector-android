@@ -2,13 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 android {
-	compileSdkVersion 31
+	compileSdkVersion 33
 	namespace "com.bitmovin.analytics.amazonivs.example"
 	defaultConfig {
-
 		applicationId "com.bitmovin.analytics.amazonivs.example"
 		minSdkVersion 21
-		targetSdkVersion 31
+		targetSdkVersion 33
 		versionCode 1
 		versionName "1.0"
 	}
@@ -27,4 +26,10 @@ dependencies {
 	implementation 'androidx.core:core-ktx:1.7.0'
 	implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 	implementation 'com.google.android.material:material:1.6.0'
+
+	if (rootProject.ext.developLocal) {
+		implementation project(':collector-amazon-ivs')
+	} else {
+		implementation "com.bitmovin.analytics:collector-amazon-ivs:${rootProject.ext.version}"
+	}
 }

@@ -6,6 +6,9 @@ import android.view.WindowManager
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.amazonaws.ivs.player.Player
+import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.amazon.ivs.AmazonIvsPlayerCollector
+import com.bitmovin.analytics.enums.CDNProvider
 
 // source: https://github.com/aws-samples/amazon-ivs-player-android-sample
 class MainActivity : AppCompatActivity() {
@@ -17,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     // MediaPlayer object and attach it to a SurfaceView with MediaPlayer.setSurface()
 //    private lateinit var playerView: PlayerView
     private lateinit var player: Player
+    private lateinit var collector: AmazonIvsPlayerCollector
 
 //        get() = playerView.player
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,14 +33,21 @@ class MainActivity : AppCompatActivity() {
 
         player = Player.Factory.create(this)
         playerController = IVSPlayerControlHelper(findViewById(R.id.playerControlView), findViewById(R.id.playerSurfaceView), player)
+
+        var config = createBitmovinAnalyticsConfig()
+        collector = AmazonIvsPlayerCollector(config, applicationContext)
+        collector.attachPlayer(player)
+
         // Set Listener for Player callback events
         addDebugListener()
         loadSource()
     }
 
     private fun initNewPlayer() {
+        collector.detachPlayer()
         player = Player.Factory.create(this)
         playerController.bindPlayer(player)
+        collector.attachPlayer(player)
     }
 
     private fun loadSource(source: Uri = VideoSources.source1) {
@@ -80,5 +91,28 @@ class MainActivity : AppCompatActivity() {
 
     private fun addDebugListener() {
         player.addListener(LoggingIVSPlayerEventListener(player))
+    }
+
+    private fun createBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {
+        /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
+        val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
+
+        bitmovinAnalyticsConfig.videoId = "androidVideoDASHStatic"
+        bitmovinAnalyticsConfig.title = "Android Amazon IVS player video"
+        bitmovinAnalyticsConfig.customUserId = "customBitmovinUserId1"
+        bitmovinAnalyticsConfig.cdnProvider = CDNProvider.BITMOVIN
+        bitmovinAnalyticsConfig.experimentName = "experiment-1"
+        bitmovinAnalyticsConfig.customData1 = "customData1"
+        bitmovinAnalyticsConfig.customData2 = "customData2"
+        bitmovinAnalyticsConfig.customData3 = "customData3"
+        bitmovinAnalyticsConfig.customData4 = "customData4"
+        bitmovinAnalyticsConfig.customData5 = "customData5"
+        bitmovinAnalyticsConfig.customData6 = "customData6"
+        bitmovinAnalyticsConfig.customData7 = "customData7"
+        bitmovinAnalyticsConfig.path = "/vod/new/"
+        bitmovinAnalyticsConfig.ads = false
+        bitmovinAnalyticsConfig.isLive = false
+
+        return bitmovinAnalyticsConfig
     }
 }
