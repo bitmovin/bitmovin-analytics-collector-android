@@ -142,7 +142,6 @@ class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
     override val isLinearAdActive: Boolean
         get() = bitmovinPlayer.isAd
     override val moduleInformation: AdModuleInformation
-        // TODO get actual module from player
         get() = AdModuleInformation("DefaultAdvertisingService", BitmovinUtil.getPlayerVersion())
     override val isAutoplayEnabled: Boolean?
         get() = bitmovinPlayer.config.playbackConfig?.isAutoplayEnabled

@@ -41,9 +41,7 @@ data class AdEventData(
     var streamFormat: String? = null,
     var surveyUrl: String? = null,
     var time: Long? = null,
-    // TODO var timeHovered: Long? = null,
     var timePlayed: Long? = null,
-    // TODO var timeUntilHover: Long? = null,
     var universalAdIdRegistry: String? = null,
     var universalAdIdValue: String? = null,
     var videoBitrate: Int? = null,
@@ -120,7 +118,6 @@ data class AdEventData(
     var screenHeight: Int? = null,
     var screenWidth: Int? = null,
     var version: String? = null,
-    // TODO var size: String? = null,
     var userId: String? = null,
     var videoId: String? = null,
     var videoTitle: String? = null,
@@ -128,8 +125,6 @@ data class AdEventData(
     var videoWindowWidth: Int? = null,
     var playerStartupTime: Long? = null,
     var analyticsVersion: String? = null,
-    // TODO var pageLoadTime: Long? = null,
-    // TODO var pageLoadType: Long? = null,
     var autoplay: Boolean? = null,
     var platform: String? = null,
     var audioCodec: String? = null,
@@ -183,8 +178,6 @@ data class AdEventData(
         this.screenHeight = eventData.screenHeight
         this.screenWidth = eventData.screenWidth
         this.version = eventData.version
-        // TODO missing
-        // this.size = eventData.size
         this.userId = eventData.userId
         this.videoId = eventData.videoId
         this.videoTitle = eventData.videoTitle
@@ -269,8 +262,5 @@ data class AdEventData(
         errorCode = adSample.errorCode
         errorData = adSample.errorData
         errorMessage = adSample.errorMessage
-
-        // TODO timeUntilHover = adSample.
-        // TODO timeHovered = adSample.
     }
 }
