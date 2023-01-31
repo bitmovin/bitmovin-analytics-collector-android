@@ -93,8 +93,8 @@ ext {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
 
     // player versions
-    bitmovinPlayerVersion = '3.25.1'
-    exoplayerVersion = '2.18.1'
+    bitmovinPlayerVersion = '3.29.0'
+    exoplayerVersion = '2.18.2'
 
     // collector dependencies
     appCompatVersion = '1.1.0'

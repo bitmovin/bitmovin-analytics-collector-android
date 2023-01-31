@@ -52,7 +52,7 @@ dependencies {
 }
 ```
 
-For ExoPlayer version between >= v2.17.0 and <= v2.18.1:
+For ExoPlayer version between >= v2.17.0 and <= v2.18.2:
 
 ```gradle
 dependencies {
