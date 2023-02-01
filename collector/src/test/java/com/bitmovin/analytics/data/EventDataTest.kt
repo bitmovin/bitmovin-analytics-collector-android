@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.data
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.enums.PlayerType
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -23,7 +24,7 @@ class EventDataTest {
     @Test
     fun testEventDataContainsDeviceInformation() {
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", false, "user-agent", "de", "package-name", 100, 200)
-        val eventData = EventDataFactory(bitmovinAnalyticsConfig, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfig, mockk(relaxed = true)).create(impressionId, null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
 
         assertThat(eventData.deviceInformation.manufacturer).isEqualTo("myManufacturer")
         assertThat(eventData.deviceInformation.model).isEqualTo("myModel")
@@ -39,7 +40,7 @@ class EventDataTest {
     @Test
     fun testEventDataSetsPlatformToAndroidTVIfDeviceInformationIsTVIsTrue() {
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", true, "user-agent", "de", "package-name", 100, 200)
-        val eventData = EventDataFactory(bitmovinAnalyticsConfig, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfig, mockk(relaxed = true)).create(impressionId, null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
 
         assertThat(eventData.platform).isEqualTo("androidTV")
     }
@@ -49,9 +50,9 @@ class EventDataTest {
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", true, "user-agent", "de", "package-name", 100, 200)
         var randomizedUserIdProvider = RandomizedUserIdIdProvider()
         var randomizedUserIdProvider1 = RandomizedUserIdIdProvider()
-        var eventData = EventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider).create(impressionId, null, deviceInformation)
-        var eventData1 = EventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider).create(impressionId, null, deviceInformation)
-        var eventData2 = EventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider1).create(impressionId, null, deviceInformation)
+        var eventData = EventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider).create(impressionId, null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
+        var eventData1 = EventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider).create(impressionId, null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
+        var eventData2 = EventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider1).create(impressionId, null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
 
         assertThat(eventData.userId).isEqualTo(eventData1.userId)
         assertThat(eventData.userId).isEqualTo(randomizedUserIdProvider.userId())

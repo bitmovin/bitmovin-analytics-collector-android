@@ -24,6 +24,7 @@ abstract class DefaultPlayerAdapter(protected val config: BitmovinAnalyticsConfi
             stateMachine.impressionId,
             currentSourceMetadata,
             deviceInformationProvider.getDeviceInformation(),
+            playerInfo,
         )
 
     override fun release() {

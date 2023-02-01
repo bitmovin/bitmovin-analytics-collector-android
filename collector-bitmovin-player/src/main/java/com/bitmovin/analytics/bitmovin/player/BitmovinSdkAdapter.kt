@@ -9,6 +9,7 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.CastTech
@@ -54,6 +55,9 @@ class BitmovinSdkAdapter(
         private set
 
     override val eventDataManipulators: Collection<EventDataManipulator> by lazy { listOf(this) }
+
+    override val playerInfo: PlayerInfo
+        get() = PLAYER_INFO
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = super.init()
@@ -177,8 +181,6 @@ class BitmovinSdkAdapter(
             // player active Source is not available
             data.isLive = fallbackIsLive
         }
-        data.player = PlayerType.BITMOVIN.toString()
-
         // version
         data.version = PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.getPlayerVersion()
 
@@ -535,5 +537,7 @@ class BitmovinSdkAdapter(
 
     companion object {
         private const val TAG = "BitmovinPlayerAdapter"
+        private const val PLAYER_TECH = "Android:Exoplayer"
+        private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.EXOPLAYER)
     }
 }

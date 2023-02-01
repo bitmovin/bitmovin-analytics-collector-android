@@ -13,7 +13,9 @@ import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import java.nio.ByteBuffer
@@ -35,11 +37,13 @@ class AmazonIvsPlayerAdapter(
     deviceInformationProvider,
 ),
     EventDataManipulator {
-
     init {
         attachAnalyticsListener()
         videoStartupService.checkStartup(player.state, player.position)
     }
+
+    override val playerInfo: PlayerInfo
+        get() = PLAYER_INFO
 
     private fun attachAnalyticsListener() {
         player.addListener(createAnalyticsListener())
@@ -121,5 +125,7 @@ class AmazonIvsPlayerAdapter(
 
     companion object {
         private const val TAG = "AmazonIVSPlayerAdapter"
+        private const val PLAYER_TECH = "Android:AmazonIVS"
+        private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.AMAZON_IVS)
     }
 }

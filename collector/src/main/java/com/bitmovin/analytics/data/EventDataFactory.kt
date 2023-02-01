@@ -9,9 +9,10 @@ class EventDataFactory(private val config: BitmovinAnalyticsConfig, private val 
     private val eventDataManipulators = mutableListOf<EventDataManipulator>()
 
     // TODO DeviceInformationProvider for now is only available after `attachPlayerAdapter`, but can also be moved to the constructor of BitmovinAnalytics and also in this class
-    fun create(impressionId: String, sourceMetadata: SourceMetadata?, deviceInformation: DeviceInformation): EventData {
+    fun create(impressionId: String, sourceMetadata: SourceMetadata?, deviceInformation: DeviceInformation, playerInfo: PlayerInfo): EventData {
         val eventData = EventData(
             deviceInformation,
+            playerInfo,
             impressionId,
             userIdProvider.userId(),
             config.key,
@@ -53,8 +54,6 @@ class EventDataFactory(private val config: BitmovinAnalyticsConfig, private val 
             if (sourceMetadata == null) config.path else sourceMetadata.path,
             if (sourceMetadata == null) config.experimentName else sourceMetadata.experimentName,
             if (sourceMetadata == null) config.cdnProvider else sourceMetadata.cdnProvider,
-            /*TODO AN-3300 This will always be overridden in the adapters, we need a logic like with m3u8 url*/
-            config.playerType?.toString(),
         )
 
         for (decorator in eventDataManipulators) {

@@ -7,6 +7,7 @@ import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.SpeedMeasurement
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.DRMType
@@ -96,6 +97,9 @@ class ExoPlayerAdapter(
         get() = /* Adapter doesn't support source-specific metadata */
             null
 
+    override val playerInfo: PlayerInfo
+        get() = PLAYER_INFO
+
     override val eventDataManipulators: Collection<EventDataManipulator> by lazy { listOf(this, bitrateEventDataManipulator) }
 
     /*
@@ -134,8 +138,6 @@ class ExoPlayerAdapter(
     }
 
     override fun manipulate(data: EventData) {
-        data.player = PlayerType.EXOPLAYER.toString()
-
         // duration
         val duration = exoplayer.duration
         if (duration != C.TIME_UNSET) {
@@ -462,6 +464,8 @@ class ExoPlayerAdapter(
         private const val TAG = "ExoPlayerAdapter"
         private const val DASH_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.dash.manifest.DashManifest"
         private const val HLS_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.hls.HlsManifest"
+        private const val PLAYER_TECH = "Android:Exoplayer"
+        private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.EXOPLAYER)
     }
 
     init {

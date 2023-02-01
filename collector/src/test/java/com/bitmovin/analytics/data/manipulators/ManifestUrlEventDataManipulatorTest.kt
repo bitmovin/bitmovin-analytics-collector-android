@@ -5,6 +5,8 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.PlayerInfo
+import com.bitmovin.analytics.enums.PlayerType
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions
@@ -34,7 +36,7 @@ class ManifestUrlEventDataManipulatorTest {
         val adapter = mockk<PlayerAdapter>(relaxed = true)
         every { adapter.currentSourceMetadata } returns null
 
-        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, mockk(relaxed = true))
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, mockk(relaxed = true), PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
         eventData.m3u8Url = "foo"
         // #endregion
 
@@ -53,7 +55,7 @@ class ManifestUrlEventDataManipulatorTest {
         val adapter = mockk<PlayerAdapter>(relaxed = true)
         every { adapter.currentSourceMetadata } returns null
 
-        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
         eventData.mpdUrl = "foo"
         // #endregion
 
@@ -72,7 +74,7 @@ class ManifestUrlEventDataManipulatorTest {
         val adapter = mockk<PlayerAdapter>(relaxed = true)
         every { adapter.currentSourceMetadata } returns null
 
-        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
         eventData.progUrl = "foo"
         // #endregion
 
@@ -92,7 +94,7 @@ class ManifestUrlEventDataManipulatorTest {
         val sourceMetadata = SourceMetadata(m3u8Url = "bar")
         every { adapter.currentSourceMetadata } returns sourceMetadata
 
-        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
         eventData.m3u8Url = "foo"
         // #endregion
 
@@ -112,7 +114,7 @@ class ManifestUrlEventDataManipulatorTest {
         val sourceMetadata = SourceMetadata(mpdUrl = "bar")
         every { adapter.currentSourceMetadata } returns sourceMetadata
 
-        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
         eventData.mpdUrl = "foo"
         // #endregion
 
@@ -132,7 +134,7 @@ class ManifestUrlEventDataManipulatorTest {
         val sourceMetadata = SourceMetadata(progUrl = "bar")
         every { adapter.currentSourceMetadata } returns sourceMetadata
 
-        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation)
+        val eventData = EventDataFactory(bitmovinAnalyticsConfigMock, mockk(relaxed = true)).create(impressionId, null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
         eventData.progUrl = "foo"
         // #endregion
 

@@ -6,6 +6,8 @@ import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.PlayerInfo
+import com.bitmovin.analytics.enums.PlayerType
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -59,7 +61,7 @@ class RetryBackendTest {
     }
 
     private fun setupEventData(sequenceNumber: Int): EventData {
-        var eventData = EventDataFactory(config, mockk(relaxed = true)).create("testImpressionId", null, deviceInformation)
+        var eventData = EventDataFactory(config, mockk(relaxed = true)).create("testImpressionId", null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
         eventData.sequenceNumber = sequenceNumber
         return eventData
     }

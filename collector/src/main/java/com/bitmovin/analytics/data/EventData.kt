@@ -4,6 +4,7 @@ import com.bitmovin.analytics.utils.Util
 
 class EventData(
     deviceInfo: DeviceInformation,
+    playerInfo: PlayerInfo,
     val impressionId: String,
     val userId: String,
     val key: String?,
@@ -44,14 +45,12 @@ class EventData(
     val path: String?,
     val experimentName: String?,
     val cdnProvider: String?,
-    var player: String?,
 ) {
     val userAgent: String = deviceInfo.userAgent
     val deviceInformation: DeviceInformationDto = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV, deviceInfo.operatingSystem, deviceInfo.operatingSystemMajor, deviceInfo.operatingSystemMinor, deviceInfo.deviceClass)
     val language: String = deviceInfo.locale
     val analyticsVersion: String = Util.getAnalyticsVersion()
-    val playerTech: String = Util.PLAYER_TECH
-
+    val playerTech: String = playerInfo.playerTech
     val domain: String = deviceInfo.domain
     val screenHeight: Int = deviceInfo.screenHeight
     val screenWidth: Int = deviceInfo.screenWidth
@@ -104,4 +103,5 @@ class EventData(
     var videoStartFailedReason: String? = null
     var downloadSpeedInfo: DownloadSpeedInfo? = null
     var retryCount: Int = 0
+    val player: String = playerInfo.playerType.toString()
 }

@@ -235,6 +235,7 @@ class BitmovinAnalyticsConfig() : Parcelable {
     /**
      * PlayerType that the current video is being played back with.
      */
+    @Deprecated("PlayerType is determined automatically and cannot be configured")
     var playerType: PlayerType? = null
 
     /**

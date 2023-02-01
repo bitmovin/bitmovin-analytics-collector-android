@@ -2,6 +2,8 @@ package com.bitmovin.analytics
 
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.PlayerInfo
+import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.utils.DataSerializer
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -16,7 +18,7 @@ class DeviceInformationDtoDataSerializationTest {
         val deviceInformation = DeviceInformation("myManufacturer", "myModel", false, "user-agent", "de", "package-name", 100, 200)
         // #endregion
 
-        val data = EventDataFactory(config, mockk(relaxed = true)).create("null", null, deviceInformation)
+        val data = EventDataFactory(config, mockk(relaxed = true)).create("null", null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
         val serialized = DataSerializer.serialize(data)
 
         assertThat(serialized).contains("\"deviceInformation\":{")
