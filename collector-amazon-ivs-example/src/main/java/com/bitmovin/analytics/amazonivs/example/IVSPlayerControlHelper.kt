@@ -12,6 +12,7 @@ import com.amazonaws.ivs.player.Quality
 import kotlin.math.roundToInt
 
 // Helper class to manage the binding of SurfaceView, PlayerControlView and Player instance
+// reason for that is to release player and re initiate new player manually
 class IVSPlayerControlHelper(
     private val playerControlView: PlayerControlView,
     private val surfaceView: SurfaceView,

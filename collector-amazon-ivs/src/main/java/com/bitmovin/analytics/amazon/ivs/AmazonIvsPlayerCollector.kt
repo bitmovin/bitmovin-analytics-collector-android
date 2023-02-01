@@ -7,6 +7,8 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.amazon.ivs.features.AmazonIvsPlayerFeatureFactory
+import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
+import com.bitmovin.analytics.amazon.ivs.playback.VodPlaybackService
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
@@ -27,6 +29,8 @@ class AmazonIvsPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
         eventDataFactory: EventDataFactory,
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = AmazonIvsPlayerFeatureFactory(analytics, player)
+        val videoStartupService = VideoStartupService(stateMachine)
+        val vodPlaybackService = VodPlaybackService(stateMachine)
         return AmazonIvsPlayerAdapter(
             player,
             config,
@@ -34,6 +38,8 @@ class AmazonIvsPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
             featureFactory,
             eventDataFactory,
             deviceInformationProvider,
+            videoStartupService,
+            vodPlaybackService,
         )
     }
 }

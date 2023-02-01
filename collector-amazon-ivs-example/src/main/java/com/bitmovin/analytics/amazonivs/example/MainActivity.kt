@@ -2,6 +2,7 @@ package com.bitmovin.analytics.amazonivs.example
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -12,29 +13,31 @@ import com.bitmovin.analytics.enums.CDNProvider
 
 // source: https://github.com/aws-samples/amazon-ivs-player-android-sample
 class MainActivity : AppCompatActivity() {
+    private val TAG = "MainActivity"
 
     private lateinit var playerController: IVSPlayerControlHelper
 
     // PlayerView is an easy to use wrapper around the MediaPlayer object.
     // If you want to use the MediaPlayer object directly, you can instantiate a
     // MediaPlayer object and attach it to a SurfaceView with MediaPlayer.setSurface()
-//    private lateinit var playerView: PlayerView
     private lateinit var player: Player
     private lateinit var collector: AmazonIvsPlayerCollector
 
-//        get() = playerView.player
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-//        playerView = findViewById(R.id.playerView)
         setupButtonClickListeners()
 
         player = Player.Factory.create(this)
-        playerController = IVSPlayerControlHelper(findViewById(R.id.playerControlView), findViewById(R.id.playerSurfaceView), player)
+        playerController = IVSPlayerControlHelper(
+            findViewById(R.id.playerControlView),
+            findViewById(R.id.playerSurfaceView),
+            player,
+        )
 
-        var config = createBitmovinAnalyticsConfig()
+        val config = createBitmovinAnalyticsConfig()
         collector = AmazonIvsPlayerCollector(config, applicationContext)
         collector.attachPlayer(player)
 
@@ -50,33 +53,34 @@ class MainActivity : AppCompatActivity() {
         collector.attachPlayer(player)
     }
 
-    private fun loadSource(source: Uri = VideoSources.source1) {
+    private fun loadSource(source: Uri = VideoSources.vodSource) {
         player.load(source)
     }
 
     private fun setupButtonClickListeners() {
         findViewById<Button>(R.id.release_button).setOnClickListener {
+            Log.d(TAG, "on_release_button_clicked")
+            collector.detachPlayer()
             playerController.release()
-            // TODO: detachPlayer()
         }
         findViewById<Button>(R.id.create_button).setOnClickListener {
+            Log.d(TAG, "on_create_button_clicked")
             initNewPlayer()
             loadSource()
-            player.play()
-            // TODO: detachPlayer()
         }
         findViewById<Button>(R.id.change_source_button).setOnClickListener {
+            Log.d(TAG, "on_create_button_clicked")
             loadSource(VideoSources.source2)
             player.play()
         }
         findViewById<Button>(R.id.custom_data_button).setOnClickListener {
-            // TODO: custom Data call
+            Log.d(TAG, "on_create_button_clicked")
         }
     }
 
     override fun onStart() {
         super.onStart()
-        player.play()
+//        player.play()
     }
 
     override fun onStop() {
@@ -95,7 +99,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun createBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {
         /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
-        val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
+        val bitmovinAnalyticsConfig =
+            BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
 
         bitmovinAnalyticsConfig.videoId = "androidVideoDASHStatic"
         bitmovinAnalyticsConfig.title = "Android Amazon IVS player video"
