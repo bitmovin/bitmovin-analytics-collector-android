@@ -25,6 +25,7 @@ plugins {
     id 'java'
     id 'jacoco'
     id "org.sonarqube" version "3.5.0.2730"
+    id 'org.jetbrains.kotlinx.binary-compatibility-validator' version '0.12.1'
 }
 
 apply from: './bitmovinpropertiesloader.gradle'
@@ -168,6 +169,23 @@ sonarqube {
                 '**/.gradle/**,' +
                 '**/R.class'
     }
+}
+
+// config for org.jetbrains.kotlinx.binary-compatibility-validator
+// this plugin is used to ensure binary compatibility on our public APIs between versions
+// it needs to be run manually for now since collector has too many public methods
+// ./gradlew apiCheck #runs the check against the current dump (stored in /api/ for each module)
+// ./gradlew apiDump #creates a new dump which we can run against in the future
+apiValidation {
+    /**
+     * Sub-projects that are excluded from API validation
+     */
+    ignoredProjects += ["collector-bitmovin-player-example",
+                        "collector-bitmovin-player-tv-example",
+                        "collector-exoplayer-example",
+                        "collector-amazon-ivs-example",
+                        "collector-amazon-ivs",
+                        "example-shared"]
 }
 
 project(":collector-exoplayer-example") {

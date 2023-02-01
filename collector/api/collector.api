@@ -1,0 +1,2211 @@
+public final class com/bitmovin/analytics/BitmovinAdAnalytics : com/bitmovin/analytics/adapters/AdAnalyticsEventListener {
+	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalytics;)V
+	public final fun attachAdapter (Lcom/bitmovin/analytics/adapters/PlayerAdapter;Lcom/bitmovin/analytics/adapters/AdAdapter;)V
+	public final fun detachAdapter ()V
+	public fun onAdBreakFinished ()V
+	public fun onAdBreakStarted (Lcom/bitmovin/analytics/ads/AdBreak;)V
+	public fun onAdClicked (Ljava/lang/String;)V
+	public fun onAdError (Lcom/bitmovin/analytics/ads/AdBreak;Ljava/lang/Integer;Ljava/lang/String;)V
+	public fun onAdFinished ()V
+	public fun onAdManifestLoaded (Lcom/bitmovin/analytics/ads/AdBreak;J)V
+	public fun onAdQuartile (Lcom/bitmovin/analytics/ads/AdQuartile;)V
+	public fun onAdSkipped ()V
+	public fun onAdStarted (Lcom/bitmovin/analytics/ads/Ad;)V
+	public fun onPause ()V
+	public fun onPlay ()V
+}
+
+public final class com/bitmovin/analytics/BitmovinAnalytics : com/bitmovin/analytics/license/LicenseCallback {
+	public static final field Companion Lcom/bitmovin/analytics/BitmovinAnalytics$Companion;
+	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)V
+	public final fun addDebugListener (Lcom/bitmovin/analytics/BitmovinAnalytics$DebugListener;)V
+	public final fun attach (Lcom/bitmovin/analytics/adapters/PlayerAdapter;)V
+	public fun authenticationCompleted (Z)V
+	public fun configureFeatures (ZLcom/bitmovin/analytics/license/FeatureConfigContainer;)V
+	public final fun detachPlayer ()V
+	public final fun getAndResetPlayerStartupTime ()J
+	public final fun getConfig ()Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;
+	public final fun getContext ()Landroid/content/Context;
+	public final fun getCustomData ()Lcom/bitmovin/analytics/data/CustomData;
+	public final fun getImpressionId ()Ljava/lang/String;
+	public final fun getOnAnalyticsReleasingObservable ()Lcom/bitmovin/analytics/Observable;
+	public final fun getOnErrorDetailObservable ()Lcom/bitmovin/analytics/Observable;
+	public final fun getPosition ()J
+	public final fun removeDebugListener (Lcom/bitmovin/analytics/BitmovinAnalytics$DebugListener;)V
+	public final fun resetSourceRelatedState ()V
+	public final fun sendAdEventData (Lcom/bitmovin/analytics/data/AdEventData;)V
+	public final fun sendEventData (Lcom/bitmovin/analytics/data/EventData;)V
+	public final fun setCustomData (Lcom/bitmovin/analytics/data/CustomData;)V
+	public final fun setCustomDataOnce (Lcom/bitmovin/analytics/data/CustomData;)V
+}
+
+public final class com/bitmovin/analytics/BitmovinAnalytics$Companion {
+}
+
+public abstract interface class com/bitmovin/analytics/BitmovinAnalytics$DebugListener {
+	public abstract fun onDispatchAdEventData (Lcom/bitmovin/analytics/data/AdEventData;)V
+	public abstract fun onDispatchEventData (Lcom/bitmovin/analytics/data/EventData;)V
+	public abstract fun onMessage (Ljava/lang/String;)V
+}
+
+public final class com/bitmovin/analytics/BitmovinAnalyticsConfig : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
+	public static final field Companion Lcom/bitmovin/analytics/BitmovinAnalyticsConfig$Companion;
+	public fun <init> ()V
+	public synthetic fun <init> (Landroid/os/Parcel;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Landroid/content/Context;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Landroid/content/Context;)V
+	public fun describeContents ()I
+	public final fun getAds ()Z
+	public final fun getCdnProvider ()Ljava/lang/String;
+	public final fun getConfig ()Lcom/bitmovin/analytics/CollectorConfig;
+	public final fun getContext ()Landroid/content/Context;
+	public final fun getCustomData1 ()Ljava/lang/String;
+	public final fun getCustomData10 ()Ljava/lang/String;
+	public final fun getCustomData11 ()Ljava/lang/String;
+	public final fun getCustomData12 ()Ljava/lang/String;
+	public final fun getCustomData13 ()Ljava/lang/String;
+	public final fun getCustomData14 ()Ljava/lang/String;
+	public final fun getCustomData15 ()Ljava/lang/String;
+	public final fun getCustomData16 ()Ljava/lang/String;
+	public final fun getCustomData17 ()Ljava/lang/String;
+	public final fun getCustomData18 ()Ljava/lang/String;
+	public final fun getCustomData19 ()Ljava/lang/String;
+	public final fun getCustomData2 ()Ljava/lang/String;
+	public final fun getCustomData20 ()Ljava/lang/String;
+	public final fun getCustomData21 ()Ljava/lang/String;
+	public final fun getCustomData22 ()Ljava/lang/String;
+	public final fun getCustomData23 ()Ljava/lang/String;
+	public final fun getCustomData24 ()Ljava/lang/String;
+	public final fun getCustomData25 ()Ljava/lang/String;
+	public final fun getCustomData26 ()Ljava/lang/String;
+	public final fun getCustomData27 ()Ljava/lang/String;
+	public final fun getCustomData28 ()Ljava/lang/String;
+	public final fun getCustomData29 ()Ljava/lang/String;
+	public final fun getCustomData3 ()Ljava/lang/String;
+	public final fun getCustomData30 ()Ljava/lang/String;
+	public final fun getCustomData4 ()Ljava/lang/String;
+	public final fun getCustomData5 ()Ljava/lang/String;
+	public final fun getCustomData6 ()Ljava/lang/String;
+	public final fun getCustomData7 ()Ljava/lang/String;
+	public final fun getCustomData8 ()Ljava/lang/String;
+	public final fun getCustomData9 ()Ljava/lang/String;
+	public final fun getCustomUserId ()Ljava/lang/String;
+	public final fun getExperimentName ()Ljava/lang/String;
+	public final fun getHeartbeatInterval ()I
+	public final fun getIsLive ()Ljava/lang/Boolean;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getM3u8Url ()Ljava/lang/String;
+	public final fun getMpdUrl ()Ljava/lang/String;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getPlayerKey ()Ljava/lang/String;
+	public final fun getPlayerType ()Lcom/bitmovin/analytics/enums/PlayerType;
+	public final fun getProgUrl ()Ljava/lang/String;
+	public final fun getRandomizeUserId ()Z
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getVideoId ()Ljava/lang/String;
+	public final fun setAds (Z)V
+	public final fun setCdnProvider (Ljava/lang/String;)V
+	public final fun setCustomData1 (Ljava/lang/String;)V
+	public final fun setCustomData10 (Ljava/lang/String;)V
+	public final fun setCustomData11 (Ljava/lang/String;)V
+	public final fun setCustomData12 (Ljava/lang/String;)V
+	public final fun setCustomData13 (Ljava/lang/String;)V
+	public final fun setCustomData14 (Ljava/lang/String;)V
+	public final fun setCustomData15 (Ljava/lang/String;)V
+	public final fun setCustomData16 (Ljava/lang/String;)V
+	public final fun setCustomData17 (Ljava/lang/String;)V
+	public final fun setCustomData18 (Ljava/lang/String;)V
+	public final fun setCustomData19 (Ljava/lang/String;)V
+	public final fun setCustomData2 (Ljava/lang/String;)V
+	public final fun setCustomData20 (Ljava/lang/String;)V
+	public final fun setCustomData21 (Ljava/lang/String;)V
+	public final fun setCustomData22 (Ljava/lang/String;)V
+	public final fun setCustomData23 (Ljava/lang/String;)V
+	public final fun setCustomData24 (Ljava/lang/String;)V
+	public final fun setCustomData25 (Ljava/lang/String;)V
+	public final fun setCustomData26 (Ljava/lang/String;)V
+	public final fun setCustomData27 (Ljava/lang/String;)V
+	public final fun setCustomData28 (Ljava/lang/String;)V
+	public final fun setCustomData29 (Ljava/lang/String;)V
+	public final fun setCustomData3 (Ljava/lang/String;)V
+	public final fun setCustomData30 (Ljava/lang/String;)V
+	public final fun setCustomData4 (Ljava/lang/String;)V
+	public final fun setCustomData5 (Ljava/lang/String;)V
+	public final fun setCustomData6 (Ljava/lang/String;)V
+	public final fun setCustomData7 (Ljava/lang/String;)V
+	public final fun setCustomData8 (Ljava/lang/String;)V
+	public final fun setCustomData9 (Ljava/lang/String;)V
+	public final fun setCustomUserId (Ljava/lang/String;)V
+	public final fun setExperimentName (Ljava/lang/String;)V
+	public final fun setHeartbeatInterval (I)V
+	public final fun setIsLive (Ljava/lang/Boolean;)V
+	public final fun setM3u8Url (Ljava/lang/String;)V
+	public final fun setMpdUrl (Ljava/lang/String;)V
+	public final fun setPath (Ljava/lang/String;)V
+	public final fun setPlayerType (Lcom/bitmovin/analytics/enums/PlayerType;)V
+	public final fun setProgUrl (Ljava/lang/String;)V
+	public final fun setRandomizeUserId (Z)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setVideoId (Ljava/lang/String;)V
+	public fun writeToParcel (Landroid/os/Parcel;I)V
+}
+
+public final class com/bitmovin/analytics/BitmovinAnalyticsConfig$Companion {
+}
+
+public final class com/bitmovin/analytics/BuildConfig {
+	public static final field BUILD_TYPE Ljava/lang/String;
+	public static final field COLLECTOR_CORE_VERSION Ljava/lang/String;
+	public static final field DEBUG Z
+	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
+	public fun <init> ()V
+}
+
+public abstract interface class com/bitmovin/analytics/Collector {
+	public abstract fun addDebugListener (Lcom/bitmovin/analytics/BitmovinAnalytics$DebugListener;)V
+	public abstract fun attachPlayer (Ljava/lang/Object;)V
+	public abstract fun detachPlayer ()V
+	public abstract fun getConfig ()Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;
+	public abstract fun getCustomData ()Lcom/bitmovin/analytics/data/CustomData;
+	public abstract fun getImpressionId ()Ljava/lang/String;
+	public abstract fun getUserId ()Ljava/lang/String;
+	public abstract fun getVersion ()Ljava/lang/String;
+	public abstract fun removeDebugListener (Lcom/bitmovin/analytics/BitmovinAnalytics$DebugListener;)V
+	public abstract fun setCustomData (Lcom/bitmovin/analytics/data/CustomData;)V
+	public abstract fun setCustomDataOnce (Lcom/bitmovin/analytics/data/CustomData;)V
+}
+
+public final class com/bitmovin/analytics/CollectorConfig : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
+	public static final field Companion Lcom/bitmovin/analytics/CollectorConfig$Companion;
+	public fun <init> ()V
+	public synthetic fun <init> (Landroid/os/Parcel;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun describeContents ()I
+	public final fun getBackendUrl ()Ljava/lang/String;
+	public final fun getTryResendDataOnFailedConnection ()Z
+	public final fun setBackendUrl (Ljava/lang/String;)V
+	public final fun setTryResendDataOnFailedConnection (Z)V
+	public fun writeToParcel (Landroid/os/Parcel;I)V
+}
+
+public final class com/bitmovin/analytics/CollectorConfig$Companion {
+}
+
+public abstract interface class com/bitmovin/analytics/DebugCallback {
+	public abstract fun dispatchAdEventData (Lcom/bitmovin/analytics/data/AdEventData;)V
+	public abstract fun dispatchEventData (Lcom/bitmovin/analytics/data/EventData;)V
+	public abstract fun message (Ljava/lang/String;)V
+}
+
+public abstract class com/bitmovin/analytics/DefaultCollector : com/bitmovin/analytics/Collector {
+	protected fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;Ljava/lang/String;)V
+	public fun addDebugListener (Lcom/bitmovin/analytics/BitmovinAnalytics$DebugListener;)V
+	public fun attachPlayer (Ljava/lang/Object;)V
+	protected abstract fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Lcom/bitmovin/analytics/data/DeviceInformationProvider;Lcom/bitmovin/analytics/data/EventDataFactory;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
+	public fun detachPlayer ()V
+	public final fun getConfig ()Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;
+	public fun getCustomData ()Lcom/bitmovin/analytics/data/CustomData;
+	public fun getImpressionId ()Ljava/lang/String;
+	public fun getUserId ()Ljava/lang/String;
+	public fun getVersion ()Ljava/lang/String;
+	public fun removeDebugListener (Lcom/bitmovin/analytics/BitmovinAnalytics$DebugListener;)V
+	public fun setCustomData (Lcom/bitmovin/analytics/data/CustomData;)V
+	public fun setCustomDataOnce (Lcom/bitmovin/analytics/data/CustomData;)V
+}
+
+public final class com/bitmovin/analytics/EventBus {
+	public fun <init> ()V
+	public final fun get (Ljava/lang/Class;)Lcom/bitmovin/analytics/ObservableSupport;
+	public final fun get (Lkotlin/reflect/KClass;)Lcom/bitmovin/analytics/ObservableSupport;
+	public final fun notify (Ljava/lang/Class;Lcom/bitmovin/analytics/ObservableSupport$EventListenerNotifier;)V
+	public final fun notify (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;)V
+}
+
+public abstract interface class com/bitmovin/analytics/LicenseKeyProvider {
+	public abstract fun getLicenseKey ()Ljava/lang/String;
+}
+
+public abstract interface class com/bitmovin/analytics/Observable {
+	public abstract fun subscribe (Ljava/lang/Object;)V
+	public abstract fun unsubscribe (Ljava/lang/Object;)V
+}
+
+public final class com/bitmovin/analytics/ObservableSupport : com/bitmovin/analytics/Observable {
+	public fun <init> ()V
+	public final fun clear ()V
+	public final fun notify (Lcom/bitmovin/analytics/ObservableSupport$EventListenerNotifier;)V
+	public final fun notify (Lkotlin/jvm/functions/Function1;)V
+	public fun subscribe (Ljava/lang/Object;)V
+	public fun unsubscribe (Ljava/lang/Object;)V
+}
+
+public abstract interface class com/bitmovin/analytics/ObservableSupport$EventListenerNotifier {
+	public abstract fun notify (Ljava/lang/Object;)V
+}
+
+public abstract interface class com/bitmovin/analytics/OnAnalyticsReleasingEventListener {
+	public abstract fun onReleasing ()V
+}
+
+public abstract interface class com/bitmovin/analytics/adapters/AdAdapter : com/bitmovin/analytics/Observable {
+	public abstract fun getModuleInformation ()Lcom/bitmovin/analytics/data/AdModuleInformation;
+	public abstract fun isAutoplayEnabled ()Ljava/lang/Boolean;
+	public abstract fun isLinearAdActive ()Z
+	public abstract fun release ()V
+}
+
+public abstract interface class com/bitmovin/analytics/adapters/AdAnalyticsEventListener {
+	public abstract fun onAdBreakFinished ()V
+	public abstract fun onAdBreakStarted (Lcom/bitmovin/analytics/ads/AdBreak;)V
+	public abstract fun onAdClicked (Ljava/lang/String;)V
+	public abstract fun onAdError (Lcom/bitmovin/analytics/ads/AdBreak;Ljava/lang/Integer;Ljava/lang/String;)V
+	public abstract fun onAdFinished ()V
+	public abstract fun onAdManifestLoaded (Lcom/bitmovin/analytics/ads/AdBreak;J)V
+	public abstract fun onAdQuartile (Lcom/bitmovin/analytics/ads/AdQuartile;)V
+	public abstract fun onAdSkipped ()V
+	public abstract fun onAdStarted (Lcom/bitmovin/analytics/ads/Ad;)V
+	public abstract fun onPause ()V
+	public abstract fun onPlay ()V
+}
+
+public abstract class com/bitmovin/analytics/adapters/DefaultPlayerAdapter : com/bitmovin/analytics/adapters/PlayerAdapter {
+	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Lcom/bitmovin/analytics/data/EventDataFactory;Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Lcom/bitmovin/analytics/features/FeatureFactory;Lcom/bitmovin/analytics/data/DeviceInformationProvider;)V
+	public fun createAdAdapter ()Lcom/bitmovin/analytics/adapters/AdAdapter;
+	public fun createEventData ()Lcom/bitmovin/analytics/data/EventData;
+	protected final fun getConfig ()Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;
+	protected abstract fun getEventDataManipulators ()Ljava/util/Collection;
+	public fun getStateMachine ()Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;
+	public fun init ()Ljava/util/Collection;
+	public fun release ()V
+}
+
+public abstract interface class com/bitmovin/analytics/adapters/PlayerAdapter {
+	public abstract fun clearValues ()V
+	public abstract fun createAdAdapter ()Lcom/bitmovin/analytics/adapters/AdAdapter;
+	public abstract fun createEventData ()Lcom/bitmovin/analytics/data/EventData;
+	public abstract fun getCurrentSourceMetadata ()Lcom/bitmovin/analytics/config/SourceMetadata;
+	public abstract fun getDrmDownloadTime ()Ljava/lang/Long;
+	public abstract fun getPosition ()J
+	public abstract fun getStateMachine ()Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;
+	public abstract fun init ()Ljava/util/Collection;
+	public abstract fun release ()V
+	public abstract fun resetSourceRelatedState ()V
+}
+
+public final class com/bitmovin/analytics/adapters/PlayerAdapter$DefaultImpls {
+	public static fun createAdAdapter (Lcom/bitmovin/analytics/adapters/PlayerAdapter;)Lcom/bitmovin/analytics/adapters/AdAdapter;
+}
+
+public final class com/bitmovin/analytics/ads/Ad {
+	public fun <init> ()V
+	public fun <init> (ZIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Boolean;Ljava/lang/Long;Ljava/lang/String;)V
+	public synthetic fun <init> (ZIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Boolean;Ljava/lang/Long;Ljava/lang/String;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component10 ()Ljava/lang/String;
+	public final fun component11 ()Ljava/lang/String;
+	public final fun component12 ()Ljava/lang/String;
+	public final fun component13 ()Ljava/lang/String;
+	public final fun component14 ()Ljava/lang/String;
+	public final fun component15 ()Ljava/lang/String;
+	public final fun component16 ()Ljava/lang/String;
+	public final fun component17 ()Ljava/lang/String;
+	public final fun component18 ()Ljava/lang/String;
+	public final fun component19 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component20 ()Ljava/lang/String;
+	public final fun component21 ()Ljava/lang/Long;
+	public final fun component22 ()Ljava/lang/String;
+	public final fun component23 ()Ljava/lang/String;
+	public final fun component24 ()Ljava/lang/String;
+	public final fun component25 ()Ljava/lang/Integer;
+	public final fun component26 ()Ljava/lang/String;
+	public final fun component27 ()Ljava/lang/Long;
+	public final fun component28 ()Ljava/lang/String;
+	public final fun component29 ()Ljava/lang/String;
+	public final fun component3 ()I
+	public final fun component30 ()Ljava/lang/Long;
+	public final fun component31 ()Ljava/lang/Boolean;
+	public final fun component32 ()Ljava/lang/Long;
+	public final fun component33 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()Ljava/lang/Integer;
+	public final fun component8 ()Ljava/lang/Integer;
+	public final fun component9 ()Ljava/lang/Integer;
+	public final fun copy (ZIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Boolean;Ljava/lang/Long;Ljava/lang/String;)Lcom/bitmovin/analytics/ads/Ad;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/ads/Ad;ZIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Boolean;Ljava/lang/Long;Ljava/lang/String;IILjava/lang/Object;)Lcom/bitmovin/analytics/ads/Ad;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdSystemName ()Ljava/lang/String;
+	public final fun getAdSystemVersion ()Ljava/lang/String;
+	public final fun getAdvertiserId ()Ljava/lang/String;
+	public final fun getAdvertiserName ()Ljava/lang/String;
+	public final fun getApiFramework ()Ljava/lang/String;
+	public final fun getBitrate ()Ljava/lang/Integer;
+	public final fun getClickThroughUrl ()Ljava/lang/String;
+	public final fun getCodec ()Ljava/lang/String;
+	public final fun getCreativeAdId ()Ljava/lang/String;
+	public final fun getCreativeId ()Ljava/lang/String;
+	public final fun getDealId ()Ljava/lang/String;
+	public final fun getDescription ()Ljava/lang/String;
+	public final fun getDuration ()Ljava/lang/Long;
+	public final fun getHeight ()I
+	public final fun getId ()Ljava/lang/String;
+	public final fun getMaxBitrate ()Ljava/lang/Integer;
+	public final fun getMediaFileUrl ()Ljava/lang/String;
+	public final fun getMimeType ()Ljava/lang/String;
+	public final fun getMinBitrate ()Ljava/lang/Integer;
+	public final fun getMinSuggestedDuration ()Ljava/lang/Long;
+	public final fun getPricingCurrency ()Ljava/lang/String;
+	public final fun getPricingModel ()Ljava/lang/String;
+	public final fun getPricingValue ()Ljava/lang/Long;
+	public final fun getSkippable ()Ljava/lang/Boolean;
+	public final fun getSkippableAfter ()Ljava/lang/Long;
+	public final fun getSurveyType ()Ljava/lang/String;
+	public final fun getSurveyUrl ()Ljava/lang/String;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getUniversalAdIdRegistry ()Ljava/lang/String;
+	public final fun getUniversalAdIdValue ()Ljava/lang/String;
+	public final fun getWidth ()I
+	public final fun getWrapperAdsCount ()Ljava/lang/Integer;
+	public fun hashCode ()I
+	public final fun isLinear ()Z
+	public final fun setAdSystemName (Ljava/lang/String;)V
+	public final fun setAdSystemVersion (Ljava/lang/String;)V
+	public final fun setAdvertiserId (Ljava/lang/String;)V
+	public final fun setAdvertiserName (Ljava/lang/String;)V
+	public final fun setApiFramework (Ljava/lang/String;)V
+	public final fun setBitrate (Ljava/lang/Integer;)V
+	public final fun setClickThroughUrl (Ljava/lang/String;)V
+	public final fun setCodec (Ljava/lang/String;)V
+	public final fun setCreativeAdId (Ljava/lang/String;)V
+	public final fun setCreativeId (Ljava/lang/String;)V
+	public final fun setDealId (Ljava/lang/String;)V
+	public final fun setDescription (Ljava/lang/String;)V
+	public final fun setDuration (Ljava/lang/Long;)V
+	public final fun setHeight (I)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setLinear (Z)V
+	public final fun setMaxBitrate (Ljava/lang/Integer;)V
+	public final fun setMediaFileUrl (Ljava/lang/String;)V
+	public final fun setMimeType (Ljava/lang/String;)V
+	public final fun setMinBitrate (Ljava/lang/Integer;)V
+	public final fun setMinSuggestedDuration (Ljava/lang/Long;)V
+	public final fun setPricingCurrency (Ljava/lang/String;)V
+	public final fun setPricingModel (Ljava/lang/String;)V
+	public final fun setPricingValue (Ljava/lang/Long;)V
+	public final fun setSkippable (Ljava/lang/Boolean;)V
+	public final fun setSkippableAfter (Ljava/lang/Long;)V
+	public final fun setSurveyType (Ljava/lang/String;)V
+	public final fun setSurveyUrl (Ljava/lang/String;)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setUniversalAdIdRegistry (Ljava/lang/String;)V
+	public final fun setUniversalAdIdValue (Ljava/lang/String;)V
+	public final fun setWidth (I)V
+	public final fun setWrapperAdsCount (Ljava/lang/Integer;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/ads/AdBreak {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;Lcom/bitmovin/analytics/ads/AdPosition;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Lcom/bitmovin/analytics/ads/AdTagType;Ljava/lang/String;Ljava/lang/Boolean;J)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/List;Lcom/bitmovin/analytics/ads/AdPosition;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Lcom/bitmovin/analytics/ads/AdTagType;Ljava/lang/String;Ljava/lang/Boolean;JILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/lang/Boolean;
+	public final fun component11 ()J
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Lcom/bitmovin/analytics/ads/AdPosition;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/Long;
+	public final fun component6 ()Ljava/lang/Long;
+	public final fun component7 ()Ljava/lang/Long;
+	public final fun component8 ()Lcom/bitmovin/analytics/ads/AdTagType;
+	public final fun component9 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;Lcom/bitmovin/analytics/ads/AdPosition;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Lcom/bitmovin/analytics/ads/AdTagType;Ljava/lang/String;Ljava/lang/Boolean;J)Lcom/bitmovin/analytics/ads/AdBreak;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/ads/AdBreak;Ljava/lang/String;Ljava/util/List;Lcom/bitmovin/analytics/ads/AdPosition;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Lcom/bitmovin/analytics/ads/AdTagType;Ljava/lang/String;Ljava/lang/Boolean;JILjava/lang/Object;)Lcom/bitmovin/analytics/ads/AdBreak;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAds ()Ljava/util/List;
+	public final fun getFallbackIndex ()J
+	public final fun getId ()Ljava/lang/String;
+	public final fun getOffset ()Ljava/lang/String;
+	public final fun getPersistent ()Ljava/lang/Boolean;
+	public final fun getPosition ()Lcom/bitmovin/analytics/ads/AdPosition;
+	public final fun getPreloadOffset ()Ljava/lang/Long;
+	public final fun getReplaceContentDuration ()Ljava/lang/Long;
+	public final fun getScheduleTime ()Ljava/lang/Long;
+	public final fun getTagType ()Lcom/bitmovin/analytics/ads/AdTagType;
+	public final fun getTagUrl ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun setAds (Ljava/util/List;)V
+	public final fun setFallbackIndex (J)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setOffset (Ljava/lang/String;)V
+	public final fun setPersistent (Ljava/lang/Boolean;)V
+	public final fun setPosition (Lcom/bitmovin/analytics/ads/AdPosition;)V
+	public final fun setPreloadOffset (Ljava/lang/Long;)V
+	public final fun setReplaceContentDuration (Ljava/lang/Long;)V
+	public final fun setScheduleTime (Ljava/lang/Long;)V
+	public final fun setTagType (Lcom/bitmovin/analytics/ads/AdTagType;)V
+	public final fun setTagUrl (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/ads/AdPosition : java/lang/Enum {
+	public static final field mid Lcom/bitmovin/analytics/ads/AdPosition;
+	public static final field post Lcom/bitmovin/analytics/ads/AdPosition;
+	public static final field pre Lcom/bitmovin/analytics/ads/AdPosition;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/ads/AdPosition;
+	public static fun values ()[Lcom/bitmovin/analytics/ads/AdPosition;
+}
+
+public final class com/bitmovin/analytics/ads/AdQuartile : java/lang/Enum {
+	public static final field FIRST_QUARTILE Lcom/bitmovin/analytics/ads/AdQuartile;
+	public static final field MIDPOINT Lcom/bitmovin/analytics/ads/AdQuartile;
+	public static final field THIRD_QUARTILE Lcom/bitmovin/analytics/ads/AdQuartile;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/ads/AdQuartile;
+	public static fun values ()[Lcom/bitmovin/analytics/ads/AdQuartile;
+}
+
+public final class com/bitmovin/analytics/ads/AdTagType : java/lang/Enum {
+	public static final field UNKNOWN Lcom/bitmovin/analytics/ads/AdTagType;
+	public static final field VAST Lcom/bitmovin/analytics/ads/AdTagType;
+	public static final field VMAP Lcom/bitmovin/analytics/ads/AdTagType;
+	public static final field VPAID Lcom/bitmovin/analytics/ads/AdTagType;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/ads/AdTagType;
+	public static fun values ()[Lcom/bitmovin/analytics/ads/AdTagType;
+}
+
+public final class com/bitmovin/analytics/config/SourceMetadata {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/lang/String;
+	public final fun component11 ()Ljava/lang/String;
+	public final fun component12 ()Ljava/lang/String;
+	public final fun component13 ()Ljava/lang/String;
+	public final fun component14 ()Ljava/lang/String;
+	public final fun component15 ()Ljava/lang/String;
+	public final fun component16 ()Ljava/lang/String;
+	public final fun component17 ()Ljava/lang/String;
+	public final fun component18 ()Ljava/lang/String;
+	public final fun component19 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component20 ()Ljava/lang/String;
+	public final fun component21 ()Ljava/lang/String;
+	public final fun component22 ()Ljava/lang/String;
+	public final fun component23 ()Ljava/lang/String;
+	public final fun component24 ()Ljava/lang/String;
+	public final fun component25 ()Ljava/lang/String;
+	public final fun component26 ()Ljava/lang/String;
+	public final fun component27 ()Ljava/lang/String;
+	public final fun component28 ()Ljava/lang/String;
+	public final fun component29 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component30 ()Ljava/lang/String;
+	public final fun component31 ()Ljava/lang/String;
+	public final fun component32 ()Ljava/lang/String;
+	public final fun component33 ()Ljava/lang/String;
+	public final fun component34 ()Ljava/lang/String;
+	public final fun component35 ()Ljava/lang/String;
+	public final fun component36 ()Ljava/lang/String;
+	public final fun component37 ()Ljava/lang/String;
+	public final fun component38 ()Ljava/lang/String;
+	public final fun component39 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()Ljava/lang/String;
+	public final fun component8 ()Ljava/lang/String;
+	public final fun component9 ()Ljava/lang/Boolean;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/bitmovin/analytics/config/SourceMetadata;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/config/SourceMetadata;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILjava/lang/Object;)Lcom/bitmovin/analytics/config/SourceMetadata;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCdnProvider ()Ljava/lang/String;
+	public final fun getCustomData1 ()Ljava/lang/String;
+	public final fun getCustomData10 ()Ljava/lang/String;
+	public final fun getCustomData11 ()Ljava/lang/String;
+	public final fun getCustomData12 ()Ljava/lang/String;
+	public final fun getCustomData13 ()Ljava/lang/String;
+	public final fun getCustomData14 ()Ljava/lang/String;
+	public final fun getCustomData15 ()Ljava/lang/String;
+	public final fun getCustomData16 ()Ljava/lang/String;
+	public final fun getCustomData17 ()Ljava/lang/String;
+	public final fun getCustomData18 ()Ljava/lang/String;
+	public final fun getCustomData19 ()Ljava/lang/String;
+	public final fun getCustomData2 ()Ljava/lang/String;
+	public final fun getCustomData20 ()Ljava/lang/String;
+	public final fun getCustomData21 ()Ljava/lang/String;
+	public final fun getCustomData22 ()Ljava/lang/String;
+	public final fun getCustomData23 ()Ljava/lang/String;
+	public final fun getCustomData24 ()Ljava/lang/String;
+	public final fun getCustomData25 ()Ljava/lang/String;
+	public final fun getCustomData26 ()Ljava/lang/String;
+	public final fun getCustomData27 ()Ljava/lang/String;
+	public final fun getCustomData28 ()Ljava/lang/String;
+	public final fun getCustomData29 ()Ljava/lang/String;
+	public final fun getCustomData3 ()Ljava/lang/String;
+	public final fun getCustomData30 ()Ljava/lang/String;
+	public final fun getCustomData4 ()Ljava/lang/String;
+	public final fun getCustomData5 ()Ljava/lang/String;
+	public final fun getCustomData6 ()Ljava/lang/String;
+	public final fun getCustomData7 ()Ljava/lang/String;
+	public final fun getCustomData8 ()Ljava/lang/String;
+	public final fun getCustomData9 ()Ljava/lang/String;
+	public final fun getExperimentName ()Ljava/lang/String;
+	public final fun getM3u8Url ()Ljava/lang/String;
+	public final fun getMpdUrl ()Ljava/lang/String;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getProgUrl ()Ljava/lang/String;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getVideoId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun isLive ()Ljava/lang/Boolean;
+	public final fun setCustomData1 (Ljava/lang/String;)V
+	public final fun setCustomData10 (Ljava/lang/String;)V
+	public final fun setCustomData11 (Ljava/lang/String;)V
+	public final fun setCustomData12 (Ljava/lang/String;)V
+	public final fun setCustomData13 (Ljava/lang/String;)V
+	public final fun setCustomData14 (Ljava/lang/String;)V
+	public final fun setCustomData15 (Ljava/lang/String;)V
+	public final fun setCustomData16 (Ljava/lang/String;)V
+	public final fun setCustomData17 (Ljava/lang/String;)V
+	public final fun setCustomData18 (Ljava/lang/String;)V
+	public final fun setCustomData19 (Ljava/lang/String;)V
+	public final fun setCustomData2 (Ljava/lang/String;)V
+	public final fun setCustomData20 (Ljava/lang/String;)V
+	public final fun setCustomData21 (Ljava/lang/String;)V
+	public final fun setCustomData22 (Ljava/lang/String;)V
+	public final fun setCustomData23 (Ljava/lang/String;)V
+	public final fun setCustomData24 (Ljava/lang/String;)V
+	public final fun setCustomData25 (Ljava/lang/String;)V
+	public final fun setCustomData26 (Ljava/lang/String;)V
+	public final fun setCustomData27 (Ljava/lang/String;)V
+	public final fun setCustomData28 (Ljava/lang/String;)V
+	public final fun setCustomData29 (Ljava/lang/String;)V
+	public final fun setCustomData3 (Ljava/lang/String;)V
+	public final fun setCustomData30 (Ljava/lang/String;)V
+	public final fun setCustomData4 (Ljava/lang/String;)V
+	public final fun setCustomData5 (Ljava/lang/String;)V
+	public final fun setCustomData6 (Ljava/lang/String;)V
+	public final fun setCustomData7 (Ljava/lang/String;)V
+	public final fun setCustomData8 (Ljava/lang/String;)V
+	public final fun setCustomData9 (Ljava/lang/String;)V
+	public final fun setExperimentName (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/data/AdEventData {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V
+	public synthetic fun <init> (Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIIIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Integer;
+	public final fun component10 ()Ljava/lang/Integer;
+	public final fun component100 ()Ljava/lang/String;
+	public final fun component101 ()Ljava/lang/String;
+	public final fun component102 ()Ljava/lang/String;
+	public final fun component103 ()Ljava/lang/String;
+	public final fun component104 ()Ljava/lang/String;
+	public final fun component105 ()Ljava/lang/String;
+	public final fun component106 ()Ljava/lang/String;
+	public final fun component107 ()Ljava/lang/String;
+	public final fun component108 ()Ljava/lang/String;
+	public final fun component109 ()Ljava/lang/String;
+	public final fun component11 ()Ljava/lang/Long;
+	public final fun component110 ()Ljava/lang/String;
+	public final fun component111 ()Ljava/lang/String;
+	public final fun component112 ()Ljava/lang/Integer;
+	public final fun component113 ()Ljava/lang/Integer;
+	public final fun component114 ()Ljava/lang/String;
+	public final fun component115 ()Ljava/lang/String;
+	public final fun component116 ()Ljava/lang/String;
+	public final fun component117 ()Ljava/lang/String;
+	public final fun component118 ()Ljava/lang/Integer;
+	public final fun component119 ()Ljava/lang/Integer;
+	public final fun component12 ()Ljava/lang/String;
+	public final fun component120 ()Ljava/lang/Long;
+	public final fun component121 ()Ljava/lang/String;
+	public final fun component122 ()Ljava/lang/Boolean;
+	public final fun component123 ()Ljava/lang/String;
+	public final fun component124 ()Ljava/lang/String;
+	public final fun component125 ()Ljava/lang/String;
+	public final fun component126 ()I
+	public final fun component13 ()Ljava/lang/String;
+	public final fun component14 ()Ljava/lang/String;
+	public final fun component15 ()Ljava/lang/String;
+	public final fun component16 ()Ljava/lang/Long;
+	public final fun component17 ()Ljava/lang/Long;
+	public final fun component18 ()Ljava/lang/Long;
+	public final fun component19 ()Ljava/lang/Long;
+	public final fun component2 ()Ljava/lang/Boolean;
+	public final fun component20 ()Ljava/lang/Long;
+	public final fun component21 ()Ljava/lang/String;
+	public final fun component22 ()Ljava/lang/String;
+	public final fun component23 ()Ljava/lang/String;
+	public final fun component24 ()Ljava/lang/Boolean;
+	public final fun component25 ()Ljava/lang/String;
+	public final fun component26 ()Ljava/lang/String;
+	public final fun component27 ()Ljava/lang/String;
+	public final fun component28 ()Ljava/lang/Long;
+	public final fun component29 ()Ljava/lang/Long;
+	public final fun component3 ()Ljava/lang/Long;
+	public final fun component30 ()Ljava/lang/Long;
+	public final fun component31 ()Ljava/lang/Long;
+	public final fun component32 ()Ljava/lang/Long;
+	public final fun component33 ()Ljava/lang/Long;
+	public final fun component34 ()Ljava/lang/Long;
+	public final fun component35 ()Ljava/lang/String;
+	public final fun component36 ()Ljava/lang/String;
+	public final fun component37 ()Ljava/lang/Long;
+	public final fun component38 ()Ljava/lang/Long;
+	public final fun component39 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component40 ()Ljava/lang/String;
+	public final fun component41 ()Ljava/lang/Integer;
+	public final fun component42 ()Ljava/lang/Integer;
+	public final fun component43 ()Ljava/lang/Long;
+	public final fun component44 ()Ljava/lang/Integer;
+	public final fun component45 ()Ljava/lang/Integer;
+	public final fun component46 ()Ljava/lang/Integer;
+	public final fun component47 ()Ljava/lang/Integer;
+	public final fun component48 ()Ljava/lang/Long;
+	public final fun component49 ()Ljava/lang/Integer;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component50 ()Ljava/lang/Long;
+	public final fun component51 ()Ljava/lang/Long;
+	public final fun component52 ()Ljava/lang/String;
+	public final fun component53 ()Ljava/lang/String;
+	public final fun component54 ()Ljava/lang/Long;
+	public final fun component55 ()Ljava/lang/Long;
+	public final fun component56 ()Ljava/lang/Long;
+	public final fun component57 ()Ljava/lang/String;
+	public final fun component58 ()Ljava/lang/String;
+	public final fun component59 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/Long;
+	public final fun component60 ()Ljava/lang/String;
+	public final fun component61 ()Ljava/lang/Boolean;
+	public final fun component62 ()Ljava/lang/String;
+	public final fun component63 ()Ljava/lang/Long;
+	public final fun component64 ()Ljava/lang/Integer;
+	public final fun component65 ()Ljava/lang/String;
+	public final fun component66 ()Ljava/lang/String;
+	public final fun component67 ()J
+	public final fun component68 ()Ljava/lang/String;
+	public final fun component69 ()Ljava/lang/String;
+	public final fun component7 ()Ljava/lang/String;
+	public final fun component70 ()Ljava/lang/String;
+	public final fun component71 ()Ljava/lang/String;
+	public final fun component72 ()Ljava/lang/String;
+	public final fun component73 ()Ljava/lang/String;
+	public final fun component74 ()Ljava/lang/String;
+	public final fun component75 ()Ljava/lang/String;
+	public final fun component76 ()Ljava/lang/String;
+	public final fun component77 ()Ljava/lang/String;
+	public final fun component78 ()Ljava/lang/String;
+	public final fun component79 ()Ljava/lang/String;
+	public final fun component8 ()Ljava/lang/String;
+	public final fun component80 ()Ljava/lang/String;
+	public final fun component81 ()Ljava/lang/String;
+	public final fun component82 ()Ljava/lang/String;
+	public final fun component83 ()Ljava/lang/String;
+	public final fun component84 ()Ljava/lang/String;
+	public final fun component85 ()Ljava/lang/String;
+	public final fun component86 ()Ljava/lang/String;
+	public final fun component87 ()Ljava/lang/String;
+	public final fun component88 ()Ljava/lang/String;
+	public final fun component89 ()Ljava/lang/String;
+	public final fun component9 ()Ljava/lang/Integer;
+	public final fun component90 ()Ljava/lang/String;
+	public final fun component91 ()Ljava/lang/String;
+	public final fun component92 ()Ljava/lang/String;
+	public final fun component93 ()Ljava/lang/String;
+	public final fun component94 ()Ljava/lang/String;
+	public final fun component95 ()Ljava/lang/String;
+	public final fun component96 ()Ljava/lang/String;
+	public final fun component97 ()Ljava/lang/String;
+	public final fun component98 ()Ljava/lang/String;
+	public final fun component99 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Lcom/bitmovin/analytics/data/AdEventData;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/data/AdEventData;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIIIILjava/lang/Object;)Lcom/bitmovin/analytics/data/AdEventData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdClickthroughUrl ()Ljava/lang/String;
+	public final fun getAdDescription ()Ljava/lang/String;
+	public final fun getAdDuration ()Ljava/lang/Long;
+	public final fun getAdFallbackIndex ()J
+	public final fun getAdId ()Ljava/lang/String;
+	public final fun getAdIdPlayer ()Ljava/lang/String;
+	public final fun getAdImpressionId ()Ljava/lang/String;
+	public final fun getAdIsPersistent ()Ljava/lang/Boolean;
+	public final fun getAdModule ()Ljava/lang/String;
+	public final fun getAdModuleVersion ()Ljava/lang/String;
+	public final fun getAdOffset ()Ljava/lang/String;
+	public final fun getAdPlaybackHeight ()Ljava/lang/Integer;
+	public final fun getAdPlaybackWidth ()Ljava/lang/Integer;
+	public final fun getAdPodPosition ()Ljava/lang/Integer;
+	public final fun getAdPosition ()Ljava/lang/String;
+	public final fun getAdPreloadOffset ()Ljava/lang/Long;
+	public final fun getAdReplaceContentDuration ()Ljava/lang/Long;
+	public final fun getAdScheduleTime ()Ljava/lang/Long;
+	public final fun getAdSkippable ()Ljava/lang/Boolean;
+	public final fun getAdSkippableAfter ()Ljava/lang/Long;
+	public final fun getAdStartupTime ()Ljava/lang/Long;
+	public final fun getAdSystem ()Ljava/lang/String;
+	public final fun getAdTagPath ()Ljava/lang/String;
+	public final fun getAdTagServer ()Ljava/lang/String;
+	public final fun getAdTagType ()Ljava/lang/String;
+	public final fun getAdTagUrl ()Ljava/lang/String;
+	public final fun getAdTitle ()Ljava/lang/String;
+	public final fun getAdvertiserName ()Ljava/lang/String;
+	public final fun getAnalyticsVersion ()Ljava/lang/String;
+	public final fun getApiFramework ()Ljava/lang/String;
+	public final fun getAudioCodec ()Ljava/lang/String;
+	public final fun getAutoplay ()Ljava/lang/Boolean;
+	public final fun getCdnProvider ()Ljava/lang/String;
+	public final fun getClickPercentage ()Ljava/lang/Integer;
+	public final fun getClickPosition ()Ljava/lang/Long;
+	public final fun getClicked ()Ljava/lang/Long;
+	public final fun getClosePercentage ()Ljava/lang/Integer;
+	public final fun getClosePosition ()Ljava/lang/Long;
+	public final fun getClosed ()Ljava/lang/Long;
+	public final fun getCompleted ()Ljava/lang/Long;
+	public final fun getCreativeAdId ()Ljava/lang/String;
+	public final fun getCreativeId ()Ljava/lang/String;
+	public final fun getCustomData1 ()Ljava/lang/String;
+	public final fun getCustomData10 ()Ljava/lang/String;
+	public final fun getCustomData11 ()Ljava/lang/String;
+	public final fun getCustomData12 ()Ljava/lang/String;
+	public final fun getCustomData13 ()Ljava/lang/String;
+	public final fun getCustomData14 ()Ljava/lang/String;
+	public final fun getCustomData15 ()Ljava/lang/String;
+	public final fun getCustomData16 ()Ljava/lang/String;
+	public final fun getCustomData17 ()Ljava/lang/String;
+	public final fun getCustomData18 ()Ljava/lang/String;
+	public final fun getCustomData19 ()Ljava/lang/String;
+	public final fun getCustomData2 ()Ljava/lang/String;
+	public final fun getCustomData20 ()Ljava/lang/String;
+	public final fun getCustomData21 ()Ljava/lang/String;
+	public final fun getCustomData22 ()Ljava/lang/String;
+	public final fun getCustomData23 ()Ljava/lang/String;
+	public final fun getCustomData24 ()Ljava/lang/String;
+	public final fun getCustomData25 ()Ljava/lang/String;
+	public final fun getCustomData26 ()Ljava/lang/String;
+	public final fun getCustomData27 ()Ljava/lang/String;
+	public final fun getCustomData28 ()Ljava/lang/String;
+	public final fun getCustomData29 ()Ljava/lang/String;
+	public final fun getCustomData3 ()Ljava/lang/String;
+	public final fun getCustomData30 ()Ljava/lang/String;
+	public final fun getCustomData4 ()Ljava/lang/String;
+	public final fun getCustomData5 ()Ljava/lang/String;
+	public final fun getCustomData6 ()Ljava/lang/String;
+	public final fun getCustomData7 ()Ljava/lang/String;
+	public final fun getCustomData8 ()Ljava/lang/String;
+	public final fun getCustomData9 ()Ljava/lang/String;
+	public final fun getCustomUserId ()Ljava/lang/String;
+	public final fun getDealId ()Ljava/lang/String;
+	public final fun getDomain ()Ljava/lang/String;
+	public final fun getErrorCode ()Ljava/lang/Integer;
+	public final fun getErrorData ()Ljava/lang/String;
+	public final fun getErrorMessage ()Ljava/lang/String;
+	public final fun getErrorPercentage ()Ljava/lang/Integer;
+	public final fun getErrorPosition ()Ljava/lang/Long;
+	public final fun getExitPosition ()Ljava/lang/Long;
+	public final fun getExperimentName ()Ljava/lang/String;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getLanguage ()Ljava/lang/String;
+	public final fun getManifestDownloadTime ()Ljava/lang/Long;
+	public final fun getMediaPath ()Ljava/lang/String;
+	public final fun getMediaServer ()Ljava/lang/String;
+	public final fun getMediaUrl ()Ljava/lang/String;
+	public final fun getMidpoint ()Ljava/lang/Long;
+	public final fun getMinSuggestedDuration ()Ljava/lang/Long;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getPlatform ()Ljava/lang/String;
+	public final fun getPlayPercentage ()Ljava/lang/Integer;
+	public final fun getPlayer ()Ljava/lang/String;
+	public final fun getPlayerKey ()Ljava/lang/String;
+	public final fun getPlayerStartupTime ()Ljava/lang/Long;
+	public final fun getPlayerTech ()Ljava/lang/String;
+	public final fun getQuartile1 ()Ljava/lang/Long;
+	public final fun getQuartile3 ()Ljava/lang/Long;
+	public final fun getRetryCount ()I
+	public final fun getScreenHeight ()Ljava/lang/Integer;
+	public final fun getScreenWidth ()Ljava/lang/Integer;
+	public final fun getSkipPercentage ()Ljava/lang/Integer;
+	public final fun getSkipPosition ()Ljava/lang/Long;
+	public final fun getSkipped ()Ljava/lang/Long;
+	public final fun getStarted ()Ljava/lang/Long;
+	public final fun getStreamFormat ()Ljava/lang/String;
+	public final fun getSurveyUrl ()Ljava/lang/String;
+	public final fun getTime ()Ljava/lang/Long;
+	public final fun getTimeFromContent ()Ljava/lang/Long;
+	public final fun getTimePlayed ()Ljava/lang/Long;
+	public final fun getTimeToContent ()Ljava/lang/Long;
+	public final fun getUniversalAdIdRegistry ()Ljava/lang/String;
+	public final fun getUniversalAdIdValue ()Ljava/lang/String;
+	public final fun getUserAgent ()Ljava/lang/String;
+	public final fun getUserId ()Ljava/lang/String;
+	public final fun getVersion ()Ljava/lang/String;
+	public final fun getVideoBitrate ()Ljava/lang/Integer;
+	public final fun getVideoCodec ()Ljava/lang/String;
+	public final fun getVideoId ()Ljava/lang/String;
+	public final fun getVideoImpressionId ()Ljava/lang/String;
+	public final fun getVideoTitle ()Ljava/lang/String;
+	public final fun getVideoWindowHeight ()Ljava/lang/Integer;
+	public final fun getVideoWindowWidth ()Ljava/lang/Integer;
+	public final fun getWrapperAdsCount ()Ljava/lang/Integer;
+	public fun hashCode ()I
+	public final fun isLinear ()Ljava/lang/Boolean;
+	public final fun setAdBreak (Lcom/bitmovin/analytics/ads/AdBreak;)V
+	public final fun setAdClickthroughUrl (Ljava/lang/String;)V
+	public final fun setAdDescription (Ljava/lang/String;)V
+	public final fun setAdDuration (Ljava/lang/Long;)V
+	public final fun setAdFallbackIndex (J)V
+	public final fun setAdId (Ljava/lang/String;)V
+	public final fun setAdIdPlayer (Ljava/lang/String;)V
+	public final fun setAdImpressionId (Ljava/lang/String;)V
+	public final fun setAdIsPersistent (Ljava/lang/Boolean;)V
+	public final fun setAdModule (Ljava/lang/String;)V
+	public final fun setAdModuleVersion (Ljava/lang/String;)V
+	public final fun setAdOffset (Ljava/lang/String;)V
+	public final fun setAdPlaybackHeight (Ljava/lang/Integer;)V
+	public final fun setAdPlaybackWidth (Ljava/lang/Integer;)V
+	public final fun setAdPodPosition (Ljava/lang/Integer;)V
+	public final fun setAdPosition (Ljava/lang/String;)V
+	public final fun setAdPreloadOffset (Ljava/lang/Long;)V
+	public final fun setAdReplaceContentDuration (Ljava/lang/Long;)V
+	public final fun setAdSample (Lcom/bitmovin/analytics/data/AdSample;)V
+	public final fun setAdScheduleTime (Ljava/lang/Long;)V
+	public final fun setAdSkippable (Ljava/lang/Boolean;)V
+	public final fun setAdSkippableAfter (Ljava/lang/Long;)V
+	public final fun setAdStartupTime (Ljava/lang/Long;)V
+	public final fun setAdSystem (Ljava/lang/String;)V
+	public final fun setAdTagPath (Ljava/lang/String;)V
+	public final fun setAdTagServer (Ljava/lang/String;)V
+	public final fun setAdTagType (Ljava/lang/String;)V
+	public final fun setAdTagUrl (Ljava/lang/String;)V
+	public final fun setAdTitle (Ljava/lang/String;)V
+	public final fun setAdvertiserName (Ljava/lang/String;)V
+	public final fun setAnalyticsVersion (Ljava/lang/String;)V
+	public final fun setApiFramework (Ljava/lang/String;)V
+	public final fun setAudioCodec (Ljava/lang/String;)V
+	public final fun setAutoplay (Ljava/lang/Boolean;)V
+	public final fun setCdnProvider (Ljava/lang/String;)V
+	public final fun setClickPercentage (Ljava/lang/Integer;)V
+	public final fun setClickPosition (Ljava/lang/Long;)V
+	public final fun setClicked (Ljava/lang/Long;)V
+	public final fun setClosePercentage (Ljava/lang/Integer;)V
+	public final fun setClosePosition (Ljava/lang/Long;)V
+	public final fun setClosed (Ljava/lang/Long;)V
+	public final fun setCompleted (Ljava/lang/Long;)V
+	public final fun setCreativeAdId (Ljava/lang/String;)V
+	public final fun setCreativeId (Ljava/lang/String;)V
+	public final fun setCustomData1 (Ljava/lang/String;)V
+	public final fun setCustomData10 (Ljava/lang/String;)V
+	public final fun setCustomData11 (Ljava/lang/String;)V
+	public final fun setCustomData12 (Ljava/lang/String;)V
+	public final fun setCustomData13 (Ljava/lang/String;)V
+	public final fun setCustomData14 (Ljava/lang/String;)V
+	public final fun setCustomData15 (Ljava/lang/String;)V
+	public final fun setCustomData16 (Ljava/lang/String;)V
+	public final fun setCustomData17 (Ljava/lang/String;)V
+	public final fun setCustomData18 (Ljava/lang/String;)V
+	public final fun setCustomData19 (Ljava/lang/String;)V
+	public final fun setCustomData2 (Ljava/lang/String;)V
+	public final fun setCustomData20 (Ljava/lang/String;)V
+	public final fun setCustomData21 (Ljava/lang/String;)V
+	public final fun setCustomData22 (Ljava/lang/String;)V
+	public final fun setCustomData23 (Ljava/lang/String;)V
+	public final fun setCustomData24 (Ljava/lang/String;)V
+	public final fun setCustomData25 (Ljava/lang/String;)V
+	public final fun setCustomData26 (Ljava/lang/String;)V
+	public final fun setCustomData27 (Ljava/lang/String;)V
+	public final fun setCustomData28 (Ljava/lang/String;)V
+	public final fun setCustomData29 (Ljava/lang/String;)V
+	public final fun setCustomData3 (Ljava/lang/String;)V
+	public final fun setCustomData30 (Ljava/lang/String;)V
+	public final fun setCustomData4 (Ljava/lang/String;)V
+	public final fun setCustomData5 (Ljava/lang/String;)V
+	public final fun setCustomData6 (Ljava/lang/String;)V
+	public final fun setCustomData7 (Ljava/lang/String;)V
+	public final fun setCustomData8 (Ljava/lang/String;)V
+	public final fun setCustomData9 (Ljava/lang/String;)V
+	public final fun setCustomUserId (Ljava/lang/String;)V
+	public final fun setDealId (Ljava/lang/String;)V
+	public final fun setDomain (Ljava/lang/String;)V
+	public final fun setErrorCode (Ljava/lang/Integer;)V
+	public final fun setErrorData (Ljava/lang/String;)V
+	public final fun setErrorMessage (Ljava/lang/String;)V
+	public final fun setErrorPercentage (Ljava/lang/Integer;)V
+	public final fun setErrorPosition (Ljava/lang/Long;)V
+	public final fun setEventData (Lcom/bitmovin/analytics/data/EventData;)V
+	public final fun setExitPosition (Ljava/lang/Long;)V
+	public final fun setExperimentName (Ljava/lang/String;)V
+	public final fun setKey (Ljava/lang/String;)V
+	public final fun setLanguage (Ljava/lang/String;)V
+	public final fun setLinear (Ljava/lang/Boolean;)V
+	public final fun setManifestDownloadTime (Ljava/lang/Long;)V
+	public final fun setMediaPath (Ljava/lang/String;)V
+	public final fun setMediaServer (Ljava/lang/String;)V
+	public final fun setMediaUrl (Ljava/lang/String;)V
+	public final fun setMidpoint (Ljava/lang/Long;)V
+	public final fun setMinSuggestedDuration (Ljava/lang/Long;)V
+	public final fun setPath (Ljava/lang/String;)V
+	public final fun setPlatform (Ljava/lang/String;)V
+	public final fun setPlayPercentage (Ljava/lang/Integer;)V
+	public final fun setPlayer (Ljava/lang/String;)V
+	public final fun setPlayerKey (Ljava/lang/String;)V
+	public final fun setPlayerStartupTime (Ljava/lang/Long;)V
+	public final fun setPlayerTech (Ljava/lang/String;)V
+	public final fun setQuartile1 (Ljava/lang/Long;)V
+	public final fun setQuartile3 (Ljava/lang/Long;)V
+	public final fun setRetryCount (I)V
+	public final fun setScreenHeight (Ljava/lang/Integer;)V
+	public final fun setScreenWidth (Ljava/lang/Integer;)V
+	public final fun setSkipPercentage (Ljava/lang/Integer;)V
+	public final fun setSkipPosition (Ljava/lang/Long;)V
+	public final fun setSkipped (Ljava/lang/Long;)V
+	public final fun setStarted (Ljava/lang/Long;)V
+	public final fun setStreamFormat (Ljava/lang/String;)V
+	public final fun setSurveyUrl (Ljava/lang/String;)V
+	public final fun setTime (Ljava/lang/Long;)V
+	public final fun setTimeFromContent (Ljava/lang/Long;)V
+	public final fun setTimePlayed (Ljava/lang/Long;)V
+	public final fun setTimeToContent (Ljava/lang/Long;)V
+	public final fun setUniversalAdIdRegistry (Ljava/lang/String;)V
+	public final fun setUniversalAdIdValue (Ljava/lang/String;)V
+	public final fun setUserAgent (Ljava/lang/String;)V
+	public final fun setUserId (Ljava/lang/String;)V
+	public final fun setVersion (Ljava/lang/String;)V
+	public final fun setVideoBitrate (Ljava/lang/Integer;)V
+	public final fun setVideoCodec (Ljava/lang/String;)V
+	public final fun setVideoId (Ljava/lang/String;)V
+	public final fun setVideoImpressionId (Ljava/lang/String;)V
+	public final fun setVideoTitle (Ljava/lang/String;)V
+	public final fun setVideoWindowHeight (Ljava/lang/Integer;)V
+	public final fun setVideoWindowWidth (Ljava/lang/Integer;)V
+	public final fun setWrapperAdsCount (Ljava/lang/Integer;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/data/AdModuleInformation {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lcom/bitmovin/analytics/data/AdModuleInformation;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/data/AdModuleInformation;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/bitmovin/analytics/data/AdModuleInformation;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getVersion ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun setName (Ljava/lang/String;)V
+	public final fun setVersion (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/data/AdSample {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Long;JLjava/lang/Long;JLjava/lang/Long;JLjava/lang/Long;Ljava/lang/Integer;JJJLjava/lang/Long;JLjava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/ads/Ad;)V
+	public synthetic fun <init> (Ljava/lang/Long;JLjava/lang/Long;JLjava/lang/Long;JLjava/lang/Long;Ljava/lang/Integer;JJJLjava/lang/Long;JLjava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/ads/Ad;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Long;
+	public final fun component10 ()J
+	public final fun component11 ()J
+	public final fun component12 ()Ljava/lang/Long;
+	public final fun component13 ()J
+	public final fun component14 ()Ljava/lang/Long;
+	public final fun component15 ()Ljava/lang/Long;
+	public final fun component16 ()Ljava/lang/Long;
+	public final fun component17 ()Ljava/lang/Long;
+	public final fun component18 ()Ljava/lang/Integer;
+	public final fun component19 ()Ljava/lang/Long;
+	public final fun component2 ()J
+	public final fun component20 ()Ljava/lang/Integer;
+	public final fun component21 ()Ljava/lang/Integer;
+	public final fun component22 ()Ljava/lang/Integer;
+	public final fun component23 ()Ljava/lang/Integer;
+	public final fun component24 ()Ljava/lang/Long;
+	public final fun component25 ()Ljava/lang/Integer;
+	public final fun component26 ()Ljava/lang/Long;
+	public final fun component27 ()Ljava/lang/Long;
+	public final fun component28 ()Ljava/lang/Long;
+	public final fun component29 ()Ljava/lang/Integer;
+	public final fun component3 ()Ljava/lang/Long;
+	public final fun component30 ()Ljava/lang/String;
+	public final fun component31 ()Ljava/lang/String;
+	public final fun component32 ()Lcom/bitmovin/analytics/ads/Ad;
+	public final fun component4 ()J
+	public final fun component5 ()Ljava/lang/Long;
+	public final fun component6 ()J
+	public final fun component7 ()Ljava/lang/Long;
+	public final fun component8 ()Ljava/lang/Integer;
+	public final fun component9 ()J
+	public final fun copy (Ljava/lang/Long;JLjava/lang/Long;JLjava/lang/Long;JLjava/lang/Long;Ljava/lang/Integer;JJJLjava/lang/Long;JLjava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/ads/Ad;)Lcom/bitmovin/analytics/data/AdSample;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/data/AdSample;Ljava/lang/Long;JLjava/lang/Long;JLjava/lang/Long;JLjava/lang/Long;Ljava/lang/Integer;JJJLjava/lang/Long;JLjava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/ads/Ad;ILjava/lang/Object;)Lcom/bitmovin/analytics/data/AdSample;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAd ()Lcom/bitmovin/analytics/ads/Ad;
+	public final fun getAdPodPosition ()Ljava/lang/Integer;
+	public final fun getAdStartupTime ()Ljava/lang/Long;
+	public final fun getClickPercentage ()Ljava/lang/Integer;
+	public final fun getClickPosition ()Ljava/lang/Long;
+	public final fun getClicked ()J
+	public final fun getClosePercentage ()Ljava/lang/Integer;
+	public final fun getClosePosition ()Ljava/lang/Long;
+	public final fun getClosed ()J
+	public final fun getCompleted ()J
+	public final fun getErrorCode ()Ljava/lang/Integer;
+	public final fun getErrorData ()Ljava/lang/String;
+	public final fun getErrorMessage ()Ljava/lang/String;
+	public final fun getErrorPercentage ()Ljava/lang/Integer;
+	public final fun getErrorPosition ()Ljava/lang/Long;
+	public final fun getExitPosition ()Ljava/lang/Long;
+	public final fun getManifestDownloadTime ()Ljava/lang/Long;
+	public final fun getMidpoint ()Ljava/lang/Long;
+	public final fun getPercentageInViewport ()Ljava/lang/Integer;
+	public final fun getPlayPercentage ()Ljava/lang/Integer;
+	public final fun getQuartile1 ()J
+	public final fun getQuartile3 ()J
+	public final fun getSkipPercentage ()Ljava/lang/Integer;
+	public final fun getSkipPosition ()Ljava/lang/Long;
+	public final fun getSkipped ()J
+	public final fun getStarted ()J
+	public final fun getTimeFromContent ()Ljava/lang/Long;
+	public final fun getTimeHovered ()Ljava/lang/Long;
+	public final fun getTimeInViewport ()Ljava/lang/Long;
+	public final fun getTimePlayed ()Ljava/lang/Long;
+	public final fun getTimeToContent ()Ljava/lang/Long;
+	public final fun getTimeUntilHover ()Ljava/lang/Long;
+	public fun hashCode ()I
+	public final fun setAd (Lcom/bitmovin/analytics/ads/Ad;)V
+	public final fun setAdPodPosition (Ljava/lang/Integer;)V
+	public final fun setAdStartupTime (Ljava/lang/Long;)V
+	public final fun setClickPercentage (Ljava/lang/Integer;)V
+	public final fun setClickPosition (Ljava/lang/Long;)V
+	public final fun setClicked (J)V
+	public final fun setClosePercentage (Ljava/lang/Integer;)V
+	public final fun setClosePosition (Ljava/lang/Long;)V
+	public final fun setClosed (J)V
+	public final fun setCompleted (J)V
+	public final fun setErrorCode (Ljava/lang/Integer;)V
+	public final fun setErrorData (Ljava/lang/String;)V
+	public final fun setErrorMessage (Ljava/lang/String;)V
+	public final fun setErrorPercentage (Ljava/lang/Integer;)V
+	public final fun setErrorPosition (Ljava/lang/Long;)V
+	public final fun setExitPosition (Ljava/lang/Long;)V
+	public final fun setManifestDownloadTime (Ljava/lang/Long;)V
+	public final fun setMidpoint (Ljava/lang/Long;)V
+	public final fun setPercentageInViewport (Ljava/lang/Integer;)V
+	public final fun setPlayPercentage (Ljava/lang/Integer;)V
+	public final fun setQuartile1 (J)V
+	public final fun setQuartile3 (J)V
+	public final fun setSkipPercentage (Ljava/lang/Integer;)V
+	public final fun setSkipPosition (Ljava/lang/Long;)V
+	public final fun setSkipped (J)V
+	public final fun setStarted (J)V
+	public final fun setTimeFromContent (Ljava/lang/Long;)V
+	public final fun setTimeHovered (Ljava/lang/Long;)V
+	public final fun setTimeInViewport (Ljava/lang/Long;)V
+	public final fun setTimePlayed (Ljava/lang/Long;)V
+	public final fun setTimeToContent (Ljava/lang/Long;)V
+	public final fun setTimeUntilHover (Ljava/lang/Long;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/bitmovin/analytics/data/Backend {
+	public abstract fun send (Lcom/bitmovin/analytics/data/EventData;)V
+	public abstract fun sendAd (Lcom/bitmovin/analytics/data/AdEventData;)V
+}
+
+public class com/bitmovin/analytics/data/BackendFactory {
+	public fun <init> ()V
+	public fun createBackend (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/data/Backend;
+}
+
+public abstract interface class com/bitmovin/analytics/data/CallbackBackend {
+	public abstract fun send (Lcom/bitmovin/analytics/data/EventData;Lcom/bitmovin/analytics/retryBackend/OnFailureCallback;)V
+	public abstract fun sendAd (Lcom/bitmovin/analytics/data/AdEventData;Lcom/bitmovin/analytics/retryBackend/OnFailureCallback;)V
+}
+
+public final class com/bitmovin/analytics/data/CustomData {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/lang/String;
+	public final fun component11 ()Ljava/lang/String;
+	public final fun component12 ()Ljava/lang/String;
+	public final fun component13 ()Ljava/lang/String;
+	public final fun component14 ()Ljava/lang/String;
+	public final fun component15 ()Ljava/lang/String;
+	public final fun component16 ()Ljava/lang/String;
+	public final fun component17 ()Ljava/lang/String;
+	public final fun component18 ()Ljava/lang/String;
+	public final fun component19 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component20 ()Ljava/lang/String;
+	public final fun component21 ()Ljava/lang/String;
+	public final fun component22 ()Ljava/lang/String;
+	public final fun component23 ()Ljava/lang/String;
+	public final fun component24 ()Ljava/lang/String;
+	public final fun component25 ()Ljava/lang/String;
+	public final fun component26 ()Ljava/lang/String;
+	public final fun component27 ()Ljava/lang/String;
+	public final fun component28 ()Ljava/lang/String;
+	public final fun component29 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component30 ()Ljava/lang/String;
+	public final fun component31 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()Ljava/lang/String;
+	public final fun component8 ()Ljava/lang/String;
+	public final fun component9 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/bitmovin/analytics/data/CustomData;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/data/CustomData;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/bitmovin/analytics/data/CustomData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCustomData1 ()Ljava/lang/String;
+	public final fun getCustomData10 ()Ljava/lang/String;
+	public final fun getCustomData11 ()Ljava/lang/String;
+	public final fun getCustomData12 ()Ljava/lang/String;
+	public final fun getCustomData13 ()Ljava/lang/String;
+	public final fun getCustomData14 ()Ljava/lang/String;
+	public final fun getCustomData15 ()Ljava/lang/String;
+	public final fun getCustomData16 ()Ljava/lang/String;
+	public final fun getCustomData17 ()Ljava/lang/String;
+	public final fun getCustomData18 ()Ljava/lang/String;
+	public final fun getCustomData19 ()Ljava/lang/String;
+	public final fun getCustomData2 ()Ljava/lang/String;
+	public final fun getCustomData20 ()Ljava/lang/String;
+	public final fun getCustomData21 ()Ljava/lang/String;
+	public final fun getCustomData22 ()Ljava/lang/String;
+	public final fun getCustomData23 ()Ljava/lang/String;
+	public final fun getCustomData24 ()Ljava/lang/String;
+	public final fun getCustomData25 ()Ljava/lang/String;
+	public final fun getCustomData26 ()Ljava/lang/String;
+	public final fun getCustomData27 ()Ljava/lang/String;
+	public final fun getCustomData28 ()Ljava/lang/String;
+	public final fun getCustomData29 ()Ljava/lang/String;
+	public final fun getCustomData3 ()Ljava/lang/String;
+	public final fun getCustomData30 ()Ljava/lang/String;
+	public final fun getCustomData4 ()Ljava/lang/String;
+	public final fun getCustomData5 ()Ljava/lang/String;
+	public final fun getCustomData6 ()Ljava/lang/String;
+	public final fun getCustomData7 ()Ljava/lang/String;
+	public final fun getCustomData8 ()Ljava/lang/String;
+	public final fun getCustomData9 ()Ljava/lang/String;
+	public final fun getExperimentName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun setCustomData1 (Ljava/lang/String;)V
+	public final fun setCustomData10 (Ljava/lang/String;)V
+	public final fun setCustomData11 (Ljava/lang/String;)V
+	public final fun setCustomData12 (Ljava/lang/String;)V
+	public final fun setCustomData13 (Ljava/lang/String;)V
+	public final fun setCustomData14 (Ljava/lang/String;)V
+	public final fun setCustomData15 (Ljava/lang/String;)V
+	public final fun setCustomData16 (Ljava/lang/String;)V
+	public final fun setCustomData17 (Ljava/lang/String;)V
+	public final fun setCustomData18 (Ljava/lang/String;)V
+	public final fun setCustomData19 (Ljava/lang/String;)V
+	public final fun setCustomData2 (Ljava/lang/String;)V
+	public final fun setCustomData20 (Ljava/lang/String;)V
+	public final fun setCustomData21 (Ljava/lang/String;)V
+	public final fun setCustomData22 (Ljava/lang/String;)V
+	public final fun setCustomData23 (Ljava/lang/String;)V
+	public final fun setCustomData24 (Ljava/lang/String;)V
+	public final fun setCustomData25 (Ljava/lang/String;)V
+	public final fun setCustomData26 (Ljava/lang/String;)V
+	public final fun setCustomData27 (Ljava/lang/String;)V
+	public final fun setCustomData28 (Ljava/lang/String;)V
+	public final fun setCustomData29 (Ljava/lang/String;)V
+	public final fun setCustomData3 (Ljava/lang/String;)V
+	public final fun setCustomData30 (Ljava/lang/String;)V
+	public final fun setCustomData4 (Ljava/lang/String;)V
+	public final fun setCustomData5 (Ljava/lang/String;)V
+	public final fun setCustomData6 (Ljava/lang/String;)V
+	public final fun setCustomData7 (Ljava/lang/String;)V
+	public final fun setCustomData8 (Ljava/lang/String;)V
+	public final fun setCustomData9 (Ljava/lang/String;)V
+	public final fun setExperimentName (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/data/DebuggingEventDataDispatcher : com/bitmovin/analytics/data/IEventDataDispatcher {
+	public fun <init> (Lcom/bitmovin/analytics/data/IEventDataDispatcher;Lcom/bitmovin/analytics/DebugCallback;)V
+	public fun add (Lcom/bitmovin/analytics/data/EventData;)V
+	public fun addAd (Lcom/bitmovin/analytics/data/AdEventData;)V
+	public fun disable ()V
+	public fun enable ()V
+	public fun resetSourceRelatedState ()V
+}
+
+public final class com/bitmovin/analytics/data/DeviceClass : java/lang/Enum {
+	public static final field Console Lcom/bitmovin/analytics/data/DeviceClass;
+	public static final field Desktop Lcom/bitmovin/analytics/data/DeviceClass;
+	public static final field Other Lcom/bitmovin/analytics/data/DeviceClass;
+	public static final field Phone Lcom/bitmovin/analytics/data/DeviceClass;
+	public static final field TV Lcom/bitmovin/analytics/data/DeviceClass;
+	public static final field Tablet Lcom/bitmovin/analytics/data/DeviceClass;
+	public static final field Wearable Lcom/bitmovin/analytics/data/DeviceClass;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/data/DeviceClass;
+	public static fun values ()[Lcom/bitmovin/analytics/data/DeviceClass;
+}
+
+public final class com/bitmovin/analytics/data/DeviceInformation {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/data/DeviceClass;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/data/DeviceClass;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/lang/String;
+	public final fun component11 ()Ljava/lang/String;
+	public final fun component12 ()Lcom/bitmovin/analytics/data/DeviceClass;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Z
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()I
+	public final fun component8 ()I
+	public final fun component9 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/data/DeviceClass;)Lcom/bitmovin/analytics/data/DeviceInformation;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/data/DeviceInformation;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/data/DeviceClass;ILjava/lang/Object;)Lcom/bitmovin/analytics/data/DeviceInformation;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDeviceClass ()Lcom/bitmovin/analytics/data/DeviceClass;
+	public final fun getDomain ()Ljava/lang/String;
+	public final fun getLocale ()Ljava/lang/String;
+	public final fun getManufacturer ()Ljava/lang/String;
+	public final fun getModel ()Ljava/lang/String;
+	public final fun getOperatingSystem ()Ljava/lang/String;
+	public final fun getOperatingSystemMajor ()Ljava/lang/String;
+	public final fun getOperatingSystemMinor ()Ljava/lang/String;
+	public final fun getScreenHeight ()I
+	public final fun getScreenWidth ()I
+	public final fun getUserAgent ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun isTV ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/data/DeviceInformationDto {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/data/DeviceClass;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/data/DeviceClass;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Z
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()Lcom/bitmovin/analytics/data/DeviceClass;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/data/DeviceClass;)Lcom/bitmovin/analytics/data/DeviceInformationDto;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/data/DeviceInformationDto;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/data/DeviceClass;ILjava/lang/Object;)Lcom/bitmovin/analytics/data/DeviceInformationDto;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDeviceClass ()Lcom/bitmovin/analytics/data/DeviceClass;
+	public final fun getManufacturer ()Ljava/lang/String;
+	public final fun getModel ()Ljava/lang/String;
+	public final fun getOperatingSystem ()Ljava/lang/String;
+	public final fun getOperatingSystemMajor ()Ljava/lang/String;
+	public final fun getOperatingSystemMinor ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun isTV ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public class com/bitmovin/analytics/data/DeviceInformationProvider {
+	public static final field Companion Lcom/bitmovin/analytics/data/DeviceInformationProvider$Companion;
+	public fun <init> (Landroid/content/Context;Ljava/lang/String;)V
+	public final fun getContext ()Landroid/content/Context;
+	public final fun getDeviceInformation ()Lcom/bitmovin/analytics/data/DeviceInformation;
+	public final fun getUserAgent ()Ljava/lang/String;
+	public final fun isTV ()Z
+}
+
+public final class com/bitmovin/analytics/data/DeviceInformationProvider$Companion {
+	public final fun isFireOS (Landroid/content/pm/PackageManager;)Z
+}
+
+public final class com/bitmovin/analytics/data/DownloadSpeedInfo {
+	public fun <init> ()V
+	public final fun getAvgDownloadSpeed ()Ljava/lang/Float;
+	public final fun getAvgTimeToFirstByte ()Ljava/lang/Float;
+	public final fun getMaxDownloadSpeed ()Ljava/lang/Float;
+	public final fun getMinDownloadSpeed ()Ljava/lang/Float;
+	public final fun getSegmentsDownloadCount ()I
+	public final fun getSegmentsDownloadSize ()J
+	public final fun getSegmentsDownloadTime ()J
+	public final fun setAvgDownloadSpeed (Ljava/lang/Float;)V
+	public final fun setAvgTimeToFirstByte (Ljava/lang/Float;)V
+	public final fun setMaxDownloadSpeed (Ljava/lang/Float;)V
+	public final fun setMinDownloadSpeed (Ljava/lang/Float;)V
+	public final fun setSegmentsDownloadCount (I)V
+	public final fun setSegmentsDownloadSize (J)V
+	public final fun setSegmentsDownloadTime (J)V
+}
+
+public final class com/bitmovin/analytics/data/ErrorCode {
+	public fun <init> (ILjava/lang/String;Lcom/bitmovin/analytics/features/errordetails/ErrorData;Lcom/bitmovin/analytics/data/LegacyErrorData;)V
+	public synthetic fun <init> (ILjava/lang/String;Lcom/bitmovin/analytics/features/errordetails/ErrorData;Lcom/bitmovin/analytics/data/LegacyErrorData;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lcom/bitmovin/analytics/features/errordetails/ErrorData;
+	public final fun component4 ()Lcom/bitmovin/analytics/data/LegacyErrorData;
+	public final fun copy (ILjava/lang/String;Lcom/bitmovin/analytics/features/errordetails/ErrorData;Lcom/bitmovin/analytics/data/LegacyErrorData;)Lcom/bitmovin/analytics/data/ErrorCode;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/data/ErrorCode;ILjava/lang/String;Lcom/bitmovin/analytics/features/errordetails/ErrorData;Lcom/bitmovin/analytics/data/LegacyErrorData;ILjava/lang/Object;)Lcom/bitmovin/analytics/data/ErrorCode;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDescription ()Ljava/lang/String;
+	public final fun getErrorCode ()I
+	public final fun getErrorData ()Lcom/bitmovin/analytics/features/errordetails/ErrorData;
+	public final fun getLegacyErrorData ()Lcom/bitmovin/analytics/data/LegacyErrorData;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/data/EventData {
+	public fun <init> (Lcom/bitmovin/analytics/data/DeviceInformation;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun getAd ()I
+	public final fun getAnalyticsVersion ()Ljava/lang/String;
+	public final fun getAudioBitrate ()I
+	public final fun getAudioCodec ()Ljava/lang/String;
+	public final fun getAudioLanguage ()Ljava/lang/String;
+	public final fun getBuffered ()J
+	public final fun getCastTech ()Ljava/lang/String;
+	public final fun getCdnProvider ()Ljava/lang/String;
+	public final fun getCustomData1 ()Ljava/lang/String;
+	public final fun getCustomData10 ()Ljava/lang/String;
+	public final fun getCustomData11 ()Ljava/lang/String;
+	public final fun getCustomData12 ()Ljava/lang/String;
+	public final fun getCustomData13 ()Ljava/lang/String;
+	public final fun getCustomData14 ()Ljava/lang/String;
+	public final fun getCustomData15 ()Ljava/lang/String;
+	public final fun getCustomData16 ()Ljava/lang/String;
+	public final fun getCustomData17 ()Ljava/lang/String;
+	public final fun getCustomData18 ()Ljava/lang/String;
+	public final fun getCustomData19 ()Ljava/lang/String;
+	public final fun getCustomData2 ()Ljava/lang/String;
+	public final fun getCustomData20 ()Ljava/lang/String;
+	public final fun getCustomData21 ()Ljava/lang/String;
+	public final fun getCustomData22 ()Ljava/lang/String;
+	public final fun getCustomData23 ()Ljava/lang/String;
+	public final fun getCustomData24 ()Ljava/lang/String;
+	public final fun getCustomData25 ()Ljava/lang/String;
+	public final fun getCustomData26 ()Ljava/lang/String;
+	public final fun getCustomData27 ()Ljava/lang/String;
+	public final fun getCustomData28 ()Ljava/lang/String;
+	public final fun getCustomData29 ()Ljava/lang/String;
+	public final fun getCustomData3 ()Ljava/lang/String;
+	public final fun getCustomData30 ()Ljava/lang/String;
+	public final fun getCustomData4 ()Ljava/lang/String;
+	public final fun getCustomData5 ()Ljava/lang/String;
+	public final fun getCustomData6 ()Ljava/lang/String;
+	public final fun getCustomData7 ()Ljava/lang/String;
+	public final fun getCustomData8 ()Ljava/lang/String;
+	public final fun getCustomData9 ()Ljava/lang/String;
+	public final fun getCustomUserId ()Ljava/lang/String;
+	public final fun getDeviceInformation ()Lcom/bitmovin/analytics/data/DeviceInformationDto;
+	public final fun getDomain ()Ljava/lang/String;
+	public final fun getDownloadSpeedInfo ()Lcom/bitmovin/analytics/data/DownloadSpeedInfo;
+	public final fun getDrmLoadTime ()Ljava/lang/Long;
+	public final fun getDrmType ()Ljava/lang/String;
+	public final fun getDroppedFrames ()I
+	public final fun getDuration ()J
+	public final fun getErrorCode ()Ljava/lang/Integer;
+	public final fun getErrorData ()Ljava/lang/String;
+	public final fun getErrorMessage ()Ljava/lang/String;
+	public final fun getExperimentName ()Ljava/lang/String;
+	public final fun getImpressionId ()Ljava/lang/String;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getLanguage ()Ljava/lang/String;
+	public final fun getM3u8Url ()Ljava/lang/String;
+	public final fun getMpdUrl ()Ljava/lang/String;
+	public final fun getPageLoadTime ()I
+	public final fun getPageLoadType ()I
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getPaused ()J
+	public final fun getPlatform ()Ljava/lang/String;
+	public final fun getPlayed ()J
+	public final fun getPlayer ()Ljava/lang/String;
+	public final fun getPlayerKey ()Ljava/lang/String;
+	public final fun getPlayerStartupTime ()J
+	public final fun getPlayerTech ()Ljava/lang/String;
+	public final fun getProgUrl ()Ljava/lang/String;
+	public final fun getRetryCount ()I
+	public final fun getScreenHeight ()I
+	public final fun getScreenWidth ()I
+	public final fun getSeeked ()J
+	public final fun getSequenceNumber ()I
+	public final fun getStartupTime ()J
+	public final fun getState ()Ljava/lang/String;
+	public final fun getStreamFormat ()Ljava/lang/String;
+	public final fun getSubtitleEnabled ()Z
+	public final fun getSubtitleLanguage ()Ljava/lang/String;
+	public final fun getSupportedVideoCodecs ()Ljava/util/List;
+	public final fun getTime ()J
+	public final fun getUserAgent ()Ljava/lang/String;
+	public final fun getUserId ()Ljava/lang/String;
+	public final fun getVersion ()Ljava/lang/String;
+	public final fun getVideoBitrate ()I
+	public final fun getVideoCodec ()Ljava/lang/String;
+	public final fun getVideoDuration ()J
+	public final fun getVideoId ()Ljava/lang/String;
+	public final fun getVideoPlaybackHeight ()I
+	public final fun getVideoPlaybackWidth ()I
+	public final fun getVideoStartFailed ()Z
+	public final fun getVideoStartFailedReason ()Ljava/lang/String;
+	public final fun getVideoStartupTime ()J
+	public final fun getVideoTimeEnd ()J
+	public final fun getVideoTimeStart ()J
+	public final fun getVideoTitle ()Ljava/lang/String;
+	public final fun getVideoWindowHeight ()I
+	public final fun getVideoWindowWidth ()I
+	public final fun isCasting ()Z
+	public final fun isLive ()Z
+	public final fun isMuted ()Z
+	public final fun setAd (I)V
+	public final fun setAudioBitrate (I)V
+	public final fun setAudioCodec (Ljava/lang/String;)V
+	public final fun setAudioLanguage (Ljava/lang/String;)V
+	public final fun setBuffered (J)V
+	public final fun setCastTech (Ljava/lang/String;)V
+	public final fun setCasting (Z)V
+	public final fun setDownloadSpeedInfo (Lcom/bitmovin/analytics/data/DownloadSpeedInfo;)V
+	public final fun setDrmLoadTime (Ljava/lang/Long;)V
+	public final fun setDrmType (Ljava/lang/String;)V
+	public final fun setDroppedFrames (I)V
+	public final fun setDuration (J)V
+	public final fun setErrorCode (Ljava/lang/Integer;)V
+	public final fun setErrorData (Ljava/lang/String;)V
+	public final fun setErrorMessage (Ljava/lang/String;)V
+	public final fun setLive (Z)V
+	public final fun setM3u8Url (Ljava/lang/String;)V
+	public final fun setMpdUrl (Ljava/lang/String;)V
+	public final fun setMuted (Z)V
+	public final fun setPageLoadTime (I)V
+	public final fun setPageLoadType (I)V
+	public final fun setPaused (J)V
+	public final fun setPlayed (J)V
+	public final fun setPlayer (Ljava/lang/String;)V
+	public final fun setPlayerKey (Ljava/lang/String;)V
+	public final fun setPlayerStartupTime (J)V
+	public final fun setProgUrl (Ljava/lang/String;)V
+	public final fun setRetryCount (I)V
+	public final fun setSeeked (J)V
+	public final fun setSequenceNumber (I)V
+	public final fun setStartupTime (J)V
+	public final fun setState (Ljava/lang/String;)V
+	public final fun setStreamFormat (Ljava/lang/String;)V
+	public final fun setSubtitleEnabled (Z)V
+	public final fun setSubtitleLanguage (Ljava/lang/String;)V
+	public final fun setSupportedVideoCodecs (Ljava/util/List;)V
+	public final fun setTime (J)V
+	public final fun setVersion (Ljava/lang/String;)V
+	public final fun setVideoBitrate (I)V
+	public final fun setVideoCodec (Ljava/lang/String;)V
+	public final fun setVideoDuration (J)V
+	public final fun setVideoPlaybackHeight (I)V
+	public final fun setVideoPlaybackWidth (I)V
+	public final fun setVideoStartFailed (Z)V
+	public final fun setVideoStartFailedReason (Ljava/lang/String;)V
+	public final fun setVideoStartupTime (J)V
+	public final fun setVideoTimeEnd (J)V
+	public final fun setVideoTimeStart (J)V
+	public final fun setVideoWindowHeight (I)V
+	public final fun setVideoWindowWidth (I)V
+}
+
+public final class com/bitmovin/analytics/data/EventDataFactory : com/bitmovin/analytics/data/manipulators/EventDataManipulatorPipeline {
+	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Lcom/bitmovin/analytics/data/UserIdProvider;)V
+	public fun clearEventDataManipulators ()V
+	public final fun create (Ljava/lang/String;Lcom/bitmovin/analytics/config/SourceMetadata;Lcom/bitmovin/analytics/data/DeviceInformation;)Lcom/bitmovin/analytics/data/EventData;
+	public fun registerEventDataManipulator (Lcom/bitmovin/analytics/data/manipulators/EventDataManipulator;)V
+}
+
+public class com/bitmovin/analytics/data/HttpBackend : com/bitmovin/analytics/data/Backend, com/bitmovin/analytics/data/CallbackBackend {
+	public fun <init> (Lcom/bitmovin/analytics/CollectorConfig;Landroid/content/Context;)V
+	public fun send (Lcom/bitmovin/analytics/data/EventData;)V
+	public fun send (Lcom/bitmovin/analytics/data/EventData;Lcom/bitmovin/analytics/retryBackend/OnFailureCallback;)V
+	public fun sendAd (Lcom/bitmovin/analytics/data/AdEventData;)V
+	public fun sendAd (Lcom/bitmovin/analytics/data/AdEventData;Lcom/bitmovin/analytics/retryBackend/OnFailureCallback;)V
+}
+
+public abstract interface class com/bitmovin/analytics/data/IEventDataDispatcher {
+	public abstract fun add (Lcom/bitmovin/analytics/data/EventData;)V
+	public abstract fun addAd (Lcom/bitmovin/analytics/data/AdEventData;)V
+	public abstract fun disable ()V
+	public abstract fun enable ()V
+	public abstract fun resetSourceRelatedState ()V
+}
+
+public final class com/bitmovin/analytics/data/LegacyErrorData {
+	public fun <init> (Ljava/lang/String;[Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;[Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()[Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;[Ljava/lang/String;)Lcom/bitmovin/analytics/data/LegacyErrorData;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/data/LegacyErrorData;Ljava/lang/String;[Ljava/lang/String;ILjava/lang/Object;)Lcom/bitmovin/analytics/data/LegacyErrorData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDetails ()[Ljava/lang/String;
+	public final fun getMsg ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public class com/bitmovin/analytics/data/LicenseCallData {
+	public fun <init> ()V
+	public fun getKey ()Ljava/lang/String;
+	public fun setAnalyticsVersion (Ljava/lang/String;)V
+	public fun setDomain (Ljava/lang/String;)V
+	public fun setKey (Ljava/lang/String;)V
+}
+
+public class com/bitmovin/analytics/data/LicenseResponse {
+	public fun <init> ()V
+	public fun getFeatures ()Lcom/bitmovin/analytics/license/FeatureConfigContainer;
+	public fun getMessage ()Ljava/lang/String;
+	public fun getStatus ()Ljava/lang/String;
+	public fun setFeatures (Lcom/bitmovin/analytics/license/FeatureConfigContainer;)V
+	public fun setMessage (Ljava/lang/String;)V
+	public fun setStatus (Ljava/lang/String;)V
+}
+
+public final class com/bitmovin/analytics/data/RandomizedUserIdIdProvider : com/bitmovin/analytics/data/UserIdProvider {
+	public fun <init> ()V
+	public fun userId ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/data/SecureSettingsAndroidIdUserIdProvider : com/bitmovin/analytics/data/UserIdProvider {
+	public fun <init> (Landroid/content/Context;)V
+	public final fun getContext ()Landroid/content/Context;
+	public fun userId ()Ljava/lang/String;
+}
+
+public class com/bitmovin/analytics/data/SimpleEventDataDispatcher : com/bitmovin/analytics/data/IEventDataDispatcher, com/bitmovin/analytics/license/AuthenticationCallback {
+	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;Lcom/bitmovin/analytics/license/LicenseCallback;Lcom/bitmovin/analytics/data/BackendFactory;)V
+	public fun add (Lcom/bitmovin/analytics/data/EventData;)V
+	public fun addAd (Lcom/bitmovin/analytics/data/AdEventData;)V
+	public fun authenticationCompleted (ZLcom/bitmovin/analytics/license/FeatureConfigContainer;)V
+	public fun disable ()V
+	public fun enable ()V
+	public fun resetSourceRelatedState ()V
+}
+
+public final class com/bitmovin/analytics/data/SpeedMeasurement {
+	public field timestamp Ljava/util/Date;
+	public fun <init> ()V
+	public fun <init> (JJ)V
+	public final fun getDuration ()J
+	public final fun getHttpStatus ()I
+	public final fun getSize ()J
+	public final fun getTimeToFirstByte ()F
+	public final fun getTimestamp ()Ljava/util/Date;
+	public final fun setDuration (J)V
+	public final fun setHttpStatus (I)V
+	public final fun setSize (J)V
+	public final fun setTimeToFirstByte (F)V
+	public final fun setTimestamp (Ljava/util/Date;)V
+}
+
+public final class com/bitmovin/analytics/data/SubtitleDto {
+	public fun <init> ()V
+	public fun <init> (ZLjava/lang/String;)V
+	public synthetic fun <init> (ZLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (ZLjava/lang/String;)Lcom/bitmovin/analytics/data/SubtitleDto;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/data/SubtitleDto;ZLjava/lang/String;ILjava/lang/Object;)Lcom/bitmovin/analytics/data/SubtitleDto;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSubtitleEnabled ()Z
+	public final fun getSubtitleLanguage ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/bitmovin/analytics/data/UserIdProvider {
+	public abstract fun userId ()Ljava/lang/String;
+}
+
+public abstract interface class com/bitmovin/analytics/data/manipulators/EventDataManipulator {
+	public abstract fun manipulate (Lcom/bitmovin/analytics/data/EventData;)V
+}
+
+public abstract interface class com/bitmovin/analytics/data/manipulators/EventDataManipulatorPipeline {
+	public abstract fun clearEventDataManipulators ()V
+	public abstract fun registerEventDataManipulator (Lcom/bitmovin/analytics/data/manipulators/EventDataManipulator;)V
+}
+
+public class com/bitmovin/analytics/data/manipulators/ManifestUrlEventDataManipulator : com/bitmovin/analytics/data/manipulators/EventDataManipulator {
+	public fun <init> (Lcom/bitmovin/analytics/adapters/PlayerAdapter;Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;)V
+	public fun manipulate (Lcom/bitmovin/analytics/data/EventData;)V
+}
+
+public final class com/bitmovin/analytics/enums/AnalyticsErrorCodes : java/lang/Enum {
+	public static final field ANALYTICS_BUFFERING_TIMEOUT_REACHED Lcom/bitmovin/analytics/enums/AnalyticsErrorCodes;
+	public static final field ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED Lcom/bitmovin/analytics/enums/AnalyticsErrorCodes;
+	public static final field ANALYTICS_VIDEOSTART_TIMEOUT_REACHED Lcom/bitmovin/analytics/enums/AnalyticsErrorCodes;
+	public final fun getErrorCode ()Lcom/bitmovin/analytics/data/ErrorCode;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/enums/AnalyticsErrorCodes;
+	public static fun values ()[Lcom/bitmovin/analytics/enums/AnalyticsErrorCodes;
+}
+
+public class com/bitmovin/analytics/enums/CDNProvider {
+	public static field AKAMAI Ljava/lang/String;
+	public static field BITGRAVITY Ljava/lang/String;
+	public static field BITMOVIN Ljava/lang/String;
+	public static field CHINACACHE Ljava/lang/String;
+	public static field CLOUDFRONT Ljava/lang/String;
+	public static field FASTLY Ljava/lang/String;
+	public static field MAXCDN Ljava/lang/String;
+	public fun <init> ()V
+}
+
+public final class com/bitmovin/analytics/enums/CastTech : java/lang/Enum {
+	public static final field GoogleCast Lcom/bitmovin/analytics/enums/CastTech;
+	public final fun getValue ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/enums/CastTech;
+	public static fun values ()[Lcom/bitmovin/analytics/enums/CastTech;
+}
+
+public final class com/bitmovin/analytics/enums/DRMType : java/lang/Enum {
+	public static final field CLEARKEY Lcom/bitmovin/analytics/enums/DRMType;
+	public static final field PLAYREADY Lcom/bitmovin/analytics/enums/DRMType;
+	public static final field WIDEVINE Lcom/bitmovin/analytics/enums/DRMType;
+	public final fun getValue ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/enums/DRMType;
+	public static fun values ()[Lcom/bitmovin/analytics/enums/DRMType;
+}
+
+public final class com/bitmovin/analytics/enums/PlayerType : java/lang/Enum, android/os/Parcelable {
+	public static final field BITMOVIN Lcom/bitmovin/analytics/enums/PlayerType;
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
+	public static final field EXOPLAYER Lcom/bitmovin/analytics/enums/PlayerType;
+	public fun describeContents ()I
+	public fun toString ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/enums/PlayerType;
+	public static fun values ()[Lcom/bitmovin/analytics/enums/PlayerType;
+	public fun writeToParcel (Landroid/os/Parcel;I)V
+}
+
+public final class com/bitmovin/analytics/enums/VideoStartFailedReason : java/lang/Enum {
+	public static final field PAGE_CLOSED Lcom/bitmovin/analytics/enums/VideoStartFailedReason;
+	public static final field PLAYER_ERROR Lcom/bitmovin/analytics/enums/VideoStartFailedReason;
+	public static final field TIMEOUT Lcom/bitmovin/analytics/enums/VideoStartFailedReason;
+	public static final field UNKNOWN Lcom/bitmovin/analytics/enums/VideoStartFailedReason;
+	public final fun getErrorCode ()Lcom/bitmovin/analytics/data/ErrorCode;
+	public final fun getReason ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/enums/VideoStartFailedReason;
+	public static fun values ()[Lcom/bitmovin/analytics/enums/VideoStartFailedReason;
+}
+
+public abstract interface class com/bitmovin/analytics/error/ExceptionMapper {
+	public abstract fun map (Ljava/lang/Object;)Lcom/bitmovin/analytics/data/ErrorCode;
+}
+
+public abstract class com/bitmovin/analytics/features/Feature {
+	public fun <init> ()V
+	public final fun configure (ZLjava/lang/Object;)Lcom/bitmovin/analytics/features/FeatureConfig;
+	public fun configured (ZLcom/bitmovin/analytics/features/FeatureConfig;)V
+	public final fun disable ()V
+	public fun disabled ()V
+	public fun enabled ()V
+	public abstract fun extractConfig (Ljava/lang/Object;)Lcom/bitmovin/analytics/features/FeatureConfig;
+	public final fun getConfig ()Lcom/bitmovin/analytics/features/FeatureConfig;
+	public final fun isEnabled ()Z
+	public fun reset ()V
+}
+
+public abstract interface class com/bitmovin/analytics/features/FeatureConfig {
+	public abstract fun getEnabled ()Z
+}
+
+public abstract interface class com/bitmovin/analytics/features/FeatureFactory {
+	public abstract fun createFeatures ()Ljava/util/Collection;
+}
+
+public final class com/bitmovin/analytics/features/FeatureManager {
+	public static final field Companion Lcom/bitmovin/analytics/features/FeatureManager$Companion;
+	public fun <init> ()V
+	public final fun configureFeatures (ZLjava/lang/Object;)V
+	public final fun registerFeature (Lcom/bitmovin/analytics/features/Feature;)V
+	public final fun registerFeatures (Ljava/util/Collection;)V
+	public final fun resetFeatures ()V
+	public final fun unregisterFeatures ()V
+}
+
+public final class com/bitmovin/analytics/features/FeatureManager$Companion {
+	public final fun getTAG ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/features/errordetails/ErrorData {
+	public static final field Companion Lcom/bitmovin/analytics/features/errordetails/ErrorData$Companion;
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/util/Collection;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Collection;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/Collection;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/util/Collection;Ljava/lang/String;)Lcom/bitmovin/analytics/features/errordetails/ErrorData;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/features/errordetails/ErrorData;Ljava/lang/String;Ljava/util/Collection;Ljava/lang/String;ILjava/lang/Object;)Lcom/bitmovin/analytics/features/errordetails/ErrorData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdditionalData ()Ljava/lang/String;
+	public final fun getExceptionMessage ()Ljava/lang/String;
+	public final fun getExceptionStacktrace ()Ljava/util/Collection;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/features/errordetails/ErrorData$Companion {
+	public final fun fromThrowable (Ljava/lang/Throwable;Ljava/lang/String;)Lcom/bitmovin/analytics/features/errordetails/ErrorData;
+	public static synthetic fun fromThrowable$default (Lcom/bitmovin/analytics/features/errordetails/ErrorData$Companion;Ljava/lang/Throwable;Ljava/lang/String;ILjava/lang/Object;)Lcom/bitmovin/analytics/features/errordetails/ErrorData;
+}
+
+public final class com/bitmovin/analytics/features/errordetails/ErrorDetail {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;JJLjava/lang/Integer;Ljava/lang/String;Lcom/bitmovin/analytics/features/errordetails/ErrorData;Ljava/util/List;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;JJLjava/lang/Integer;Ljava/lang/String;Lcom/bitmovin/analytics/features/errordetails/ErrorData;Ljava/util/List;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/util/List;
+	public final fun component11 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()J
+	public final fun component6 ()J
+	public final fun component7 ()Ljava/lang/Integer;
+	public final fun component8 ()Ljava/lang/String;
+	public final fun component9 ()Lcom/bitmovin/analytics/features/errordetails/ErrorData;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;JJLjava/lang/Integer;Ljava/lang/String;Lcom/bitmovin/analytics/features/errordetails/ErrorData;Ljava/util/List;Ljava/lang/String;)Lcom/bitmovin/analytics/features/errordetails/ErrorDetail;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/features/errordetails/ErrorDetail;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;JJLjava/lang/Integer;Ljava/lang/String;Lcom/bitmovin/analytics/features/errordetails/ErrorData;Ljava/util/List;Ljava/lang/String;ILjava/lang/Object;)Lcom/bitmovin/analytics/features/errordetails/ErrorDetail;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnalyticsVersion ()Ljava/lang/String;
+	public final fun getCode ()Ljava/lang/Integer;
+	public final fun getData ()Lcom/bitmovin/analytics/features/errordetails/ErrorData;
+	public final fun getDomain ()Ljava/lang/String;
+	public final fun getErrorId ()J
+	public final fun getHttpRequests ()Ljava/util/List;
+	public final fun getImpressionId ()Ljava/lang/String;
+	public final fun getLicenseKey ()Ljava/lang/String;
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getPlatform ()Ljava/lang/String;
+	public final fun getTimestamp ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/features/errordetails/ErrorDetailBackend {
+	public static final field Companion Lcom/bitmovin/analytics/features/errordetails/ErrorDetailBackend$Companion;
+	public static final field MAX_STRING_LENGTH I
+	public static final field MAX_URL_LENGTH I
+	public fun <init> (Lcom/bitmovin/analytics/CollectorConfig;Landroid/content/Context;)V
+	public final fun clear ()V
+	public final fun flush ()V
+	public final fun getEnabled ()Z
+	public final fun getQueue ()Ljava/util/List;
+	public final fun limitHttpRequestsInQueue (I)V
+	public final fun send (Lcom/bitmovin/analytics/features/errordetails/ErrorDetail;)V
+	public final fun setEnabled (Z)V
+}
+
+public final class com/bitmovin/analytics/features/errordetails/ErrorDetailBackend$Companion {
+	public final fun copyTruncateHttpRequests (Lcom/bitmovin/analytics/features/errordetails/ErrorDetail;I)Lcom/bitmovin/analytics/features/errordetails/ErrorDetail;
+	public final fun copyTruncateStringsAndUrls (Lcom/bitmovin/analytics/features/errordetails/ErrorDetail;II)Lcom/bitmovin/analytics/features/errordetails/ErrorDetail;
+}
+
+public final class com/bitmovin/analytics/features/errordetails/ErrorDetailTracking : com/bitmovin/analytics/features/Feature, com/bitmovin/analytics/features/errordetails/OnErrorDetailEventListener {
+	public fun <init> (Landroid/content/Context;Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Lcom/bitmovin/analytics/features/errordetails/ErrorDetailBackend;Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestTracking;[Lcom/bitmovin/analytics/Observable;)V
+	public synthetic fun configured (ZLcom/bitmovin/analytics/features/FeatureConfig;)V
+	public fun configured (ZLcom/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig;)V
+	public fun disabled ()V
+	public fun enabled ()V
+	public fun extractConfig (Lcom/bitmovin/analytics/license/FeatureConfigContainer;)Lcom/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig;
+	public synthetic fun extractConfig (Ljava/lang/Object;)Lcom/bitmovin/analytics/features/FeatureConfig;
+	public fun onError (Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Lcom/bitmovin/analytics/features/errordetails/ErrorData;)V
+	public fun reset ()V
+}
+
+public final class com/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig : com/bitmovin/analytics/features/FeatureConfig {
+	public fun <init> ()V
+	public fun <init> (ZLjava/lang/Integer;)V
+	public synthetic fun <init> (ZLjava/lang/Integer;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component2 ()Ljava/lang/Integer;
+	public final fun copy (ZLjava/lang/Integer;)Lcom/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig;ZLjava/lang/Integer;ILjava/lang/Object;)Lcom/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getEnabled ()Z
+	public final fun getNumberOfHttpRequests ()Ljava/lang/Integer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/bitmovin/analytics/features/errordetails/OnErrorDetailEventListener {
+	public abstract fun onError (Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Lcom/bitmovin/analytics/features/errordetails/ErrorData;)V
+}
+
+public final class com/bitmovin/analytics/features/httprequesttracking/HttpRequest {
+	public fun <init> (JLcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;Ljava/lang/String;Ljava/lang/String;IJLjava/lang/Long;Ljava/lang/Long;Z)V
+	public final fun component1 ()J
+	public final fun component2 ()Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()I
+	public final fun component6 ()J
+	public final fun component7 ()Ljava/lang/Long;
+	public final fun component8 ()Ljava/lang/Long;
+	public final fun component9 ()Z
+	public final fun copy (JLcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;Ljava/lang/String;Ljava/lang/String;IJLjava/lang/Long;Ljava/lang/Long;Z)Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequest;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequest;JLcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;Ljava/lang/String;Ljava/lang/String;IJLjava/lang/Long;Ljava/lang/Long;ZILjava/lang/Object;)Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequest;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDownloadTime ()J
+	public final fun getHttpStatus ()I
+	public final fun getLastRedirectLocation ()Ljava/lang/String;
+	public final fun getSize ()Ljava/lang/Long;
+	public final fun getSuccess ()Z
+	public final fun getTimeToFirstByte ()Ljava/lang/Long;
+	public final fun getTimestamp ()J
+	public final fun getType ()Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public final fun getUrl ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/features/httprequesttracking/HttpRequestTracking : com/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventListener {
+	public static final field Companion Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestTracking$Companion;
+	public static final field defaultMaxRequests I
+	public fun <init> ([Lcom/bitmovin/analytics/Observable;)V
+	public final fun configure (I)V
+	public final fun disable ()V
+	public final fun getHttpRequests ()Ljava/util/Collection;
+	public final fun getMaxRequests ()I
+	public fun onDownloadFinished (Lcom/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventObject;)V
+	public final fun reset ()V
+}
+
+public final class com/bitmovin/analytics/features/httprequesttracking/HttpRequestTracking$Companion {
+}
+
+public final class com/bitmovin/analytics/features/httprequesttracking/HttpRequestType : java/lang/Enum {
+	public static final field DRM_LICENSE_WIDEVINE Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field DRM_OTHER Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field KEY_HLS_AES Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MANIFEST Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MANIFEST_DASH Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MANIFEST_HLS Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MANIFEST_HLS_MASTER Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MANIFEST_HLS_VARIANT Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MANIFEST_SMOOTH Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MEDIA_AUDIO Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MEDIA_PROGRESSIVE Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MEDIA_SUBTITLES Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MEDIA_THUMBNAILS Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field MEDIA_VIDEO Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static final field UNKNOWN Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+	public static fun values ()[Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequestType;
+}
+
+public abstract interface class com/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventListener {
+	public abstract fun onDownloadFinished (Lcom/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventObject;)V
+}
+
+public final class com/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventObject {
+	public fun <init> (Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequest;)V
+	public final fun component1 ()Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequest;
+	public final fun copy (Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequest;)Lcom/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventObject;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventObject;Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequest;ILjava/lang/Object;)Lcom/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventObject;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHttpRequest ()Lcom/bitmovin/analytics/features/httprequesttracking/HttpRequest;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/bitmovin/analytics/license/AuthenticationCallback {
+	public abstract fun authenticationCompleted (ZLcom/bitmovin/analytics/license/FeatureConfigContainer;)V
+}
+
+public final class com/bitmovin/analytics/license/FeatureConfigContainer {
+	public fun <init> (Lcom/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig;)V
+	public final fun component1 ()Lcom/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig;
+	public final fun copy (Lcom/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig;)Lcom/bitmovin/analytics/license/FeatureConfigContainer;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/license/FeatureConfigContainer;Lcom/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig;ILjava/lang/Object;)Lcom/bitmovin/analytics/license/FeatureConfigContainer;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getErrorDetails ()Lcom/bitmovin/analytics/features/errordetails/ErrorDetailTrackingConfig;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public class com/bitmovin/analytics/license/LicenseCall {
+	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)V
+	public fun authenticate (Lcom/bitmovin/analytics/license/AuthenticationCallback;)V
+}
+
+public abstract interface class com/bitmovin/analytics/license/LicenseCallback {
+	public abstract fun authenticationCompleted (Z)V
+	public abstract fun configureFeatures (ZLcom/bitmovin/analytics/license/FeatureConfigContainer;)V
+}
+
+public abstract interface class com/bitmovin/analytics/license/LicenseProvider {
+	public abstract fun getAnalyticsLicense ()Ljava/lang/String;
+}
+
+public abstract interface class com/bitmovin/analytics/retryBackend/OnFailureCallback {
+	public abstract fun onFailure (Ljava/lang/Exception;Lkotlin/jvm/functions/Function0;)V
+}
+
+public final class com/bitmovin/analytics/retryBackend/RetryBackend : com/bitmovin/analytics/data/Backend {
+	public fun <init> (Lcom/bitmovin/analytics/data/CallbackBackend;Landroid/os/Handler;)V
+	public final fun getNextScheduledTime ()Ljava/util/Date;
+	public final fun processQueuedSamples ()V
+	public fun send (Lcom/bitmovin/analytics/data/EventData;)V
+	public fun sendAd (Lcom/bitmovin/analytics/data/AdEventData;)V
+}
+
+public final class com/bitmovin/analytics/retryBackend/RetryQueue {
+	public fun <init> ()V
+	public final fun addSample (Lcom/bitmovin/analytics/retryBackend/RetrySample;)V
+	public final fun getMaxSampleNumber ()I
+	public final fun getNextSampleOrNull ()Lcom/bitmovin/analytics/retryBackend/RetrySample;
+	public final fun getNextScheduleTime ()Ljava/util/Date;
+	public final fun now ()Ljava/util/Date;
+}
+
+public final class com/bitmovin/analytics/retryBackend/RetrySample {
+	public fun <init> (Ljava/lang/Object;ILjava/util/Date;I)V
+	public final fun getEventData ()Ljava/lang/Object;
+	public final fun getRetry ()I
+	public final fun getScheduledTime ()Ljava/util/Date;
+	public final fun getTotalTime ()I
+	public final fun setRetry (I)V
+	public final fun setScheduledTime (Ljava/util/Date;)V
+	public final fun setTotalTime (I)V
+}
+
+public class com/bitmovin/analytics/stateMachines/DefaultPlayerState : com/bitmovin/analytics/stateMachines/PlayerState {
+	public fun <init> (Ljava/lang/String;)V
+	protected final fun getDataOnEnter ()Ljava/lang/Object;
+	public fun getName ()Ljava/lang/String;
+	public fun onEnterState (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Ljava/lang/Object;)V
+	public fun onExitState (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;JJLcom/bitmovin/analytics/stateMachines/PlayerState;)V
+	protected final fun setDataOnEnter (Ljava/lang/Object;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/stateMachines/DefaultStateMachineListener : com/bitmovin/analytics/stateMachines/StateMachineListener {
+	public static final field Companion Lcom/bitmovin/analytics/stateMachines/DefaultStateMachineListener$Companion;
+	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/analytics/adapters/PlayerAdapter;Lcom/bitmovin/analytics/ObservableSupport;)V
+	public fun onAd (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public fun onAudioTrackChange (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public fun onError (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Lcom/bitmovin/analytics/data/ErrorCode;)V
+	public fun onHeartbeat (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public fun onMute (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public fun onPauseExit (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public fun onPlayExit (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public fun onQualityChange (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public fun onRebuffering (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public fun onSeekComplete (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public fun onStartup (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;JJ)V
+	public fun onSubtitleChange (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Lcom/bitmovin/analytics/data/SubtitleDto;)V
+	public fun onUnmute (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public fun onUpdateSample (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public fun onVideoChange (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public fun onVideoStartFailed (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+}
+
+public final class com/bitmovin/analytics/stateMachines/DefaultStateMachineListener$Companion {
+}
+
+public final class com/bitmovin/analytics/stateMachines/ObservableTimer : com/bitmovin/analytics/Observable {
+	public fun <init> (JJ)V
+	public final fun cancel ()V
+	public final fun isRunning ()Z
+	public final fun start ()V
+	public fun subscribe (Lcom/bitmovin/analytics/stateMachines/ObservableTimer$OnFinishedEventListener;)V
+	public synthetic fun subscribe (Ljava/lang/Object;)V
+	public fun unsubscribe (Lcom/bitmovin/analytics/stateMachines/ObservableTimer$OnFinishedEventListener;)V
+	public synthetic fun unsubscribe (Ljava/lang/Object;)V
+}
+
+public abstract interface class com/bitmovin/analytics/stateMachines/ObservableTimer$OnFinishedEventListener {
+	public abstract fun onFinished ()V
+}
+
+public abstract interface class com/bitmovin/analytics/stateMachines/PlayerState {
+	public abstract fun getName ()Ljava/lang/String;
+	public abstract fun onEnterState (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Ljava/lang/Object;)V
+	public abstract fun onExitState (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;JJLcom/bitmovin/analytics/stateMachines/PlayerState;)V
+}
+
+public final class com/bitmovin/analytics/stateMachines/PlayerStateMachine {
+	public static final field Companion Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine$Companion;
+	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/analytics/stateMachines/ObservableTimer;Lcom/bitmovin/analytics/stateMachines/QualityChangeEventLimiter;Lcom/bitmovin/analytics/stateMachines/ObservableTimer;Landroid/os/Handler;)V
+	public synthetic fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/analytics/stateMachines/ObservableTimer;Lcom/bitmovin/analytics/stateMachines/QualityChangeEventLimiter;Lcom/bitmovin/analytics/stateMachines/ObservableTimer;Landroid/os/Handler;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun addStartupTime (J)V
+	public final fun audioQualityChanged (JZLkotlin/jvm/functions/Function0;)V
+	public final fun changeCustomData (JLcom/bitmovin/analytics/data/CustomData;Lkotlin/jvm/functions/Function1;)V
+	public final fun disableHeartbeat ()V
+	public final fun disableRebufferHeartbeat ()V
+	public final fun enableHeartbeat ()V
+	public final fun enableRebufferHeartbeat ()V
+	public final fun endAd ()V
+	public final fun error (JLcom/bitmovin/analytics/data/ErrorCode;)V
+	public final fun getAndResetPlayerStartupTime ()J
+	public final fun getCurrentState ()Lcom/bitmovin/analytics/stateMachines/PlayerState;
+	public final fun getImpressionId ()Ljava/lang/String;
+	public final fun getStartupTime ()J
+	public final fun getVideoStartFailedReason ()Lcom/bitmovin/analytics/enums/VideoStartFailedReason;
+	public final fun getVideoTimeEnd ()J
+	public final fun getVideoTimeStart ()J
+	public final fun isStartupFinished ()Z
+	public final fun pause (J)V
+	public final fun release ()V
+	public final fun resetStateMachine ()V
+	public final fun setStartupFinished (Z)V
+	public final fun setVideoStartFailedReason (Lcom/bitmovin/analytics/enums/VideoStartFailedReason;)V
+	public final fun sourceChange (JJZ)V
+	public final fun startAd (J)V
+	public final fun subscribe (Lcom/bitmovin/analytics/stateMachines/StateMachineListener;)V
+	public final fun subtitleChanged (JLcom/bitmovin/analytics/data/SubtitleDto;Lcom/bitmovin/analytics/data/SubtitleDto;)V
+	public final fun transitionState (Lcom/bitmovin/analytics/stateMachines/PlayerState;J)V
+	public final fun transitionState (Lcom/bitmovin/analytics/stateMachines/PlayerState;JLjava/lang/Object;)V
+	public final fun videoQualityChanged (JZLkotlin/jvm/functions/Function0;)V
+}
+
+public final class com/bitmovin/analytics/stateMachines/PlayerStateMachine$Companion {
+}
+
+public final class com/bitmovin/analytics/stateMachines/PlayerStates {
+	public static final field AD Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field ADFINISHED Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field AUDIOTRACKCHANGE Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field BUFFERING Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field CUSTOMDATACHANGE Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field Companion Lcom/bitmovin/analytics/stateMachines/PlayerStates$Companion;
+	public static final field ERROR Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field EXITBEFOREVIDEOSTART Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field PAUSE Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field PLAYING Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field QUALITYCHANGE Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field READY Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field SEEKING Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field SOURCE_CHANGED Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field STARTUP Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public static final field SUBTITLECHANGE Lcom/bitmovin/analytics/stateMachines/DefaultPlayerState;
+	public fun <init> ()V
+}
+
+public final class com/bitmovin/analytics/stateMachines/PlayerStates$Companion {
+}
+
+public final class com/bitmovin/analytics/stateMachines/QualityChangeEventLimiter {
+	public static final field Companion Lcom/bitmovin/analytics/stateMachines/QualityChangeEventLimiter$Companion;
+	public fun <init> (Lcom/bitmovin/analytics/stateMachines/ObservableTimer;)V
+	public final fun isQualityChangeEventEnabled ()Z
+	public final fun onQualityChange ()V
+	public final fun release ()V
+	public final fun reset ()V
+}
+
+public final class com/bitmovin/analytics/stateMachines/QualityChangeEventLimiter$Companion {
+}
+
+public abstract interface class com/bitmovin/analytics/stateMachines/StateMachineListener {
+	public abstract fun onAd (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public abstract fun onAudioTrackChange (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public abstract fun onError (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Lcom/bitmovin/analytics/data/ErrorCode;)V
+	public abstract fun onHeartbeat (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public abstract fun onMute (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public abstract fun onPauseExit (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public abstract fun onPlayExit (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public abstract fun onQualityChange (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public abstract fun onRebuffering (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public abstract fun onSeekComplete (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;J)V
+	public abstract fun onStartup (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;JJ)V
+	public abstract fun onSubtitleChange (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Lcom/bitmovin/analytics/data/SubtitleDto;)V
+	public abstract fun onUnmute (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public abstract fun onUpdateSample (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public abstract fun onVideoChange (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+	public abstract fun onVideoStartFailed (Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)V
+}
+
+public final class com/bitmovin/analytics/utils/ClientFactory {
+	public fun <init> ()V
+	public final fun createClient (Lcom/bitmovin/analytics/CollectorConfig;)Lokhttp3/OkHttpClient;
+}
+
+public final class com/bitmovin/analytics/utils/DataSerializer {
+	public static final field INSTANCE Lcom/bitmovin/analytics/utils/DataSerializer;
+	public static final fun deserialize (Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;
+	public static final fun serialize (Ljava/lang/Object;)Ljava/lang/String;
+	public static final fun trySerialize (Ljava/lang/Object;)Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/utils/DownloadSpeedMeter {
+	public fun <init> ()V
+	public final fun addMeasurement (Lcom/bitmovin/analytics/data/SpeedMeasurement;)V
+	public final fun getInfo ()Lcom/bitmovin/analytics/data/DownloadSpeedInfo;
+	public final fun reset ()V
+}
+
+public final class com/bitmovin/analytics/utils/ErrorUtilKt {
+	public static final fun getTopOfStacktrace (Ljava/lang/Throwable;)[Ljava/lang/String;
+}
+
+public class com/bitmovin/analytics/utils/HttpClient {
+	public static final field JSON Lokhttp3/MediaType;
+	public fun <init> (Landroid/content/Context;Lokhttp3/OkHttpClient;)V
+	public fun post (Ljava/lang/String;Ljava/lang/String;Lokhttp3/Callback;)V
+}
+
+public final class com/bitmovin/analytics/utils/Measure {
+	public fun <init> (Lcom/bitmovin/analytics/data/SpeedMeasurement;)V
+	public final fun getDownloadSize ()J
+	public final fun getDuration ()J
+	public final fun getHttpStatus ()I
+	public final fun getSpeed ()F
+	public final fun getTimeToFirstByte ()F
+	public final fun setDownloadSize (J)V
+	public final fun setDuration (J)V
+	public final fun setHttpStatus (I)V
+	public final fun setSpeed (F)V
+	public final fun setTimeToFirstByte (F)V
+}
+
+public final class com/bitmovin/analytics/utils/QueueExtensions {
+	public static final field Companion Lcom/bitmovin/analytics/utils/QueueExtensions$Companion;
+	public fun <init> ()V
+}
+
+public final class com/bitmovin/analytics/utils/QueueExtensions$Companion {
+	public final fun limit (Ljava/util/Queue;I)V
+}
+
+public class com/bitmovin/analytics/utils/Util {
+	public static final field ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL I
+	public static final field ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD I
+	public static final field DASH_STREAM_FORMAT Ljava/lang/String;
+	public static final field HEARTBEAT_INTERVAL I
+	public static final field HLS_STREAM_FORMAT Ljava/lang/String;
+	public static final field MILLISECONDS_IN_SECONDS I
+	public static final field PLAYER_TECH Ljava/lang/String;
+	public static final field PROGRESSIVE_STREAM_FORMAT Ljava/lang/String;
+	public static final field REBUFFERING_TIMEOUT I
+	public static final field SMOOTH_STREAM_FORMAT Ljava/lang/String;
+	public static final field VIDEOSTART_TIMEOUT I
+	public fun <init> ()V
+	public static fun calculatePercentage (Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Boolean;)Ljava/lang/Integer;
+	public static fun getAnalyticsVersion ()Ljava/lang/String;
+	public static fun getDomain (Landroid/content/Context;)Ljava/lang/String;
+	public static fun getElapsedTime ()J
+	public static fun getHostnameAndPath (Ljava/lang/String;)Landroid/util/Pair;
+	public static fun getIsLiveFromConfigOrPlayer (ZLjava/lang/Boolean;Z)Z
+	public static fun getLocale ()Ljava/lang/String;
+	public static fun getPlatform (Ljava/lang/Boolean;)Ljava/lang/String;
+	public static fun getPrivateFieldFromReflection (Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+	public static fun getSupportedVideoFormats ()Ljava/util/List;
+	public static fun getTimestamp ()J
+	public static fun getUUID ()Ljava/lang/String;
+	public static fun isClassLoaded (Ljava/lang/String;Ljava/lang/ClassLoader;)Z
+	public static fun isMimeTypeSupported (Ljava/lang/String;)Z
+	public static fun isTVDevice (Landroid/content/Context;)Ljava/lang/Boolean;
+	public static fun joinUrl (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+	public static fun multiply (Ljava/lang/Double;Ljava/lang/Integer;)Ljava/lang/Double;
+	public static fun multiply (Ljava/lang/Double;Ljava/lang/Long;)Ljava/lang/Double;
+	public static fun secondsToMillis (Ljava/lang/Double;)J
+	public static fun toPrimitiveLong (Ljava/lang/Double;)J
+}
+
