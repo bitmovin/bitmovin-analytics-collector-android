@@ -6,7 +6,7 @@ import android.os.Parcelable;
 public enum PlayerType implements Parcelable {
     BITMOVIN("bitmovin"),
     EXOPLAYER("exoplayer"),
-    AMAZON_IVS("amazonivs"); // TODO: check uppercase vs lowercase (we use Android:Exoplayer for PLAYER_TECH on the others)
+    AMAZON_IVS("amazonivs");
 
     private final String name;
 
