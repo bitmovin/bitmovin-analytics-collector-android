@@ -39,7 +39,7 @@ class RetryQueueTest {
         retryQueue.addSample(RetrySample(firstSample, 290, firstDate, 9))
 
         var nextScheduledTime = retryQueue.getNextScheduleTime()
-        Assertions.assertThat(nextScheduledTime).isEqualTo(null)
+        Assertions.assertThat(nextScheduledTime).isNull()
     }
 
     @Test
