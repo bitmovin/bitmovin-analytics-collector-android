@@ -85,7 +85,7 @@ class AdBreakMapperTest {
         `when`(imaAdBreak.position).thenReturn("pre")
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
 
-        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.pre)
+        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.PRE)
     }
 
     @Test
@@ -93,21 +93,21 @@ class AdBreakMapperTest {
         `when`(imaAdBreak.position).thenReturn("post")
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
 
-        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.post)
+        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.POST)
     }
 
     @Test
     fun FromPlayerAdConfigurationPlayerPositionMIDShouldSetMIDPlayerPosition() {
         `when`(imaAdBreak.position).thenReturn("10")
         var collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
-        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.mid)
+        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.MID)
 
         `when`(imaAdBreak.position).thenReturn("25%")
         collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
-        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.mid)
+        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.MID)
 
         `when`(imaAdBreak.position).thenReturn("00:10:00.000")
         collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
-        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.mid)
+        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.MID)
     }
 }

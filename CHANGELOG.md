@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] updated spotless config
 - [internal] move to main as default branch
 - [internal] refactored PlayerTech to be constant and part of adapters
+- [internal] fix AdPosition and AdTagType enums to return configured string representation
 - Upgraded gson dependency to v2.8.9
 - Upgraded example apps to latest bitmovin player (v3.29.0) and latest exoplayer (v2.18.2)
 - Deprecated obsolete PlayerType config in AnalyticsConfig

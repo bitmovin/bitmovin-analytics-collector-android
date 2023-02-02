@@ -52,9 +52,9 @@ class AdBreakMapper {
 
     private fun getPositionFromPlayerPosition(playerPosition: String): AdPosition? {
         return when {
-            playerPosition == "pre" -> AdPosition.pre
-            playerPosition == "post" -> AdPosition.post
-            "([0-9]+.*)".toRegex().matches(playerPosition) -> AdPosition.mid
+            playerPosition == AdPosition.PRE.position -> AdPosition.PRE
+            playerPosition == AdPosition.POST.position -> AdPosition.POST
+            "([0-9]+.*)".toRegex().matches(playerPosition) -> AdPosition.MID
             else -> null
         }
     }
