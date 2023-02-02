@@ -119,7 +119,6 @@ ext {
     assertjCoreVersion = '3.11.1'
     robolectricVersion = '4.9'
     testCoreXVersion = '1.5.0'
-    espressoCoreVersion = '3.5.1'
 }
 
 task createPrePushHook() {
