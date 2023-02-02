@@ -539,6 +539,6 @@ class BitmovinSdkAdapter(
     companion object {
         private const val TAG = "BitmovinPlayerAdapter"
         private const val PLAYER_TECH = "Android:Exoplayer"
-        private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.EXOPLAYER)
+        private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.BITMOVIN)
     }
 }
