@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.data
 
 import android.os.Build
-import androidx.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import org.assertj.core.api.Assertions
 import org.junit.Test
 
