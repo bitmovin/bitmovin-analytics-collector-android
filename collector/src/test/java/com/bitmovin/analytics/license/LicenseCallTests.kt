@@ -11,9 +11,9 @@ import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.verify
 import okhttp3.Callback
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Response
-import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
 
@@ -26,7 +26,7 @@ class LicenseCallTests {
 
     private fun createLicenseCall(responseBody: String): LicenseCall {
         val mockedResponse = mockk<Response>()
-        every { mockedResponse.body() }.returns(ResponseBody.create(MediaType.get("text/json"), responseBody))
+        every { mockedResponse.body }.returns(responseBody.toResponseBody("text/json".toMediaType()))
         mockkConstructor(HttpClient::class)
         val slot = slot<Callback>()
         every { anyConstructed<HttpClient>().post(any(), any(), capture(slot)) }.answers {

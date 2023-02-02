@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 - [internal] v1 Collectors
-- [internal] obsolete dependencies
+- [internal] obsolete test dependencies
 - [internal] unnecessary TODOs
 - AppCompat dependency for exoplayer adapter
 
@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] move to main as default branch
 - [internal] refactored PlayerTech to be constant and part of adapters
 - [internal] fix AdPosition and AdTagType enums to return configured string representation
+- Upgraded okhttp3 to v4.10.0 (this is a major version upgrade from v3 to v4)
 - Upgraded gson dependency to v2.8.9
 - Upgraded example apps to latest bitmovin player (v3.29.0) and latest exoplayer (v2.18.2)
 - Deprecated obsolete PlayerType config in AnalyticsConfig

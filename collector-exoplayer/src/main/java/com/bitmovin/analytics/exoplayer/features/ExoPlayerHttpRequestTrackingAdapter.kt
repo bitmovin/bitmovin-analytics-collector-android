@@ -114,6 +114,10 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
 
         private val LoadEventInfo.extractStatusCode: Int?
             get() {
+                // TODO: verify if this code is correct (add test?)
+                // sonarcloud complains
+                // https://sonarcloud.io/project/issues?resolved=false&sinceLeakPeriod=true&types=BUG&id=bitmovin-engineering_bitmovin-analytics-collector-android-internal&open=AYUrLCjLAU6LttWUMN61
+
                 val nullableKeyMap = this.responseHeaders as? Map<*, List<String>> ?: return null
                 if (nullableKeyMap.contains(null)) {
                     val nullEntryList = nullableKeyMap[null] ?: listOf()
@@ -137,6 +141,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
         private fun mapHlsManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): HttpRequestType {
             try {
                 val window = Timeline.Window()
+                // TODO: verify maybe??
                 // maybe needs currentWindowIndex, currentTimeline
                 eventTime.timeline.getWindow(eventTime.windowIndex, window)
                 val initialPlaylistUri = window.mediaItem.localConfiguration?.uri
@@ -164,6 +169,7 @@ class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private
             if (isHlsManifestClassLoaded) {
                 try {
                     val window = Timeline.Window()
+                    // TODO: maybe??
                     // maybe needs currentWindowIndex, currentTimeline
                     eventTime.timeline.getWindow(eventTime.windowIndex, window)
                     if (window.manifest is HlsManifest) {

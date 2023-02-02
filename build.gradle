@@ -101,7 +101,7 @@ ext {
 
     // collector dependencies
     gsonVersion = '2.8.9'
-    okhttp3Version = '3.12.1'
+    okhttp3Version = '4.10.0'
     appCompatVersion = '1.1.0' // still needed by bitmovin player collector
 
     // example apps dependencies
