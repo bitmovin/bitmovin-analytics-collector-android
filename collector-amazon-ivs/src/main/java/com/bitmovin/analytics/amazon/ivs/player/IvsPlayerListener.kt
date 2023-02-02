@@ -5,6 +5,7 @@ import com.amazonaws.ivs.player.Cue
 import com.amazonaws.ivs.player.Player
 import com.amazonaws.ivs.player.PlayerException
 import com.amazonaws.ivs.player.Quality
+import com.bitmovin.analytics.amazon.ivs.manipulators.PlaybackEventDataManipulator
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.playback.VodPlaybackService
 import java.nio.ByteBuffer
@@ -13,11 +14,14 @@ class IvsPlayerListener(
     private val positionProvider: PositionProvider,
     private val vodPlaybackService: VodPlaybackService,
     private val videoStartupService: VideoStartupService,
+    private val playbackManipulator: PlaybackEventDataManipulator,
 ) : Player.Listener() {
 
     // not dispatched for live stream
     override fun onAnalyticsEvent(name: String, properties: String) {
         Log.d(TAG, "onAnalyticsEvent name: $name, properties: $properties")
+        val analyticsEvent = AnalyticsEvent(properties)
+        playbackManipulator.onAnalyticsEvent(name, analyticsEvent)
     }
 
     override fun onMetadata(mediaType: String, data: ByteBuffer) {
@@ -28,7 +32,6 @@ class IvsPlayerListener(
     }
 
     override fun onCue(p0: Cue) {
-//                Log.d(TAG, "onCue $p0")
     }
 
     override fun onDurationChanged(duration: Long) {

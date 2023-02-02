@@ -15,6 +15,7 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.CastTech
 import com.bitmovin.analytics.enums.DRMType
 import com.bitmovin.analytics.enums.PlayerType
+import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.features.Feature
@@ -157,17 +158,17 @@ class BitmovinSdkAdapter(
             when (sourceConfig.type) {
                 SourceType.Hls -> {
                     data.m3u8Url = sourceConfig.url
-                    data.streamFormat = Util.HLS_STREAM_FORMAT
+                    data.streamFormat = StreamFormat.HLS.value
                 }
                 SourceType.Dash -> {
                     data.mpdUrl = sourceConfig.url
-                    data.streamFormat = Util.DASH_STREAM_FORMAT
+                    data.streamFormat = StreamFormat.DASH.value
                 }
                 SourceType.Progressive -> {
                     data.progUrl = sourceConfig.url
-                    data.streamFormat = Util.PROGRESSIVE_STREAM_FORMAT
+                    data.streamFormat = StreamFormat.PROGRESSIVE.value
                 }
-                SourceType.Smooth -> data.streamFormat = Util.SMOOTH_STREAM_FORMAT
+                SourceType.Smooth -> data.streamFormat = StreamFormat.SMOOTH.value
             }
             val drmConfig = sourceConfig.drmConfig
             when {

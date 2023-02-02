@@ -7,7 +7,6 @@ import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
@@ -24,14 +23,14 @@ class AmazonIvsPlayerAdapter(
     deviceInformationProvider: DeviceInformationProvider,
     videoStartupService: VideoStartupService,
     private val playerListener: IvsPlayerListener,
+    manipulators: List<EventDataManipulator>,
 ) : DefaultPlayerAdapter(
     config,
     eventDataFactory,
     stateMachine,
     featureFactory,
     deviceInformationProvider,
-),
-    EventDataManipulator {
+) {
     init {
         player.addListener(playerListener)
         videoStartupService.checkStartup(player.state, player.position)
@@ -45,11 +44,7 @@ class AmazonIvsPlayerAdapter(
         player.removeListener(playerListener)
     }
 
-    override fun manipulate(data: EventData) {
-        data.version = player.version
-    }
-
-    override val eventDataManipulators: Collection<EventDataManipulator> by lazy { listOf(this) } // TODO("Not yet implemented")
+    override val eventDataManipulators: Collection<EventDataManipulator> = manipulators
 
     override val position: Long
         get() = player.position

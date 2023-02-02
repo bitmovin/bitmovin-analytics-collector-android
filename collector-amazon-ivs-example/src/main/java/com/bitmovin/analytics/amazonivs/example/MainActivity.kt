@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         setupButtonClickListeners()
 
         player = Player.Factory.create(this)
+        player.isMuted = true
         playerController = IVSPlayerControlHelper(
             findViewById(R.id.playerControlView),
             findViewById(R.id.playerSurfaceView),
@@ -49,11 +50,12 @@ class MainActivity : AppCompatActivity() {
     private fun initNewPlayer() {
         collector.detachPlayer()
         player = Player.Factory.create(this)
+        player.isMuted = true
         playerController.bindPlayer(player)
         collector.attachPlayer(player)
     }
 
-    private fun loadSource(source: Uri = VideoSources.source1) {
+    private fun loadSource(source: Uri = VideoSources.vodSource) {
         player.load(source)
     }
 

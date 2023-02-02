@@ -8,7 +8,9 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.SystemClock;
 import android.util.Pair;
+
 import com.bitmovin.analytics.BuildConfig;
+
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;
@@ -18,10 +20,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Util {
-    public static final String DASH_STREAM_FORMAT = "dash";
-    public static final String HLS_STREAM_FORMAT = "hls";
-    public static final String PROGRESSIVE_STREAM_FORMAT = "progressive";
-    public static final String SMOOTH_STREAM_FORMAT = "smooth";
     public static final int MILLISECONDS_IN_SECONDS = 1000;
     public static final int VIDEOSTART_TIMEOUT = 1000 * 60; // in milliseconds
     public static final int ANALYTICS_QUALITY_CHANGE_COUNT_THRESHOLD = 50;

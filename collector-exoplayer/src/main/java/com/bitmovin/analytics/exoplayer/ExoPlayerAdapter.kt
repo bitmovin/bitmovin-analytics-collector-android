@@ -12,6 +12,7 @@ import com.bitmovin.analytics.data.SpeedMeasurement
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.DRMType
 import com.bitmovin.analytics.enums.PlayerType
+import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.exoplayer.manipulators.BitrateEventDataManipulator
@@ -166,11 +167,11 @@ class ExoPlayerAdapter(
         // streamFormat, mpdUrl, and m3u8Url
         val manifest = exoplayer.currentManifest
         if (isDashManifestClassLoaded && manifest is DashManifest) {
-            data.streamFormat = Util.DASH_STREAM_FORMAT
+            data.streamFormat = StreamFormat.DASH.value
             data.mpdUrl = manifest.location?.toString() ?: manifestUrl
         } else if (isHlsManifestClassLoaded && manifest is HlsManifest) {
             val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
-            data.streamFormat = Util.HLS_STREAM_FORMAT
+            data.streamFormat = StreamFormat.HLS.value
             data.m3u8Url = masterPlaylist.baseUri
         }
 
