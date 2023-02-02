@@ -2,34 +2,36 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 android {
-	compileSdkVersion 33
-	namespace "com.bitmovin.analytics.amazonivs.example"
-	defaultConfig {
-		applicationId "com.bitmovin.analytics.amazonivs.example"
-		minSdkVersion 21
-		targetSdkVersion 33
-		versionCode 1
-		versionName "1.0"
-	}
+    compileSdk rootProject.ext.compileSdkVersion
+    namespace "com.bitmovin.analytics.amazonivs.example"
 
-	buildTypes {
-		release {
-			minifyEnabled false
-			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-		}
-	}
+    defaultConfig {
+        applicationId "com.bitmovin.analytics.amazonivs.example"
+        minSdkVersion rootProject.ext.amazonIvsMinSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
 }
 
 dependencies {
-	implementation "com.amazonaws:ivs-player:1.16.0"
-	implementation 'androidx.appcompat:appcompat:1.4.0'
-	implementation 'androidx.core:core-ktx:1.7.0'
-	implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-	implementation 'com.google.android.material:material:1.6.0'
+    implementation "com.amazonaws:ivs-player:1.16.0"
+    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.material:material:1.6.0'
 
-	if (rootProject.ext.developLocal) {
-		implementation project(':collector-amazon-ivs')
-	} else {
-		implementation "com.bitmovin.analytics:collector-amazon-ivs:${rootProject.ext.version}"
-	}
+    if (rootProject.ext.developLocal) {
+        implementation project(':collector-amazon-ivs')
+    } else {
+        implementation "com.bitmovin.analytics:collector-amazon-ivs:${rootProject.ext.version}"
+    }
 }

@@ -3,16 +3,17 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-//TODO use global settings like rootProject.ext.compileSdkVersion
 android {
     namespace 'com.bitmovin.analytics.amazon.ivs'
-    compileSdk 33
+    compileSdk rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdk 21
-        targetSdk 33
+        minSdkVersion rootProject.ext.amazonIvsMinSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // TODO: do we need this file, we don't use consumer rules for the other collectors
         consumerProguardFiles "consumer-rules.pro"
     }
 

@@ -87,6 +87,7 @@ ext {
 
     compileSdkVersion = 33
     minSdkVersion = 16
+    amazonIvsMinSdkVersion = 21
     targetSdkVersion = 33
 
     sourceCompatibility = JavaVersion.VERSION_1_8
