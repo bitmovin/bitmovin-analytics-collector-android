@@ -46,6 +46,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+
+    // app compat is needed for the bitmovin player in the expanded_controller.xml
+    // otherwise processDebugAndroidTestResources is failing
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
 
     // This could theoretically be `implementation`, but the MavenPublication process will

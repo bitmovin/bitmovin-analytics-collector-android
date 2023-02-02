@@ -21,6 +21,7 @@
 package com.bitmovin.analytics.data
 
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Point
@@ -31,7 +32,6 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Display
 import android.view.WindowManager
-import androidx.annotation.RequiresApi
 import com.bitmovin.analytics.features.FeatureManager.Companion.TAG
 import com.bitmovin.analytics.utils.Util
 
@@ -186,7 +186,7 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
     }
 
     // This code is copied from exoplayer https://github.com/google/ExoPlayer, converted into kotlin and adapted to iterate over all display modes
-    @RequiresApi(23)
+    @TargetApi(23)
     private fun getDisplaySizeV23(display: Display, outSize: Point) {
         // Detecting display size for TVs similar as ExoPlayer does it
         // (we also go over all modes additionally since I couldn't find anything about order of these modes in the API docs)
@@ -206,7 +206,7 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
     }
 
     // This code is copied from exoplayer https://github.com/google/ExoPlayer and converted into kotlin
-    @RequiresApi(17)
+    @TargetApi(17)
     private fun getDisplaySizeV17(display: Display, outSize: Point) {
         display.getRealSize(outSize)
     }

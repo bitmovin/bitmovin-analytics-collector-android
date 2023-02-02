@@ -98,9 +98,9 @@ ext {
     exoplayerVersion = '2.18.2'
 
     // collector dependencies
-    appCompatVersion = '1.1.0'
     gsonVersion = '2.8.9'
     okhttp3Version = '3.12.1'
+    appCompatVersion = '1.1.0' // still needed by bitmovin player collector
 
     // example apps dependencies
     playServicesAdsVersion = '19.7.0'

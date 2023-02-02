@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] v1 Collectors
 - [internal] obsolete dependencies
 - [internal] unnecessary TODOs
+- AppCompat dependency for exoplayer adapter
 
 ### Changed
 - [internal] updated gradle plugin and dependencies
