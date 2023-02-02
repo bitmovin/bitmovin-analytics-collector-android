@@ -1,0 +1,18 @@
+LIVE play pause workflow
+
+2023-01-31 14:08:54.602 30833-30833 LoggingIVSListener      com...n.analytics.amazonivs.example  D  Current state: IDLE
+2023-01-31 14:08:56.992 30833-30833 LoggingIVSListener      com...n.analytics.amazonivs.example  D  Current state: READY
+2023-01-31 14:08:57.296 30833-30833 LoggingIVSListener      com...n.analytics.amazonivs.example  D  Current state: BUFFERING
+2023-01-31 14:08:58.070 30833-30833 LoggingIVSListener      com...n.analytics.amazonivs.example  D  onSeekCompleted: 0
+2023-01-31 14:08:58.101 30833-30833 LoggingIVSListener      com...n.analytics.amazonivs.example  D  Current state: PLAYING
+
+to me the Buffering after Pause should be SEEKED event
+
+VOD play pause workflow
+
+2023-01-31 14:12:54.814  1986-1986  LoggingIVSListener      com...n.analytics.amazonivs.example  D  Current state: IDLE
+2023-01-31 14:12:56.670  1986-1986  LoggingIVSListener      com...n.analytics.amazonivs.example  D  Current state: PLAYING
+
+
+Edge Cases
+ [  ] call of `player.release()` without detaching

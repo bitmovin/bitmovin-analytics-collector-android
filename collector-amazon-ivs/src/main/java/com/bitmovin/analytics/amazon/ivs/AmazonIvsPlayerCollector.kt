@@ -9,6 +9,8 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.amazon.ivs.features.AmazonIvsPlayerFeatureFactory
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.playback.VodPlaybackService
+import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
+import com.bitmovin.analytics.amazon.ivs.player.IvsPositionProvider
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
@@ -20,7 +22,8 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine
  * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
  * @param context [Context]
  */
-class AmazonIvsPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : DefaultCollector<Player>(bitmovinAnalyticsConfig, context, AmazonIvsUtil.getUserAgent()) {
+class AmazonIvsPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) :
+    DefaultCollector<Player>(bitmovinAnalyticsConfig, context, AmazonIvsUtil.getUserAgent()) {
     override fun createAdapter(
         player: Player,
         analytics: BitmovinAnalytics,
@@ -31,6 +34,9 @@ class AmazonIvsPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
         val featureFactory: FeatureFactory = AmazonIvsPlayerFeatureFactory(analytics, player)
         val videoStartupService = VideoStartupService(stateMachine)
         val vodPlaybackService = VodPlaybackService(stateMachine)
+        val positionProvider = IvsPositionProvider(player)
+        val playerListener =
+            IvsPlayerListener(positionProvider, vodPlaybackService, videoStartupService)
         return AmazonIvsPlayerAdapter(
             player,
             config,
@@ -39,7 +45,7 @@ class AmazonIvsPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
             eventDataFactory,
             deviceInformationProvider,
             videoStartupService,
-            vodPlaybackService,
+            playerListener,
         )
     }
 }

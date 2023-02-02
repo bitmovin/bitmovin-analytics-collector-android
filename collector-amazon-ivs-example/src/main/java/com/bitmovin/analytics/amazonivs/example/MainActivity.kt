@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         collector.attachPlayer(player)
     }
 
-    private fun loadSource(source: Uri = VideoSources.vodSource) {
+    private fun loadSource(source: Uri = VideoSources.source1) {
         player.load(source)
     }
 
