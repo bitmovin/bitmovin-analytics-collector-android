@@ -13,7 +13,7 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulator
  * - videoPlaybackHeight
  * - videoCodec
  */
-class QualityEventDataManipulator(private val player: Player) : EventDataManipulator {
+internal class QualityEventDataManipulator(private val player: Player) : EventDataManipulator {
     override fun manipulate(data: EventData) {
         data.droppedFrames = getAndSetDroppedFrames(player.statistics.droppedFrames)
         data.videoBitrate = player.quality.bitrate

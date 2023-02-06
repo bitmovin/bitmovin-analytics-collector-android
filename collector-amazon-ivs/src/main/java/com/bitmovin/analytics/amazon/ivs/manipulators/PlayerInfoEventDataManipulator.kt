@@ -9,7 +9,7 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulator
  * Fields handled:
  *  - version
  */
-class PlayerInfoEventDataManipulator(private val player: Player) : EventDataManipulator {
+internal class PlayerInfoEventDataManipulator(private val player: Player) : EventDataManipulator {
     override fun manipulate(data: EventData) {
         data.version = player.version
     }

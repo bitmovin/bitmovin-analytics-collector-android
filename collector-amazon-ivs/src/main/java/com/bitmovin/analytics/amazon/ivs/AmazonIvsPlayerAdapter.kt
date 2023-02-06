@@ -14,7 +14,7 @@ import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 
-class AmazonIvsPlayerAdapter(
+internal class AmazonIvsPlayerAdapter(
     private val player: Player,
     config: BitmovinAnalyticsConfig,
     stateMachine: PlayerStateMachine,

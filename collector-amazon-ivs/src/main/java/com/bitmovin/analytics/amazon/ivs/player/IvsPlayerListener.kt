@@ -10,7 +10,7 @@ import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.playback.VodPlaybackService
 import java.nio.ByteBuffer
 
-class IvsPlayerListener(
+internal class IvsPlayerListener(
     private val positionProvider: PositionProvider,
     private val vodPlaybackService: VodPlaybackService,
     private val videoStartupService: VideoStartupService,

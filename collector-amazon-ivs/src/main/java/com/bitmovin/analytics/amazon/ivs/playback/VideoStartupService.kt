@@ -4,7 +4,7 @@ import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 
-class VideoStartupService(private val stateMachine: PlayerStateMachine) {
+internal class VideoStartupService(private val stateMachine: PlayerStateMachine) {
 
     fun onStateChange(state: Player.State, position: Long) {
         if (stateMachine.isStartupFinished) {

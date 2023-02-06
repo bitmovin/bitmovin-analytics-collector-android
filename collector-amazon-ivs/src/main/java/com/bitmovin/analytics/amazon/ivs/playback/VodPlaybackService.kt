@@ -4,7 +4,7 @@ import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 
-class VodPlaybackService(private val stateMachine: PlayerStateMachine) {
+internal class VodPlaybackService(private val stateMachine: PlayerStateMachine) {
     fun onStateChange(state: Player.State, position: Long) {
         when (state) {
             Player.State.BUFFERING ->

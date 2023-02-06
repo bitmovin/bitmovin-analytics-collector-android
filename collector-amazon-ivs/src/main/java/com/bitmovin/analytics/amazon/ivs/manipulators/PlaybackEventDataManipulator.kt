@@ -18,7 +18,7 @@ import com.bitmovin.analytics.enums.StreamFormat
  *  - streamFormat
  *  - isLive
  */
-class PlaybackEventDataManipulator(
+internal class PlaybackEventDataManipulator(
     private val player: Player,
     private val config: BitmovinAnalyticsConfig,
 ) : EventDataManipulator {
