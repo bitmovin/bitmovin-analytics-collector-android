@@ -2,10 +2,10 @@ package com.bitmovin.analytics.retryBackend
 
 import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.enums.PlayerType
 import io.mockk.every
@@ -22,7 +22,8 @@ class RetryBackendTest {
     private val config = BitmovinAnalyticsConfig()
     private val backendMock = mockk<CallbackBackend>(relaxed = true)
     private val handlerMock = mockk<Handler>(relaxed = true)
-    private val deviceInformation = DeviceInformation("manufacturer", "model", false, "userAgentString", "locale", "packageName", 0, 0)
+    private val deviceInformation =
+        DeviceInformation("manufacturer", "model", false, "locale", "packageName", 0, 0)
 
     private val firstDate = Date()
 
@@ -49,7 +50,7 @@ class RetryBackendTest {
 
         val retryBacked = spyk(RetryBackend(backendMock, handler))
 
-        every { retryBacked.getNextScheduledTime() } answers { secondDate } andThen(firstDate)
+        every { retryBacked.getNextScheduledTime() } answers { secondDate } andThen (firstDate)
 
         retryBacked.processQueuedSamples()
 
@@ -61,7 +62,12 @@ class RetryBackendTest {
     }
 
     private fun setupEventData(sequenceNumber: Int): EventData {
-        var eventData = EventDataFactory(config, mockk(relaxed = true)).create("testImpressionId", null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
+        var eventData = TestFactory.createEventDataFactory(config).create(
+            "testImpressionId",
+            null,
+            deviceInformation,
+            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+        )
         eventData.sequenceNumber = sequenceNumber
         return eventData
     }

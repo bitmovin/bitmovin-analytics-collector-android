@@ -45,9 +45,17 @@ class EventData(
     val path: String?,
     val experimentName: String?,
     val cdnProvider: String?,
+    val userAgent: String,
 ) {
-    val userAgent: String = deviceInfo.userAgent
-    val deviceInformation: DeviceInformationDto = DeviceInformationDto(deviceInfo.manufacturer, deviceInfo.model, deviceInfo.isTV, deviceInfo.operatingSystem, deviceInfo.operatingSystemMajor, deviceInfo.operatingSystemMinor, deviceInfo.deviceClass)
+    val deviceInformation: DeviceInformationDto = DeviceInformationDto(
+        deviceInfo.manufacturer,
+        deviceInfo.model,
+        deviceInfo.isTV,
+        deviceInfo.operatingSystem,
+        deviceInfo.operatingSystemMajor,
+        deviceInfo.operatingSystemMinor,
+        deviceInfo.deviceClass,
+    )
     val language: String = deviceInfo.locale
     val analyticsVersion: String = Util.getAnalyticsVersion()
     val playerTech: String = playerInfo.playerTech

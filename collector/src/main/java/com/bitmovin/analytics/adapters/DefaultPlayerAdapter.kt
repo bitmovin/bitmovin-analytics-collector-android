@@ -10,7 +10,13 @@ import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 
-abstract class DefaultPlayerAdapter(protected val config: BitmovinAnalyticsConfig, private val eventDataFactory: EventDataFactory, override val stateMachine: PlayerStateMachine, private val featureFactory: FeatureFactory, private val deviceInformationProvider: DeviceInformationProvider) : PlayerAdapter {
+abstract class DefaultPlayerAdapter(
+    protected val config: BitmovinAnalyticsConfig,
+    private val eventDataFactory: EventDataFactory,
+    override val stateMachine: PlayerStateMachine,
+    private val featureFactory: FeatureFactory,
+    private val deviceInformationProvider: DeviceInformationProvider,
+) : PlayerAdapter {
     protected abstract val eventDataManipulators: Collection<EventDataManipulator>
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {

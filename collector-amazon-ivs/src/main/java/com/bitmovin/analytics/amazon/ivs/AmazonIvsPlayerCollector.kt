@@ -18,6 +18,7 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.utils.PlayerUserAgentProvider
 
 /**
  * Bitmovin Analytics
@@ -25,14 +26,16 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine
  * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
  * @param context [Context]
  */
-class AmazonIvsPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) :
-    DefaultCollector<Player>(bitmovinAnalyticsConfig, context, AmazonIvsUtil.getUserAgent()) {
+class AmazonIvsPlayerCollector(
+    bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
+    private val context: Context,
+) :
+    DefaultCollector<Player>(bitmovinAnalyticsConfig, context) {
+
     override fun createAdapter(
         player: Player,
         analytics: BitmovinAnalytics,
         stateMachine: PlayerStateMachine,
-        deviceInformationProvider: DeviceInformationProvider,
-        eventDataFactory: EventDataFactory,
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = AmazonIvsPlayerFeatureFactory(analytics, player)
         val videoStartupService = VideoStartupService(stateMachine)
@@ -48,7 +51,10 @@ class AmazonIvsPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
             )
         val playerInfoManipulator = PlayerInfoEventDataManipulator(player)
         val qualityManipulator = QualityEventDataManipulator(player)
+        val userAgentProvider = PlayerUserAgentProvider(context, getPlayerAgent(player))
+        val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val manipulators = listOf(playbackManipulator, playerInfoManipulator, qualityManipulator)
+        val deviceInformationProvider = DeviceInformationProvider(context)
         return AmazonIvsPlayerAdapter(
             player,
             config,
@@ -61,4 +67,6 @@ class AmazonIvsPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
             manipulators,
         )
     }
+
+    private fun getPlayerAgent(player: Player) = "AmazonIVSPlayer/ ${player.version}"
 }

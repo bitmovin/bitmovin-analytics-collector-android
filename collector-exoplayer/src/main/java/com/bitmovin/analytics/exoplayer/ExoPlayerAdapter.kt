@@ -46,7 +46,14 @@ class ExoPlayerAdapter(
     featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
-) : DefaultPlayerAdapter(config, eventDataFactory, stateMachine, featureFactory, deviceInformationProvider), EventDataManipulator {
+) : DefaultPlayerAdapter(
+    config,
+    eventDataFactory,
+    stateMachine,
+    featureFactory,
+    deviceInformationProvider,
+),
+    EventDataManipulator {
     private val isDashManifestClassLoaded by lazy {
         Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, this.javaClass.classLoader)
     }
@@ -101,7 +108,12 @@ class ExoPlayerAdapter(
     override val playerInfo: PlayerInfo
         get() = PLAYER_INFO
 
-    override val eventDataManipulators: Collection<EventDataManipulator> by lazy { listOf(this, bitrateEventDataManipulator) }
+    override val eventDataManipulators: Collection<EventDataManipulator> by lazy {
+        listOf(
+            this,
+            bitrateEventDataManipulator,
+        )
+    }
 
     /*
      * Because of the late initialization of the Adapter we do not get the first
@@ -110,7 +122,8 @@ class ExoPlayerAdapter(
      */
     private fun checkAutoplayStartup() {
         val playbackState = exoplayer.playbackState
-        val isBufferingAndWillAutoPlay = exoplayer.playWhenReady && playbackState == Player.STATE_BUFFERING
+        val isBufferingAndWillAutoPlay =
+            exoplayer.playWhenReady && playbackState == Player.STATE_BUFFERING
         /*
          * Even if flag was set as `player.setPlayWhenReady(false)`, when player is
          * playing, flags is returned as `true`
@@ -231,7 +244,11 @@ class ExoPlayerAdapter(
 
     private fun createAnalyticsListener(): AnalyticsListener {
         return object : AnalyticsListener {
-            override fun onPlayWhenReadyChanged(eventTime: AnalyticsListener.EventTime, playWhenReady: Boolean, reason: Int) {
+            override fun onPlayWhenReadyChanged(
+                eventTime: AnalyticsListener.EventTime,
+                playWhenReady: Boolean,
+                reason: Int,
+            ) {
                 Log.d(TAG, String.format("onPlayWhenReadyChanged: %b, %d", playWhenReady, reason))
                 // if player preload is setup without autoplay being enabled
                 // this gets triggered after user clicks play
@@ -243,7 +260,10 @@ class ExoPlayerAdapter(
                 }
             }
 
-            override fun onIsPlayingChanged(eventTime: AnalyticsListener.EventTime, isPlaying: Boolean) {
+            override fun onIsPlayingChanged(
+                eventTime: AnalyticsListener.EventTime,
+                isPlaying: Boolean,
+            ) {
                 try {
                     Log.d(TAG, "onIsPlayingChanged $isPlaying")
                     this@ExoPlayerAdapter.isPlaying = isPlaying
@@ -259,7 +279,10 @@ class ExoPlayerAdapter(
                 }
             }
 
-            override fun onPlaybackStateChanged(eventTime: AnalyticsListener.EventTime, state: Int) {
+            override fun onPlaybackStateChanged(
+                eventTime: AnalyticsListener.EventTime,
+                state: Int,
+            ) {
                 try {
                     val videoTime = position
                     Log.d(
@@ -354,7 +377,10 @@ class ExoPlayerAdapter(
             ) {
                 Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate))
                 try {
-                    stateMachine.videoQualityChanged(position, bitrateEventDataManipulator.hasAudioFormatChanged(format)) { bitrateEventDataManipulator.currentAudioFormat = format }
+                    stateMachine.videoQualityChanged(
+                        position,
+                        bitrateEventDataManipulator.hasAudioFormatChanged(format),
+                    ) { bitrateEventDataManipulator.currentAudioFormat = format }
                 } catch (e: Exception) {
                     Log.d(TAG, e.message, e)
                 }
@@ -367,7 +393,10 @@ class ExoPlayerAdapter(
             ) {
                 Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate))
                 try {
-                    stateMachine.videoQualityChanged(position, bitrateEventDataManipulator.hasVideoFormatChanged(format)) { bitrateEventDataManipulator.currentVideoFormat = format }
+                    stateMachine.videoQualityChanged(
+                        position,
+                        bitrateEventDataManipulator.hasVideoFormatChanged(format),
+                    ) { bitrateEventDataManipulator.currentVideoFormat = format }
                 } catch (e: Exception) {
                     Log.d(TAG, e.message, e)
                 }
@@ -385,7 +414,11 @@ class ExoPlayerAdapter(
                 }
             }
 
-            override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime, output: Any, renderTimeMs: Long) {
+            override fun onRenderedFirstFrame(
+                eventTime: AnalyticsListener.EventTime,
+                output: Any,
+                renderTimeMs: Long,
+            ) {
                 playerIsReady = true
             }
 
@@ -463,8 +496,10 @@ class ExoPlayerAdapter(
 
     companion object {
         private const val TAG = "ExoPlayerAdapter"
-        private const val DASH_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.dash.manifest.DashManifest"
-        private const val HLS_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.hls.HlsManifest"
+        private const val DASH_MANIFEST_CLASSNAME =
+            "com.google.android.exoplayer2.source.dash.manifest.DashManifest"
+        private const val HLS_MANIFEST_CLASSNAME =
+            "com.google.android.exoplayer2.source.hls.HlsManifest"
         private const val PLAYER_TECH = "Android:Exoplayer"
         private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.EXOPLAYER)
     }

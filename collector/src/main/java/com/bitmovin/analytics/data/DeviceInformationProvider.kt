@@ -35,14 +35,17 @@ import android.view.WindowManager
 import com.bitmovin.analytics.features.FeatureManager.Companion.TAG
 import com.bitmovin.analytics.utils.Util
 
-open class DeviceInformationProvider(val context: Context, val userAgent: String) {
+open class DeviceInformationProvider(
+    val context: Context,
+) {
     val isTV: Boolean = Util.isTVDevice(context)
 
     fun getDeviceInformation(): DeviceInformation {
-        val windowManager: WindowManager? = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
+        val windowManager: WindowManager? =
+            context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
         val displayMetrics = DisplayMetrics()
-        var width: Int = 0
-        var height: Int = 0
+        var width = 0
+        var height = 0
 
         if (windowManager != null) {
             windowManager.defaultDisplay.getMetrics(displayMetrics)
@@ -89,7 +92,6 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
             domain = Util.getDomain(context),
             screenWidth = width,
             screenHeight = height,
-            userAgent = userAgent,
             operatingSystem = operatingSystem,
             operatingSystemMajor = operatingSystemMajor,
             deviceClass = deviceClass,
@@ -115,11 +117,15 @@ open class DeviceInformationProvider(val context: Context, val userAgent: String
 
         // This will also include FireTV Sticks
         // https://developer.amazon.com/docs/fire-tv/identify-amazon-fire-tv-devices.html
-        private fun isFireTV(packageManager: PackageManager) = packageManager.hasSystemFeature(AMAZON_FEATURE_FIRE_TV)
+        private fun isFireTV(packageManager: PackageManager) =
+            packageManager.hasSystemFeature(AMAZON_FEATURE_FIRE_TV)
 
         // https://developer.amazon.com/docs/fire-tablets/ft-identifying-tablet-devices.html
         private val isFireTablet: Boolean
-            get() = "Amazon".equals(Build.MANUFACTURER, true) && Build.MODEL?.startsWith("KF", true) == true
+            get() = "Amazon".equals(Build.MANUFACTURER, true) && Build.MODEL?.startsWith(
+                "KF",
+                true,
+            ) == true
     }
 
     // This code is partly copied from exoplayer https://github.com/google/ExoPlayer and converted into Kotlin

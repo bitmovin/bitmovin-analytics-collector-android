@@ -1,9 +1,8 @@
 package com.bitmovin.analytics.exoplayer;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Player;
+
 import java.lang.reflect.Field;
 
 public class ExoUtil {
@@ -30,17 +29,5 @@ public class ExoUtil {
         } catch (IllegalAccessException ignored) {
         }
         return "unknown";
-    }
-
-    public static String getUserAgent(Context context) {
-        ApplicationInfo applicationInfo = context.getApplicationInfo();
-        String applicationName = "Unknown";
-        if (applicationInfo != null) {
-            int stringId = applicationInfo.labelRes;
-            if (stringId == 0 && applicationInfo.nonLocalizedLabel != null) {
-                applicationName = applicationInfo.nonLocalizedLabel.toString();
-            }
-        }
-        return com.google.android.exoplayer2.util.Util.getUserAgent(context, applicationName);
     }
 }

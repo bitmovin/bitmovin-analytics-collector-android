@@ -10,7 +10,7 @@ class DeviceInformationProviderInstrumentedTest {
     fun testContainsBuildModelAndManufacturer() {
         // #region Mocking
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        val deviceInformationProvider = DeviceInformationProvider(appContext, "user-agent")
+        val deviceInformationProvider = DeviceInformationProvider(appContext)
         val deviceInfo = deviceInformationProvider.getDeviceInformation()
         // #endregion
 

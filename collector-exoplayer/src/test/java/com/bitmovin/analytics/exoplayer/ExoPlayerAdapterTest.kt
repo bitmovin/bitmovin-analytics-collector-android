@@ -30,8 +30,27 @@ class ExoPlayerAdapterTest {
             every { periodCount } returns 1
         }
         every { player.currentTimeline } returns timeline
-        stateMachine = spyk(PlayerStateMachine(mockk(), mockk(), mockk(), qualityChangeEventLimiter, mockk(), mockk()), recordPrivateCalls = true)
-        adapter = spyk(ExoPlayerAdapter(player, mockk(relaxed = true), stateMachine, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)))
+        stateMachine = spyk(
+            PlayerStateMachine(
+                mockk(),
+                mockk(),
+                mockk(),
+                qualityChangeEventLimiter,
+                mockk(),
+                mockk(),
+            ),
+            recordPrivateCalls = true,
+        )
+        adapter = spyk(
+            ExoPlayerAdapter(
+                player,
+                mockk(relaxed = true),
+                stateMachine,
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+            ),
+        )
     }
 
     @Test
@@ -43,13 +62,21 @@ class ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(
+            getEventTime(20L),
+            Format.Builder().setAverageBitrate(bitrate).build(),
+            null,
+        )
 
         // assert
         verify(exactly = 1) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
 
         // act
-        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(
+            getEventTime(30L),
+            Format.Builder().setAverageBitrate(bitrate).build(),
+            null,
+        )
 
         // assert
         verify(exactly = 1) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
@@ -64,13 +91,21 @@ class ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(
+            getEventTime(20L),
+            Format.Builder().setAverageBitrate(bitrate).build(),
+            null,
+        )
 
         // assert
         verify(exactly = 1) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
 
         // act
-        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(getEventTime(30L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(
+            getEventTime(30L),
+            Format.Builder().setAverageBitrate(bitrate).build(),
+            null,
+        )
 
         // assert
         verify(exactly = 1) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
@@ -85,7 +120,11 @@ class ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(
+            getEventTime(20L),
+            Format.Builder().setAverageBitrate(bitrate).build(),
+            null,
+        )
 
         // assert
         verify(exactly = 0) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
@@ -100,7 +139,11 @@ class ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(getEventTime(20L), Format.Builder().setAverageBitrate(bitrate).build(), null)
+        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(
+            getEventTime(20L),
+            Format.Builder().setAverageBitrate(bitrate).build(),
+            null,
+        )
 
         // assert
         verify(exactly = 0) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }

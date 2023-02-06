@@ -1,12 +1,11 @@
 package com.bitmovin.analytics.retryBackend
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.enums.PlayerType
-import io.mockk.mockk
 import org.assertj.core.api.Assertions
 import org.junit.Test
 import org.mockito.Mockito
@@ -17,7 +16,8 @@ import java.util.concurrent.TimeUnit
 
 class RetryQueueTest {
     private val config = BitmovinAnalyticsConfig()
-    private val deviceInformation = DeviceInformation("manufacturer", "model", false, "userAgentString", "locale", "packageName", 0, 0)
+    private val deviceInformation =
+        DeviceInformation("manufacturer", "model", false, "locale", "packageName", 0, 0)
 
     private val firstDate = Date()
     private val secondDate = Calendar.getInstance().run {
@@ -26,7 +26,12 @@ class RetryQueueTest {
     }
 
     private fun setupEventData(sequenceNumber: Int): EventData {
-        var eventData = EventDataFactory(config, mockk(relaxed = true)).create("testImpressionId", null, deviceInformation, PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER))
+        var eventData = TestFactory.createEventDataFactory(config).create(
+            "testImpressionId",
+            null,
+            deviceInformation,
+            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+        )
         eventData.sequenceNumber = sequenceNumber
         return eventData
     }

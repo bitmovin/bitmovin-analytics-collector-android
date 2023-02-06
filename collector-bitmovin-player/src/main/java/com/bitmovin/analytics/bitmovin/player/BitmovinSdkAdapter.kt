@@ -43,7 +43,14 @@ class BitmovinSdkAdapter(
     private val sourceMetadataMap: Map<Source, SourceMetadata>,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
-) : DefaultPlayerAdapter(config, eventDataFactory, stateMachine, featureFactory, deviceInformationProvider), EventDataManipulator {
+) : DefaultPlayerAdapter(
+    config,
+    eventDataFactory,
+    stateMachine,
+    featureFactory,
+    deviceInformationProvider,
+),
+    EventDataManipulator {
     private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
     private var totalDroppedVideoFrames = 0
     private var isVideoAttemptedPlay = false
@@ -230,7 +237,10 @@ class BitmovinSdkAdapter(
 
     private fun getSubtitleDto(subtitleTrack: SubtitleTrack?): SubtitleDto {
         val isEnabled = subtitleTrack?.id != null && subtitleTrack.id != "bitmovin-off"
-        return SubtitleDto(isEnabled, if (isEnabled) subtitleTrack?.language ?: subtitleTrack?.label else null)
+        return SubtitleDto(
+            isEnabled,
+            if (isEnabled) subtitleTrack?.language ?: subtitleTrack?.label else null,
+        )
     }
 
     override fun release() {
@@ -282,6 +292,7 @@ class BitmovinSdkAdapter(
         Log.d(TAG, "On Source Loaded")
         isVideoAttemptedPlay = false
     }
+
     private fun onSourceEventSourceUnloaded(event: SourceEvent.Unloaded) {
         try {
             Log.d(TAG, "On Source Unloaded")
@@ -290,6 +301,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventDestroy(event: PlayerEvent.Destroy) {
         try {
             Log.d(TAG, "On Destroy")
@@ -301,12 +313,14 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventPlaybackFinished(event: PlayerEvent.PlaybackFinished) {
         try {
             Log.d(TAG, "On Playback Finished Listener")
 
             // if it's life stream we are using currentPosition of playback as videoTime
-            val videoTime = if (player.duration != Double.POSITIVE_INFINITY) Util.secondsToMillis(player.duration) else position
+            val videoTime =
+                if (player.duration != Double.POSITIVE_INFINITY) Util.secondsToMillis(player.duration) else position
             stateMachine.transitionState(PlayerStates.PAUSE, videoTime)
             resetSourceRelatedState()
             stateMachine.resetStateMachine()
@@ -314,6 +328,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventPaused(event: PlayerEvent.Paused) {
         try {
             Log.d(TAG, "On Pause Listener")
@@ -329,6 +344,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventPlay(event: PlayerEvent.Play) {
         try {
             Log.d(TAG, "On Play Listener")
@@ -339,6 +355,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventPlaying(event: PlayerEvent.Playing) {
         try {
             Log.d(TAG, "On Playing Listener " + stateMachine.currentState.name)
@@ -347,6 +364,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventTimeChanged(event: PlayerEvent.TimeChanged) {
         try {
             if (!player.isStalled && !player.isPaused && player.isPlaying) {
@@ -356,9 +374,11 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventSeeked(event: PlayerEvent.Seeked) {
         Log.d(TAG, "On Seeked Listener")
     }
+
     private fun onPlayerEventSeek(event: PlayerEvent.Seek) {
         try {
             Log.d(TAG, "On Seek Listener")
@@ -370,6 +390,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventStallEnded(event: PlayerEvent.StallEnded) {
         try {
             Log.d(TAG, "On Stall Ended: " + player!!.isPlaying)
@@ -389,6 +410,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onSourceEventAudioChanged(event: SourceEvent.AudioChanged) {
         try {
             Log.d(TAG, "On AudioChanged")
@@ -410,14 +432,20 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onSourceEventSubtitleChanged(event: SourceEvent.SubtitleChanged) {
         try {
             Log.d(TAG, "On SubtitleChanged")
-            stateMachine.subtitleChanged(position, getSubtitleDto(event.oldSubtitleTrack), getSubtitleDto(event.newSubtitleTrack))
+            stateMachine.subtitleChanged(
+                position,
+                getSubtitleDto(event.oldSubtitleTrack),
+                getSubtitleDto(event.newSubtitleTrack),
+            )
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventStallStarted(event: PlayerEvent.StallStarted) {
         try {
             Log.d(TAG, "On Stall Started Listener isPlaying:" + player!!.isPlaying)
@@ -434,6 +462,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventVideoPlaybackQualityChanged(event: PlayerEvent.VideoPlaybackQualityChanged) {
         try {
             Log.d(TAG, "On Video Quality Changed")
@@ -445,6 +474,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventDroppedVideoFrames(event: PlayerEvent.DroppedVideoFrames) {
         try {
             totalDroppedVideoFrames += event.droppedFrames
@@ -452,17 +482,20 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventAudioPlaybackQualityChanged(event: PlayerEvent.AudioPlaybackQualityChanged) {
         try {
             Log.d(TAG, "On Audio Quality Changed")
             val oldQuality = event.oldAudioQuality
             val newQuality = event.newAudioQuality
-            val didQualityChange = oldQuality == null || newQuality == null || oldQuality.bitrate != newQuality.bitrate
+            val didQualityChange =
+                oldQuality == null || newQuality == null || oldQuality.bitrate != newQuality.bitrate
             stateMachine.audioQualityChanged(position, didQualityChange) {}
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onSourceEventDownloadFinished(event: SourceEvent.DownloadFinished) {
         try {
             if (event.downloadType.toString().contains("drm/license")) {
@@ -472,10 +505,12 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerErrorEvent(event: PlayerEvent.Error) {
         Log.d(TAG, "onPlayerError")
         handleErrorEvent(event, exceptionMapper.map(event))
     }
+
     private fun onSourceErrorEvent(event: SourceEvent.Error) {
         Log.d(TAG, "onSourceError")
         handleErrorEvent(event, exceptionMapper.map(event))
@@ -500,6 +535,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventAdBreakFinished(event: PlayerEvent.AdBreakFinished) {
         try {
             stateMachine.endAd()
@@ -507,6 +543,7 @@ class BitmovinSdkAdapter(
             Log.d(TAG, e.message, e)
         }
     }
+
     private fun onPlayerEventPlaylistTransition(event: PlayerEvent.PlaylistTransition) {
         try {
             Log.d(
@@ -528,7 +565,8 @@ class BitmovinSdkAdapter(
             // Transitioning can either be triggered by finishing the previous
             // source or seeking to another source. In both cases, we set the
             // videoEndTime to the duration of the old source.
-            val videoEndTimeOfPreviousSource = Util.secondsToMillis(overrideCurrentSource!!.duration)
+            val videoEndTimeOfPreviousSource =
+                Util.secondsToMillis(overrideCurrentSource!!.duration)
             val shouldStartup = player.isPlaying
             stateMachine.sourceChange(videoEndTimeOfPreviousSource, position, shouldStartup)
         } catch (e: Exception) {

@@ -4,8 +4,13 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
+import com.bitmovin.analytics.utils.UserAgentProvider
 
-class EventDataFactory(private val config: BitmovinAnalyticsConfig, private val userIdProvider: UserIdProvider) : EventDataManipulatorPipeline {
+class EventDataFactory(
+    private val config: BitmovinAnalyticsConfig,
+    private val userIdProvider: UserIdProvider,
+    private val userAgentProvider: UserAgentProvider,
+) : EventDataManipulatorPipeline {
     private val eventDataManipulators = mutableListOf<EventDataManipulator>()
 
     // TODO DeviceInformationProvider for now is only available after `attachPlayerAdapter`, but can also be moved to the constructor of BitmovinAnalytics and also in this class
@@ -54,6 +59,7 @@ class EventDataFactory(private val config: BitmovinAnalyticsConfig, private val 
             if (sourceMetadata == null) config.path else sourceMetadata.path,
             if (sourceMetadata == null) config.experimentName else sourceMetadata.experimentName,
             if (sourceMetadata == null) config.cdnProvider else sourceMetadata.cdnProvider,
+            userAgentProvider.userAgent,
         )
 
         for (decorator in eventDataManipulators) {

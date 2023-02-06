@@ -23,7 +23,7 @@ class DeviceInformationProviderTest {
     @Config(qualifiers = "fr-rFR-w360dp-h640dp-xhdpi")
     fun testGetDeviceInformation_Phone_targetAPI_ShouldReturnInfo() {
         // arrange
-        val dip = DeviceInformationProvider(ApplicationProvider.getApplicationContext(), "test-ua")
+        val dip = DeviceInformationProvider(ApplicationProvider.getApplicationContext())
 
         // act
         val deviceInfo = dip.getDeviceInformation()
@@ -36,7 +36,6 @@ class DeviceInformationProviderTest {
         // manufacturer and model are expected to be robolectric when running tests with the framework
         Assert.assertEquals("robolectric", deviceInfo.manufacturer)
         Assert.assertEquals("robolectric", deviceInfo.model)
-        Assert.assertEquals("test-ua", deviceInfo.userAgent)
         Assert.assertEquals("com.bitmovin.analytics.test", deviceInfo.domain)
         Assert.assertEquals(null, deviceInfo.deviceClass)
     }
@@ -45,7 +44,7 @@ class DeviceInformationProviderTest {
     @Config(qualifiers = "en-rUS-w1080dp-h1920dp-xhdpi", sdk = [26])
     fun testGetDeviceInformation_4kPhone_API_V26_ShouldReturnInfo() {
         // arrange
-        val dip = DeviceInformationProvider(ApplicationProvider.getApplicationContext(), "test")
+        val dip = DeviceInformationProvider(ApplicationProvider.getApplicationContext())
 
         // act
         val deviceInfo = dip.getDeviceInformation()
@@ -63,7 +62,7 @@ class DeviceInformationProviderTest {
         // arrange
         val context = ApplicationProvider.getApplicationContext<Context>()
         setTvMode(context)
-        val dip = DeviceInformationProvider(context, "test")
+        val dip = DeviceInformationProvider(context)
 
         // act
         val deviceInfo = dip.getDeviceInformation()
@@ -81,7 +80,7 @@ class DeviceInformationProviderTest {
         // arrange
         val context = ApplicationProvider.getApplicationContext<Context>()
         setTvMode(context)
-        val dip = DeviceInformationProvider(context, "test")
+        val dip = DeviceInformationProvider(context)
 
         // act
         val deviceInfo = dip.getDeviceInformation()
@@ -99,7 +98,7 @@ class DeviceInformationProviderTest {
         // arrange
         val context = ApplicationProvider.getApplicationContext<Context>()
         setTvMode(context)
-        val dip = DeviceInformationProvider(context, "test")
+        val dip = DeviceInformationProvider(context)
 
         // act
         val deviceInfo = dip.getDeviceInformation()
@@ -119,7 +118,7 @@ class DeviceInformationProviderTest {
         setTvMode(context)
         setFireOs(context)
 
-        val dip = DeviceInformationProvider(context, "test")
+        val dip = DeviceInformationProvider(context)
 
         // act
         val deviceInfo = dip.getDeviceInformation()
@@ -142,7 +141,7 @@ class DeviceInformationProviderTest {
         setTvMode(context)
         setFireOs(context)
 
-        val dip = DeviceInformationProvider(context, "test")
+        val dip = DeviceInformationProvider(context)
 
         // act
         val deviceInfo = dip.getDeviceInformation()
