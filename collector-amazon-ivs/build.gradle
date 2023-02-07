@@ -51,7 +51,9 @@ android {
 dependencies {
     api "com.amazonaws:ivs-player:${rootProject.ext.amazonIvsPlayerVersion}"
 
+    testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+    testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 
     androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"

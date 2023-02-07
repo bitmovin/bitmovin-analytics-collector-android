@@ -44,6 +44,7 @@ class AmazonIvsPlayerCollector(
         val playbackManipulator = PlaybackEventDataManipulator(player, config)
         val playerListener =
             IvsPlayerListener(
+                stateMachine,
                 positionProvider,
                 vodPlaybackService,
                 videoStartupService,

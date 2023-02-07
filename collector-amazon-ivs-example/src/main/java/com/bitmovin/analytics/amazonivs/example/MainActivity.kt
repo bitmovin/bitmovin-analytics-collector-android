@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.change_source_button).setOnClickListener {
             Log.d(TAG, "on_create_button_clicked")
-            loadSource(VideoSources.source2)
+            loadSource(VideoSources.liveStream2Source)
             player.play()
         }
         findViewById<Button>(R.id.custom_data_button).setOnClickListener {
