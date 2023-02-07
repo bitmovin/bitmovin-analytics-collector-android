@@ -11,6 +11,7 @@ import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.playback.VodPlaybackService
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.PlayerStates
 import java.nio.ByteBuffer
 
 internal class IvsPlayerListener(
@@ -64,6 +65,7 @@ internal class IvsPlayerListener(
 
     override fun onRebuffering() {
         Log.d(TAG, "onRebuffering")
+        stateMachine.transitionState(PlayerStates.BUFFERING, positionProvider.position)
     }
 
     // This is triggered once the seek completed
