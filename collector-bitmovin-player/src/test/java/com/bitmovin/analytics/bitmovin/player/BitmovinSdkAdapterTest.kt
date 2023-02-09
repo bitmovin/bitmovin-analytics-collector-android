@@ -57,6 +57,7 @@ class BitmovinSdkAdapterTest {
             sourceMap,
             mockk(relaxed = true),
             mockk(relaxed = true),
+            mockk(relaxed = true),
         )
     }
 

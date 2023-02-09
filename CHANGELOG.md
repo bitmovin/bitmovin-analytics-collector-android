@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Allow exoplayer >= v2.17.0 to be used with the collector
+- Tracking of bitmovin player key when it is specified in the manifest
 
 ## v2.13.0
 
