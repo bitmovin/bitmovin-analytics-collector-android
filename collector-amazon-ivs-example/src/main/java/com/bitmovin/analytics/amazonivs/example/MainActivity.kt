@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         collector.attachPlayer(player)
     }
 
-    private fun loadSource(source: Uri = VideoSources.vodSource) {
+    private fun loadSource(source: Uri = VideoSources.liveStream2Source) {
         player.load(source)
     }
 
