@@ -162,9 +162,9 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = 0
-        analytics.sendEventData(data)
-        data.videoTimeStart = stateMachine.videoTimeEnd
+        data.videoTimeStart = stateMachine.videoTimeStart
         data.videoTimeEnd = stateMachine.videoTimeEnd
+        analytics.sendEventData(data)
     }
 
     override fun onVideoChange(stateMachine: PlayerStateMachine) {
@@ -180,9 +180,9 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
             data.subtitleEnabled = oldValue.subtitleEnabled
             data.subtitleLanguage = oldValue.subtitleLanguage
         }
-        analytics.sendEventData(data)
         data.videoTimeStart = stateMachine.videoTimeStart
         data.videoTimeEnd = stateMachine.videoTimeEnd
+        analytics.sendEventData(data)
     }
 
     override fun onAudioTrackChange(stateMachine: PlayerStateMachine) {

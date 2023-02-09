@@ -23,11 +23,9 @@ internal class PlaybackEventDataManipulator(
     private val config: BitmovinAnalyticsConfig,
 ) : EventDataManipulator {
     override fun manipulate(data: EventData) {
-//        data.videoId should it be set by the user or automatically?
+        // TODO: data.videoId should it be set by the user or automatically?
         data.isMuted = player.isMuted
         data.videoDuration = player.duration
-        data.videoPlaybackHeight = player.quality.height
-        data.videoPlaybackWidth = player.quality.width
         setLive(data)
         setUrlInfo(data)
     }

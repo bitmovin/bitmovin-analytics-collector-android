@@ -17,6 +17,7 @@ import java.nio.ByteBuffer
 internal class IvsPlayerListener(
     private val stateMachine: PlayerStateMachine,
     private val positionProvider: PositionProvider,
+    private val playbackQualityProvider: PlaybackQualityProvider,
     private val vodPlaybackService: VodPlaybackService,
     private val videoStartupService: VideoStartupService,
     private val playbackManipulator: PlaybackEventDataManipulator,
@@ -77,11 +78,18 @@ internal class IvsPlayerListener(
         Log.d(TAG, "onVideoSizeChanged")
     }
 
-    override fun onQualityChanged(p0: Quality) {
-        Log.d(TAG, "onQualityChanged")
+    override fun onQualityChanged(newQuality: Quality) {
+        try {
+            Log.d(TAG, "onQualityChanged: $newQuality")
+            stateMachine.videoQualityChanged(positionProvider.position, playbackQualityProvider.didQualityChange(newQuality)) {
+                playbackQualityProvider.currentQuality = newQuality
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, e.message, e)
+        }
     }
 
     companion object {
-        val TAG = "IvsPlayerListener"
+        const val TAG = "IvsPlayerListener"
     }
 }

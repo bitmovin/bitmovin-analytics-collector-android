@@ -14,6 +14,7 @@ import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.playback.VodPlaybackService
 import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
 import com.bitmovin.analytics.amazon.ivs.player.IvsPositionProvider
+import com.bitmovin.analytics.amazon.ivs.player.PlaybackQualityProvider
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
@@ -38,20 +39,23 @@ class AmazonIvsPlayerCollector(
         stateMachine: PlayerStateMachine,
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = AmazonIvsPlayerFeatureFactory(analytics, player)
-        val videoStartupService = VideoStartupService(stateMachine)
+
         val vodPlaybackService = VodPlaybackService(stateMachine)
         val positionProvider = IvsPositionProvider(player)
         val playbackManipulator = PlaybackEventDataManipulator(player, config)
+        val playbackQualityProvider = PlaybackQualityProvider()
+        val videoStartupService = VideoStartupService(stateMachine, player, playbackQualityProvider)
         val playerListener =
             IvsPlayerListener(
                 stateMachine,
                 positionProvider,
+                playbackQualityProvider,
                 vodPlaybackService,
                 videoStartupService,
                 playbackManipulator,
             )
         val playerInfoManipulator = PlayerInfoEventDataManipulator(player)
-        val qualityManipulator = QualityEventDataManipulator(player)
+        val qualityManipulator = QualityEventDataManipulator(player, playbackQualityProvider)
         val userAgentProvider = PlayerUserAgentProvider(context, getPlayerAgent(player))
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val manipulators = listOf(playbackManipulator, playerInfoManipulator, qualityManipulator)
