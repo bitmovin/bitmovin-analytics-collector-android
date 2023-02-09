@@ -86,17 +86,6 @@ publishing {
                 configurationNames.each { configurationName ->
                     configurations[configurationName].allDependencies.each {
 
-                        if ((it.group == 'com.google.android.libraries.cast.companionlibrary' && it.name == 'ccl') ||
-                                (it.group == 'com.android.support' && it.name == 'mediarouter-v7') ||
-                                (it.group == 'com.android.support' && it.name == 'support-v4') ||
-                                (it.group == 'com.android.support' && it.name == 'appcompat-v7') ||
-                                (it.group == 'com.google.android.gms' && it.name == 'play-services-cast-framework') ||
-                                (it.group == 'com.google.ads.interactivemedia.v3' && it.name == 'interactivemedia') ||
-                                (it.group == 'com.google.android.gms' && it.name == 'play-services-ads')) {
-                            return
-                        }
-
-
                         if (it.group == null || it.name == null) {
                             return
                         }
@@ -119,8 +108,8 @@ artifactory {
             // The Artifactory repository key to publish to
             repoKey = rootProject.ext.version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
             username = bitmovinProperties.getProperty('artifactoryUser') // The publisher user name
-            password = bitmovinProperties.getProperty('artifactoryPassword')
-            // The publisher password
+            password = bitmovinProperties.getProperty('artifactoryPassword') // The publisher password
+
             maven = true
         }
         defaults {

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] v1 Collectors
 - [internal] obsolete test dependencies
 - [internal] unnecessary TODOs
+- [internal] cleaned obsolete parts of mavenpublish script
 - AppCompat dependency for exoplayer adapter
 
 ### Changed
