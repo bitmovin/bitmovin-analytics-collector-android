@@ -7,21 +7,23 @@ import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestType
 import com.bitmovin.analytics.utils.HttpClient
 import io.mockk.mockk
-import io.mockk.mockkConstructor
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 
 class ErrorDetailBackendTests {
+
+    lateinit var httpClientMock: HttpClient
+
     @Before
     fun setup() {
-        mockkConstructor(HttpClient::class)
+        httpClientMock = mockk(relaxed = true)
     }
 
     @Test
     fun testCorrectlyLimitsHttpRequestsInQueue() {
-        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk())
+        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk(), httpClientMock)
         val d1 = getErrorDetail(5)
         val d2 = getErrorDetail(5)
         val d3 = getErrorDetail(null)
@@ -98,36 +100,36 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testWontPostWhileDisabled() {
-        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk())
+        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk(), httpClientMock)
         backend.send(getErrorDetail(0))
-        verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
+        verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
     }
 
     @Test
     fun testWillPostWhenEnabled() {
-        val backend = ErrorDetailBackend(CollectorConfig().also { it.backendUrl = "http://localhost" }, mockk(relaxed = true))
+        val backend = ErrorDetailBackend(CollectorConfig().also { it.backendUrl = "http://localhost" }, mockk(relaxed = true), httpClientMock)
         backend.enabled = true
         backend.send(getErrorDetail(0))
-        verify(exactly = 1) { anyConstructed<HttpClient>().post(any(), any(), any()) }
+        verify(exactly = 1) { httpClientMock.post(any(), any(), any()) }
     }
 
     @Test
     fun testWillFlushToHttpClientIfEnabled() {
-        val backend = ErrorDetailBackend(CollectorConfig().also { it.backendUrl = "http://localhost" }, mockk(relaxed = true))
+        val backend = ErrorDetailBackend(CollectorConfig().also { it.backendUrl = "http://localhost" }, mockk(relaxed = true), httpClientMock)
         backend.send(getErrorDetail(0))
         backend.enabled = true
-        verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
+        verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
         backend.flush()
-        verify(exactly = 1) { anyConstructed<HttpClient>().post(any(), any(), any()) }
+        verify(exactly = 1) { httpClientMock.post(any(), any(), any()) }
     }
 
     @Test
     fun testWillRequeueOnFlushIfDisabled() {
-        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk(relaxed = true))
+        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk(relaxed = true), httpClientMock)
         backend.send(getErrorDetail(0))
-        verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
+        verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
         backend.flush()
-        verify(exactly = 0) { anyConstructed<HttpClient>().post(any(), any(), any()) }
+        verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
     }
 
     private fun getErrorDetail(httpRequestCount: Int?) = ErrorDetail("platform", "key", "domain", "impressionId", 0, 0, null, null, ErrorData(), if (httpRequestCount == null) null else (0..httpRequestCount).map { getHttpRequest() }.toMutableList())

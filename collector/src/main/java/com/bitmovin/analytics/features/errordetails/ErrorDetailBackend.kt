@@ -9,12 +9,10 @@ import com.bitmovin.analytics.utils.Util
 import okhttp3.OkHttpClient
 import java.util.LinkedList
 
-class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context) {
+class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context, private val httpClient: HttpClient = HttpClient(context, OkHttpClient())) {
     private val backendUrl = Util.joinUrl(collectorConfig.backendUrl, "/analytics/error")
-    private val httpClient = HttpClient(context, OkHttpClient())
     private val _queue = LinkedList<ErrorDetail>()
     val queue: List<ErrorDetail> = _queue
-
     var enabled: Boolean = false
 
     fun limitHttpRequestsInQueue(max: Int) {
