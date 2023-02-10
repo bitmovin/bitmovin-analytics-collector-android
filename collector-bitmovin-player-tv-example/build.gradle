@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace "com.bitmovin.analytics.bitmovinplayer.tv.example"
     compileSdk 33
 
     defaultConfig {

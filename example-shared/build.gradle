@@ -4,6 +4,8 @@ plugins {
 }
 
 android {
+    namespace "com.bitmovin.analytics.example.shared"
+
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
