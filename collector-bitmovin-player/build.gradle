@@ -5,6 +5,7 @@ apply plugin: 'maven-publish'
 apply from: '../bitmovinpropertiesloader.gradle'
 
 android {
+    namespace "com.bitmovin.analytics.bitmovin.player"
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {

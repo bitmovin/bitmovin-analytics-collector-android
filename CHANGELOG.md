@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Deprecated obsolete PlayerType config in AnalyticsConfig
 
 ### Fixed
+- [internal] reporting of videoTimeStart and videoTimeEnd for audioTrackChange, subtitleChange, qualityChange
 - Allow exoplayer >= v2.17.0 to be used with the collector
 - Tracking of bitmovin player key when it is specified in the manifest
 

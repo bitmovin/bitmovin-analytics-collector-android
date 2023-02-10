@@ -12,12 +12,13 @@ import com.google.android.exoplayer2.ExoPlayer
 class ExoPlayerFeatureFactory(private val analytics: BitmovinAnalytics, private val player: ExoPlayer) : FeatureFactory {
     override fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
-        var httpRequestTracking: HttpRequestTracking? = null
+
         val httpRequestTrackingAdapter = ExoPlayerHttpRequestTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
-        httpRequestTracking = HttpRequestTracking(httpRequestTrackingAdapter)
+        val httpRequestTracking = HttpRequestTracking(httpRequestTrackingAdapter)
 
         val errorDetailsBackend = ErrorDetailBackend(analytics.config.config, analytics.context)
         val errorDetailTracking = ErrorDetailTracking(analytics.context, analytics.config, errorDetailsBackend, httpRequestTracking, analytics.onErrorDetailObservable)
+
         features.add(errorDetailTracking)
         return features
     }

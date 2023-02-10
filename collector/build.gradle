@@ -7,6 +7,7 @@ apply from: '../jacoco.gradle'
 apply from: '../bitmovinpropertiesloader.gradle'
 
 android {
+    namespace "com.bitmovin.analytics"
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
