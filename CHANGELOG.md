@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded gson dependency to v2.8.9
 - Upgraded example apps to latest bitmovin player (v3.29.0) and latest exoplayer (v2.18.2)
 - Deprecated obsolete PlayerType config in AnalyticsConfig
+- use `System.getProperty("http.agent")` for user agent tracking
 
 ### Fixed
 - [internal] reporting of videoTimeStart and videoTimeEnd for audioTrackChange, subtitleChange, qualityChange

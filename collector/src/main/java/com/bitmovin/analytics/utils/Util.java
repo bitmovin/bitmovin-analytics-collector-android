@@ -2,11 +2,16 @@ package com.bitmovin.analytics.utils;
 
 import android.app.UiModeManager;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
+import android.os.Build;
 import android.os.SystemClock;
+import android.util.Log;
 import android.util.Pair;
 
 import com.bitmovin.analytics.BuildConfig;
@@ -186,5 +191,50 @@ public class Util {
         } catch (Exception ignored) {
         }
         return null;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static ApplicationInfo getApplicationInfoOrNull(Context context) {
+        ApplicationInfo applicationInfo = null;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                applicationInfo = context.getPackageManager().getApplicationInfo(
+                        context.getPackageName(),
+                        PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA)
+                );
+            } else {
+                applicationInfo = context.getPackageManager().getApplicationInfo(
+                        context.getPackageName(),
+                        PackageManager.GET_META_DATA
+                );
+            }
+        }catch (PackageManager.NameNotFoundException e ) {
+            Log.d("Util", "Something went wrong while getting application info, e:", e);
+        }
+
+        return applicationInfo;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static PackageInfo getPackageInfoOrNull(Context context) {
+        PackageInfo packageInfo = null;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageInfo = context.getPackageManager().getPackageInfo(
+                        context.getApplicationContext().getPackageName(),
+                        PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA)
+                );
+            } else {
+                packageInfo = context.getPackageManager().getPackageInfo(
+                        context.getApplicationContext().getPackageName(),
+                        0
+                );
+            }
+        }
+        catch (PackageManager.NameNotFoundException e) {
+            Log.d("Util", "Something went wrong while getting package info, e:", e);
+        }
+
+        return packageInfo;
     }
 }

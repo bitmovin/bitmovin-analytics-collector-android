@@ -8,9 +8,11 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.exoplayer.features.ExoPlayerFeatureFactory
-import com.bitmovin.analytics.exoplayer.util.ExoPlayerUserAgentProvider
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.utils.SystemInformationProvider
+import com.bitmovin.analytics.utils.UserAgentProvider
+import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.ExoPlayer
 
 class ExoPlayerCollector
@@ -43,7 +45,11 @@ class ExoPlayerCollector
         stateMachine: PlayerStateMachine,
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = ExoPlayerFeatureFactory(analytics, player)
-        val userAgentProvider = ExoPlayerUserAgentProvider(context)
+        val userAgentProvider = UserAgentProvider(
+            Util.getApplicationInfoOrNull(context),
+            Util.getPackageInfoOrNull(context),
+            SystemInformationProvider.getProperty("http.agent"),
+        )
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val deviceInformationProvider = DeviceInformationProvider(context)
         return ExoPlayerAdapter(

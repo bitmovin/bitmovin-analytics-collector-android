@@ -62,13 +62,19 @@ class EventDataTest {
             DeviceInformation("myManufacturer", "myModel", true, "de", "package-name", 100, 200)
         var randomizedUserIdProvider = RandomizedUserIdIdProvider()
         var randomizedUserIdProvider1 = RandomizedUserIdIdProvider()
-        var eventData = TestFactory.createEventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider).create(
+        var eventData = TestFactory.createEventDataFactory(
+            bitmovinAnalyticsConfig,
+            randomizedUserIdProvider,
+        ).create(
             impressionId,
             null,
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         )
-        var eventData1 = TestFactory.createEventDataFactory(bitmovinAnalyticsConfig, randomizedUserIdProvider).create(
+        var eventData1 = TestFactory.createEventDataFactory(
+            bitmovinAnalyticsConfig,
+            randomizedUserIdProvider,
+        ).create(
             impressionId,
             null,
             deviceInformation,

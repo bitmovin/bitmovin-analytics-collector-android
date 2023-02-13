@@ -47,21 +47,25 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     ): PlayerAdapter
 
     override fun attachPlayer(player: TPlayer) {
+        val stateMachine = createStateMachine()
+        val adapter = createAdapter(player, analytics, stateMachine)
+        analytics.attach(adapter)
+    }
+
+    private fun createStateMachine(): PlayerStateMachine {
         val bufferingTimeoutTimer = ObservableTimer(Util.REBUFFERING_TIMEOUT.toLong(), 1000)
         val qualityChangeCountResetTimer =
             ObservableTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL.toLong(), 1000)
         val qualityChangeEventLimiter = QualityChangeEventLimiter(qualityChangeCountResetTimer)
         val videoStartTimeoutTimer = ObservableTimer(Util.VIDEOSTART_TIMEOUT.toLong(), 1000)
 
-        val stateMachine = PlayerStateMachine(
+        return PlayerStateMachine(
             config,
             analytics,
             bufferingTimeoutTimer,
             qualityChangeEventLimiter,
             videoStartTimeoutTimer,
         )
-        val adapter = createAdapter(player, analytics, stateMachine)
-        analytics.attach(adapter)
     }
 
     override fun detachPlayer() {

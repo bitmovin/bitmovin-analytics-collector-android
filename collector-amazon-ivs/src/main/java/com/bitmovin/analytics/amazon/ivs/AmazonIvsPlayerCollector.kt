@@ -19,7 +19,9 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
-import com.bitmovin.analytics.utils.PlayerUserAgentProvider
+import com.bitmovin.analytics.utils.SystemInformationProvider
+import com.bitmovin.analytics.utils.UserAgentProvider
+import com.bitmovin.analytics.utils.Util
 
 /**
  * Bitmovin Analytics
@@ -56,7 +58,11 @@ class AmazonIvsPlayerCollector(
             )
         val playerInfoManipulator = PlayerInfoEventDataManipulator(player)
         val qualityManipulator = QualityEventDataManipulator(player, playbackQualityProvider)
-        val userAgentProvider = PlayerUserAgentProvider(context, getPlayerAgent(player))
+        val userAgentProvider = UserAgentProvider(
+            Util.getApplicationInfoOrNull(context),
+            Util.getPackageInfoOrNull(context),
+            SystemInformationProvider.getProperty("http.agent"),
+        )
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val manipulators = listOf(playbackManipulator, playerInfoManipulator, qualityManipulator)
         val deviceInformationProvider = DeviceInformationProvider(context)
@@ -72,6 +78,4 @@ class AmazonIvsPlayerCollector(
             manipulators,
         )
     }
-
-    private fun getPlayerAgent(player: Player) = "AmazonIVSPlayer/ ${player.version}"
 }

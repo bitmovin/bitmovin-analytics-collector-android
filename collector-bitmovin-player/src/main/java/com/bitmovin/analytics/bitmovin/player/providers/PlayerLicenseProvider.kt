@@ -1,8 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player.providers
 
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
+import com.bitmovin.analytics.utils.Util.getApplicationInfoOrNull
 import com.bitmovin.player.api.PlayerConfig
 
 /**
@@ -21,18 +20,7 @@ class PlayerLicenseProvider(private val context: Context) {
 
     // Workaround to retrieve PlayerKey from manifest (copied from player)
     private fun getBitmovinLicenseKeyFromAppManifestOrNull() = runCatching {
-        val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.packageManager.getApplicationInfo(
-                context.applicationContext.packageName,
-                PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()),
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            context.packageManager.getApplicationInfo(
-                context.applicationContext.packageName,
-                PackageManager.GET_META_DATA,
-            )
-        }
+        val applicationInfo = getApplicationInfoOrNull(context)
 
         applicationInfo.metaData?.getString(BITMOVIN_PLAYER_LICENSE_KEY)
     }.getOrNull()

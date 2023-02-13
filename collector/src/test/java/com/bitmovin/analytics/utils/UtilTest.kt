@@ -4,8 +4,14 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert
 import org.junit.Test
-import java.lang.Exception
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
 
+@RunWith(
+    RobolectricTestRunner::class,
+)
 class UtilTest {
 
     @Test
@@ -26,7 +32,7 @@ class UtilTest {
         config.isLive = true
 
         val isLive = Util.getIsLiveFromConfigOrPlayer(false, config.isLive, false)
-        assertThat(isLive).isTrue()
+        assertThat(isLive).isTrue
     }
 
     @Test
@@ -36,7 +42,7 @@ class UtilTest {
         config.isLive = false
 
         val isLive = Util.getIsLiveFromConfigOrPlayer(false, config.isLive, false)
-        assertThat(isLive).isFalse()
+        assertThat(isLive).isFalse
     }
 
     @Test
@@ -46,7 +52,7 @@ class UtilTest {
         config.isLive = true
 
         val isLive = Util.getIsLiveFromConfigOrPlayer(true, config.isLive, true)
-        assertThat(isLive).isTrue()
+        assertThat(isLive).isTrue
     }
 
     @Test
@@ -56,7 +62,7 @@ class UtilTest {
         config.isLive = true
 
         val isLive = Util.getIsLiveFromConfigOrPlayer(true, config.isLive, false)
-        assertThat(isLive).isFalse()
+        assertThat(isLive).isFalse
     }
 
     @Test
@@ -90,5 +96,57 @@ class UtilTest {
         Assert.assertEquals(Util.secondsToMillis(null), 0)
         Assert.assertEquals(Util.secondsToMillis(0.0), 0)
         Assert.assertEquals(Util.secondsToMillis(3.5), 3500)
+    }
+
+    @Test
+    @Config(sdk = [33])
+    fun getApplicationInfo_StartingSDK33() {
+        // arrange
+        val context = RuntimeEnvironment.getApplication()
+
+        // act
+        val applicationInfo = Util.getApplicationInfoOrNull(context)
+
+        // assert
+        Assert.assertNotNull(applicationInfo)
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun getApplicationInfo_BeforeSDK33() {
+        // arrange
+        val context = RuntimeEnvironment.getApplication()
+
+        // act
+        val applicationInfo = Util.getApplicationInfoOrNull(context)
+
+        // assert
+        Assert.assertNotNull(applicationInfo)
+    }
+
+    @Test
+    @Config(sdk = [33])
+    fun getPackageInfo_StartingSDK33() {
+        // arrange
+        val context = RuntimeEnvironment.getApplication()
+
+        // act
+        val packageInfo = Util.getPackageInfoOrNull(context)
+
+        // assert
+        Assert.assertNotNull(packageInfo)
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun getPackageInfo_BeforeSDK33() {
+        // arrange
+        val context = RuntimeEnvironment.getApplication()
+
+        // act
+        val packageInfo = Util.getPackageInfoOrNull(context)
+
+        // assert
+        Assert.assertNotNull(packageInfo)
     }
 }

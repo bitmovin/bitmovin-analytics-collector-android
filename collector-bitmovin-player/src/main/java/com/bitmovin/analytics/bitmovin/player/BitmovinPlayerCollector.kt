@@ -12,7 +12,9 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
-import com.bitmovin.analytics.utils.PlayerUserAgentProvider
+import com.bitmovin.analytics.utils.SystemInformationProvider
+import com.bitmovin.analytics.utils.UserAgentProvider
+import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.source.Source
 
@@ -47,7 +49,11 @@ class BitmovinPlayerCollector
         stateMachine: PlayerStateMachine,
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = BitmovinFeatureFactory(analytics, player)
-        val userAgentProvider = PlayerUserAgentProvider(context, getPlayerAgent())
+        val userAgentProvider = UserAgentProvider(
+            Util.getApplicationInfoOrNull(context),
+            Util.getPackageInfoOrNull(context),
+            SystemInformationProvider.getProperty("http.agent"),
+        )
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val deviceInformationProvider = DeviceInformationProvider(context)
         val playerLicenseProvider = PlayerLicenseProvider(context)
@@ -66,6 +72,4 @@ class BitmovinPlayerCollector
     fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata) {
         sourceMetadataMap[playerSource] = sourceMetadata
     }
-
-    private fun getPlayerAgent() = "BitmovinPlayer/" + BitmovinUtil.getPlayerVersion()
 }
