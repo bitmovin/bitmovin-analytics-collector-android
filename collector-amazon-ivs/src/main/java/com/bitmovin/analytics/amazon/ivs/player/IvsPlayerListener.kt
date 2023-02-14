@@ -93,6 +93,8 @@ internal class IvsPlayerListener(
         Log.d(TAG, "onSeekCompleted")
     }
 
+    // onVideoSizeChanged doesn't need to be tracked separately, because
+    // onQualityChanged also fires on size changes
     override fun onVideoSizeChanged(p0: Int, p1: Int) {
         Log.d(TAG, "onVideoSizeChanged")
     }
