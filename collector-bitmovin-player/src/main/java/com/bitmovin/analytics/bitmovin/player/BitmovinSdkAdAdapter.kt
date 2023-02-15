@@ -14,7 +14,7 @@ import com.bitmovin.player.api.event.PlayerEvent
 /**
  * An adapter that maps the Ad Events to the BitmovinAdAnalytics class
  */
-class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
+internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
     private val observableSupport = ObservableSupport<AdAnalyticsEventListener>()
     private val adMapper: AdMapper = AdMapper()
     private val adBreakMapper: AdBreakMapper = AdBreakMapper()

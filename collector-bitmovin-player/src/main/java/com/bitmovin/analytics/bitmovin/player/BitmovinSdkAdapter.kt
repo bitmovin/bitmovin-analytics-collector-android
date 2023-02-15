@@ -36,7 +36,7 @@ import com.bitmovin.player.api.media.subtitle.SubtitleTrack
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceType
 
-class BitmovinSdkAdapter(
+internal class BitmovinSdkAdapter(
     private val player: Player,
     config: BitmovinAnalyticsConfig,
     stateMachine: PlayerStateMachine,

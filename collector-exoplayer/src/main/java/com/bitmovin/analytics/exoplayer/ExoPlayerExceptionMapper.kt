@@ -9,7 +9,7 @@ import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.source.BehindLiveWindowException
 import com.google.android.exoplayer2.upstream.HttpDataSource
 
-class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
+internal class ExoPlayerExceptionMapper : ExceptionMapper<Throwable> {
 
     private val errorMessages = mapOf(
         -1 to "Unknown Error",

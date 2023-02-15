@@ -8,7 +8,7 @@ import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.topOfStacktrace
 import com.bitmovin.player.api.deficiency.ErrorEvent
 
-class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
+internal class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
     override fun map(event: ErrorEvent): ErrorCode {
         var legacyErrorData: LegacyErrorData? = null
         var additionalData: String? = null

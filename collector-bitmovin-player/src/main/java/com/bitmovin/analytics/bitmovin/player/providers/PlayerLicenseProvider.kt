@@ -7,7 +7,7 @@ import com.bitmovin.player.api.PlayerConfig
 /**
  * Provides the player_license in case it is not set through analytics config
  */
-class PlayerLicenseProvider(private val context: Context) {
+internal class PlayerLicenseProvider(private val context: Context) {
     fun getBitmovinPlayerLicenseKey(playerConfig: PlayerConfig): String? {
         if (!playerConfig.key.isNullOrBlank()) {
             return playerConfig.key

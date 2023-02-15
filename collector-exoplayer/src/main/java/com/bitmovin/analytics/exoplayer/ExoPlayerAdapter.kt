@@ -39,7 +39,7 @@ import com.google.android.exoplayer2.source.hls.HlsManifest
 import com.google.android.exoplayer2.source.hls.playlist.HlsMultivariantPlaylist
 import java.util.Date
 
-class ExoPlayerAdapter(
+internal class ExoPlayerAdapter(
     private val exoplayer: ExoPlayer,
     config: BitmovinAnalyticsConfig,
     stateMachine: PlayerStateMachine,

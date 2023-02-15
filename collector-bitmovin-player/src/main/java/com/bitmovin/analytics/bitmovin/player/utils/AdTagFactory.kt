@@ -3,7 +3,7 @@ package com.bitmovin.analytics.bitmovin.player.utils
 import com.bitmovin.analytics.ads.AdTagType
 import com.bitmovin.player.api.advertising.AdTag
 
-class AdTagFactory {
+internal class AdTagFactory {
 
     fun FromPlayerAdTag(adTag: AdTag): AdTagType {
         return when {

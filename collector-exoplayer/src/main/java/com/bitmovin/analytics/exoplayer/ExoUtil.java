@@ -5,8 +5,8 @@ import com.google.android.exoplayer2.Player;
 
 import java.lang.reflect.Field;
 
-public class ExoUtil {
-    public static String exoStateToString(int state) {
+class ExoUtil {
+    static String exoStateToString(int state) {
         switch (state) {
             case Player.STATE_IDLE:
                 return "Idle";
@@ -21,7 +21,7 @@ public class ExoUtil {
         }
     }
 
-    public static String getPlayerVersion() {
+    static String getPlayerVersion() {
         try {
             Field versionField = ExoPlayerLibraryInfo.class.getField("VERSION");
             return (String) versionField.get(null);

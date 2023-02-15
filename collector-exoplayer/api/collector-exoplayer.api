@@ -5,69 +5,9 @@ public final class com/bitmovin/analytics/exoplayer/BuildConfig {
 	public fun <init> ()V
 }
 
-public final class com/bitmovin/analytics/exoplayer/ExoPlayerAdapter : com/bitmovin/analytics/adapters/DefaultPlayerAdapter, com/bitmovin/analytics/data/manipulators/EventDataManipulator {
-	public static final field Companion Lcom/bitmovin/analytics/exoplayer/ExoPlayerAdapter$Companion;
-	public fun <init> (Lcom/google/android/exoplayer2/ExoPlayer;Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Lcom/bitmovin/analytics/features/FeatureFactory;Lcom/bitmovin/analytics/data/EventDataFactory;Lcom/bitmovin/analytics/data/DeviceInformationProvider;)V
-	public fun clearValues ()V
-	public fun getCurrentSourceMetadata ()Lcom/bitmovin/analytics/config/SourceMetadata;
-	public fun getDrmDownloadTime ()Ljava/lang/Long;
-	public fun getPosition ()J
-	public fun init ()Ljava/util/Collection;
-	public fun manipulate (Lcom/bitmovin/analytics/data/EventData;)V
-	public fun release ()V
-	public fun resetSourceRelatedState ()V
-}
-
-public final class com/bitmovin/analytics/exoplayer/ExoPlayerAdapter$Companion {
-}
-
 public final class com/bitmovin/analytics/exoplayer/ExoPlayerCollector : com/bitmovin/analytics/DefaultCollector {
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;)V
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)V
-	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Lcom/bitmovin/analytics/data/DeviceInformationProvider;Lcom/bitmovin/analytics/data/EventDataFactory;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
-}
-
-public final class com/bitmovin/analytics/exoplayer/ExoPlayerExceptionMapper : com/bitmovin/analytics/error/ExceptionMapper {
-	public fun <init> ()V
-	public synthetic fun map (Ljava/lang/Object;)Lcom/bitmovin/analytics/data/ErrorCode;
-	public fun map (Ljava/lang/Throwable;)Lcom/bitmovin/analytics/data/ErrorCode;
-}
-
-public class com/bitmovin/analytics/exoplayer/ExoUtil {
-	public fun <init> ()V
-	public static fun exoStateToString (I)Ljava/lang/String;
-	public static fun getPlayerVersion ()Ljava/lang/String;
-	public static fun getUserAgent (Landroid/content/Context;)Ljava/lang/String;
-}
-
-public final class com/bitmovin/analytics/exoplayer/features/ExoPlayerFeatureFactory : com/bitmovin/analytics/features/FeatureFactory {
-	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/google/android/exoplayer2/ExoPlayer;)V
-	public fun createFeatures ()Ljava/util/Collection;
-}
-
-public final class com/bitmovin/analytics/exoplayer/features/ExoPlayerHttpRequestTrackingAdapter : com/bitmovin/analytics/Observable, com/bitmovin/analytics/OnAnalyticsReleasingEventListener {
-	public static final field Companion Lcom/bitmovin/analytics/exoplayer/features/ExoPlayerHttpRequestTrackingAdapter$Companion;
-	public fun <init> (Lcom/google/android/exoplayer2/ExoPlayer;Lcom/bitmovin/analytics/Observable;)V
-	public fun onReleasing ()V
-	public fun subscribe (Lcom/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventListener;)V
-	public synthetic fun subscribe (Ljava/lang/Object;)V
-	public fun unsubscribe (Lcom/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventListener;)V
-	public synthetic fun unsubscribe (Ljava/lang/Object;)V
-}
-
-public final class com/bitmovin/analytics/exoplayer/features/ExoPlayerHttpRequestTrackingAdapter$Companion {
-}
-
-public final class com/bitmovin/analytics/exoplayer/manipulators/BitrateEventDataManipulator : com/bitmovin/analytics/data/manipulators/EventDataManipulator {
-	public fun <init> (Lcom/google/android/exoplayer2/ExoPlayer;)V
-	public final fun getCurrentAudioFormat ()Lcom/google/android/exoplayer2/Format;
-	public final fun getCurrentVideoFormat ()Lcom/google/android/exoplayer2/Format;
-	public final fun hasAudioFormatChanged (Lcom/google/android/exoplayer2/Format;)Z
-	public final fun hasVideoFormatChanged (Lcom/google/android/exoplayer2/Format;)Z
-	public fun manipulate (Lcom/bitmovin/analytics/data/EventData;)V
-	public final fun reset ()V
-	public final fun setCurrentAudioFormat (Lcom/google/android/exoplayer2/Format;)V
-	public final fun setCurrentVideoFormat (Lcom/google/android/exoplayer2/Format;)V
-	public final fun setFormatsFromPlayer ()V
+	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
 }
 

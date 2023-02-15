@@ -5,7 +5,7 @@ import com.bitmovin.player.api.advertising.LinearAd
 import com.bitmovin.player.api.advertising.ima.ImaAdData
 import com.bitmovin.player.api.advertising.vast.VastAdData
 
-class AdMapper {
+internal class AdMapper {
 
     fun fromPlayerAd(playerAd: com.bitmovin.player.api.advertising.Ad): Ad {
         return fromPlayerAd(Ad(), playerAd)

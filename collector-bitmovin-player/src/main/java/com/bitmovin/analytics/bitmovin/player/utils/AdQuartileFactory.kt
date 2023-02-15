@@ -2,7 +2,7 @@ package com.bitmovin.analytics.bitmovin.player.utils
 
 import com.bitmovin.analytics.ads.AdQuartile
 
-class AdQuartileFactory {
+internal class AdQuartileFactory {
 
     fun FromPlayerAdQuartile(playerAdQuartle: com.bitmovin.player.api.advertising.AdQuartile): AdQuartile {
         return when (playerAdQuartle) {

@@ -187,6 +187,7 @@ apiValidation {
                         "collector-exoplayer-example",
                         "collector-amazon-ivs-example",
                         "collector-amazon-ivs",
+                        "collector",    // excluded until we have a better structure with internal package
                         "example-shared"]
 }
 

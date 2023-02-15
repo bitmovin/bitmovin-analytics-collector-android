@@ -25,7 +25,7 @@ class UserAgentProviderTest {
 
     @Test
     @Config(sdk = [33])
-    fun `userAgentProvider_generatesUserAgentWhenSystemPropertyIsNull`() {
+    fun `userAgentProvider_generatesUserAgentWhenSystemPropertyIsNull_onSdk33`() {
         // arrange
         val applicationInfo = ApplicationInfo()
         applicationInfo.labelRes = 0
@@ -39,20 +39,23 @@ class UserAgentProviderTest {
     }
 
     @Test
-    @Config(sdk = [33])
-    fun `userAgentProvider_returnsValueFromSystemProperty`() {
+    @Config(sdk = [16])
+    fun `userAgentProvider_generatesUserAgentWhenSystemPropertyIsNull_onMinSdk`() {
         // arrange
         val applicationInfo = ApplicationInfo()
+        applicationInfo.labelRes = 0
+        applicationInfo.nonLocalizedLabel = "test"
         val packageInfo = PackageInfo()
-        val userAgentProvider = UserAgentProvider(applicationInfo, packageInfo, "test-user-agent")
+        packageInfo.versionName = "1"
+        val userAgentProvider = UserAgentProvider(applicationInfo, packageInfo, null)
 
         // act & assert
-        Assert.assertEquals("test-user-agent", userAgentProvider.userAgent)
+        Assert.assertEquals("test/1 (Linux;Android 4.1.2)", userAgentProvider.userAgent)
     }
 
     @Test
-    @Config(minSdk = 16)
-    fun `userAgentProvider_returnsValueFromSystemProperty_minSdk16`() {
+    @Config(sdk = [33])
+    fun `userAgentProvider_returnsValueFromSystemProperty`() {
         // arrange
         val applicationInfo = ApplicationInfo()
         val packageInfo = PackageInfo()

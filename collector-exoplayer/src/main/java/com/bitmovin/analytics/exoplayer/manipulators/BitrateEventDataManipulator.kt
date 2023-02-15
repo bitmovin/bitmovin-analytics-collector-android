@@ -7,7 +7,7 @@ import com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 
-class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataManipulator {
+internal class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataManipulator {
     var currentAudioFormat: Format? = null
     var currentVideoFormat: Format? = null
 

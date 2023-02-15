@@ -9,7 +9,7 @@ import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.google.android.exoplayer2.ExoPlayer
 
-class ExoPlayerFeatureFactory(private val analytics: BitmovinAnalytics, private val player: ExoPlayer) : FeatureFactory {
+internal class ExoPlayerFeatureFactory(private val analytics: BitmovinAnalytics, private val player: ExoPlayer) : FeatureFactory {
     override fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
 

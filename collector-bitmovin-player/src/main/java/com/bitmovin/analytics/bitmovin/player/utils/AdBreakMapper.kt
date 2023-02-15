@@ -7,7 +7,7 @@ import com.bitmovin.player.api.advertising.AdConfig
 import com.bitmovin.player.api.advertising.ima.ImaAdBreak
 import java.util.ArrayList
 
-class AdBreakMapper {
+internal class AdBreakMapper {
 
     fun fromPlayerAdConfiguration(adConfig: AdConfig): AdBreak {
         val collectorAdBreak = AdBreak("notset", ArrayList<Ad>() as List<Ad>)

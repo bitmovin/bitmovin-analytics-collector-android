@@ -9,7 +9,7 @@ import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.player.api.Player
 
-class BitmovinFeatureFactory(private val analytics: BitmovinAnalytics, private val player: Player) : FeatureFactory {
+internal class BitmovinFeatureFactory(private val analytics: BitmovinAnalytics, private val player: Player) : FeatureFactory {
     override fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
         val httpRequestTrackingAdapter = BitmovinHttpRequestTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)

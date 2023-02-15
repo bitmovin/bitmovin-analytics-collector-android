@@ -1,54 +1,8 @@
 public final class com/bitmovin/analytics/bitmovin/player/BitmovinPlayerCollector : com/bitmovin/analytics/DefaultCollector {
-	public static final field Companion Lcom/bitmovin/analytics/bitmovin/player/BitmovinPlayerCollector$Companion;
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;)V
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)V
 	public final fun addSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/config/SourceMetadata;)V
-	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Lcom/bitmovin/analytics/data/DeviceInformationProvider;Lcom/bitmovin/analytics/data/EventDataFactory;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/BitmovinPlayerCollector$Companion {
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/BitmovinPlayerExceptionMapper : com/bitmovin/analytics/error/ExceptionMapper {
-	public fun <init> ()V
-	public fun map (Lcom/bitmovin/player/api/deficiency/ErrorEvent;)Lcom/bitmovin/analytics/data/ErrorCode;
-	public synthetic fun map (Ljava/lang/Object;)Lcom/bitmovin/analytics/data/ErrorCode;
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/BitmovinSdkAdAdapter : com/bitmovin/analytics/adapters/AdAdapter {
-	public fun <init> (Lcom/bitmovin/player/api/Player;)V
-	public final fun getBitmovinPlayer ()Lcom/bitmovin/player/api/Player;
-	public fun getModuleInformation ()Lcom/bitmovin/analytics/data/AdModuleInformation;
-	public fun isAutoplayEnabled ()Ljava/lang/Boolean;
-	public fun isLinearAdActive ()Z
-	public fun release ()V
-	public fun subscribe (Lcom/bitmovin/analytics/adapters/AdAnalyticsEventListener;)V
-	public synthetic fun subscribe (Ljava/lang/Object;)V
-	public fun unsubscribe (Lcom/bitmovin/analytics/adapters/AdAnalyticsEventListener;)V
-	public synthetic fun unsubscribe (Ljava/lang/Object;)V
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/BitmovinSdkAdapter : com/bitmovin/analytics/adapters/DefaultPlayerAdapter, com/bitmovin/analytics/data/manipulators/EventDataManipulator {
-	public static final field Companion Lcom/bitmovin/analytics/bitmovin/player/BitmovinSdkAdapter$Companion;
-	public fun <init> (Lcom/bitmovin/player/api/Player;Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;Lcom/bitmovin/analytics/features/FeatureFactory;Ljava/util/Map;Lcom/bitmovin/analytics/data/EventDataFactory;Lcom/bitmovin/analytics/data/DeviceInformationProvider;)V
-	public fun clearValues ()V
-	public fun createAdAdapter ()Lcom/bitmovin/analytics/adapters/AdAdapter;
-	public fun getCurrentSourceMetadata ()Lcom/bitmovin/analytics/config/SourceMetadata;
-	public fun getDrmDownloadTime ()Ljava/lang/Long;
-	public fun getPosition ()J
-	public fun init ()Ljava/util/Collection;
-	public fun manipulate (Lcom/bitmovin/analytics/data/EventData;)V
-	public fun release ()V
-	public fun resetSourceRelatedState ()V
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/BitmovinSdkAdapter$Companion {
-}
-
-public class com/bitmovin/analytics/bitmovin/player/BitmovinUtil {
-	public fun <init> ()V
-	public static fun getCurrentTimeInMs (Lcom/bitmovin/player/api/Player;)J
-	public static fun getPlayerVersion ()Ljava/lang/String;
+	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
 }
 
 public final class com/bitmovin/analytics/bitmovin/player/BuildConfig {
@@ -56,44 +10,5 @@ public final class com/bitmovin/analytics/bitmovin/player/BuildConfig {
 	public static final field DEBUG Z
 	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
 	public fun <init> ()V
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/features/BitmovinFeatureFactory : com/bitmovin/analytics/features/FeatureFactory {
-	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/player/api/Player;)V
-	public fun createFeatures ()Ljava/util/Collection;
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/features/BitmovinHttpRequestTrackingAdapter : com/bitmovin/analytics/Observable, com/bitmovin/analytics/OnAnalyticsReleasingEventListener {
-	public static final field Companion Lcom/bitmovin/analytics/bitmovin/player/features/BitmovinHttpRequestTrackingAdapter$Companion;
-	public fun <init> (Lcom/bitmovin/player/api/Player;Lcom/bitmovin/analytics/Observable;)V
-	public fun onReleasing ()V
-	public fun subscribe (Lcom/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventListener;)V
-	public synthetic fun subscribe (Ljava/lang/Object;)V
-	public fun unsubscribe (Lcom/bitmovin/analytics/features/httprequesttracking/OnDownloadFinishedEventListener;)V
-	public synthetic fun unsubscribe (Ljava/lang/Object;)V
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/features/BitmovinHttpRequestTrackingAdapter$Companion {
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/utils/AdBreakMapper {
-	public fun <init> ()V
-	public final fun fromPlayerAdConfiguration (Lcom/bitmovin/player/api/advertising/AdConfig;)Lcom/bitmovin/analytics/ads/AdBreak;
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/utils/AdMapper {
-	public fun <init> ()V
-	public final fun fromPlayerAd (Lcom/bitmovin/analytics/ads/Ad;Lcom/bitmovin/player/api/advertising/Ad;)Lcom/bitmovin/analytics/ads/Ad;
-	public final fun fromPlayerAd (Lcom/bitmovin/player/api/advertising/Ad;)Lcom/bitmovin/analytics/ads/Ad;
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/utils/AdQuartileFactory {
-	public fun <init> ()V
-	public final fun FromPlayerAdQuartile (Lcom/bitmovin/player/api/advertising/AdQuartile;)Lcom/bitmovin/analytics/ads/AdQuartile;
-}
-
-public final class com/bitmovin/analytics/bitmovin/player/utils/AdTagFactory {
-	public fun <init> ()V
-	public final fun FromPlayerAdTag (Lcom/bitmovin/player/api/advertising/AdTag;)Lcom/bitmovin/analytics/ads/AdTagType;
 }
 
