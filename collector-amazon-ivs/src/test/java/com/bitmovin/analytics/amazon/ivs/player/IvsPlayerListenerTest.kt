@@ -2,7 +2,6 @@ package com.bitmovin.analytics.amazon.ivs.player
 
 import com.amazonaws.ivs.player.PlayerException
 import com.amazonaws.ivs.player.Quality
-import com.bitmovin.analytics.amazon.ivs.manipulators.PlaybackEventDataManipulator
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.playback.VodPlaybackService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
@@ -56,7 +55,11 @@ class IvsPlayerListenerTest {
     fun testOnQualityChange_ShouldTransitionStateToQualityChange() {
         // arrange
         val playbackQualityProvider = PlaybackQualityProvider()
-        val playerListener = createPlayerListener(stateMachineMock, positionProviderMock, playbackQualityProvider)
+        val playerListener = createPlayerListener(
+            stateMachineMock,
+            positionProviderMock,
+            playbackQualityProvider,
+        )
         every { positionProviderMock.position }.returns(123L)
 
         val qualityMock = mockk<Quality>(relaxed = true)
@@ -72,7 +75,11 @@ class IvsPlayerListenerTest {
     fun testOnQualityChange_ShouldNotHaveQualityChange_WithSameQuality() {
         // arrange
         val playbackQualityProvider = PlaybackQualityProvider()
-        val playerListener = createPlayerListener(stateMachineMock, positionProviderMock, playbackQualityProvider)
+        val playerListener = createPlayerListener(
+            stateMachineMock,
+            positionProviderMock,
+            playbackQualityProvider,
+        )
         every { positionProviderMock.position }.returns(123L)
 
         val qualityMock = mockk<Quality>(relaxed = true)
@@ -91,8 +98,7 @@ class IvsPlayerListenerTest {
         playbackQualityProvider: PlaybackQualityProvider = mockk(relaxed = true),
         vodPlaybackService: VodPlaybackService = mockk(relaxed = true),
         videoStartupService: VideoStartupService = mockk(relaxed = true),
-        playbackManipulator: PlaybackEventDataManipulator = mockk(relaxed = true),
     ): IvsPlayerListener {
-        return IvsPlayerListener(stateMachine, positionProvider, playbackQualityProvider, vodPlaybackService, videoStartupService, playbackManipulator)
+        return IvsPlayerListener(stateMachine, positionProvider, playbackQualityProvider, vodPlaybackService, videoStartupService)
     }
 }

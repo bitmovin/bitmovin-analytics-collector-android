@@ -54,7 +54,6 @@ class AmazonIvsPlayerCollector(
                 playbackQualityProvider,
                 vodPlaybackService,
                 videoStartupService,
-                playbackManipulator,
             )
         val playerInfoManipulator = PlayerInfoEventDataManipulator(player)
         val qualityManipulator = QualityEventDataManipulator(player, playbackQualityProvider)

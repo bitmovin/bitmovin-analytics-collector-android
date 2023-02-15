@@ -6,7 +6,6 @@ import com.amazonaws.ivs.player.Player
 import com.amazonaws.ivs.player.PlayerException
 import com.amazonaws.ivs.player.Quality
 import com.bitmovin.analytics.amazon.ivs.AmazonIvsPlayerExceptionMapper
-import com.bitmovin.analytics.amazon.ivs.manipulators.PlaybackEventDataManipulator
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.playback.VodPlaybackService
 import com.bitmovin.analytics.error.ExceptionMapper
@@ -39,24 +38,9 @@ internal class IvsPlayerListener(
     private val playbackQualityProvider: PlaybackQualityProvider,
     private val vodPlaybackService: VodPlaybackService,
     private val videoStartupService: VideoStartupService,
-    private val playbackManipulator: PlaybackEventDataManipulator,
 ) : Player.Listener() {
 
     private val exceptionMapper: ExceptionMapper<PlayerException> = AmazonIvsPlayerExceptionMapper()
-
-    // not dispatched for live stream
-    override fun onAnalyticsEvent(name: String, properties: String) {
-        Log.d(TAG, "onAnalyticsEvent name: $name, properties: $properties")
-        val analyticsEvent = AnalyticsEvent(properties)
-        playbackManipulator.onAnalyticsEvent(name, analyticsEvent)
-    }
-
-    override fun onMetadata(mediaType: String, data: ByteBuffer) {
-        Log.d(
-            TAG,
-            "onMetadata mediaType: $mediaType, data: ${String(data.array())}",
-        )
-    }
 
     override fun onCue(p0: Cue) {
     }
@@ -113,4 +97,18 @@ internal class IvsPlayerListener(
     companion object {
         const val TAG = "IvsPlayerListener"
     }
+
+    // #region internal API
+
+    override fun onAnalyticsEvent(name: String, properties: String) {
+        // Do not use this method
+        // not part of public API and vulnerable to changes
+    }
+
+    override fun onMetadata(mediaType: String, data: ByteBuffer) {
+        // Do not use this method
+        // not part of public API and vulnerable to changes
+    }
+
+    // #endregion
 }
