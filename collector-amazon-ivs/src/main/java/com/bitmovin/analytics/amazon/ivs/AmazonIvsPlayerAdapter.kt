@@ -61,8 +61,9 @@ internal class AmazonIvsPlayerAdapter(
 
     override val drmDownloadTime: Long?
         get() = null
+
     override val currentSourceMetadata: SourceMetadata?
-        get() = null
+        get() = null // not supported by IVS player
 
     override fun resetSourceRelatedState() {
         // this method is called on state machine init, on buffering timeout and on source change

@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.amazon.ivs.AmazonIvsPlayerCollector
-import com.bitmovin.analytics.enums.CDNProvider
 
 // source: https://github.com/aws-samples/amazon-ivs-player-android-sample
 class MainActivity : AppCompatActivity() {
@@ -71,12 +70,12 @@ class MainActivity : AppCompatActivity() {
             loadSource()
         }
         findViewById<Button>(R.id.change_source_button).setOnClickListener {
-            Log.d(TAG, "on_create_button_clicked")
+            Log.d(TAG, "on_change_source_button_clicked")
             loadSource(VideoSources.liveStream2Source)
             player.play()
         }
         findViewById<Button>(R.id.custom_data_button).setOnClickListener {
-            Log.d(TAG, "on_create_button_clicked")
+            Log.d(TAG, "on_custom_data_button_clicked")
         }
     }
 
@@ -104,10 +103,8 @@ class MainActivity : AppCompatActivity() {
         val bitmovinAnalyticsConfig =
             BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
 
-        bitmovinAnalyticsConfig.videoId = "androidVideoDASHStatic"
         bitmovinAnalyticsConfig.title = "Android Amazon IVS player video"
         bitmovinAnalyticsConfig.customUserId = "customBitmovinUserId1"
-        bitmovinAnalyticsConfig.cdnProvider = CDNProvider.BITMOVIN
         bitmovinAnalyticsConfig.experimentName = "experiment-1"
         bitmovinAnalyticsConfig.customData1 = "customData1"
         bitmovinAnalyticsConfig.customData2 = "customData2"
@@ -116,9 +113,8 @@ class MainActivity : AppCompatActivity() {
         bitmovinAnalyticsConfig.customData5 = "customData5"
         bitmovinAnalyticsConfig.customData6 = "customData6"
         bitmovinAnalyticsConfig.customData7 = "customData7"
-        bitmovinAnalyticsConfig.path = "/vod/new/"
-        bitmovinAnalyticsConfig.ads = false
-        bitmovinAnalyticsConfig.isLive = false
+        bitmovinAnalyticsConfig.path = "/customPath/new/"
+        bitmovinAnalyticsConfig.m3u8Url = VideoSources.liveStream2Source.toString()
 
         return bitmovinAnalyticsConfig
     }

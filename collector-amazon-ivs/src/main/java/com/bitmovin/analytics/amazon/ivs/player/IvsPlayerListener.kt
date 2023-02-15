@@ -57,8 +57,9 @@ internal class IvsPlayerListener(
             Log.d(TAG, "onStateChanged state: $state, position: ${positionProvider.position} ")
             if (!stateMachine.isStartupFinished) {
                 videoStartupService.onStateChange(state, positionProvider.position)
+            } else {
+                playbackService.onStateChange(state, positionProvider.position)
             }
-            playbackService.onStateChange(state, positionProvider.position)
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while doing state transitions, e: ${e.message}", e)
         }

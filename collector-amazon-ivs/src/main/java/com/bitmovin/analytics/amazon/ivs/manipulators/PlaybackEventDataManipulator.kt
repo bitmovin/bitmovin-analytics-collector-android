@@ -6,6 +6,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.amazon.ivs.Utils
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.enums.StreamFormat
 
 /**
  * Manipulator for playback info
@@ -26,6 +27,10 @@ internal class PlaybackEventDataManipulator(
         try {
             data.isMuted = player.isMuted
             data.videoDuration = player.duration
+
+            // IVS player only supports HLS, thus we hardcode it here
+            data.streamFormat = StreamFormat.HLS.value
+
             setVideoId(data)
             setLive(data)
         } catch (e: Exception) {
