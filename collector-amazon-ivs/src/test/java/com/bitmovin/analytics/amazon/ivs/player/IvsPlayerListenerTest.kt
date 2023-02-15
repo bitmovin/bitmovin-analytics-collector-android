@@ -2,8 +2,8 @@ package com.bitmovin.analytics.amazon.ivs.player
 
 import com.amazonaws.ivs.player.PlayerException
 import com.amazonaws.ivs.player.Quality
+import com.bitmovin.analytics.amazon.ivs.playback.PlaybackService
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
-import com.bitmovin.analytics.amazon.ivs.playback.VodPlaybackService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import io.mockk.every
@@ -72,6 +72,40 @@ class IvsPlayerListenerTest {
     }
 
     @Test
+    fun testOnSeekCompleted_ShouldTransitionStateToSeekingForVOD() {
+        // arrange
+        val playbackQualityProvider = PlaybackQualityProvider()
+        val playerListener = createPlayerListener(stateMachineMock, positionProviderMock, playbackQualityProvider)
+        every { positionProviderMock.position }.returns(123L)
+
+        // to update duration
+        playerListener.onDurationChanged(123L)
+
+        // act
+        playerListener.onSeekCompleted(44L)
+
+        // assert
+        verify(exactly = 1) { stateMachineMock.transitionState(PlayerStates.SEEKING, 123L) }
+    }
+
+    @Test
+    fun testOnSeekCompleted_ShouldNotTransitionStateToSeekingForLive() {
+        // arrange
+        val playbackQualityProvider = PlaybackQualityProvider()
+        val playerListener = createPlayerListener(stateMachineMock, positionProviderMock, playbackQualityProvider)
+        every { positionProviderMock.position }.returns(123L)
+
+        // to update duration
+        playerListener.onDurationChanged(-1L)
+
+        // act
+        playerListener.onSeekCompleted(44L)
+
+        // assert
+        verify(exactly = 0) { stateMachineMock.transitionState(PlayerStates.SEEKING, any()) }
+    }
+
+    @Test
     fun testOnQualityChange_ShouldNotHaveQualityChange_WithSameQuality() {
         // arrange
         val playbackQualityProvider = PlaybackQualityProvider()
@@ -96,9 +130,9 @@ class IvsPlayerListenerTest {
         stateMachine: PlayerStateMachine = mockk(relaxed = true),
         positionProvider: PositionProvider = mockk(relaxed = true),
         playbackQualityProvider: PlaybackQualityProvider = mockk(relaxed = true),
-        vodPlaybackService: VodPlaybackService = mockk(relaxed = true),
+        playbackService: PlaybackService = mockk(relaxed = true),
         videoStartupService: VideoStartupService = mockk(relaxed = true),
     ): IvsPlayerListener {
-        return IvsPlayerListener(stateMachine, positionProvider, playbackQualityProvider, vodPlaybackService, videoStartupService)
+        return IvsPlayerListener(stateMachine, positionProvider, playbackQualityProvider, playbackService, videoStartupService)
     }
 }

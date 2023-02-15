@@ -2,6 +2,7 @@ package com.bitmovin.analytics.amazon.ivs.manipulators
 
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.amazon.ivs.Utils
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 
@@ -58,12 +59,8 @@ internal class PlaybackEventDataManipulator(
         if (configIsLive != null) {
             data.isLive = configIsLive
         } else {
-            data.isLive = isPlaybackLive(player)
+            data.isLive = Utils.isPlaybackLive(player.duration)
         }
-    }
-
-    private fun isPlaybackLive(player: Player): Boolean {
-        return player.duration == -1L
     }
 
     companion object {

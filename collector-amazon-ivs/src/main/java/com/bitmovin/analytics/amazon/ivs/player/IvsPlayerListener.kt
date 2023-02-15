@@ -6,8 +6,9 @@ import com.amazonaws.ivs.player.Player
 import com.amazonaws.ivs.player.PlayerException
 import com.amazonaws.ivs.player.Quality
 import com.bitmovin.analytics.amazon.ivs.AmazonIvsPlayerExceptionMapper
+import com.bitmovin.analytics.amazon.ivs.Utils
+import com.bitmovin.analytics.amazon.ivs.playback.PlaybackService
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
-import com.bitmovin.analytics.amazon.ivs.playback.VodPlaybackService
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
@@ -36,24 +37,26 @@ internal class IvsPlayerListener(
     private val stateMachine: PlayerStateMachine,
     private val positionProvider: PositionProvider,
     private val playbackQualityProvider: PlaybackQualityProvider,
-    private val vodPlaybackService: VodPlaybackService,
+    private val playbackService: PlaybackService,
     private val videoStartupService: VideoStartupService,
 ) : Player.Listener() {
 
     private val exceptionMapper: ExceptionMapper<PlayerException> = AmazonIvsPlayerExceptionMapper()
+    private var duration: Long? = null
 
     override fun onCue(p0: Cue) {
     }
 
     override fun onDurationChanged(duration: Long) {
         Log.d(TAG, "onDurationChanged $duration")
+        this.duration = duration
     }
 
     override fun onStateChanged(state: Player.State) {
         Log.d(TAG, "onStateChanged state: $state, position: ${positionProvider.position} ")
 
         videoStartupService.onStateChange(state, positionProvider.position)
-        vodPlaybackService.onStateChange(state, positionProvider.position)
+        playbackService.onStateChange(state, positionProvider.position)
     }
 
     override fun onError(pe: PlayerException) {
@@ -72,9 +75,16 @@ internal class IvsPlayerListener(
         stateMachine.transitionState(PlayerStates.BUFFERING, positionProvider.position)
     }
 
-    // This is triggered once the seek completed
-    override fun onSeekCompleted(p0: Long) {
+    override fun onSeekCompleted(positionInMs: Long) {
         Log.d(TAG, "onSeekCompleted")
+        // player does not support DVR mode so it's not possible to seek on live streams using UI
+        // all seeking events on live stream are usually caused by pausing stream and then resuming playing
+        // since player is trying to catch up with live edge
+        if (duration?.let { Utils.isPlaybackLive(it) } == false) {
+            val stateBeforeSeek = stateMachine.currentState
+            stateMachine.transitionState(PlayerStates.SEEKING, positionProvider.position)
+            stateMachine.transitionState(stateBeforeSeek, positionProvider.position)
+        }
     }
 
     // onVideoSizeChanged doesn't need to be tracked separately, because
