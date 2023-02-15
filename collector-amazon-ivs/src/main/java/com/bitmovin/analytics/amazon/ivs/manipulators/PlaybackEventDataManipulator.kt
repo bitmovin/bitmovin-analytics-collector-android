@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.amazon.ivs.manipulators
 
+import android.util.Log
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.amazon.ivs.Utils
@@ -22,10 +23,14 @@ internal class PlaybackEventDataManipulator(
     private val config: BitmovinAnalyticsConfig,
 ) : EventDataManipulator {
     override fun manipulate(data: EventData) {
-        data.isMuted = player.isMuted
-        data.videoDuration = player.duration
-        setVideoId(data)
-        setLive(data)
+        try {
+            data.isMuted = player.isMuted
+            data.videoDuration = player.duration
+            setVideoId(data)
+            setLive(data)
+        } catch (e: Exception) {
+            Log.e("PlaybackDataManipulator", "Something went wrong while setting playback event data, e: ${e.message}", e)
+        }
     }
 
     private fun setVideoId(data: EventData) {

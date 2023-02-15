@@ -53,10 +53,15 @@ internal class IvsPlayerListener(
     }
 
     override fun onStateChanged(state: Player.State) {
-        Log.d(TAG, "onStateChanged state: $state, position: ${positionProvider.position} ")
-
-        videoStartupService.onStateChange(state, positionProvider.position)
-        playbackService.onStateChange(state, positionProvider.position)
+        try {
+            Log.d(TAG, "onStateChanged state: $state, position: ${positionProvider.position} ")
+            if (!stateMachine.isStartupFinished) {
+                videoStartupService.onStateChange(state, positionProvider.position)
+            }
+            playbackService.onStateChange(state, positionProvider.position)
+        } catch (e: Exception) {
+            Log.e(TAG, "Something went wrong while doing state transitions, e: ${e.message}", e)
+        }
     }
 
     override fun onError(pe: PlayerException) {
@@ -66,24 +71,32 @@ internal class IvsPlayerListener(
             // TODO: discuss if we need to set VideoStartFailedReason similar as we do with exoplayer and bitmovin player
             stateMachine.error(positionProvider.position, errorCode)
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            Log.e(TAG, "Something went wrong while processing error, e: ${e.message}", e)
         }
     }
 
     override fun onRebuffering() {
         Log.d(TAG, "onRebuffering")
-        stateMachine.transitionState(PlayerStates.BUFFERING, positionProvider.position)
+        try {
+            stateMachine.transitionState(PlayerStates.BUFFERING, positionProvider.position)
+        } catch (e: Exception) {
+            Log.e(TAG, "Something went wrong while processing buffering, e: ${e.message}", e)
+        }
     }
 
     override fun onSeekCompleted(positionInMs: Long) {
-        Log.d(TAG, "onSeekCompleted")
-        // player does not support DVR mode so it's not possible to seek on live streams using UI
-        // all seeking events on live stream are usually caused by pausing stream and then resuming playing
-        // since player is trying to catch up with live edge
-        if (duration?.let { Utils.isPlaybackLive(it) } == false) {
-            val stateBeforeSeek = stateMachine.currentState
-            stateMachine.transitionState(PlayerStates.SEEKING, positionProvider.position)
-            stateMachine.transitionState(stateBeforeSeek, positionProvider.position)
+        try {
+            Log.d(TAG, "onSeekCompleted")
+            // player does not support DVR mode so it's not possible to seek on live streams using UI
+            // all seeking events on live stream are usually caused by pausing stream and then resuming playing
+            // since player is trying to catch up with live edge
+            if (duration?.let { Utils.isPlaybackLive(it) } == false) {
+                val stateBeforeSeek = stateMachine.currentState
+                stateMachine.transitionState(PlayerStates.SEEKING, positionProvider.position)
+                stateMachine.transitionState(stateBeforeSeek, positionProvider.position)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Something went wrong while processing seeking, e: ${e.message}", e)
         }
     }
 
@@ -100,7 +113,7 @@ internal class IvsPlayerListener(
                 playbackQualityProvider.currentQuality = newQuality
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            Log.e(TAG, "Something went wrong while processing quality change, e: ${e.message}", e)
         }
     }
 

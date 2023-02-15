@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.amazon.ivs.manipulators
 
+import android.util.Log
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.amazon.ivs.player.PlaybackQualityProvider
 import com.bitmovin.analytics.data.EventData
@@ -16,22 +17,26 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulator
  */
 internal class QualityEventDataManipulator(private val player: Player, private val playbackQualityProvider: PlaybackQualityProvider) : EventDataManipulator {
     override fun manipulate(data: EventData) {
-        data.droppedFrames = getAndSetDroppedFrames(player.statistics.droppedFrames)
+        try {
+            data.droppedFrames = getAndSetDroppedFrames(player.statistics.droppedFrames)
 
-        // we use the quality data to track stream quality which represents what's coming from the manifest
-        // compared to statistics which shows actual played bitrate for example
-        val currentQuality = playbackQualityProvider.currentQuality
+            // we use the quality data to track stream quality which represents what's coming from the manifest
+            // compared to statistics which shows actual played bitrate for example
+            val currentQuality = playbackQualityProvider.currentQuality
 
-        if (currentQuality != null) {
-            // quality.bitrate is the media bitrate which is including video and audio bitrate
-            // the api doesn't support tracking both separately
-            data.videoBitrate = currentQuality.bitrate
-            data.videoPlaybackWidth = currentQuality.width
-            data.videoPlaybackHeight = currentQuality.height
+            if (currentQuality != null) {
+                // quality.bitrate is the media bitrate which is including video and audio bitrate
+                // the api doesn't support tracking both separately
+                data.videoBitrate = currentQuality.bitrate
+                data.videoPlaybackWidth = currentQuality.width
+                data.videoPlaybackHeight = currentQuality.height
 
-            val codecInfo = extractCodecInfo(currentQuality.codecs)
-            data.audioCodec = codecInfo.audioCodec
-            data.videoCodec = codecInfo.videoCodec
+                val codecInfo = extractCodecInfo(currentQuality.codecs)
+                data.audioCodec = codecInfo.audioCodec
+                data.videoCodec = codecInfo.videoCodec
+            }
+        } catch (e: Exception) {
+            Log.e("QualityDataManipulator", "Something went wrong while setting quality event data, e: ${e.message}", e)
         }
     }
 

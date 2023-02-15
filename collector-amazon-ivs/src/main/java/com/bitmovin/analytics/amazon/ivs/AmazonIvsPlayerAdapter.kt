@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.amazon.ivs
 
+import android.util.Log
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
@@ -32,38 +33,49 @@ internal class AmazonIvsPlayerAdapter(
     deviceInformationProvider,
 ) {
     init {
-        player.addListener(playerListener)
-        videoStartupService.checkStartup(player.state, player.position)
+        try {
+            player.addListener(playerListener)
+            videoStartupService.checkStartup(player.state, player.position)
+        } catch (e: Exception) {
+            Log.e(TAG, "Something went wrong while initializing IVS adapter, e: ${e.message}", e)
+        }
     }
 
     override val playerInfo: PlayerInfo
         get() = PLAYER_INFO
 
     override fun release() {
-        super.release()
-        player.removeListener(playerListener)
+        try {
+            super.release()
+            player.removeListener(playerListener)
+        } catch (e: Exception) {
+            Log.e(TAG, "Something went wrong while releasing IVS adapter, e: ${e.message}", e)
+        }
     }
 
     override val eventDataManipulators: Collection<EventDataManipulator> = manipulators
 
+    // PositionProvider should be used instead
     override val position: Long
         get() = player.position
 
     override val drmDownloadTime: Long?
-        get() = null // TODO("Not yet implemented")
+        get() = null
     override val currentSourceMetadata: SourceMetadata?
-        get() = null // TODO("Not yet implemented")
+        get() = null
 
     override fun resetSourceRelatedState() {
-//        TODO("Not yet implemented")
+        // this method is called on state machine init, on buffering timeout and on source change
+        // nothing to do here since we don't store source related state
     }
 
     override fun clearValues() {
-//        TODO("Not yet implemented")
+        // this method should clear values after sample is sent, no action needed
     }
 
     companion object {
         private const val PLAYER_TECH = "Android:AmazonIVS"
+        private const val TAG = "AmazonIvsPlayerAdapter"
         private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.AMAZON_IVS)
     }
 }

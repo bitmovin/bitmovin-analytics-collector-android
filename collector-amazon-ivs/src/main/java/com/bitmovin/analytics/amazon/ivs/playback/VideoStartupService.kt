@@ -8,9 +8,6 @@ import com.bitmovin.analytics.stateMachines.PlayerStates
 internal class VideoStartupService(private val stateMachine: PlayerStateMachine, private val player: Player, private val playbackQualityProvider: PlaybackQualityProvider) {
 
     fun onStateChange(state: Player.State, position: Long) {
-        if (stateMachine.isStartupFinished) {
-            return
-        }
         when (state) {
             Player.State.BUFFERING ->
                 prepareStartup(position)
