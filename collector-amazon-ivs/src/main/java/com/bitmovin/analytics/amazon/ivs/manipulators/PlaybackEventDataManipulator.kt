@@ -8,17 +8,6 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.StreamFormat
 
-/**
- * Manipulator for playback info
- * Fields handled:
- *  - isMuted
- *  - videoDuration
- *  - videoPlaybackHeight
- *  - videoPlaybackWidth
- *  - m3u8Url
- *  - streamFormat
- *  - isLive
- */
 internal class PlaybackEventDataManipulator(
     private val player: Player,
     private val config: BitmovinAnalyticsConfig,
@@ -38,7 +27,12 @@ internal class PlaybackEventDataManipulator(
         }
     }
 
+    // applies the channelId and sessionId if config.videoId is not set
     private fun setVideoId(data: EventData) {
+        if (config.videoId != null) {
+            return
+        }
+
         val sessionId = player.sessionId
         val channelId = getChannelIdFromUrl(config.m3u8Url)
         if (sessionId.isBlank() || channelId == null || channelId.isBlank()) {
