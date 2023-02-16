@@ -79,6 +79,7 @@ echo "Artifacts to publish:"
 echo "  - com.bitmovin.analytics:collector:$VERSION (:collector project)"
 echo "  - com.bitmovin.analytics:collector-bitmovin-player:$VERSION (:collector-bitmovin-player project)"
 echo "  - com.bitmovin.analytics:collector-exoplayer:$VERSION (:collector-exoplayer project)"
+echo "  - com.bitmovin.analytics:collector-amazon-ivs:$VERSION (:collector-amazon-ivs project)"
 echo "\nAre all tokens, artifacts and versions correct ?"
 read -p "(Press enter to continue)"
 
@@ -116,6 +117,14 @@ echo "\n:collector-exoplayer project build and publishing..."
 ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-exoplayer:publishToMavenLocal || exit
 echo "\n:collector-exoplayer project built and published!"
 
+echo "\n:collector-amazon-ivs project build and publishing..."
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-amazon-ivs:clean || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-amazon-ivs:build || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-amazon-ivs:assembleRelease || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-amazon-ivs:artifactoryPublish || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-amazon-ivs:publishToMavenLocal || exit
+echo "\n:collector-amazon-ivs project built and published!"
+
 echo "\nGit release"
 echo "\nGit create tag 'v$VERSION' ..."
 git tag -a v$VERSION -m "v$VERSION"
@@ -148,16 +157,18 @@ else
   echo "$file not found."
 fi
 
-echo "Distributing the artifacts to jfrog..."
+echo "Copying artifacts from libs-release-local to public-releases in jfrog ..."
 
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector/${VERSION}"
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-bitmovin-player/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-bitmovin-player/${VERSION}"
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-exoplayer/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-exoplayer/${VERSION}"
+curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-amazon-ivs/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-amazon-ivs/${VERSION}"
 
-echo "\nDistributed the artifacts to jfrog."
+echo "\nCopied artifacts to public jfrog repo."
 
 notifyApi "android-bitmovin" $VERSION "collector-bitmovin-player"
 notifyApi "android-exo" $VERSION "collector-exoplayer"
+notifyApi "android-amazon-ivs" $VERSION "collector-amazon-ivs"
 
 echo "Don't forget to update the changelog in Contentful."
 open "https://app.contentful.com/spaces/blfijbdi3ei3/entries?id=Dg0lZXAPC2p1fVj6&order.fieldId=updatedAt&order.direction=descending&folderId=KJ8HH1mX0jJQ5mHx&searchText=ANDROID&contentTypeId=release&displayedFieldIds=contentType&displayedFieldIds=updatedAt&displayedFieldIds=author&filters.0.key=fields.product&filters.0.val=ANALYTICS"
