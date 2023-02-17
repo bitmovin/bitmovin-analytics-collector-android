@@ -192,7 +192,7 @@ internal class BitmovinSdkAdapter(
             data.isLive = fallbackIsLive
         }
         // version
-        data.version = PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.getPlayerVersion()
+        data.version = PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.playerVersion
 
         // isCasting
         data.isCasting = player.isCasting

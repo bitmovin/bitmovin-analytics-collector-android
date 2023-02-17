@@ -17,8 +17,7 @@ internal class VideoStartupService(private val stateMachine: PlayerStateMachine,
         }
     }
 
-    // TODO: we should have better naming, this is also modifying the state not just checking
-    fun checkStartup(currentState: Player.State, position: Long) {
+    fun finishStartupOnPlaying(currentState: Player.State, position: Long) {
         if (currentState == Player.State.PLAYING) {
             finishStartup(position)
         }

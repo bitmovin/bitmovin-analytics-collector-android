@@ -2,6 +2,7 @@ package com.bitmovin.analytics.data;
 
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 
+// TODO (AN-3352): probably subject to pro guard obfuscation
 public class LicenseResponse {
     private String status;
     private String message;

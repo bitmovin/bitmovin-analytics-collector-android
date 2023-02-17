@@ -34,7 +34,6 @@ public class Util {
     public static final int HEARTBEAT_INTERVAL = 59700; // in milliseconds
 
     private static final Map<String, String> VIDEO_FORMAT_MIME_TYPE_MAP;
-    public static final String PLAYER_TECH = "Android:Exoplayer";
 
     static {
         VIDEO_FORMAT_MIME_TYPE_MAP = new HashMap<>();

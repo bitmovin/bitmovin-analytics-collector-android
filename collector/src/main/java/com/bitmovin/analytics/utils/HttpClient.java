@@ -14,7 +14,7 @@ import okhttp3.Response;
 public class HttpClient {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static final String TAG = "HttpClient";
-    private OkHttpClient client = null;
+    private OkHttpClient client;
     private Context context;
 
     public HttpClient(Context context, OkHttpClient client) {

@@ -3,6 +3,7 @@ package com.bitmovin.analytics.data
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.utils.Util
 
+// TODO (AN-3352): probably subject to pro guard obfuscation
 data class AdEventData(
     var wrapperAdsCount: Int? = null,
     var adSkippable: Boolean? = null,

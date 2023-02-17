@@ -55,6 +55,8 @@ class RetryBackend(private val next: CallbackBackend, private val scheduleSample
     fun processQueuedSamples() {
         try {
             val nextScheduledTime = getNextScheduledTime()
+
+            // TODO: nextScheduledTime is always null in second clause of if, verify if this could be a bug
             if (nextScheduledTime != null || retryDateToken != nextScheduledTime) {
                 if (retryDateToken != null) {
                     scheduleSampleHandler.removeCallbacks(sendNextSampleRunnable, retryDateToken)

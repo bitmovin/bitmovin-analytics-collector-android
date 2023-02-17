@@ -171,7 +171,7 @@ internal class ExoPlayerAdapter(
         )
 
         // version
-        data.version = PlayerType.EXOPLAYER.toString() + "-" + ExoUtil.getPlayerVersion()
+        data.version = PlayerType.EXOPLAYER.toString() + "-" + ExoUtil.playerVersion
 
         // DroppedVideoFrames
         data.droppedFrames = totalDroppedVideoFrames

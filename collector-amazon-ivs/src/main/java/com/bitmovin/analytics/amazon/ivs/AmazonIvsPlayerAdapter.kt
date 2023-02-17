@@ -35,7 +35,7 @@ internal class AmazonIvsPlayerAdapter(
     init {
         try {
             player.addListener(playerListener)
-            videoStartupService.checkStartup(player.state, player.position)
+            videoStartupService.finishStartupOnPlaying(player.state, player.position)
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while initializing IVS adapter, e: ${e.message}", e)
         }

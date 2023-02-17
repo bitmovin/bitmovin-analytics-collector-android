@@ -2,6 +2,7 @@ package com.bitmovin.analytics.data
 
 import com.bitmovin.analytics.utils.Util
 
+// TODO (AN-3352): probably subject to pro guard obfuscation
 class EventData(
     deviceInfo: DeviceInformation,
     playerInfo: PlayerInfo,
