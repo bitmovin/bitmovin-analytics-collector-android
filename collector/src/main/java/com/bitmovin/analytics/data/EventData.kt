@@ -58,7 +58,7 @@ class EventData(
         deviceInfo.deviceClass,
     )
     val language: String = deviceInfo.locale
-    val analyticsVersion: String = Util.getAnalyticsVersion()
+    val analyticsVersion: String = Util.analyticsVersion
     val playerTech: String = playerInfo.playerTech
     val domain: String = deviceInfo.domain
     val screenHeight: Int = deviceInfo.screenHeight
@@ -67,7 +67,7 @@ class EventData(
     var isCasting: Boolean = false
     var castTech: String? = null
     var videoDuration: Long = 0
-    var time: Long = Util.getTimestamp()
+    var time: Long = Util.timestamp
     var videoWindowWidth: Int = 0
     var videoWindowHeight: Int = 0
     var droppedFrames: Int = 0

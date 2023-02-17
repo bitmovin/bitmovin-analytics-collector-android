@@ -88,7 +88,7 @@ open class DeviceInformationProvider(
             manufacturer = Build.MANUFACTURER,
             model = Build.MODEL,
             isTV = isTV,
-            locale = Util.getLocale(),
+            locale = Util.locale,
             domain = Util.getDomain(context),
             screenWidth = width,
             screenHeight = height,

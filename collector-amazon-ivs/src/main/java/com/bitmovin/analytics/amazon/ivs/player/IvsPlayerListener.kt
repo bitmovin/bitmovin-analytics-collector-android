@@ -69,7 +69,7 @@ internal class IvsPlayerListener(
         try {
             Log.d(TAG, "onError: " + pe.message)
             val errorCode = exceptionMapper.map(pe)
-            // TODO: discuss if we need to set VideoStartFailedReason similar as we do with exoplayer and bitmovin player
+            // TODO (AN-3361): check if we can detect if error happened during startup
             stateMachine.error(positionProvider.position, errorCode)
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while processing error, e: ${e.message}", e)

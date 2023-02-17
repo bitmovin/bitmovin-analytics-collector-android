@@ -76,7 +76,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     }
 
     private fun triggerHeartbeat() {
-        val elapsedTime = Util.getElapsedTime()
+        val elapsedTime = Util.elapsedTime
         videoTimeEnd = analytics.position
         listeners.notify { it.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter) }
         elapsedTimeOnEnter = elapsedTime
@@ -86,7 +86,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     private fun resetSourceRelatedState() {
         disableHeartbeat()
         disableRebufferHeartbeat()
-        impressionId = Util.getUUID()
+        impressionId = Util.uUID
         videoStartFailedReason = null
         startupTime = 0
         isStartupFinished = false
@@ -111,7 +111,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         if (!isTransitionAllowed(currentState, destinationPlayerState)) {
             return
         }
-        val elapsedTime = Util.getElapsedTime()
+        val elapsedTime = Util.elapsedTime
         videoTimeEnd = videoTime
         Log.d(TAG, "Transitioning from $currentState to $destinationPlayerState")
         currentState.onExitState(this, elapsedTime, elapsedTime - elapsedTimeOnEnter, destinationPlayerState)

@@ -78,17 +78,9 @@ class UtilTest {
     @Test
     fun multiplyInteger() {
         Assert.assertNull(Util.multiply(null, null as? Int?))
-        Assert.assertNull(Util.multiply(null, 1))
+        Assert.assertNull(Util.multiply(null, 1 as Int?))
         Assert.assertNull(Util.multiply(1.0, null as? Int?))
-        Assert.assertEquals(Util.multiply(1.0, 1), 1.0, 0.0)
-    }
-
-    @Test
-    fun multiplyLong() {
-        Assert.assertNull(Util.multiply(null, null as? Long?))
-        Assert.assertNull(Util.multiply(null, 1L))
-        Assert.assertNull(Util.multiply(1.0, null as? Long?))
-        Assert.assertEquals(Util.multiply(1.0, 1L), 1.0, 0.0)
+        Assert.assertEquals(Util.multiply(1.0, 1 as Int?)!!, 1.0, 0.0)
     }
 
     @Test

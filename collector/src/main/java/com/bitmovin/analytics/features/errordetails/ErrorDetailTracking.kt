@@ -51,7 +51,7 @@ class ErrorDetailTracking(private val context: Context, private val analyticsCon
         val errorIndex = errorIndex
         this.errorIndex++
         val platform = Util.getPlatform(Util.isTVDevice(context))
-        val timestamp = Util.getTimestamp()
+        val timestamp = Util.timestamp
 
         val errorDetails = ErrorDetail(platform, analyticsConfig.key, Util.getDomain(context), impressionId, errorIndex, timestamp, code, message, errorData ?: ErrorData(), httpRequests)
         backend.send(errorDetails)

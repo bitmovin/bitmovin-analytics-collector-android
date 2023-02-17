@@ -84,6 +84,7 @@ class RetryBackend(private val next: CallbackBackend, private val scheduleSample
         }
     }
 
+    // TODO: verify why we use finalize, this seems to be a code smell since finalize is not guaranteed to be called ever
     protected fun finalize() { // destroys an instance of RetryBackend
         Log.d(TAG, "finalize")
         scheduleSampleHandler.removeCallbacksAndMessages(null) // removes all callbacks and messages

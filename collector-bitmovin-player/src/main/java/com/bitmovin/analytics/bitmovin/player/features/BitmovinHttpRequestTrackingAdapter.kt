@@ -19,7 +19,7 @@ internal class BitmovinHttpRequestTrackingAdapter(private val player: Player, pr
         catchAndLogException("Exception occurred in SourceEvent.DownloadFinished") {
             val requestType = mapHttpRequestType(event.downloadType)
             val httpRequest =
-                HttpRequest(Util.getTimestamp(), requestType, event.url, event.lastRedirectLocation, event.httpStatus, Util.secondsToMillis(event.downloadTime), null, event.size, event.isSuccess)
+                HttpRequest(Util.timestamp, requestType, event.url, event.lastRedirectLocation, event.httpStatus, Util.secondsToMillis(event.downloadTime), null, event.size, event.isSuccess)
             observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(httpRequest)) }
         }
     }

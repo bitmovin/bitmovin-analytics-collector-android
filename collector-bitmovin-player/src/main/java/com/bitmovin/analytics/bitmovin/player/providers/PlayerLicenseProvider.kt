@@ -21,8 +21,7 @@ internal class PlayerLicenseProvider(private val context: Context) {
     // Workaround to retrieve PlayerKey from manifest (copied from player)
     private fun getBitmovinLicenseKeyFromAppManifestOrNull() = runCatching {
         val applicationInfo = getApplicationInfoOrNull(context)
-
-        applicationInfo.metaData?.getString(BITMOVIN_PLAYER_LICENSE_KEY)
+        applicationInfo?.metaData?.getString(BITMOVIN_PLAYER_LICENSE_KEY)
     }.getOrNull()
 
     companion object {

@@ -106,6 +106,7 @@ class BitmovinAnalytics
         eventDataDispatcher.resetSourceRelatedState()
         featureManager.resetFeatures()
         // TODO reset features and prepare for new source
+        // double check once more and then delete
         playerAdapter?.resetSourceRelatedState()
     }
 

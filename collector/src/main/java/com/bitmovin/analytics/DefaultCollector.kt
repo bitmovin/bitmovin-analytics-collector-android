@@ -35,7 +35,7 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         get() = analytics.impressionId
 
     override val version: String
-        get() = Util.getAnalyticsVersion()
+        get() = Util.analyticsVersion
 
     override val userId: String
         get() = userIdProvider.userId()

@@ -17,7 +17,7 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context, pri
 
     fun limitHttpRequestsInQueue(max: Int) {
         for ((index, detail) in _queue.withIndex()) {
-            _queue.set(index, detail.copyTruncateHttpRequests(max))
+            _queue[index] = detail.copyTruncateHttpRequests(max)
         }
     }
 

@@ -27,7 +27,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
             if (field == null || this.elapsedTimeBeginPlaying == null) {
                 null
             } else {
-                field!! + Util.getElapsedTime() - this.elapsedTimeBeginPlaying!!
+                field!! + Util.elapsedTime - this.elapsedTimeBeginPlaying!!
             }
         } else {
             field
@@ -54,7 +54,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         this.resetActiveAd()
         val adSample = AdSample(ad = ad)
         val elapsedTimeAdStartup = this.elapsedTimeAdStartup
-        adSample.adStartupTime = if (elapsedTimeAdStartup != null) Util.getElapsedTime() - elapsedTimeAdStartup else null
+        adSample.adStartupTime = if (elapsedTimeAdStartup != null) Util.elapsedTime - elapsedTimeAdStartup else null
 
         this.activeAdSample = adSample
 
@@ -74,7 +74,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
     override fun onAdBreakStarted(adBreak: AdBreak) {
         this.adPodPosition = 0
         this.activeAdBreak = adBreak
-        this.elapsedTimeAdStartup = Util.getElapsedTime()
+        this.elapsedTimeAdStartup = Util.elapsedTime
     }
 
     override fun onAdBreakFinished() {
@@ -113,7 +113,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
 
     override fun onPlay() {
         if (adAdapter?.isLinearAdActive == true && this.activeAdSample != null) {
-            val elapsedTime = Util.getElapsedTime()
+            val elapsedTime = Util.elapsedTime
             this.elapsedTimeBeginPlaying = elapsedTime
             this.isPlaying = true
         }
@@ -154,7 +154,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         adSample.timePlayed = 0
         adSample.timeInViewport = 0
         adSample.adPodPosition = this.adPodPosition
-        this.elapsedTimeBeginPlaying = Util.getElapsedTime()
+        this.elapsedTimeBeginPlaying = Util.elapsedTime
         this.isPlaying = true
         this.currentTime = 0
         this.adPodPosition++
@@ -166,7 +166,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         adSample.playPercentage = Util.calculatePercentage(adSample.timePlayed, adSample.ad.duration, true)
 
         // reset elapsedTimeAdStartup for the next ad, in case there are multiple ads in one ad break
-        this.elapsedTimeAdStartup = Util.getElapsedTime()
+        this.elapsedTimeAdStartup = Util.elapsedTime
         this.isPlaying = false
         this.sendAnalyticsRequest(adBreak, adSample)
     }
@@ -187,7 +187,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         val eventData = playerAdapter?.createEventData() ?: return
         val adEventData = AdEventData()
 
-        adEventData.analyticsVersion = Util.getAnalyticsVersion()
+        adEventData.analyticsVersion = Util.analyticsVersion
         val moduleInfo = adAdapter?.moduleInformation
         if (moduleInfo != null) {
             adEventData.adModule = moduleInfo.name
@@ -201,8 +201,8 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         adEventData.setAdBreak(adBreak)
         adEventData.setAdSample(adSample)
 
-        adEventData.time = Util.getTimestamp()
-        adEventData.adImpressionId = Util.getUUID()
+        adEventData.time = Util.timestamp
+        adEventData.adImpressionId = Util.uUID
         analytics.sendAdEventData(adEventData)
     }
 }

@@ -30,6 +30,7 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
             mediaLoadData: MediaLoadData,
         ) {
             catchAndLogException("Exception occurred in onLoadCompleted") {
+                // TODO: clarify why we need the null check
                 // we have to consider LoadEventInfo as nullable, because it comes from java, to prevent NPE and fail before notify is called
                 val statusCode = loadEventInfo?.extractStatusCode ?: 0
                 notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, statusCode)
@@ -197,7 +198,7 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
 
         private fun mapLoadCompletedArgsToHttpRequest(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, statusCode: Int, success: Boolean): HttpRequest {
             val requestType = mapDataType(eventTime, loadEventInfo.uri, mediaLoadData.dataType, mediaLoadData.trackType)
-            return HttpRequest(Util.getTimestamp(), requestType, loadEventInfo.dataSpec.uri.toString(), loadEventInfo.uri.toString(), statusCode, loadEventInfo.loadDurationMs, null, loadEventInfo.bytesLoaded, success)
+            return HttpRequest(Util.timestamp, requestType, loadEventInfo.dataSpec.uri.toString(), loadEventInfo.uri.toString(), statusCode, loadEventInfo.loadDurationMs, null, loadEventInfo.bytesLoaded, success)
         }
     }
 }

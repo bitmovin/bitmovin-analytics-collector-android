@@ -19,7 +19,7 @@ class DefaultStateMachineListener(private val analytics: BitmovinAnalytics, priv
     override fun onStartup(stateMachine: PlayerStateMachine, videoStartupTime: Long, playerStartupTime: Long) {
         Log.d(TAG, String.format("onStartup %s", stateMachine.impressionId))
         val data = playerAdapter.createEventData()
-        data.supportedVideoCodecs = Util.getSupportedVideoFormats()
+        data.supportedVideoCodecs = Util.supportedVideoFormats
         data.state = "startup"
         data.duration = videoStartupTime + playerStartupTime
         data.videoStartupTime = videoStartupTime

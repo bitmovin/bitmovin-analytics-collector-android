@@ -13,9 +13,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        // TODO: do we need this file, we don't use consumer rules for the other collectors
-        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
