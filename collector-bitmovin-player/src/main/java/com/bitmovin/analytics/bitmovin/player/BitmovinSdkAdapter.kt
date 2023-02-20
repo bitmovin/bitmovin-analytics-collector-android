@@ -321,7 +321,7 @@ internal class BitmovinSdkAdapter(
         try {
             Log.d(TAG, "On Playback Finished Listener")
 
-            // if it's life stream we are using currentPosition of playback as videoTime
+            // if it's live stream we are using currentPosition of playback as videoTime
             val videoTime =
                 if (player.duration != Double.POSITIVE_INFINITY) Util.secondsToMillis(player.duration) else position
             stateMachine.transitionState(PlayerStates.PAUSE, videoTime)

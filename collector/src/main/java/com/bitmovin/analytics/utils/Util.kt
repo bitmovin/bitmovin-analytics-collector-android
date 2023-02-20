@@ -152,12 +152,10 @@ object Util {
         return if (isTV) "androidTV" else "android"
     }
 
-    @JvmStatic
     fun getDomain(context: Context): String {
         return context.packageName
     }
 
-    @JvmStatic
     val analyticsVersion: String
         get() = BuildConfig.COLLECTOR_CORE_VERSION
 

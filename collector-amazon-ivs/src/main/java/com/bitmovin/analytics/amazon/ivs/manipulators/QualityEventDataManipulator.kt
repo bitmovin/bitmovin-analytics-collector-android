@@ -40,6 +40,8 @@ internal class QualityEventDataManipulator(private val player: Player, private v
         }
     }
 
+    // TODO: we are not resetting dropped frames on source change or detach, probably need to do that to get accurate data
+    // for example on a channel switch
     private var previousTotalDroppedFrames: Int = 0
     private fun getAndSetDroppedFrames(totalDroppedFrames: Int): Int {
         val currentSampleDroppedFrames = totalDroppedFrames - previousTotalDroppedFrames
