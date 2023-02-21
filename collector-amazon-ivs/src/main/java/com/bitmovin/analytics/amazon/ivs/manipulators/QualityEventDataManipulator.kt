@@ -5,6 +5,7 @@ import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.amazon.ivs.player.PlaybackQualityProvider
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.utils.CodecHelper
 
 /**
  * Manipulator for video quality
@@ -52,10 +53,6 @@ internal class QualityEventDataManipulator(private val player: Player, private v
     internal data class CodecInfo(val videoCodec: String?, val audioCodec: String?)
 
     companion object {
-        // Extracting the codecs is best effort for now since the order
-        // is not guaranteed according to AWS IVS support (video might be first or second parameter)
-        // general format is "videoCodec,audioCodec"
-        // TODO (AN-3350): improve codec detection
         private fun extractCodecInfo(codecs: String): CodecInfo {
             val splitted = codecs.split(",")
 
@@ -63,8 +60,21 @@ internal class QualityEventDataManipulator(private val player: Player, private v
                 return CodecInfo(null, null)
             }
 
-            val videoCodec = splitted[0]
-            val audioCodec = splitted[1]
+            var videoCodec: String?
+            var audioCodec: String?
+
+            // it is expected but not guaranteed that first item
+            // in codecs is video codec and second item is audio codec
+            // try to confirm the reverse case when the first item is audio codec and the second item is video codec
+            if (CodecHelper.isVideoCodec(splitted[1]) || CodecHelper.isAudioCodec(splitted[0])) {
+                videoCodec = splitted[1]
+                audioCodec = splitted[0]
+            }
+            // default
+            else {
+                videoCodec = splitted[0]
+                audioCodec = splitted[1]
+            }
 
             return CodecInfo(videoCodec, audioCodec)
         }
