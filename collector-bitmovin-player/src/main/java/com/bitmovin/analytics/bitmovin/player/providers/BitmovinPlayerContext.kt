@@ -10,6 +10,6 @@ internal class BitmovinPlayerContext(private val player: Player) : PlayerContext
     }
 
     override val position: Long
-    //TODOMY use BitmovinUtil
+        // TODOMY use BitmovinUtil
         get() = Util.secondsToMillis(player.currentTime)
 }

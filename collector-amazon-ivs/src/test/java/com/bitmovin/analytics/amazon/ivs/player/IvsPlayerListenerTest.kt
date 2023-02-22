@@ -139,7 +139,7 @@ class IvsPlayerListenerTest {
             playerContext,
             playbackQualityProvider,
             playbackService,
-            videoStartupService
+            videoStartupService,
         )
     }
 }

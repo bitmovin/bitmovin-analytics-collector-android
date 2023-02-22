@@ -6,7 +6,7 @@ import com.google.android.exoplayer2.Timeline
 
 internal class ExoPlayerContext(private val player: Player) : PlayerContext {
     override fun isPlaying(): Boolean {
-        //TODOMY check if this is right for exoplayer?
+        // TODOMY check if this is right for exoplayer?
         return player.isPlaying
     }
 
@@ -24,9 +24,9 @@ internal class ExoPlayerContext(private val player: Player) : PlayerContext {
                 ) {
                     timeline.getPeriod(firstPeriodInWindowIndex, firstPeriodInWindow)
                     var position = (
-                            player.currentPosition -
-                                    firstPeriodInWindow.positionInWindowMs
-                            )
+                        player.currentPosition -
+                            firstPeriodInWindow.positionInWindowMs
+                        )
                     if (position < 0) {
                         position = 0
                     }

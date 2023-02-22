@@ -86,7 +86,7 @@ class PlayerStateMachine(
         if (playerContext.isPlaying()) {
             triggerHeartbeat()
         } else {
-            //transition into pause state
+            // transition into pause state
             pause(playerContext.position)
         }
     }

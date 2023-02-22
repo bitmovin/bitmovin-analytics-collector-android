@@ -12,8 +12,8 @@ import com.bitmovin.analytics.amazon.ivs.manipulators.PlayerInfoEventDataManipul
 import com.bitmovin.analytics.amazon.ivs.manipulators.QualityEventDataManipulator
 import com.bitmovin.analytics.amazon.ivs.playback.PlaybackService
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
-import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
 import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerContext
+import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
 import com.bitmovin.analytics.amazon.ivs.player.PlaybackQualityProvider
 import com.bitmovin.analytics.amazon.ivs.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.data.DeviceInformationProvider

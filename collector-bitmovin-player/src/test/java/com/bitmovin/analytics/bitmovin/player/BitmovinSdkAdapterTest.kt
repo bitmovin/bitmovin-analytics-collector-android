@@ -45,7 +45,7 @@ class BitmovinSdkAdapterTest {
                 qualityChangeEventLimiter,
                 mockk(),
                 mockk(),
-                mockk()
+                mockk(),
             ),
             recordPrivateCalls = true,
         )

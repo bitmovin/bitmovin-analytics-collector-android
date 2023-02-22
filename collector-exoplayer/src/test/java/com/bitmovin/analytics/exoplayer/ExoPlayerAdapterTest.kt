@@ -37,7 +37,7 @@ class ExoPlayerAdapterTest {
                 qualityChangeEventLimiter,
                 mockk(),
                 mockk(),
-                mockk()
+                mockk(),
             ),
             recordPrivateCalls = true,
         )
