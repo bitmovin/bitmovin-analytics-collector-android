@@ -49,7 +49,7 @@ class QualityEventDataManipulatorTest {
         val qualityProvider = PlaybackQualityProvider()
         qualityProvider.currentQuality = qualityMock
 
-        val qualityEventDataManipulator = QualityEventDataManipulator(playerMock, qualityProvider)
+        val qualityEventDataManipulator = QualityEventDataManipulator(qualityProvider, mockk(relaxed = true))
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -69,7 +69,7 @@ class QualityEventDataManipulatorTest {
         val qualityProvider = PlaybackQualityProvider()
         qualityProvider.currentQuality = qualityMock
 
-        val qualityEventDataManipulator = QualityEventDataManipulator(playerMock, qualityProvider)
+        val qualityEventDataManipulator = QualityEventDataManipulator(qualityProvider, mockk(relaxed = true))
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -89,7 +89,7 @@ class QualityEventDataManipulatorTest {
         val qualityProvider = PlaybackQualityProvider()
         qualityProvider.currentQuality = qualityMock
 
-        val qualityEventDataManipulator = QualityEventDataManipulator(playerMock, qualityProvider)
+        val qualityEventDataManipulator = QualityEventDataManipulator(qualityProvider, mockk(relaxed = true))
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -109,7 +109,7 @@ class QualityEventDataManipulatorTest {
         val qualityProvider = PlaybackQualityProvider()
         qualityProvider.currentQuality = qualityMock
 
-        val qualityEventDataManipulator = QualityEventDataManipulator(playerMock, qualityProvider)
+        val qualityEventDataManipulator = QualityEventDataManipulator(qualityProvider, mockk(relaxed = true))
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -129,7 +129,7 @@ class QualityEventDataManipulatorTest {
         val qualityProvider = PlaybackQualityProvider()
         qualityProvider.currentQuality = qualityMock
 
-        val qualityEventDataManipulator = QualityEventDataManipulator(playerMock, qualityProvider)
+        val qualityEventDataManipulator = QualityEventDataManipulator(qualityProvider, mockk(relaxed = true))
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -149,7 +149,7 @@ class QualityEventDataManipulatorTest {
         val qualityProvider = PlaybackQualityProvider()
         qualityProvider.currentQuality = qualityMock
 
-        val qualityEventDataManipulator = QualityEventDataManipulator(playerMock, qualityProvider)
+        val qualityEventDataManipulator = QualityEventDataManipulator(qualityProvider, mockk(relaxed = true))
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -169,7 +169,7 @@ class QualityEventDataManipulatorTest {
         val qualityProvider = PlaybackQualityProvider()
         qualityProvider.currentQuality = qualityMock
 
-        val qualityEventDataManipulator = QualityEventDataManipulator(playerMock, qualityProvider)
+        val qualityEventDataManipulator = QualityEventDataManipulator(qualityProvider, mockk(relaxed = true))
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -189,7 +189,7 @@ class QualityEventDataManipulatorTest {
         val qualityProvider = PlaybackQualityProvider()
         qualityProvider.currentQuality = qualityMock
 
-        val qualityEventDataManipulator = QualityEventDataManipulator(playerMock, qualityProvider)
+        val qualityEventDataManipulator = QualityEventDataManipulator(qualityProvider, mockk(relaxed = true))
         val eventData = TestUtils.createMinimalEventData()
 
         // act
