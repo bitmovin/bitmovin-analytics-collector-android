@@ -15,7 +15,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] obsolete test dependencies
 - [internal] unnecessary TODOs
 - [internal] cleaned obsolete parts of mavenpublish script
-- AppCompat dependency for exoplayer adapter
 
 ### Changed
 - [internal] updated gradle plugin and dependencies
@@ -25,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] fix AdPosition and AdTagType enums to return configured string representation
 - Upgraded okhttp3 to v4.10.0 (this is a major version upgrade from v3 to v4)
 - Upgraded gson dependency to v2.8.9
+- Upgraded androidx.appcompat dependency to v1.6.1
 - Upgraded example apps to latest bitmovin player (v3.29.0) and latest exoplayer (v2.18.2)
 - Deprecated obsolete PlayerType config in AnalyticsConfig
 - use `System.getProperty("http.agent")` for user agent tracking
@@ -32,8 +32,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - [internal] reporting of videoTimeStart and videoTimeEnd for audioTrackChange, subtitleChange, qualityChange
-- Allow exoplayer >= v2.17.0 to be used with the collector
+- [internal] tracking of http status codes on exoplayer
 - Tracking of bitmovin player key when it is specified in the manifest
+- Tracking of audiolanguage, audiocodec and videocodec for exoplayer
+- Serialization issues when ProGuard is used for obfuscation
 
 ## v2.13.0
 

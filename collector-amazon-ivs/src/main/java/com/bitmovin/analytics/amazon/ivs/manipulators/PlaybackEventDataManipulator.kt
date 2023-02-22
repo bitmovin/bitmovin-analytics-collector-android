@@ -44,17 +44,17 @@ internal class PlaybackEventDataManipulator(
     private fun getChannelIdFromUrl(url: String?): String? {
         url ?: return null
 
-        val indexOfChannelPrefix = url.indexOf(channelPrefix)
+        val indexOfChannelPrefix = url.indexOf(CHANNEL_PREFIX)
         if (indexOfChannelPrefix == -1) {
             return null
         }
 
-        val indexOfExtension = url.indexOf(hlsExtension)
+        val indexOfExtension = url.indexOf(HLS_EXTENSION)
         if (indexOfExtension == -1) {
             return null
         }
 
-        val indexOfChannelId = indexOfChannelPrefix + channelPrefix.length
+        val indexOfChannelId = indexOfChannelPrefix + CHANNEL_PREFIX.length
         return url.substring(indexOfChannelId until indexOfExtension)
     }
 
@@ -68,7 +68,7 @@ internal class PlaybackEventDataManipulator(
     }
 
     companion object {
-        private const val channelPrefix = ".channel."
-        private const val hlsExtension = ".m3u8"
+        private const val CHANNEL_PREFIX = ".channel."
+        private const val HLS_EXTENSION = ".m3u8"
     }
 }

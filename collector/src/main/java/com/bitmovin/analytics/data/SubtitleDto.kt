@@ -1,6 +1,8 @@
 package com.bitmovin.analytics.data
 
-// TODO (AN-3352): probably subject to pro guard obfuscation
+import androidx.annotation.Keep
+
+@Keep // Protect from obfuscation in case customers are using proguard
 data class SubtitleDto(
     val subtitleEnabled: Boolean = false,
     val subtitleLanguage: String? = null,

@@ -133,14 +133,13 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
                     )
 
                     bitmovinAnalytics?.addDebugListener(this)
-                    bitmovinAnalytics = bitmovinAnalytics
 
                     // Step 3: Attach ExoPlayer
                     bitmovinAnalytics?.attachPlayer(exoPlayer)
 
                     // Step 4: Create, prepare, and play media source
-                    // val mediaItem = buildMediaItem(HLS_REDBULL)
-                    // exoPlayer.setMediaItem(mediaItem)
+                    val mediaItem = buildMediaItem(HLS_REDBULL)
+                    exoPlayer.setMediaItem(mediaItem)
 
                     this.buildConcatenatingMediaSource()
                     exoPlayer.setMediaSource(this.concatenatingMediaSource!!)

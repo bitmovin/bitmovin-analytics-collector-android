@@ -102,7 +102,7 @@ ext {
     // collector dependencies
     gsonVersion = '2.8.9'
     okhttp3Version = '4.10.0'
-    appCompatVersion = '1.1.0' // still needed by bitmovin player collector
+    appCompatVersion = '1.6.1' // required for bitmovin player and @Keep annotation in core collector to avoid proguard issues
 
     // example apps dependencies
     playServicesAdsVersion = '19.7.0'

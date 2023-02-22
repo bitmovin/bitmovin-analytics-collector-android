@@ -18,19 +18,18 @@ import java.nio.ByteBuffer
  * IVS Player States
  *
  * IVS.IDLE => Initial State before source is loaded, State when Paused, State when player is released
- * IVS.READY => Player is ready to play the loaded source (this state is after source loaded, but not played yet, it is only reached after source is loaded at the beginning and marks that startup is done) -> needs to be verified
+ * IVS.READY => Player is ready to play the loaded source (this state is after source loaded, but not played yet, can also happen on pause/play)
  * IVS.PLAYING => Player is playing
  * IVS.BUFFERING => Player is buffering
- * IVS.ENDED => Player reached end of the stream (this state is only valid for VOD??)
+ * IVS.ENDED => Player reached end of the stream
  *
  * How do events like seeking and quality changed play into this?
- * -> Since these are events only they don't change the player state directly (could be indirectly though, since a seek might cause a buffering)
+ * -> These events don't indicate a change in player state directly, but can have side effect like triggering buffering as result of seeking
  * -> When a seek is issued, the onSeekCompleted event is happening after buffering is completed if necessary
  *
- * To double check:
- * -> Seeking on pause vs seeking on playing
- * -> what does seeking on Live actually do? it is possible throught the api but doesn't make much sense
- * -> what is happining on pause, play on a live video, is there a DVR mode? it doesn't look like there is one
+ * Nuances
+ * -> When a live video is paused and played again, the player seeks to the live edge implicitly (there is no DVR mode)
+ *
  */
 
 internal class IvsPlayerListener(
@@ -91,6 +90,7 @@ internal class IvsPlayerListener(
             // player does not support DVR mode so it's not possible to seek on live streams using UI
             // all seeking events on live stream are usually caused by pausing stream and then resuming playing
             // since player is trying to catch up with live edge
+            // we only track seeking on vod
             if (duration?.let { Utils.isPlaybackLive(it) } == false) {
                 val stateBeforeSeek = stateMachine.currentState
                 stateMachine.transitionState(PlayerStates.SEEKING, positionProvider.position)

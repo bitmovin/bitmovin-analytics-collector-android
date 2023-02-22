@@ -6,6 +6,8 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
+import com.bitmovin.analytics.amazon.ivs.player.PlayerStatisticsProvider
+import com.bitmovin.analytics.amazon.ivs.player.PositionProvider
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
@@ -25,6 +27,8 @@ internal class AmazonIvsPlayerAdapter(
     videoStartupService: VideoStartupService,
     private val playerListener: IvsPlayerListener,
     manipulators: List<EventDataManipulator>,
+    private val playerStatisticsProvider: PlayerStatisticsProvider,
+    private val playerPositionProvider: PositionProvider,
 ) : DefaultPlayerAdapter(
     config,
     eventDataFactory,
@@ -55,19 +59,18 @@ internal class AmazonIvsPlayerAdapter(
 
     override val eventDataManipulators: Collection<EventDataManipulator> = manipulators
 
-    // PositionProvider should be used instead
     override val position: Long
-        get() = player.position
+        get() = playerPositionProvider.position
 
     override val drmDownloadTime: Long?
-        get() = null
+        get() = null // drm is not supported by IVS player
 
     override val currentSourceMetadata: SourceMetadata?
         get() = null // not supported by IVS player
 
     override fun resetSourceRelatedState() {
         // this method is called on state machine init, on buffering timeout and on source change
-        // nothing to do here since we don't store source related state
+        playerStatisticsProvider.reset()
     }
 
     override fun clearValues() {

@@ -1,24 +1,15 @@
 package com.bitmovin.analytics.amazon.ivs.manipulators
 
-import com.amazonaws.ivs.player.Player
 import com.amazonaws.ivs.player.Quality
 import com.bitmovin.analytics.amazon.ivs.TestUtils
 import com.bitmovin.analytics.amazon.ivs.player.PlaybackQualityProvider
+import com.bitmovin.analytics.amazon.ivs.player.PlayerStatisticsProvider
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
 import org.junit.Test
 
 class QualityEventDataManipulatorTest {
-
-    private lateinit var playerMock: Player
-
-    @Before
-    fun setup() {
-        playerMock = mockk(relaxed = true)
-    }
-
     @Test
     fun testManipulate_ShouldSetEventDataCorrectly() {
         // arrange
@@ -27,12 +18,14 @@ class QualityEventDataManipulatorTest {
         every { qualityMock.height } returns 4
         every { qualityMock.width } returns 5
         every { qualityMock.codecs } returns "videoCodec1,audioCodec1"
-        every { playerMock.statistics.droppedFrames } returns 7
+
+        val statisticsProviderMock = mockk<PlayerStatisticsProvider>(relaxed = true)
+        every { statisticsProviderMock.getDroppedFramesDelta() } returns 7
 
         val qualityProvider = PlaybackQualityProvider()
         qualityProvider.currentQuality = qualityMock
 
-        val qualityEventDataManipulator = QualityEventDataManipulator(playerMock, qualityProvider)
+        val qualityEventDataManipulator = QualityEventDataManipulator(qualityProvider, statisticsProviderMock)
         val eventData = TestUtils.createMinimalEventData()
 
         // act

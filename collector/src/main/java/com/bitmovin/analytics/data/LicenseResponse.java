@@ -1,8 +1,10 @@
 package com.bitmovin.analytics.data;
 
+import androidx.annotation.Keep;
+
 import com.bitmovin.analytics.license.FeatureConfigContainer;
 
-// TODO (AN-3352): probably subject to pro guard obfuscation
+@Keep // Protect from obfuscation in case customers are using proguard
 public class LicenseResponse {
     private String status;
     private String message;

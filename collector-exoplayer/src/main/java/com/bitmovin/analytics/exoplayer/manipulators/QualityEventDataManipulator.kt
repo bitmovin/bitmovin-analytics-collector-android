@@ -7,7 +7,7 @@ import com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 
-internal class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataManipulator {
+internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataManipulator {
     var currentAudioFormat: Format? = null
     var currentVideoFormat: Format? = null
 
@@ -44,6 +44,7 @@ internal class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : E
         data.videoBitrate = videoFormat.bitrate
         data.videoPlaybackHeight = videoFormat.height
         data.videoPlaybackWidth = videoFormat.width
+        data.videoCodec = videoFormat.codecs
     }
 
     private fun applyAudioFormat(data: EventData, audioFormat: Format?) {
@@ -52,9 +53,13 @@ internal class BitrateEventDataManipulator(private val exoplayer: ExoPlayer) : E
         }
 
         data.audioBitrate = audioFormat.bitrate
+        data.audioCodec = audioFormat.codecs
+        data.audioLanguage = audioFormat.language
     }
 
     fun setFormatsFromPlayer() {
+        // TODO (AN-3381): why do we need the fallback?
+        // without the fallback we could support exoplayer 2.17.0
         currentVideoFormat = exoplayer.videoFormat ?: getCurrentFormatFromPlayer(TRACK_TYPE_VIDEO)
         currentAudioFormat = exoplayer.audioFormat ?: getCurrentFormatFromPlayer(TRACK_TYPE_AUDIO)
     }

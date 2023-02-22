@@ -90,6 +90,8 @@ class BitmovinAnalytics
     }
 
     /** Detach the current player that is being used with Bitmovin Analytics.  */
+    // TODO: AN-3379 -> exoplayer crashes in case licensing callback is calling detaching (okhttp callback)
+    // since we are not releasing from the main thread
     fun detachPlayer() {
         detachAd()
         featureManager.unregisterFeatures()
@@ -105,8 +107,6 @@ class BitmovinAnalytics
     fun resetSourceRelatedState() {
         eventDataDispatcher.resetSourceRelatedState()
         featureManager.resetFeatures()
-        // TODO reset features and prepare for new source
-        // double check once more and then delete
         playerAdapter?.resetSourceRelatedState()
     }
 

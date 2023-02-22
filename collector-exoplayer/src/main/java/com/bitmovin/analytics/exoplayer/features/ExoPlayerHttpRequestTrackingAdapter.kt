@@ -24,15 +24,14 @@ import java.io.IOException
 internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
     private val analyticsListener = object : AnalyticsListener {
+
         override fun onLoadCompleted(
             eventTime: AnalyticsListener.EventTime,
             loadEventInfo: LoadEventInfo,
             mediaLoadData: MediaLoadData,
         ) {
             catchAndLogException("Exception occurred in onLoadCompleted") {
-                // TODO: clarify why we need the null check
-                // we have to consider LoadEventInfo as nullable, because it comes from java, to prevent NPE and fail before notify is called
-                val statusCode = loadEventInfo?.extractStatusCode ?: 0
+                val statusCode = loadEventInfo.extractStatusCode ?: 0
                 notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, statusCode)
             }
         }
@@ -45,8 +44,7 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
             wasCanceled: Boolean,
         ) {
             catchAndLogException("Exception occurred in onLoadError") {
-                // we have to consider LoadEventInfo as nullable, because it comes from java, to prevent NPE and fail before notify is called
-                val loadEventInfoStatusCode = loadEventInfo?.extractStatusCode ?: 0
+                val loadEventInfoStatusCode = loadEventInfo.extractStatusCode ?: 0
                 val errorResponseCode =
                     (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode
                 notifyObservable(
@@ -113,18 +111,19 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
                 return null
             }
 
-        private val LoadEventInfo.extractStatusCode: Int?
-            get() {
-                // TODO: verify if this code is correct (add test?)
-                // sonarcloud complains
-                // https://sonarcloud.io/project/issues?resolved=false&sinceLeakPeriod=true&types=BUG&id=bitmovin-engineering_bitmovin-analytics-collector-android-internal&open=AYUrLCjLAU6LttWUMN61
+        private const val PATTERN = """null=\[(.*?)\]"""
+        private val regex = PATTERN.toRegex()
 
-                val nullableKeyMap = this.responseHeaders as? Map<*, List<String>> ?: return null
-                if (nullableKeyMap.contains(null)) {
-                    val nullEntryList = nullableKeyMap[null] ?: listOf()
-                    return nullEntryList.firstOrNull()?.extractStatusCode
-                }
-                return null
+        internal val LoadEventInfo.extractStatusCode: Int?
+            get() {
+                // the null key contains the status code information
+                // this solution is bit hacky since I couldn't find a way to extract the null key from the java hashmap directly
+                // using toString and parsing the string works (might be an issue with kotlin/java interoperability)
+                // toString returns a string in the following format:
+                // {null=[HTTP/1.1 200 OK], Accept-Ranges=[bytes], Access-Control-Allow-Credentials=[false], Access-Control-Allow-Headers=[*], Access-Control-Allow-Methods=[GET,POST,HEAD], ....
+                val matchResult = regex.find(this.responseHeaders.toString())
+                val statusCodeString = matchResult?.value
+                return statusCodeString?.extractStatusCode
             }
 
         @SuppressLint("SwitchIntDef")
@@ -142,8 +141,8 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
         private fun mapHlsManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): HttpRequestType {
             try {
                 val window = Timeline.Window()
-                // TODO: verify maybe??
                 // maybe needs currentWindowIndex, currentTimeline
+                // TODO (AN-3382): whats the difference between currentTimeline and timeline??
                 eventTime.timeline.getWindow(eventTime.windowIndex, window)
                 val initialPlaylistUri = window.mediaItem.localConfiguration?.uri
                 if (initialPlaylistUri != null) {
@@ -170,8 +169,8 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
             if (isHlsManifestClassLoaded) {
                 try {
                     val window = Timeline.Window()
-                    // TODO: maybe??
                     // maybe needs currentWindowIndex, currentTimeline
+                    // TODO (AN-3382): whats the difference between currentTimeline and timeline??
                     eventTime.timeline.getWindow(eventTime.windowIndex, window)
                     if (window.manifest is HlsManifest) {
                         return HttpRequestType.KEY_HLS_AES

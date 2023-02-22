@@ -15,6 +15,7 @@ import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
 import com.bitmovin.analytics.amazon.ivs.player.IvsPositionProvider
 import com.bitmovin.analytics.amazon.ivs.player.PlaybackQualityProvider
+import com.bitmovin.analytics.amazon.ivs.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
@@ -56,7 +57,8 @@ class AmazonIvsPlayerCollector(
                 videoStartupService,
             )
         val playerInfoManipulator = PlayerInfoEventDataManipulator(player)
-        val qualityManipulator = QualityEventDataManipulator(player, playbackQualityProvider)
+        val playerStatisticsProvider = PlayerStatisticsProvider(player)
+        val qualityManipulator = QualityEventDataManipulator(playbackQualityProvider, playerStatisticsProvider)
         val userAgentProvider = UserAgentProvider(
             Util.getApplicationInfoOrNull(context),
             Util.getPackageInfoOrNull(context),
@@ -75,6 +77,8 @@ class AmazonIvsPlayerCollector(
             videoStartupService,
             playerListener,
             manipulators,
+            playerStatisticsProvider,
+            positionProvider,
         )
     }
 }

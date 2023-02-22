@@ -15,7 +15,7 @@ import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.error.ExceptionMapper
-import com.bitmovin.analytics.exoplayer.manipulators.BitrateEventDataManipulator
+import com.bitmovin.analytics.exoplayer.manipulators.QualityEventDataManipulator
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
@@ -61,7 +61,7 @@ internal class ExoPlayerAdapter(
         Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
     }
     private val exceptionMapper: ExceptionMapper<Throwable> = ExoPlayerExceptionMapper()
-    private val bitrateEventDataManipulator = BitrateEventDataManipulator(exoplayer)
+    private val qualityEventDataManipulator = QualityEventDataManipulator(exoplayer)
     private val meter = DownloadSpeedMeter()
 
     // TODO inject those from the outside, as this is not really testable
@@ -84,7 +84,7 @@ internal class ExoPlayerAdapter(
     }
 
     private fun startup(position: Long) {
-        bitrateEventDataManipulator.setFormatsFromPlayer()
+        qualityEventDataManipulator.setFormatsFromPlayer()
         stateMachine.transitionState(PlayerStates.STARTUP, position)
         isVideoAttemptedPlay = true
     }
@@ -111,7 +111,7 @@ internal class ExoPlayerAdapter(
     override val eventDataManipulators: Collection<EventDataManipulator> by lazy {
         listOf(
             this,
-            bitrateEventDataManipulator,
+            qualityEventDataManipulator,
         )
     }
 
@@ -201,14 +201,14 @@ internal class ExoPlayerAdapter(
         exoplayer.removeListener(defaultPlayerEventListener)
         exoplayer.removeAnalyticsListener(defaultAnalyticsListener)
         meter.reset()
-        bitrateEventDataManipulator.reset()
+        qualityEventDataManipulator.reset()
         stateMachine.resetStateMachine()
     }
 
     override fun resetSourceRelatedState() {
         drmDownloadTime = null
         drmType = null
-        bitrateEventDataManipulator.reset()
+        qualityEventDataManipulator.reset()
         // no Playlist transition event in older version of collector (v1)
     }
 
@@ -379,8 +379,8 @@ internal class ExoPlayerAdapter(
                 try {
                     stateMachine.videoQualityChanged(
                         position,
-                        bitrateEventDataManipulator.hasAudioFormatChanged(format),
-                    ) { bitrateEventDataManipulator.currentAudioFormat = format }
+                        qualityEventDataManipulator.hasAudioFormatChanged(format),
+                    ) { qualityEventDataManipulator.currentAudioFormat = format }
                 } catch (e: Exception) {
                     Log.d(TAG, e.message, e)
                 }
@@ -395,8 +395,8 @@ internal class ExoPlayerAdapter(
                 try {
                     stateMachine.videoQualityChanged(
                         position,
-                        bitrateEventDataManipulator.hasVideoFormatChanged(format),
-                    ) { bitrateEventDataManipulator.currentVideoFormat = format }
+                        qualityEventDataManipulator.hasVideoFormatChanged(format),
+                    ) { qualityEventDataManipulator.currentVideoFormat = format }
                 } catch (e: Exception) {
                     Log.d(TAG, e.message, e)
                 }

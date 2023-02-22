@@ -8,9 +8,6 @@ import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.utils.Util
 
-// TODO we also need to track errors from other sources, not just the player.
-// Should be streamlined and go through the BitmovinAnalytics class
-
 class ErrorDetailTracking(private val context: Context, private val analyticsConfig: BitmovinAnalyticsConfig, private val backend: ErrorDetailBackend, private val httpRequestTracking: HttpRequestTracking?, private vararg val observables: Observable<OnErrorDetailEventListener>) :
     Feature<FeatureConfigContainer, ErrorDetailTrackingConfig>(),
     OnErrorDetailEventListener {

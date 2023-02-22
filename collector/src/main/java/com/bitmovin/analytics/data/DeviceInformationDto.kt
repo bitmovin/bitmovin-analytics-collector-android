@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.data
 
-// TODO (AN-3352): probably subject to pro guard obfuscation
+import androidx.annotation.Keep
+@Keep // Protect from proguard obfuscation
 data class DeviceInformationDto(
     val manufacturer: String,
     val model: String,

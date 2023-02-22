@@ -1,5 +1,8 @@
 package com.bitmovin.analytics.data
 
+import androidx.annotation.Keep
+
+@Keep // Protect from obfuscation in case customers are using proguard
 class DownloadSpeedInfo {
 
     // Number of completed segment downloads

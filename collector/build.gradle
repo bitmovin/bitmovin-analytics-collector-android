@@ -58,6 +58,10 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttp3Version}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
 
+    // required for @Keep annotation to avoid pro guard issues with obfuscated dtos
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
+
+
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"

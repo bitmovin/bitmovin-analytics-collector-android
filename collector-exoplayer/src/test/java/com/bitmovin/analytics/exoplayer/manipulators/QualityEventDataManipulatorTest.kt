@@ -14,20 +14,20 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 
-class BitrateEventDataManipulatorTest {
+class QualityEventDataManipulatorTest {
     private lateinit var mockExoPlayer: ExoPlayer
-    private lateinit var bitrateEventDataManipulator: BitrateEventDataManipulator
+    private lateinit var qualityEventDataManipulator: QualityEventDataManipulator
 
     @Before
     fun setup() {
         mockExoPlayer = mockk(relaxed = true)
-        bitrateEventDataManipulator = BitrateEventDataManipulator(mockExoPlayer)
+        qualityEventDataManipulator = QualityEventDataManipulator(mockExoPlayer)
     }
 
     @Test
     fun `hasAudioFormatChanged should return false if newFormat is null`() {
         // act
-        val hasAudioFormatChanged = bitrateEventDataManipulator.hasAudioFormatChanged(null)
+        val hasAudioFormatChanged = qualityEventDataManipulator.hasAudioFormatChanged(null)
 
         // assert
         assertThat(hasAudioFormatChanged).isFalse()
@@ -36,10 +36,10 @@ class BitrateEventDataManipulatorTest {
     @Test
     fun `hasAudioFormatChanged should return true if currentAudioBitrate is null`() {
         // arrange
-        bitrateEventDataManipulator.currentAudioFormat = null
+        qualityEventDataManipulator.currentAudioFormat = null
 
         // act
-        val hasAudioFormatChanged = bitrateEventDataManipulator.hasAudioFormatChanged(mockk(relaxed = true))
+        val hasAudioFormatChanged = qualityEventDataManipulator.hasAudioFormatChanged(mockk(relaxed = true))
 
         // assert
         assertThat(hasAudioFormatChanged).isTrue()
@@ -49,10 +49,10 @@ class BitrateEventDataManipulatorTest {
     fun `hasAudioFormatChanged should return true if currentAudioBitrate is different from newFormat`() {
         // arrange
         val newFormat = Format.Builder().setAverageBitrate(789).build()
-        bitrateEventDataManipulator.currentAudioFormat = Format.Builder().setAverageBitrate(123).build()
+        qualityEventDataManipulator.currentAudioFormat = Format.Builder().setAverageBitrate(123).build()
 
         // act
-        val hasAudioFormatChanged = bitrateEventDataManipulator.hasAudioFormatChanged(newFormat)
+        val hasAudioFormatChanged = qualityEventDataManipulator.hasAudioFormatChanged(newFormat)
 
         // assert
         assertThat(hasAudioFormatChanged).isTrue()
@@ -61,7 +61,7 @@ class BitrateEventDataManipulatorTest {
     @Test
     fun `hasVideoFormatChanged should return false if newFormat is null`() {
         // act
-        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(null)
+        val hasVideoFormatChanged = qualityEventDataManipulator.hasVideoFormatChanged(null)
 
         // assert
         assertThat(hasVideoFormatChanged).isFalse()
@@ -70,10 +70,10 @@ class BitrateEventDataManipulatorTest {
     @Test
     fun `hasVideoFormatChanged should return true if currentVideoFormat is null`() {
         // arrange
-        bitrateEventDataManipulator.currentVideoFormat = null
+        qualityEventDataManipulator.currentVideoFormat = null
 
         // act
-        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(mockk(relaxed = true))
+        val hasVideoFormatChanged = qualityEventDataManipulator.hasVideoFormatChanged(mockk(relaxed = true))
 
         // assert
         assertThat(hasVideoFormatChanged).isTrue()
@@ -83,10 +83,10 @@ class BitrateEventDataManipulatorTest {
     fun `hasVideoFormatChanged should return true if currentVideoFormat's bitrate is different from newFormat`() {
         // arrange
         val newFormat = Format.Builder().setAverageBitrate(789).build()
-        bitrateEventDataManipulator.currentVideoFormat = Format.Builder().setAverageBitrate(123).build()
+        qualityEventDataManipulator.currentVideoFormat = Format.Builder().setAverageBitrate(123).build()
 
         // act
-        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(newFormat)
+        val hasVideoFormatChanged = qualityEventDataManipulator.hasVideoFormatChanged(newFormat)
 
         // assert
 
@@ -97,10 +97,10 @@ class BitrateEventDataManipulatorTest {
     fun `hasVideoFormatChanged should return true if currentVideoFormat's width is different from newFormat`() {
         // arrange
         val newFormat = Format.Builder().setWidth(789).build()
-        bitrateEventDataManipulator.currentVideoFormat = Format.Builder().setWidth(123).build()
+        qualityEventDataManipulator.currentVideoFormat = Format.Builder().setWidth(123).build()
 
         // act
-        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(newFormat)
+        val hasVideoFormatChanged = qualityEventDataManipulator.hasVideoFormatChanged(newFormat)
 
         // assert
 
@@ -111,10 +111,10 @@ class BitrateEventDataManipulatorTest {
     fun `hasVideoFormatChanged should return true if currentVideoFormat's height is different from newFormat`() {
         // arrange
         val newFormat = Format.Builder().setHeight(789).build()
-        bitrateEventDataManipulator.currentVideoFormat = Format.Builder().setHeight(123).build()
+        qualityEventDataManipulator.currentVideoFormat = Format.Builder().setHeight(123).build()
 
         // act
-        val hasVideoFormatChanged = bitrateEventDataManipulator.hasVideoFormatChanged(newFormat)
+        val hasVideoFormatChanged = qualityEventDataManipulator.hasVideoFormatChanged(newFormat)
 
         // assert
 
@@ -129,11 +129,11 @@ class BitrateEventDataManipulatorTest {
             .setWidth(234)
             .setHeight(345)
             .build()
-        bitrateEventDataManipulator.currentVideoFormat = videoFormatFromExo
+        qualityEventDataManipulator.currentVideoFormat = videoFormatFromExo
         val data = mockk<EventData>(relaxed = true)
 
         // act
-        bitrateEventDataManipulator.manipulate(data)
+        qualityEventDataManipulator.manipulate(data)
 
         // assert
         verify { data.videoBitrate = 123 }
@@ -147,11 +147,11 @@ class BitrateEventDataManipulatorTest {
         val audioFormatFromExo = Format.Builder()
             .setAverageBitrate(123)
             .build()
-        bitrateEventDataManipulator.currentAudioFormat = audioFormatFromExo
+        qualityEventDataManipulator.currentAudioFormat = audioFormatFromExo
         val data = mockk<EventData>(relaxed = true)
 
         // act
-        bitrateEventDataManipulator.manipulate(data)
+        qualityEventDataManipulator.manipulate(data)
 
         // assert
         verify { data.audioBitrate = 123 }
@@ -160,22 +160,22 @@ class BitrateEventDataManipulatorTest {
     @Test
     fun `reset will set Formats to null`() {
         // arrange
-        bitrateEventDataManipulator.currentAudioFormat = mockk()
-        bitrateEventDataManipulator.currentVideoFormat = mockk()
+        qualityEventDataManipulator.currentAudioFormat = mockk()
+        qualityEventDataManipulator.currentVideoFormat = mockk()
 
         // act
-        bitrateEventDataManipulator.reset()
+        qualityEventDataManipulator.reset()
 
         // assert
-        assertThat(bitrateEventDataManipulator.currentAudioFormat?.bitrate).isNull()
-        assertThat(bitrateEventDataManipulator.currentVideoFormat?.bitrate).isNull()
+        assertThat(qualityEventDataManipulator.currentAudioFormat?.bitrate).isNull()
+        assertThat(qualityEventDataManipulator.currentVideoFormat?.bitrate).isNull()
     }
 
     @Test
     fun `setFormatsFromPlayer will set currentFormats from exoplayer TrackGroupInfo if exoPlayers format are null`() {
         // arrange
-        bitrateEventDataManipulator.currentAudioFormat = null
-        bitrateEventDataManipulator.currentVideoFormat = null
+        qualityEventDataManipulator.currentAudioFormat = null
+        qualityEventDataManipulator.currentVideoFormat = null
         val videoFormatFromExo = Format.Builder().setAverageBitrate(123).build()
         val audioFormatFromExo = Format.Builder().setAverageBitrate(321).build()
         every { mockExoPlayer.videoFormat } answers { null }
@@ -183,11 +183,11 @@ class BitrateEventDataManipulatorTest {
         prepareExoToReturnFormat(mockExoPlayer, videoFormatFromExo, audioFormatFromExo)
 
         // act
-        bitrateEventDataManipulator.setFormatsFromPlayer()
+        qualityEventDataManipulator.setFormatsFromPlayer()
 
         // assert
-        assertThat(bitrateEventDataManipulator.currentVideoFormat?.bitrate).isEqualTo(videoFormatFromExo.bitrate)
-        assertThat(bitrateEventDataManipulator.currentAudioFormat?.bitrate).isEqualTo(audioFormatFromExo.bitrate)
+        assertThat(qualityEventDataManipulator.currentVideoFormat?.bitrate).isEqualTo(videoFormatFromExo.bitrate)
+        assertThat(qualityEventDataManipulator.currentAudioFormat?.bitrate).isEqualTo(audioFormatFromExo.bitrate)
     }
 
     @Test
@@ -197,7 +197,7 @@ class BitrateEventDataManipulatorTest {
         val audioFormatFromExo = Format.Builder().setAverageBitrate(321).build()
         every { mockExoPlayer.videoFormat } answers { videoFormatFromExo }
         every { mockExoPlayer.audioFormat } answers { audioFormatFromExo }
-        val bitrateManipulator = BitrateEventDataManipulator(mockExoPlayer)
+        val bitrateManipulator = QualityEventDataManipulator(mockExoPlayer)
 
         // act
         bitrateManipulator.setFormatsFromPlayer()

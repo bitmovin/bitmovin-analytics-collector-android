@@ -1,8 +1,9 @@
 package com.bitmovin.analytics.data
 
+import androidx.annotation.Keep
 import com.bitmovin.analytics.utils.Util
 
-// TODO (AN-3352): probably subject to pro guard obfuscation
+@Keep // Protect from obfuscation in case customers are using proguard
 class EventData(
     deviceInfo: DeviceInformation,
     playerInfo: PlayerInfo,
