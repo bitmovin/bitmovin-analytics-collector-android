@@ -58,7 +58,7 @@ class BitmovinPlayerCollector
         val deviceInformationProvider = DeviceInformationProvider(context)
         val playerLicenseProvider = PlayerLicenseProvider(context)
         val playerContext = BitmovinPlayerContext(player)
-        val stateMachine = PlayerStateMachine.create(analytics, playerContext)
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext)
         return BitmovinSdkAdapter(
             player,
             config,

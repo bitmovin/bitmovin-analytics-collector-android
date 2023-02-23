@@ -42,7 +42,7 @@ class AmazonIvsPlayerCollector(
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = AmazonIvsPlayerFeatureFactory(analytics, player)
         val playerContext = IvsPlayerContext(player)
-        val stateMachine = PlayerStateMachine.create(analytics, playerContext)
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext)
 
         val playbackService = PlaybackService(stateMachine)
         val playbackManipulator = PlaybackEventDataManipulator(player, config)

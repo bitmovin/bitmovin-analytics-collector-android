@@ -279,8 +279,7 @@ class PlayerStateMachine(
         resetStateMachine()
     }
 
-    companion object {
-
+    object Factory {
         fun create(analytics: BitmovinAnalytics, playerContext: PlayerContext): PlayerStateMachine {
             val bufferingTimeoutTimer = ObservableTimer(Util.REBUFFERING_TIMEOUT.toLong(), 1000)
             val qualityChangeCountResetTimer =
@@ -296,6 +295,9 @@ class PlayerStateMachine(
             )
         }
 
+    }
+
+    companion object {
         private const val TAG = "PlayerStateMachine"
         private val rebufferingIntervals = arrayOf(3000, 5000, 10000, 30000, 59700)
     }

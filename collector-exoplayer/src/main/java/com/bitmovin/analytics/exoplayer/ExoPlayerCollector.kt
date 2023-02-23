@@ -52,7 +52,7 @@ class ExoPlayerCollector
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val deviceInformationProvider = DeviceInformationProvider(context)
         val playerContext = ExoPlayerContext(player)
-        val stateMachine = PlayerStateMachine.create(analytics, playerContext)
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext)
         return ExoPlayerAdapter(
             player,
             config,
