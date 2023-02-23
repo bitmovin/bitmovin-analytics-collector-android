@@ -6,7 +6,6 @@ import com.google.android.exoplayer2.Timeline
 
 internal class ExoPlayerContext(private val player: Player) : PlayerContext {
     override fun isPlaying(): Boolean {
-        // TODOMY check if this is right for exoplayer?
         return player.isPlaying
     }
 

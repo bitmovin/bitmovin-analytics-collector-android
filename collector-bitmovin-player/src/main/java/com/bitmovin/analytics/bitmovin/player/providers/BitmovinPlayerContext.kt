@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player.providers
 
 import com.bitmovin.analytics.adapters.PlayerContext
-import com.bitmovin.analytics.utils.Util
+import com.bitmovin.analytics.bitmovin.player.BitmovinUtil
 import com.bitmovin.player.api.Player
 
 internal class BitmovinPlayerContext(private val player: Player) : PlayerContext {
@@ -10,6 +10,5 @@ internal class BitmovinPlayerContext(private val player: Player) : PlayerContext
     }
 
     override val position: Long
-        // TODOMY use BitmovinUtil
-        get() = Util.secondsToMillis(player.currentTime)
+        get() = BitmovinUtil.getCurrentTimeInMs(player)
 }
