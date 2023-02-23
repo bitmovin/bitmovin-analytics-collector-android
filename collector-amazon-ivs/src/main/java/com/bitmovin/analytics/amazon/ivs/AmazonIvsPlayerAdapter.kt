@@ -4,10 +4,10 @@ import android.util.Log
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
 import com.bitmovin.analytics.amazon.ivs.player.PlayerStatisticsProvider
-import com.bitmovin.analytics.amazon.ivs.player.PositionProvider
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
@@ -28,7 +28,7 @@ internal class AmazonIvsPlayerAdapter(
     private val playerListener: IvsPlayerListener,
     manipulators: List<EventDataManipulator>,
     private val playerStatisticsProvider: PlayerStatisticsProvider,
-    private val playerPositionProvider: PositionProvider,
+    private val playerContext: PlayerContext,
 ) : DefaultPlayerAdapter(
     config,
     eventDataFactory,
@@ -60,7 +60,7 @@ internal class AmazonIvsPlayerAdapter(
     override val eventDataManipulators: Collection<EventDataManipulator> = manipulators
 
     override val position: Long
-        get() = playerPositionProvider.position
+        get() = playerContext.position
 
     override val drmDownloadTime: Long?
         get() = null // drm is not supported by IVS player
