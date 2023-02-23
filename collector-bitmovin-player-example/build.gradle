@@ -16,9 +16,6 @@ android {
         multiDexEnabled true
     }
 
-    lintOptions {
-        abortOnError false
-    }
 
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibility
@@ -34,6 +31,9 @@ android {
 
     buildFeatures{
         viewBinding = true
+    }
+    lint {
+        abortOnError false
     }
 }
 

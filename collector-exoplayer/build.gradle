@@ -16,9 +16,6 @@ android {
         multiDexEnabled true
     }
 
-    lintOptions {
-        abortOnError false
-    }
 
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibility
@@ -41,6 +38,9 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+    }
+    lint {
+        abortOnError false
     }
 }
 

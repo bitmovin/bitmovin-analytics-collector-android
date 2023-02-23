@@ -37,10 +37,7 @@ class LicenseCall(private val config: BitmovinAnalyticsConfig, private val conte
     }
 
     fun authenticate(callback: AuthenticationCallback) {
-        val data = LicenseCallData()
-        data.key = config.key
-        data.setAnalyticsVersion(Util.analyticsVersion)
-        data.setDomain(Util.getDomain(context))
+        val data = LicenseCallData(config.key, Util.analyticsVersion, Util.getDomain(context))
         val json = serialize(data)
         httpClient.post(
             backendUrl,

@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] move to main as default branch
 - [internal] refactored PlayerTech to be constant and part of adapters
 - [internal] fix AdPosition and AdTagType enums to return configured string representation
+- [internal] Converted all Java classes that were left to kotlin
 - Upgraded okhttp3 to v4.10.0 (this is a major version upgrade from v3 to v4)
 - Upgraded gson dependency to v2.8.9
 - Upgraded androidx.appcompat dependency to v1.6.1

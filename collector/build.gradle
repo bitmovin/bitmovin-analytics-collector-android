@@ -19,9 +19,6 @@ android {
         multiDexEnabled true
     }
 
-    lintOptions {
-        abortOnError false
-    }
 
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibility
@@ -49,6 +46,9 @@ android {
         debug {
             testCoverageEnabled true
         }
+    }
+    lint {
+        abortOnError false
     }
 }
 
