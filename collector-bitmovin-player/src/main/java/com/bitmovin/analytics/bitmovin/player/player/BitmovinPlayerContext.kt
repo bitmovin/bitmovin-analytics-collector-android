@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.bitmovin.player.providers
+package com.bitmovin.analytics.bitmovin.player.player
 
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.bitmovin.player.BitmovinUtil

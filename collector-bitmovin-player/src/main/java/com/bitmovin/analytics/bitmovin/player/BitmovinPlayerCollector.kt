@@ -6,8 +6,8 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory
-import com.bitmovin.analytics.bitmovin.player.providers.BitmovinPlayerContext
-import com.bitmovin.analytics.bitmovin.player.providers.PlayerLicenseProvider
+import com.bitmovin.analytics.bitmovin.player.player.BitmovinPlayerContext
+import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory

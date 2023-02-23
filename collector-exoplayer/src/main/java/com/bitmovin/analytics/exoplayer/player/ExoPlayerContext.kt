@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.exoplayer
+package com.bitmovin.analytics.exoplayer.player
 
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.google.android.exoplayer2.Player
