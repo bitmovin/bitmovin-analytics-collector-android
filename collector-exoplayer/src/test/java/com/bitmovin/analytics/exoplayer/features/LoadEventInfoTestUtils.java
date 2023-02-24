@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// We need to create the ResponseHeaderMap in a java class since
+// this is the only way to insert null key values and pass this as a non nullable key map in kotlin
 public class LoadEventInfoTestUtils {
-    // We need to create the ResponseHeaderMap in a java class since
-    // this is the only way to insert null key values and pass this a non nullable key map in kotlin
     public static Map<String, List<String>> getResponseHeaderMap (String nullKeyValue){
         Map<String,List<String>> result = new HashMap<>();
 

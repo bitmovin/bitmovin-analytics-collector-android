@@ -195,14 +195,26 @@ internal class ExoPlayerAdapter(
     }
 
     override fun release() {
-        playerIsReady = false
-        isInInitialBufferState = false
-        manifestUrl = null
-        exoplayer.removeListener(defaultPlayerEventListener)
-        exoplayer.removeAnalyticsListener(defaultAnalyticsListener)
-        meter.reset()
-        qualityEventDataManipulator.reset()
-        stateMachine.resetStateMachine()
+        // we need to run this on the application thread to prevent exoplayer from crashing
+        // when calling the api from a non application thread
+        // (this is potentially called from okhttp callback which is on a separate thread)
+        // we execute the whole method on the main thread to make sure the order is kept
+        ExoUtil.executeSyncOrAsyncOnLooperThread(exoplayer.applicationLooper) {
+            try {
+                playerIsReady = false
+                isInInitialBufferState = false
+                manifestUrl = null
+
+                exoplayer.removeListener(defaultPlayerEventListener)
+                exoplayer.removeAnalyticsListener(defaultAnalyticsListener)
+
+                meter.reset()
+                qualityEventDataManipulator.reset()
+                stateMachine.resetStateMachine()
+            } catch (e: Exception) {
+                Log.e(TAG, e.toString())
+            }
+        }
     }
 
     override fun resetSourceRelatedState() {

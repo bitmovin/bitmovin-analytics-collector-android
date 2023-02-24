@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded okhttp3 to v4.10.0 (this is a major version upgrade from v3 to v4)
 - Upgraded gson dependency to v2.8.9
 - Upgraded androidx.appcompat dependency to v1.6.1
-- Upgraded example apps to latest bitmovin player (v3.29.0) and latest exoplayer (v2.18.2)
+- Upgraded example apps to latest bitmovin player (v3.29.0) and latest exoplayer (v2.18.3)
 - Deprecated obsolete PlayerType config in AnalyticsConfig
 - use `System.getProperty("http.agent")` for user agent tracking
 - Made all bitmovin and exoplayer collector classes that are not part of the public API internal
@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Tracking of bitmovin player key when it is specified in the manifest
 - Tracking of audiolanguage, audiocodec and videocodec for exoplayer
 - Serialization issues when ProGuard is used for obfuscation
+- ExoPlayer v2.18.3 could crash on detaching of analytics listener on certain scenarios
 
 ## v2.13.0
 

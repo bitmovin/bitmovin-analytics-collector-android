@@ -6,6 +6,7 @@ import android.util.Log
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
+import com.bitmovin.analytics.exoplayer.ExoUtil
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestType
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
@@ -74,7 +75,17 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
 
     private fun unwireEvents() {
         onAnalyticsReleasingObservable.unsubscribe(this)
-        player.removeAnalyticsListener(analyticsListener)
+
+        // we need to run this on the application thread to prevent exoplayer from crashing
+        // when calling the api from a non application thread
+        // (this is potentially called from okhttp callback which is on a separate thread)
+        ExoUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
+            try {
+                player.removeAnalyticsListener(analyticsListener)
+            } catch (e: Exception) {
+                Log.e(TAG, e.toString())
+            }
+        }
     }
 
     override fun subscribe(listener: OnDownloadFinishedEventListener) {

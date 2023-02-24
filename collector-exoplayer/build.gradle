@@ -38,6 +38,11 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+
+        // robolectric setting
+        unitTests {
+            includeAndroidResources = true
+        }
     }
     lint {
         abortOnError false
@@ -52,6 +57,8 @@ dependencies {
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
+
+    testImplementation "org.robolectric:robolectric:${rootProject.ext.robolectricVersion}"
 
     if (rootProject.ext.developLocal) {
         api project(':collector')
