@@ -41,13 +41,17 @@ class PlayerStateMachine(
     private var currentRebufferingIntervalIndex = 0
     private val heartbeatDelay = HEARTBEAT_INTERVAL.toLong() // 60 seconds
     var videoStartFailedReason: VideoStartFailedReason? = null
+    private var isHeartbeatEnabled = false
 
     fun enableHeartbeat() {
+        isHeartbeatEnabled = true
         heartbeatHandler.postDelayed(
             object : Runnable {
                 override fun run() {
                     triggerPlayingHeartbeat()
-                    heartbeatHandler.postDelayed(this, heartbeatDelay)
+                    if (isHeartbeatEnabled) {
+                        heartbeatHandler.postDelayed(this, heartbeatDelay)
+                    }
                 }
             },
             heartbeatDelay,
@@ -55,6 +59,7 @@ class PlayerStateMachine(
     }
 
     fun disableHeartbeat() {
+        isHeartbeatEnabled = false
         heartbeatHandler.removeCallbacksAndMessages(null)
     }
 
