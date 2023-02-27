@@ -299,7 +299,6 @@ class PlayerStateMachine(
                 playerContext,
             )
         }
-
     }
 
     companion object {
