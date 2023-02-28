@@ -19,7 +19,7 @@ class PlayerStateMachine(
     internal val qualityChangeEventLimiter: QualityChangeEventLimiter,
     internal val videoStartTimeoutTimer: ObservableTimer,
     private val playerContext: PlayerContext,
-    private val heartbeatHandler: Handler = Handler(),
+    private val heartbeatHandler: Handler = Handler() //TODO (AN-3404) fix deprecated Handler constructor
 ) {
     internal val listeners = ObservableSupport<StateMachineListener>()
 
@@ -41,15 +41,13 @@ class PlayerStateMachine(
     private var currentRebufferingIntervalIndex = 0
     private val heartbeatDelay = HEARTBEAT_INTERVAL.toLong() // 60 seconds
     var videoStartFailedReason: VideoStartFailedReason? = null
-    private var isHeartbeatEnabled = false
 
     fun enableHeartbeat() {
-        isHeartbeatEnabled = true
         heartbeatHandler.postDelayed(
             object : Runnable {
                 override fun run() {
-                    triggerPlayingHeartbeat()
-                    if (isHeartbeatEnabled) {
+                    val continueHeartbeat = checkAndTriggerPlayingHeartbeat()
+                    if (continueHeartbeat) {
                         heartbeatHandler.postDelayed(this, heartbeatDelay)
                     }
                 }
@@ -59,7 +57,6 @@ class PlayerStateMachine(
     }
 
     fun disableHeartbeat() {
-        isHeartbeatEnabled = false
         heartbeatHandler.removeCallbacksAndMessages(null)
     }
 
@@ -91,12 +88,14 @@ class PlayerStateMachine(
     // the player was released. This is problematic when a customer releases player but does not
     // detach our collectors, as we do not transition into pause state and will continue sending
     // samples. The below check prevents this from happening.
-    fun triggerPlayingHeartbeat() {
+    fun checkAndTriggerPlayingHeartbeat() : Boolean {
         if (playerContext.isPlaying()) {
             triggerHeartbeat()
+            return true
         } else {
             // transition into pause state when player is in PLAYING state but not actually playing
             pause(playerContext.position)
+            return false
         }
     }
 
