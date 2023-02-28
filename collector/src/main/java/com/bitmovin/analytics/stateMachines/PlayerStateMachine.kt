@@ -3,8 +3,8 @@ package com.bitmovin.analytics.stateMachines
 import android.os.Handler
 import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.ObservableSupport
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.SubtitleDto
@@ -13,7 +13,14 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
 
-class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics: BitmovinAnalytics, internal val bufferingTimeoutTimer: ObservableTimer, internal val qualityChangeEventLimiter: QualityChangeEventLimiter, internal val videoStartTimeoutTimer: ObservableTimer, private val heartbeatHandler: Handler = Handler()) {
+class PlayerStateMachine(
+    private val analytics: BitmovinAnalytics,
+    internal val bufferingTimeoutTimer: ObservableTimer,
+    internal val qualityChangeEventLimiter: QualityChangeEventLimiter,
+    internal val videoStartTimeoutTimer: ObservableTimer,
+    private val playerContext: PlayerContext,
+    private val heartbeatHandler: Handler = Handler(),
+) {
     internal val listeners = ObservableSupport<StateMachineListener>()
 
     var currentState: PlayerState<*> = PlayerStates.READY
@@ -39,7 +46,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         heartbeatHandler.postDelayed(
             object : Runnable {
                 override fun run() {
-                    triggerHeartbeat()
+                    triggerPlayingHeartbeat()
                     heartbeatHandler.postDelayed(this, heartbeatDelay)
                 }
             },
@@ -75,9 +82,18 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         heartbeatHandler.removeCallbacksAndMessages(null)
     }
 
+    fun triggerPlayingHeartbeat() {
+        if (playerContext.isPlaying()) {
+            triggerHeartbeat()
+        } else {
+            //transition into pause state
+            pause(playerContext.position)
+        }
+    }
+
     private fun triggerHeartbeat() {
         val elapsedTime = Util.elapsedTime
-        videoTimeEnd = analytics.position
+        videoTimeEnd = playerContext.position
         listeners.notify { it.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter) }
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
@@ -248,7 +264,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     private fun onRebufferingTimerFinished() {
         Log.d(TAG, "rebufferingTimeout finish")
         error(
-            analytics.position,
+            playerContext.position,
             AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.errorCode,
         )
         disableRebufferHeartbeat()
@@ -264,6 +280,22 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     }
 
     companion object {
+
+        fun create(analytics: BitmovinAnalytics, playerContext: PlayerContext): PlayerStateMachine {
+            val bufferingTimeoutTimer = ObservableTimer(Util.REBUFFERING_TIMEOUT.toLong(), 1000)
+            val qualityChangeCountResetTimer =
+                ObservableTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL.toLong(), 1000)
+            val qualityChangeEventLimiter = QualityChangeEventLimiter(qualityChangeCountResetTimer)
+            val videoStartTimeoutTimer = ObservableTimer(Util.VIDEOSTART_TIMEOUT.toLong(), 1000)
+            return PlayerStateMachine(
+                analytics,
+                bufferingTimeoutTimer,
+                qualityChangeEventLimiter,
+                videoStartTimeoutTimer,
+                playerContext,
+            )
+        }
+
         private const val TAG = "PlayerStateMachine"
         private val rebufferingIntervals = arrayOf(3000, 5000, 10000, 30000, 59700)
     }

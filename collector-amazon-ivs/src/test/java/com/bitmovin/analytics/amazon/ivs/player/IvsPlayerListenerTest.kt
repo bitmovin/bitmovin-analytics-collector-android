@@ -2,6 +2,7 @@ package com.bitmovin.analytics.amazon.ivs.player
 
 import com.amazonaws.ivs.player.PlayerException
 import com.amazonaws.ivs.player.Quality
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.amazon.ivs.playback.PlaybackService
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
@@ -14,22 +15,22 @@ import org.junit.Test
 
 class IvsPlayerListenerTest {
 
-    private lateinit var positionProviderMock: PositionProvider
+    private lateinit var playerContextMock: PlayerContext
     private lateinit var stateMachineMock: PlayerStateMachine
 
     @Before
     fun setup() {
         stateMachineMock = mockk(relaxed = true)
-        positionProviderMock = mockk(relaxed = true)
+        playerContextMock = mockk(relaxed = true)
     }
 
     @Test
     fun testOnError_ShouldTransitionStateToError() {
         // arrange
-        val playerListener = createPlayerListener(stateMachineMock, positionProviderMock)
+        val playerListener = createPlayerListener(stateMachineMock, playerContextMock)
         val pe = mockk<PlayerException>(relaxed = true)
 
-        every { positionProviderMock.position }.returns(123L)
+        every { playerContextMock.position }.returns(123L)
 
         // act
         playerListener.onError(pe)
@@ -41,8 +42,8 @@ class IvsPlayerListenerTest {
     @Test
     fun testOnRebuffering_ShouldTransitionStateToBuffering() {
         // arrange
-        val playerListener = createPlayerListener(stateMachineMock, positionProviderMock)
-        every { positionProviderMock.position }.returns(123L)
+        val playerListener = createPlayerListener(stateMachineMock, playerContextMock)
+        every { playerContextMock.position }.returns(123L)
 
         // act
         playerListener.onRebuffering()
@@ -57,10 +58,10 @@ class IvsPlayerListenerTest {
         val playbackQualityProvider = PlaybackQualityProvider()
         val playerListener = createPlayerListener(
             stateMachineMock,
-            positionProviderMock,
+            playerContextMock,
             playbackQualityProvider,
         )
-        every { positionProviderMock.position }.returns(123L)
+        every { playerContextMock.position }.returns(123L)
 
         val qualityMock = mockk<Quality>(relaxed = true)
 
@@ -75,8 +76,8 @@ class IvsPlayerListenerTest {
     fun testOnSeekCompleted_ShouldTransitionStateToSeekingForVOD() {
         // arrange
         val playbackQualityProvider = PlaybackQualityProvider()
-        val playerListener = createPlayerListener(stateMachineMock, positionProviderMock, playbackQualityProvider)
-        every { positionProviderMock.position }.returns(123L)
+        val playerListener = createPlayerListener(stateMachineMock, playerContextMock, playbackQualityProvider)
+        every { playerContextMock.position }.returns(123L)
 
         // to update duration
         playerListener.onDurationChanged(123L)
@@ -92,8 +93,8 @@ class IvsPlayerListenerTest {
     fun testOnSeekCompleted_ShouldNotTransitionStateToSeekingForLive() {
         // arrange
         val playbackQualityProvider = PlaybackQualityProvider()
-        val playerListener = createPlayerListener(stateMachineMock, positionProviderMock, playbackQualityProvider)
-        every { positionProviderMock.position }.returns(123L)
+        val playerListener = createPlayerListener(stateMachineMock, playerContextMock, playbackQualityProvider)
+        every { playerContextMock.position }.returns(123L)
 
         // to update duration
         playerListener.onDurationChanged(-1L)
@@ -111,10 +112,10 @@ class IvsPlayerListenerTest {
         val playbackQualityProvider = PlaybackQualityProvider()
         val playerListener = createPlayerListener(
             stateMachineMock,
-            positionProviderMock,
+            playerContextMock,
             playbackQualityProvider,
         )
-        every { positionProviderMock.position }.returns(123L)
+        every { playerContextMock.position }.returns(123L)
 
         val qualityMock = mockk<Quality>(relaxed = true)
         playbackQualityProvider.currentQuality = qualityMock
@@ -128,11 +129,17 @@ class IvsPlayerListenerTest {
 
     private fun createPlayerListener(
         stateMachine: PlayerStateMachine = mockk(relaxed = true),
-        positionProvider: PositionProvider = mockk(relaxed = true),
+        playerContext: PlayerContext = mockk(relaxed = true),
         playbackQualityProvider: PlaybackQualityProvider = mockk(relaxed = true),
         playbackService: PlaybackService = mockk(relaxed = true),
         videoStartupService: VideoStartupService = mockk(relaxed = true),
     ): IvsPlayerListener {
-        return IvsPlayerListener(stateMachine, positionProvider, playbackQualityProvider, playbackService, videoStartupService)
+        return IvsPlayerListener(
+            stateMachine,
+            playerContext,
+            playbackQualityProvider,
+            playbackService,
+            videoStartupService
+        )
     }
 }

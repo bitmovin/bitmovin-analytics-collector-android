@@ -5,6 +5,7 @@ import com.amazonaws.ivs.player.Cue
 import com.amazonaws.ivs.player.Player
 import com.amazonaws.ivs.player.PlayerException
 import com.amazonaws.ivs.player.Quality
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.amazon.ivs.AmazonIvsPlayerExceptionMapper
 import com.bitmovin.analytics.amazon.ivs.Utils
 import com.bitmovin.analytics.amazon.ivs.playback.PlaybackService
@@ -34,7 +35,7 @@ import java.nio.ByteBuffer
 
 internal class IvsPlayerListener(
     private val stateMachine: PlayerStateMachine,
-    private val positionProvider: PositionProvider,
+    private val playerContext: PlayerContext,
     private val playbackQualityProvider: PlaybackQualityProvider,
     private val playbackService: PlaybackService,
     private val videoStartupService: VideoStartupService,
@@ -53,11 +54,11 @@ internal class IvsPlayerListener(
 
     override fun onStateChanged(state: Player.State) {
         try {
-            Log.d(TAG, "onStateChanged state: $state, position: ${positionProvider.position} ")
+            Log.d(TAG, "onStateChanged state: $state, position: ${playerContext.position} ")
             if (!stateMachine.isStartupFinished) {
-                videoStartupService.onStateChange(state, positionProvider.position)
+                videoStartupService.onStateChange(state, playerContext.position)
             } else {
-                playbackService.onStateChange(state, positionProvider.position)
+                playbackService.onStateChange(state, playerContext.position)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while doing state transitions, e: ${e.message}", e)
@@ -69,7 +70,7 @@ internal class IvsPlayerListener(
             Log.d(TAG, "onError: " + pe.message)
             val errorCode = exceptionMapper.map(pe)
             // TODO (AN-3361): check if we can detect if error happened during startup
-            stateMachine.error(positionProvider.position, errorCode)
+            stateMachine.error(playerContext.position, errorCode)
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while processing error, e: ${e.message}", e)
         }
@@ -78,7 +79,7 @@ internal class IvsPlayerListener(
     override fun onRebuffering() {
         Log.d(TAG, "onRebuffering")
         try {
-            stateMachine.transitionState(PlayerStates.BUFFERING, positionProvider.position)
+            stateMachine.transitionState(PlayerStates.BUFFERING, playerContext.position)
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while processing buffering, e: ${e.message}", e)
         }
@@ -93,8 +94,8 @@ internal class IvsPlayerListener(
             // we only track seeking on vod
             if (duration?.let { Utils.isPlaybackLive(it) } == false) {
                 val stateBeforeSeek = stateMachine.currentState
-                stateMachine.transitionState(PlayerStates.SEEKING, positionProvider.position)
-                stateMachine.transitionState(stateBeforeSeek, positionProvider.position)
+                stateMachine.transitionState(PlayerStates.SEEKING, playerContext.position)
+                stateMachine.transitionState(stateBeforeSeek, playerContext.position)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while processing seeking, e: ${e.message}", e)
@@ -110,7 +111,7 @@ internal class IvsPlayerListener(
     override fun onQualityChanged(newQuality: Quality) {
         try {
             Log.d(TAG, "onQualityChanged: $newQuality")
-            stateMachine.videoQualityChanged(positionProvider.position, playbackQualityProvider.didQualityChange(newQuality)) {
+            stateMachine.videoQualityChanged(playerContext.position, playbackQualityProvider.didQualityChange(newQuality)) {
                 playbackQualityProvider.currentQuality = newQuality
             }
         } catch (e: Exception) {

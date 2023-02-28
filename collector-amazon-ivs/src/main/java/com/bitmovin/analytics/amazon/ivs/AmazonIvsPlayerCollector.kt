@@ -13,7 +13,7 @@ import com.bitmovin.analytics.amazon.ivs.manipulators.QualityEventDataManipulato
 import com.bitmovin.analytics.amazon.ivs.playback.PlaybackService
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
 import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
-import com.bitmovin.analytics.amazon.ivs.player.IvsPositionProvider
+import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerContext
 import com.bitmovin.analytics.amazon.ivs.player.PlaybackQualityProvider
 import com.bitmovin.analytics.amazon.ivs.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.data.DeviceInformationProvider
@@ -39,19 +39,19 @@ class AmazonIvsPlayerCollector(
     override fun createAdapter(
         player: Player,
         analytics: BitmovinAnalytics,
-        stateMachine: PlayerStateMachine,
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = AmazonIvsPlayerFeatureFactory(analytics, player)
+        val playerContext = IvsPlayerContext(player)
+        val stateMachine = PlayerStateMachine.create(analytics, playerContext)
 
         val playbackService = PlaybackService(stateMachine)
-        val positionProvider = IvsPositionProvider(player)
         val playbackManipulator = PlaybackEventDataManipulator(player, config)
         val playbackQualityProvider = PlaybackQualityProvider()
         val videoStartupService = VideoStartupService(stateMachine, player, playbackQualityProvider)
         val playerListener =
             IvsPlayerListener(
                 stateMachine,
-                positionProvider,
+                playerContext,
                 playbackQualityProvider,
                 playbackService,
                 videoStartupService,
@@ -78,7 +78,7 @@ class AmazonIvsPlayerCollector(
             playerListener,
             manipulators,
             playerStatisticsProvider,
-            positionProvider,
+            playerContext,
         )
     }
 }

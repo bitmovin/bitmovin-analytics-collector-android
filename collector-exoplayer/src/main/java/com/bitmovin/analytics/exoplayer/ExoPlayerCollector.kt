@@ -42,7 +42,6 @@ class ExoPlayerCollector
     override fun createAdapter(
         player: ExoPlayer,
         analytics: BitmovinAnalytics,
-        stateMachine: PlayerStateMachine,
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = ExoPlayerFeatureFactory(analytics, player)
         val userAgentProvider = UserAgentProvider(
@@ -52,6 +51,8 @@ class ExoPlayerCollector
         )
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val deviceInformationProvider = DeviceInformationProvider(context)
+        val playerContext = ExoPlayerContext(player)
+        val stateMachine = PlayerStateMachine.create(analytics, playerContext)
         return ExoPlayerAdapter(
             player,
             config,

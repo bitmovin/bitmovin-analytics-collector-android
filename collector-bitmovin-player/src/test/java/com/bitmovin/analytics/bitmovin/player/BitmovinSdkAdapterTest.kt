@@ -42,10 +42,10 @@ class BitmovinSdkAdapterTest {
             PlayerStateMachine(
                 mockk(),
                 mockk(),
-                mockk(),
                 qualityChangeEventLimiter,
                 mockk(),
                 mockk(),
+                mockk()
             ),
             recordPrivateCalls = true,
         )
