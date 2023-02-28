@@ -87,11 +87,15 @@ class PlayerStateMachine(
         heartbeatHandler.removeCallbacksAndMessages(null)
     }
 
+    // Exoplayer and IVsPlayer do not have a 'playerWasReleased' event, so we can not detect when
+    // the player was released. This is problematic when a customer releases player but does not
+    // detach our collectors, as we do not transition into pause state and will continue sending
+    // samples. The below check prevents this from happening.
     fun triggerPlayingHeartbeat() {
         if (playerContext.isPlaying()) {
             triggerHeartbeat()
         } else {
-            // transition into pause state
+            // transition into pause state when player is in PLAYING state but not actually playing
             pause(playerContext.position)
         }
     }
