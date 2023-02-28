@@ -16,6 +16,7 @@ import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.exoplayer.manipulators.QualityEventDataManipulator
+import com.bitmovin.analytics.exoplayer.player.ExoPlayerContext
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
@@ -28,7 +29,6 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.decoder.DecoderReuseEvaluation
 import com.google.android.exoplayer2.drm.DrmInitData
@@ -63,6 +63,7 @@ internal class ExoPlayerAdapter(
     private val exceptionMapper: ExceptionMapper<Throwable> = ExoPlayerExceptionMapper()
     private val qualityEventDataManipulator = QualityEventDataManipulator(exoplayer)
     private val meter = DownloadSpeedMeter()
+    private val exoplayerContext = ExoPlayerContext(exoplayer)
 
     // TODO inject those from the outside, as this is not really testable
     internal val defaultAnalyticsListener = createAnalyticsListener()
@@ -226,28 +227,7 @@ internal class ExoPlayerAdapter(
 
     override val position: Long
         get() {
-            val timeline = exoplayer.currentTimeline
-            val currentWindowIndex = exoplayer.currentMediaItemIndex
-            if (currentWindowIndex >= 0 && currentWindowIndex < timeline.windowCount) {
-                val currentWindow = Timeline.Window()
-                timeline.getWindow(currentWindowIndex, currentWindow)
-                val firstPeriodInWindowIndex = currentWindow.firstPeriodIndex
-                val firstPeriodInWindow = Timeline.Period()
-                if (firstPeriodInWindowIndex >= 0 &&
-                    firstPeriodInWindowIndex < timeline.periodCount
-                ) {
-                    timeline.getPeriod(firstPeriodInWindowIndex, firstPeriodInWindow)
-                    var position = (
-                        exoplayer.currentPosition -
-                            firstPeriodInWindow.positionInWindowMs
-                        )
-                    if (position < 0) {
-                        position = 0
-                    }
-                    return position
-                }
-            }
-            return 0
+            return exoplayerContext.position
         }
 
     override fun clearValues() {
