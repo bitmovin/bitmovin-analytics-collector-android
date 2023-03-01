@@ -65,7 +65,7 @@ internal class ExoPlayerAdapter(
     private val meter = DownloadSpeedMeter()
     private val exoplayerContext = ExoPlayerContext(exoplayer)
 
-    // TODO inject those from the outside, as this is not really testable
+    // TODO [AN-3405]: create separate listener classes and inject those from the outside, as this is not really testable
     internal val defaultAnalyticsListener = createAnalyticsListener()
     internal val defaultPlayerEventListener = createPlayerEventListener()
 

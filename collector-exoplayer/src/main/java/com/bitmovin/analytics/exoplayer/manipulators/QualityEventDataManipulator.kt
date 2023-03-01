@@ -58,8 +58,6 @@ internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : E
     }
 
     fun setFormatsFromPlayer() {
-        // TODO (AN-3381): why do we need the fallback?
-        // without the fallback we could support exoplayer 2.17.0
         currentVideoFormat = exoplayer.videoFormat ?: getCurrentFormatFromPlayer(TRACK_TYPE_VIDEO)
         currentAudioFormat = exoplayer.audioFormat ?: getCurrentFormatFromPlayer(TRACK_TYPE_AUDIO)
     }

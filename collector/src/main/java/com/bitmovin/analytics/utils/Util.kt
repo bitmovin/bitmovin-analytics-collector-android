@@ -48,7 +48,6 @@ object Util {
     val locale: String
         get() = Resources.getSystem().configuration.locale.toString()
 
-    // TODO: double check whats the use of this, this seems to work very poorly when looking into crate
     val supportedVideoFormats: List<String>
         get() {
             val codecs: MutableList<String> = ArrayList()

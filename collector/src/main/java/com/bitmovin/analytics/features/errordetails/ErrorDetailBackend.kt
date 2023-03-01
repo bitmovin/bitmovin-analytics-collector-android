@@ -31,7 +31,6 @@ class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context, pri
     }
 
     fun flush() {
-        // TODO: clarify what we are doing here
         // We create a copy of the list to avoid side-effects like ending up in an infinite loop if we always add and remove the same element.
         // This shouldn't happen as Kotlin is call-by-value, so `send` would not modify the original queue.
         _queue.toList().forEach {
