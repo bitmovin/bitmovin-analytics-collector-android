@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Deprecated obsolete PlayerType config in AnalyticsConfig
 - use `System.getProperty("http.agent")` for user agent tracking
 - Made all bitmovin and exoplayer collector classes that are not part of the public API internal
+- Stopped sending samples once player is released
 
 ### Fixed
 - [internal] reporting of videoTimeStart and videoTimeEnd for audioTrackChange, subtitleChange, qualityChange

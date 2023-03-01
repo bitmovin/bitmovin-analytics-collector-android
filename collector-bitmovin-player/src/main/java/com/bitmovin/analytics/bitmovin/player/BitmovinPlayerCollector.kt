@@ -6,7 +6,8 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory
-import com.bitmovin.analytics.bitmovin.player.providers.PlayerLicenseProvider
+import com.bitmovin.analytics.bitmovin.player.player.BitmovinPlayerContext
+import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
@@ -46,7 +47,6 @@ class BitmovinPlayerCollector
     override fun createAdapter(
         player: Player,
         analytics: BitmovinAnalytics,
-        stateMachine: PlayerStateMachine,
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = BitmovinFeatureFactory(analytics, player)
         val userAgentProvider = UserAgentProvider(
@@ -57,6 +57,8 @@ class BitmovinPlayerCollector
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val deviceInformationProvider = DeviceInformationProvider(context)
         val playerLicenseProvider = PlayerLicenseProvider(context)
+        val playerContext = BitmovinPlayerContext(player)
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext)
         return BitmovinSdkAdapter(
             player,
             config,

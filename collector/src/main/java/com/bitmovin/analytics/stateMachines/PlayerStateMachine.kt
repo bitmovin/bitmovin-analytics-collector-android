@@ -3,8 +3,8 @@ package com.bitmovin.analytics.stateMachines
 import android.os.Handler
 import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.ObservableSupport
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.SubtitleDto
@@ -13,7 +13,14 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
 
-class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics: BitmovinAnalytics, internal val bufferingTimeoutTimer: ObservableTimer, internal val qualityChangeEventLimiter: QualityChangeEventLimiter, internal val videoStartTimeoutTimer: ObservableTimer, private val heartbeatHandler: Handler = Handler()) {
+class PlayerStateMachine(
+    private val analytics: BitmovinAnalytics,
+    internal val bufferingTimeoutTimer: ObservableTimer,
+    internal val qualityChangeEventLimiter: QualityChangeEventLimiter,
+    internal val videoStartTimeoutTimer: ObservableTimer,
+    private val playerContext: PlayerContext,
+    private val heartbeatHandler: Handler = Handler(), // TODO (AN-3404) fix deprecated Handler constructor
+) {
     internal val listeners = ObservableSupport<StateMachineListener>()
 
     var currentState: PlayerState<*> = PlayerStates.READY
@@ -39,8 +46,10 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         heartbeatHandler.postDelayed(
             object : Runnable {
                 override fun run() {
-                    triggerHeartbeat()
-                    heartbeatHandler.postDelayed(this, heartbeatDelay)
+                    val continueHeartbeat = checkAndTriggerPlayingHeartbeat()
+                    if (continueHeartbeat) {
+                        heartbeatHandler.postDelayed(this, heartbeatDelay)
+                    }
                 }
             },
             heartbeatDelay,
@@ -75,9 +84,24 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         heartbeatHandler.removeCallbacksAndMessages(null)
     }
 
+    // Exoplayer and IVsPlayer do not have a 'playerWasReleased' event, so we can not detect when
+    // the player was released. This is problematic when a customer releases player but does not
+    // detach our collectors, as we do not transition into pause state and will continue sending
+    // samples. The below check prevents this from happening.
+    fun checkAndTriggerPlayingHeartbeat(): Boolean {
+        if (playerContext.isPlaying()) {
+            triggerHeartbeat()
+            return true
+        } else {
+            // transition into pause state when player is in PLAYING state but not actually playing
+            pause(playerContext.position)
+            return false
+        }
+    }
+
     private fun triggerHeartbeat() {
         val elapsedTime = Util.elapsedTime
-        videoTimeEnd = analytics.position
+        videoTimeEnd = playerContext.position
         listeners.notify { it.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter) }
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
@@ -248,7 +272,7 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
     private fun onRebufferingTimerFinished() {
         Log.d(TAG, "rebufferingTimeout finish")
         error(
-            analytics.position,
+            playerContext.position,
             AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.errorCode,
         )
         disableRebufferHeartbeat()
@@ -261,6 +285,23 @@ class PlayerStateMachine(config: BitmovinAnalyticsConfig, private val analytics:
         bufferingTimeoutTimer.subscribe(::onRebufferingTimerFinished)
         videoStartTimeoutTimer.subscribe(::onVideoStartTimeoutTimerFinished)
         resetStateMachine()
+    }
+
+    object Factory {
+        fun create(analytics: BitmovinAnalytics, playerContext: PlayerContext): PlayerStateMachine {
+            val bufferingTimeoutTimer = ObservableTimer(Util.REBUFFERING_TIMEOUT.toLong(), 1000)
+            val qualityChangeCountResetTimer =
+                ObservableTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL.toLong(), 1000)
+            val qualityChangeEventLimiter = QualityChangeEventLimiter(qualityChangeCountResetTimer)
+            val videoStartTimeoutTimer = ObservableTimer(Util.VIDEOSTART_TIMEOUT.toLong(), 1000)
+            return PlayerStateMachine(
+                analytics,
+                bufferingTimeoutTimer,
+                qualityChangeEventLimiter,
+                videoStartTimeoutTimer,
+                playerContext,
+            )
+        }
     }
 
     companion object {

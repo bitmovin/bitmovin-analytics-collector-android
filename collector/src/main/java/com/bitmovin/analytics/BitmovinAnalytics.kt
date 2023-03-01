@@ -119,7 +119,7 @@ class BitmovinAnalytics
             if (sourceMetadata != null) {
                 setCustomDataFunction = { sourceMetadata.setCustomData(it) }
             }
-            playerAdapter?.stateMachine?.changeCustomData(position, customData, setCustomDataFunction)
+            playerAdapter?.stateMachine?.changeCustomData(playerAdapter?.position ?: 0, customData, setCustomDataFunction)
         }
 
     fun setCustomDataOnce(customData: CustomData) {
@@ -152,8 +152,6 @@ class BitmovinAnalytics
         eventDataDispatcher.addAd(data)
     }
 
-    val position: Long
-        get() = playerAdapter?.position ?: 0
     val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>
         get() = eventBus[OnAnalyticsReleasingEventListener::class]
     val onErrorDetailObservable: Observable<OnErrorDetailEventListener>

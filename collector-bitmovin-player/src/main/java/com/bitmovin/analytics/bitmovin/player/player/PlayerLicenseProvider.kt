@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.bitmovin.player.providers
+package com.bitmovin.analytics.bitmovin.player.player
 
 import android.content.Context
 import com.bitmovin.analytics.utils.Util.getApplicationInfoOrNull

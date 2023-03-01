@@ -8,6 +8,7 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.exoplayer.features.ExoPlayerFeatureFactory
+import com.bitmovin.analytics.exoplayer.player.ExoPlayerContext
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.SystemInformationProvider
@@ -42,7 +43,6 @@ class ExoPlayerCollector
     override fun createAdapter(
         player: ExoPlayer,
         analytics: BitmovinAnalytics,
-        stateMachine: PlayerStateMachine,
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = ExoPlayerFeatureFactory(analytics, player)
         val userAgentProvider = UserAgentProvider(
@@ -52,6 +52,8 @@ class ExoPlayerCollector
         )
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val deviceInformationProvider = DeviceInformationProvider(context)
+        val playerContext = ExoPlayerContext(player)
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext)
         return ExoPlayerAdapter(
             player,
             config,
