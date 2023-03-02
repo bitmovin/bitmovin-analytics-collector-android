@@ -9,12 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Example app with Amazon IVS setup
 - Amazon IVS adapter
+- Interfaces for each collector
 
 ### Removed
-- [internal] v1 Collectors
 - [internal] obsolete test dependencies
 - [internal] unnecessary TODOs
 - [internal] cleaned obsolete parts of mavenpublish script
+- v1 Collectors
 
 ### Changed
 - [internal] updated gradle plugin and dependencies

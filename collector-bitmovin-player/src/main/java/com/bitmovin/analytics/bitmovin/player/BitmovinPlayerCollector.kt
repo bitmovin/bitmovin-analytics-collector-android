@@ -19,15 +19,15 @@ import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.source.Source
 
-class BitmovinPlayerCollector
 /**
  * Bitmovin Analytics
  *
  * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
  * @param context [Context]
  */
-(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, private val context: Context) :
-    DefaultCollector<Player>(bitmovinAnalyticsConfig, context) {
+class BitmovinPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, private val context: Context) :
+    DefaultCollector<Player>(bitmovinAnalyticsConfig, context), IBitmovinPlayerCollector {
+
     private val sourceMetadataMap = HashMap<Source, SourceMetadata>()
 
     /**
@@ -71,7 +71,7 @@ class BitmovinPlayerCollector
         )
     }
 
-    fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata) {
+    override fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata) {
         sourceMetadataMap[playerSource] = sourceMetadata
     }
 }

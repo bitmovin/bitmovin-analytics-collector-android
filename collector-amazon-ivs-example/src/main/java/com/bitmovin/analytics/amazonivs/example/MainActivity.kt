@@ -8,7 +8,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.amazon.ivs.AmazonIvsPlayerCollector
+import com.bitmovin.analytics.amazon.ivs.IAmazonIvsPlayerCollector
 
 // source: https://github.com/aws-samples/amazon-ivs-player-android-sample
 class MainActivity : AppCompatActivity() {
@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     // If you want to use the MediaPlayer object directly, you can instantiate a
     // MediaPlayer object and attach it to a SurfaceView with MediaPlayer.setSurface()
     private lateinit var player: Player
-    private lateinit var collector: AmazonIvsPlayerCollector
+    private lateinit var collector: IAmazonIvsPlayerCollector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +38,8 @@ class MainActivity : AppCompatActivity() {
         )
 
         val config = createBitmovinAnalyticsConfig()
-        collector = AmazonIvsPlayerCollector(config, applicationContext)
+        collector = IAmazonIvsPlayerCollector.create(config, applicationContext)
+
         collector.attachPlayer(player)
 
         // Set Listener for Player callback events

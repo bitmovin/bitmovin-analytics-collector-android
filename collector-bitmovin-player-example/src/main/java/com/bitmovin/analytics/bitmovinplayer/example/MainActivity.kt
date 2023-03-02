@@ -6,6 +6,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
+import com.bitmovin.analytics.bitmovin.player.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.CustomData
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var player: Player
     private lateinit var binding: ActivityMainBinding
-    private var bitmovinPlayerCollector: BitmovinPlayerCollector? = null
+    private var bitmovinPlayerCollector: IBitmovinPlayerCollector? = null
     private var currentPlaylistItemIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,7 +119,7 @@ class MainActivity : AppCompatActivity() {
 
         player = Player.create(this, playerConfig).also { binding.playerView.player = it }
 
-        val collector = BitmovinPlayerCollector(createBitmovinAnalyticsConfig(), applicationContext)
+        val collector = IBitmovinPlayerCollector.Factory.create(createBitmovinAnalyticsConfig(), applicationContext)
         this.bitmovinPlayerCollector = collector
 
         val redbullMetadata = SourceMetadata(

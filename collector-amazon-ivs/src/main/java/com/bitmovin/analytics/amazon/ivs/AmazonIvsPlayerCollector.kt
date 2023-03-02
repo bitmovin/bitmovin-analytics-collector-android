@@ -30,11 +30,10 @@ import com.bitmovin.analytics.utils.Util
  * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
  * @param context [Context]
  */
-class AmazonIvsPlayerCollector(
+internal class AmazonIvsPlayerCollector(
     bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
     private val context: Context,
-) :
-    DefaultCollector<Player>(bitmovinAnalyticsConfig, context) {
+) : DefaultCollector<Player>(bitmovinAnalyticsConfig, context), IAmazonIvsPlayerCollector {
 
     override fun createAdapter(
         player: Player,

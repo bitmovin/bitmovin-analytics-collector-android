@@ -14,7 +14,9 @@ import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.PlayerType
+import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 
 internal class AmazonIvsPlayerAdapter(
@@ -24,7 +26,7 @@ internal class AmazonIvsPlayerAdapter(
     featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
-    videoStartupService: VideoStartupService,
+    private val videoStartupService: VideoStartupService,
     private val playerListener: IvsPlayerListener,
     manipulators: List<EventDataManipulator>,
     private val playerStatisticsProvider: PlayerStatisticsProvider,
@@ -36,12 +38,14 @@ internal class AmazonIvsPlayerAdapter(
     featureFactory,
     deviceInformationProvider,
 ) {
-    init {
+    override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         try {
             player.addListener(playerListener)
             videoStartupService.finishStartupOnPlaying(player.state, player.position)
+            return super.init()
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while initializing IVS adapter, e: ${e.message}", e)
+            return emptyList()
         }
     }
 

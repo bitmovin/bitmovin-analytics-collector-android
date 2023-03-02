@@ -16,15 +16,14 @@ import com.bitmovin.analytics.utils.UserAgentProvider
 import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.ExoPlayer
 
-class ExoPlayerCollector
 /**
  * Bitmovin Analytics
  *
  * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
  * @param context [Context]
  */
-(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, private val context: Context) :
-    DefaultCollector<ExoPlayer>(bitmovinAnalyticsConfig, context) {
+class ExoPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, private val context: Context) :
+    DefaultCollector<ExoPlayer>(bitmovinAnalyticsConfig, context), IExoPlayerCollector {
 
     /**
      * Bitmovin Analytics

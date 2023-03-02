@@ -15,7 +15,7 @@ import com.bitmovin.analytics.example.shared.Sample
 import com.bitmovin.analytics.example.shared.Samples.DASH_DRM_WIDEVINE
 import com.bitmovin.analytics.example.shared.Samples.DASH_SINTEL
 import com.bitmovin.analytics.example.shared.Samples.HLS_REDBULL
-import com.bitmovin.analytics.exoplayer.ExoPlayerCollector
+import com.bitmovin.analytics.exoplayer.IExoPlayerCollector
 import com.bitmovin.analytics.exoplayer.example.databinding.ActivityMainBinding
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
     private var player: ExoPlayer? = null
 
     private var dataSourceFactory: DataSource.Factory? = null
-    private var bitmovinAnalytics: ExoPlayerCollector? = null
+    private var bitmovinAnalytics: IExoPlayerCollector? = null
     private var bitmovinAnalyticsConfig: BitmovinAnalyticsConfig? = null
     private var eventLogView: TextView? = null
     private var concatenatingMediaSource: ConcatenatingMediaSource? = null
@@ -127,12 +127,10 @@ class MainActivity : AppCompatActivity(), DebugListener, Player.Listener {
                     eventLogView?.text = ""
 
                     // Step 2: Create Analytics Collector
-                    bitmovinAnalytics = ExoPlayerCollector(
+                    bitmovinAnalytics = IExoPlayerCollector.create(
                         bitmovinAnalyticsConfig!!,
                         applicationContext,
                     )
-
-                    bitmovinAnalytics?.addDebugListener(this)
 
                     // Step 3: Attach ExoPlayer
                     bitmovinAnalytics?.attachPlayer(exoPlayer)
