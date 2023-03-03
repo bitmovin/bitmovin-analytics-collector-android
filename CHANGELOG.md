@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - v1 Collectors
 
 ### Changed
-- [internal] updated gradle plugin and dependencies
+- [internal] updated gradle plugin and build dependencies
 - [internal] updated spotless config
 - [internal] move to main as default branch
 - [internal] refactored PlayerTech to be constant and part of adapters

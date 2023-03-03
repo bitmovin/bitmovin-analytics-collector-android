@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.exoplayer.features
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
 import com.bitmovin.analytics.Observable
@@ -137,15 +136,11 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
                 return statusCodeString?.extractStatusCode
             }
 
-        @SuppressLint("SwitchIntDef")
-        @Suppress("DEPRECATION")
-        // TODO: we don't support 2.17.0 anymore
-        // New ContentType names were introduced in exoplayer v2.18.0 but we still support v2.17.0, thus we need to use the deprecated constants for now
         private fun mapManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): HttpRequestType {
             return when (com.google.android.exoplayer2.util.Util.inferContentType(uri)) {
-                C.TYPE_DASH -> HttpRequestType.MANIFEST_DASH
-                C.TYPE_HLS -> mapHlsManifestType(uri, eventTime)
-                C.TYPE_SS -> HttpRequestType.MANIFEST_SMOOTH
+                C.CONTENT_TYPE_DASH -> HttpRequestType.MANIFEST_DASH
+                C.CONTENT_TYPE_HLS -> mapHlsManifestType(uri, eventTime)
+                C.CONTENT_TYPE_SS -> HttpRequestType.MANIFEST_SMOOTH
                 else -> HttpRequestType.MANIFEST
             }
         }
@@ -153,8 +148,10 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
         private fun mapHlsManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): HttpRequestType {
             try {
                 val window = Timeline.Window()
-                // maybe needs currentWindowIndex, currentTimeline
-                // TODO (AN-3382): whats the difference between currentTimeline and timeline??
+                // we want the window corresponding to the eventTime that was part of the triggered event
+                // thus we use the eventTime.windowIndex and eventTime.timeline
+                // (and not eventTime.currentTimeline which corresponds to Player.getCurrentTimeline(),
+                // and might not be the same timeline as the one from the eventTime)
                 eventTime.timeline.getWindow(eventTime.windowIndex, window)
                 val initialPlaylistUri = window.mediaItem.localConfiguration?.uri
                 if (initialPlaylistUri != null) {
