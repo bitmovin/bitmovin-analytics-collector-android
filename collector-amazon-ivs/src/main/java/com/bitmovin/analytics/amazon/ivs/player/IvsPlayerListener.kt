@@ -45,9 +45,6 @@ internal class IvsPlayerListener(
     private val exceptionMapper: ExceptionMapper<PlayerException> = AmazonIvsPlayerExceptionMapper()
     private var duration: Long? = null
 
-    override fun onCue(p0: Cue) {
-    }
-
     override fun onDurationChanged(duration: Long) {
         Log.d(TAG, "onDurationChanged $duration")
         this.duration = duration
@@ -120,6 +117,10 @@ internal class IvsPlayerListener(
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while processing quality change, e: ${e.message}", e)
         }
+    }
+
+    override fun onCue(p0: Cue) {
+        // nothing to do here, since we don't track cues
     }
 
     companion object {
