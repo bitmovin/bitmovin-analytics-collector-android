@@ -139,6 +139,7 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
 
         @SuppressLint("SwitchIntDef")
         @Suppress("DEPRECATION")
+        // TODO: we don't support 2.17.0 anymore
         // New ContentType names were introduced in exoplayer v2.18.0 but we still support v2.17.0, thus we need to use the deprecated constants for now
         private fun mapManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): HttpRequestType {
             return when (com.google.android.exoplayer2.util.Util.inferContentType(uri)) {

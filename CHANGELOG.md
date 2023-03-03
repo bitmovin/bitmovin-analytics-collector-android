@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Example app with Amazon IVS setup
 - Amazon IVS adapter
 - Interfaces for each collector
+- Descriptive error messages to analytics errors
 
 ### Removed
 - [internal] obsolete test dependencies
