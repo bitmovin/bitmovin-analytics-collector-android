@@ -178,8 +178,10 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
             if (isHlsManifestClassLoaded) {
                 try {
                     val window = Timeline.Window()
-                    // maybe needs currentWindowIndex, currentTimeline
-                    // TODO (AN-3382): whats the difference between currentTimeline and timeline??
+                    // we want the window corresponding to the eventTime that was part of the triggered event
+                    // thus we use the eventTime.windowIndex and eventTime.timeline
+                    // (and not eventTime.currentTimeline which corresponds to Player.getCurrentTimeline(),
+                    // and might not be the same timeline as the one from the eventTime)
                     eventTime.timeline.getWindow(eventTime.windowIndex, window)
                     if (window.manifest is HlsManifest) {
                         return HttpRequestType.KEY_HLS_AES
