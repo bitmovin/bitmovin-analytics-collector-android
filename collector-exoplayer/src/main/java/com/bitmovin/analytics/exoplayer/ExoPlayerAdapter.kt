@@ -72,7 +72,6 @@ internal class ExoPlayerAdapter(
     private var totalDroppedVideoFrames = 0
     private var playerIsReady = false
     private var manifestUrl: String? = null
-    private var isVideoAttemptedPlay = false
     private var isPlaying = false
     private var isInInitialBufferState = false
     private var drmLoadStartTime: Long = 0
@@ -87,7 +86,6 @@ internal class ExoPlayerAdapter(
     private fun startup(position: Long) {
         qualityEventDataManipulator.setFormatsFromPlayer()
         stateMachine.transitionState(PlayerStates.STARTUP, position)
-        isVideoAttemptedPlay = true
     }
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
@@ -95,7 +93,6 @@ internal class ExoPlayerAdapter(
         totalDroppedVideoFrames = 0
         playerIsReady = false
         isInInitialBufferState = false
-        isVideoAttemptedPlay = false
         isPlaying = false
         checkAutoplayStartup()
         return features
@@ -443,7 +440,7 @@ internal class ExoPlayerAdapter(
                     val videoTime = position
                     error.printStackTrace()
                     val errorCode = exceptionMapper.map(error)
-                    if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
+                    if (!stateMachine.isStartupFinished) {
                         stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
                     }
                     stateMachine.error(videoTime, errorCode)

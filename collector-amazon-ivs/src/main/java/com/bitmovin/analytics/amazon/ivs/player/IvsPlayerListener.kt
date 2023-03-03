@@ -10,6 +10,7 @@ import com.bitmovin.analytics.amazon.ivs.AmazonIvsPlayerExceptionMapper
 import com.bitmovin.analytics.amazon.ivs.Utils
 import com.bitmovin.analytics.amazon.ivs.playback.PlaybackService
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
+import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
@@ -69,7 +70,9 @@ internal class IvsPlayerListener(
         try {
             Log.d(TAG, "onError: " + pe.message)
             val errorCode = exceptionMapper.map(pe)
-            // TODO (AN-3361): check if we can detect if error happened during startup
+            if (!stateMachine.isStartupFinished) {
+                stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
+            }
             stateMachine.error(playerContext.position, errorCode)
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while processing error, e: ${e.message}", e)

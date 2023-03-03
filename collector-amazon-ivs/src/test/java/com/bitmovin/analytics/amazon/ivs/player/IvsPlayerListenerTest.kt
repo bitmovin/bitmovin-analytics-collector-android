@@ -5,6 +5,7 @@ import com.amazonaws.ivs.player.Quality
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.amazon.ivs.playback.PlaybackService
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
+import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import io.mockk.every
@@ -25,18 +26,37 @@ class IvsPlayerListenerTest {
     }
 
     @Test
-    fun testOnError_ShouldTransitionStateToError() {
+    fun testOnError_afterStartup_ShouldTransitionStateToError() {
         // arrange
         val playerListener = createPlayerListener(stateMachineMock, playerContextMock)
         val pe = mockk<PlayerException>(relaxed = true)
 
         every { playerContextMock.position }.returns(123L)
+        every { stateMachineMock.isStartupFinished }.returns(true)
 
         // act
         playerListener.onError(pe)
 
         // assert
         verify(exactly = 1) { stateMachineMock.error(123, any()) }
+        verify(inverse = true) { stateMachineMock setProperty "videoStartFailedReason" value VideoStartFailedReason.PLAYER_ERROR }
+    }
+
+    @Test
+    fun testOnError_duringStartup_ShouldTransitionStateToErrorWithVideoStartFailedReason() {
+        // arrange
+        val playerListener = createPlayerListener(stateMachineMock, playerContextMock)
+        val pe = mockk<PlayerException>(relaxed = true)
+
+        every { playerContextMock.position }.returns(123L)
+        every { stateMachineMock.isStartupFinished }.returns(false)
+
+        // act
+        playerListener.onError(pe)
+
+        // assert
+        verify(exactly = 1) { stateMachineMock.error(123, any()) }
+        verify(exactly = 1) { stateMachineMock setProperty "videoStartFailedReason" value VideoStartFailedReason.PLAYER_ERROR }
     }
 
     @Test

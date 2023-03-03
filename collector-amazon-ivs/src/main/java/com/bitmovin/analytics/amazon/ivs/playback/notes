@@ -43,5 +43,4 @@ on seek:
 
 
 Edge Cases
- [  ] call of `player.release()` without detaching
  [  ] should Buffering after Pause be SEEKED event?

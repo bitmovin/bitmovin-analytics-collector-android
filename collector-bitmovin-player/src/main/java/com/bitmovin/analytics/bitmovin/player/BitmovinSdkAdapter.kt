@@ -418,8 +418,7 @@ internal class BitmovinSdkAdapter(
         try {
             Log.d(TAG, "On AudioChanged")
             // TODO AN-3298 add a audio track changed to the statemachine that will check if
-            // tranistion is allowed
-            // and make sure the old sample is send with the old audio track value
+            // transition is allowed and make sure the old sample is send with the old audio track value
             if (!stateMachine.isStartupFinished) {
                 return
             }

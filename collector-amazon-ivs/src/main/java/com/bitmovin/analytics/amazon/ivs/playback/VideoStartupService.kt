@@ -28,6 +28,7 @@ internal class VideoStartupService(private val stateMachine: PlayerStateMachine,
         stateMachine.addStartupTime(1)
 
         // we set the initial quality during startup, to avoid sending a sample on the first quality change event
+        // which is just the initial quality and not a real change
         playbackQualityProvider.currentQuality = player.quality
         stateMachine.transitionState(PlayerStates.PLAYING, position)
     }
