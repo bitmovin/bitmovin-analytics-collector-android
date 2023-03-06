@@ -73,11 +73,14 @@ class RetryQueue {
 
     fun getNextScheduleTime(): Date? {
         try {
+            lock.lock()
             if (retrySamplesList.size > 0) {
                 return retrySamplesList.first().scheduledTime
             }
         } catch (e: Exception) {
             Log.e(TAG, "getNextScheduleTime threw an unexpected exception ${e.message}", e)
+        } finally {
+            lock.unlock()
         }
         return null
     }
