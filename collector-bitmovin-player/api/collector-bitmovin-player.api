@@ -1,8 +1,8 @@
-public final class com/bitmovin/analytics/bitmovin/player/BitmovinPlayerCollector : com/bitmovin/analytics/DefaultCollector {
+public final class com/bitmovin/analytics/bitmovin/player/BitmovinPlayerCollector : com/bitmovin/analytics/DefaultCollector, com/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector {
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;)V
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)V
-	public final fun addSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/config/SourceMetadata;)V
-	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
+	public fun addSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/config/SourceMetadata;)V
+	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
 }
 
 public final class com/bitmovin/analytics/bitmovin/player/BuildConfig {
@@ -10,5 +10,15 @@ public final class com/bitmovin/analytics/bitmovin/player/BuildConfig {
 	public static final field DEBUG Z
 	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
 	public fun <init> ()V
+}
+
+public abstract interface class com/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector : com/bitmovin/analytics/AnalyticsCollector {
+	public static final field Factory Lcom/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector$Factory;
+	public abstract fun addSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/config/SourceMetadata;)V
+	public static fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector;
+}
+
+public final class com/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector$Factory {
+	public final fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector;
 }
 

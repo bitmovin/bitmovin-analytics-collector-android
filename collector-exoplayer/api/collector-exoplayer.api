@@ -5,9 +5,18 @@ public final class com/bitmovin/analytics/exoplayer/BuildConfig {
 	public fun <init> ()V
 }
 
-public final class com/bitmovin/analytics/exoplayer/ExoPlayerCollector : com/bitmovin/analytics/DefaultCollector {
+public final class com/bitmovin/analytics/exoplayer/ExoPlayerCollector : com/bitmovin/analytics/DefaultCollector, com/bitmovin/analytics/exoplayer/IExoPlayerCollector {
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;)V
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)V
-	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;Lcom/bitmovin/analytics/stateMachines/PlayerStateMachine;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
+	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
+}
+
+public abstract interface class com/bitmovin/analytics/exoplayer/IExoPlayerCollector : com/bitmovin/analytics/AnalyticsCollector {
+	public static final field Factory Lcom/bitmovin/analytics/exoplayer/IExoPlayerCollector$Factory;
+	public static fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/exoplayer/IExoPlayerCollector;
+}
+
+public final class com/bitmovin/analytics/exoplayer/IExoPlayerCollector$Factory {
+	public final fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/exoplayer/IExoPlayerCollector;
 }
 
