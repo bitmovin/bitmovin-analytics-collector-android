@@ -12,13 +12,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Example app with Amazon IVS setup
 - Amazon IVS adapter
 - Interfaces for each collector
-- Descriptive error messages to analytics errors
+- Descriptive error messages for analytics errors
 
 ### Removed
 - [internal] obsolete test dependencies
 - [internal] unnecessary TODOs
 - [internal] cleaned obsolete parts of mavenpublish script
-- v1 Collectors
+- Deprecated v1 Collectors
 
 ### Changed
 - [internal] updated gradle plugin and build dependencies
@@ -28,12 +28,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] fix AdPosition and AdTagType enums to return configured string representation
 - [internal] Converted all Java classes that were left to kotlin
 - [internal] cleanup of exoplayer example app and added more scenarios
+- [internal] use `System.getProperty("http.agent")` for user agent tracking
 - Upgraded okhttp3 to v4.10.0 (this is a major version upgrade from v3 to v4)
 - Upgraded gson dependency to v2.8.9
 - Upgraded androidx.appcompat dependency to v1.6.1
 - Upgraded example apps to latest bitmovin player (v3.33.0) and latest exoplayer (v2.18.4)
 - Deprecated obsolete PlayerType config in AnalyticsConfig
-- use `System.getProperty("http.agent")` for user agent tracking
 - Made all bitmovin and exoplayer collector classes that are not part of the public API internal
 - Stopped sending samples once player is released and collector is still attached
 
