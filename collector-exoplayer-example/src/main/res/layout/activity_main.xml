@@ -42,13 +42,31 @@
                     android:id="@+id/source_change_button"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Change Source" />
+                    android:text="Change Source to DRM" />
 
                 <Button
-                    android:id="@+id/set_custom_data"
+                    android:id="@+id/source_change_live_button"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Set custom data" />
+                    android:text="Change Source to live" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/change_custom_data"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Change custom data" />
+
+                <Button
+                    android:id="@+id/set_custom_data_once"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Set custom data once" />
             </TableRow>
 
         </TableLayout>

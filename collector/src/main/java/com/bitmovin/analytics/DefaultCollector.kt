@@ -11,7 +11,7 @@ import com.bitmovin.analytics.utils.Util
 abstract class DefaultCollector<TPlayer> protected constructor(
     final override val config: BitmovinAnalyticsConfig,
     context: Context,
-) : Collector<TPlayer> {
+) : Collector<TPlayer>, AnalyticsCollector<TPlayer> {
     private val analytics by lazy { BitmovinAnalytics(config, context) }
     protected val userIdProvider: UserIdProvider =
         if (config.randomizeUserId) {

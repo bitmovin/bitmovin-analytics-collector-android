@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] refactored PlayerTech to be constant and part of adapters
 - [internal] fix AdPosition and AdTagType enums to return configured string representation
 - [internal] Converted all Java classes that were left to kotlin
+- [internal] cleanup of exoplayer example app and added more scenarios
 - Upgraded okhttp3 to v4.10.0 (this is a major version upgrade from v3 to v4)
 - Upgraded gson dependency to v2.8.9
 - Upgraded androidx.appcompat dependency to v1.6.1
