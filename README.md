@@ -20,6 +20,14 @@ allprojects {
 
 And this line to your main project `build.gradle`
 
+For Bitmovin Player v3:
+
+```gradle
+dependencies {
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.14.0'
+}
+```
+
 For Bitmovin Player v2:
 
 ```gradle
@@ -28,19 +36,19 @@ dependencies {
 }
 ```
 
-For Bitmovin Player v3:
+For ExoPlayer version between >= v2.18.0 and <= v2.18.4:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.13.0'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:2.14.0'
 }
 ```
 
-For ExoPlayer < v2.12.0:
+For ExoPlayer version between >= v2.17.0 and < v2.18.0:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:1.36.0'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:2.9.0'
 }
 ```
 
@@ -52,16 +60,17 @@ dependencies {
 }
 ```
 
-For ExoPlayer version between >= v2.17.0 and <= v2.18.2:
+For ExoPlayer < v2.12.0:
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:2.13.0'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:1.36.0'
 }
 ```
+
 ## Examples
 
-The following example creates a BitmovinAnalytics object and attaches an Bitmovin Native SDK instance to it.
+The following example creates a BitmovinAnalytics object and attaches a Bitmovin Player instance to it.
 
 ### Basic analytics monitoring with Bitmovin Player SDK
 
@@ -69,9 +78,8 @@ The following example creates a BitmovinAnalytics object and attaches an Bitmovi
 // Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key and (optionally) your Bitmovin Player Key
 BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", "<BITMOVIN_PLAYER_KEY>");
 
-
 // Create a BitmovinPlayerCollector object using the BitmovinAnalyitcsConfig you just created
-BitmovinPlayerCollector analyticsCollector = new BitmovinPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
+IBitmovinPlayerCollector analyticsCollector = IBitmovinPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext());
 
 // Attach your player instance
 analyticsCollector.attachPlayer(player);
@@ -87,7 +95,7 @@ analyticsCollector.detachPlayer();
 BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>");
 
 // Create Analytics Collector for ExoPlayer
-ExoPlayerCollector bitmovinAnalytics = new ExoPlayerCollector(bitmovinAnalyticsConfig, getApplicationContext());
+IExoPlayerCollector bitmovinAnalytics = IExoPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext());
 
 // Attach your ExoPlayer instance
 bitmovinAnalytics.attachPlayer(player);
