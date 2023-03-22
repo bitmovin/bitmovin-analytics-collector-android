@@ -1,0 +1,1 @@
+./gradlew cleanPixel6api30DebugAndroidTest collector-amazon-ivs-example:connectedAndroidTest pixel6api30DebugAndroidTest

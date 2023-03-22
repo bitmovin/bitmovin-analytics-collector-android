@@ -38,7 +38,7 @@ android {
                     device = "Pixel 6"
                     // Use only API levels 27 and higher.
                     apiLevel = 30
-                    // To include Google services, use "google".
+                    // To include Google services, use "google-atd".
                     systemImageSource = "aosp-atd"
                 }
             }
@@ -55,6 +55,8 @@ dependencies {
 
     androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+    androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    androidTestImplementation project(':example-shared')
 
     if (rootProject.ext.developLocal) {
         api project(':collector')
