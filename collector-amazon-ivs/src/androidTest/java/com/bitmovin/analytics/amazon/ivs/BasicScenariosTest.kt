@@ -16,6 +16,10 @@ import org.junit.runner.RunWith
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
+// System test for basic playing and error scenario using ivs player
+// This tests assume a phone with api level 30 for validations
+// Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
+// Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
 class BasicScenariosTest {
 
@@ -172,10 +176,10 @@ class BasicScenariosTest {
 
         // find starting of logs of most recent test run (this is a bit of a hack because I couldn't get
         // clearing of logcat after a test run working)
-        val testRunLogStartedIdx = logLines.indexOfLast { x -> x.contains("TestRunner: started:") }
-        // filter for log lines that contain the network requests
+        val testRunLogStartedIdx = logLines.indexOfLast { x -> x.contains("Initialized Analytics HTTP Backend") }
         val testRunLines = logLines.subList(testRunLogStartedIdx, logLines.size)
 
+        // filter for log lines that contain the network requests
         val jsonRegex = """\{.*\}$""".toRegex()
         val analyticsSamplesStrings = testRunLines.filter { x -> x.contains("HttpClient: {") }
             .map { x -> jsonRegex.find(x)?.value }
