@@ -1,5 +1,8 @@
-## accept all sdk licenses
+# accept all sdk licenses
 yes | /Users/$USER/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
-## run systemtest for ivs
-./gradlew cleanPixel6api30DebugAndroidTest :collector-amazon-ivs-example:connectedAndroidTest pixel6api30DebugAndroidTest
+# run systemtest for ivs
+## clean test to make sure we run test on everytime
+./gradlew :collector-amazon-ivs:cleanPixel6api30DebugAndroidTest
+## run test
+./gradlew :collector-amazon-ivs:pixel6api30DebugAndroidTest

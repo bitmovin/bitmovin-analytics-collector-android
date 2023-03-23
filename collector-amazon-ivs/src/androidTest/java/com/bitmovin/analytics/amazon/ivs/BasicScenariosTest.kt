@@ -7,6 +7,7 @@ import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.example.shared.Samples
+import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import com.bitmovin.analytics.utils.DataSerializer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.BeforeClass
@@ -16,7 +17,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 @RunWith(AndroidJUnit4::class)
-class BasicPlayScenarioTest {
+class BasicScenariosTest {
 
     companion object {
         @BeforeClass @JvmStatic
@@ -92,6 +93,49 @@ class BasicPlayScenarioTest {
         assertThat(pauseSamples[0].paused).isGreaterThan(1000)
     }
 
+    @Test
+    fun test_errorScenario_Should_sendErrorSample() {
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val player = Player.Factory.create(appContext)
+        player.isMuted = true
+
+        val analyticsConfig = createBitmovinAnalyticsConfig()
+        val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
+        collector.attachPlayer(player)
+        player.load(Samples.nonExistingStream.uri)
+
+        player.play()
+        Thread.sleep(5000)
+
+        val eventDataList = extractHttpClientJsonLogLines()
+
+        // remove license call
+        eventDataList.removeFirst()
+
+        val eventData = DataSerializer.deserialize(
+            eventDataList[0],
+            EventData::class.java,
+        )
+
+        val impressionId = eventData?.impressionId
+
+        assertThat(eventData?.errorMessage).isEqualTo("ERROR_NOT_AVAILABLE")
+        assertThat(eventData?.errorCode).isEqualTo(11)
+        assertThat(eventData?.videoStartFailed).isTrue
+
+        val errorDetail = DataSerializer.deserialize(
+            eventDataList[1],
+            ErrorDetail::class.java,
+        )
+
+        assertThat(errorDetail?.data?.exceptionStacktrace?.size).isGreaterThan(0)
+        assertThat(errorDetail?.data?.exceptionMessage).isEqualTo("MasterPlaylist : ERROR_NOT_AVAILABLE : 404 : Failed to load playlist")
+        assertThat(errorDetail?.impressionId).isEqualTo(impressionId)
+        assertThat(errorDetail?.platform).isEqualTo("android")
+        assertThat(errorDetail?.licenseKey).isEqualTo(analyticsConfig.key)
+    }
+
     private fun extractAnalyticsSamplesFromLogs(): MutableList<EventData> {
         val analyticsSamplesStrings = extractHttpClientJsonLogLines()
 
@@ -126,13 +170,14 @@ class BasicPlayScenarioTest {
             logLines.add(line!!)
         }
 
-        // clear logs so that next run doesn't contain outdated data
-        Runtime.getRuntime().exec("logcat -c")
+        // find starting of logs of most recent test run (this is a bit of a hack because I couldn't get
+        // clearing of logcat after a test run working)
+        val testRunLogStartedIdx = logLines.indexOfLast { x -> x.contains("TestRunner: started:") }
+        // filter for log lines that contain the network requests
+        val testRunLines = logLines.subList(testRunLogStartedIdx, logLines.size)
 
         val jsonRegex = """\{.*\}$""".toRegex()
-
-        // filter for log lines that contain the network requests
-        val analyticsSamplesStrings = logLines.filter { x -> x.contains("HttpClient: {") }
+        val analyticsSamplesStrings = testRunLines.filter { x -> x.contains("HttpClient: {") }
             .map { x -> jsonRegex.find(x)?.value }
             .toMutableList()
             .filterNotNull()
