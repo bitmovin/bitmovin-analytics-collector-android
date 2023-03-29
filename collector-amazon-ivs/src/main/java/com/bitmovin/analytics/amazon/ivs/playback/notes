@@ -40,7 +40,3 @@ on seek:
 2023-02-10 16:26:56.042  1897-1897  IvsPlayerListener       com...n.analytics.amazonivs.example  D  onStateChanged state: BUFFERING, position: 132809
 2023-02-10 16:26:56.358  1897-1897  IvsPlayerListener       com...n.analytics.amazonivs.example  D  onSeekCompleted
 2023-02-10 16:26:56.533  1897-1897  IvsPlayerListener       com...n.analytics.amazonivs.example  D  onStateChanged state: PLAYING, position: 132809
-
-
-Edge Cases
- [  ] should Buffering after Pause be SEEKED event?

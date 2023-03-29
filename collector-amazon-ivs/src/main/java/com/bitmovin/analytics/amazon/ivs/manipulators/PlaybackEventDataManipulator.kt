@@ -34,9 +34,4 @@ internal class PlaybackEventDataManipulator(
             data.isLive = Utils.isPlaybackLive(player.duration)
         }
     }
-
-    companion object {
-        private const val CHANNEL_PREFIX = ".channel."
-        private const val HLS_EXTENSION = ".m3u8"
-    }
 }

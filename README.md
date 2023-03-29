@@ -68,6 +68,14 @@ dependencies {
 }
 ```
 
+For AmazonIVS player:
+
+```gradle
+dependencies {
+    implementation 'com.bitmovin.analytics:collector-amazon-ivs:2.15.0'
+}
+```
+
 ## Examples
 
 The following example creates a BitmovinAnalytics object and attaches a Bitmovin Player instance to it.
@@ -95,12 +103,28 @@ analyticsCollector.detachPlayer();
 BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>");
 
 // Create Analytics Collector for ExoPlayer
-IExoPlayerCollector bitmovinAnalytics = IExoPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext());
+IExoPlayerCollector analyticsCollector = IExoPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext());
 
 // Attach your ExoPlayer instance
-bitmovinAnalytics.attachPlayer(player);
+analyticsCollector.attachPlayer(player);
 
 // Detach your player when you are done. For example, call this method when you call ExoPlayer's release() method
+analyticsCollector.detachPlayer();
+```
+
+### Basic analytics monitoring with Amazon IVS Player SDK
+
+```java
+// Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key
+BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>");
+
+// Create Analytics Collector for Amazon IVS Player
+IAmazonIvsPlayerCollector analyticsCollector = IAmazonIvsPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext())
+
+// Attach your Amazon IVS Player instance
+analyticsCollector.attachPlayer(player);
+
+// Detach your player when you are done. For example, call this method when you call the release() method
 analyticsCollector.detachPlayer();
 ```
 

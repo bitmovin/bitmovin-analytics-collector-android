@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         val config = createBitmovinAnalyticsConfig()
-        collector = IAmazonIvsPlayerCollector.create(config, applicationContext)
+        collector = IAmazonIvsPlayerCollector.Factory.create(config, applicationContext)
 
         collector.attachPlayer(player)
 
