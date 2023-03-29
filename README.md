@@ -1,6 +1,6 @@
 # [![bitmovin](http://bitmovin-a.akamaihd.net/webpages/bitmovin-logo-github.png)](http://www.bitmovin.com)
 
-Android client that allows you to monitor your Bitmovin Native SDK or ExoPlayer playback with [Bitmovin Analytics](https://bitmovin.com/video-analytics/).
+Android client that allows you to monitor your Bitmovin Native SDK, ExoPlayer or Amazon IVS Player playback with [Bitmovin Analytics](https://bitmovin.com/video-analytics/).
 
 # Getting started
 
