@@ -10,7 +10,7 @@ class AmazonIvsPlayerFeatureFactoryTest {
     @Test
     fun createFeatures_ShouldAddErrorTracking() {
         // arrange
-        val factory = AmazonIvsPlayerFeatureFactory(mockk(relaxed = true), mockk(relaxed = true))
+        val factory = AmazonIvsPlayerFeatureFactory(mockk(relaxed = true))
 
         // act
         val features = factory.createFeatures()

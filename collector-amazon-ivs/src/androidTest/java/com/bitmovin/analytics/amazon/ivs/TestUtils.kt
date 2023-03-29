@@ -100,7 +100,7 @@ object TestUtils {
     fun verifyIvsPlayerStartupSample(eventData: EventData) {
         assertThat(eventData.state).isEqualTo("startup")
         assertThat(eventData.startupTime).isGreaterThan(0)
-        assertThat(eventData.supportedVideoCodecs).isNotNull // TODO: check if this is static in ivs
+        assertThat(eventData.supportedVideoCodecs).isNotNull
         assertThat(eventData.playerStartupTime).isEqualTo(1)
         assertThat(eventData.videoStartupTime).isGreaterThan(0)
     }

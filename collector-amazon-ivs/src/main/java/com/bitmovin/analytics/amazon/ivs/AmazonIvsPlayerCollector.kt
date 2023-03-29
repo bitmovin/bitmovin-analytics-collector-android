@@ -39,7 +39,7 @@ internal class AmazonIvsPlayerCollector(
         player: Player,
         analytics: BitmovinAnalytics,
     ): PlayerAdapter {
-        val featureFactory: FeatureFactory = AmazonIvsPlayerFeatureFactory(analytics, player)
+        val featureFactory: FeatureFactory = AmazonIvsPlayerFeatureFactory(analytics)
         val playerContext = IvsPlayerContext(player)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext)
 

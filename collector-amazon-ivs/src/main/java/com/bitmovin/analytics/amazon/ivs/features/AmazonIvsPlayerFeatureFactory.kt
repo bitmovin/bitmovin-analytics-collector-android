@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.amazon.ivs.features
 
-import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
@@ -8,7 +7,7 @@ import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend
 import com.bitmovin.analytics.features.errordetails.ErrorDetailTracking
 import com.bitmovin.analytics.license.FeatureConfigContainer
 
-internal class AmazonIvsPlayerFeatureFactory(private val analytics: BitmovinAnalytics, private val player: Player) : FeatureFactory {
+internal class AmazonIvsPlayerFeatureFactory(private val analytics: BitmovinAnalytics) : FeatureFactory {
     override fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
         val errorDetailsBackend = ErrorDetailBackend(analytics.config.config, analytics.context)

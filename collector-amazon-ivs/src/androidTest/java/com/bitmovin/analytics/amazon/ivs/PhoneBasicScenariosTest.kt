@@ -10,6 +10,7 @@ import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import com.bitmovin.analytics.utils.DataSerializer
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -97,8 +98,7 @@ class PhoneBasicScenariosTest {
 
         // act
         player.load(vodStreamSample.uri)
-        // wait 5 seconds to make sure player is ready for playing
-        Thread.sleep(5000)
+        waitUntilPlayerIsReady(player)
 
         player.play()
         val playedBeforeSeekMs = 5000L
@@ -233,6 +233,21 @@ class PhoneBasicScenariosTest {
             }
             assertThat(eventData.videoTimeStart).isEqualTo(previousVideoTimeEnd)
             previousVideoTimeEnd = eventData.videoTimeEnd
+        }
+    }
+
+    private fun waitUntilPlayerIsReady(player: Player) {
+        val maxWaitMs = 10000L
+        var waitingTotalMs = 0L
+        val waitingDeltaMs = 100L
+        // make sure player is ready
+        while (player.state != Player.State.READY) {
+            Thread.sleep(waitingDeltaMs)
+            waitingTotalMs += waitingDeltaMs
+
+            if (waitingTotalMs >= maxWaitMs) {
+                fail<Nothing>("player didn't get into ready state within $maxWaitMs ms")
+            }
         }
     }
 }
