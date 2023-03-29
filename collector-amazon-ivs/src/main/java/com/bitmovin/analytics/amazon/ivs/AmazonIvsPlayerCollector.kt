@@ -47,6 +47,7 @@ internal class AmazonIvsPlayerCollector(
         val playbackManipulator = PlaybackEventDataManipulator(player, config)
         val playbackQualityProvider = PlaybackQualityProvider()
         val videoStartupService = VideoStartupService(stateMachine, player, playbackQualityProvider)
+        val playerStatisticsProvider = PlayerStatisticsProvider(player)
         val playerListener =
             IvsPlayerListener(
                 stateMachine,
@@ -54,9 +55,9 @@ internal class AmazonIvsPlayerCollector(
                 playbackQualityProvider,
                 playbackService,
                 videoStartupService,
+                playerStatisticsProvider,
             )
         val playerInfoManipulator = PlayerInfoEventDataManipulator(player)
-        val playerStatisticsProvider = PlayerStatisticsProvider(player)
         val qualityManipulator = QualityEventDataManipulator(playbackQualityProvider, playerStatisticsProvider)
         val userAgentProvider = UserAgentProvider(
             Util.getApplicationInfoOrNull(context),

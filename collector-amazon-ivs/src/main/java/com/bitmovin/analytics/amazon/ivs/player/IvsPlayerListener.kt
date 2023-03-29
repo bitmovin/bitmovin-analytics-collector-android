@@ -40,6 +40,7 @@ internal class IvsPlayerListener(
     private val playbackQualityProvider: PlaybackQualityProvider,
     private val playbackService: PlaybackService,
     private val videoStartupService: VideoStartupService,
+    private val playerStatisticsProvider: PlayerStatisticsProvider,
 ) : Player.Listener() {
 
     private val exceptionMapper: ExceptionMapper<PlayerException> = AmazonIvsPlayerExceptionMapper()
@@ -94,6 +95,11 @@ internal class IvsPlayerListener(
             // we only track seeking on vod
             if (duration?.let { Utils.isPlaybackLive(it) } == false) {
                 val stateBeforeSeek = stateMachine.currentState
+
+                // we cannot determine the position before the seek, thus
+                // we use the current position which represents where it was seeked to
+                // this is a limitation of the ivs player and leads to incorrect
+                // videoendtime for the sample before the seek
                 stateMachine.transitionState(PlayerStates.SEEKING, playerContext.position)
                 stateMachine.transitionState(stateBeforeSeek, playerContext.position)
             }
@@ -111,9 +117,16 @@ internal class IvsPlayerListener(
     override fun onQualityChanged(newQuality: Quality) {
         try {
             Log.d(TAG, "onQualityChanged: $newQuality")
+
             stateMachine.videoQualityChanged(playerContext.position, playbackQualityProvider.didQualityChange(newQuality)) {
                 playbackQualityProvider.currentQuality = newQuality
             }
+
+            // we need to reset the statistics on a qualityChanged Event
+            // since the ivs player also resets the dropped frames counter on these events
+            // (this might be subject to change according to IVS team!)
+            // we cannot just read the player.statistics.dropped_frames counter since the reset happens after the event
+            playerStatisticsProvider.reset()
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while processing quality change, e: ${e.message}", e)
         }

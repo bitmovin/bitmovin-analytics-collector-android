@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- Systemtests for IVS collector
+
+### Fixed
+- Calculation of dropped frames on IVS collector
+
 ## v2.14.0
 
 ### Added

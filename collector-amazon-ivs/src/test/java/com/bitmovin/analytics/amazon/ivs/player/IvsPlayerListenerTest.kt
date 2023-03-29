@@ -18,11 +18,13 @@ class IvsPlayerListenerTest {
 
     private lateinit var playerContextMock: PlayerContext
     private lateinit var stateMachineMock: PlayerStateMachine
+    private lateinit var statisticsProviderMock: PlayerStatisticsProvider
 
     @Before
     fun setup() {
         stateMachineMock = mockk(relaxed = true)
         playerContextMock = mockk(relaxed = true)
+        statisticsProviderMock = mockk(relaxed = true)
     }
 
     @Test
@@ -80,6 +82,7 @@ class IvsPlayerListenerTest {
             stateMachineMock,
             playerContextMock,
             playbackQualityProvider,
+            playerStatisticsProvider = statisticsProviderMock,
         )
         every { playerContextMock.position }.returns(123L)
 
@@ -90,6 +93,7 @@ class IvsPlayerListenerTest {
 
         // assert
         verify(exactly = 1) { stateMachineMock.videoQualityChanged(123L, true, any()) }
+        verify(exactly = 1) { statisticsProviderMock.reset() }
     }
 
     @Test
@@ -134,6 +138,7 @@ class IvsPlayerListenerTest {
             stateMachineMock,
             playerContextMock,
             playbackQualityProvider,
+            playerStatisticsProvider = statisticsProviderMock,
         )
         every { playerContextMock.position }.returns(123L)
 
@@ -145,6 +150,7 @@ class IvsPlayerListenerTest {
 
         // assert
         verify(exactly = 1) { stateMachineMock.videoQualityChanged(123L, false, any()) }
+        verify(exactly = 1) { statisticsProviderMock.reset() }
     }
 
     private fun createPlayerListener(
@@ -153,6 +159,7 @@ class IvsPlayerListenerTest {
         playbackQualityProvider: PlaybackQualityProvider = mockk(relaxed = true),
         playbackService: PlaybackService = mockk(relaxed = true),
         videoStartupService: VideoStartupService = mockk(relaxed = true),
+        playerStatisticsProvider: PlayerStatisticsProvider = mockk(relaxed = true),
     ): IvsPlayerListener {
         return IvsPlayerListener(
             stateMachine,
@@ -160,6 +167,7 @@ class IvsPlayerListenerTest {
             playbackQualityProvider,
             playbackService,
             videoStartupService,
+            playerStatisticsProvider,
         )
     }
 }
