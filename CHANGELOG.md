@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
+### Changed
+- [internal] Bitmovin player version detection catches `ClassNotFoundException` and fallbacks to core module BuildConfig.
+
+### Fixed
+- Workaround issue in Bitmovin Player version 3.34 and 3.35 that would lead to a
+  `ClassNotFoundException` when detecting the player version.
 
 ### Added
 - Systemtests for IVS collector
