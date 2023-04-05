@@ -65,7 +65,7 @@ dependencies {
 <td> Player Version </td> <td> Dependency </td>
 </tr>
 <tr>
-<td> >= v2.18.0 and <= v2.18.5 </td>
+<td>  <= v2.18.5 <br/> >= v2.18.0 </td>
 <td>
 
 ```gradle
@@ -78,7 +78,7 @@ dependencies {
 </tr>
 
 <tr>
-<td> >= v2.17.0 and < v2.18.0 </td>
+<td> < v2.18.0 <br/> >= v2.17.0</td>
 <td>
 
 ```gradle
@@ -91,7 +91,7 @@ dependencies {
 </tr>
 
 <tr>
-<td> >= v2.12.0 and < v2.17.0 </td>
+<td> < v2.17.0 <br/> >= v2.12.0  </td>
 <td>
 
 ```gradle
@@ -119,11 +119,25 @@ dependencies {
 
 ### IVS Player
 
+<table>
+<tr>
+<td> Player Version </td> <td> Dependency </td>
+</tr>
+
+<tr>
+<td> >= 1.16 </td>
+<td>
+
 ```gradle
 dependencies {
     implementation 'com.bitmovin.analytics:collector-amazon-ivs:2.15.0'
 }
 ```
+
+</td>
+</tr>
+
+</table>
 
 ## Examples
 
