@@ -11,6 +11,9 @@ Add this to your top level `build.gradle`
 ```gradle
 allprojects {
     repositories {
+        mavenCentral()
+        google()
+
         maven {
             url  'https://artifacts.bitmovin.com/artifactory/public-releases'
         }
@@ -18,9 +21,18 @@ allprojects {
 }
 ```
 
-And this line to your main project `build.gradle`
+And this line, depending on your player version, to your main project `build.gradle` :
 
-For Bitmovin Player v3:
+### Bitmovin Player
+
+<table>
+<tr>
+<td> Player Version </td> <td> Dependency </td>
+</tr>
+
+<tr>
+<td> v3 </td>
+<td>
 
 ```gradle
 dependencies {
@@ -28,7 +40,12 @@ dependencies {
 }
 ```
 
-For Bitmovin Player v2:
+</td>
+</tr>
+
+<tr>
+<td> v2 </td>
+<td>
 
 ```gradle
 dependencies {
@@ -36,7 +53,20 @@ dependencies {
 }
 ```
 
-For ExoPlayer version between >= v2.18.0 and <= v2.18.5:
+</td>
+</tr>
+
+</table>
+
+### Exoplayer
+
+<table>
+<tr>
+<td> Player Version </td> <td> Dependency </td>
+</tr>
+<tr>
+<td>  <= v2.18.5 <br/> >= v2.18.0 </td>
+<td>
 
 ```gradle
 dependencies {
@@ -44,7 +74,12 @@ dependencies {
 }
 ```
 
-For ExoPlayer version between >= v2.17.0 and < v2.18.0:
+</td>
+</tr>
+
+<tr>
+<td> < v2.18.0 <br/> >= v2.17.0</td>
+<td>
 
 ```gradle
 dependencies {
@@ -52,7 +87,12 @@ dependencies {
 }
 ```
 
-For ExoPlayer version between >= v2.12.0 and < v2.17.0:
+</td>
+</tr>
+
+<tr>
+<td> < v2.17.0 <br/> >= v2.12.0  </td>
+<td>
 
 ```gradle
 dependencies {
@@ -60,7 +100,12 @@ dependencies {
 }
 ```
 
-For ExoPlayer < v2.12.0:
+</td>
+</tr>
+
+<tr>
+<td> < v2.12.0 </td>
+<td>
 
 ```gradle
 dependencies {
@@ -68,7 +113,20 @@ dependencies {
 }
 ```
 
-For AmazonIVS player:
+</td>
+</tr>
+</table>
+
+### IVS Player
+
+<table>
+<tr>
+<td> Player Version </td> <td> Dependency </td>
+</tr>
+
+<tr>
+<td> >= 1.16 </td>
+<td>
 
 ```gradle
 dependencies {
@@ -76,92 +134,101 @@ dependencies {
 }
 ```
 
+</td>
+</tr>
+
+</table>
+
 ## Examples
 
-The following example creates a BitmovinAnalytics object and attaches a Bitmovin Player instance to it.
+The following example creates a BitmovinAnalyticsCollector object and attaches a Player instance to it.
 
 ### Basic analytics monitoring with Bitmovin Player SDK
 
-```java
+```kotlin
 // Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key and (optionally) your Bitmovin Player Key
-BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", "<BITMOVIN_PLAYER_KEY>");
+val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", "<BITMOVIN_PLAYER_KEY>")
 
 // Create a BitmovinPlayerCollector object using the BitmovinAnalyitcsConfig you just created
-IBitmovinPlayerCollector analyticsCollector = IBitmovinPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext());
+val analyticsCollector = IBitmovinPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext())
 
 // Attach your player instance
-analyticsCollector.attachPlayer(player);
+analyticsCollector.attachPlayer(player)
 
 // Detach your player when you are done. For example, call this method when you call the release() method
-analyticsCollector.detachPlayer();
+analyticsCollector.detachPlayer()
 ```
 
 ### Basic analytics monitoring with ExoPlayer
 
-```java
+```kotlin
 // Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key
-BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>");
+val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>")
 
 // Create Analytics Collector for ExoPlayer
-IExoPlayerCollector analyticsCollector = IExoPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext());
+val analyticsCollector = IExoPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext())
 
 // Attach your ExoPlayer instance
-analyticsCollector.attachPlayer(player);
+analyticsCollector.attachPlayer(player)
 
 // Detach your player when you are done. For example, call this method when you call ExoPlayer's release() method
-analyticsCollector.detachPlayer();
+analyticsCollector.detachPlayer()
 ```
 
 ### Basic analytics monitoring with Amazon IVS Player SDK
 
-```java
+```kotlin
 // Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key
-BitmovinAnalyticsConfig bitmovinAnalyticsConfig = new BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>");
+val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>")
 
 // Create Analytics Collector for Amazon IVS Player
-IAmazonIvsPlayerCollector analyticsCollector = IAmazonIvsPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext())
+val analyticsCollector = IAmazonIvsPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext())
 
 // Attach your Amazon IVS Player instance
-analyticsCollector.attachPlayer(player);
+analyticsCollector.attachPlayer(player)
 
 // Detach your player when you are done. For example, call this method when you call the release() method
-analyticsCollector.detachPlayer();
+analyticsCollector.detachPlayer()
 ```
 
 ### Switching to a new video
 
 When switching to a new video we recommend that you follow the sequence of events below.
 
-```java
+```kotlin
 //Detach your player when the first video is completed
-analyticsCollector.detachPlayer();
+analyticsCollector.detachPlayer()
 
 //Update your config with new optional parameters related to the new video playback
-bitmovinAnalyticsConfig.setVideoId("newVideoId");
-bitmovinAnalyticsConfig.setCustomData1("newCustomData");
+bitmovinAnalyticsConfig.videoId = "newVideoId"
+bitmovinAnalyticsConfig.customData1 = "newCustomData"
 
 //Reattach your player instance
-analyticsCollector.attachPlayer(newPlayer);
+analyticsCollector.attachPlayer(newPlayer)
 ```
 
 ### Optional Configuration Parameters
 
-```java
-bitmovinAnalyticsConfig.setVideoId("videoId1234");
-bitmovinAnalyticsConfig.setCustomUserId("customUserId1");
-bitmovinAnalyticsConfig.setCdnProvider(CDNProvider.BITMOVIN);
-bitmovinAnalyticsConfig.setExperimentName("experiment-1");
-bitmovinAnalyticsConfig.setCustomData1("customData1");
-bitmovinAnalyticsConfig.setCustomData2("customData2");
-bitmovinAnalyticsConfig.setCustomData3("customData3");
-bitmovinAnalyticsConfig.setCustomData4("customData4");
-bitmovinAnalyticsConfig.setCustomData5("customData5");
-bitmovinAnalyticsConfig.setCustomData6("customData6");
-bitmovinAnalyticsConfig.setCustomData7("customData7");
-bitmovinAnalyticsConfig.setIsLive(false);
+```kotlin
+bitmovinAnalyticsConfig.title = "videoTitle1234"
+bitmovinAnalyticsConfig.videoId = "videoId1234"
+bitmovinAnalyticsConfig.cdnProvider = CDNProvider.BITMOVIN
+bitmovinAnalyticsConfig.isLive= false
+bitmovinAnalyticsConfig.experimentName = "experiment-1"
+bitmovinAnalyticsConfig.customUserId = "customUserId1"
+bitmovinAnalyticsConfig.customData1 = "customData1"
+bitmovinAnalyticsConfig.customData2 = "customData2"
+bitmovinAnalyticsConfig.customData3 = "customData3"
+bitmovinAnalyticsConfig.customData4 = "customData4"
+bitmovinAnalyticsConfig.customData5 = "customData5"
+bitmovinAnalyticsConfig.path = "path"
+bitmovinAnalyticsConfig.ads = false
+bitmovinAnalyticsConfig.randomizeUserId = false
 ```
 
-A [full example app](https://github.com/bitmovin/bitmovin-analytics-collector-android/tree/main/collector-bitmovin-player-example) can be seen in the github repo
+A [full example app](https://github.com/bitmovin/bitmovin-analytics-collector-android/tree/main/collector-bitmovin-player-example) can be seen in the github repo.
+
+For more information about the Analytics Product and the collectors check out our [documentation](https://developer.bitmovin.com/playback/docs/setup-analytics).
 
 ## Support
 
