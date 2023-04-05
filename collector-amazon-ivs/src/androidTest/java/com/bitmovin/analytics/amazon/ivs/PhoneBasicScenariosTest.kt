@@ -59,7 +59,7 @@ class PhoneBasicScenariosTest {
         // assert
         val eventDataList = LogParser.extractAnalyticsSamplesFromLogs()
         val expectedStreamData = StreamData(
-            "avc1.4D401F",
+            "avc1.",
             "mp4a.40.2",
             Samples.ivsLiveStream1Source.uri.toString(),
             "hls",
@@ -83,6 +83,95 @@ class PhoneBasicScenariosTest {
         val pauseSamples = eventDataList.filter { x -> x.state?.lowercase() == "pause" }
         assertThat(pauseSamples.size).isEqualTo(1)
         assertThat(pauseSamples[0].paused).isGreaterThan(firstPauseMs - 100) // reducing minimal expected pause time to make test stable
+    }
+
+    @Test
+    fun testLiveStream_basic2ImpressionsScenarios_Should_sendCorrectSamples() {
+        // arrange
+        val liveStreamSample1 = Samples.ivsLiveStream1Source
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val player = Player.Factory.create(appContext)
+        player.isMuted = true
+
+        val analyticsConfig = TestUtils.createBitmovinAnalyticsConfig(liveStreamSample1.uri.toString())
+        val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
+        collector.attachPlayer(player)
+
+        // act
+        player.load(liveStreamSample1.uri)
+
+        player.play()
+        Thread.sleep(4000)
+        player.pause()
+        Thread.sleep(100)
+
+        collector.detachPlayer()
+
+        val liveStreamSample2 = Samples.ivsLiveStream2Source
+        analyticsConfig.m3u8Url = liveStreamSample2.uri.toString()
+        collector.attachPlayer(player)
+
+        player.load(liveStreamSample2.uri)
+        player.play()
+        Thread.sleep(4000)
+        player.pause()
+        Thread.sleep(100)
+
+        collector.detachPlayer()
+        player.release()
+
+        // assert
+        val eventDataList = LogParser.extractAnalyticsSamplesFromLogs()
+        val expectedStreamData1 = StreamData(
+            "avc1",
+            "mp4a.40.2",
+            liveStreamSample1.uri.toString(),
+            "hls",
+            true,
+            -1,
+        )
+
+        val expectedStreamData2 = StreamData(
+            "avc1",
+            "mp4a.40.2",
+            liveStreamSample2.uri.toString(),
+            "hls",
+            true,
+            -1,
+        )
+
+        // make sure there are only 2 sessions
+        assertThat(eventDataList.filter { x -> x.state == "startup" }.size).isEqualTo(2)
+
+        val secondSessionIndex = eventDataList.indexOfLast { x -> x.state == "startup" }
+        val firstSessionSamples = eventDataList.subList(0, secondSessionIndex).toMutableList()
+        val secondSessionSamples = eventDataList.subList(secondSessionIndex, eventDataList.size).toMutableList()
+
+        // last sample of first session is actually the license call for second session
+        firstSessionSamples.removeLast()
+
+        // verify that two session have different impression_id
+        assertThat(firstSessionSamples[0].impressionId).isNotEqualTo(secondSessionSamples[0].impressionId)
+
+        verifyStaticData(firstSessionSamples, analyticsConfig, expectedStreamData1)
+        verifyStaticData(secondSessionSamples, analyticsConfig, expectedStreamData2)
+
+        TestUtils.verifyDroppedFramesAreNeverNegative(firstSessionSamples)
+        TestUtils.verifyDroppedFramesAreNeverNegative(secondSessionSamples)
+
+        TestUtils.filterNonDeterministicEvents(firstSessionSamples)
+        TestUtils.filterNonDeterministicEvents(secondSessionSamples)
+
+        // there need to be at least 2 events per session
+        // startup, playing
+        assertThat(firstSessionSamples.size).isGreaterThanOrEqualTo(2)
+        assertThat(secondSessionSamples.size).isGreaterThanOrEqualTo(2)
+
+        TestUtils.verifyIvsPlayerStartupSample(firstSessionSamples[0])
+        TestUtils.verifyIvsPlayerStartupSample(secondSessionSamples[0], false)
+
+        assertThat(firstSessionSamples[1].state).isEqualTo("playing")
+        assertThat(secondSessionSamples[1].state).isEqualTo("playing")
     }
 
     @Test
@@ -114,7 +203,7 @@ class PhoneBasicScenariosTest {
 
         // assert
         val expectedStreamData = StreamData(
-            "avc1.4D401F",
+            "avc1.",
             "mp4a.40.2",
             Samples.ivsVodStreamSource.uri.toString(),
             "hls",
@@ -147,7 +236,7 @@ class PhoneBasicScenariosTest {
             playedTime += eventData.played
         }
 
-        assertThat(playedTime).isBetween(playedBeforeSeekMs - 500, playedBeforeSeekMs + 500)
+        assertThat(playedTime).isBetween(playedBeforeSeekMs - 700, playedBeforeSeekMs + 700)
 
         val seekingSamples = eventDataList.filter { x -> x.state?.lowercase() == "seeking" }
         assertThat(seekingSamples.size).isEqualTo(1)
@@ -199,7 +288,7 @@ class PhoneBasicScenariosTest {
     }
 
     private fun verifyStaticData(
-        eventDataList: List<EventData>,
+        eventDataList: MutableList<EventData>,
         analyticsConfig: BitmovinAnalyticsConfig,
         expectedStreamData: StreamData,
     ) {

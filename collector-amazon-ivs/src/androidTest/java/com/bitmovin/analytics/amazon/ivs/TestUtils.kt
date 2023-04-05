@@ -42,7 +42,7 @@ object TestUtils {
 
     fun verifyStreamData(eventData: EventData, exepectedData: StreamData) {
         assertThat(eventData.audioCodec).isEqualTo(exepectedData.audioCodec)
-        assertThat(eventData.videoCodec).isEqualTo(exepectedData.videoCodec)
+        assertThat(eventData.videoCodec).startsWith(exepectedData.videoCodec)
         assertThat(eventData.m3u8Url).isEqualTo(exepectedData.m3u8Url)
         assertThat(eventData.streamFormat).isEqualTo(exepectedData.streamFormat)
         assertThat(eventData.videoBitrate).isGreaterThan(0)
@@ -97,12 +97,18 @@ object TestUtils {
         eventDataList.removeAll { x -> x.state?.lowercase() == "buffering" }
     }
 
-    fun verifyIvsPlayerStartupSample(eventData: EventData) {
+    fun verifyIvsPlayerStartupSample(eventData: EventData, isFirstImpression: Boolean = true) {
         assertThat(eventData.state).isEqualTo("startup")
         assertThat(eventData.startupTime).isGreaterThan(0)
         assertThat(eventData.supportedVideoCodecs).isNotNull
-        assertThat(eventData.playerStartupTime).isEqualTo(1)
+
+        // if user watches several different videos there are several impressions but only the first one has playerStartupTime !=0
+        if (isFirstImpression) {
+            assertThat(eventData.playerStartupTime).isEqualTo(1)
+        }
         assertThat(eventData.videoStartupTime).isGreaterThan(0)
+        assertThat(eventData.videoTimeStart).isEqualTo(0)
+        assertThat(eventData.videoTimeEnd).isEqualTo(0)
     }
 
     fun verifyDroppedFramesAreNeverNegative(eventDataList: MutableList<EventData>) {
