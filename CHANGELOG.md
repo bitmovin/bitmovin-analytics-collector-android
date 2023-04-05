@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Upgrade example app to use latest amazon ivs player (v1.18.0)
+
 ## v2.15.0
 
 ### Changed
