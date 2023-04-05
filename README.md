@@ -13,7 +13,7 @@ allprojects {
     repositories {
         mavenCentral()
         google()
-    
+
         maven {
             url  'https://artifacts.bitmovin.com/artifactory/public-releases'
         }
