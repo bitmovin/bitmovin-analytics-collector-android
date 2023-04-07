@@ -43,6 +43,20 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+
+        // https://developer.android.com/studio/test/gradle-managed-devices
+        managedDevices {
+            devices {
+                pixel6api30 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                    // Use device profiles you typically see in Android Studio.
+                    device = "Pixel 6"
+                    // Use only API levels 27 and higher.
+                    apiLevel = 30
+                    // To include Google services, use "google-atd".
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
     }
     lint {
         abortOnError false
@@ -59,6 +73,11 @@ dependencies {
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 
     testImplementation "org.robolectric:robolectric:${rootProject.ext.robolectricVersion}"
+
+    androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+    androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    androidTestImplementation project(':example-shared')
 
     if (rootProject.ext.developLocal) {
         api project(':collector')

@@ -1,34 +1,45 @@
-package com.bitmovin.analytics.amazon.ivs
+package com.bitmovin.analytics.systemtest.utils
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.features.errordetails.ErrorDetail
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 
-object TestUtils {
+object DataVerifier {
+    val QUALITYCHANGE = "qualitychange"
+    val BUFFERING = "buffering"
 
-    fun createBitmovinAnalyticsConfig(m3u8Url: String): BitmovinAnalyticsConfig {
-        /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
-        val bitmovinAnalyticsConfig =
-            BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
+    fun verifyStaticData(
+        eventDataList: MutableList<EventData>,
+        analyticsConfig: BitmovinAnalyticsConfig,
+        expectedStreamData: StreamData,
+        expectedPlayerInfo: PlayerInfo,
+        is4kTV: Boolean = false,
+    ) {
+        // make sure that these properties are static over the whole session
+        val generatedUserId = eventDataList[0].userId
+        val impressionId = eventDataList[0].impressionId
 
-        bitmovinAnalyticsConfig.title = "Android Amazon IVS player video"
-        bitmovinAnalyticsConfig.videoId = "IVS video id"
-        bitmovinAnalyticsConfig.customUserId = "customBitmovinUserId1"
-        bitmovinAnalyticsConfig.experimentName = "experiment-1"
-        bitmovinAnalyticsConfig.customData1 = "customData1"
-        bitmovinAnalyticsConfig.customData2 = "customData2"
-        bitmovinAnalyticsConfig.customData3 = "customData3"
-        bitmovinAnalyticsConfig.customData4 = "customData4"
-        bitmovinAnalyticsConfig.customData5 = "customData5"
-        bitmovinAnalyticsConfig.customData6 = "customData6"
-        bitmovinAnalyticsConfig.customData7 = "customData7"
-        bitmovinAnalyticsConfig.path = "/customPath/new/"
-        bitmovinAnalyticsConfig.m3u8Url = m3u8Url
-        bitmovinAnalyticsConfig.cdnProvider = "testCdnProvider"
-        return bitmovinAnalyticsConfig
+        for (eventData in eventDataList) {
+            if (is4kTV) {
+                verify4kTVDeviceInfo(eventData)
+            } else {
+                verifyPhoneDeviceInfo(eventData)
+            }
+
+            verifyAnalyticsConfig(eventData, analyticsConfig)
+            verifyPlayerAndCollectorInfo(eventData, expectedPlayerInfo)
+            verifyStreamData(eventData, expectedStreamData)
+            verifyUserAgent(eventData)
+
+            assertThat(eventData.impressionId).isEqualTo(impressionId)
+            assertThat(eventData.userId).isEqualTo(generatedUserId)
+            assertThat(eventData.videoStartFailed).isFalse
+        }
     }
 
-    fun verifyPlayerAndCollectorInfo(eventData: EventData, expectedPlayerInfo: PlayerInfo) {
+    private fun verifyPlayerAndCollectorInfo(eventData: EventData, expectedPlayerInfo: PlayerInfo) {
         assertThat(eventData.player).isEqualTo(expectedPlayerInfo.playerName)
         assertThat(eventData.playerTech).isEqualTo(expectedPlayerInfo.playerTech)
         assertThat(eventData.version).isEqualTo(expectedPlayerInfo.playerVersion)
@@ -42,7 +53,7 @@ object TestUtils {
 
     fun verifyStreamData(eventData: EventData, exepectedData: StreamData) {
         assertThat(eventData.audioCodec).isEqualTo(exepectedData.audioCodec)
-        assertThat(eventData.videoCodec).startsWith(exepectedData.videoCodec)
+        assertThat(eventData.videoCodec).startsWith(exepectedData.videoCodecStartsWith)
         assertThat(eventData.m3u8Url).isEqualTo(exepectedData.m3u8Url)
         assertThat(eventData.streamFormat).isEqualTo(exepectedData.streamFormat)
         assertThat(eventData.videoBitrate).isGreaterThan(0)
@@ -67,7 +78,7 @@ object TestUtils {
         assertThat(eventData.customData7).isEqualTo(analyticsConfig.customData7)
     }
 
-    fun verifyPhoneDeviceInfo(eventData: EventData) {
+    private fun verifyPhoneDeviceInfo(eventData: EventData) {
         assertThat(eventData.deviceInformation.model).isNotEmpty
         assertThat(eventData.deviceInformation.isTV).isFalse
         assertThat(eventData.deviceInformation.manufacturer).isNotEmpty
@@ -76,7 +87,7 @@ object TestUtils {
         assertThat(eventData.platform).isEqualTo("android")
     }
 
-    fun verify4kTVDeviceInfo(eventData: EventData) {
+    private fun verify4kTVDeviceInfo(eventData: EventData) {
         assertThat(eventData.deviceInformation.model).isNotEmpty
         assertThat(eventData.deviceInformation.isTV).isTrue
         assertThat(eventData.deviceInformation.manufacturer).isNotEmpty
@@ -85,7 +96,7 @@ object TestUtils {
         assertThat(eventData.platform).isEqualTo("androidTV")
     }
 
-    fun verifyUserAgent(eventData: EventData) {
+    private fun verifyUserAgent(eventData: EventData) {
         assertThat(eventData.userAgent).isNotEmpty
         assertThat(eventData.userAgent).contains("Android 1") // is dynamic so we only check that it is at least Android 1x
     }
@@ -93,11 +104,11 @@ object TestUtils {
     fun filterNonDeterministicEvents(eventDataList: MutableList<EventData>) {
         // We filter for qualitychange and buffering events
         // since they are non deterministic and would probably make the test flaky
-        eventDataList.removeAll { x -> x.state?.lowercase() == "qualitychange" }
-        eventDataList.removeAll { x -> x.state?.lowercase() == "buffering" }
+        eventDataList.removeAll { x -> x.state?.lowercase() == QUALITYCHANGE }
+        eventDataList.removeAll { x -> x.state?.lowercase() == BUFFERING }
     }
 
-    fun verifyIvsPlayerStartupSample(eventData: EventData, isFirstImpression: Boolean = true) {
+    fun verifyStartupSample(eventData: EventData, isFirstImpression: Boolean = true) {
         assertThat(eventData.state).isEqualTo("startup")
         assertThat(eventData.startupTime).isGreaterThan(0)
         assertThat(eventData.supportedVideoCodecs).isNotNull
@@ -114,5 +125,50 @@ object TestUtils {
     fun verifyDroppedFramesAreNeverNegative(eventDataList: MutableList<EventData>) {
         val negativeDroppedFramesSamples = eventDataList.filter { x -> x.droppedFrames < 0 }
         assertThat(negativeDroppedFramesSamples.size).isEqualTo(0)
+    }
+
+    fun verifyQualityOnlyChangesWithQualityChangeEvent(eventDataList: MutableList<EventData>) {
+        var currentVideoBitrate = eventDataList[0].videoBitrate
+        var currentAudioBitrate = eventDataList[0].audioBitrate
+
+        for (eventData in eventDataList) {
+            if (eventData.state == QUALITYCHANGE) {
+                currentVideoBitrate = eventData.videoBitrate
+                currentAudioBitrate = eventData.audioBitrate
+            }
+
+            if (eventData.videoBitrate != currentVideoBitrate) {
+                Assertions.fail<Nothing>("video quality changed before qualitychangeevent")
+            }
+
+            if (eventData.audioBitrate != currentAudioBitrate) {
+                Assertions.fail<Nothing>("audio quality changed before qualitychangeevent")
+            }
+        }
+    }
+
+    fun verifyVideoStartEndTimesOnContinuousPlayback(eventDataList: MutableList<EventData>) {
+        var previousVideoTimeEnd = 0L
+
+        for (eventData in eventDataList) {
+            if (eventData.state != "seeking") { // on seeking we might not have monotonic increasing videostart and videoend
+
+                // we need to add a couple of ms to videoTimeEnd to make test stable
+                // since it seems like ivs player is sometimes changing the position backwards a bit on
+                // subsequent player.position calls after a seek, which affects the playing sample after the seek
+                assertThat(eventData.videoTimeStart).isLessThanOrEqualTo(eventData.videoTimeEnd + 5)
+            }
+            assertThat(eventData.videoTimeStart).isEqualTo(previousVideoTimeEnd)
+            previousVideoTimeEnd = eventData.videoTimeEnd
+        }
+    }
+
+    fun verifyStaticErrorDetails(errorDetail: ErrorDetail, expectedImpressionId: String, expectedLicenseKey: String) {
+        assertThat(errorDetail.impressionId).isEqualTo(expectedImpressionId)
+        assertThat(errorDetail.platform).isEqualTo("android")
+        assertThat(errorDetail.licenseKey).isEqualTo(expectedLicenseKey)
+        assertThat(errorDetail.analyticsVersion).isEqualTo("0.0.0-local")
+        assertThat(errorDetail.timestamp).isGreaterThan(0)
+        assertThat(errorDetail.domain).isNotEmpty
     }
 }

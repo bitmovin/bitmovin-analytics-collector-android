@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.amazon.ivs
+package com.bitmovin.analytics.systemtest.utils
 
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.utils.DataSerializer

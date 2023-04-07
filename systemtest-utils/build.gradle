@@ -1,0 +1,31 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
+
+android {
+    namespace "com.bitmovin.analytics.systemtest.utils"
+
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+    }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibility
+        targetCompatibility rootProject.ext.targetCompatibility
+    }
+}
+
+dependencies {
+    implementation project(':collector')
+    implementation project(':example-shared')
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+    implementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
+    implementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+    implementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+
+}

@@ -5,7 +5,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.example.shared.Samples
-import org.assertj.core.api.Assertions.assertThat
+import com.bitmovin.analytics.systemtest.utils.DataVerifier
+import com.bitmovin.analytics.systemtest.utils.LogParser
+import com.bitmovin.analytics.systemtest.utils.StreamData
+import com.bitmovin.analytics.systemtest.utils.TestConfig
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,7 +34,7 @@ class TVBasicScenariosTest {
 
         val testSample = Samples.ivsLiveStream1Source
 
-        val analyticsConfig = TestUtils.createBitmovinAnalyticsConfig(testSample.uri.toString())
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(testSample.uri.toString())
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
@@ -61,23 +64,7 @@ class TVBasicScenariosTest {
             -1,
         )
 
-        // make sure that these properties are static over the whole session
-        val generatedUserId = eventDataList[0].userId
-        val impression_id = eventDataList[0].impressionId
-
-        // verify data that should be present in all samples
-        for (eventData in eventDataList) {
-            TestUtils.verify4kTVDeviceInfo(eventData)
-            TestUtils.verifyAnalyticsConfig(eventData, analyticsConfig)
-            TestUtils.verifyPlayerAndCollectorInfo(eventData, IvsPlayerConstants.playerInfo)
-            TestUtils.verifyStreamData(eventData, expectedStreamData)
-            TestUtils.verifyUserAgent(eventData)
-
-            assertThat(eventData.impressionId).isEqualTo(impression_id)
-            assertThat(eventData.userId).isEqualTo(generatedUserId)
-            assertThat(eventData.videoStartFailed).isFalse
-        }
-
-        TestUtils.verifyIvsPlayerStartupSample(eventDataList[0])
+        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, expectedStreamData, IvsPlayerConstants.playerInfo, true)
+        DataVerifier.verifyStartupSample(eventDataList[0])
     }
 }

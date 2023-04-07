@@ -4,10 +4,13 @@ import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
+import com.bitmovin.analytics.systemtest.utils.DataVerifier
+import com.bitmovin.analytics.systemtest.utils.LogParser
+import com.bitmovin.analytics.systemtest.utils.StreamData
+import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.utils.DataSerializer
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
@@ -36,7 +39,7 @@ class PhoneBasicScenariosTest {
         val player = Player.Factory.create(appContext)
         player.isMuted = true
 
-        val analyticsConfig = TestUtils.createBitmovinAnalyticsConfig(liveStreamSample.uri.toString())
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample.uri.toString())
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
@@ -67,16 +70,16 @@ class PhoneBasicScenariosTest {
             -1,
         )
 
-        verifyStaticData(eventDataList, analyticsConfig, expectedStreamData)
-        TestUtils.verifyDroppedFramesAreNeverNegative(eventDataList)
+        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, expectedStreamData, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyDroppedFramesAreNeverNegative(eventDataList)
 
-        TestUtils.filterNonDeterministicEvents(eventDataList)
+        DataVerifier.filterNonDeterministicEvents(eventDataList)
 
         // there need to be at least 4 events
         // startup, playing, pause, playing
         assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
 
-        TestUtils.verifyIvsPlayerStartupSample(eventDataList[0])
+        DataVerifier.verifyStartupSample(eventDataList[0])
         assertThat(eventDataList[1].state).isEqualTo("playing")
 
         // verify that there is exactly one pause sample
@@ -93,7 +96,7 @@ class PhoneBasicScenariosTest {
         val player = Player.Factory.create(appContext)
         player.isMuted = true
 
-        val analyticsConfig = TestUtils.createBitmovinAnalyticsConfig(liveStreamSample1.uri.toString())
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample1.uri.toString())
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
@@ -153,22 +156,22 @@ class PhoneBasicScenariosTest {
         // verify that two session have different impression_id
         assertThat(firstSessionSamples[0].impressionId).isNotEqualTo(secondSessionSamples[0].impressionId)
 
-        verifyStaticData(firstSessionSamples, analyticsConfig, expectedStreamData1)
-        verifyStaticData(secondSessionSamples, analyticsConfig, expectedStreamData2)
+        DataVerifier.verifyStaticData(firstSessionSamples, analyticsConfig, expectedStreamData1, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(secondSessionSamples, analyticsConfig, expectedStreamData2, IvsPlayerConstants.playerInfo)
 
-        TestUtils.verifyDroppedFramesAreNeverNegative(firstSessionSamples)
-        TestUtils.verifyDroppedFramesAreNeverNegative(secondSessionSamples)
+        DataVerifier.verifyDroppedFramesAreNeverNegative(firstSessionSamples)
+        DataVerifier.verifyDroppedFramesAreNeverNegative(secondSessionSamples)
 
-        TestUtils.filterNonDeterministicEvents(firstSessionSamples)
-        TestUtils.filterNonDeterministicEvents(secondSessionSamples)
+        DataVerifier.filterNonDeterministicEvents(firstSessionSamples)
+        DataVerifier.filterNonDeterministicEvents(secondSessionSamples)
 
         // there need to be at least 2 events per session
         // startup, playing
         assertThat(firstSessionSamples.size).isGreaterThanOrEqualTo(2)
         assertThat(secondSessionSamples.size).isGreaterThanOrEqualTo(2)
 
-        TestUtils.verifyIvsPlayerStartupSample(firstSessionSamples[0])
-        TestUtils.verifyIvsPlayerStartupSample(secondSessionSamples[0], false)
+        DataVerifier.verifyStartupSample(firstSessionSamples[0])
+        DataVerifier.verifyStartupSample(secondSessionSamples[0], false)
 
         assertThat(firstSessionSamples[1].state).isEqualTo("playing")
         assertThat(secondSessionSamples[1].state).isEqualTo("playing")
@@ -181,7 +184,7 @@ class PhoneBasicScenariosTest {
         val player = Player.Factory.create(appContext)
         player.isMuted = true
 
-        val analyticsConfig = TestUtils.createBitmovinAnalyticsConfig(vodStreamSample.uri.toString())
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(vodStreamSample.uri.toString())
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
@@ -194,7 +197,7 @@ class PhoneBasicScenariosTest {
         Thread.sleep(playedBeforeSeekMs)
 
         player.seekTo(1000)
-        Thread.sleep(1000)
+        Thread.sleep(2000)
         player.pause()
         Thread.sleep(1000)
 
@@ -212,17 +215,17 @@ class PhoneBasicScenariosTest {
         )
         val eventDataList = LogParser.extractAnalyticsSamplesFromLogs()
 
-        verifyStaticData(eventDataList, analyticsConfig, expectedStreamData)
-        verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-        TestUtils.verifyDroppedFramesAreNeverNegative(eventDataList)
+        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, expectedStreamData, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
+        DataVerifier.verifyDroppedFramesAreNeverNegative(eventDataList)
 
-        TestUtils.filterNonDeterministicEvents(eventDataList)
+        DataVerifier.filterNonDeterministicEvents(eventDataList)
 
         // there need to be at least 3 events
         // startup, playing, seeking
         assertThat(eventDataList.size).isGreaterThanOrEqualTo(3)
 
-        TestUtils.verifyIvsPlayerStartupSample(eventDataList[0])
+        DataVerifier.verifyStartupSample(eventDataList[0])
 
         // verify first playing period (until seek), there can be more than one playing sample since
         // quality change events and bufferings could have happened in between
@@ -249,13 +252,16 @@ class PhoneBasicScenariosTest {
         val player = Player.Factory.create(appContext)
         player.isMuted = true
 
-        val analyticsConfig = TestUtils.createBitmovinAnalyticsConfig(nonExistingStreamSample.uri.toString())
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(nonExistingStreamSample.uri.toString())
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
         player.load(nonExistingStreamSample.uri)
 
         player.play()
         Thread.sleep(1000)
+
+        collector.detachPlayer()
+        player.release()
 
         val jsonSamples = LogParser.extractHttpClientJsonLogLines()
 
@@ -273,6 +279,7 @@ class PhoneBasicScenariosTest {
         assertThat(eventData?.errorMessage).isEqualTo("ERROR_NOT_AVAILABLE")
         assertThat(eventData?.errorCode).isEqualTo(11)
         assertThat(eventData?.videoStartFailed).isTrue
+        DataVerifier.verifyAnalyticsConfig(eventData!!, analyticsConfig)
 
         // second sample is errorDetail
         val errorDetail = DataSerializer.deserialize(
@@ -285,44 +292,6 @@ class PhoneBasicScenariosTest {
         assertThat(errorDetail?.impressionId).isEqualTo(impressionId)
         assertThat(errorDetail?.platform).isEqualTo("android")
         assertThat(errorDetail?.licenseKey).isEqualTo(analyticsConfig.key)
-    }
-
-    private fun verifyStaticData(
-        eventDataList: MutableList<EventData>,
-        analyticsConfig: BitmovinAnalyticsConfig,
-        expectedStreamData: StreamData,
-    ) {
-        // make sure that these properties are static over the whole session
-        val generatedUserId = eventDataList[0].userId
-        val impression_id = eventDataList[0].impressionId
-
-        for (eventData in eventDataList) {
-            TestUtils.verifyPhoneDeviceInfo(eventData)
-            TestUtils.verifyAnalyticsConfig(eventData, analyticsConfig)
-            TestUtils.verifyPlayerAndCollectorInfo(eventData, IvsPlayerConstants.playerInfo)
-            TestUtils.verifyStreamData(eventData, expectedStreamData)
-            TestUtils.verifyUserAgent(eventData)
-
-            assertThat(eventData.impressionId).isEqualTo(impression_id)
-            assertThat(eventData.userId).isEqualTo(generatedUserId)
-            assertThat(eventData.videoStartFailed).isFalse
-        }
-    }
-
-    private fun verifyVideoStartEndTimesOnContinuousPlayback(eventDataList: MutableList<EventData>) {
-        var previousVideoTimeEnd = 0L
-
-        for (eventData in eventDataList) {
-            if (eventData.state != "seeking") { // on seeking we might not have monotonic increasing videostart and videoend
-
-                // we need to add a couple of ms to videoTimeEnd to make test stable
-                // since it seems like ivs player is sometimes changing the position backwards a bit on
-                // subsequent player.position calls after a seek, which affects the playing sample after the seek
-                assertThat(eventData.videoTimeStart).isLessThanOrEqualTo(eventData.videoTimeEnd + 5)
-            }
-            assertThat(eventData.videoTimeStart).isEqualTo(previousVideoTimeEnd)
-            previousVideoTimeEnd = eventData.videoTimeEnd
-        }
     }
 
     private fun waitUntilPlayerIsReady(player: Player) {

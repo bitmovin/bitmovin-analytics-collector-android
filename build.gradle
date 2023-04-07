@@ -212,6 +212,12 @@ project(":collector-amazon-ivs-example") {
     }
 }
 
+project(":systemtest-utils") {
+    sonarqube {
+        sonar.skipProject = true
+    }
+}
+
 java {
     sourceCompatibility = rootProject.ext.sourceCompatibility
     targetCompatibility = rootProject.ext.targetCompatibility

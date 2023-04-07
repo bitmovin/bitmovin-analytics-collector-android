@@ -8,3 +8,4 @@ include ':collector-amazon-ivs-example'
 
 include ':example-shared'
 include ':collector-bitmovin-player-tv-example'
+include ':systemtest-utils'
