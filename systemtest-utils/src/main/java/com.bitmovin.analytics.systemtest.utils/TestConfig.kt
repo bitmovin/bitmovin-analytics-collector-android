@@ -4,11 +4,10 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 
 object TestConfig {
 
-    fun createBitmovinAnalyticsConfig(m3u8Url: String): BitmovinAnalyticsConfig {
-        /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
+    /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
+    fun createBitmovinAnalyticsConfig(m3u8Url: String, analyticsKey: String = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0"): BitmovinAnalyticsConfig {
         val bitmovinAnalyticsConfig =
-            BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
-
+            BitmovinAnalyticsConfig(analyticsKey)
         bitmovinAnalyticsConfig.title = "dummy title"
         bitmovinAnalyticsConfig.videoId = "dummy-videoId"
         bitmovinAnalyticsConfig.customUserId = "customBitmovinUserId1"

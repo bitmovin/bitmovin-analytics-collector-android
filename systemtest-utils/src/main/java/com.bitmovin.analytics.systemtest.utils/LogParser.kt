@@ -1,35 +1,65 @@
 package com.bitmovin.analytics.systemtest.utils
 
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import com.bitmovin.analytics.utils.DataSerializer
+import org.assertj.core.api.Assertions.fail
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
 object LogParser {
 
-    fun extractAnalyticsSamplesFromLogs(): MutableList<EventData> {
-        val analyticsSamplesStrings = extractHttpClientJsonLogLines()
+    fun extractImpressions(): List<Impression> {
+        val jsonSamples = extractHttpClientJsonLogLines()
+        val impressionList = mutableListOf<Impression>()
+        var currentImpression = Impression()
 
-        // remove the first network requests since it is the license call
-        val licenseCallStringJson = analyticsSamplesStrings.removeFirst()
+        // remove license call (but keep errorDetail and evenData, thus filter for impressionId)
+        jsonSamples.removeAll { x -> !x.contains("impressionId") }
 
-        val eventDataList = mutableListOf<EventData>()
+        val iterator = jsonSamples.iterator()
+        while (iterator.hasNext()) {
+            val sample = iterator.next()
 
-        for (sample in analyticsSamplesStrings) {
             val eventData = DataSerializer.deserialize(
                 sample,
                 EventData::class.java,
             )
 
             if (eventData != null) {
-                eventDataList.add(eventData)
+                if (isNewImpressionSample(eventData)) {
+                    currentImpression = Impression()
+                    impressionList.add(currentImpression)
+                }
+
+                currentImpression.eventDataList.add(eventData)
+
+                // if eventdata includes errorMessage, next sample is errorDetail
+                if (eventData.errorMessage != null) {
+                    val errorDetailJson = iterator.next()
+                    val errorDetail = DataSerializer.deserialize(
+                        errorDetailJson,
+                        ErrorDetail::class.java,
+                    )
+                    if (errorDetail != null) {
+                        currentImpression.errorDetailList.add(errorDetail)
+                    } else {
+                        fail<Nothing>("Couldn't parse errorDetails")
+                    }
+                }
+            } else {
+                fail<Nothing>("Couldn't parse event data")
             }
         }
 
-        return eventDataList
+        return impressionList
     }
 
-    fun extractHttpClientJsonLogLines(): MutableList<String> {
+    private fun isNewImpressionSample(eventData: EventData): Boolean {
+        return eventData.sequenceNumber == 0
+    }
+
+    private fun extractHttpClientJsonLogLines(): MutableList<String> {
         val logLines = mutableListOf<String>()
         val process = Runtime.getRuntime().exec("logcat -d")
         val bufferedReader = BufferedReader(

@@ -64,21 +64,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
-
-    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
-    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
-    testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-    testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
-
-    testImplementation "org.robolectric:robolectric:${rootProject.ext.robolectricVersion}"
-
-    androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
-    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
-    androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-    androidTestImplementation project(':example-shared')
-
     if (rootProject.ext.developLocal) {
         api project(':collector')
     } else {
@@ -91,6 +76,21 @@ dependencies {
             strictly "[2.18.0, 2.19.0["
         }
     }
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+
+    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+    testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
+    testImplementation "org.robolectric:robolectric:${rootProject.ext.robolectricVersion}"
+
+    androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+    androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+
+    androidTestImplementation project(':example-shared')
+    androidTestImplementation project(':systemtest-utils')
 }
 
 publishing {

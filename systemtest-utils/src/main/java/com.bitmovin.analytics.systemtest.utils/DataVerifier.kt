@@ -1,15 +1,20 @@
 package com.bitmovin.analytics.systemtest.utils
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 
 object DataVerifier {
     val QUALITYCHANGE = "qualitychange"
     val BUFFERING = "buffering"
+    val STARTUP = "startup"
+    val SEEKING = "seeking"
 
+    // verifies properties that are not specific to playback order
     fun verifyStaticData(
         eventDataList: MutableList<EventData>,
         analyticsConfig: BitmovinAnalyticsConfig,
@@ -17,18 +22,52 @@ object DataVerifier {
         expectedPlayerInfo: PlayerInfo,
         is4kTV: Boolean = false,
     ) {
+        if (eventDataList.size == 0) {
+            fail<Nothing>("No eventData samples collected")
+        }
+
+        verifyStaticData(eventDataList, expectedStreamData, expectedPlayerInfo, is4kTV)
+
+        for (eventData in eventDataList) {
+            verifyAnalyticsConfig(eventData, analyticsConfig)
+        }
+    }
+
+    fun verifyStaticData(
+        eventDataList: MutableList<EventData>,
+        sourceMetadata: SourceMetadata,
+        expectedStreamData: StreamData,
+        expectedPlayerInfo: PlayerInfo,
+        is4kTV: Boolean = false,
+    ) {
+        if (eventDataList.size == 0) {
+            fail<Nothing>("No eventData samples collected")
+        }
+
+        verifyStaticData(eventDataList, expectedStreamData, expectedPlayerInfo, is4kTV)
+
+        for (eventData in eventDataList) {
+            verifySourceMetadata(eventData, sourceMetadata)
+        }
+    }
+
+    private fun verifyStaticData(
+        eventDataList: MutableList<EventData>,
+        expectedStreamData: StreamData,
+        expectedPlayerInfo: PlayerInfo,
+        is4kTV: Boolean,
+    ) {
         // make sure that these properties are static over the whole session
         val generatedUserId = eventDataList[0].userId
         val impressionId = eventDataList[0].impressionId
 
-        for (eventData in eventDataList) {
+        for ((expectedSequenceNumber, eventData) in eventDataList.withIndex()) {
             if (is4kTV) {
                 verify4kTVDeviceInfo(eventData)
             } else {
                 verifyPhoneDeviceInfo(eventData)
             }
 
-            verifyAnalyticsConfig(eventData, analyticsConfig)
             verifyPlayerAndCollectorInfo(eventData, expectedPlayerInfo)
             verifyStreamData(eventData, expectedStreamData)
             verifyUserAgent(eventData)
@@ -36,6 +75,13 @@ object DataVerifier {
             assertThat(eventData.impressionId).isEqualTo(impressionId)
             assertThat(eventData.userId).isEqualTo(generatedUserId)
             assertThat(eventData.videoStartFailed).isFalse
+
+            // dropped frames can never be negative
+            // verified since IVS player behaves weird with the internal statistics
+            assertThat(eventData.droppedFrames).isGreaterThanOrEqualTo(0)
+
+            // make sure that sequenceNumber is continuous increasing
+            assertThat(eventData.sequenceNumber).isEqualTo(expectedSequenceNumber)
         }
     }
 
@@ -78,6 +124,22 @@ object DataVerifier {
         assertThat(eventData.customData7).isEqualTo(analyticsConfig.customData7)
     }
 
+    fun verifySourceMetadata(eventData: EventData, sourceMetadata: SourceMetadata) {
+        assertThat(eventData.videoTitle).isEqualTo(sourceMetadata.title)
+        assertThat(eventData.videoId).isEqualTo(sourceMetadata.videoId)
+        assertThat(eventData.cdnProvider).isEqualTo(sourceMetadata.cdnProvider)
+        assertThat(eventData.experimentName).isEqualTo(sourceMetadata.experimentName)
+        assertThat(eventData.path).isEqualTo(sourceMetadata.path)
+
+        assertThat(eventData.customData1).isEqualTo(sourceMetadata.customData1)
+        assertThat(eventData.customData2).isEqualTo(sourceMetadata.customData2)
+        assertThat(eventData.customData3).isEqualTo(sourceMetadata.customData3)
+        assertThat(eventData.customData4).isEqualTo(sourceMetadata.customData4)
+        assertThat(eventData.customData5).isEqualTo(sourceMetadata.customData5)
+        assertThat(eventData.customData6).isEqualTo(sourceMetadata.customData6)
+        assertThat(eventData.customData7).isEqualTo(sourceMetadata.customData7)
+    }
+
     private fun verifyPhoneDeviceInfo(eventData: EventData) {
         assertThat(eventData.deviceInformation.model).isNotEmpty
         assertThat(eventData.deviceInformation.isTV).isFalse
@@ -101,15 +163,8 @@ object DataVerifier {
         assertThat(eventData.userAgent).contains("Android 1") // is dynamic so we only check that it is at least Android 1x
     }
 
-    fun filterNonDeterministicEvents(eventDataList: MutableList<EventData>) {
-        // We filter for qualitychange and buffering events
-        // since they are non deterministic and would probably make the test flaky
-        eventDataList.removeAll { x -> x.state?.lowercase() == QUALITYCHANGE }
-        eventDataList.removeAll { x -> x.state?.lowercase() == BUFFERING }
-    }
-
     fun verifyStartupSample(eventData: EventData, isFirstImpression: Boolean = true) {
-        assertThat(eventData.state).isEqualTo("startup")
+        assertThat(eventData.state).isEqualTo(STARTUP)
         assertThat(eventData.startupTime).isGreaterThan(0)
         assertThat(eventData.supportedVideoCodecs).isNotNull
 
@@ -120,19 +175,27 @@ object DataVerifier {
         assertThat(eventData.videoStartupTime).isGreaterThan(0)
         assertThat(eventData.videoTimeStart).isEqualTo(0)
         assertThat(eventData.videoTimeEnd).isEqualTo(0)
+        assertThat(eventData.droppedFrames).isEqualTo(0)
     }
 
-    fun verifyDroppedFramesAreNeverNegative(eventDataList: MutableList<EventData>) {
-        val negativeDroppedFramesSamples = eventDataList.filter { x -> x.droppedFrames < 0 }
-        assertThat(negativeDroppedFramesSamples.size).isEqualTo(0)
+    fun verifyHasNoErrorSamples(impression: Impression) {
+        assertThat(impression.errorDetailList.size).isEqualTo(0)
+
+        val errorSamples = impression.eventDataList.filter { x ->
+            x.errorMessage != null ||
+                x.errorData != null ||
+                x.errorCode != null
+        }
+
+        assertThat(errorSamples.size).isEqualTo(0)
     }
 
-    fun verifyQualityOnlyChangesWithQualityChangeEvent(eventDataList: MutableList<EventData>) {
+    fun verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList: MutableList<EventData>) {
         var currentVideoBitrate = eventDataList[0].videoBitrate
         var currentAudioBitrate = eventDataList[0].audioBitrate
 
         for (eventData in eventDataList) {
-            if (eventData.state == QUALITYCHANGE) {
+            if (eventData.state == QUALITYCHANGE || eventData.state == SEEKING) {
                 currentVideoBitrate = eventData.videoBitrate
                 currentAudioBitrate = eventData.audioBitrate
             }
@@ -170,5 +233,18 @@ object DataVerifier {
         assertThat(errorDetail.analyticsVersion).isEqualTo("0.0.0-local")
         assertThat(errorDetail.timestamp).isGreaterThan(0)
         assertThat(errorDetail.domain).isNotEmpty
+    }
+
+    fun verifyExactlyOneSeekingSample(eventDataList: MutableList<EventData>) {
+        verifyOnlyOneSampleHasState(eventDataList, "seeking")
+    }
+
+    fun verifyExactlyOnPauseSample(eventDataList: MutableList<EventData>) {
+        verifyOnlyOneSampleHasState(eventDataList, "pause")
+    }
+
+    private fun verifyOnlyOneSampleHasState(eventDataList: MutableList<EventData>, state: String) {
+        val seekingSamples = eventDataList.filter { x -> x.state?.lowercase() == state }
+        assertThat(seekingSamples.size).isEqualTo(1)
     }
 }

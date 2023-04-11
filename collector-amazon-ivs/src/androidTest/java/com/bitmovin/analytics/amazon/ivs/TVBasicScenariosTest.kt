@@ -1,14 +1,15 @@
 package com.bitmovin.analytics.amazon.ivs
 
+import android.net.Uri
 import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
-import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.LogParser
-import com.bitmovin.analytics.systemtest.utils.StreamData
 import com.bitmovin.analytics.systemtest.utils.TestConfig
+import com.bitmovin.analytics.systemtest.utils.TestSamples
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,39 +33,34 @@ class TVBasicScenariosTest {
         val player = Player.Factory.create(appContext)
         player.isMuted = true
 
-        val testSample = Samples.ivsLiveStream1Source
+        val liveSample = TestSamples.IVS_LIVE_1
 
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(testSample.uri.toString())
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveSample.m3u8Url)
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
         // act
-        player.load(testSample.uri)
+        player.load(Uri.parse(liveSample.m3u8Url))
+        IvsTestUtils.waitUntilPlayerIsReady(player)
 
         player.play()
-        Thread.sleep(4000)
+        Thread.sleep(2000)
         player.pause()
-        Thread.sleep(1200)
-        player.play()
-        Thread.sleep(5000)
-        player.pause()
-        Thread.sleep(1000)
+        Thread.sleep(100)
 
         collector.detachPlayer()
         player.release()
 
         // assert
-        val eventDataList = LogParser.extractAnalyticsSamplesFromLogs()
-        val expectedStreamData = StreamData(
-            "avc1.4D401F",
-            "mp4a.40.2",
-            testSample.uri.toString(),
-            "hls",
-            true,
-            -1,
-        )
+        val impressionsList = LogParser.extractImpressions()
 
-        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, expectedStreamData, IvsPlayerConstants.playerInfo, true)
+        assertThat(impressionsList.size).isEqualTo(1)
+
+        val impression = impressionsList.first()
+        assertThat(impression.errorDetailList.size).isEqualTo(0)
+
+        val eventDataList = impression.eventDataList
+        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, liveSample, IvsPlayerConstants.playerInfo, true)
         DataVerifier.verifyStartupSample(eventDataList[0])
     }
 }
