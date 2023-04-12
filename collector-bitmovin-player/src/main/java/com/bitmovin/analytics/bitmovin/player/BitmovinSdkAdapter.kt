@@ -4,6 +4,7 @@ import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
+import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
 import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
@@ -45,6 +46,7 @@ internal class BitmovinSdkAdapter(
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
     private val playerLicenseProvider: PlayerLicenseProvider,
+    private val playbackQualityProvider: PlaybackQualityProvider,
 ) : DefaultPlayerAdapter(
     config,
     eventDataFactory,
@@ -204,8 +206,7 @@ internal class BitmovinSdkAdapter(
         data.droppedFrames = totalDroppedVideoFrames
         totalDroppedVideoFrames = 0
 
-        // video quality
-        val videoQuality = player.playbackVideoData
+        val videoQuality = playbackQualityProvider.currentVideoQuality
         if (videoQuality != null) {
             data.videoBitrate = videoQuality.bitrate
             data.videoPlaybackHeight = videoQuality.height
@@ -213,8 +214,7 @@ internal class BitmovinSdkAdapter(
             data.videoCodec = videoQuality.codec
         }
 
-        // audio quality
-        val audioQuality = player.playbackAudioData
+        val audioQuality = playbackQualityProvider.currentAudioQuality
         if (audioQuality != null) {
             data.audioBitrate = audioQuality.bitrate
             data.audioCodec = audioQuality.codec
@@ -282,7 +282,9 @@ internal class BitmovinSdkAdapter(
     }
 
     private fun startup() {
+        playbackQualityProvider.resetPlaybackQualities()
         stateMachine.transitionState(PlayerStates.STARTUP, position)
+
         if (!player.isAd) {
             // if ad is playing as first thing we prevent from sending the
             // VideoStartFailedReason.PAGE_CLOSED / VideoStartFailedReason.PLAYER_ERROR
@@ -468,10 +470,9 @@ internal class BitmovinSdkAdapter(
     private fun onPlayerEventVideoPlaybackQualityChanged(event: PlayerEvent.VideoPlaybackQualityChanged) {
         try {
             Log.d(TAG, "On Video Quality Changed")
-            // TODO AN-3299 check if any value actually changed
-            // Maybe the didQualityChange can actually deeply compare two objects
-            // that already have all the properties that we later need (codec, bitrate, etc)
-            stateMachine.videoQualityChanged(position, true) {}
+            stateMachine.videoQualityChanged(position, playbackQualityProvider.didVideoQualityChange(event.newVideoQuality)) {
+                playbackQualityProvider.currentVideoQuality = event.newVideoQuality
+            }
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
@@ -488,11 +489,9 @@ internal class BitmovinSdkAdapter(
     private fun onPlayerEventAudioPlaybackQualityChanged(event: PlayerEvent.AudioPlaybackQualityChanged) {
         try {
             Log.d(TAG, "On Audio Quality Changed")
-            val oldQuality = event.oldAudioQuality
-            val newQuality = event.newAudioQuality
-            val didQualityChange =
-                oldQuality == null || newQuality == null || oldQuality.bitrate != newQuality.bitrate
-            stateMachine.audioQualityChanged(position, didQualityChange) {}
+            stateMachine.audioQualityChanged(position, playbackQualityProvider.didAudioQualityChange(event.newAudioQuality)) {
+                playbackQualityProvider.currentAudioQuality = event.newAudioQuality
+            }
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }

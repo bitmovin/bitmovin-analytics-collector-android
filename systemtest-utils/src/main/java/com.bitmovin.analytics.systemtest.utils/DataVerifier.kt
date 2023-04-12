@@ -211,7 +211,8 @@ object DataVerifier {
     }
 
     fun verifyVideoStartEndTimesOnContinuousPlayback(eventDataList: MutableList<EventData>) {
-        var previousVideoTimeEnd = 0L
+        // startup sample should just have the same videoStart and videoEnd, thus we init with videoTimeEnd from first sample
+        var previousVideoTimeEnd = eventDataList[0].videoTimeEnd
 
         for (eventData in eventDataList) {
             if (eventData.state != "seeking") { // on seeking we might not have monotonic increasing videostart and videoend

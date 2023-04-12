@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
+import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
@@ -32,6 +33,9 @@ class BitmovinSdkAdapterTest {
     @RelaxedMockK
     private lateinit var player: Player
 
+    @RelaxedMockK
+    private lateinit var playbackQualityProvider: PlaybackQualityProvider
+
     private val sourceMap = mutableMapOf<Source, SourceMetadata>()
     private lateinit var bitmovinSdkAdapter: BitmovinSdkAdapter
 
@@ -58,6 +62,7 @@ class BitmovinSdkAdapterTest {
             mockk(relaxed = true),
             mockk(relaxed = true),
             mockk(relaxed = true),
+            playbackQualityProvider,
         )
     }
 
@@ -92,6 +97,8 @@ class BitmovinSdkAdapterTest {
         } answers { }
         every { player.currentTime } returns 0.0
         every { qualityChangeEventLimiter.isQualityChangeEventEnabled } returns true
+        every { playbackQualityProvider.didAudioQualityChange(any()) } returns true
+
         playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
         playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
         clearMocks(playerStateMachine)
