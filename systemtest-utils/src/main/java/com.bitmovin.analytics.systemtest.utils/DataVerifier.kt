@@ -75,12 +75,7 @@ object DataVerifier {
             assertThat(eventData.impressionId).isEqualTo(impressionId)
             assertThat(eventData.userId).isEqualTo(generatedUserId)
             assertThat(eventData.videoStartFailed).isFalse
-
-            // TODO: amazonivs droppedframes tracking is currently scewed a bit, this needs to
-            // be fixed once we have more info from ivs team (thus we skip evaluation for ivs player)
-            if (eventData.player != "amazonivs") {
-                assertThat(eventData.droppedFrames).isGreaterThanOrEqualTo(0)
-            }
+            assertThat(eventData.droppedFrames).isGreaterThanOrEqualTo(0)
 
             // make sure that sequenceNumber is continuous increasing
             assertThat(eventData.sequenceNumber).isEqualTo(expectedSequenceNumber)

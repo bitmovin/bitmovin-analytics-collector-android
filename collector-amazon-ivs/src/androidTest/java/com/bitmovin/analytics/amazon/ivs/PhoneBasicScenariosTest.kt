@@ -39,9 +39,6 @@ class PhoneBasicScenariosTest {
         player.isMuted = true
     }
 
-    // this test is currently flaky due to droppedFrames being negative, waiting on ivs to
-    // confirm that pause events are also causing a reset of dropped frames, this needs to be fixed
-    // on collector side afterwards
     @Test
     fun testLiveStream_basicPlayPauseScenario_Should_sendCorrectSamples() {
         // arrange

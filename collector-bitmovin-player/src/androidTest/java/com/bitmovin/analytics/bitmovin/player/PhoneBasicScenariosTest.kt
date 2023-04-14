@@ -408,8 +408,8 @@ class PhoneBasicScenariosTest {
     private fun waitUntilNextSourcePlayedToMs(player: Player, playedTo: Long) {
         val currentSource = player.source
         PlaybackUtils.waitUntil { player.source != currentSource }
-        // it seems like player is sometimes reporting the new source but the old currentTime??
 
+        // it seems like player is sometimes reporting the new source but the old currentTime??
         assertThat(player.currentTime).isLessThan(120.0)
 
         PlaybackUtils.waitUntil { player.isPlaying }
