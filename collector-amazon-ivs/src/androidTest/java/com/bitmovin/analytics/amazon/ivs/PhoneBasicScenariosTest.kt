@@ -233,7 +233,8 @@ class PhoneBasicScenariosTest {
         val eventData = impression.eventDataList.first()
         assertThat(eventData.errorMessage).isEqualTo("ERROR_NOT_AVAILABLE")
         assertThat(eventData.errorCode).isEqualTo(11)
-        assertThat(eventData.videoStartFailed).isTrue
+
+        DataVerifier.verifyStartupSampleOnError(eventData, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyAnalyticsConfig(eventData, analyticsConfig)
 
         assertThat(impression.errorDetailList.size).isEqualTo(1)

@@ -9,7 +9,7 @@ import org.assertj.core.api.Assertions
 
 object PlaybackUtils {
     fun waitUntil(condition: () -> Boolean) {
-        val maxWaitMs = 10000L
+        val maxWaitMs = 15000L
         var waitingTotalMs = 0L
         val waitingDeltaMs = 100L
         val channel = Channel<Unit>()

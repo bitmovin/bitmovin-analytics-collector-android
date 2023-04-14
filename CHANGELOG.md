@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Added `android.permission.INTERNET` to all adapter manifests
+- Upgrade example app to use latest amazon ivs player (v1.18.0)
+
 ### Added
 - [internal] Systemtests for Bitmovin and Exoplayer collectors
 
@@ -13,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Bitmovin Player: New quality on quality change events was tracked one sample too early
 - IVS Player: Wrong initialization order on startup
 - IVS Player: Wrong order of releasing of resources when collector is detached
+- All players: Reporting of `videostartup_time = 0` on certain edgecases where startup was very fast
 
 ## v2.15.0
 

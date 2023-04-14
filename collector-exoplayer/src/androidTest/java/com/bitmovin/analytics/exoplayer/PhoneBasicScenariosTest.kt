@@ -45,7 +45,7 @@ class PhoneBasicScenariosTest {
     // Test is currently flaky since videoStartupTime is sometimes = 0,
     // which might be a bug in the collector (needs to be investigated)
     @Test
-    fun test_basicPlayPauseScenario_Should_sendCorrectSamples() {
+    fun test_basicPlayPauseScenario_PlayWhenReady_Should_sendCorrectSamples() {
         // arrange
         val sample = TestSamples.HLS_REDBULL
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(sample.m3u8Url)
@@ -58,6 +58,7 @@ class PhoneBasicScenariosTest {
             player.prepare()
         }
 
+        // we wait until player is in ready state before we call play to test this specific scenario
         waitUntilPlayerIsReady(player)
 
         mainScope.launch {
@@ -120,6 +121,9 @@ class PhoneBasicScenariosTest {
 
         waitUntilPlayerHasError(player)
 
+        // wait a bit for samples being sent out
+        Thread.sleep(300)
+
         mainScope.launch {
             collector.detachPlayer()
             player.release()
@@ -133,7 +137,8 @@ class PhoneBasicScenariosTest {
         val eventData = impression.eventDataList.first()
         Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: InvalidResponseCodeException (Status Code: 404")
         Assertions.assertThat(eventData.errorCode).isEqualTo(0) // TODO: verify why errorCode is 0
-        Assertions.assertThat(eventData.videoStartFailed).isTrue
+
+        DataVerifier.verifyStartupSampleOnError(eventData, ExoplayerConstants.playerInfo)
         DataVerifier.verifyAnalyticsConfig(eventData, analyticsConfig)
 
         Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)

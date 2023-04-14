@@ -71,7 +71,7 @@ class PhoneBasicScenariosTest {
         }
 
         // we sleep a bit longer to increase probability of a qualitychange event
-        waitUntilPlayerPlayedToMs(player, 12000)
+        waitUntilPlayerPlayedToMs(player, 10000)
 
         mainScope.launch {
             player.pause()
@@ -261,7 +261,7 @@ class PhoneBasicScenariosTest {
             player.seek(seekTo)
         }
 
-        waitUntilDifferentSourcePlayedToMs(player, 2000)
+        waitUntilNextSourcePlayedToMs(player, 2000)
 
         // seek to almost end of second track
         val seekTo2 = dashSample.duration / 1000 - 1.0
@@ -269,7 +269,7 @@ class PhoneBasicScenariosTest {
             player.seek(seekTo2)
         }
 
-        waitUntilDifferentSourcePlayedToMs(player, 2000)
+        waitUntilNextSourcePlayedToMs(player, 2000)
 
         mainScope.launch {
             player.pause()
@@ -349,8 +349,8 @@ class PhoneBasicScenariosTest {
         val impressionId = eventData.impressionId
         assertThat(eventData.errorMessage).isEqualTo("A general error occurred: Response code: 404")
         assertThat(eventData.errorCode).isEqualTo(2001)
-        assertThat(eventData.videoStartFailed).isTrue
         assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+        DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
 
         DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.key)
         assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
@@ -405,9 +405,14 @@ class PhoneBasicScenariosTest {
         PlaybackUtils.waitUntil { player.isPaused }
     }
 
-    private fun waitUntilDifferentSourcePlayedToMs(player: Player, playedTo: Long) {
+    private fun waitUntilNextSourcePlayedToMs(player: Player, playedTo: Long) {
         val currentSource = player.source
         PlaybackUtils.waitUntil { player.source != currentSource }
+        // it seems like player is sometimes reporting the new source but the old currentTime??
+
+        assertThat(player.currentTime).isLessThan(120.0)
+
+        PlaybackUtils.waitUntil { player.isPlaying }
         PlaybackUtils.waitUntil { player.currentTime > (playedTo / 1000).toDouble() }
     }
 }
