@@ -125,7 +125,7 @@ dependencies {
 </tr>
 
 <tr>
-<td> >= 1.16 </td>
+<td> >= 1.14 </td>
 <td>
 
 ```gradle
