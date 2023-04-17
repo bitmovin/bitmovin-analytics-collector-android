@@ -7,7 +7,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
-- Added `android.permission.INTERNET` to all adapter manifests
 - Upgrade example apps to use latest amazon ivs player (v1.18.0) and latest bitmovin player (v3.35.2)
 
 ### Added

@@ -80,9 +80,6 @@ dependencies {
     androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-
-    //TODO: double check with player team, but seems like we are bound to this version
-    // due to player
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
 
     androidTestImplementation project(':example-shared')
