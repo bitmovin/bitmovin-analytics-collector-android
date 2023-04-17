@@ -6,6 +6,7 @@ import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
+import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSamples
 import com.google.android.exoplayer2.ExoPlayer
@@ -50,9 +51,9 @@ class PhoneBasicScenariosTest {
         val sample = TestSamples.HLS_REDBULL
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(sample.m3u8Url)
         val collector = IExoPlayerCollector.create(analyticsConfig, appContext)
-
         // act
         mainScope.launch {
+            player.volume = 0.0f
             collector.attachPlayer(player)
             player.setMediaItem(MediaItem.fromUri(sample.m3u8Url))
             player.prepare()
@@ -65,7 +66,7 @@ class PhoneBasicScenariosTest {
             player.play()
         }
 
-        Thread.sleep(500)
+        waitUntilPlayerHasPlayedToMs(player, 500)
 
         mainScope.launch {
             player.pause()
@@ -78,7 +79,7 @@ class PhoneBasicScenariosTest {
         }
 
         // we sleep a bit longer to increase probability of a qualitychange event
-        Thread.sleep(10000)
+        waitUntilPlayerHasPlayedToMs(player, 10000)
 
         mainScope.launch {
             player.pause()
@@ -103,6 +104,7 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
     }
 
     @Test
@@ -181,6 +183,11 @@ class PhoneBasicScenariosTest {
 
     private fun waitUntilPlayerIsPlaying(player: ExoPlayer) {
         PlaybackUtils.waitUntil { player.isPlaying }
+    }
+
+    private fun waitUntilPlayerHasPlayedToMs(player: ExoPlayer, playedToMs: Long) {
+        PlaybackUtils.waitUntil { player.isPlaying }
+        PlaybackUtils.waitUntil { player.currentPosition >= playedToMs }
     }
 
     private fun waitUntilPlayerHasError(player: ExoPlayer) {

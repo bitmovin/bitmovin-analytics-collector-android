@@ -95,7 +95,7 @@ ext {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
 
     // player versions
-    bitmovinPlayerVersion = '3.35.1'
+    bitmovinPlayerVersion = '3.35.2'
     exoplayerVersion = '2.18.5'
     amazonIvsPlayerVersion = '1.18.0'
 

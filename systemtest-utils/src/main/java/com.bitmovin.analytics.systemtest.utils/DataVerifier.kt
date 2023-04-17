@@ -90,8 +90,10 @@ object DataVerifier {
         assertThat(eventData.analyticsVersion).isEqualTo("0.0.0-local")
     }
 
-    fun verifyPlayerSetting(eventData: EventData, expectedPlayerSettings: PlayerSettings) {
-        assertThat(eventData.isMuted).isEqualTo(expectedPlayerSettings.isMuted)
+    fun verifyPlayerSetting(eventDataList: MutableList<EventData>, expectedPlayerSettings: PlayerSettings) {
+        for (eventData in eventDataList) {
+            assertThat(eventData.isMuted).isEqualTo(expectedPlayerSettings.isMuted)
+        }
     }
 
     fun verifyStreamData(eventData: EventData, exepectedData: StreamData) {

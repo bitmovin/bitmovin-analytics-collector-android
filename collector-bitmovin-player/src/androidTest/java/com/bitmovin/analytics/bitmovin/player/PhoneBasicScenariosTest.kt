@@ -5,8 +5,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
+import com.bitmovin.analytics.systemtest.utils.EventDataUtils
 import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
+import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSamples
 import com.bitmovin.player.api.PlaybackConfig
@@ -19,6 +21,7 @@ import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,6 +44,11 @@ class PhoneBasicScenariosTest {
         playbackConfig.isAutoplayEnabled = false
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
         player = Player.create(appContext, playerConfig)
+    }
+
+    @After
+    fun tearDown() {
+        player.destroy()
     }
 
     @Test
@@ -143,6 +151,62 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    fun test_playWithAutoplayEnabled_Should_sendCorrectSamples() {
+        val localPlaybackConfig = PlaybackConfig()
+        localPlaybackConfig.isMuted = true
+        localPlaybackConfig.isAutoplayEnabled = true
+        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = localPlaybackConfig)
+        val localPlayer = Player.create(appContext, playerConfig)
+
+        // arrange
+        val sample = TestSamples.HLS_REDBULL
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(sample.m3u8Url)
+        val redbullSource = Source.create(SourceConfig.fromUrl(sample.m3u8Url))
+        val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
+
+        // act
+        mainScope.launch {
+            collector.attachPlayer(localPlayer)
+            localPlayer.load(redbullSource)
+        }
+
+        waitUntilPlayerPlayedToMs(localPlayer, 2000)
+
+        mainScope.launch {
+            localPlayer.pause()
+        }
+
+        // wait a bit to make sure last play sample is sent
+        Thread.sleep(500)
+
+        mainScope.launch {
+            collector.detachPlayer()
+            localPlayer.destroy()
+        }
+
+        // assert
+        val impressionList = LogParser.extractImpressions()
+        assertThat(impressionList.size).isEqualTo(1)
+
+        val impression = impressionList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, sample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStartupSample(eventDataList[0])
+        DataVerifier.verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList)
+        DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+
+        EventDataUtils.filterNonDeterministicEvents(eventDataList)
+        // TODO: add helper to verify sample states
+        assertThat(eventDataList.filter { x -> x.state == "startup" }.size).isEqualTo(1)
+        assertThat(eventDataList.filter { x -> x.state == "playing" }.size).isGreaterThanOrEqualTo(1)
+        // verify that no other states than startup and playing were reached
+        assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
+    }
+
+    @Test
     fun test_2Impressions_Should_NotCarryOverDataFromFirstImpression() {
         val hlsSample = TestSamples.HLS_REDBULL
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(hlsSample.m3u8Url)
@@ -156,8 +220,7 @@ class PhoneBasicScenariosTest {
             player.play()
         }
 
-        waitUntilPlayerIsPlaying(player)
-        Thread.sleep(1500)
+        waitUntilPlayerPlayedToMs(player, 1500)
 
         val dashSample = TestSamples.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.m3u8Url))
@@ -173,8 +236,10 @@ class PhoneBasicScenariosTest {
             player.play()
         }
 
-        waitUntilPlayerIsPlaying(player)
-        Thread.sleep(1500)
+        // wait a bit for the source change to happen
+        Thread.sleep(500)
+
+        waitUntilPlayerPlayedToMs(player, 1500)
 
         mainScope.launch {
             player.pause()
@@ -183,7 +248,8 @@ class PhoneBasicScenariosTest {
             player.destroy()
         }
 
-        Thread.sleep(2000)
+        // wait a bit for player to be cleaned up
+        Thread.sleep(500)
 
         val impressions = LogParser.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
@@ -297,7 +363,7 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyStaticData(impression1.eventDataList, hlsMetadata, hlsSample, BitmovinPlayerConstants.playerInfo)
         DataVerifier.verifyStaticData(impression2.eventDataList, dashMetadata, dashSample, BitmovinPlayerConstants.playerInfo)
 
-        // for some reason videoBitrate is -1 for prog
+        // TODO: for some reason videoBitrate is -1 for prog
 //        DataVerifier.verifyStaticData(impression3.eventDataList, progMetadata, progSample, BitmovinPlayerConstants.playerInfo)
 
         val startupSampleImpression1 = impression1.eventDataList.first()

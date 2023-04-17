@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Added `android.permission.INTERNET` to all adapter manifests
-- Upgrade example app to use latest amazon ivs player (v1.18.0)
+- Upgrade example apps to use latest amazon ivs player (v1.18.0) and latest bitmovin player (v3.35.2)
 
 ### Added
 - [internal] Systemtests for Bitmovin and Exoplayer collectors
@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - IVS Player: Wrong initialization order on startup
 - IVS Player: Wrong order of releasing of resources when collector is detached
 - IVS Player: Reporting of negative droppedFrames in certain edgecases
+- Exo Player and Bitmovin Player: Tracking if player is muted
 - All players: Reporting of `videostartup_time = 0` on certain edgecases where startup was very fast
 
 ## v2.15.0

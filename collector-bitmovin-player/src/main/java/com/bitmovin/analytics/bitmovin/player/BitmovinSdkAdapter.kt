@@ -236,6 +236,8 @@ internal class BitmovinSdkAdapter(
         if (config.playerKey.isBlank()) {
             data.playerKey = playerLicenseProvider.getBitmovinPlayerLicenseKey(player.config)
         }
+
+        data.isMuted = player.isMuted
     }
 
     private fun getSubtitleDto(subtitleTrack: SubtitleTrack?): SubtitleDto {
