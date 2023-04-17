@@ -36,7 +36,7 @@ And this line, depending on your player version, to your main project `build.gra
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.15.0'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.16.0'
 }
 ```
 
@@ -70,7 +70,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:2.15.0'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:2.16.0'
 }
 ```
 
@@ -130,7 +130,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-amazon-ivs:2.15.0'
+    implementation 'com.bitmovin.analytics:collector-amazon-ivs:2.16.0'
 }
 ```
 
