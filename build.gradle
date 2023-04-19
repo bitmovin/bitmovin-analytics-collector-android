@@ -124,7 +124,7 @@ ext {
 task createPrePushHook() {
     def gitDir = new ByteArrayOutputStream()
     exec {
-        commandLine "git" "rev-parse" "--git-dir"
+        commandLine "git", "rev-parse", "--git-dir"
         workingDir = project.rootDir
         standardOutput = gitDir
     }
