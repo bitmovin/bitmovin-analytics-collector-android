@@ -126,7 +126,7 @@ task createPrePushHook() {
     exec {
         commandLine "git", "rev-parse", "--git-dir"
         workingDir = project.rootDir
-        standardOutput = gitDir
+        standardOutput = gitDirStream
     }
     def gitDir = gitDirStream.toString().trim()
     def gitHooksDirectory = new File("$gitDir/hooks/")
