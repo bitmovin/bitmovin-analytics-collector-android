@@ -100,6 +100,8 @@ object DataVerifier {
         assertThat(eventData.audioCodec).isEqualTo(exepectedData.audioCodec)
         assertThat(eventData.videoCodec).startsWith(exepectedData.videoCodecStartsWith)
         assertThat(eventData.m3u8Url).isEqualTo(exepectedData.m3u8Url)
+        assertThat(eventData.progUrl).isEqualTo(exepectedData.progUrl)
+        assertThat(eventData.mpdUrl).isEqualTo(exepectedData.mpdUrl)
         assertThat(eventData.streamFormat).isEqualTo(exepectedData.streamFormat)
         assertThat(eventData.videoBitrate).isGreaterThan(0)
         assertThat(eventData.isLive).isEqualTo(exepectedData.isLive)
@@ -178,6 +180,16 @@ object DataVerifier {
         assertThat(eventData.sequenceNumber).isEqualTo(0)
     }
 
+    fun verifyDrmStartupSample(eventData: EventData, drmType: String?, isFirstImpression: Boolean = true, isAutoPlay: Boolean = true) {
+        verifyStartupSample(eventData, isFirstImpression)
+        assertThat(eventData.drmType).isEqualTo(drmType)
+        assertThat(eventData.drmLoadTime).isGreaterThan(0)
+
+        if (isAutoPlay) {
+            assertThat(eventData.drmLoadTime).isLessThan(eventData.videoStartupTime)
+        }
+    }
+
     fun verifyStartupSampleOnError(eventData: EventData, expectedPlayerInfo: PlayerInfo) {
         assertThat(eventData.state).isIn("startup", "ready") // we are ending up with ready state on exoplayer and ivs
         // assertThat(eventData.supportedVideoCodecs).isNotNull // TODO: for some reason this is not set on some error scenarios, needs to be investigated
@@ -254,7 +266,7 @@ object DataVerifier {
         verifyOnlyOneSampleHasState(eventDataList, "seeking")
     }
 
-    fun verifyExactlyOnPauseSample(eventDataList: MutableList<EventData>) {
+    fun verifyExactlyOnePauseSample(eventDataList: MutableList<EventData>) {
         verifyOnlyOneSampleHasState(eventDataList, "pause")
     }
 

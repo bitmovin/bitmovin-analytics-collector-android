@@ -1,10 +1,12 @@
 package com.bitmovin.analytics.systemtest.utils
 
-object TestSamples {
+object TestSources {
     val HLS_REDBULL = StreamData(
         "avc1.",
         "mp4a.40.2",
         "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
+        null,
+        null,
         "hls",
         false,
         210000,
@@ -13,6 +15,8 @@ object TestSamples {
     val DASH = StreamData(
         "avc1.",
         "mp4a.40.2",
+        null,
+        null,
         "https://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd",
         "dash",
         false,
@@ -22,7 +26,9 @@ object TestSamples {
     val PROGRESSIVE = StreamData(
         "avc1.",
         "mp4a.40.2",
+        null,
         "https://bitmovin-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4",
+        null,
         "progressive",
         false,
         210000,
@@ -32,6 +38,8 @@ object TestSamples {
         "avc1.",
         "mp4a.40.2",
         "https://fcc3ddae59ed.us-west-2.playback.live-video.net/api/video/v1/us-west-2.893648527354.channel.DmumNckWFTqz.m3u8",
+        null,
+        null,
         "hls",
         true,
         -1,
@@ -41,6 +49,8 @@ object TestSamples {
         "avc1",
         "mp4a.40.2",
         "https://fcc3ddae59ed.us-west-2.playback.live-video.net/api/video/v1/us-west-2.893648527354.channel.XFAcAcypUxQm.m3u8",
+        null,
+        null,
         "hls",
         true,
         -1,
@@ -50,8 +60,23 @@ object TestSamples {
         "avc1.",
         "mp4a.40.2",
         "https://d6hwdeiig07o4.cloudfront.net/ivs/956482054022/cTo5UpKS07do/2020-07-13T22-54-42.188Z/OgRXMLtq8M11/media/hls/master.m3u8",
+        null,
+        null,
         "hls",
         false,
         362356,
+    )
+
+    val DRM_DASH_WIDEVINE = StreamData(
+        "avc1.",
+        "mp4a.40.2",
+        null,
+        null,
+        "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd",
+        "dash",
+        false,
+        210000,
+        drmSchema = "widevine",
+        drmLicenseUrl = "https://cwip-shaka-proxy.appspot.com/no_auth",
     )
 }

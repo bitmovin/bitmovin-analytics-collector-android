@@ -8,7 +8,7 @@ import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSamples
+import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import kotlinx.coroutines.MainScope
@@ -32,6 +32,10 @@ class PhoneBasicScenariosTest {
     private lateinit var player: ExoPlayer
     private lateinit var channel: Channel<Unit>
 
+    private var defaultSample = TestSources.HLS_REDBULL
+    private var defaultAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(defaultSample.m3u8Url!!)
+    private var defaultMediaItem = MediaItem.fromUri(defaultSample.m3u8Url!!)
+
     @Before
     fun setup() {
         channel = Channel(0)
@@ -48,14 +52,12 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_basicPlayPauseScenario_PlayWhenReady_Should_sendCorrectSamples() {
         // arrange
-        val sample = TestSamples.HLS_REDBULL
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(sample.m3u8Url)
-        val collector = IExoPlayerCollector.create(analyticsConfig, appContext)
+        val collector = IExoPlayerCollector.create(defaultAnalyticsConfig, appContext)
         // act
         mainScope.launch {
             player.volume = 0.0f
             collector.attachPlayer(player)
-            player.setMediaItem(MediaItem.fromUri(sample.m3u8Url))
+            player.setMediaItem(defaultMediaItem)
             player.prepare()
         }
 
@@ -100,7 +102,7 @@ class PhoneBasicScenariosTest {
 
         val eventDataList = impression.eventDataList
 
-        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, sample, ExoplayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(eventDataList, defaultAnalyticsConfig, defaultSample, ExoplayerConstants.playerInfo)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)

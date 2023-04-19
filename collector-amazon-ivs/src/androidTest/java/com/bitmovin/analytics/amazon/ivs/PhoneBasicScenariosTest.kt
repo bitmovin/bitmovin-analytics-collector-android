@@ -11,7 +11,7 @@ import com.bitmovin.analytics.systemtest.utils.EventDataUtils
 import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSamples
+import com.bitmovin.analytics.systemtest.utils.TestSources
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.BeforeClass
@@ -43,8 +43,8 @@ class PhoneBasicScenariosTest {
     @Test
     fun testLiveStream_basicPlayPauseScenario_Should_sendCorrectSamples() {
         // arrange
-        val liveStreamSample = TestSamples.IVS_LIVE_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample.m3u8Url)
+        val liveStreamSample = TestSources.IVS_LIVE_1
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample.m3u8Url!!)
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
@@ -93,8 +93,8 @@ class PhoneBasicScenariosTest {
     @Test
     fun testLiveStream_basic2ImpressionsScenarios_Should_sendCorrectSamples() {
         // arrange
-        val liveStreamSample1 = TestSamples.IVS_LIVE_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample1.m3u8Url)
+        val liveStreamSample1 = TestSources.IVS_LIVE_1
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample1.m3u8Url!!)
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         player.isMuted = false
         collector.attachPlayer(player)
@@ -108,7 +108,7 @@ class PhoneBasicScenariosTest {
 
         collector.detachPlayer()
 
-        val liveStreamSample2 = TestSamples.IVS_LIVE_2
+        val liveStreamSample2 = TestSources.IVS_LIVE_2
         analyticsConfig.m3u8Url = liveStreamSample2.m3u8Url
         collector.attachPlayer(player)
 
@@ -154,8 +154,8 @@ class PhoneBasicScenariosTest {
 
     @Test
     fun testVodStream_seekScenario_Should_sendCorrectSamples() {
-        val vodStreamSample = TestSamples.IVS_VOD_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(vodStreamSample.m3u8Url)
+        val vodStreamSample = TestSources.IVS_VOD_1
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(vodStreamSample.m3u8Url!!)
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
@@ -207,8 +207,8 @@ class PhoneBasicScenariosTest {
         }
 
         // TODO: we are probably tracking initial buffering as played
-        // thus this test is flaky, we might need to reevaluate how we track bufferings in ivs
-//        assertThat(playedTime).isBetween(playedBeforeSeekMs - 700, playedBeforeSeekMs + 700)
+        // thus we might need to reevaluate how we track bufferings in ivs
+        // assertThat(playedTime).isBetween(playedBeforeSeekMs - 700, playedBeforeSeekMs + 700)
         DataVerifier.verifyExactlyOneSeekingSample(eventDataList)
     }
 
@@ -251,8 +251,8 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_wrongAnalyticsLicense_Should_notInterfereWithPlayer() {
         // arrange
-        val sample = TestSamples.HLS_REDBULL
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(sample.m3u8Url, "nonExistingKey")
+        val sample = TestSources.HLS_REDBULL
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(sample.m3u8Url!!, "nonExistingKey")
         val collector = IAmazonIvsPlayerCollector.Factory.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
         player.load(Uri.parse(sample.m3u8Url))

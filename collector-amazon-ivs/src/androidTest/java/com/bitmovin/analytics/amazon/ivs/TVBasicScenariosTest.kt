@@ -8,7 +8,7 @@ import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSamples
+import com.bitmovin.analytics.systemtest.utils.TestSources
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.BeforeClass
 import org.junit.Test
@@ -33,7 +33,7 @@ class TVBasicScenariosTest {
         val player = Player.Factory.create(appContext)
         player.isMuted = true
 
-        val liveSample = TestSamples.IVS_LIVE_1
+        val liveSample = TestSources.IVS_LIVE_1
 
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveSample.m3u8Url)
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
