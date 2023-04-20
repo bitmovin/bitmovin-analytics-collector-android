@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.license
 
 interface AuthenticationCallback {
-    fun authenticationCompleted(success: Boolean, featureConfigs: FeatureConfigContainer?)
+    fun authenticationCompleted(response: AuthenticationResponse)
 }
 
 sealed class AuthenticationResponse {
@@ -10,7 +10,7 @@ sealed class AuthenticationResponse {
     ): AuthenticationResponse()
 
     data class Denied(
-        val message: String
+        val message: String?
     ): AuthenticationResponse()
 
     object Error : AuthenticationResponse()

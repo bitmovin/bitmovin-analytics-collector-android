@@ -3,6 +3,7 @@ package com.bitmovin.analytics.data
 import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.license.AuthenticationCallback
+import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
@@ -35,25 +36,26 @@ class SimpleEventDataDispatcher(
 
     @Synchronized
     override fun authenticationCompleted(
-        success: Boolean,
-        featureConfigs: FeatureConfigContainer?,
+        response: AuthenticationResponse
     ) {
-        callback?.configureFeatures(success, featureConfigs)
-
-        if (success) {
-            enabled = true
-            val it = data.iterator()
-            while (it.hasNext()) {
-                val eventData = it.next()
-                backend.send(eventData)
-                it.remove()
+        val success = when (response) {
+            is AuthenticationResponse.Granted -> {
+                callback?.configureFeatures(
+                    true,
+                    response.featureConfigContainer,
+                )
+                enabled = true
+                forwardQueuedEvents()
+                true
             }
-            val adIt = adData.iterator()
-            while (adIt.hasNext()) {
-                val eventData = adIt.next()
-                backend.sendAd(eventData)
-                adIt.remove()
+            is AuthenticationResponse.Denied -> {
+                callback?.configureFeatures(
+                    false,
+                    null,
+                )
+                false
             }
+            is AuthenticationResponse.Error -> return
         }
         callback?.authenticationCompleted(success)
     }
@@ -89,5 +91,20 @@ class SimpleEventDataDispatcher(
 
     override fun resetSourceRelatedState() {
         sampleSequenceNumber = 0
+    }
+
+    private fun forwardQueuedEvents() {
+        val it = data.iterator()
+        while (it.hasNext()) {
+            val eventData = it.next()
+            backend.send(eventData)
+            it.remove()
+        }
+        val adIt = adData.iterator()
+        while (adIt.hasNext()) {
+            val eventData = adIt.next()
+            backend.sendAd(eventData)
+            adIt.remove()
+        }
     }
 }
