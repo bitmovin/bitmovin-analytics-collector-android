@@ -6,11 +6,16 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.core.content.contentValuesOf
 import androidx.core.database.sqlite.transaction
+import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_CREATED_AT
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_DATA
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_ID
 import com.bitmovin.analytics.data.persistence.TableDefinition.TABLE_NAME
 
-internal class DefaultEventDatabaseConnection(context: Context, databaseName:String) :
+internal class DefaultEventDatabaseConnection(
+    context: Context,
+    databaseName: String,
+    private val limitAgeInMillis: Long = DEFAULT_LIMIT_AGE_IN_MS
+) :
     SQLiteOpenHelper(
         /* context = */ context,
         /* name = */ databaseName,
@@ -20,6 +25,7 @@ internal class DefaultEventDatabaseConnection(context: Context, databaseName:Str
 
     companion object {
         private const val VERSION = 1
+        private const val DEFAULT_LIMIT_AGE_IN_MS = 86_400_00L
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -29,7 +35,8 @@ internal class DefaultEventDatabaseConnection(context: Context, databaseName:Str
             (
             _id INTEGER PRIMARY KEY AUTOINCREMENT,
              $COLUMN_EVENT_ID TEXT,
-             $COLUMN_EVENT_DATA TEXT
+             $COLUMN_EVENT_DATA TEXT,
+             $COLUMN_EVENT_CREATED_AT INTEGER
             );
         """.trimIndent()
         )
@@ -39,7 +46,6 @@ internal class DefaultEventDatabaseConnection(context: Context, databaseName:Str
         // nothing to do yet
     }
 
-    @Synchronized
     override fun push(entry: EventDatabaseEntry): Boolean {
         writableDatabase.transaction {
             val rowId = insert(
@@ -47,16 +53,17 @@ internal class DefaultEventDatabaseConnection(context: Context, databaseName:Str
                 /* nullColumnHack = */ null,
                 /* values = */ contentValuesOf(
                     COLUMN_EVENT_ID to entry.id,
-                    COLUMN_EVENT_DATA to entry.data
+                    COLUMN_EVENT_DATA to entry.data,
+                    COLUMN_EVENT_CREATED_AT to System.currentTimeMillis()
                 )
             )
             return rowId != -1L
         }
     }
 
-    @Synchronized
     override fun pop(): EventDatabaseEntry? {
         writableDatabase.transaction {
+            cleanupDatabase()
             // query the very first entry
             val entries = query(
                 /* table = */ TABLE_NAME,
@@ -104,7 +111,6 @@ internal class DefaultEventDatabaseConnection(context: Context, databaseName:Str
         entries
     }
 
-    @Synchronized
     override fun purge(): List<EventDatabaseEntry> {
         writableDatabase.transaction {
             // query the very first entry
@@ -132,10 +138,20 @@ internal class DefaultEventDatabaseConnection(context: Context, databaseName:Str
             return entries
         }
     }
+
+    private fun SQLiteDatabase.cleanupDatabase() {
+        val now = System.currentTimeMillis()
+        delete(
+            TABLE_NAME,
+            "$COLUMN_EVENT_CREATED_AT < ?",
+            arrayOf((now - limitAgeInMillis).toString())
+        )
+    }
 }
 
 private object TableDefinition {
     const val TABLE_NAME = "event"
-    const val COLUMN_EVENT_ID = "eventId"
-    const val COLUMN_EVENT_DATA = "eventData"
+    const val COLUMN_EVENT_ID = "event_id"
+    const val COLUMN_EVENT_DATA = "event_data"
+    const val COLUMN_EVENT_CREATED_AT = "created_at"
 }
