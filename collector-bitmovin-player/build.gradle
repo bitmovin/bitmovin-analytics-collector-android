@@ -24,6 +24,7 @@ android {
 
     kotlinOptions {
         jvmTarget = rootProject.ext.jvmTarget
+        freeCompilerArgs += "-Xopt-in=com.bitmovin.player.core.internal.InternalBitmovinApi"
     }
 
     buildTypes {
@@ -64,13 +65,15 @@ dependencies {
         api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
     }
 
-    api "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
+    compileOnly "com.bitmovin.player:player-core:${rootProject.ext.bitmovinPlayerVersion}"
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 
     // app compat is needed for the bitmovin player in the expanded_controller.xml
     // otherwise processDebugAndroidTestResources is failing
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
 
+    testImplementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"

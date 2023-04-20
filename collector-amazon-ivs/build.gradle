@@ -53,8 +53,9 @@ dependencies {
         api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
     }
 
-    implementation "com.amazonaws:ivs-player:${rootProject.ext.amazonIvsPlayerVersion}"
+    compileOnly "com.amazonaws:ivs-player:${rootProject.ext.amazonIvsPlayerVersion}"
 
+    testImplementation "com.amazonaws:ivs-player:${rootProject.ext.amazonIvsPlayerVersion}"
     testImplementation "com.amazonaws:ivs-player:${rootProject.ext.amazonIvsPlayerVersion}"
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
