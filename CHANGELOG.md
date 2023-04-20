@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [internal] Bitmovin player collector relies on `player-core` package
 - All collector use `compileOnly` dependency to player
 - Updated to latest bitmovin player (v3.36.0)
+- Upgrade to use latest exoplayer version (v2.18.6)
 
 ## v2.16.0
 
