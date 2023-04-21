@@ -14,7 +14,8 @@ import com.bitmovin.analytics.data.persistence.TableDefinition.TABLE_NAME
 internal class DefaultEventDatabaseConnection(
     context: Context,
     databaseName: String,
-    private val limitAgeInMillis: Long = DEFAULT_LIMIT_AGE_IN_MS
+    private val limitAgeInMillis: Long = DEFAULT_LIMIT_AGE_IN_MS,
+    private val maximumCountOfEvents: Int = MAX_COUNT
 ) :
     SQLiteOpenHelper(
         /* context = */ context,
@@ -25,7 +26,8 @@ internal class DefaultEventDatabaseConnection(
 
     companion object {
         private const val VERSION = 1
-        private const val DEFAULT_LIMIT_AGE_IN_MS = 86_400_00L
+        private const val DEFAULT_LIMIT_AGE_IN_MS: Long = 30L * 24L * 60L * 60L * 1000L
+        private const val MAX_COUNT = 10_000
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -38,6 +40,13 @@ internal class DefaultEventDatabaseConnection(
              $COLUMN_EVENT_DATA TEXT,
              $COLUMN_EVENT_CREATED_AT INTEGER
             );
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            CREATE INDEX IF NOT EXISTS ${TABLE_NAME}_${COLUMN_EVENT_CREATED_AT}
+            ON ${TABLE_NAME}(${COLUMN_EVENT_CREATED_AT});
         """.trimIndent()
         )
     }
@@ -72,7 +81,7 @@ internal class DefaultEventDatabaseConnection(
                 /* selectionArgs = */ null,
                 /* groupBy = */ null,
                 /* having = */ null,
-                /* orderBy = */ null,
+                /* orderBy = */ "$COLUMN_EVENT_CREATED_AT ASC",
                 /* limit = */ "1"
             ).parseCursor()
 
@@ -121,7 +130,7 @@ internal class DefaultEventDatabaseConnection(
                 /* selectionArgs = */ null,
                 /* groupBy = */ null,
                 /* having = */ null,
-                /* orderBy = */ null,
+                /* orderBy = */ "$COLUMN_EVENT_CREATED_AT ASC",
                 /* limit = */ null
             ).parseCursor()
 
@@ -141,10 +150,38 @@ internal class DefaultEventDatabaseConnection(
 
     private fun SQLiteDatabase.cleanupDatabase() {
         val now = System.currentTimeMillis()
+        // cleanup by timestamp
         delete(
-            TABLE_NAME,
-            "$COLUMN_EVENT_CREATED_AT < ?",
-            arrayOf((now - limitAgeInMillis).toString())
+            /* table = */ TABLE_NAME,
+            /* whereClause = */ "$COLUMN_EVENT_CREATED_AT < ?",
+            /* whereArgs = */ arrayOf((now - limitAgeInMillis).toString())
+        )
+
+        // cleanup by count
+        // therefore query the maximum count + 1, get the timestamp of it, and delete every event which is older than this element
+        val deleteStartWith: Long = query(
+            /* table = */ TABLE_NAME,
+            /* columns = */ arrayOf(COLUMN_EVENT_CREATED_AT),
+            /* selection = */ null,
+            /* selectionArgs = */ null,
+            /* groupBy = */ null,
+            /* having = */ null,
+            /* orderBy = */ "$COLUMN_EVENT_CREATED_AT ASC",
+            /* limit = */ (maximumCountOfEvents + 1).toString()
+        ).use {
+            if (it.count <= maximumCountOfEvents) {
+                return@use null
+            }
+            if (!it.moveToLast()) {
+                return@use null
+            }
+            return@use it.getLong(it.getColumnIndexOrThrow(COLUMN_EVENT_CREATED_AT))
+        } ?: return
+
+        delete(
+            /* table = */ TABLE_NAME,
+            /* whereClause = */ "$COLUMN_EVENT_CREATED_AT <= ?",
+            /* whereArgs = */ arrayOf(deleteStartWith.toString())
         )
     }
 }
