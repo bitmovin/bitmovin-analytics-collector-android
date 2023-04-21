@@ -16,23 +16,17 @@ internal class DefaultEventDatabaseConnection(
     databaseName: String,
     private val limitAgeInMillis: Long = DEFAULT_LIMIT_AGE_IN_MS,
     private val maximumCountOfEvents: Int = MAX_COUNT
-) :
-    SQLiteOpenHelper(
+) : EventDatabaseConnection {
+
+    private val dbHelper = object : SQLiteOpenHelper(
         /* context = */ context,
         /* name = */ databaseName,
         /* factory = */ null,
         /* version = */ VERSION
-    ), EventDatabaseConnection {
-
-    companion object {
-        private const val VERSION = 1
-        private const val DEFAULT_LIMIT_AGE_IN_MS: Long = 30L * 24L * 60L * 60L * 1000L
-        private const val MAX_COUNT = 10_000
-    }
-
-    override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(
-            """
+    ) {
+        override fun onCreate(db: SQLiteDatabase) {
+            db.execSQL(
+                """
             CREATE TABLE IF NOT EXISTS $TABLE_NAME
             (
             _id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,22 +35,29 @@ internal class DefaultEventDatabaseConnection(
              $COLUMN_EVENT_CREATED_AT INTEGER
             );
         """.trimIndent()
-        )
+            )
 
-        db.execSQL(
-            """
+            db.execSQL(
+                """
             CREATE INDEX IF NOT EXISTS ${TABLE_NAME}_${COLUMN_EVENT_CREATED_AT}
             ON ${TABLE_NAME}(${COLUMN_EVENT_CREATED_AT});
         """.trimIndent()
-        )
+            )
+        }
+
+        override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+            // nothing to do yet
+        }
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // nothing to do yet
+    companion object {
+        private const val VERSION = 1
+        private const val DEFAULT_LIMIT_AGE_IN_MS: Long = 30L * 24L * 60L * 60L * 1000L
+        private const val MAX_COUNT = 10_000
     }
 
     override fun push(entry: EventDatabaseEntry): Boolean {
-        writableDatabase.transaction {
+        dbHelper.writableDatabase.transaction {
             val rowId = insert(
                 /* table = */ TABLE_NAME,
                 /* nullColumnHack = */ null,
@@ -71,7 +72,7 @@ internal class DefaultEventDatabaseConnection(
     }
 
     override fun pop(): EventDatabaseEntry? {
-        writableDatabase.transaction {
+        dbHelper.writableDatabase.transaction {
             cleanupDatabase()
             // query the very first entry
             val entries = query(
@@ -121,7 +122,7 @@ internal class DefaultEventDatabaseConnection(
     }
 
     override fun purge(): List<EventDatabaseEntry> {
-        writableDatabase.transaction {
+        dbHelper.writableDatabase.transaction {
             // query the very first entry
             val entries: List<EventDatabaseEntry> = query(
                 /* table = */ TABLE_NAME,
