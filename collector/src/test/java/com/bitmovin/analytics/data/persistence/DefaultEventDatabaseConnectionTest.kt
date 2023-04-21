@@ -15,13 +15,13 @@ class DefaultEventDatabaseConnectionTest {
     private fun databaseTest(
         eventTimeLimit: Long = Long.MAX_VALUE,
         eventMaxCount: Int = Int.MAX_VALUE,
-        block: EventDatabaseConnection.() -> Unit
+        block: EventDatabaseConnection.() -> Unit,
     ) {
         val databaseConnection = DefaultEventDatabaseConnection(
             context = ApplicationProvider.getApplicationContext(),
             databaseName = UUID.randomUUID().toString(),
             limitAgeInMillis = eventTimeLimit,
-            maximumCountOfEvents = eventMaxCount
+            maximumCountOfEvents = eventMaxCount,
         )
 
         block(databaseConnection)
@@ -133,10 +133,9 @@ class DefaultEventDatabaseConnectionTest {
         Assert.assertEquals(2, read.size)
         Assert.assertArrayEquals(
             events.subList(1, events.size).toTypedArray(),
-            read.toTypedArray()
+            read.toTypedArray(),
         )
     }
-
 
     @Test
     fun testPopEventCountLimitOverrun() = databaseTest(eventMaxCount = 2) {

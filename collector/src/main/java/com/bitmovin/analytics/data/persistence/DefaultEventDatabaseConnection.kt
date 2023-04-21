@@ -19,14 +19,14 @@ internal class DefaultEventDatabaseConnection(
     context: Context,
     databaseName: String,
     private val limitAgeInMillis: Long = DEFAULT_LIMIT_AGE_IN_MS,
-    private val maximumCountOfEvents: Int = MAX_COUNT
+    private val maximumCountOfEvents: Int = MAX_COUNT,
 ) : EventDatabaseConnection {
 
     private val dbHelper = object : SQLiteOpenHelper(
         /* context = */ context,
         /* name = */ databaseName,
         /* factory = */ null,
-        /* version = */ VERSION
+        /* version = */ VERSION,
     ) {
         override fun onCreate(db: SQLiteDatabase) {
             db.execSQL(
@@ -38,14 +38,14 @@ internal class DefaultEventDatabaseConnection(
              $COLUMN_EVENT_DATA TEXT,
              $COLUMN_EVENT_CREATED_AT INTEGER
             );
-        """.trimIndent()
+                """.trimIndent(),
             )
 
             db.execSQL(
                 """
-            CREATE INDEX IF NOT EXISTS ${TABLE_NAME}_${COLUMN_EVENT_CREATED_AT}
-            ON ${TABLE_NAME}(${COLUMN_EVENT_CREATED_AT});
-        """.trimIndent()
+            CREATE INDEX IF NOT EXISTS ${TABLE_NAME}_$COLUMN_EVENT_CREATED_AT
+            ON $TABLE_NAME($COLUMN_EVENT_CREATED_AT);
+                """.trimIndent(),
             )
         }
 
@@ -67,8 +67,8 @@ internal class DefaultEventDatabaseConnection(
             /* values = */ contentValuesOf(
                 COLUMN_EVENT_ID to entry.id,
                 COLUMN_EVENT_DATA to entry.data,
-                COLUMN_EVENT_CREATED_AT to System.currentTimeMillis()
-            )
+                COLUMN_EVENT_CREATED_AT to System.currentTimeMillis(),
+            ),
         )
         rowId != -1L
     } ?: false
@@ -84,7 +84,7 @@ internal class DefaultEventDatabaseConnection(
             /* groupBy = */ null,
             /* having = */ null,
             /* orderBy = */ "$COLUMN_EVENT_CREATED_AT ASC",
-            /* limit = */ "1"
+            /* limit = */ "1",
         ).parseCursor()
 
         if (entries.size != 1) {
@@ -97,8 +97,8 @@ internal class DefaultEventDatabaseConnection(
             /* table = */ TABLE_NAME,
             """
                     $COLUMN_EVENT_ID = ?
-                """.trimIndent(),
-            arrayOf(entry.id)
+            """.trimIndent(),
+            arrayOf(entry.id),
         )
         // if no rows were affected there is something weird going on - rollback and try later
         if (affectedRows != 1) {
@@ -132,7 +132,7 @@ internal class DefaultEventDatabaseConnection(
             /* groupBy = */ null,
             /* having = */ null,
             /* orderBy = */ "$COLUMN_EVENT_CREATED_AT ASC",
-            /* limit = */ null
+            /* limit = */ null,
         ).parseCursor()
 
         val listToDelete = LinkedList<EventDatabaseEntry>().apply { addAll(entries) }
@@ -145,7 +145,7 @@ internal class DefaultEventDatabaseConnection(
             val affectedRows = delete(
                 /* table = */ TABLE_NAME,
                 /* whereClause = */ "$COLUMN_EVENT_ID in (${subList.joinToString { "?" }})",
-                /* whereArgs = */subList.map { it.id }.toTypedArray()
+                /* whereArgs = */subList.map { it.id }.toTypedArray(),
             )
             // if no rows were affected there is something weird going on, better rollback (throw exception) and try later
             if (affectedRows != subList.size) {
@@ -163,7 +163,7 @@ internal class DefaultEventDatabaseConnection(
         delete(
             /* table = */ TABLE_NAME,
             /* whereClause = */ "$COLUMN_EVENT_CREATED_AT < ?",
-            /* whereArgs = */ arrayOf((now - limitAgeInMillis).toString())
+            /* whereArgs = */ arrayOf((now - limitAgeInMillis).toString()),
         )
 
         // cleanup by count
@@ -176,7 +176,7 @@ internal class DefaultEventDatabaseConnection(
             /* groupBy = */ null,
             /* having = */ null,
             /* orderBy = */ "$COLUMN_INTERNAL_ID DESC",
-            /* limit = */ (maximumCountOfEvents + 1).toString()
+            /* limit = */ (maximumCountOfEvents + 1).toString(),
         ).use {
             if (it.count <= maximumCountOfEvents) {
                 return@use null
@@ -190,7 +190,7 @@ internal class DefaultEventDatabaseConnection(
         delete(
             /* table = */ TABLE_NAME,
             /* whereClause = */ "$COLUMN_INTERNAL_ID <= ?",
-            /* whereArgs = */ arrayOf(deleteStartWith.toString())
+            /* whereArgs = */ arrayOf(deleteStartWith.toString()),
         )
     }
 
