@@ -6,6 +6,7 @@ import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.enums.PlayerType
 import io.mockk.every
@@ -34,8 +35,8 @@ class RetryBackendTest {
 
     @Test
     fun sampleShouldBeProcessedAfterHttpRequestTimeout() {
-        every { backendMock.send(any(), any()) } answers {
-            (it.invocation.args[1] as OnFailureCallback).onFailure(SocketTimeoutException("Timeout")) {}
+        every { backendMock.send(any(), any(), any()) } answers {
+            (it.invocation.args[2] as OnFailureCallback).onFailure(SocketTimeoutException("Timeout")) {}
         }
 
         val retryBackend = spyk(RetryBackend(backendMock, handlerMock))
@@ -62,7 +63,7 @@ class RetryBackendTest {
     }
 
     private fun setupEventData(sequenceNumber: Int): EventData {
-        var eventData = TestFactory.createEventDataFactory(config).create(
+        val eventData = TestFactory.createEventDataFactory(config).create(
             "testImpressionId",
             null,
             deviceInformation,
