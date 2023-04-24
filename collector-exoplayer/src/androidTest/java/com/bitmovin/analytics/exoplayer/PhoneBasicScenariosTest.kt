@@ -47,8 +47,6 @@ class PhoneBasicScenariosTest {
         channel.close()
     }
 
-    // Test is currently flaky since videoStartupTime is sometimes = 0,
-    // which might be a bug in the collector (needs to be investigated)
     @Test
     fun test_basicPlayPauseScenario_PlayWhenReady_Should_sendCorrectSamples() {
         // arrange
@@ -139,6 +137,7 @@ class PhoneBasicScenariosTest {
 
         Assertions.assertThat(impression.eventDataList.size).isEqualTo(1)
         val eventData = impression.eventDataList.first()
+        val impressionId = eventData.impressionId
         Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: InvalidResponseCodeException (Status Code: 404")
         Assertions.assertThat(eventData.errorCode).isEqualTo(0) // TODO: verify why errorCode is 0
 
@@ -147,11 +146,9 @@ class PhoneBasicScenariosTest {
 
         Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)
         val errorDetail = impression.errorDetailList.first()
+        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.key)
         Assertions.assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
         Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Data Source request failed with HTTP status: 404")
-        Assertions.assertThat(errorDetail.impressionId).isEqualTo(eventData.impressionId)
-        Assertions.assertThat(errorDetail.platform).isEqualTo("android")
-        Assertions.assertThat(errorDetail.licenseKey).isEqualTo(analyticsConfig.key)
     }
 
     @Test
@@ -167,9 +164,7 @@ class PhoneBasicScenariosTest {
             player.play()
         }
 
-        waitUntilPlayerIsPlaying(player)
-
-        Thread.sleep(1500)
+        waitUntilPlayerHasPlayedToMs(player, 2000)
 
         mainScope.launch {
             player.pause()
@@ -177,14 +172,16 @@ class PhoneBasicScenariosTest {
             collector.detachPlayer()
             player.release()
         }
+
+        Thread.sleep(300)
+
+        // assert that no samples are sent
+        val impressions = LogParser.extractImpressions()
+        Assertions.assertThat(impressions.size).isEqualTo(0)
     }
 
     private fun waitUntilPlayerIsReady(player: ExoPlayer) {
         PlaybackUtils.waitUntil { player.playbackState == ExoPlayer.STATE_READY }
-    }
-
-    private fun waitUntilPlayerIsPlaying(player: ExoPlayer) {
-        PlaybackUtils.waitUntil { player.isPlaying }
     }
 
     private fun waitUntilPlayerHasPlayedToMs(player: ExoPlayer, playedToMs: Long) {
