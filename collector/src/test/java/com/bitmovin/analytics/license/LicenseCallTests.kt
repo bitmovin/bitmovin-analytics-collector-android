@@ -37,50 +37,51 @@ class LicenseCallTests {
 
     private fun getGrantedResponseBody(features: String) = "{\"status\": \"granted\"$features}"
 
-    private fun verifyLicenseResponse(responseBody: String, expectedSuccess: Boolean, expectedFeatures: FeatureConfigContainer?) {
+    private fun verifyLicenseResponse(responseBody: String, expectedAuthenticationResponse: AuthenticationResponse) {
         val licenseCall = createLicenseCall(responseBody)
         val callback = mockk<AuthenticationCallback>(relaxed = true)
         licenseCall.authenticate(callback)
-        verify { callback.authenticationCompleted(expectedSuccess, expectedFeatures) }
+
+        verify { callback.authenticationCompleted(expectedAuthenticationResponse) }
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithoutFeatures() {
-        verifyLicenseResponse(getGrantedResponseBody(""), true, null)
+        verifyLicenseResponse(getGrantedResponseBody(""), AuthenticationResponse.Granted(null))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithNullFeatures() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": null"), true, null)
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": null"), AuthenticationResponse.Granted(null))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEmptyFeatures() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": {}"), true, FeatureConfigContainer(null))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": {}"), AuthenticationResponse.Granted(FeatureConfigContainer(null)))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithErrorTracking() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(false)))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {} }"), AuthenticationResponse.Granted( FeatureConfigContainer(ErrorDetailTrackingConfig(false))))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithDisabledErrorTracking() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": false} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(false)))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": false} }"), AuthenticationResponse.Granted( FeatureConfigContainer(ErrorDetailTrackingConfig(false))))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEnabledErrorTracking() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfHttpRequests\": 12} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(true, 12)))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfHttpRequests\": 12} }"), AuthenticationResponse.Granted( FeatureConfigContainer(ErrorDetailTrackingConfig(true, 12))))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEnabledErrorTrackingAndTypo() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfSeeegments\": 12} }"), true, FeatureConfigContainer(ErrorDetailTrackingConfig(true)))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfSeeegments\": 12} }"), AuthenticationResponse.Granted( FeatureConfigContainer(ErrorDetailTrackingConfig(true))))
     }
 
     @Test
     fun testLicenseResponseShouldFailWithWrongFeatures() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": \"asdf\""), false, null)
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": \"asdf\""), AuthenticationResponse.Error)
     }
 }

@@ -48,14 +48,13 @@ class SimpleEventDataDispatcher(
                 forwardQueuedEvents()
                 true
             }
-            is AuthenticationResponse.Denied -> {
+            is AuthenticationResponse.Denied, AuthenticationResponse.Error -> {
                 callback?.configureFeatures(
                     false,
                     null,
                 )
                 false
             }
-            is AuthenticationResponse.Error -> return
         }
         callback?.authenticationCompleted(success)
     }
