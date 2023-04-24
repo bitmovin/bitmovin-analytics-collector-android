@@ -62,22 +62,22 @@ class LicenseCallTests {
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithErrorTracking() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {} }"), AuthenticationResponse.Granted( FeatureConfigContainer(ErrorDetailTrackingConfig(false))))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {} }"), AuthenticationResponse.Granted(FeatureConfigContainer(ErrorDetailTrackingConfig(false))))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithDisabledErrorTracking() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": false} }"), AuthenticationResponse.Granted( FeatureConfigContainer(ErrorDetailTrackingConfig(false))))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": false} }"), AuthenticationResponse.Granted(FeatureConfigContainer(ErrorDetailTrackingConfig(false))))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEnabledErrorTracking() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfHttpRequests\": 12} }"), AuthenticationResponse.Granted( FeatureConfigContainer(ErrorDetailTrackingConfig(true, 12))))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfHttpRequests\": 12} }"), AuthenticationResponse.Granted(FeatureConfigContainer(ErrorDetailTrackingConfig(true, 12))))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEnabledErrorTrackingAndTypo() {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfSeeegments\": 12} }"), AuthenticationResponse.Granted( FeatureConfigContainer(ErrorDetailTrackingConfig(true))))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfSeeegments\": 12} }"), AuthenticationResponse.Granted(FeatureConfigContainer(ErrorDetailTrackingConfig(true))))
     }
 
     @Test

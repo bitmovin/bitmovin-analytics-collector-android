@@ -81,13 +81,13 @@ class LicenseCall(private val config: BitmovinAnalyticsConfig, private val conte
                             ),
                         )
                         callback.authenticationCompleted(
-                            AuthenticationResponse.Denied(licenseResponse.message)
+                            AuthenticationResponse.Denied(licenseResponse.message),
                         )
                         return
                     }
                     Log.d(TAG, "License response was granted")
                     callback.authenticationCompleted(
-                        AuthenticationResponse.Granted(licenseResponse.features)
+                        AuthenticationResponse.Granted(licenseResponse.features),
                     )
                 }
             },

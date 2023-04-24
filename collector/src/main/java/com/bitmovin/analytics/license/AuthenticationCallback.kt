@@ -6,12 +6,12 @@ interface AuthenticationCallback {
 
 sealed class AuthenticationResponse {
     data class Granted(
-        val featureConfigContainer: FeatureConfigContainer?
-    ): AuthenticationResponse()
+        val featureConfigContainer: FeatureConfigContainer?,
+    ) : AuthenticationResponse()
 
     data class Denied(
-        val message: String?
-    ): AuthenticationResponse()
+        val message: String?,
+    ) : AuthenticationResponse()
 
     object Error : AuthenticationResponse()
 }

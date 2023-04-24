@@ -35,7 +35,7 @@ class SimpleEventDataDispatcher(
 
     @Synchronized
     override fun authenticationCompleted(
-        response: AuthenticationResponse
+        response: AuthenticationResponse,
     ) {
         val success = when (response) {
             is AuthenticationResponse.Granted -> {
