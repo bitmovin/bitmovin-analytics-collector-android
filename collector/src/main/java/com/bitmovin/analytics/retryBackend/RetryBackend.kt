@@ -32,10 +32,16 @@ class RetryBackend(private val next: CallbackBackend, private val scheduleSample
 
     private fun scheduleSample(retrySample: RetrySample<Any>) {
         val callback = OnFailureCallback { e, cancel ->
-            if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
-                cancel()
-                retryQueue.addSample(retrySample)
-                processQueuedSamples()
+            when (e) {
+                is SocketTimeoutException,
+                is ConnectException,
+                is StreamResetException,
+                is UnknownHostException,
+                -> {
+                    cancel()
+                    retryQueue.addSample(retrySample)
+                    processQueuedSamples()
+                }
             }
         }
 
