@@ -7,7 +7,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
-- Upgrade example app to use latest amazon ivs player (v1.18.0)
+- [internal] Bitmovin player collector relies on `player-core` package
+- All collector use `compileOnly` dependency to player
+- Updated to latest bitmovin player (v3.36.0)
+- Upgrade to use latest exoplayer version (v2.18.6)
+
+## v2.16.0
+
+### Changed
+- Upgrade example apps to use latest amazon ivs player (v1.18.0) and latest bitmovin player (v3.35.2)
+
+### Added
+- [internal] Systemtests for Bitmovin and Exoplayer collectors
+
+### Fixed
+- Bitmovin Player: New quality on quality change events was tracked one sample too early
+- IVS Player: Wrong initialization order on startup
+- IVS Player: Wrong order of releasing of resources when collector is detached
+- IVS Player: Reporting of negative droppedFrames in certain edgecases
+- Exo Player and Bitmovin Player: Tracking if player is muted
+- All players: Reporting of `videostartup_time = 0` on certain edgecases where startup was very fast
 
 ## v2.15.0
 
@@ -16,7 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded example apps to latest bitmovin player (v3.35.1) and latest exoplayer (v2.18.5)
 
 ### Added
-- Systemtests for IVS collector
+- [internal] Systemtests for IVS collector
 
 ### Fixed
 - Calculation of dropped frames on IVS collector

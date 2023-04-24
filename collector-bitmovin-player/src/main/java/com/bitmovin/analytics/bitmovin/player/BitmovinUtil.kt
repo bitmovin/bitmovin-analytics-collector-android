@@ -7,9 +7,9 @@ import com.bitmovin.player.api.Player
 internal object BitmovinUtil {
     val playerVersion: String by lazy {
         // In version Bitmovin player 3.34 and 3.35, player.BuildConfig doesn't exist.
-        getVersionWithReflection()
+        getVersionByClassNameWithReflection("com.bitmovin.player.internal.BuildConfig")
             // Workaround Bitmovin player 3.34 and 3.35
-            ?: getVersionByClassNameWithReflection("com.bitmovin.player.internal.BuildConfig")
+            ?: getVersionWithReflection()
             ?: "unknown"
     }
 

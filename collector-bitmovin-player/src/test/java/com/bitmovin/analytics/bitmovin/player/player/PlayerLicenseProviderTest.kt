@@ -1,10 +1,9 @@
-package com.bitmovin.analytics.bitmovin.player.providers
+package com.bitmovin.analytics.bitmovin.player.player
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
-import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.player.api.PlayerConfig
 import io.mockk.every
 import io.mockk.mockk

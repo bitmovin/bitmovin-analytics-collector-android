@@ -47,22 +47,26 @@ android {
 }
 
 dependencies {
-    api "com.amazonaws:ivs-player:${rootProject.ext.amazonIvsPlayerVersion}"
-
-    testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
-    testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
-
-    androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
-    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
-    androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-    androidTestImplementation project(':example-shared')
-
     if (rootProject.ext.developLocal) {
         api project(':collector')
     } else {
         api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
     }
+
+    compileOnly "com.amazonaws:ivs-player:${rootProject.ext.amazonIvsPlayerVersion}"
+
+    testImplementation "com.amazonaws:ivs-player:${rootProject.ext.amazonIvsPlayerVersion}"
+    testImplementation "com.amazonaws:ivs-player:${rootProject.ext.amazonIvsPlayerVersion}"
+    testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+    testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
+
+    androidTestImplementation "com.amazonaws:ivs-player:${rootProject.ext.amazonIvsPlayerVersion}"
+    androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+    androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    androidTestImplementation project(':example-shared')
+    androidTestImplementation project(':systemtest-utils')
 }
 
 publishing {

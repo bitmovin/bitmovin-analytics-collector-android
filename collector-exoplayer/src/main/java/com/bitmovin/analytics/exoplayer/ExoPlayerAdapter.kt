@@ -29,6 +29,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Player.COMMAND_GET_DEVICE_VOLUME
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.decoder.DecoderReuseEvaluation
 import com.google.android.exoplayer2.drm.DrmInitData
@@ -190,6 +191,10 @@ internal class ExoPlayerAdapter(
 
         // DRM Information
         data.drmType = drmType
+
+        if (exoplayer.isCommandAvailable(COMMAND_GET_DEVICE_VOLUME)) {
+            data.isMuted = exoplayer.isDeviceMuted || exoplayer.volume <= 0.01f
+        }
     }
 
     override fun release() {

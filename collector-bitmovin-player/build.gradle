@@ -24,6 +24,7 @@ android {
 
     kotlinOptions {
         jvmTarget = rootProject.ext.jvmTarget
+        freeCompilerArgs += "-Xopt-in=com.bitmovin.player.core.internal.InternalBitmovinApi"
     }
 
     buildTypes {
@@ -37,6 +38,19 @@ android {
     }
 
     testOptions {
+        // https://developer.android.com/studio/test/gradle-managed-devices
+        managedDevices {
+            devices {
+                pixel6api30 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                    // Use device profiles you typically see in Android Studio.
+                    device = "Pixel 6"
+                    // Use only API levels 27 and higher.
+                    apiLevel = 30
+                    // To include Google services, use "google-atd".
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
         unitTests.returnDefaultValues = true
     }
     lint {
@@ -45,27 +59,34 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
-
-    // app compat is needed for the bitmovin player in the expanded_controller.xml
-    // otherwise processDebugAndroidTestResources is failing
-    implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
-
-    // This could theoretically be `implementation`, but the MavenPublication process will
-    // only add `api` dependencies to the resulting pom file.
-    api "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
-
     if (rootProject.ext.developLocal) {
         api project(':collector')
     } else {
         api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
     }
 
+    compileOnly "com.bitmovin.player:player-core:${rootProject.ext.bitmovinPlayerVersion}"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+
+    // app compat is needed for the bitmovin player in the expanded_controller.xml
+    // otherwise processDebugAndroidTestResources is failing
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
+
+    testImplementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
+
+    androidTestImplementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
+    androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+    androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+
+    androidTestImplementation project(':example-shared')
+    androidTestImplementation project(':systemtest-utils')
 }
 
 publishing {

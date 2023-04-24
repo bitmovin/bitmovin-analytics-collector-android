@@ -40,9 +40,10 @@ internal class AmazonIvsPlayerAdapter(
 ) {
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         try {
+            val features = super.init()
             player.addListener(playerListener)
             videoStartupService.finishStartupOnPlaying(player.state, player.position)
-            return super.init()
+            return features
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while initializing IVS adapter, e: ${e.message}", e)
             return emptyList()
@@ -54,8 +55,8 @@ internal class AmazonIvsPlayerAdapter(
 
     override fun release() {
         try {
-            super.release()
             player.removeListener(playerListener)
+            super.release()
         } catch (e: Exception) {
             Log.e(TAG, "Something went wrong while releasing IVS adapter, e: ${e.message}", e)
         }

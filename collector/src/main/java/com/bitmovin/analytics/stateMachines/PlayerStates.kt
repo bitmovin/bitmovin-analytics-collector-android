@@ -23,7 +23,16 @@ class PlayerStates {
             ) {
                 machine.videoStartTimeoutTimer.cancel()
                 machine.addStartupTime(durationInState)
+
                 if (destinationPlayerState === PlayerStates.PLAYING) {
+                    // this exit marks a valid startup, which means we always
+                    // need to have a valid videostartup_time
+                    // there can be edge cases where we transition so fast that the durationInState is 0
+                    // thus we add at least 1ms for these cases
+                    if (durationInState == 0L) {
+                        machine.addStartupTime(1)
+                    }
+
                     val playerStartupTime = machine.getAndResetPlayerStartupTime()
                     machine.listeners.notify {
                         it.onStartup(machine, machine.startupTime, playerStartupTime)
