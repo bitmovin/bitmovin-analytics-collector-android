@@ -45,7 +45,7 @@ class LicenseCall(private val config: BitmovinAnalyticsConfig, private val conte
             object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     Log.d(TAG, "License call failed due to connectivity issues", e)
-                    callback.authenticationCompleted(false, null)
+                    callback.authenticationCompleted(AuthenticationResponse.Error)
                 }
 
                 @Throws(IOException::class)
@@ -54,7 +54,7 @@ class LicenseCall(private val config: BitmovinAnalyticsConfig, private val conte
 
                     if (body == null) {
                         Log.d(TAG, "License call was denied without providing a response body")
-                        callback.authenticationCompleted(false, null)
+                        callback.authenticationCompleted(AuthenticationResponse.Error)
                         return
                     }
 
@@ -64,12 +64,12 @@ class LicenseCall(private val config: BitmovinAnalyticsConfig, private val conte
                     )
                     if (licenseResponse == null) {
                         Log.d(TAG, "License call was denied without providing a response body")
-                        callback.authenticationCompleted(false, null)
+                        callback.authenticationCompleted(AuthenticationResponse.Error)
                         return
                     }
                     if (licenseResponse.status == null) {
                         Log.d(TAG, String.format("License response was denied without status"))
-                        callback.authenticationCompleted(false, null)
+                        callback.authenticationCompleted(AuthenticationResponse.Error)
                         return
                     }
                     if (licenseResponse.status != "granted") {
@@ -80,11 +80,15 @@ class LicenseCall(private val config: BitmovinAnalyticsConfig, private val conte
                                 licenseResponse.message,
                             ),
                         )
-                        callback.authenticationCompleted(false, null)
+                        callback.authenticationCompleted(
+                            AuthenticationResponse.Denied(licenseResponse.message),
+                        )
                         return
                     }
                     Log.d(TAG, "License response was granted")
-                    callback.authenticationCompleted(true, licenseResponse.features)
+                    callback.authenticationCompleted(
+                        AuthenticationResponse.Granted(licenseResponse.features),
+                    )
                 }
             },
         )
