@@ -49,10 +49,7 @@ class SimpleEventDataDispatcher(
                 true
             }
             is AuthenticationResponse.Denied, AuthenticationResponse.Error -> {
-                callback?.configureFeatures(
-                    false,
-                    null,
-                )
+                callback?.configureFeatures(false, null)
                 false
             }
         }
