@@ -64,7 +64,8 @@ internal class DefaultEventDatabaseConnection(
         val rowId = insert(
             /* table = */ TABLE_NAME,
             /* nullColumnHack = */ null,
-            /* values = */ contentValuesOf(
+            /* values = */
+            contentValuesOf(
                 COLUMN_EVENT_ID to entry.id,
                 COLUMN_EVENT_DATA to entry.data,
                 COLUMN_EVENT_CREATED_AT to System.currentTimeMillis(),
@@ -95,10 +96,8 @@ internal class DefaultEventDatabaseConnection(
         // delete the just read entry
         val affectedRows = delete(
             /* table = */ TABLE_NAME,
-            """
-                    $COLUMN_EVENT_ID = ?
-            """.trimIndent(),
-            arrayOf(entry.id),
+            /* whereClause = */ "$COLUMN_EVENT_ID = ?",
+            /* whereArgs = */ arrayOf(entry.id),
         )
         // if no rows were affected there is something weird going on - rollback and try later
         if (affectedRows != 1) {
