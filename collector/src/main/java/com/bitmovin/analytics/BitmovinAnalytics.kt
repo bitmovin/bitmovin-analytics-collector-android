@@ -51,17 +51,23 @@ class BitmovinAnalytics
     private val featureManager = FeatureManager<FeatureConfigContainer>()
     private val eventBus = EventBus()
 
-    //TODO replace with persistent storage
+    // TODO replace with persistent storage
     private val eventQueue = InMemoryEventQueue()
 
     @Suppress("ConstantConditionIf")
     private val eventDataDispatcher = DebuggingEventDataDispatcher(
-        //TODO replace with config flag once feature is enabled
+        // TODO replace with config flag once feature is enabled
         if (false) {
-            OfflineAuthenticatedDispatcher(config, context, this, BackendFactory(
+            OfflineAuthenticatedDispatcher(
+                config,
+                context,
+                this,
+                BackendFactory(
+                    eventQueue,
+                    true,
+                ),
                 eventQueue,
-                true
-            ), eventQueue)
+            )
         } else {
             SimpleEventDataDispatcher(config, this.context, this, BackendFactory(eventQueue))
         },

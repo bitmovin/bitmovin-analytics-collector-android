@@ -13,7 +13,7 @@ import kotlinx.coroutines.SupervisorJob
 
 class BackendFactory(
     private val eventQueue: AnalyticsEventQueue,
-    private val usePersistentEventCacheOnFailedConnections: Boolean = false
+    private val usePersistentEventCacheOnFailedConnections: Boolean = false,
 ) {
     fun createBackend(config: BitmovinAnalyticsConfig, context: Context): Backend {
         val httpBackend = HttpBackend(config.config, context)

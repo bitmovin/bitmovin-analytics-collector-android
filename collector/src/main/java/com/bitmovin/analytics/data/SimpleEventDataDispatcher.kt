@@ -6,7 +6,6 @@ import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
-import com.bitmovin.analytics.persistence.queue.InMemoryEventQueue
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
