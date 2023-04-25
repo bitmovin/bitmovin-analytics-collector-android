@@ -446,6 +446,12 @@ class PhoneBasicScenariosTest {
         mainScope.launch {
             collector.attachPlayer(defaultPlayer)
             defaultPlayer.load(nonExistingSource)
+        }
+
+        // wait 2 seconds to start without autoplay
+        Thread.sleep(2000)
+
+        mainScope.launch {
             defaultPlayer.play()
         }
 
@@ -505,7 +511,11 @@ class PhoneBasicScenariosTest {
             defaultPlayer.destroy()
         }
 
-        Thread.sleep(100)
+        Thread.sleep(300)
+
+        // assert that no samples are sent
+        val impressions = LogParser.extractImpressions()
+        assertThat(impressions.size).isEqualTo(0)
     }
 
     private fun waitUntilPlaybackFinished(player: Player) {
@@ -525,11 +535,10 @@ class PhoneBasicScenariosTest {
         val currentSource = player.source
         PlaybackUtils.waitUntil { player.source != currentSource }
 
-        // we need to wait a bit for the player to report position of new source (TODO: needs to be checked with player team)
+        // we need to wait a bit for the player to report position of new source
+        // this is a workaround, since this is due to the asynchronous nature of the player
         Thread.sleep(300)
-
-        // it seems like player is sometimes reporting the new source but the old currentTime, this check verifies that the currentTime is reset
-        assertThat(player.currentTime).isLessThan(5.0)
+        assertThat(player.currentTime).isLessThan(4.0)
 
         PlaybackUtils.waitUntil { player.isPlaying }
         PlaybackUtils.waitUntil { player.currentTime > (playedTo / 1000).toDouble() }

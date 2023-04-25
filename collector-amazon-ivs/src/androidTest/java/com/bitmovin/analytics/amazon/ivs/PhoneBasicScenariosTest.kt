@@ -113,6 +113,7 @@ class PhoneBasicScenariosTest {
         collector.attachPlayer(player)
 
         player.load(Uri.parse(liveStreamSample2.m3u8Url))
+        player.isMuted = true
         player.play()
         IvsTestUtils.waitUntilPlayerPlayedToMs(player, 3000L)
 
@@ -135,7 +136,7 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyStaticData(firstImpressionSamples, analyticsConfig, liveStreamSample1, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyStaticData(secondImpressionSamples, analyticsConfig, liveStreamSample2, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyPlayerSetting(firstImpressionSamples, PlayerSettings(false))
-        DataVerifier.verifyPlayerSetting(secondImpressionSamples, PlayerSettings(false))
+        DataVerifier.verifyPlayerSetting(secondImpressionSamples, PlayerSettings(true))
 
         EventDataUtils.filterNonDeterministicEvents(firstImpressionSamples)
         EventDataUtils.filterNonDeterministicEvents(secondImpressionSamples)
@@ -193,22 +194,6 @@ class PhoneBasicScenariosTest {
         assertThat(eventDataList.size).isGreaterThanOrEqualTo(3)
 
         DataVerifier.verifyStartupSample(eventDataList[0])
-
-        // verify first playing period (until seek), there can be more than one playing sample since
-        // quality change events and bufferings could have happened in between
-        var playedTime = 0L
-
-        for (eventData in eventDataList) {
-            if (eventData.state == "seeking") {
-                break
-            }
-
-            playedTime += eventData.played
-        }
-
-        // TODO: we are probably tracking initial buffering as played
-        // thus we might need to reevaluate how we track bufferings in ivs
-        // assertThat(playedTime).isBetween(playedBeforeSeekMs - 700, playedBeforeSeekMs + 700)
         DataVerifier.verifyExactlyOneSeekingSample(eventDataList)
     }
 
@@ -222,6 +207,7 @@ class PhoneBasicScenariosTest {
 
         // act
         player.load(nonExistingStreamSample.uri)
+
         Thread.sleep(500) // we need to wait a bit until player goes into error state
 
         collector.detachPlayer()
@@ -233,6 +219,7 @@ class PhoneBasicScenariosTest {
 
         assertThat(impression.eventDataList.size).isEqualTo(1)
         val eventData = impression.eventDataList.first()
+        val impressionId = eventData.impressionId
         assertThat(eventData.errorMessage).isEqualTo("ERROR_NOT_AVAILABLE")
         assertThat(eventData.errorCode).isEqualTo(11)
 
@@ -241,11 +228,9 @@ class PhoneBasicScenariosTest {
 
         assertThat(impression.errorDetailList.size).isEqualTo(1)
         val errorDetail = impression.errorDetailList.first()
+        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.key)
         assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
         assertThat(errorDetail.data.exceptionMessage).isEqualTo("MasterPlaylist : ERROR_NOT_AVAILABLE : 404 : Failed to load playlist")
-        assertThat(errorDetail.impressionId).isEqualTo(eventData.impressionId)
-        assertThat(errorDetail.platform).isEqualTo("android")
-        assertThat(errorDetail.licenseKey).isEqualTo(analyticsConfig.key)
     }
 
     @Test
