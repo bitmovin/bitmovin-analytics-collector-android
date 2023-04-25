@@ -17,6 +17,8 @@ import com.bitmovin.analytics.features.FeatureManager
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.LicenseCallback
+import com.bitmovin.analytics.persistence.OfflineAuthenticatedDispatcher
+import com.bitmovin.analytics.persistence.queue.InMemoryEventQueue
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
@@ -48,7 +50,23 @@ class BitmovinAnalytics
     }
     private val featureManager = FeatureManager<FeatureConfigContainer>()
     private val eventBus = EventBus()
-    private val eventDataDispatcher = DebuggingEventDataDispatcher(SimpleEventDataDispatcher(config, this.context, this, BackendFactory()), debugCallback)
+
+    //TODO replace with persistent storage
+    private val eventQueue = InMemoryEventQueue()
+
+    @Suppress("ConstantConditionIf")
+    private val eventDataDispatcher = DebuggingEventDataDispatcher(
+        //TODO replace with config flag once feature is enabled
+        if (false) {
+            OfflineAuthenticatedDispatcher(config, context, this, BackendFactory(
+                eventQueue,
+                true
+            ), eventQueue)
+        } else {
+            SimpleEventDataDispatcher(config, this.context, this, BackendFactory(eventQueue))
+        },
+        debugCallback,
+    )
 
     private var playerAdapter: PlayerAdapter? = null
     private var stateMachineListener: StateMachineListener? = null
