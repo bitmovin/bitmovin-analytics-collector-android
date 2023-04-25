@@ -8,12 +8,11 @@ import android.database.sqlite.SQLiteOpenHelper
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.contentValuesOf
 import androidx.core.database.sqlite.transaction
-import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_TIMESTAMP
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_DATA
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_ID
+import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_TIMESTAMP
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_INTERNAL_ID
 import com.bitmovin.analytics.data.persistence.TableDefinition.TABLE_NAME
-import java.util.LinkedList
 
 internal class DefaultEventDatabaseConnection(
     context: Context,

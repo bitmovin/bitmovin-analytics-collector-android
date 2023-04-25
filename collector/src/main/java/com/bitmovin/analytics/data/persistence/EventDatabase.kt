@@ -5,11 +5,11 @@ import android.content.Context
 internal class EventDatabase private constructor(context: Context) {
     val eventData: EventDatabaseConnection = DefaultEventDatabaseConnection(
         context.applicationContext,
-        "eventDatabase.sqlite"
+        "eventDatabase.sqlite",
     )
     val adEventData: EventDatabaseConnection = DefaultEventDatabaseConnection(
         context.applicationContext,
-        "adEventDatabase.sqlite"
+        "adEventDatabase.sqlite",
     )
 
     companion object {

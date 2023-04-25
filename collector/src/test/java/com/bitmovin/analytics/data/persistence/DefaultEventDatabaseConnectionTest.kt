@@ -154,6 +154,6 @@ class DefaultEventDatabaseConnectionTest {
         EventDatabaseEntry(
             System.currentTimeMillis(),
             UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
         )
 }
