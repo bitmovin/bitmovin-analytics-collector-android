@@ -151,5 +151,9 @@ class DefaultEventDatabaseConnectionTest {
     }
 
     private fun createRandomEvent(): EventDatabaseEntry =
-        EventDatabaseEntry(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        EventDatabaseEntry(
+            System.currentTimeMillis(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        )
 }

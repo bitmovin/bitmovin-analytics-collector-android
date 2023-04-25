@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.contentValuesOf
 import androidx.core.database.sqlite.transaction
-import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_CREATED_AT
+import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_TIMESTAMP
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_DATA
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_ID
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_INTERNAL_ID
@@ -36,15 +36,15 @@ internal class DefaultEventDatabaseConnection(
             $COLUMN_INTERNAL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
              $COLUMN_EVENT_ID TEXT,
              $COLUMN_EVENT_DATA TEXT,
-             $COLUMN_EVENT_CREATED_AT INTEGER
+             $COLUMN_EVENT_TIMESTAMP INTEGER
             );
                 """.trimIndent(),
             )
 
             db.execSQL(
                 """
-            CREATE INDEX IF NOT EXISTS ${TABLE_NAME}_$COLUMN_EVENT_CREATED_AT
-            ON $TABLE_NAME($COLUMN_EVENT_CREATED_AT);
+            CREATE INDEX IF NOT EXISTS ${TABLE_NAME}_$COLUMN_EVENT_TIMESTAMP
+            ON $TABLE_NAME($COLUMN_EVENT_TIMESTAMP);
                 """.trimIndent(),
             )
         }
@@ -69,7 +69,7 @@ internal class DefaultEventDatabaseConnection(
             contentValuesOf(
                 COLUMN_EVENT_ID to entry.id,
                 COLUMN_EVENT_DATA to entry.data,
-                COLUMN_EVENT_CREATED_AT to System.currentTimeMillis(),
+                COLUMN_EVENT_TIMESTAMP to entry.eventTimestamp,
             ),
         )
         rowId != -1L
@@ -79,12 +79,12 @@ internal class DefaultEventDatabaseConnection(
         cleanupDatabase()
         val entries = query(
             /* table = */ TABLE_NAME,
-            /* columns = */ arrayOf(COLUMN_EVENT_ID, COLUMN_EVENT_DATA),
+            /* columns = */ arrayOf(COLUMN_EVENT_TIMESTAMP, COLUMN_EVENT_ID, COLUMN_EVENT_DATA),
             /* selection = */ null,
             /* selectionArgs = */ null,
             /* groupBy = */ null,
             /* having = */ null,
-            /* orderBy = */ "$COLUMN_EVENT_CREATED_AT ASC",
+            /* orderBy = */ "$COLUMN_EVENT_TIMESTAMP ASC",
             /* limit = */ "1",
         ).parseCursor()
 
@@ -111,9 +111,10 @@ internal class DefaultEventDatabaseConnection(
         }
         val entries = ArrayList<EventDatabaseEntry>(count)
         while (!isAfterLast) {
+            val eventTimestamp = getLong(getColumnIndexOrThrow(COLUMN_EVENT_TIMESTAMP))
             val eventId = getString(getColumnIndexOrThrow(COLUMN_EVENT_ID))
             val eventData = getString(getColumnIndexOrThrow(COLUMN_EVENT_DATA))
-            entries.add(EventDatabaseEntry(eventId, eventData))
+            entries.add(EventDatabaseEntry(eventTimestamp, eventId, eventData))
             moveToNext()
         }
         entries
@@ -123,12 +124,12 @@ internal class DefaultEventDatabaseConnection(
         cleanupDatabase()
         val entries: List<EventDatabaseEntry> = query(
             /* table = */ TABLE_NAME,
-            /* columns = */ arrayOf(COLUMN_EVENT_ID, COLUMN_EVENT_DATA),
+            /* columns = */ arrayOf(COLUMN_EVENT_TIMESTAMP, COLUMN_EVENT_ID, COLUMN_EVENT_DATA),
             /* selection = */ null,
             /* selectionArgs = */ null,
             /* groupBy = */ null,
             /* having = */ null,
-            /* orderBy = */ "$COLUMN_EVENT_CREATED_AT ASC",
+            /* orderBy = */ "$COLUMN_EVENT_TIMESTAMP ASC",
             /* limit = */ null,
         ).parseCursor()
 
@@ -154,7 +155,7 @@ internal class DefaultEventDatabaseConnection(
         // cleanup by timestamp
         delete(
             /* table = */ TABLE_NAME,
-            /* whereClause = */ "$COLUMN_EVENT_CREATED_AT < ?",
+            /* whereClause = */ "$COLUMN_EVENT_TIMESTAMP < ?",
             /* whereArgs = */ arrayOf((now - limitAgeInMillis).toString()),
         )
 
@@ -212,5 +213,5 @@ private object TableDefinition {
     const val COLUMN_INTERNAL_ID = "_id"
     const val COLUMN_EVENT_ID = "event_id"
     const val COLUMN_EVENT_DATA = "event_data"
-    const val COLUMN_EVENT_CREATED_AT = "created_at"
+    const val COLUMN_EVENT_TIMESTAMP = "event_timestamp"
 }
