@@ -128,10 +128,10 @@ task createPrePushHook() {
         workingDir = project.rootDir
         standardOutput = gitDirStream
     }
-    def gitDir = gitDirStream.toString().trim()
-    def gitHooksDirectory = new File("$gitDir/hooks/")
+    def gitDir = project.file(gitDirStream.toString().trim())
+    def gitHooksDirectory = new File(gitDir, "/hooks/")
     if (!gitHooksDirectory.exists()) gitHooksDirectory.mkdirs()
-    def prePushHookFile = new File("$gitDir/hooks", "pre-push")
+    def prePushHookFile = new File(gitDir, "/hooks/pre-push")
     if (prePushHookFile.exists()) prePushHookFile.delete()
     prePushHookFile.text = """
     #!/bin/sh

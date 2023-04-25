@@ -60,6 +60,8 @@ object DataVerifier {
         // make sure that these properties are static over the whole session
         val generatedUserId = eventDataList[0].userId
         val impressionId = eventDataList[0].impressionId
+        assertThat(impressionId).isNotBlank
+        assertThat(generatedUserId).isNotBlank
 
         for ((expectedSequenceNumber, eventData) in eventDataList.withIndex()) {
             if (is4kTV) {
@@ -76,6 +78,7 @@ object DataVerifier {
             assertThat(eventData.userId).isEqualTo(generatedUserId)
             assertThat(eventData.videoStartFailed).isFalse
             assertThat(eventData.droppedFrames).isGreaterThanOrEqualTo(0)
+            assertThat(eventData.language).isEqualTo("en_US")
 
             // make sure that sequenceNumber is continuous increasing
             assertThat(eventData.sequenceNumber).isEqualTo(expectedSequenceNumber)
@@ -106,6 +109,9 @@ object DataVerifier {
         assertThat(eventData.videoBitrate).isGreaterThan(0)
         assertThat(eventData.isLive).isEqualTo(exepectedData.isLive)
         assertThat(eventData.videoDuration).isEqualTo(exepectedData.duration)
+
+        assertThat(eventData.videoPlaybackHeight).isGreaterThan(0)
+        assertThat(eventData.videoPlaybackWidth).isGreaterThan(8)
     }
 
     fun verifyAnalyticsConfig(eventData: EventData, analyticsConfig: BitmovinAnalyticsConfig) {
@@ -192,12 +198,16 @@ object DataVerifier {
 
     fun verifyStartupSampleOnError(eventData: EventData, expectedPlayerInfo: PlayerInfo) {
         assertThat(eventData.state).isIn("startup", "ready") // we are ending up with ready state on exoplayer and ivs
-        // assertThat(eventData.supportedVideoCodecs).isNotNull // TODO: for some reason this is not set on some error scenarios, needs to be investigated
         assertThat(eventData.videoStartupTime).isEqualTo(0)
         assertThat(eventData.videoTimeStart).isEqualTo(0)
         assertThat(eventData.videoTimeEnd).isEqualTo(0)
         assertThat(eventData.droppedFrames).isEqualTo(0)
         assertThat(eventData.videoStartFailed).isTrue
+        assertThat(eventData.language).isEqualTo("en_US")
+        assertThat(eventData.impressionId).isNotBlank
+        assertThat(eventData.userId).isNotBlank
+        assertThat(eventData.sequenceNumber).isEqualTo(0)
+        assertThat(eventData.domain).isNotBlank
 
         verifyPhoneDeviceInfo(eventData)
         verifyPlayerAndCollectorInfo(eventData, expectedPlayerInfo)
