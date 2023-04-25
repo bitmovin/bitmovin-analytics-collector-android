@@ -19,7 +19,7 @@ internal class InMemoryEventQueue : AnalyticsEventQueue {
 
     override fun popAdEvent() = adEventQueue.pop()
 
-    override fun purge() {
+    override fun clear() {
         eventQueue.clear()
         adEventQueue.clear()
     }

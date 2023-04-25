@@ -56,7 +56,7 @@ internal class OfflineAuthenticatedDispatcher(
                     null,
                 )
                 operationMode = Disabled
-                eventQueue.purge()
+                eventQueue.clear()
                 false
             }
 
