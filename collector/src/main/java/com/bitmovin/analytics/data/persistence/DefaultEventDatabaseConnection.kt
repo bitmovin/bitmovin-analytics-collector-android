@@ -61,6 +61,7 @@ internal class DefaultEventDatabaseConnection(
     }
 
     override fun push(entry: EventDatabaseEntry): Boolean = catchingTransaction {
+        cleanupDatabase()
         val rowId = insert(
             /* table = */ TABLE_NAME,
             /* nullColumnHack = */ null,
@@ -76,7 +77,6 @@ internal class DefaultEventDatabaseConnection(
 
     override fun pop(): EventDatabaseEntry? = catchingTransaction {
         cleanupDatabase()
-        // query the very first entry
         val entries = query(
             /* table = */ TABLE_NAME,
             /* columns = */ arrayOf(COLUMN_EVENT_ID, COLUMN_EVENT_DATA),
@@ -93,20 +93,19 @@ internal class DefaultEventDatabaseConnection(
         }
         val entry = entries.first()
 
-        // delete the just read entry
         val affectedRows = delete(
             /* table = */ TABLE_NAME,
             /* whereClause = */ "$COLUMN_EVENT_ID = ?",
             /* whereArgs = */ arrayOf(entry.id),
         )
-        // if no rows were affected there is something weird going on - rollback and try later
         if (affectedRows != 1) {
+            // Deletion didn't work -> throw to cancel the transaction
             throw SQLiteException("Cannot delete row")
         }
         entry
     }
 
-    private fun Cursor.parseCursor(): MutableList<EventDatabaseEntry> = use {
+    private fun Cursor.parseCursor(): List<EventDatabaseEntry> = use {
         if (!moveToFirst()) {
             return@use mutableListOf()
         }
@@ -122,7 +121,6 @@ internal class DefaultEventDatabaseConnection(
 
     override fun purge(): List<EventDatabaseEntry> = catchingTransaction {
         cleanupDatabase()
-        // query the very first entry
         val entries: List<EventDatabaseEntry> = query(
             /* table = */ TABLE_NAME,
             /* columns = */ arrayOf(COLUMN_EVENT_ID, COLUMN_EVENT_DATA),
@@ -134,25 +132,20 @@ internal class DefaultEventDatabaseConnection(
             /* limit = */ null,
         ).parseCursor()
 
-        val listToDelete = LinkedList<EventDatabaseEntry>().apply { addAll(entries) }
-
-        // unfortunately we cannot delete more than 999 elements at a time (delete by ID)
+        // it is not possible to delete more than 999 elements at a time (delete by ID)
         // this number is hardcoded in `sqlite3.c`, see here: https://stackoverflow.com/a/15313495/21555458
-        while (listToDelete.isNotEmpty()) {
-            val subList = listToDelete.take(999)
-            // delete the just read entries
-            val affectedRows = delete(
-                /* table = */ TABLE_NAME,
-                /* whereClause = */ "$COLUMN_EVENT_ID in (${subList.joinToString { "?" }})",
-                /* whereArgs = */subList.map { it.id }.toTypedArray(),
-            )
-            // if no rows were affected there is something weird going on, better rollback (throw exception) and try later
-            if (affectedRows != subList.size) {
-                throw SQLiteException("Could not delete all data")
+        entries.chunked(999)
+            .forEach { subList ->
+                val affectedRows = delete(
+                    /* table = */ TABLE_NAME,
+                    /* whereClause = */ "$COLUMN_EVENT_ID in (${subList.joinToString { "?" }})",
+                    /* whereArgs = */subList.map { it.id }.toTypedArray(),
+                )
+                // if no rows were affected there is something weird going on, better rollback (throw exception) and try later
+                if (affectedRows != subList.size) {
+                    throw SQLiteException("Could not delete all data")
+                }
             }
-
-            listToDelete.removeAll(subList.toSet())
-        }
         entries
     } ?: emptyList()
 
