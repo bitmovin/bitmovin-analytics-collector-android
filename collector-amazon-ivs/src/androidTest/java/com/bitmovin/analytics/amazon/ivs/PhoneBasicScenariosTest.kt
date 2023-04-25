@@ -41,7 +41,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun testLiveStream_basicPlayPauseScenario_Should_sendCorrectSamples() {
+    fun test_live_playPause() {
         // arrange
         val liveStreamSample = TestSources.IVS_LIVE_1
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample.m3u8Url!!)
@@ -74,6 +74,7 @@ class PhoneBasicScenariosTest {
         val eventDataList = impressionSamples.first().eventDataList
 
         DataVerifier.verifyStaticData(eventDataList, analyticsConfig, liveStreamSample, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyInvariants(eventDataList)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)
 
@@ -137,6 +138,8 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyStaticData(secondImpressionSamples, analyticsConfig, liveStreamSample2, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyPlayerSetting(firstImpressionSamples, PlayerSettings(false))
         DataVerifier.verifyPlayerSetting(secondImpressionSamples, PlayerSettings(true))
+        DataVerifier.verifyInvariants(firstImpressionSamples)
+        DataVerifier.verifyInvariants(secondImpressionSamples)
 
         EventDataUtils.filterNonDeterministicEvents(firstImpressionSamples)
         EventDataUtils.filterNonDeterministicEvents(secondImpressionSamples)
@@ -186,6 +189,7 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyStaticData(eventDataList, analyticsConfig, vodStreamSample, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+        DataVerifier.verifyInvariants(eventDataList)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)
 
@@ -234,7 +238,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_wrongAnalyticsLicense_Should_notInterfereWithPlayer() {
+    fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         // arrange
         val sample = TestSources.HLS_REDBULL
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(sample.m3u8Url!!, "nonExistingKey")

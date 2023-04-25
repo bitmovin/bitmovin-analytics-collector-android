@@ -4,7 +4,6 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 
@@ -13,6 +12,8 @@ object DataVerifier {
     val BUFFERING = "buffering"
     val STARTUP = "startup"
     val SEEKING = "seeking"
+    val PLAYING = "playing"
+    val PAUSE = "pause"
 
     // verifies properties that are not specific to playback order
     fun verifyStaticData(
@@ -57,6 +58,9 @@ object DataVerifier {
         expectedPlayerInfo: PlayerInfo,
         is4kTV: Boolean,
     ) {
+        // verify that there is only one startup sample per session
+        assertThat(eventDataList.filter { x -> x.state == STARTUP }.size).isEqualTo(1)
+
         // make sure that these properties are static over the whole session
         val generatedUserId = eventDataList[0].userId
         val impressionId = eventDataList[0].impressionId
@@ -99,16 +103,23 @@ object DataVerifier {
         }
     }
 
-    fun verifyStreamData(eventData: EventData, exepectedData: StreamData) {
-        assertThat(eventData.audioCodec).isEqualTo(exepectedData.audioCodec)
-        assertThat(eventData.videoCodec).startsWith(exepectedData.videoCodecStartsWith)
-        assertThat(eventData.m3u8Url).isEqualTo(exepectedData.m3u8Url)
-        assertThat(eventData.progUrl).isEqualTo(exepectedData.progUrl)
-        assertThat(eventData.mpdUrl).isEqualTo(exepectedData.mpdUrl)
-        assertThat(eventData.streamFormat).isEqualTo(exepectedData.streamFormat)
-        assertThat(eventData.videoBitrate).isGreaterThan(0)
-        assertThat(eventData.isLive).isEqualTo(exepectedData.isLive)
-        assertThat(eventData.videoDuration).isEqualTo(exepectedData.duration)
+    fun verifyStreamData(eventData: EventData, expectedData: StreamData) {
+        assertThat(eventData.audioCodec).isEqualTo(expectedData.audioCodec)
+        assertThat(eventData.videoCodec).startsWith(expectedData.videoCodecStartsWith)
+        assertThat(eventData.m3u8Url).isEqualTo(expectedData.m3u8Url)
+        assertThat(eventData.progUrl).isEqualTo(expectedData.progUrl)
+        assertThat(eventData.mpdUrl).isEqualTo(expectedData.mpdUrl)
+        assertThat(eventData.streamFormat).isEqualTo(expectedData.streamFormat)
+
+        // if video is progressive, bitrate is set to -1 (TODO: verify why?)
+        if (expectedData.progUrl != null) {
+            assertThat(eventData.videoBitrate).isEqualTo(-1)
+        } else {
+            assertThat(eventData.videoBitrate).isGreaterThan(0)
+        }
+
+        assertThat(eventData.isLive).isEqualTo(expectedData.isLive)
+        assertThat(eventData.videoDuration).isEqualTo(expectedData.duration)
 
         assertThat(eventData.videoPlaybackHeight).isGreaterThan(0)
         assertThat(eventData.videoPlaybackWidth).isGreaterThan(8)
@@ -226,26 +237,6 @@ object DataVerifier {
         assertThat(errorSamples.size).isEqualTo(0)
     }
 
-    fun verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList: MutableList<EventData>) {
-        var currentVideoBitrate = eventDataList[0].videoBitrate
-        var currentAudioBitrate = eventDataList[0].audioBitrate
-
-        for (eventData in eventDataList) {
-            if (eventData.state == QUALITYCHANGE || eventData.state == SEEKING) {
-                currentVideoBitrate = eventData.videoBitrate
-                currentAudioBitrate = eventData.audioBitrate
-            }
-
-            if (eventData.videoBitrate != currentVideoBitrate) {
-                Assertions.fail<Nothing>("video quality changed before qualitychangeevent")
-            }
-
-            if (eventData.audioBitrate != currentAudioBitrate) {
-                Assertions.fail<Nothing>("audio quality changed before qualitychangeevent")
-            }
-        }
-    }
-
     fun verifyVideoStartEndTimesOnContinuousPlayback(eventDataList: MutableList<EventData>) {
         // TODO: we skip the startup sample here, since the videotime start and videotime end are sometimes not 0 for these (seen on bitmovin player)
         var previousVideoTimeEnd = eventDataList[0].videoTimeEnd
@@ -272,16 +263,74 @@ object DataVerifier {
         assertThat(errorDetail.domain).isNotEmpty
     }
 
+    fun verifyInvariants(eventDataList: MutableList<EventData>) {
+        verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList)
+        verifyStateDurationsAreSetCorrectly(eventDataList)
+    }
+
+    fun verifySubtitles(eventDataList: MutableList<EventData>, enabled: Boolean = false, language: String? = null) {
+        for (eventData in eventDataList) {
+            assertThat(eventData.subtitleEnabled).isEqualTo(enabled)
+            assertThat(eventData.subtitleLanguage).isEqualTo(language)
+        }
+    }
+
     fun verifyExactlyOneSeekingSample(eventDataList: MutableList<EventData>) {
-        verifyOnlyOneSampleHasState(eventDataList, "seeking")
+        verifyOnlyOneSampleHasState(eventDataList, SEEKING)
     }
 
     fun verifyExactlyOnePauseSample(eventDataList: MutableList<EventData>) {
-        verifyOnlyOneSampleHasState(eventDataList, "pause")
+        verifyOnlyOneSampleHasState(eventDataList, PAUSE)
+    }
+
+    fun verifyAtLeastOnePlayingSample(eventDataList: MutableList<EventData>) {
+        verifyAtLeastOneSampleHasState(eventDataList, PLAYING)
     }
 
     private fun verifyOnlyOneSampleHasState(eventDataList: MutableList<EventData>, state: String) {
-        val seekingSamples = eventDataList.filter { x -> x.state?.lowercase() == state }
-        assertThat(seekingSamples.size).isEqualTo(1)
+        val samplesWithState = eventDataList.filter { x -> x.state?.lowercase() == state }
+        assertThat(samplesWithState.size).isEqualTo(1)
+    }
+
+    private fun verifyAtLeastOneSampleHasState(eventDataList: MutableList<EventData>, state: String) {
+        val samplesWithState = eventDataList.filter { x -> x.state?.lowercase() == state }
+        assertThat(samplesWithState.size).isGreaterThanOrEqualTo(1)
+    }
+
+    private fun verifyStateDurationsAreSetCorrectly(eventDataList: MutableList<EventData>) {
+        val playingSamples = eventDataList.filter { x -> x.state?.lowercase() == PLAYING }
+        playingSamples.forEach {
+            assertThat(it.duration).isEqualTo(it.played)
+        }
+
+        val seekSamples = eventDataList.filter { x -> x.state?.lowercase() == SEEKING }
+        seekSamples.forEach {
+            assertThat(it.duration).isEqualTo(it.seeked)
+        }
+
+        val pauseSamples = eventDataList.filter { x -> x.state?.lowercase() == PAUSE }
+        pauseSamples.forEach {
+            assertThat(it.duration).isEqualTo(it.paused)
+        }
+    }
+
+    private fun verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList: MutableList<EventData>) {
+        var currentVideoBitrate = eventDataList[0].videoBitrate
+        var currentAudioBitrate = eventDataList[0].audioBitrate
+
+        for (eventData in eventDataList) {
+            if (eventData.state == QUALITYCHANGE || eventData.state == SEEKING) {
+                currentVideoBitrate = eventData.videoBitrate
+                currentAudioBitrate = eventData.audioBitrate
+            }
+
+            if (eventData.videoBitrate != currentVideoBitrate) {
+                fail<Nothing>("video quality changed before qualitychangeevent")
+            }
+
+            if (eventData.audioBitrate != currentAudioBitrate) {
+                fail<Nothing>("audio quality changed before qualitychangeevent")
+            }
+        }
     }
 }
