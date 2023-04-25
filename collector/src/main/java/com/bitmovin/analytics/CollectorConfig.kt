@@ -27,7 +27,7 @@ class CollectorConfig() : Parcelable {
     }
 
     companion object {
-        private const val DEFAULT_BACKEND_URL = "https://analytics-ingress-global.bitmovin.com/"
+        internal const val DEFAULT_BACKEND_URL = "https://analytics-ingress-global.bitmovin.com/"
 
         @JvmField
         val CREATOR = object : Parcelable.Creator<CollectorConfig> {
