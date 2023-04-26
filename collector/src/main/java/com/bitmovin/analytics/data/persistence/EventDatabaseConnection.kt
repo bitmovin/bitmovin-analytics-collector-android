@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.data.persistence
 
-data class EventDatabaseEntry(val eventTimestamp: Long, val id: String, val data: String)
+internal data class EventDatabaseEntry(val eventTimestamp: Long, val data: String)
 
 internal interface EventDatabaseConnection {
     /**
