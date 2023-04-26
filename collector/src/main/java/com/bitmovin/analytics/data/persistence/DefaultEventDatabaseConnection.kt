@@ -122,7 +122,8 @@ internal class DefaultEventDatabaseConnection(
 
         // it is not possible to delete more than 999 elements at a time (delete by ID)
         // this number is hardcoded in `sqlite3.c`, see here: https://stackoverflow.com/a/15313495/21555458
-        rows.chunked(999)
+        rows
+            .chunked(999)
             .forEach { subList ->
                 val affectedRows = db.delete(
                     /* table = */ TABLE_NAME,
