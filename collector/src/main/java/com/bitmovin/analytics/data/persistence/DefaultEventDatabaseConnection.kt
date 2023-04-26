@@ -84,7 +84,9 @@ internal class DefaultEventDatabaseConnection(
             /* having = */ null,
             /* orderBy = */ "$COLUMN_EVENT_TIMESTAMP ASC",
             /* limit = */ "1",
-        ).parseCursor()
+        ).use {
+            it.parseRows()
+        }
 
         if (rows.size != 1) {
             return@catchingTransaction null
@@ -103,21 +105,6 @@ internal class DefaultEventDatabaseConnection(
         row.entry
     }
 
-    private fun Cursor.parseCursor(): List<Row> = use {
-        if (!moveToFirst()) {
-            return@use mutableListOf()
-        }
-        val rows = ArrayList<Row>(count)
-        while (!isAfterLast) {
-            val internalId = getLong(getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
-            val eventTimestamp = getLong(getColumnIndexOrThrow(COLUMN_EVENT_TIMESTAMP))
-            val eventData = getString(getColumnIndexOrThrow(COLUMN_EVENT_DATA))
-            rows.add(Row(internalId, EventDatabaseEntry(eventTimestamp, eventData)))
-            moveToNext()
-        }
-        rows
-    }
-
     override fun purge(): List<EventDatabaseEntry> = catchingTransaction {
         cleanupDatabase()
         val rows: List<Row> = query(
@@ -129,7 +116,9 @@ internal class DefaultEventDatabaseConnection(
             /* having = */ null,
             /* orderBy = */ "$COLUMN_EVENT_TIMESTAMP ASC",
             /* limit = */ null,
-        ).parseCursor()
+        ).use{
+            it.parseRows()
+        }
 
         // it is not possible to delete more than 999 elements at a time (delete by ID)
         // this number is hardcoded in `sqlite3.c`, see here: https://stackoverflow.com/a/15313495/21555458
@@ -147,6 +136,21 @@ internal class DefaultEventDatabaseConnection(
             }
         rows.map { it.entry }
     } ?: emptyList()
+
+    private fun Cursor.parseRows(): List<Row> {
+        if (!moveToFirst()) {
+            return mutableListOf()
+        }
+        val rows = ArrayList<Row>(count)
+        while (!isAfterLast) {
+            val internalId = getLong(getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
+            val eventTimestamp = getLong(getColumnIndexOrThrow(COLUMN_EVENT_TIMESTAMP))
+            val eventData = getString(getColumnIndexOrThrow(COLUMN_EVENT_DATA))
+            rows.add(Row(internalId, EventDatabaseEntry(eventTimestamp, eventData)))
+            moveToNext()
+        }
+        return rows
+    }
 
     private fun SQLiteDatabase.cleanupDatabase() = transaction {
         val now = System.currentTimeMillis()
