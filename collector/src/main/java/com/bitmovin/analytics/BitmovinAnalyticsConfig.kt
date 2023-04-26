@@ -381,7 +381,7 @@ class BitmovinAnalyticsConfig() : Parcelable {
         /**
          * This acts as constructor, but is just a helper function to convert an [AnalyticsConfig] to [BitmovinAnalyticsConfig]
          */
-        internal operator fun invoke(analyticsConfig: AnalyticsConfig): BitmovinAnalyticsConfig =
+        operator fun invoke(analyticsConfig: AnalyticsConfig): BitmovinAnalyticsConfig =
             BitmovinAnalyticsConfig(
                 analyticsConfig.key,
                 analyticsConfig.playerKey
