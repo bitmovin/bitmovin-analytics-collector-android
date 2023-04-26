@@ -61,7 +61,7 @@ internal class DefaultEventDatabaseConnection(
 
     override fun push(entry: EventDatabaseEntry): Boolean = catchingTransaction {
         cleanupDatabase()
-        val rowId = insert(
+        val rowId = db.insert(
             /* table = */ TABLE_NAME,
             /* nullColumnHack = */ null,
             /* values = */
@@ -75,7 +75,7 @@ internal class DefaultEventDatabaseConnection(
 
     override fun pop(): EventDatabaseEntry? = catchingTransaction {
         cleanupDatabase()
-        val rows = query(
+        val rows = db.query(
             /* table = */ TABLE_NAME,
             /* columns = */ arrayOf(COLUMN_INTERNAL_ID, COLUMN_EVENT_TIMESTAMP, COLUMN_EVENT_DATA),
             /* selection = */ null,
@@ -93,7 +93,7 @@ internal class DefaultEventDatabaseConnection(
         }
         val row = rows.first()
 
-        val affectedRows = delete(
+        val affectedRows = db.delete(
             /* table = */ TABLE_NAME,
             /* whereClause = */ "$COLUMN_INTERNAL_ID = ?",
             /* whereArgs = */ arrayOf(row.internalId.toString()),
@@ -107,7 +107,7 @@ internal class DefaultEventDatabaseConnection(
 
     override fun purge(): List<EventDatabaseEntry> = catchingTransaction {
         cleanupDatabase()
-        val rows: List<Row> = query(
+        val rows: List<Row> = db.query(
             /* table = */ TABLE_NAME,
             /* columns = */ arrayOf(COLUMN_INTERNAL_ID, COLUMN_EVENT_TIMESTAMP, COLUMN_EVENT_DATA),
             /* selection = */ null,
@@ -116,7 +116,7 @@ internal class DefaultEventDatabaseConnection(
             /* having = */ null,
             /* orderBy = */ "$COLUMN_EVENT_TIMESTAMP ASC",
             /* limit = */ null,
-        ).use{
+        ).use {
             it.parseRows()
         }
 
@@ -124,7 +124,7 @@ internal class DefaultEventDatabaseConnection(
         // this number is hardcoded in `sqlite3.c`, see here: https://stackoverflow.com/a/15313495/21555458
         rows.chunked(999)
             .forEach { subList ->
-                val affectedRows = delete(
+                val affectedRows = db.delete(
                     /* table = */ TABLE_NAME,
                     /* whereClause = */ "$COLUMN_INTERNAL_ID in (${subList.joinToString { "?" }})",
                     /* whereArgs = */subList.map { it.internalId.toString() }.toTypedArray(),
@@ -152,10 +152,10 @@ internal class DefaultEventDatabaseConnection(
         return rows
     }
 
-    private fun SQLiteDatabase.cleanupDatabase() = transaction {
+    private fun Transaction.cleanupDatabase() {
         val now = System.currentTimeMillis()
         // cleanup by timestamp
-        delete(
+        db.delete(
             /* table = */ TABLE_NAME,
             /* whereClause = */ "$COLUMN_EVENT_TIMESTAMP < ?",
             /* whereArgs = */ arrayOf((now - limitAgeInMillis).toString()),
@@ -163,7 +163,7 @@ internal class DefaultEventDatabaseConnection(
 
         // cleanup by count
         // therefore query the maximum count + 1, get the internal id of it, and delete every event which was inserted before this element
-        val deleteStartWith: Long = query(
+        val deleteStartWith: Long = db.query(
             /* table = */ TABLE_NAME,
             /* columns = */ arrayOf(COLUMN_INTERNAL_ID),
             /* selection = */ null,
@@ -180,19 +180,19 @@ internal class DefaultEventDatabaseConnection(
                 return@use null
             }
             return@use it.getLong(it.getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
-        } ?: return@transaction
+        } ?: return
 
-        delete(
+        db.delete(
             /* table = */ TABLE_NAME,
             /* whereClause = */ "$COLUMN_INTERNAL_ID <= ?",
             /* whereArgs = */ arrayOf(deleteStartWith.toString()),
         )
     }
 
-    private fun <T> catchingTransaction(block: SQLiteDatabase.() -> T): T? {
+    private fun <T> catchingTransaction(block: Transaction.() -> T): T? {
         return try {
             dbHelper.writableDatabase.transaction {
-                block()
+                Transaction(this).block()
             }
         } catch (e: Exception) {
             // database exception -> transaction is cancelled, just log (should never happen on real devices)
@@ -208,6 +208,9 @@ internal class DefaultEventDatabaseConnection(
         // otherwise (during normal app runtime) the connection to the database stays alive the whole app lifetime!
         dbHelper.close()
     }
+
+    @JvmInline
+    value class Transaction(val db: SQLiteDatabase)
 }
 
 private object TableDefinition {
