@@ -4,7 +4,9 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.bitmovin.analytics.CollectorConfig
 
-data class AnalyticsConfig(
+data class AnalyticsConfig
+@JvmOverloads
+constructor(
     val key: String = "",
     val playerKey: String = "",
     /**
