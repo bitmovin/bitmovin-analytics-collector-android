@@ -1,8 +1,14 @@
 package com.bitmovin.analytics.data
 
-import com.bitmovin.analytics.retryBackend.OnFailureCallback
-
 interface CallbackBackend {
-    fun send(eventData: EventData, callback: OnFailureCallback?)
-    fun sendAd(eventData: AdEventData, callback: OnFailureCallback?)
+    fun send(eventData: EventData, success: OnSuccessCallback? = null, failure: OnFailureCallback?)
+    fun sendAd(eventData: AdEventData, success: OnSuccessCallback? = null, failure: OnFailureCallback?)
+}
+
+fun interface OnFailureCallback {
+    fun onFailure(e: Exception, cancel: () -> Unit)
+}
+
+fun interface OnSuccessCallback {
+    fun onSuccess()
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import com.bitmovin.analytics.CollectorConfig
-import com.bitmovin.analytics.retryBackend.OnFailureCallback
 import com.bitmovin.analytics.utils.ClientFactory
 import com.bitmovin.analytics.utils.DataSerializer.serialize
 import com.bitmovin.analytics.utils.HttpClient
@@ -37,14 +36,14 @@ class HttpBackend(config: CollectorConfig, context: Context) : Backend, Callback
     }
 
     override fun send(eventData: EventData) {
-        this.send(eventData, null)
+        this.send(eventData)
     }
 
     override fun sendAd(eventData: AdEventData) {
-        this.sendAd(eventData, null)
+        this.sendAd(eventData)
     }
 
-    override fun send(eventData: EventData, callback: OnFailureCallback?) {
+    override fun send(eventData: EventData, success: OnSuccessCallback?, failure: OnFailureCallback?) {
         Log.d(
             TAG,
             String.format(
@@ -63,15 +62,17 @@ class HttpBackend(config: CollectorConfig, context: Context) : Backend, Callback
             serialize(eventData),
             object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    callback?.onFailure(e) { call.cancel() }
+                    failure?.onFailure(e) { call.cancel() }
                 }
 
-                override fun onResponse(call: Call, response: Response) {}
+                override fun onResponse(call: Call, response: Response) {
+                    success?.onSuccess()
+                }
             },
         )
     }
 
-    override fun sendAd(eventData: AdEventData, callback: OnFailureCallback?) {
+    override fun sendAd(eventData: AdEventData, success: OnSuccessCallback?, failure: OnFailureCallback?) {
         Log.d(
             TAG,
             String.format(
@@ -86,10 +87,12 @@ class HttpBackend(config: CollectorConfig, context: Context) : Backend, Callback
             serialize(eventData),
             object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    callback?.onFailure(e) { call.cancel() }
+                    failure?.onFailure(e) { call.cancel() }
                 }
 
-                override fun onResponse(call: Call, response: Response) {}
+                override fun onResponse(call: Call, response: Response) {
+                    success?.onSuccess()
+                }
             },
         )
     }

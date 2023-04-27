@@ -7,6 +7,7 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.data.OnFailureCallback
 import okhttp3.internal.http2.StreamResetException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -30,9 +31,13 @@ class RetryBackend(private val next: CallbackBackend, private val scheduleSample
     }
 
     private fun scheduleSample(retrySample: RetrySample<Any>) {
-        val callback = object : OnFailureCallback {
-            override fun onFailure(e: Exception, cancel: () -> Unit) {
-                if (e is SocketTimeoutException || e is ConnectException || e is StreamResetException || e is UnknownHostException) {
+        val callback = OnFailureCallback { e, cancel ->
+            when (e) {
+                is SocketTimeoutException,
+                is ConnectException,
+                is StreamResetException,
+                is UnknownHostException,
+                -> {
                     cancel()
                     retryQueue.addSample(retrySample)
                     processQueuedSamples()
@@ -43,11 +48,11 @@ class RetryBackend(private val next: CallbackBackend, private val scheduleSample
         if (retrySample.eventData is EventData) {
             Log.d(TAG, "sending sample ${retrySample.eventData?.sequenceNumber} retry ${retrySample.retry}")
             retrySample.eventData.retryCount = retrySample.retry
-            this.next.send(retrySample.eventData, callback)
+            this.next.send(retrySample.eventData, failure = callback)
         } else if (retrySample.eventData is AdEventData) {
             Log.d(TAG, "sending ad sample ${retrySample.eventData?.adId} retry ${retrySample.retry}")
             retrySample.eventData.retryCount = retrySample.retry
-            this.next.sendAd(retrySample.eventData, callback)
+            this.next.sendAd(retrySample.eventData, failure = callback)
         }
     }
 
