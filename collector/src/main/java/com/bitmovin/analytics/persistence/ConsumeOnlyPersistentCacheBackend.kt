@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-internal class ReadOnlyPersistentCacheBackend(
+internal class ConsumeOnlyPersistentCacheBackend(
     scope: CoroutineScope,
     private val backend: CallbackBackend,
     private val eventQueue: ConsumeOnlyAnalyticsEventQueue,

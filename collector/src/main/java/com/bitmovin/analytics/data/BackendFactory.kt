@@ -3,8 +3,8 @@ package com.bitmovin.analytics.data
 import android.content.Context
 import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.persistence.ConsumeOnlyPersistentCacheBackend
 import com.bitmovin.analytics.persistence.PersistentCacheBackend
-import com.bitmovin.analytics.persistence.ReadOnlyPersistentCacheBackend
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.retryBackend.RetryBackend
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +20,7 @@ class BackendFactory(
         val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob()) // TODO scope?
 
         return if (usePersistentEventCacheOnFailedConnections) {
-            ReadOnlyPersistentCacheBackend(
+            ConsumeOnlyPersistentCacheBackend(
                 coroutineScope,
                 PersistentCacheBackend(
                     httpBackend,
@@ -29,7 +29,7 @@ class BackendFactory(
                 eventQueue,
             )
         } else {
-            val backend = ReadOnlyPersistentCacheBackend(
+            val backend = ConsumeOnlyPersistentCacheBackend(
                 coroutineScope,
                 httpBackend,
                 eventQueue,
