@@ -42,7 +42,7 @@ object TestSources {
         null,
         "hls",
         true,
-        -1,
+        0,
     )
 
     val IVS_LIVE_2 = StreamData(
@@ -53,7 +53,7 @@ object TestSources {
         null,
         "hls",
         true,
-        -1,
+        0,
     )
 
     val IVS_VOD_1 = StreamData(

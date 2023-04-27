@@ -92,7 +92,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun testLiveStream_basic2ImpressionsScenarios_Should_sendCorrectSamples() {
+    fun test_live_2ImpressionsScenario() {
         // arrange
         val liveStreamSample1 = TestSources.IVS_LIVE_1
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample1.m3u8Url!!)
@@ -103,7 +103,8 @@ class PhoneBasicScenariosTest {
         // act
         player.load(Uri.parse(liveStreamSample1.m3u8Url))
         player.play()
-        IvsTestUtils.waitUntilPlayerPlayedToMs(player, 3000L)
+        val firstPlayMs = 3000L
+        IvsTestUtils.waitUntilPlayerPlayedToMs(player, firstPlayMs)
         player.pause()
         Thread.sleep(100)
 
@@ -116,7 +117,8 @@ class PhoneBasicScenariosTest {
         player.load(Uri.parse(liveStreamSample2.m3u8Url))
         player.isMuted = true
         player.play()
-        IvsTestUtils.waitUntilPlayerPlayedToMs(player, 3000L)
+        val secondPlayMs = 5000L
+        IvsTestUtils.waitUntilPlayerPlayedToMs(player, secondPlayMs)
 
         player.pause()
         Thread.sleep(100)
@@ -154,10 +156,17 @@ class PhoneBasicScenariosTest {
 
         assertThat(firstImpressionSamples[1].state).isEqualTo("playing")
         assertThat(secondImpressionSamples[1].state).isEqualTo("playing")
+
+        // verify durations of playing samples state are within a reasonable range
+        val playedDurationFirstImpression = firstImpressionSamples.sumOf { it.played }
+        assertThat(playedDurationFirstImpression).isBetween((firstPlayMs * 0.9).toLong(), (firstPlayMs * 1.1).toLong())
+
+        val playedDurationSecondImpression = secondImpressionSamples.sumOf { it.played }
+        assertThat(playedDurationSecondImpression).isBetween((secondPlayMs * 0.9).toLong(), (secondPlayMs * 1.1).toLong())
     }
 
     @Test
-    fun testVodStream_seekScenario_Should_sendCorrectSamples() {
+    fun test_vod_playSeekWithAutoplay() {
         val vodStreamSample = TestSources.IVS_VOD_1
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(vodStreamSample.m3u8Url!!)
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
@@ -189,7 +198,6 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyStaticData(eventDataList, analyticsConfig, vodStreamSample, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
-        DataVerifier.verifyInvariants(eventDataList)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)
 
@@ -198,11 +206,57 @@ class PhoneBasicScenariosTest {
         assertThat(eventDataList.size).isGreaterThanOrEqualTo(3)
 
         DataVerifier.verifyStartupSample(eventDataList[0])
-        DataVerifier.verifyExactlyOneSeekingSample(eventDataList)
+        DataVerifier.verifyThereWasExactlyOneSeekingSample(eventDataList)
     }
 
     @Test
-    fun test_errorScenario_Should_sendErrorSample() {
+    fun test_vod_play() {
+        val vodStreamSample = TestSources.IVS_VOD_1
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(vodStreamSample.m3u8Url!!)
+        val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
+        collector.attachPlayer(player)
+
+        // act
+        player.load(Uri.parse(vodStreamSample.m3u8Url))
+        IvsTestUtils.waitUntilPlayerIsReady(player)
+
+        player.play()
+
+        val playedBeforePause = 3000L
+        IvsTestUtils.waitUntilPlayerPlayedToMs(player, playedBeforePause)
+
+        player.pause()
+        Thread.sleep(100)
+
+        collector.detachPlayer()
+        player.release()
+
+        // assert
+        val impressionsList = LogParser.extractImpressions()
+        assertThat(impressionsList.size).isEqualTo(1)
+
+        val impression = impressionsList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, vodStreamSample, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+        DataVerifier.verifyInvariants(eventDataList)
+
+        EventDataUtils.filterNonDeterministicEvents(eventDataList)
+
+        // there need to be at least 2 events
+        // startup, playing
+        assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
+        DataVerifier.verifyStartupSample(eventDataList[0])
+
+        val playedDuration = eventDataList.sumOf { it.played }
+        assertThat(playedDuration).isBetween((playedBeforePause * 0.95).toLong(), (playedBeforePause * 1.10).toLong())
+    }
+
+    @Test
+    fun test_nonExistingStream_Should_sendErrorSample() {
         // arrange
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(nonExistingStreamSample.uri.toString())
