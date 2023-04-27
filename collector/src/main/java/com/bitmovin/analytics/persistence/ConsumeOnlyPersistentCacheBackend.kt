@@ -38,31 +38,31 @@ internal class ConsumeOnlyPersistentCacheBackend(
         eventData: EventData,
         success: OnSuccessCallback?,
         failure: OnFailureCallback?,
-    ) {
-        backend.send(
-            eventData,
-            success = {
-                cacheFlushChannel.trySend(true)
-                success?.onSuccess()
-            },
-            failure,
-        )
-    }
+    ) = backend.send(
+        eventData,
+        success = {
+            cacheFlushChannel.trySend(true)
+            success?.onSuccess()
+        },
+        failure,
+    )
 
     override fun sendAd(
         eventData: AdEventData,
         success: OnSuccessCallback?,
         failure: OnFailureCallback?,
-    ) {
-        backend.sendAd(
-            eventData,
-            success = {
-                cacheFlushChannel.trySend(true)
-                success?.onSuccess()
-            },
-            failure,
-        )
-    }
+    ) = backend.sendAd(
+        eventData,
+        success = {
+            cacheFlushChannel.trySend(true)
+            success?.onSuccess()
+        },
+        failure,
+    )
+
+    override fun send(eventData: EventData) = send(eventData, null, null)
+
+    override fun sendAd(eventData: AdEventData) = sendAd(eventData, null, null)
 
     private fun sendNextCachedEvent() {
         val eventData: EventData? = eventQueue.popEvent()
@@ -71,13 +71,5 @@ internal class ConsumeOnlyPersistentCacheBackend(
         } ?: eventQueue.popAdEvent()?.let {
             sendAd(it)
         }
-    }
-
-    override fun send(eventData: EventData) {
-        send(eventData, null, null)
-    }
-
-    override fun sendAd(eventData: AdEventData) {
-        sendAd(eventData, null, null)
     }
 }

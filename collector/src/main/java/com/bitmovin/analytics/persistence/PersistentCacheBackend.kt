@@ -14,13 +14,9 @@ internal class PersistentCacheBackend(
     private val eventQueue: AnalyticsEventQueue,
 ) : Backend, CallbackBackend {
 
-    override fun send(eventData: EventData) {
-        send(eventData, null, null)
-    }
+    override fun send(eventData: EventData) = send(eventData, null, null)
 
-    override fun sendAd(eventData: AdEventData) {
-        sendAd(eventData, null, null)
-    }
+    override fun sendAd(eventData: AdEventData) = sendAd(eventData, null, null)
 
     override fun send(
         eventData: EventData,
