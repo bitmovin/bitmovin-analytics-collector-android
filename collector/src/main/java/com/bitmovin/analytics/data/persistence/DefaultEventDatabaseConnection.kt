@@ -130,9 +130,9 @@ internal class DefaultEventDatabaseConnection(
                     /* whereClause = */ "$COLUMN_INTERNAL_ID in (${subList.joinToString { "?" }})",
                     /* whereArgs = */subList.map { it.internalId.toString() }.toTypedArray(),
                 )
-                // if no rows were affected there is something weird going on, better rollback (throw exception) and try later
                 if (affectedRows != subList.size) {
-                    throw SQLiteException("Could not delete all data")
+                    // Deletion didn't work -> throw to cancel the transaction
+                    throw SQLiteException("Cannot delete all rows")
                 }
             }
         rows.map { it.entry }
