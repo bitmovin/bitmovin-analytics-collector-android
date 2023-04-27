@@ -14,6 +14,7 @@ object PlaybackUtils {
         val waitingDeltaMs = 100L
         val channel = Channel<Unit>()
 
+        // TODO: when condition fails it is hard to track which condition caused the issue, we should add more logging here
         MainScope().launch {
             while (!condition()) {
                 delay(waitingDeltaMs)

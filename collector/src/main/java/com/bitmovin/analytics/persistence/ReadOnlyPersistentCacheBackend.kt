@@ -6,7 +6,7 @@ import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.OnSuccessCallback
-import com.bitmovin.analytics.persistence.queue.ReadOnlyAnalyticsEventQueue
+import com.bitmovin.analytics.persistence.queue.ConsumeOnlyAnalyticsEventQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.onEach
 internal class ReadOnlyPersistentCacheBackend(
     scope: CoroutineScope,
     private val backend: CallbackBackend,
-    private val eventQueue: ReadOnlyAnalyticsEventQueue,
+    private val eventQueue: ConsumeOnlyAnalyticsEventQueue,
 ) : Backend, CallbackBackend {
 
     private val cacheFlushChannel = Channel<Boolean>(

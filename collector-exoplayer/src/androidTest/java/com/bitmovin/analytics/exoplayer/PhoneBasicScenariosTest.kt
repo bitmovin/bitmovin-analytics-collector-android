@@ -102,13 +102,13 @@ class PhoneBasicScenariosTest {
 
         DataVerifier.verifyStaticData(eventDataList, defaultAnalyticsConfig, defaultSample, ExoplayerConstants.playerInfo)
         DataVerifier.verifyStartupSample(eventDataList[0])
-        DataVerifier.verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList)
+        DataVerifier.verifyInvariants(eventDataList)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
     }
 
     @Test
-    fun test_errorScenario_Should_sendErrorSample() {
+    fun est_nonExistingStream_Should_sendErrorSample() {
         // arrange
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(nonExistingStreamSample.uri.toString())
@@ -139,7 +139,9 @@ class PhoneBasicScenariosTest {
         val eventData = impression.eventDataList.first()
         val impressionId = eventData.impressionId
         Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: InvalidResponseCodeException (Status Code: 404")
-        Assertions.assertThat(eventData.errorCode).isEqualTo(0) // TODO: verify why errorCode is 0
+        Assertions.assertThat(eventData.errorCode).isEqualTo(0)
+
+//      Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS) // switch to this once https://bitmovin.atlassian.net/browse/AN-3520 is implemented
 
         DataVerifier.verifyStartupSampleOnError(eventData, ExoplayerConstants.playerInfo)
         DataVerifier.verifyAnalyticsConfig(eventData, analyticsConfig)
