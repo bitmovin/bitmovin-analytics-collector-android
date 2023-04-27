@@ -35,13 +35,9 @@ class HttpBackend(config: CollectorConfig, context: Context) : Backend, Callback
         httpClient = HttpClient(context, ClientFactory().createClient(config))
     }
 
-    override fun send(eventData: EventData) {
-        this.send(eventData)
-    }
+    override fun send(eventData: EventData) = send(eventData, null, null)
 
-    override fun sendAd(eventData: AdEventData) {
-        this.sendAd(eventData)
-    }
+    override fun sendAd(eventData: AdEventData) = sendAd(eventData, null, null)
 
     override fun send(eventData: EventData, success: OnSuccessCallback?, failure: OnFailureCallback?) {
         Log.d(
