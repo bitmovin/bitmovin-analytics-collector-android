@@ -12,8 +12,7 @@ class AnalyticsConfigTest {
     @Test
     fun testAnalyticsConfigMapping() {
         val config = AnalyticsConfig(
-            randomString(),
-            playerKey = randomString(),
+            key = randomString(),
             cdnProvider = randomString(),
             customData1 = randomString(),
             customData2 = randomString(),
@@ -55,7 +54,6 @@ class AnalyticsConfigTest {
 
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig(config)
 
-        Assert.assertEquals(config.playerKey, bitmovinAnalyticsConfig.playerKey)
         Assert.assertEquals(config.cdnProvider, bitmovinAnalyticsConfig.cdnProvider)
         Assert.assertEquals(config.customData1, bitmovinAnalyticsConfig.customData1)
         Assert.assertEquals(config.customData2, bitmovinAnalyticsConfig.customData2)

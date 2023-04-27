@@ -8,7 +8,6 @@ data class AnalyticsConfig
 @JvmOverloads
 constructor(
     val key: String = "",
-    val playerKey: String = "",
     /**
      * CDN Provider used to play out Content
      */
@@ -197,8 +196,6 @@ constructor(
     constructor(parcel: Parcel) : this(
         // TODO: should we throw, if there is no key in the bundle?
         key = parcel.readString() ?: "",
-        // TODO: should we throw, if there is no playerKey in the bundle?
-        playerKey = parcel.readString() ?: "",
         cdnProvider = parcel.readString(),
         customData1 = parcel.readString(),
         customData2 = parcel.readString(),
@@ -242,7 +239,6 @@ constructor(
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(key)
-        parcel.writeString(playerKey)
         parcel.writeString(cdnProvider)
         parcel.writeString(customData1)
         parcel.writeString(customData2)

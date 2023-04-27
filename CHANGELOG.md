@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgrade to use latest exoplayer version (v2.18.6)
 
 ### Added
-- New `AnalyticsConfig` which can be used to create a `AnalyticsCollector`
+- [internal] New `AnalyticsConfig` which can be used to create a `AnalyticsCollector`
 
 ## v2.16.0
 

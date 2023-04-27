@@ -25,10 +25,8 @@ class IBitmovinPlayerCollectorKotlinTest {
         val analyticsConfig = AnalyticsConfig("analytics_key", "player_key")
         val collector = IBitmovinPlayerCollector.Factory.create(analyticsConfig, mockk(relaxed = true))
         Assert.assertEquals(analyticsConfig.key, collector.config.key)
-        Assert.assertEquals(analyticsConfig.playerKey, collector.config.playerKey)
 
         val collector2 = IBitmovinPlayerCollector.create(analyticsConfig, mockk(relaxed = true))
         Assert.assertEquals(analyticsConfig.key, collector2.config.key)
-        Assert.assertEquals(analyticsConfig.playerKey, collector2.config.playerKey)
     }
 }

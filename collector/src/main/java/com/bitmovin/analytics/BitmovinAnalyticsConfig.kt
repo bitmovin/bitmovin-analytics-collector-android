@@ -383,8 +383,7 @@ class BitmovinAnalyticsConfig() : Parcelable {
          */
         operator fun invoke(analyticsConfig: AnalyticsConfig): BitmovinAnalyticsConfig =
             BitmovinAnalyticsConfig(
-                analyticsConfig.key,
-                analyticsConfig.playerKey
+                analyticsConfig.key
             ).apply {
                 cdnProvider = analyticsConfig.cdnProvider
                 customData1 = analyticsConfig.customData1

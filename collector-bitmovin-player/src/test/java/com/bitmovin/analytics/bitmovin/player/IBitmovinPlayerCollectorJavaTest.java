@@ -34,11 +34,9 @@ public class IBitmovinPlayerCollectorJavaTest {
         IBitmovinPlayerCollector collector = IBitmovinPlayerCollector.Factory.create(analyticsConfig, context);
         Assert.assertNotNull(collector);
         Assert.assertEquals(analyticsConfig.getKey(), collector.getConfig().getKey());
-        Assert.assertEquals(analyticsConfig.getPlayerKey(), collector.getConfig().getPlayerKey());
 
         IBitmovinPlayerCollector collector2 = IBitmovinPlayerCollector.create(analyticsConfig, context);
         Assert.assertNotNull(collector2);
         Assert.assertEquals(analyticsConfig.getKey(), collector2.getConfig().getKey());
-        Assert.assertEquals(analyticsConfig.getPlayerKey(), collector2.getConfig().getPlayerKey());
     }
 }
