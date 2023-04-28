@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v2.17.0
+
 ### Changed
 - [internal] Bitmovin player collector depends on `player-core` package instead of `player`
 - All collectors use `compileOnly` dependency to players instead of `implementation`
