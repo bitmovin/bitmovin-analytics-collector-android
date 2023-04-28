@@ -25,16 +25,10 @@ internal class OfflineAuthenticatedDispatcher(
     private val eventQueue: AnalyticsEventQueue,
 ) : IEventDataDispatcher {
     private val backend: Backend
-    private val config: BitmovinAnalyticsConfig
-    private val callback: LicenseCallback?
-    private val context: Context
     private var operationMode = Unauthenticated
     private var sampleSequenceNumber = 0
 
     init {
-        this.config = config
-        this.callback = callback
-        this.context = context
         backend = backendFactory.createBackend(config, context)
     }
 
