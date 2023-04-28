@@ -23,6 +23,17 @@ object TestSources {
         210000,
     )
 
+    val DASH_LIVE = StreamData(
+        "avc1.",
+        "mp4a.40.2",
+        null,
+        null,
+        "https://livesim.dashif.org/livesim/testpic_2s/Manifest.mpd",
+        "dash",
+        true,
+        0,
+    )
+
     val PROGRESSIVE = StreamData(
         "avc1.",
         "mp4a.40.2",
