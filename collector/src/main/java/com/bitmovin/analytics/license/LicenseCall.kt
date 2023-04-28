@@ -16,7 +16,10 @@ import okhttp3.Callback
 import okhttp3.Response
 import java.io.IOException
 
-class LicenseCall(private val config: BitmovinAnalyticsConfig, private val context: Context) {
+class LicenseCall(
+    private val config: BitmovinAnalyticsConfig,
+    private val context: Context,
+) : ILicenseCall {
     private val backendUrl: String
     private val httpClient: HttpClient
 
@@ -36,7 +39,7 @@ class LicenseCall(private val config: BitmovinAnalyticsConfig, private val conte
         )
     }
 
-    fun authenticate(callback: AuthenticationCallback) {
+    override fun authenticate(callback: AuthenticationCallback) {
         val data = LicenseCallData(config.key, Util.analyticsVersion, Util.getDomain(context))
         val json = serialize(data)
         httpClient.post(
@@ -93,8 +96,6 @@ class LicenseCall(private val config: BitmovinAnalyticsConfig, private val conte
             },
         )
     }
-
-    companion object {
-        private const val TAG = "LicenseCall"
-    }
 }
+
+private const val TAG = "LicenseCall"
