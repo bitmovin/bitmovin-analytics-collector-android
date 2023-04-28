@@ -6,6 +6,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
 @RunWith(
     RobolectricTestRunner::class,
@@ -20,7 +21,7 @@ class DefaultEventDatabaseConnectionTest {
         val databaseConnection = DefaultEventDatabaseConnection(
             context = ApplicationProvider.getApplicationContext(),
             databaseName = UUID.randomUUID().toString(),
-            limitAgeInMillis = eventTimeLimit,
+            ageLimit = eventTimeLimit.milliseconds,
             maximumCountOfEvents = eventMaxCount,
         )
 
