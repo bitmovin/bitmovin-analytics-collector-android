@@ -4,7 +4,7 @@ import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
-import com.bitmovin.analytics.license.LicenseCall
+import com.bitmovin.analytics.license.DefaultLicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -57,7 +57,7 @@ class SimpleEventDataDispatcher(
     }
 
     override fun enable() {
-        val licenseCall = LicenseCall(config, context)
+        val licenseCall = DefaultLicenseCall(config, context)
         licenseCall.authenticate(this)
     }
 
