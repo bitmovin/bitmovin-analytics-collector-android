@@ -16,6 +16,7 @@ import com.bitmovin.analytics.data.SimpleEventDataDispatcher
 import com.bitmovin.analytics.features.FeatureManager
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.license.FeatureConfigContainer
+import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.persistence.OfflineAuthenticatedDispatcher
 import com.bitmovin.analytics.persistence.queue.InMemoryEventQueue
@@ -66,6 +67,7 @@ class BitmovinAnalytics
                     eventQueue,
                     true,
                 ),
+                LicenseCall(config, context),
                 eventQueue,
             )
         } else {
