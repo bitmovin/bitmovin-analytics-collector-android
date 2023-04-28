@@ -9,6 +9,7 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.IEventDataDispatcher
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
+import com.bitmovin.analytics.license.ILicenseCall
 import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.persistence.OperationMode.Authenticated
@@ -21,7 +22,7 @@ internal class OfflineAuthenticatedDispatcher(
     context: Context,
     callback: LicenseCallback?,
     backendFactory: BackendFactory,
-    private val licenseCall: LicenseCall,
+    private val licenseCall: ILicenseCall,
     private val eventQueue: AnalyticsEventQueue,
 ) : IEventDataDispatcher {
     private val backend: Backend
