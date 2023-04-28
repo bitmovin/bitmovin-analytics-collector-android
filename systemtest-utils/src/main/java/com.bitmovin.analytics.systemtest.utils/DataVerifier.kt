@@ -266,6 +266,15 @@ object DataVerifier {
     fun verifyInvariants(eventDataList: MutableList<EventData>) {
         verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList)
         verifyStateDurationsAreSetCorrectly(eventDataList)
+
+        // ivs is reporting videotime inconsistently for live samples, thus we skip this check for ivs live
+        // TODO: we also skip the check for the bitmovin player, since tests are unstable right now, needs to be investigated
+        // how we can improve the accuracy here.
+        if (!(eventDataList[0].isLive && eventDataList[0].player == "amazonivs") &&
+            eventDataList[0].player != "bitmovin"
+        ) {
+            verifyPlayingDurationCorrelatesWithVideoTimeStartAndEnd(eventDataList)
+        }
     }
 
     fun verifySubtitles(eventDataList: MutableList<EventData>, enabled: Boolean = false, language: String? = null) {
@@ -275,7 +284,7 @@ object DataVerifier {
         }
     }
 
-    fun verifyExactlyOneSeekingSample(eventDataList: MutableList<EventData>) {
+    fun verifyThereWasExactlyOneSeekingSample(eventDataList: MutableList<EventData>) {
         verifyOnlyOneSampleHasState(eventDataList, SEEKING)
     }
 
@@ -283,7 +292,7 @@ object DataVerifier {
         verifyOnlyOneSampleHasState(eventDataList, PAUSE)
     }
 
-    fun verifyAtLeastOnePlayingSample(eventDataList: MutableList<EventData>) {
+    fun verifyThereWasAtLeastOnePlayingSample(eventDataList: MutableList<EventData>) {
         verifyAtLeastOneSampleHasState(eventDataList, PLAYING)
     }
 
@@ -332,5 +341,14 @@ object DataVerifier {
                 fail<Nothing>("audio quality changed before qualitychangeevent")
             }
         }
+    }
+
+    private fun verifyPlayingDurationCorrelatesWithVideoTimeStartAndEnd(eventDataList: MutableList<EventData>) {
+        val playingEvents = eventDataList.filter { x -> x.state == PLAYING }
+        val playingStartEndDelta = playingEvents.sumOf { it.videoTimeEnd - it.videoTimeStart }
+        val playingDuration = playingEvents.sumOf { it.played }
+
+        // we use a range of -5% to +10% to account for some inaccuracies in the players
+        assertThat(playingStartEndDelta).isBetween((playingDuration * 0.95).toLong(), (playingDuration * 1.10).toLong())
     }
 }

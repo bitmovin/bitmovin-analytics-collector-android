@@ -54,7 +54,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vod_playPauseScenarioWithAutoPlay() {
+    fun test_vod_playPauseWithAutoPlay() {
         // arrange
         val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         defaultPlayer.config.playbackConfig.isAutoplayEnabled = true
@@ -114,7 +114,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vodWithDrm_playPauseScenarioWithAutoPlay() {
+    fun test_vodWithDrm_playPauseWithAutoPlay() {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
@@ -163,7 +163,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vod_playSeekScenarioWithAutoPlay() {
+    fun test_vod_playSeekWithAutoPlay() {
         // arrange
         val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
 
@@ -205,12 +205,12 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
 
         // verify samples states
-        DataVerifier.verifyAtLeastOnePlayingSample(eventDataList)
-        DataVerifier.verifyExactlyOneSeekingSample(eventDataList)
+        DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+        DataVerifier.verifyThereWasExactlyOneSeekingSample(eventDataList)
     }
 
     @Test
-    fun test_vod_playScenarioWithAutoplayAndMuted() {
+    fun test_vod_playWithAutoplayAndMuted() {
         // arrange
         val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
@@ -252,7 +252,61 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyInvariants(eventDataList)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)
-        DataVerifier.verifyAtLeastOnePlayingSample(eventDataList)
+        DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+        // verify that no other states than startup and playing were reached
+        assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
+    }
+
+    @Test
+    fun test_live_playWithAutoplayAndMuted() {
+        // arrange
+        val liveSample = TestSources.IVS_LIVE_1
+        val liveSource = Source.create(SourceConfig.fromUrl(liveSample.m3u8Url!!))
+        defaultAnalyticsConfig.isLive = true
+        defaultAnalyticsConfig.m3u8Url = liveSample.m3u8Url
+
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
+        val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
+        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
+        val localPlayer = Player.create(appContext, playerConfig)
+
+        // act
+        mainScope.launch {
+            collector.attachPlayer(localPlayer)
+            localPlayer.load(liveSource)
+        }
+
+        // play for 2 seconds
+        Thread.sleep(2000)
+
+        mainScope.launch {
+            localPlayer.pause()
+        }
+
+        // wait a bit to make sure last play sample is sent
+        Thread.sleep(500)
+
+        mainScope.launch {
+            collector.detachPlayer()
+            localPlayer.destroy()
+        }
+
+        // assert
+        val impressionList = LogParser.extractImpressions()
+        assertThat(impressionList.size).isEqualTo(1)
+
+        val impression = impressionList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        DataVerifier.verifyStaticData(eventDataList, defaultAnalyticsConfig, liveSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStartupSample(eventDataList[0])
+        DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+        DataVerifier.verifyInvariants(eventDataList)
+
+        EventDataUtils.filterNonDeterministicEvents(eventDataList)
+        DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
         // verify that no other states than startup and playing were reached
         assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
     }
