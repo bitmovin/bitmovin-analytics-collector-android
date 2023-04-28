@@ -84,6 +84,12 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+    androidTestImplementation "androidx.work:work-runtime-ktx:2.7.1"
+
+    // dependencies for ads systemtests
+    androidTestImplementation "com.google.ads.interactivemedia.v3:interactivemedia:${rootProject.ext.imaSdkVersion}"
+    androidTestImplementation "com.google.android.gms:play-services-ads:${rootProject.ext.playServicesAdsVersion}"
+    androidTestImplementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     androidTestImplementation project(':example-shared')
     androidTestImplementation project(':systemtest-utils')
