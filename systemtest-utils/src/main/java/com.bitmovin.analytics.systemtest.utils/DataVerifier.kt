@@ -240,6 +240,7 @@ object DataVerifier {
     fun verifyVideoStartEndTimesOnContinuousPlayback(eventDataList: MutableList<EventData>) {
         // TODO: we skip the startup sample here, since the videotime start and videotime end are sometimes not 0 for these (seen on bitmovin player)
         var previousVideoTimeEnd = eventDataList[0].videoTimeEnd
+        var previousWasAd = false
 
         for (eventData in eventDataList.subList(1, eventDataList.size)) {
             if (eventData.state != "seeking") { // on seeking we might not have monotonic increasing videostart and videoend
@@ -249,8 +250,16 @@ object DataVerifier {
                 // subsequent player.position calls after a seek, which affects the playing sample after the seek
                 assertThat(eventData.videoTimeStart).isLessThanOrEqualTo(eventData.videoTimeEnd + 5)
             }
-            assertThat(eventData.videoTimeStart).isEqualTo(previousVideoTimeEnd)
+
+            // we don't check for continous playback in case ad was played before
+            // since ads have startTime = endTime, but first sample after ad, has startTime that is a
+            // bit higher than endTime of ad
+            if (!previousWasAd) {
+                assertThat(eventData.videoTimeStart).isEqualTo(previousVideoTimeEnd)
+            }
+
             previousVideoTimeEnd = eventData.videoTimeEnd
+            previousWasAd = eventData.ad == 1
         }
     }
 

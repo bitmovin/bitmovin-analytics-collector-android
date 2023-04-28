@@ -14,6 +14,10 @@ import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
+import com.bitmovin.player.api.advertising.AdItem
+import com.bitmovin.player.api.advertising.AdSource
+import com.bitmovin.player.api.advertising.AdSourceType
+import com.bitmovin.player.api.advertising.AdvertisingConfig
 import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
@@ -24,6 +28,7 @@ import kotlinx.coroutines.launch
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -257,15 +262,81 @@ class PhoneBasicScenariosTest {
         assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
     }
 
+    @Ignore("ads currently don't work on gradle managed devices")
+    @Test
+    fun test_vodWithAds_playWithAutoplayAndMuted() {
+        // arrange
+        // https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/tags
+        val imaTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator="
+        val adSource = AdSource(AdSourceType.Ima, imaTag)
+
+        // Setup a pre-roll ad
+        val preRoll = AdItem("pre", adSource)
+        // play midroll after 3seconds
+        val midRoll = AdItem("3", adSource)
+        val advertisingConfig = AdvertisingConfig(preRoll, midRoll)
+
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
+        val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
+        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig, advertisingConfig = advertisingConfig)
+        val localPlayer = Player.create(appContext, playerConfig)
+
+        // act
+        mainScope.launch {
+            collector.attachPlayer(localPlayer)
+            localPlayer.load(defaultSource)
+        }
+
+        // wait until midRoll ad is played
+        waitUntilPlayerPlayedToMs(localPlayer, 8000)
+
+        mainScope.launch {
+            localPlayer.pause()
+        }
+
+        // wait a bit to make sure last play sample is sent
+        Thread.sleep(500)
+
+        mainScope.launch {
+            collector.detachPlayer()
+            localPlayer.destroy()
+        }
+
+        // assert
+        val impressionList = LogParser.extractImpressions()
+        assertThat(impressionList.size).isEqualTo(1)
+
+        val impression = impressionList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        // we expect 2 adEventData to be sent
+        assertThat(impression.adEventDataList.size).isEqualTo(2)
+        val eventDataWithAdState = impression.eventDataList.filter { x -> x.ad == 1 }
+        assertThat(eventDataWithAdState.size).isEqualTo(2)
+
+        val eventDataList = impression.eventDataList
+        DataVerifier.verifyStaticData(eventDataList, defaultAnalyticsConfig, defaultSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStartupSample(eventDataList[0])
+        DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+        DataVerifier.verifyInvariants(eventDataList)
+
+        EventDataUtils.filterNonDeterministicEvents(eventDataList)
+        DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+        // verify that no other states than startup, playing and ad were reached
+        assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" && x.state != "ad" }.size).isEqualTo(0)
+    }
+
     @Test
     fun test_live_playWithAutoplayAndMuted() {
         // arrange
-        val liveSample = TestSources.IVS_LIVE_1
-        val liveSource = Source.create(SourceConfig.fromUrl(liveSample.m3u8Url!!))
-        defaultAnalyticsConfig.isLive = true
-        defaultAnalyticsConfig.m3u8Url = liveSample.m3u8Url
+        val liveSample = TestSources.DASH_LIVE
+        val liveSource = Source.create(SourceConfig.fromUrl(liveSample.mpdUrl!!))
+        val localAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(null)
+        localAnalyticsConfig.isLive = true
+        localAnalyticsConfig.mpdUrl = liveSample.mpdUrl
 
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
+        val collector = IBitmovinPlayerCollector.create(localAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
         val localPlayer = Player.create(appContext, playerConfig)
@@ -276,7 +347,9 @@ class PhoneBasicScenariosTest {
             localPlayer.load(liveSource)
         }
 
-        // play for 2 seconds
+        waitUntilPlaybackStarted(localPlayer)
+
+        // wait a bit for livestream to start playing
         Thread.sleep(2000)
 
         mainScope.launch {
@@ -501,12 +574,6 @@ class PhoneBasicScenariosTest {
         mainScope.launch {
             collector.attachPlayer(defaultPlayer)
             defaultPlayer.load(nonExistingSource)
-        }
-
-        // wait 2 seconds for loading to be done and to start without autoplay
-        Thread.sleep(2000)
-
-        mainScope.launch {
             defaultPlayer.play()
         }
 
@@ -575,9 +642,15 @@ class PhoneBasicScenariosTest {
         PlaybackUtils.waitUntil { !player.isPlaying }
     }
 
+    private fun waitUntilPlaybackStarted(player: Player) {
+        PlaybackUtils.waitUntil { player.isPlaying }
+    }
+
     private fun waitUntilPlayerPlayedToMs(player: Player, playedTo: Long) {
         PlaybackUtils.waitUntil { player.isPlaying }
-        PlaybackUtils.waitUntil { player.currentTime > (playedTo / 1000).toDouble() }
+
+        // we ignore ads here to make sure the player is actual playing to position on source
+        PlaybackUtils.waitUntil { player.currentTime > (playedTo / 1000).toDouble() && !player.isAd }
     }
 
     private fun waitUntilPlayerIsPaused(player: Player) {
