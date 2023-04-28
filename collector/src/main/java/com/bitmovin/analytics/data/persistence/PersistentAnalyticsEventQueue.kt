@@ -39,7 +39,7 @@ private fun EventDatabaseEntry.toEventData() = DataSerializer.deserialize(
 )
 
 private fun AdEventData.toEventDatabaseEntry() = EventDatabaseEntry(
-    -1, // TODO
+    -1, // TODO: time in AdEventData is nullable. Discuss this.
     DataSerializer.serialize(this)!!,
 )
 
