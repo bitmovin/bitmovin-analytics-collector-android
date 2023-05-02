@@ -43,8 +43,8 @@ internal class OfflineAuthenticatedDispatcher(
         val success = when (response) {
             is AuthenticationResponse.Granted -> {
                 callback?.configureFeatures(
-                    true,
-                    response.featureConfigContainer,
+                    authenticated = true,
+                    featureConfigs = response.featureConfigContainer,
                 )
                 operationMode = Authenticated
                 true
@@ -52,8 +52,8 @@ internal class OfflineAuthenticatedDispatcher(
 
             is AuthenticationResponse.Denied -> {
                 callback?.configureFeatures(
-                    false,
-                    null,
+                    authenticated = false,
+                    featureConfigs = null,
                 )
                 operationMode = Disabled
                 eventQueue.clear()
