@@ -65,11 +65,10 @@ internal class ConsumeOnlyPersistentCacheBackend(
     override fun sendAd(eventData: AdEventData) = sendAd(eventData, null, null)
 
     private fun sendNextCachedEvent() {
-        val eventData: EventData? = eventQueue.popEvent()
-        eventData?.run {
+        eventQueue.popEvent()?.let { eventData ->
             send(eventData)
-        } ?: eventQueue.popAdEvent()?.let {
-            sendAd(it)
+        } ?: eventQueue.popAdEvent()?.let { adEventData ->
+            sendAd(adEventData)
         }
     }
 }
