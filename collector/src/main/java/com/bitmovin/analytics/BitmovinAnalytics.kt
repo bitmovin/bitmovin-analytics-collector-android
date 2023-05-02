@@ -34,7 +34,7 @@ class BitmovinAnalytics
  * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
  * @param context [Context]
  */
-    (val config: BitmovinAnalyticsConfig, val context: Context) : LicenseCallback {
+(val config: BitmovinAnalyticsConfig, val context: Context) : LicenseCallback {
     private val debugCallback: DebugCallback = object : DebugCallback {
         override fun dispatchEventData(data: EventData) {
             eventBus.notify(DebugListener::class) { it.onDispatchEventData(data) }
@@ -73,7 +73,7 @@ class BitmovinAnalytics
                 context = context,
                 config = config,
                 callback = this,
-                backendFactory = BackendFactory(eventQueue)
+                backendFactory = BackendFactory(eventQueue),
             )
         },
         debugCallback,
@@ -153,7 +153,7 @@ class BitmovinAnalytics
             playerAdapter?.stateMachine?.changeCustomData(
                 playerAdapter?.position ?: 0,
                 customData,
-                setCustomDataFunction
+                setCustomDataFunction,
             )
         }
 
@@ -194,7 +194,7 @@ class BitmovinAnalytics
 
     override fun configureFeatures(
         authenticated: Boolean,
-        featureConfigs: FeatureConfigContainer?
+        featureConfigs: FeatureConfigContainer?,
     ) {
         featureManager.configureFeatures(authenticated, featureConfigs)
     }
