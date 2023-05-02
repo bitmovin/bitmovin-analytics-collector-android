@@ -30,7 +30,6 @@ class SimpleEventDataDispatcher(
         this.config = config
         this.callback = callback
         this.context = context
-        // TODO queue should be the same instance as for offline
         backend = backendFactory.createBackend(config, context)
     }
 
