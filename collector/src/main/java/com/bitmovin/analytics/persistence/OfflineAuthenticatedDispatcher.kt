@@ -91,13 +91,12 @@ internal class OfflineAuthenticatedDispatcher(
 
     override fun addAd(data: AdEventData) {
         when (operationMode) {
+            Disabled -> return
             Authenticated -> backend.sendAd(data)
             Unauthenticated -> {
                 eventQueue.push(data)
                 licenseCall.authenticate(authenticationCallback)
             }
-
-            Disabled -> return
         }
     }
 
