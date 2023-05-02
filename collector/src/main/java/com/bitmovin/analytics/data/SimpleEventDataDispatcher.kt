@@ -10,8 +10,8 @@ import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class SimpleEventDataDispatcher(
-    config: BitmovinAnalyticsConfig,
     context: Context,
+    config: BitmovinAnalyticsConfig,
     callback: LicenseCallback?,
     backendFactory: BackendFactory,
 ) : IEventDataDispatcher, AuthenticationCallback {

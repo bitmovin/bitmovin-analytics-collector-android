@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.license
 
-interface AuthenticationCallback {
+fun interface AuthenticationCallback {
     fun authenticationCompleted(response: AuthenticationResponse)
 }
 
