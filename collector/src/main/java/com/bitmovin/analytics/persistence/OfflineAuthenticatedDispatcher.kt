@@ -17,8 +17,8 @@ import com.bitmovin.analytics.persistence.OperationMode.Unauthenticated
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 
 internal class OfflineAuthenticatedDispatcher(
-    config: BitmovinAnalyticsConfig,
     context: Context,
+    config: BitmovinAnalyticsConfig,
     callback: LicenseCallback?,
     backendFactory: BackendFactory,
     private val eventQueue: AnalyticsEventQueue,
