@@ -20,6 +20,9 @@ internal class ConsumeOnlyPersistentCacheBackend(
     private val eventQueue: ConsumeOnlyAnalyticsEventQueue,
 ) : Backend, CallbackBackend {
 
+    // A channel that can only hold one element, can be used
+    // to "merge" multiple signals into one. Avoiding many parallel
+    // code executions.
     private val cacheFlushChannel = Channel<Boolean>(
         capacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
