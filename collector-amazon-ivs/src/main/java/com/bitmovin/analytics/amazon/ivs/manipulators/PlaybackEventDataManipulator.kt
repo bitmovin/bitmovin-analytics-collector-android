@@ -15,12 +15,17 @@ internal class PlaybackEventDataManipulator(
     override fun manipulate(data: EventData) {
         try {
             data.isMuted = player.isMuted
-            data.videoDuration = player.duration
-
             // IVS player only supports HLS, thus we hardcode it here
             data.streamFormat = StreamFormat.HLS.value
 
             setLive(data)
+
+            // for live streams, we set duration to 0 to be consistent with other players and platforms
+            if (data.isLive) {
+                data.videoDuration = 0
+            } else {
+                data.videoDuration = player.duration
+            }
         } catch (e: Exception) {
             Log.e("PlaybackDataManipulator", "Something went wrong while setting playback event data, e: ${e.message}", e)
         }

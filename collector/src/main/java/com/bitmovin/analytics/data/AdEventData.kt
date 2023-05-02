@@ -42,7 +42,7 @@ data class AdEventData(
     var started: Long? = 0,
     var streamFormat: String? = null,
     var surveyUrl: String? = null,
-    var time: Long? = null,
+    val time: Long = Util.timestamp,
     var timePlayed: Long? = null,
     var universalAdIdRegistry: String? = null,
     var universalAdIdValue: String? = null,

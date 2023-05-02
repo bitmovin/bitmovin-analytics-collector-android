@@ -6,11 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v2.17.0
+
 ### Changed
-- [internal] Bitmovin player collector relies on `player-core` package
-- All collector use `compileOnly` dependency to player
-- Updated to latest bitmovin player (v3.36.0)
-- Upgrade to use latest exoplayer version (v2.18.6)
+- [internal] Bitmovin player collector depends on `player-core` package instead of `player`
+- All collectors use `compileOnly` dependency to players instead of `implementation`
+- Upgrade example app to latest bitmovin player (v3.37.0)
+- Upgrade example app to latest exoplayer version (v2.18.6)
+- IVS Player and ExoPlayer: Streamlined reporting of video duration for live streams to be 0, to be consistent with other players/platforms
 
 ## v2.16.0
 

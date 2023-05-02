@@ -10,8 +10,8 @@ import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class SimpleEventDataDispatcher(
-    config: BitmovinAnalyticsConfig,
     context: Context,
+    config: BitmovinAnalyticsConfig,
     callback: LicenseCallback?,
     backendFactory: BackendFactory,
 ) : IEventDataDispatcher, AuthenticationCallback {
@@ -30,7 +30,6 @@ class SimpleEventDataDispatcher(
         this.config = config
         this.callback = callback
         this.context = context
-        // TODO queue should be the same instance as for offline
         backend = backendFactory.createBackend(config, context)
     }
 
