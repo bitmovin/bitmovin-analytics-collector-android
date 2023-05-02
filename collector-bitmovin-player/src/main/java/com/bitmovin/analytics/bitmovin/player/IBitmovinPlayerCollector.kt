@@ -5,6 +5,7 @@ import com.bitmovin.analytics.AnalyticsCollector
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.config.SourceMetadata
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.source.Source
 
@@ -30,6 +31,7 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
             return BitmovinPlayerCollector(config, context)
         }
 
+        @InternalBitmovinApi
         @JvmStatic
         fun create(config: AnalyticsConfig, context: Context): IBitmovinPlayerCollector {
             return BitmovinPlayerCollector(BitmovinAnalyticsConfig(config), context)

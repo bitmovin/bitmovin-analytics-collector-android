@@ -2,8 +2,10 @@ package com.bitmovin.analytics.api
 
 import android.os.Parcelable
 import com.bitmovin.analytics.CollectorConfig
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import kotlinx.parcelize.Parcelize
 
+@InternalBitmovinApi
 @Parcelize
 data class AnalyticsConfig
 @JvmOverloads

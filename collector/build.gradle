@@ -28,6 +28,7 @@ android {
 
     kotlinOptions {
         jvmTarget = rootProject.ext.targetCompatibility
+        freeCompilerArgs += "-Xopt-in=com.bitmovin.analytics.internal.InternalBitmovinApi"
     }
 
     testOptions {

@@ -5,6 +5,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.enums.PlayerType
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
 
 class BitmovinAnalyticsConfig() : Parcelable {
@@ -381,6 +382,7 @@ class BitmovinAnalyticsConfig() : Parcelable {
         /**
          * This acts as constructor, but is just a helper function to convert an [AnalyticsConfig] to [BitmovinAnalyticsConfig]
          */
+        @InternalBitmovinApi
         operator fun invoke(analyticsConfig: AnalyticsConfig): BitmovinAnalyticsConfig =
             BitmovinAnalyticsConfig(
                 analyticsConfig.key
@@ -421,7 +423,8 @@ class BitmovinAnalyticsConfig() : Parcelable {
                 randomizeUserId = analyticsConfig.randomizeUserId
                 config = CollectorConfig().apply {
                     backendUrl = analyticsConfig.backendUrl
-                    tryResendDataOnFailedConnection = analyticsConfig.tryResendDataOnFailedConnection
+                    tryResendDataOnFailedConnection =
+                        analyticsConfig.tryResendDataOnFailedConnection
                 }
             }
     }
