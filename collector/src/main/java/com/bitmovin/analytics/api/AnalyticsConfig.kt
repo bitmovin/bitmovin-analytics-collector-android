@@ -194,5 +194,5 @@ constructor(
     /**
      * Specifies if failed requests should be resent again.
      */
-    val tryResendDataOnFailedConnection: Boolean = false
+    val tryResendDataOnFailedConnection: Boolean = false,
 ) : Parcelable

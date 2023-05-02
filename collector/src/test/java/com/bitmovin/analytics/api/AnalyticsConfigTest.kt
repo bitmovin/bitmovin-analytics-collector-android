@@ -49,7 +49,7 @@ class AnalyticsConfigTest {
             ads = true,
             randomizeUserId = true,
             backendUrl = randomString(),
-            tryResendDataOnFailedConnection = true
+            tryResendDataOnFailedConnection = true,
         )
 
         val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig(config)
@@ -92,7 +92,7 @@ class AnalyticsConfigTest {
         Assert.assertEquals(config.backendUrl, bitmovinAnalyticsConfig.config.backendUrl)
         Assert.assertEquals(
             config.tryResendDataOnFailedConnection,
-            bitmovinAnalyticsConfig.config.tryResendDataOnFailedConnection
+            bitmovinAnalyticsConfig.config.tryResendDataOnFailedConnection,
         )
     }
 }

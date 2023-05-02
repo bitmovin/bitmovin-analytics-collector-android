@@ -6,7 +6,7 @@ package com.bitmovin.analytics.internal
  */
 @RequiresOptIn(
     level = RequiresOptIn.Level.ERROR,
-    message = "The API is for Bitmovin internal usage only and must not be used otherwise."
+    message = "The API is for Bitmovin internal usage only and must not be used otherwise.",
 )
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)

@@ -385,7 +385,7 @@ class BitmovinAnalyticsConfig() : Parcelable {
         @InternalBitmovinApi
         operator fun invoke(analyticsConfig: AnalyticsConfig): BitmovinAnalyticsConfig =
             BitmovinAnalyticsConfig(
-                analyticsConfig.key
+                analyticsConfig.key,
             ).apply {
                 cdnProvider = analyticsConfig.cdnProvider
                 customData1 = analyticsConfig.customData1
