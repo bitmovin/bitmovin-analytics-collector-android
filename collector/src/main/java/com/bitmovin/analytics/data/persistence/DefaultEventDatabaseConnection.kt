@@ -59,7 +59,7 @@ internal class DefaultEventDatabaseConnection(
     companion object {
         private const val VERSION = 1
         private const val TAG = "EventDatabase"
-        private const val DEFAULT_AGE_LIMIT: Duration = 30L.days
+        private val DEFAULT_AGE_LIMIT: Duration = 30L.days
         private const val MAX_COUNT = 10_000
     }
 
