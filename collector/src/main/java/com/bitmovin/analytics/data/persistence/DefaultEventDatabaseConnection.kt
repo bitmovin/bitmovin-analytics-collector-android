@@ -14,12 +14,12 @@ import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_TIME
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_INTERNAL_ID
 import com.bitmovin.analytics.data.persistence.TableDefinition.TABLE_NAME
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.days
 
 internal class DefaultEventDatabaseConnection(
     context: Context,
     databaseName: String,
-    private val ageLimit: Duration = DEFAULT_LIMIT_AGE_IN_MS.milliseconds,
+    private val ageLimit: Duration = DEFAULT_AGE_LIMIT,
     private val maximumCountOfEvents: Int = MAX_COUNT,
 ) : EventDatabaseConnection {
 
@@ -59,7 +59,7 @@ internal class DefaultEventDatabaseConnection(
     companion object {
         private const val VERSION = 1
         private const val TAG = "EventDatabase"
-        private const val DEFAULT_LIMIT_AGE_IN_MS: Long = 30L * 24L * 60L * 60L * 1000L
+        private const val DEFAULT_AGE_LIMIT: Duration = 30L.days
         private const val MAX_COUNT = 10_000
     }
 
