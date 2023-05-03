@@ -9,16 +9,13 @@ import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.contentValuesOf
 import androidx.core.database.sqlite.transaction
-import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_DATA
-import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_TIMESTAMP
-import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_INTERNAL_ID
-import com.bitmovin.analytics.data.persistence.TableDefinition.TABLE_NAME
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
 internal class DefaultEventDatabaseConnection(
     context: Context,
-    databaseName: String,
+    private val table: Table,
+    private val databaseName: String = "eventDatabase.sqlite",
     private val ageLimit: Duration = DEFAULT_AGE_LIMIT,
     private val maximumCountOfEvents: Int = MAX_COUNT,
 ) : EventDatabaseConnection {
@@ -32,23 +29,7 @@ internal class DefaultEventDatabaseConnection(
         /* version = */ VERSION,
     ) {
         override fun onCreate(db: SQLiteDatabase) {
-            db.execSQL(
-                """
-            CREATE TABLE IF NOT EXISTS $TABLE_NAME
-            (
-            $COLUMN_INTERNAL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-             $COLUMN_EVENT_DATA TEXT,
-             $COLUMN_EVENT_TIMESTAMP INTEGER
-            );
-                """.trimIndent(),
-            )
-
-            db.execSQL(
-                """
-            CREATE INDEX IF NOT EXISTS ${TABLE_NAME}_$COLUMN_EVENT_TIMESTAMP
-            ON $TABLE_NAME($COLUMN_EVENT_TIMESTAMP);
-                """.trimIndent(),
-            )
+            Table.values().forEach { it.create(db) }
         }
 
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -56,22 +37,15 @@ internal class DefaultEventDatabaseConnection(
         }
     }
 
-    companion object {
-        private const val VERSION = 1
-        private const val TAG = "EventDatabase"
-        private val DEFAULT_AGE_LIMIT: Duration = 30L.days
-        private const val MAX_COUNT = 10_000
-    }
-
     override fun push(entry: EventDatabaseEntry): Boolean = catchingTransaction {
         cleanupDatabase()
         val rowId = db.insert(
-            /* table = */ TABLE_NAME,
+            /* table = */ table.tableName,
             /* nullColumnHack = */ null,
             /* values = */
             contentValuesOf(
-                COLUMN_EVENT_DATA to entry.data,
-                COLUMN_EVENT_TIMESTAMP to entry.eventTimestamp,
+                table.COLUMN_EVENT_DATA to entry.data,
+                table.COLUMN_EVENT_TIMESTAMP to entry.eventTimestamp,
             ),
         )
         rowId != -1L
@@ -80,16 +54,28 @@ internal class DefaultEventDatabaseConnection(
     override fun pop(): EventDatabaseEntry? = catchingTransaction {
         cleanupDatabase()
         val rows = db.query(
-            /* table = */ TABLE_NAME,
-            /* columns = */ arrayOf(COLUMN_INTERNAL_ID, COLUMN_EVENT_TIMESTAMP, COLUMN_EVENT_DATA),
-            /* selection = */ null,
-            /* selectionArgs = */ null,
-            /* groupBy = */ null,
-            /* having = */ null,
-            /* orderBy = */ "$COLUMN_EVENT_TIMESTAMP ASC",
-            /* limit = */ "1",
+            /* table = */
+            table.tableName,
+            /* columns = */
+            arrayOf(
+                table.COLUMN_INTERNAL_ID,
+                table.COLUMN_EVENT_TIMESTAMP,
+                table.COLUMN_EVENT_DATA
+            ),
+            /* selection = */
+            null,
+            /* selectionArgs = */
+            null,
+            /* groupBy = */
+            null,
+            /* having = */
+            null,
+            /* orderBy = */
+            "${table.COLUMN_EVENT_TIMESTAMP} ASC",
+            /* limit = */
+            "1",
         ).use {
-            it.parseRows()
+            it.getAllRows()
         }
 
         if (rows.size != 1) {
@@ -98,8 +84,8 @@ internal class DefaultEventDatabaseConnection(
         val row = rows.first()
 
         val affectedRows = db.delete(
-            /* table = */ TABLE_NAME,
-            /* whereClause = */ "$COLUMN_INTERNAL_ID = ?",
+            /* table = */ table.tableName,
+            /* whereClause = */ "${table.COLUMN_INTERNAL_ID} = ?",
             /* whereArgs = */ arrayOf(row.internalId.toString()),
         )
         if (affectedRows != 1) {
@@ -112,16 +98,28 @@ internal class DefaultEventDatabaseConnection(
     override fun purge(): List<EventDatabaseEntry> = catchingTransaction {
         cleanupDatabase()
         val rows: List<Row> = db.query(
-            /* table = */ TABLE_NAME,
-            /* columns = */ arrayOf(COLUMN_INTERNAL_ID, COLUMN_EVENT_TIMESTAMP, COLUMN_EVENT_DATA),
-            /* selection = */ null,
-            /* selectionArgs = */ null,
-            /* groupBy = */ null,
-            /* having = */ null,
-            /* orderBy = */ "$COLUMN_EVENT_TIMESTAMP ASC",
-            /* limit = */ null,
+            /* table = */
+            table.tableName,
+            /* columns = */
+            arrayOf(
+                table.COLUMN_INTERNAL_ID,
+                table.COLUMN_EVENT_TIMESTAMP,
+                table.COLUMN_EVENT_DATA
+            ),
+            /* selection = */
+            null,
+            /* selectionArgs = */
+            null,
+            /* groupBy = */
+            null,
+            /* having = */
+            null,
+            /* orderBy = */
+            "${table.COLUMN_EVENT_TIMESTAMP} ASC",
+            /* limit = */
+            null,
         ).use {
-            it.parseRows()
+            it.getAllRows()
         }
 
         // it is not possible to delete more than 999 elements at a time (delete by ID)
@@ -130,9 +128,12 @@ internal class DefaultEventDatabaseConnection(
             .chunked(999)
             .forEach { subList ->
                 val affectedRows = db.delete(
-                    /* table = */ TABLE_NAME,
-                    /* whereClause = */ "$COLUMN_INTERNAL_ID in (${subList.joinToString { "?" }})",
-                    /* whereArgs = */subList.map { it.internalId.toString() }.toTypedArray(),
+                    /* table = */
+                    table.tableName,
+                    /* whereClause = */
+                    "${table.COLUMN_INTERNAL_ID} in (${subList.joinToString { "?" }})",
+                    /* whereArgs = */
+                    subList.map { it.internalId.toString() }.toTypedArray(),
                 )
                 if (affectedRows != subList.size) {
                     // Deletion didn't work -> throw to cancel the transaction
@@ -142,15 +143,15 @@ internal class DefaultEventDatabaseConnection(
         rows.map { it.entry }
     } ?: emptyList()
 
-    private fun Cursor.parseRows(): List<Row> {
+    private fun Cursor.getAllRows(): List<Row> {
         if (!moveToFirst()) {
             return mutableListOf()
         }
         val rows = ArrayList<Row>(count)
         while (!isAfterLast) {
-            val internalId = getLong(getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
-            val eventTimestamp = getLong(getColumnIndexOrThrow(COLUMN_EVENT_TIMESTAMP))
-            val eventData = getString(getColumnIndexOrThrow(COLUMN_EVENT_DATA))
+            val internalId = getLong(getColumnIndexOrThrow(table.COLUMN_INTERNAL_ID))
+            val eventTimestamp = getLong(getColumnIndexOrThrow(table.COLUMN_EVENT_TIMESTAMP))
+            val eventData = getString(getColumnIndexOrThrow(table.COLUMN_EVENT_DATA))
             rows.add(Row(internalId, EventDatabaseEntry(eventTimestamp, eventData)))
             moveToNext()
         }
@@ -158,8 +159,10 @@ internal class DefaultEventDatabaseConnection(
     }
 
     private fun Transaction.cleanupDatabase() {
-        cleanupByTime(ageLimit)
-        cleanupByCount(maximumCountOfEvents)
+        Table.values().forEach { table ->
+            table.cleanupByTime(db, ageLimit)
+            table.cleanupByCount(db, maximumCountOfEvents)
+        }
     }
 
     private fun <T> catchingTransaction(block: Transaction.() -> T): T? {
@@ -181,51 +184,95 @@ internal class DefaultEventDatabaseConnection(
         // otherwise (during normal app runtime) the connection to the database stays alive the whole app lifetime!
         dbHelper.close()
     }
+
+    companion object {
+        private const val VERSION = 1
+        private const val TAG = "EventDatabase"
+        val DEFAULT_AGE_LIMIT: Duration = 30L.days
+        const val MAX_COUNT = 10_000
+    }
 }
 
 @JvmInline
-private value class Transaction(val db: SQLiteDatabase)
+internal value class Transaction(val db: SQLiteDatabase)
 
-private fun Transaction.cleanupByTime(ageLimit: Duration) {
-    val now = System.currentTimeMillis()
-    db.delete(
-        /* table = */ TABLE_NAME,
-        /* whereClause = */ "$COLUMN_EVENT_TIMESTAMP < ?",
-        /* whereArgs = */ arrayOf((now - ageLimit.inWholeMilliseconds).toString()),
-    )
-}
+internal sealed class Table(
+    val tableName: String,
+    val COLUMN_INTERNAL_ID: String = "_id",
+    val COLUMN_EVENT_DATA: String = "event_data",
+    val COLUMN_EVENT_TIMESTAMP: String = "event_timestamp",
+) {
 
-private fun Transaction.cleanupByCount(maximumCountOfEvents: Int) {
-    // query the maximum count + 1, get the internal id of it, and delete every event which was inserted before this element
-    val deleteStartWith: Long = db.query(
-        /* table = */ TABLE_NAME,
-        /* columns = */ arrayOf(COLUMN_INTERNAL_ID),
-        /* selection = */ null,
-        /* selectionArgs = */ null,
-        /* groupBy = */ null,
-        /* having = */ null,
-        /* orderBy = */ "$COLUMN_INTERNAL_ID DESC",
-        /* limit = */ (maximumCountOfEvents + 1).toString(),
-    ).use {
-        if (it.count <= maximumCountOfEvents) {
-            return@use null
-        }
-        if (!it.moveToLast()) {
-            return@use null
-        }
-        return@use it.getLong(it.getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
-    } ?: return
+    object Events : Table(tableName = "events")
+    object AdEvents : Table(tableName = "adEvents")
 
-    db.delete(
-        /* table = */ TABLE_NAME,
-        /* whereClause = */ "$COLUMN_INTERNAL_ID <= ?",
-        /* whereArgs = */ arrayOf(deleteStartWith.toString()),
-    )
-}
+    /**
+     * Creates a table to the provided [db]
+     */
+    fun create(db: SQLiteDatabase) = with(db) {
+        execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS $tableName
+            (
+            $COLUMN_INTERNAL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+             $COLUMN_EVENT_DATA TEXT,
+             $COLUMN_EVENT_TIMESTAMP INTEGER
+            );
+                """.trimIndent(),
+        )
 
-private object TableDefinition {
-    const val TABLE_NAME = "event"
-    const val COLUMN_INTERNAL_ID = "_id"
-    const val COLUMN_EVENT_DATA = "event_data"
-    const val COLUMN_EVENT_TIMESTAMP = "event_timestamp"
+        execSQL(
+            """
+            CREATE INDEX IF NOT EXISTS ${tableName}_$COLUMN_EVENT_TIMESTAMP
+            ON $tableName($COLUMN_EVENT_TIMESTAMP);
+                """.trimIndent(),
+        )
+    }
+
+    fun cleanupByTime(
+        db: SQLiteDatabase,
+        ageLimit: Duration
+    ) {
+        val now = System.currentTimeMillis()
+        db.delete(
+            /* table = */ tableName,
+            /* whereClause = */ "$COLUMN_EVENT_TIMESTAMP < ?",
+            /* whereArgs = */ arrayOf((now - ageLimit.inWholeMilliseconds).toString()),
+        )
+    }
+
+    fun cleanupByCount(
+        db: SQLiteDatabase,
+        maximumCountOfEvents: Int
+    ) {
+        // query the maximum count + 1, get the internal id of it, and delete every event which was inserted before this element
+        val deleteStartWith: Long = db.query(
+            /* table = */ tableName,
+            /* columns = */ arrayOf(COLUMN_INTERNAL_ID),
+            /* selection = */ null,
+            /* selectionArgs = */ null,
+            /* groupBy = */ null,
+            /* having = */ null,
+            /* orderBy = */ "$COLUMN_INTERNAL_ID DESC",
+            /* limit = */ (maximumCountOfEvents + 1).toString(),
+        ).use {
+            if (it.count <= maximumCountOfEvents) {
+                return@use null
+            }
+            if (!it.moveToLast()) {
+                return@use null
+            }
+            return@use it.getLong(it.getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
+        } ?: return
+
+        db.delete(
+            /* table = */ tableName,
+            /* whereClause = */ "$COLUMN_INTERNAL_ID <= ?",
+            /* whereArgs = */ arrayOf(deleteStartWith.toString()),
+        )
+    }
+
+    companion object {
+        fun values() = listOf(Events, AdEvents)
+    }
 }

@@ -20,6 +20,7 @@ class DefaultEventDatabaseConnectionTest {
     ) {
         val databaseConnection = DefaultEventDatabaseConnection(
             context = ApplicationProvider.getApplicationContext(),
+            table = Table.Events,
             databaseName = UUID.randomUUID().toString(),
             ageLimit = eventTimeLimit.milliseconds,
             maximumCountOfEvents = eventMaxCount,

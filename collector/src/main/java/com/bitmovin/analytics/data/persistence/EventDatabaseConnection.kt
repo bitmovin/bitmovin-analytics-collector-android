@@ -1,6 +1,9 @@
 package com.bitmovin.analytics.data.persistence
 
-internal data class EventDatabaseEntry(val eventTimestamp: Long, val data: String)
+internal data class EventDatabaseEntry(
+    val eventTimestamp: Long,
+    val data: String
+)
 
 internal interface EventDatabaseConnection {
     /**
@@ -21,3 +24,4 @@ internal interface EventDatabaseConnection {
      */
     fun purge(): List<EventDatabaseEntry>
 }
+
