@@ -1,102 +1,20 @@
 package com.bitmovin.analytics.data.persistence
 
-import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
-import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
-import androidx.annotation.VisibleForTesting
 import androidx.core.content.contentValuesOf
-import androidx.core.database.sqlite.transaction
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
 
-internal class DefaultEventDatabaseConnection(
-    context: Context,
-    private val table: Table,
-    private val databaseName: String = "eventDatabase.sqlite",
-    private val ageLimit: Duration = DEFAULT_AGE_LIMIT,
-    private val maximumCountOfEvents: Int = MAX_COUNT,
-) : EventDatabaseConnection {
-
-    private val dbHelper = object : SQLiteOpenHelper(
-        /* context = */ context,
-        /* name = */ databaseName,
-        /* factory = */ null,
-        /* version = */ VERSION,
-    ) {
-        override fun onCreate(db: SQLiteDatabase) {
-            Table.values().forEach { it.create(db) }
-        }
-
-        override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-            // nothing to do yet
-        }
-    }
-
-    override fun push(entry: EventDatabaseEntry): Boolean = catchingTransaction {
-        cleanupDatabase()
-        table.push(transaction = this, entry = entry)
-    } ?: false
-
-    override fun pop(): EventDatabaseEntry? = catchingTransaction {
-        cleanupDatabase()
-        table.pop(transaction = this)
-    }
-
-    override fun purge(): List<EventDatabaseEntry> = catchingTransaction {
-        cleanupDatabase()
-        table.purge(transaction = this)
-    } ?: emptyList()
-
-    private fun Transaction.cleanupDatabase() {
-        Table.values().forEach { table ->
-            table.cleanupByTime(transaction = this, ageLimit)
-            table.cleanupByCount(transaction = this, maximumCountOfEvents)
-        }
-    }
-
-    private fun <T> catchingTransaction(block: Transaction.() -> T): T? {
-        return try {
-            dbHelper.writableDatabase.transaction {
-                Transaction(this).block()
-            }
-        } catch (e: Exception) {
-            // database exception -> transaction is cancelled, just log (should never happen on real devices)
-            Log.d(TAG, "Transaction failed", e)
-            e.printStackTrace()
-            null
-        }
-    }
-
-    @VisibleForTesting
-    fun close() {
-        // this is only necessary for robolectric tests.
-        // otherwise (during normal app runtime) the connection to the database stays alive the whole app lifetime!
-        dbHelper.close()
-    }
-
-    companion object {
-        private const val VERSION = 1
-        private const val TAG = "EventDatabase"
-        val DEFAULT_AGE_LIMIT: Duration = 30L.days
-        const val MAX_COUNT = 10_000
-    }
-}
-
-@JvmInline
-internal value class Transaction(val db: SQLiteDatabase)
-
-internal sealed class Table(
+internal sealed class EventDatabaseTable(
     val tableName: String,
     private val COLUMN_INTERNAL_ID: String = "_id",
     private val COLUMN_EVENT_DATA: String = "event_data",
     private val COLUMN_EVENT_TIMESTAMP: String = "event_timestamp",
 ) : EventDatabaseTableOperation {
 
-    object Events : Table(tableName = "events")
-    object AdEvents : Table(tableName = "adEvents")
+    object Events : EventDatabaseTable(tableName = "events")
+    object AdEvents : EventDatabaseTable(tableName = "adEvents")
 
     /**
      * Creates a table to the provided [db]
@@ -290,6 +208,6 @@ internal sealed class Table(
     }
 
     companion object {
-        fun values() = listOf(Events, AdEvents)
+        val allTables = listOf(Events, AdEvents)
     }
 }

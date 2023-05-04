@@ -6,7 +6,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.util.UUID
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @RunWith(
     RobolectricTestRunner::class,
@@ -14,18 +16,13 @@ import kotlin.time.Duration.Companion.milliseconds
 class DefaultEventDatabaseConnectionTest {
 
     private fun databaseTest(
-        eventTimeLimit: Long = Long.MAX_VALUE,
+        eventTimeLimit: Duration = Duration.INFINITE,
         eventMaxCount: Int = Int.MAX_VALUE,
         block: EventDatabaseConnection.() -> Unit,
     ) {
-        val databaseConnection = DefaultEventDatabaseConnection(
-            context = ApplicationProvider.getApplicationContext(),
-            table = Table.Events,
-            databaseName = UUID.randomUUID().toString(),
-            ageLimit = eventTimeLimit.milliseconds,
-            maximumCountOfEvents = eventMaxCount,
-        )
-
+        val databaseConnection = EventDatabase.getInstance(ApplicationProvider.getApplicationContext())
+        databaseConnection.ageLimit = eventTimeLimit
+        databaseConnection.maxEntries = eventMaxCount
         block(databaseConnection)
         databaseConnection.close()
     }
@@ -66,7 +63,7 @@ class DefaultEventDatabaseConnectionTest {
     }
 
     @Test
-    fun testPurgeEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1000) {
+    fun testPurgeEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1.toDuration(DurationUnit.SECONDS)) {
         // insert multiple and wait for "expiration" -> should be completely clean
         push(createRandomEvent())
         push(createRandomEvent())
@@ -96,7 +93,7 @@ class DefaultEventDatabaseConnectionTest {
     }
 
     @Test
-    fun testPopEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1000) {
+    fun testPopEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1.toDuration(DurationUnit.SECONDS)) {
         // insert multiple and wait for "expiration" -> should be completely clean
         push(createRandomEvent())
         push(createRandomEvent())

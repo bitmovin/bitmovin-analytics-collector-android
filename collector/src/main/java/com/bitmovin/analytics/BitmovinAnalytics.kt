@@ -52,12 +52,7 @@ class BitmovinAnalytics
     private val featureManager = FeatureManager<FeatureConfigContainer>()
     private val eventBus = EventBus()
 
-    private val eventQueue = EventDatabase.getInstance(context).let {
-        PersistentAnalyticsEventQueue(
-            it.eventData,
-            it.adEventData,
-        )
-    }
+    private val eventQueue = PersistentAnalyticsEventQueue(EventDatabase.getInstance(context))
 
     @Suppress("ConstantConditionIf")
     private val eventDataDispatcher = DebuggingEventDataDispatcher(
