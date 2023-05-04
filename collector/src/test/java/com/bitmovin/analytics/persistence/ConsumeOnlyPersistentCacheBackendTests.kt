@@ -64,7 +64,7 @@ class ConsumeOnlyPersistentCacheBackendTests {
 
     @Test
     fun `when a new EventData is sent successfully all enqueued Events and AdEvents get sent`() {
-        testAdditionalSendingHappens(TestFactory.createEventData())
+        testAdditionalSendingHappens(TestFactory.createEventData(impressionId = "new-id"))
     }
 
     @Test
@@ -74,7 +74,7 @@ class ConsumeOnlyPersistentCacheBackendTests {
 
     @Test
     fun `when EventData failed to be sent additional sending shouldn't happen`() {
-        testNoAdditionalSendingHappens(TestFactory.createEventData())
+        testNoAdditionalSendingHappens(TestFactory.createEventData(impressionId = "new-id"))
     }
 
     @Test
@@ -128,7 +128,7 @@ class ConsumeOnlyPersistentCacheBackendTests {
         requireEventDataOrAdEventData(newEvent)
 
         val testQueue = InMemoryEventQueue()
-        val enqueuedEvent = TestFactory.createEventData()
+        val enqueuedEvent = TestFactory.createEventData(impressionId = "enqueuedId")
         val enqueuedAdEvent = TestFactory.createAdEventData("enqueuedAdId")
         val enqueuedEventCount = 2
         val enqueuedAdEventCount = 2
