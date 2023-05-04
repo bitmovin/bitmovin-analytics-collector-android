@@ -14,6 +14,11 @@ private const val VERSION = 1
 private val DEFAULT_AGE_LIMIT: Duration = 30L.days
 private const val DEFAULT_MAX_ENTRIES = 10_000
 
+internal data class RetentionConfig(
+    val ageLimit: Duration,
+    val maximumEntriesPerType: Int,
+)
+
 internal class EventDatabase private constructor(context: Context) : EventDatabaseConnection {
     private val dbHelper = object : SQLiteOpenHelper(
         /* context = */ context.applicationContext,
@@ -30,20 +35,10 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
         }
     }
 
-    var ageLimit: Duration = DEFAULT_AGE_LIMIT
+    var retentionConfig: RetentionConfig = RetentionConfig(DEFAULT_AGE_LIMIT, DEFAULT_MAX_ENTRIES)
         set(value) {
             field = value
-            dbHelper.catchingTransaction {
-                cleanupDatabase()
-            }
-        }
-
-    var maxEntries: Int = DEFAULT_MAX_ENTRIES
-        set(value) {
-            field = value
-            dbHelper.catchingTransaction {
-                cleanupDatabase()
-            }
+            dbHelper.catchingTransaction { cleanupDatabase() }
         }
 
     override fun push(entry: EventDatabaseEntry): Boolean = dbHelper.catchingTransaction {
@@ -71,9 +66,16 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
     } ?: 0
 
     private fun Transaction.cleanupDatabase() {
+        val deletableSessionIds = EventDatabaseTable.allTables.first().findPurgableSessions(
+            transaction = this,
+            retentionConfig = retentionConfig,
+        )
+        if (deletableSessionIds.isEmpty()) return
         EventDatabaseTable.allTables.forEach { table ->
-            table.cleanupByAge(transaction = this, ageLimit = ageLimit)
-            table.cleanupByCount(transaction = this, maximumCountOfEvents = maxEntries)
+            table.deleteSessions(
+                transaction = this,
+                sessions = deletableSessionIds,
+            )
         }
     }
 

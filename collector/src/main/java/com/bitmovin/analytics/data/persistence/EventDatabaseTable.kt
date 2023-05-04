@@ -94,7 +94,62 @@ internal sealed class EventDatabaseTable(
         return transaction.db.delete(tableName, null, null)
     }
 
-    override fun cleanupByAge(
+    override fun deleteSessions(transaction: Transaction, sessions: List<String>) {
+        transaction.db.delete(
+            /* table = */ tableName,
+            /* whereClause = */ "$COLUMN_SESSION_ID in (${sessions.joinToString { "?" }})",
+            /* whereArgs = */ sessions.toTypedArray(),
+        )
+    }
+
+    override fun findPurgableSessions(
+        transaction: Transaction,
+        retentionConfig: RetentionConfig,
+    ) = listOf(
+        findSessionsOutsideTheCountLimit(transaction, retentionConfig),
+        findSessionsBeyondTheAgeLimit(transaction, retentionConfig),
+    ).flatten()
+
+    private fun findSessionsOutsideTheCountLimit(
+        transaction: Transaction,
+        retentionConfig: RetentionConfig,
+    ): List<String> = transaction.db.query(
+        /* table = */ tableName,
+        /* columns = */ arrayOf(COLUMN_SESSION_ID),
+        /* selection = */ null,
+        /* selectionArgs = */ null,
+        /* groupBy = */ null,
+        /* having = */ null,
+        /* orderBy = */ "$COLUMN_EVENT_TIMESTAMP DESC",
+        /* limit = */ "${retentionConfig.maximumEntriesPerType},1",
+    ).use {
+        if (!it.moveToLast()) null else it.getString(it.getColumnIndexOrThrow(COLUMN_SESSION_ID))
+    }?.let {
+        listOf(it)
+    } ?: emptyList()
+
+    private fun findSessionsBeyondTheAgeLimit(
+        transaction: Transaction,
+        retentionConfig: RetentionConfig,
+    ): List<String> {
+        val now = System.currentTimeMillis()
+        return transaction.db.query(
+            /* table = */ tableName,
+            /* columns = */ arrayOf(COLUMN_SESSION_ID),
+            /* selection = */ "$COLUMN_EVENT_TIMESTAMP <= ?",
+            /* selectionArgs = */ arrayOf(
+                (now - retentionConfig.ageLimit.inWholeMilliseconds).toString(),
+            ),
+            /* groupBy = */ COLUMN_SESSION_ID,
+            /* having = */ null,
+            /* orderBy = */ null,
+            /* limit = */ null,
+        ).use {
+            it.getStrings(it.getColumnIndexOrThrow(COLUMN_SESSION_ID))
+        }
+    }
+
+    private fun cleanupByAge(
         transaction: Transaction,
         ageLimit: Duration,
     ) {
@@ -106,26 +161,20 @@ internal sealed class EventDatabaseTable(
         )
     }
 
-    override fun cleanupByCount(
-        transaction: Transaction,
-        maximumCountOfEvents: Int,
-    ) {
-        // get the newest `maximumCountOfEvents` + 1 entry and delete all entries
-        // that have the same session
-        transaction.db.execSQL(
-            """
-               DELETE FROM $tableName 
-               WHERE $COLUMN_SESSION_ID 
-               IN ( 
-               SELECT $COLUMN_SESSION_ID FROM $tableName 
-               ORDER BY timestamp DESC 
-               LIMIT 1 OFFSET $maximumCountOfEvents
-               )
-            """.trimIndent()
-        )
-    }
-
     private data class Row(val internalId: Long, val entry: EventDatabaseEntry)
+
+    private fun Cursor.getStrings(columnIndex: Int): List<String> {
+        if (!moveToFirst()) {
+            return mutableListOf()
+        }
+        val rows = ArrayList<String>(count)
+        while (!isAfterLast) {
+            val value = getString(columnIndex)
+            rows.add(value)
+            moveToNext()
+        }
+        return rows.toList()
+    }
 
     private fun Cursor.getAllRows(): List<Row> {
         if (!moveToFirst()) {
