@@ -44,7 +44,7 @@ class PersistentCacheBackendTests {
 
     @Test
     fun `calling sendAd calls CallbackBackend_sendAd`() {
-        val event = AdEventData()
+        val event = TestFactory.createAdEventData()
 
         backend.sendAd(event, null, null)
 
