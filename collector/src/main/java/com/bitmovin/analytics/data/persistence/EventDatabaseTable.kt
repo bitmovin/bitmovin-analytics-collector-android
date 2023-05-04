@@ -51,26 +51,14 @@ internal sealed class EventDatabaseTable(
 
     override fun pop(transaction: Transaction): EventDatabaseEntry? {
         val rows = transaction.db.query(
-            /* table = */
-            tableName,
-            /* columns = */
-            arrayOf(
-                COLUMN_INTERNAL_ID,
-                COLUMN_EVENT_TIMESTAMP,
-                COLUMN_EVENT_DATA,
-            ),
-            /* selection = */
-            null,
-            /* selectionArgs = */
-            null,
-            /* groupBy = */
-            null,
-            /* having = */
-            null,
-            /* orderBy = */
-            "$COLUMN_EVENT_TIMESTAMP ASC",
-            /* limit = */
-            "1",
+            /* table = */ tableName,
+            /* columns = */ arrayOf(COLUMN_INTERNAL_ID, COLUMN_EVENT_TIMESTAMP, COLUMN_EVENT_DATA),
+            /* selection = */ null,
+            /* selectionArgs = */ null,
+            /* groupBy = */ null,
+            /* having = */ null,
+            /* orderBy = */ "$COLUMN_EVENT_TIMESTAMP ASC",
+            /* limit = */ "1",
         ).use {
             it.getAllRows()
         }
@@ -92,8 +80,9 @@ internal sealed class EventDatabaseTable(
         return row.entry
     }
 
-    override fun purge(transaction: Transaction): Int =
-        transaction.db.delete(tableName, null, null)
+    override fun purge(transaction: Transaction): Int {
+        return transaction.db.delete(tableName, null, null)
+    }
 
     override fun cleanupByAge(
         transaction: Transaction,
