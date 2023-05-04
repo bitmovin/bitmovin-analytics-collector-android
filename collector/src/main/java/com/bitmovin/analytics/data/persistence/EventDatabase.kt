@@ -10,6 +10,10 @@ import kotlin.time.Duration.Companion.days
 @JvmInline
 internal value class Transaction(val db: SQLiteDatabase)
 
+private const val VERSION = 1
+private val DEFAULT_AGE_LIMIT: Duration = 30L.days
+private const val DEFAULT_MAX_ENTRIES = 10_000
+
 internal class EventDatabase private constructor(context: Context) : EventDatabaseConnection {
     private val dbHelper = object : SQLiteOpenHelper(
         /* context = */ context.applicationContext,
@@ -81,11 +85,6 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
     }
 
     companion object {
-        private const val VERSION = 1
-        private const val TAG = "EventDatabase"
-        val DEFAULT_AGE_LIMIT: Duration = 30L.days
-        const val DEFAULT_MAX_ENTRIES = 10_000
-
         private var instance: EventDatabase? = null
 
         fun getInstance(context: Context): EventDatabase {
