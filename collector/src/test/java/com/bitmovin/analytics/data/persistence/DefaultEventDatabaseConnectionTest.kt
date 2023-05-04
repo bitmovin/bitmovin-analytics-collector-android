@@ -62,7 +62,7 @@ class DefaultEventDatabaseConnectionTest {
     }
 
     @Test
-     fun testPurgeEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1.toDuration(DurationUnit.SECONDS)) {
+    fun testPurgeEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1.toDuration(DurationUnit.SECONDS)) {
         // insert multiple and wait for "expiration" -> should be completely clean
         push(createRandomEvent())
         push(createRandomEvent())
