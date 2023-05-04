@@ -58,7 +58,7 @@ class PersistentAnalyticsEventQueueTest {
         eventQueue.push(event)
 
         verify {
-            eventDatabase.push(eventDatabaseEntry)
+            adEventDatabase.push(eventDatabaseEntry)
         }
     }
 

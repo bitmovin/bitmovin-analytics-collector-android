@@ -14,6 +14,7 @@ internal class EventDatabase private constructor(context: Context) {
 
     companion object {
         private var instance: EventDatabase? = null
+
         fun getInstance(context: Context): EventDatabase {
             if (instance == null) {
                 synchronized(EventDatabase::class) {

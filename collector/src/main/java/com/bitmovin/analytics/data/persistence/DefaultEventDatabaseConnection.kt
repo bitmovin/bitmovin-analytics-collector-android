@@ -20,8 +20,6 @@ internal class DefaultEventDatabaseConnection(
     private val maximumCountOfEvents: Int = MAX_COUNT,
 ) : EventDatabaseConnection {
 
-    private data class Row(val internalId: Long, val entry: EventDatabaseEntry)
-
     private val dbHelper = object : SQLiteOpenHelper(
         /* context = */ context,
         /* name = */ databaseName,
@@ -39,129 +37,23 @@ internal class DefaultEventDatabaseConnection(
 
     override fun push(entry: EventDatabaseEntry): Boolean = catchingTransaction {
         cleanupDatabase()
-        val rowId = db.insert(
-            /* table = */ table.tableName,
-            /* nullColumnHack = */ null,
-            /* values = */
-            contentValuesOf(
-                table.COLUMN_EVENT_DATA to entry.data,
-                table.COLUMN_EVENT_TIMESTAMP to entry.eventTimestamp,
-            ),
-        )
-        rowId != -1L
+        table.push(transaction = this, entry = entry)
     } ?: false
 
     override fun pop(): EventDatabaseEntry? = catchingTransaction {
         cleanupDatabase()
-        val rows = db.query(
-            /* table = */
-            table.tableName,
-            /* columns = */
-            arrayOf(
-                table.COLUMN_INTERNAL_ID,
-                table.COLUMN_EVENT_TIMESTAMP,
-                table.COLUMN_EVENT_DATA
-            ),
-            /* selection = */
-            null,
-            /* selectionArgs = */
-            null,
-            /* groupBy = */
-            null,
-            /* having = */
-            null,
-            /* orderBy = */
-            "${table.COLUMN_EVENT_TIMESTAMP} ASC",
-            /* limit = */
-            "1",
-        ).use {
-            it.getAllRows()
-        }
-
-        if (rows.size != 1) {
-            return@catchingTransaction null
-        }
-        val row = rows.first()
-
-        val affectedRows = db.delete(
-            /* table = */ table.tableName,
-            /* whereClause = */ "${table.COLUMN_INTERNAL_ID} = ?",
-            /* whereArgs = */ arrayOf(row.internalId.toString()),
-        )
-        if (affectedRows != 1) {
-            // Deletion didn't work -> throw to cancel the transaction
-            throw SQLiteException("Cannot delete row")
-        }
-        row.entry
+        table.pop(transaction = this)
     }
 
     override fun purge(): List<EventDatabaseEntry> = catchingTransaction {
         cleanupDatabase()
-        val rows: List<Row> = db.query(
-            /* table = */
-            table.tableName,
-            /* columns = */
-            arrayOf(
-                table.COLUMN_INTERNAL_ID,
-                table.COLUMN_EVENT_TIMESTAMP,
-                table.COLUMN_EVENT_DATA
-            ),
-            /* selection = */
-            null,
-            /* selectionArgs = */
-            null,
-            /* groupBy = */
-            null,
-            /* having = */
-            null,
-            /* orderBy = */
-            "${table.COLUMN_EVENT_TIMESTAMP} ASC",
-            /* limit = */
-            null,
-        ).use {
-            it.getAllRows()
-        }
-
-        // it is not possible to delete more than 999 elements at a time (delete by ID)
-        // this number is hardcoded in `sqlite3.c`, see here: https://stackoverflow.com/a/15313495/21555458
-        rows
-            .chunked(999)
-            .forEach { subList ->
-                val affectedRows = db.delete(
-                    /* table = */
-                    table.tableName,
-                    /* whereClause = */
-                    "${table.COLUMN_INTERNAL_ID} in (${subList.joinToString { "?" }})",
-                    /* whereArgs = */
-                    subList.map { it.internalId.toString() }.toTypedArray(),
-                )
-                if (affectedRows != subList.size) {
-                    // Deletion didn't work -> throw to cancel the transaction
-                    throw SQLiteException("Cannot delete all rows")
-                }
-            }
-        rows.map { it.entry }
+        table.purge(transaction = this)
     } ?: emptyList()
-
-    private fun Cursor.getAllRows(): List<Row> {
-        if (!moveToFirst()) {
-            return mutableListOf()
-        }
-        val rows = ArrayList<Row>(count)
-        while (!isAfterLast) {
-            val internalId = getLong(getColumnIndexOrThrow(table.COLUMN_INTERNAL_ID))
-            val eventTimestamp = getLong(getColumnIndexOrThrow(table.COLUMN_EVENT_TIMESTAMP))
-            val eventData = getString(getColumnIndexOrThrow(table.COLUMN_EVENT_DATA))
-            rows.add(Row(internalId, EventDatabaseEntry(eventTimestamp, eventData)))
-            moveToNext()
-        }
-        return rows
-    }
 
     private fun Transaction.cleanupDatabase() {
         Table.values().forEach { table ->
-            table.cleanupByTime(db, ageLimit)
-            table.cleanupByCount(db, maximumCountOfEvents)
+            table.cleanupByTime(transaction = this, ageLimit)
+            table.cleanupByCount(transaction = this, maximumCountOfEvents)
         }
     }
 
@@ -198,10 +90,10 @@ internal value class Transaction(val db: SQLiteDatabase)
 
 internal sealed class Table(
     val tableName: String,
-    val COLUMN_INTERNAL_ID: String = "_id",
-    val COLUMN_EVENT_DATA: String = "event_data",
-    val COLUMN_EVENT_TIMESTAMP: String = "event_timestamp",
-) {
+    private val COLUMN_INTERNAL_ID: String = "_id",
+    private val COLUMN_EVENT_DATA: String = "event_data",
+    private val COLUMN_EVENT_TIMESTAMP: String = "event_timestamp",
+) : EventDatabaseTableOperation {
 
     object Events : Table(tableName = "events")
     object AdEvents : Table(tableName = "adEvents")
@@ -229,24 +121,127 @@ internal sealed class Table(
         )
     }
 
-    fun cleanupByTime(
-        db: SQLiteDatabase,
+    override fun push(transaction: Transaction, entry: EventDatabaseEntry): Boolean {
+        val rowId = transaction.db.insert(
+            /* table = */ tableName,
+            /* nullColumnHack = */ null,
+            /* values = */
+            contentValuesOf(
+                COLUMN_EVENT_DATA to entry.data,
+                COLUMN_EVENT_TIMESTAMP to entry.eventTimestamp,
+            ),
+        )
+        return rowId != -1L
+    }
+
+    override fun pop(transaction: Transaction): EventDatabaseEntry? {
+        val rows = transaction.db.query(
+            /* table = */
+            tableName,
+            /* columns = */
+            arrayOf(
+                COLUMN_INTERNAL_ID,
+                COLUMN_EVENT_TIMESTAMP,
+                COLUMN_EVENT_DATA
+            ),
+            /* selection = */
+            null,
+            /* selectionArgs = */
+            null,
+            /* groupBy = */
+            null,
+            /* having = */
+            null,
+            /* orderBy = */
+            "$COLUMN_EVENT_TIMESTAMP ASC",
+            /* limit = */
+            "1",
+        ).use {
+            it.getAllRows()
+        }
+
+        if (rows.size != 1) {
+            return null
+        }
+        val row = rows.first()
+
+        val affectedRows = transaction.db.delete(
+            /* table = */ tableName,
+            /* whereClause = */ "$COLUMN_INTERNAL_ID = ?",
+            /* whereArgs = */ arrayOf(row.internalId.toString()),
+        )
+        if (affectedRows != 1) {
+            // Deletion didn't work -> throw to cancel the transaction
+            throw SQLiteException("Cannot delete row")
+        }
+        return row.entry
+    }
+
+    override fun purge(transaction: Transaction): List<EventDatabaseEntry> {
+        val rows: List<Row> = transaction.db.query(
+            /* table = */
+            tableName,
+            /* columns = */
+            arrayOf(
+                COLUMN_INTERNAL_ID,
+                COLUMN_EVENT_TIMESTAMP,
+                COLUMN_EVENT_DATA
+            ),
+            /* selection = */
+            null,
+            /* selectionArgs = */
+            null,
+            /* groupBy = */
+            null,
+            /* having = */
+            null,
+            /* orderBy = */
+            "$COLUMN_EVENT_TIMESTAMP ASC",
+            /* limit = */
+            null,
+        ).use {
+            it.getAllRows()
+        }
+
+        // it is not possible to delete more than 999 elements at a time (delete by ID)
+        // this number is hardcoded in `sqlite3.c`, see here: https://stackoverflow.com/a/15313495/21555458
+        rows
+            .chunked(999)
+            .forEach { subList ->
+                val affectedRows = transaction.db.delete(
+                    /* table = */
+                    tableName,
+                    /* whereClause = */
+                    "$COLUMN_INTERNAL_ID in (${subList.joinToString { "?" }})",
+                    /* whereArgs = */
+                    subList.map { it.internalId.toString() }.toTypedArray(),
+                )
+                if (affectedRows != subList.size) {
+                    // Deletion didn't work -> throw to cancel the transaction
+                    throw SQLiteException("Cannot delete all rows")
+                }
+            }
+        return rows.map { it.entry }
+    }
+
+    override fun cleanupByTime(
+        transaction: Transaction,
         ageLimit: Duration
     ) {
         val now = System.currentTimeMillis()
-        db.delete(
+        transaction.db.delete(
             /* table = */ tableName,
             /* whereClause = */ "$COLUMN_EVENT_TIMESTAMP < ?",
             /* whereArgs = */ arrayOf((now - ageLimit.inWholeMilliseconds).toString()),
         )
     }
 
-    fun cleanupByCount(
-        db: SQLiteDatabase,
+    override fun cleanupByCount(
+        transaction: Transaction,
         maximumCountOfEvents: Int
     ) {
         // query the maximum count + 1, get the internal id of it, and delete every event which was inserted before this element
-        val deleteStartWith: Long = db.query(
+        val deleteStartWith: Long = transaction.db.query(
             /* table = */ tableName,
             /* columns = */ arrayOf(COLUMN_INTERNAL_ID),
             /* selection = */ null,
@@ -265,11 +260,33 @@ internal sealed class Table(
             return@use it.getLong(it.getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
         } ?: return
 
-        db.delete(
+        transaction.db.delete(
             /* table = */ tableName,
             /* whereClause = */ "$COLUMN_INTERNAL_ID <= ?",
             /* whereArgs = */ arrayOf(deleteStartWith.toString()),
         )
+    }
+
+    private data class Row(val internalId: Long, val entry: EventDatabaseEntry)
+
+    private fun Cursor.getAllRows(): List<Row> {
+        if (!moveToFirst()) {
+            return mutableListOf()
+        }
+        val rows = ArrayList<Row>(count)
+        while (!isAfterLast) {
+            val internalId = getLong(getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
+            val eventTimestamp = getLong(getColumnIndexOrThrow(COLUMN_EVENT_TIMESTAMP))
+            val eventData = getString(getColumnIndexOrThrow(COLUMN_EVENT_DATA))
+            rows.add(
+                Row(
+                    internalId,
+                    EventDatabaseEntry(eventTimestamp, eventData)
+                )
+            )
+            moveToNext()
+        }
+        return rows
     }
 
     companion object {

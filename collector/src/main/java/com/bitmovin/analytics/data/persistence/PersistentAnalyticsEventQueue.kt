@@ -15,7 +15,7 @@ internal class PersistentAnalyticsEventQueue(
     }
 
     override fun push(event: AdEventData) {
-        eventDatabase.push(event.toEventDatabaseEntry())
+        adEventDatabase.push(event.toEventDatabaseEntry())
     }
 
     override fun clear() {
