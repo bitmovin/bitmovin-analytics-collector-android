@@ -15,21 +15,27 @@ import com.bitmovin.analytics.persistence.OperationMode.Authenticated
 import com.bitmovin.analytics.persistence.OperationMode.Disabled
 import com.bitmovin.analytics.persistence.OperationMode.Unauthenticated
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
+import com.bitmovin.analytics.utils.ScopeProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 
 internal class OfflineAuthenticatedDispatcher(
-    context: Context,
-    config: BitmovinAnalyticsConfig,
+    private val context: Context,
+    private val config: BitmovinAnalyticsConfig,
     callback: LicenseCallback?,
-    backendFactory: BackendFactory,
+    private val backendFactory: BackendFactory,
     private val licenseCall: LicenseCall,
     private val eventQueue: AnalyticsEventQueue,
+    private val scopeProvider: ScopeProvider,
 ) : IEventDataDispatcher {
-    private val backend: Backend
+    private var scope: CoroutineScope
+    private var backend: Backend
     private var operationMode = Unauthenticated
     private var sampleSequenceNumber = 0
 
     init {
-        backend = backendFactory.createBackend(config, context)
+        scope = scopeProvider.createMainScope()
+        backend = backendFactory.createBackend(config, context, scope)
     }
 
     private val authenticationCallback = AuthenticationCallback { response ->
@@ -48,7 +54,7 @@ internal class OfflineAuthenticatedDispatcher(
                     authenticated = false,
                     featureConfigs = null,
                 )
-                operationMode = Disabled
+                disable()
                 eventQueue.clear()
                 false
             }
@@ -62,9 +68,12 @@ internal class OfflineAuthenticatedDispatcher(
 
     override fun enable() {
         operationMode = Unauthenticated
+        scope = scopeProvider.createMainScope()
+        backend = backendFactory.createBackend(config, context, scope)
     }
 
     override fun disable() {
+        scope.cancel()
         operationMode = Disabled
         sampleSequenceNumber = 0
     }
