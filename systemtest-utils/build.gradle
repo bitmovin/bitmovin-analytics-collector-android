@@ -27,5 +27,5 @@ dependencies {
     implementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     implementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     implementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
 }
