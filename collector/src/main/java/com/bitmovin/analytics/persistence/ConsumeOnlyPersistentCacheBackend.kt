@@ -7,12 +7,15 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.OnSuccessCallback
 import com.bitmovin.analytics.persistence.queue.ConsumeOnlyAnalyticsEventQueue
+import kotlinx.coroutines.CompletionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 private typealias Signal = Unit
 
@@ -22,10 +25,10 @@ internal class ConsumeOnlyPersistentCacheBackend(
     private val eventQueue: ConsumeOnlyAnalyticsEventQueue,
 ) : Backend, CallbackBackend {
 
-    private val cacheFlushChannel = Channel<Signal>(
-        capacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
+    // A channel that can only hold one element. Can be used
+    // to conflate multiple signals into one.
+    // Allows for self sustaining sequential flush loop as long the consuming code is blocking.
+    private val cacheFlushChannel = Channel<Signal>(capacity = Channel.CONFLATED)
 
     init {
         cacheFlushChannel
@@ -66,11 +69,38 @@ internal class ConsumeOnlyPersistentCacheBackend(
 
     override fun sendAd(eventData: AdEventData) = sendAd(eventData, null, null)
 
-    private fun sendNextCachedEvent() {
-        eventQueue.popEvent()?.let { eventData ->
-            send(eventData)
-        } ?: eventQueue.popAdEvent()?.let { adEventData ->
-            sendAd(adEventData)
-        }
+    private suspend fun sendNextCachedEvent() = eventQueue.popEvent()?.let { eventData ->
+        sendSuspended(eventData)
+    } ?: eventQueue.popAdEvent()?.let { adEventData ->
+        sendAdSuspended(adEventData)
+    } ?: false
+}
+
+private suspend fun CallbackBackend.sendSuspended(
+    eventData: EventData,
+): Boolean = suspendCoroutine { continuation ->
+    val callback = ContinuationCallback(continuation)
+    send(eventData, callback, callback)
+}
+
+private suspend fun CallbackBackend.sendAdSuspended(
+    adEventData: AdEventData,
+): Boolean = suspendCoroutine { continuation ->
+    val callback = ContinuationCallback(continuation)
+    sendAd(adEventData, callback, callback)
+}
+
+private class ContinuationCallback(
+    private val continuation: Continuation<Boolean>,
+) : CompletionHandler, OnFailureCallback, OnSuccessCallback {
+    override fun invoke(cause: Throwable?) {}
+
+    override fun onFailure(e: Exception, cancel: () -> Unit) {
+        cancel()
+        continuation.resume(false)
+    }
+
+    override fun onSuccess() {
+        continuation.resume(true)
     }
 }
