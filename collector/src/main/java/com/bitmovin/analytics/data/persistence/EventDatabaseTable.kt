@@ -110,30 +110,18 @@ internal sealed class EventDatabaseTable(
         transaction: Transaction,
         maximumCountOfEvents: Int,
     ) {
-        // query the maximum count + 1, get the internal id of it, and delete every event which was inserted before this element
-        val deleteStartWith: Long = transaction.db.query(
-            /* table = */ tableName,
-            /* columns = */ arrayOf(COLUMN_INTERNAL_ID),
-            /* selection = */ null,
-            /* selectionArgs = */ null,
-            /* groupBy = */ null,
-            /* having = */ null,
-            /* orderBy = */ "$COLUMN_INTERNAL_ID DESC",
-            /* limit = */ (maximumCountOfEvents + 1).toString(),
-        ).use {
-            if (it.count <= maximumCountOfEvents) {
-                return@use null
-            }
-            if (!it.moveToLast()) {
-                return@use null
-            }
-            return@use it.getLong(it.getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
-        } ?: return
-
-        transaction.db.delete(
-            /* table = */ tableName,
-            /* whereClause = */ "$COLUMN_INTERNAL_ID <= ?",
-            /* whereArgs = */ arrayOf(deleteStartWith.toString()),
+        // get the newest `maximumCountOfEvents` + 1 entry and delete all entries
+        // that have the same session
+        transaction.db.execSQL(
+            """
+               DELETE FROM $tableName 
+               WHERE $COLUMN_SESSION_ID 
+               IN ( 
+               SELECT $COLUMN_SESSION_ID FROM $tableName 
+               ORDER BY timestamp DESC 
+               LIMIT 1 OFFSET $maximumCountOfEvents
+               )
+            """.trimIndent()
         )
     }
 
