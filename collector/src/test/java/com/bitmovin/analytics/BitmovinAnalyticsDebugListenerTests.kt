@@ -1,6 +1,6 @@
 package com.bitmovin.analytics
 
-import android.app.Activity
+import android.content.Context
 import com.bitmovin.analytics.data.BackendFactory
 import io.mockk.every
 import io.mockk.mockk
@@ -17,7 +17,10 @@ class BitmovinAnalyticsDebugListenerTests {
     fun setup() {
         mockkConstructor(BackendFactory::class)
         every { anyConstructed<BackendFactory>().createBackend(any(), any()) } returns mockk(relaxed = true)
-        analytics = BitmovinAnalytics(config, Activity())
+        val context = mockk<Context> {
+            every { applicationContext } returns mockk()
+        }
+        analytics = BitmovinAnalytics(config, context)
     }
 
     @Test
