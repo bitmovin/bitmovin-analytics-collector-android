@@ -51,7 +51,7 @@ class PersistentAnalyticsEventQueueTest {
     fun `pushing an AdEventData pushes an according AdEventDatabaseEntry to the event database`() {
         val event = TestFactory.createAdEventData()
         val eventDatabaseEntry = EventDatabaseEntry(
-            -1,
+            event.time,
             DataSerializer.serialize(event)!!,
         )
 
@@ -90,7 +90,7 @@ class PersistentAnalyticsEventQueueTest {
     fun `popping an AdEventData pops from the event database`() {
         val event = TestFactory.createAdEventData()
         val eventDatabaseEntry = EventDatabaseEntry(
-            -1, // TODO: time in AdEventData is nullable. Discuss this.
+            event.time,
             DataSerializer.serialize(event)!!,
         )
         every { adEventDatabase.pop() } returns eventDatabaseEntry
