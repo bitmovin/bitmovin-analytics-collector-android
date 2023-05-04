@@ -163,7 +163,8 @@ class DefaultEventDatabaseConnectionTest {
 
     private fun createRandomEvent(): EventDatabaseEntry =
         EventDatabaseEntry(
-            System.currentTimeMillis(),
-            UUID.randomUUID().toString(),
+            sessionId = UUID.randomUUID().toString(),
+            eventTimestamp = System.currentTimeMillis(),
+            data = UUID.randomUUID().toString(),
         )
 }

@@ -6,11 +6,13 @@ import android.database.sqlite.SQLiteException
 import androidx.core.content.contentValuesOf
 import kotlin.time.Duration
 
+private const val COLUMN_INTERNAL_ID: String = "_id"
+private const val COLUMN_SESSION_ID: String = "session_id"
+private const val COLUMN_EVENT_TIMESTAMP: String = "event_timestamp"
+private const val COLUMN_EVENT_DATA: String = "event_data"
+
 internal sealed class EventDatabaseTable(
     val tableName: String,
-    private val COLUMN_INTERNAL_ID: String = "_id",
-    private val COLUMN_EVENT_DATA: String = "event_data",
-    private val COLUMN_EVENT_TIMESTAMP: String = "event_timestamp",
 ) : EventDatabaseTableOperation {
 
     object Events : EventDatabaseTable(tableName = "events")
@@ -22,8 +24,9 @@ internal sealed class EventDatabaseTable(
             CREATE TABLE IF NOT EXISTS $tableName
             (
             $COLUMN_INTERNAL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-             $COLUMN_EVENT_DATA TEXT,
-             $COLUMN_EVENT_TIMESTAMP INTEGER
+             $COLUMN_SESSION_ID TEXT,
+             $COLUMN_EVENT_TIMESTAMP INTEGER,
+             $COLUMN_EVENT_DATA TEXT
             );
             """.trimIndent(),
         )
@@ -42,8 +45,9 @@ internal sealed class EventDatabaseTable(
             /* nullColumnHack = */ null,
             /* values = */
             contentValuesOf(
-                COLUMN_EVENT_DATA to entry.data,
+                COLUMN_SESSION_ID to entry.sessionId,
                 COLUMN_EVENT_TIMESTAMP to entry.eventTimestamp,
+                COLUMN_EVENT_DATA to entry.data,
             ),
         )
         return rowId != -1L
@@ -52,7 +56,13 @@ internal sealed class EventDatabaseTable(
     override fun pop(transaction: Transaction): EventDatabaseEntry? {
         val rows = transaction.db.query(
             /* table = */ tableName,
-            /* columns = */ arrayOf(COLUMN_INTERNAL_ID, COLUMN_EVENT_TIMESTAMP, COLUMN_EVENT_DATA),
+            /* columns = */
+            arrayOf(
+                COLUMN_INTERNAL_ID,
+                COLUMN_SESSION_ID,
+                COLUMN_EVENT_TIMESTAMP,
+                COLUMN_EVENT_DATA
+            ),
             /* selection = */ null,
             /* selectionArgs = */ null,
             /* groupBy = */ null,
@@ -136,12 +146,17 @@ internal sealed class EventDatabaseTable(
         val rows = ArrayList<Row>(count)
         while (!isAfterLast) {
             val internalId = getLong(getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
+            val sessionId = getString(getColumnIndexOrThrow(COLUMN_SESSION_ID))
             val eventTimestamp = getLong(getColumnIndexOrThrow(COLUMN_EVENT_TIMESTAMP))
             val eventData = getString(getColumnIndexOrThrow(COLUMN_EVENT_DATA))
             rows.add(
                 Row(
                     internalId,
-                    EventDatabaseEntry(eventTimestamp, eventData),
+                    EventDatabaseEntry(
+                        sessionId = sessionId,
+                        eventTimestamp = eventTimestamp,
+                        data = eventData
+                    ),
                 ),
             )
             moveToNext()

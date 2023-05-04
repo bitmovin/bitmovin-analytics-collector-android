@@ -31,8 +31,9 @@ class PersistentAnalyticsEventQueueTest {
     fun `pushing an EventData pushes an according EventDatabaseEntry to the event database`() {
         val event = TestFactory.createEventData()
         val eventDatabaseEntry = EventDatabaseEntry(
-            event.time,
-            DataSerializer.serialize(event)!!,
+            sessionId = event.impressionId,
+            eventTimestamp = event.time,
+            data = DataSerializer.serialize(event)!!,
         )
 
         eventQueue.push(event)
@@ -46,8 +47,9 @@ class PersistentAnalyticsEventQueueTest {
     fun `pushing an AdEventData pushes an according AdEventDatabaseEntry to the event database`() {
         val event = TestFactory.createAdEventData()
         val eventDatabaseEntry = EventDatabaseEntry(
-            event.time,
-            DataSerializer.serialize(event)!!,
+            sessionId = event.videoImpressionId!!,
+            eventTimestamp = event.time,
+            data = DataSerializer.serialize(event)!!,
         )
 
         eventQueue.push(event)
@@ -70,8 +72,9 @@ class PersistentAnalyticsEventQueueTest {
     fun `popping an EventData pops from the event database`() {
         val event = TestFactory.createEventData()
         val eventDatabaseEntry = EventDatabaseEntry(
-            event.time,
-            DataSerializer.serialize(event)!!,
+            sessionId = event.impressionId,
+            eventTimestamp = event.time,
+            data = DataSerializer.serialize(event)!!,
         )
         every { eventDatabase.pop() } returns eventDatabaseEntry
 
@@ -84,8 +87,9 @@ class PersistentAnalyticsEventQueueTest {
     fun `popping an AdEventData pops from the event database`() {
         val event = TestFactory.createAdEventData()
         val eventDatabaseEntry = EventDatabaseEntry(
-            event.time,
-            DataSerializer.serialize(event)!!,
+            sessionId = event.videoImpressionId!!,
+            eventTimestamp = event.time,
+            data = DataSerializer.serialize(event)!!,
         )
         every { eventDatabase.popAd() } returns eventDatabaseEntry
 
