@@ -43,51 +43,36 @@ class DefaultEventDatabaseConnectionTest {
     }
 
     @Test
+    fun testPushPopAd() = databaseTest {
+        // nothing in the database yet
+        Assert.assertNull(popAd())
+
+        val event = createRandomEvent()
+        pushAd(event)
+
+        val readEvent = popAd()
+        Assert.assertEquals(event, readEvent)
+
+        // database should be empty again
+        Assert.assertNull(popAd())
+    }
+
+    @Test
     fun testPurge() = databaseTest {
         // prepare the database
-        val eventsCount = 10_000
-        val events = ArrayList<EventDatabaseEntry>(eventsCount)
-        (0 until eventsCount).forEach { _ ->
+        val eventsCountPerTable = 5_000
+        repeat(eventsCountPerTable) {
             val entry = createRandomEvent()
-            events.add(entry)
             push(entry)
+            pushAd(entry)
         }
 
         // purge (query all + delete database)
         val deletedRowsCount = purge()
-        Assert.assertEquals(events.size, deletedRowsCount)
+        Assert.assertEquals(eventsCountPerTable * 2, deletedRowsCount)
 
         // database should be empty after purging!
         Assert.assertEquals(0, purge())
-    }
-
-    @Test
-    fun testPurgeEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1.toDuration(DurationUnit.SECONDS)) {
-        // insert multiple and wait for "expiration" -> should be completely clean
-        push(createRandomEvent())
-        push(createRandomEvent())
-        push(createRandomEvent())
-
-        Thread.sleep(1500)
-
-        Assert.assertEquals(0, purge())
-
-        // insert multiple and query immediately (no expiration) -> should contain all elements
-        push(createRandomEvent())
-        push(createRandomEvent())
-        push(createRandomEvent())
-
-        Assert.assertEquals(3, purge())
-
-        // insert 2 elements, wait for expiration, insert one again -> should contain only the latest
-        push(createRandomEvent())
-        push(createRandomEvent())
-        Thread.sleep(1200)
-        val latest = createRandomEvent()
-        push(latest)
-
-        val deletedRowsCount = purge()
-        Assert.assertEquals(1, deletedRowsCount)
     }
 
     @Test
@@ -121,13 +106,33 @@ class DefaultEventDatabaseConnectionTest {
     }
 
     @Test
-    fun testPurgeEventCountLimitOverrun() = databaseTest(eventMaxCount = 2) {
-        // insert more than maximum -> should drop all over the limit (starting with the first inserted)
-        val events = listOf(createRandomEvent(), createRandomEvent(), createRandomEvent())
-        events.forEach { push(it) }
+    fun testPopAdEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1.toDuration(DurationUnit.SECONDS)) {
+        // insert multiple and wait for "expiration" -> should be completely clean
+        push(createRandomEvent())
+        push(createRandomEvent())
+        push(createRandomEvent())
 
-        val deletedRowsCount = purge()
-        Assert.assertEquals(2, deletedRowsCount)
+        Thread.sleep(1500)
+
+        Assert.assertNull(popAd())
+
+        // insert multiple and query immediately (no expiration) -> should return the very first inserted
+        val first = createRandomEvent()
+        pushAd(first)
+        pushAd(createRandomEvent())
+        pushAd(createRandomEvent())
+
+        Assert.assertEquals(first, popAd())
+
+        // insert 2 elements, wait for expiration, insert one again -> should return the last inserted (which is the single element in the list now)
+        pushAd(createRandomEvent())
+        pushAd(createRandomEvent())
+        Thread.sleep(1200)
+        val latest = createRandomEvent()
+        pushAd(latest)
+
+        val read = popAd()
+        Assert.assertEquals(latest, read)
     }
 
     @Test
@@ -141,6 +146,19 @@ class DefaultEventDatabaseConnectionTest {
         Assert.assertEquals(event3, pop())
         // database is empty now
         Assert.assertNull(pop())
+    }
+
+    @Test
+    fun testPopAdEventCountLimitOverrun() = databaseTest(eventMaxCount = 2) {
+        // insert more than maximum -> should drop all over the limit (starting with the first inserted)
+        createRandomEvent().also { push(it) }
+        val event2 = createRandomEvent().also { pushAd(it) }
+        val event3 = createRandomEvent().also { pushAd(it) }
+
+        Assert.assertEquals(event2, popAd())
+        Assert.assertEquals(event3, popAd())
+        // database is empty now
+        Assert.assertNull(popAd())
     }
 
     private fun createRandomEvent(): EventDatabaseEntry =

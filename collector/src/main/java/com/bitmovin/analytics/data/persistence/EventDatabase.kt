@@ -63,7 +63,6 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
     }
 
     override fun purge(): Int = dbHelper.catchingTransaction {
-        cleanupDatabase()
         EventDatabaseTable.allTables.sumOf { it.purge(transaction = this) }
     } ?: 0
 
