@@ -4,14 +4,14 @@ import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
-import com.bitmovin.analytics.license.LicenseCall
+import com.bitmovin.analytics.license.DefaultLicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class SimpleEventDataDispatcher(
-    config: BitmovinAnalyticsConfig,
     context: Context,
+    config: BitmovinAnalyticsConfig,
     callback: LicenseCallback?,
     backendFactory: BackendFactory,
 ) : IEventDataDispatcher, AuthenticationCallback {
@@ -30,7 +30,6 @@ class SimpleEventDataDispatcher(
         this.config = config
         this.callback = callback
         this.context = context
-        // TODO queue should be the same instance as for offline
         backend = backendFactory.createBackend(config, context)
     }
 
@@ -57,7 +56,7 @@ class SimpleEventDataDispatcher(
     }
 
     override fun enable() {
-        val licenseCall = LicenseCall(config, context)
+        val licenseCall = DefaultLicenseCall(config, context)
         licenseCall.authenticate(this)
     }
 

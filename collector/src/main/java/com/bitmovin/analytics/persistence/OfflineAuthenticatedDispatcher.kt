@@ -17,34 +17,27 @@ import com.bitmovin.analytics.persistence.OperationMode.Unauthenticated
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 
 internal class OfflineAuthenticatedDispatcher(
-    config: BitmovinAnalyticsConfig,
     context: Context,
+    config: BitmovinAnalyticsConfig,
     callback: LicenseCallback?,
     backendFactory: BackendFactory,
+    private val licenseCall: LicenseCall,
     private val eventQueue: AnalyticsEventQueue,
 ) : IEventDataDispatcher {
     private val backend: Backend
-    private val config: BitmovinAnalyticsConfig
-    private val callback: LicenseCallback?
-    private val context: Context
-    private val licenseCall: LicenseCall
     private var operationMode = Unauthenticated
     private var sampleSequenceNumber = 0
 
     init {
-        this.config = config
-        this.callback = callback
-        this.context = context
         backend = backendFactory.createBackend(config, context)
-        licenseCall = LicenseCall(config, context)
     }
 
     private val authenticationCallback = AuthenticationCallback { response ->
         val success = when (response) {
             is AuthenticationResponse.Granted -> {
                 callback?.configureFeatures(
-                    true,
-                    response.featureConfigContainer,
+                    authenticated = true,
+                    featureConfigs = response.featureConfigContainer,
                 )
                 operationMode = Authenticated
                 true
@@ -52,8 +45,8 @@ internal class OfflineAuthenticatedDispatcher(
 
             is AuthenticationResponse.Denied -> {
                 callback?.configureFeatures(
-                    false,
-                    null,
+                    authenticated = false,
+                    featureConfigs = null,
                 )
                 operationMode = Disabled
                 eventQueue.clear()
@@ -91,13 +84,12 @@ internal class OfflineAuthenticatedDispatcher(
 
     override fun addAd(data: AdEventData) {
         when (operationMode) {
+            Disabled -> return
             Authenticated -> backend.sendAd(data)
             Unauthenticated -> {
                 eventQueue.push(data)
                 licenseCall.authenticate(authenticationCallback)
             }
-
-            Disabled -> return
         }
     }
 
