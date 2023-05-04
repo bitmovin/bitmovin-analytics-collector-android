@@ -6,7 +6,7 @@ import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.utils.DataSerializer
 
 internal class PersistentAnalyticsEventQueue(
-    private val eventDatabase: EventDatabase
+    private val eventDatabase: EventDatabase,
 ) : AnalyticsEventQueue {
 
     override fun push(event: EventData) {

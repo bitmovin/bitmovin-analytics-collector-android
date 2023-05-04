@@ -25,14 +25,14 @@ internal sealed class EventDatabaseTable(
              $COLUMN_EVENT_DATA TEXT,
              $COLUMN_EVENT_TIMESTAMP INTEGER
             );
-                """.trimIndent(),
+            """.trimIndent(),
         )
 
         execSQL(
             """
             CREATE INDEX IF NOT EXISTS ${tableName}_$COLUMN_EVENT_TIMESTAMP
             ON $tableName($COLUMN_EVENT_TIMESTAMP);
-                """.trimIndent(),
+            """.trimIndent(),
         )
     }
 
@@ -57,7 +57,7 @@ internal sealed class EventDatabaseTable(
             arrayOf(
                 COLUMN_INTERNAL_ID,
                 COLUMN_EVENT_TIMESTAMP,
-                COLUMN_EVENT_DATA
+                COLUMN_EVENT_DATA,
             ),
             /* selection = */
             null,
@@ -101,7 +101,7 @@ internal sealed class EventDatabaseTable(
             arrayOf(
                 COLUMN_INTERNAL_ID,
                 COLUMN_EVENT_TIMESTAMP,
-                COLUMN_EVENT_DATA
+                COLUMN_EVENT_DATA,
             ),
             /* selection = */
             null,
@@ -142,7 +142,7 @@ internal sealed class EventDatabaseTable(
 
     override fun cleanupByAge(
         transaction: Transaction,
-        ageLimit: Duration
+        ageLimit: Duration,
     ) {
         val now = System.currentTimeMillis()
         transaction.db.delete(
@@ -154,7 +154,7 @@ internal sealed class EventDatabaseTable(
 
     override fun cleanupByCount(
         transaction: Transaction,
-        maximumCountOfEvents: Int
+        maximumCountOfEvents: Int,
     ) {
         // query the maximum count + 1, get the internal id of it, and delete every event which was inserted before this element
         val deleteStartWith: Long = transaction.db.query(
@@ -197,8 +197,8 @@ internal sealed class EventDatabaseTable(
             rows.add(
                 Row(
                     internalId,
-                    EventDatabaseEntry(eventTimestamp, eventData)
-                )
+                    EventDatabaseEntry(eventTimestamp, eventData),
+                ),
             )
             moveToNext()
         }

@@ -37,4 +37,3 @@ internal interface EventDatabaseTableOperation {
      */
     fun cleanupByCount(transaction: Transaction, maximumCountOfEvents: Int)
 }
-
