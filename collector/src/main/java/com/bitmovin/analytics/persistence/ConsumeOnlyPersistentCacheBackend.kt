@@ -7,7 +7,6 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.OnSuccessCallback
 import com.bitmovin.analytics.persistence.queue.ConsumeOnlyAnalyticsEventQueue
-import kotlinx.coroutines.CompletionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -92,9 +91,7 @@ private suspend fun CallbackBackend.sendAdSuspended(
 
 private class ContinuationCallback(
     private val continuation: Continuation<Boolean>,
-) : CompletionHandler, OnFailureCallback, OnSuccessCallback {
-    override fun invoke(cause: Throwable?) {}
-
+) : OnFailureCallback, OnSuccessCallback {
     override fun onFailure(e: Exception, cancel: () -> Unit) {
         cancel()
         continuation.resume(false)
