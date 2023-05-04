@@ -12,7 +12,7 @@ internal value class Transaction(val db: SQLiteDatabase)
 
 internal class EventDatabase private constructor(context: Context) : EventDatabaseConnection {
     private val dbHelper = object : SQLiteOpenHelper(
-        /* context = */ context,
+        /* context = */ context.applicationContext,
         /* name = */ "eventDatabase.sqlite",
         /* factory = */ null,
         /* version = */ VERSION,
