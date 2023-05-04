@@ -1,15 +1,11 @@
 package com.bitmovin.analytics.persistence
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.TestFactory
-import com.bitmovin.analytics.config.SourceMetadata
-import com.bitmovin.analytics.data.AdEventData
+import com.bitmovin.analytics.TestFactory.createAdEventData
+import com.bitmovin.analytics.TestFactory.createEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.BackendFactory
-import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.data.PlayerInfo
-import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.FeatureConfigContainer
@@ -34,17 +30,15 @@ class OfflineAuthenticatedDispatcherTest {
     private val backend: Backend = mockk()
     private val licenseCall: LicenseCall = mockk()
     private val analyticsEventQueue: AnalyticsEventQueue = mockk()
-    private lateinit var config: BitmovinAnalyticsConfig
     private lateinit var offlineAuthenticatedDispatcher: OfflineAuthenticatedDispatcher
 
     @Before
     fun setup() {
-        config = BitmovinAnalyticsConfig()
         every { backendFactory.createBackend(any(), any()) } returns backend
 
         offlineAuthenticatedDispatcher = OfflineAuthenticatedDispatcher(
-            config,
             mockk(),
+            BitmovinAnalyticsConfig(),
             outerLicenseCallback,
             backendFactory,
             licenseCall,
@@ -65,7 +59,7 @@ class OfflineAuthenticatedDispatcherTest {
 
     @Test
     fun `adding an EventData when the dispatcher is unauthenticated it adds the event to the analytics queue`() {
-        val eventData = createEventData(config)
+        val eventData = createEventData()
         offlineAuthenticatedDispatcher.add(eventData)
 
         verify { analyticsEventQueue.push(eventData) }
@@ -81,7 +75,7 @@ class OfflineAuthenticatedDispatcherTest {
 
     @Test
     fun `adding an EventData when the dispatcher is unauthenticated it requests authentication`() {
-        val eventData = createEventData(config)
+        val eventData = createEventData()
         offlineAuthenticatedDispatcher.add(eventData)
 
         verify { licenseCall.authenticate(any()) }
@@ -101,7 +95,7 @@ class OfflineAuthenticatedDispatcherTest {
             AuthenticationResponse.Granted(null),
         )
 
-        val eventData = createEventData(config)
+        val eventData = createEventData()
         offlineAuthenticatedDispatcher.add(eventData)
 
         verify { backend.send(eventData) }
@@ -126,10 +120,10 @@ class OfflineAuthenticatedDispatcherTest {
         )
         offlineAuthenticatedDispatcher.resetSourceRelatedState()
         val eventData = listOf(
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
+            createEventData(),
+            createEventData(),
+            createEventData(),
+            createEventData(),
         )
 
         eventData.forEach { offlineAuthenticatedDispatcher.add(it) }
@@ -148,16 +142,16 @@ class OfflineAuthenticatedDispatcherTest {
         )
         offlineAuthenticatedDispatcher.resetSourceRelatedState()
         val eventDataOfFirstSource = listOf(
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
+            createEventData(),
+            createEventData(),
+            createEventData(),
+            createEventData(),
         )
         val eventDataOfSecondSource = listOf(
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
+            createEventData(),
+            createEventData(),
+            createEventData(),
+            createEventData(),
         )
 
         eventDataOfFirstSource.forEach { offlineAuthenticatedDispatcher.add(it) }
@@ -176,10 +170,10 @@ class OfflineAuthenticatedDispatcherTest {
     @Test
     fun `adding EventData after the dispatcher is disabled does nothing`() {
         val eventDataOfFirstSource = listOf(
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
+            createEventData(),
+            createEventData(),
+            createEventData(),
+            createEventData(),
         )
         offlineAuthenticatedDispatcher.disable()
         eventDataOfFirstSource.forEach { offlineAuthenticatedDispatcher.add(it) }
@@ -212,16 +206,16 @@ class OfflineAuthenticatedDispatcherTest {
         )
         offlineAuthenticatedDispatcher.resetSourceRelatedState()
         val eventDataOfFirstSource = listOf(
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
+            createEventData(),
+            createEventData(),
+            createEventData(),
+            createEventData(),
         )
         val eventDataOfSecondSource = listOf(
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
+            createEventData(),
+            createEventData(),
+            createEventData(),
+            createEventData(),
         )
 
         eventDataOfFirstSource.forEach { offlineAuthenticatedDispatcher.add(it) }
@@ -286,10 +280,10 @@ class OfflineAuthenticatedDispatcherTest {
             AuthenticationResponse.Denied(licenseMessage),
         )
         val eventDataOfFirstSource = listOf(
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
-            createEventData(config),
+            createEventData(),
+            createEventData(),
+            createEventData(),
+            createEventData(),
         )
         val adEventDataOfFirstSource = listOf(
             createAdEventData(),
@@ -316,7 +310,7 @@ class OfflineAuthenticatedDispatcherTest {
     }
 
     private fun triggerAuthenticationCallback(response: AuthenticationResponse) {
-        val eventData = createEventData(config)
+        val eventData = createEventData()
         offlineAuthenticatedDispatcher.add(eventData)
         val authenticationCallbackSlot = slot<AuthenticationCallback>()
         verify { licenseCall.authenticate(capture(authenticationCallbackSlot)) }
@@ -326,29 +320,3 @@ class OfflineAuthenticatedDispatcherTest {
         )
     }
 }
-
-private val defaultDeviceInformation = DeviceInformation(
-    manufacturer = "manufacturer",
-    model = "model",
-    isTV = false,
-    locale = "locale",
-    domain = "packageName",
-    screenHeight = 0,
-    screenWidth = 0,
-)
-
-private fun createEventData(
-    config: BitmovinAnalyticsConfig,
-    impressionId: String = "test-impression",
-    sourceMetadata: SourceMetadata? = null,
-    deviceInformation: DeviceInformation = defaultDeviceInformation,
-    playerInfo: PlayerInfo = PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-): EventData = TestFactory.createEventDataFactory(config)
-    .create(
-        impressionId,
-        sourceMetadata,
-        deviceInformation,
-        playerInfo,
-    )
-
-private fun createAdEventData() = AdEventData(adId = "test-ad-id")
