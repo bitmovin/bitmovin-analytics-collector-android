@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
         playbackConfig.isMuted = false
         playbackConfig.isAutoplayEnabled = false
         val playerConfig = PlayerConfig(playbackConfig = playbackConfig)
-        // playerConfig.advertisingConfig = createAdvertisingConfig()
+        playerConfig.advertisingConfig = createAdvertisingConfig()
 
         player = Player.create(this, playerConfig).also { binding.playerView.player = it }
 
@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity() {
             bitmovinAnalyticsConfig.customData6 = "customData6"
             bitmovinAnalyticsConfig.customData7 = "customData7"
             bitmovinAnalyticsConfig.path = "/vod/new/"
-            bitmovinAnalyticsConfig.ads = false
+            bitmovinAnalyticsConfig.ads = true
             bitmovinAnalyticsConfig.isLive = false
 
             return bitmovinAnalyticsConfig
@@ -233,7 +233,7 @@ class MainActivity : AppCompatActivity() {
 
             // Set up a mid-roll waterfalling ad at 10% of the content duration
             // NOTE: AdItems containing more than one AdSource will be executed as waterfalling ad
-            val midRoll = AdItem("10%", firstAdSource, secondAdSource)
+            val midRoll = AdItem("5", firstAdSource, secondAdSource)
 
             // Set up a post-roll ad
             val postRoll = AdItem("post", fourthAdSource)

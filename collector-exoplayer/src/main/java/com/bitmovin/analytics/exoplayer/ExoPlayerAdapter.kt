@@ -151,12 +151,6 @@ internal class ExoPlayerAdapter(
     }
 
     override fun manipulate(data: EventData) {
-        // duration
-        val duration = exoplayer.duration
-        if (duration != C.TIME_UNSET) {
-            data.videoDuration = duration
-        }
-
         // ad
         if (exoplayer.isPlayingAd) {
             data.ad = 1
@@ -168,6 +162,16 @@ internal class ExoPlayerAdapter(
             config.isLive,
             exoplayer.isCurrentMediaItemDynamic,
         )
+
+        // we report 0 videoDuration for live streams to be consistent with other players/platforms
+        if (data.isLive) {
+            data.videoDuration = 0
+        } else {
+            val duration = exoplayer.duration
+            if (duration != C.TIME_UNSET) {
+                data.videoDuration = duration
+            }
+        }
 
         // version
         data.version = PlayerType.EXOPLAYER.toString() + "-" + ExoUtil.playerVersion

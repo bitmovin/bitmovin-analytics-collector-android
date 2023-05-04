@@ -17,8 +17,8 @@ import com.bitmovin.analytics.persistence.OperationMode.Unauthenticated
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 
 internal class OfflineAuthenticatedDispatcher(
-    config: BitmovinAnalyticsConfig,
     context: Context,
+    config: BitmovinAnalyticsConfig,
     callback: LicenseCallback?,
     backendFactory: BackendFactory,
     private val licenseCall: LicenseCall,
@@ -36,8 +36,8 @@ internal class OfflineAuthenticatedDispatcher(
         val success = when (response) {
             is AuthenticationResponse.Granted -> {
                 callback?.configureFeatures(
-                    true,
-                    response.featureConfigContainer,
+                    authenticated = true,
+                    featureConfigs = response.featureConfigContainer,
                 )
                 operationMode = Authenticated
                 true
@@ -45,8 +45,8 @@ internal class OfflineAuthenticatedDispatcher(
 
             is AuthenticationResponse.Denied -> {
                 callback?.configureFeatures(
-                    false,
-                    null,
+                    authenticated = false,
+                    featureConfigs = null,
                 )
                 operationMode = Disabled
                 eventQueue.clear()
@@ -84,13 +84,12 @@ internal class OfflineAuthenticatedDispatcher(
 
     override fun addAd(data: AdEventData) {
         when (operationMode) {
+            Disabled -> return
             Authenticated -> backend.sendAd(data)
             Unauthenticated -> {
                 eventQueue.push(data)
                 licenseCall.authenticate(authenticationCallback)
             }
-
-            Disabled -> return
         }
     }
 

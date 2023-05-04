@@ -60,25 +60,31 @@ class BitmovinAnalytics
         // TODO replace with config flag once feature is enabled
         if (false) {
             OfflineAuthenticatedDispatcher(
-                config,
-                context,
-                this,
-                BackendFactory(
+                context = context,
+                config = config,
+                callback = this,
+                backendFactory = BackendFactory(
                     eventQueue,
                     true,
                 ),
-                DefaultLicenseCall(config, context),
-                eventQueue,
+                licenseCall = DefaultLicenseCall(config, context),
+                eventQueue = eventQueue,
             )
         } else {
-            SimpleEventDataDispatcher(config, this.context, this, BackendFactory(eventQueue))
+            SimpleEventDataDispatcher(
+                context = context,
+                config = config,
+                callback = this,
+                backendFactory = BackendFactory(eventQueue),
+            )
         },
         debugCallback,
     )
 
     private var playerAdapter: PlayerAdapter? = null
     private var stateMachineListener: StateMachineListener? = null
-    private val adAnalytics: BitmovinAdAnalytics? = if (config.ads) BitmovinAdAnalytics(this) else null
+    private val adAnalytics: BitmovinAdAnalytics? =
+        if (config.ads) BitmovinAdAnalytics(this) else null
 
     // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
     // first startup sample, in case the collector supports multiple sources)
@@ -99,7 +105,8 @@ class BitmovinAnalytics
      */
     fun attach(adapter: PlayerAdapter) {
         detachPlayer()
-        val stateMachineListener = DefaultStateMachineListener(this, adapter, eventBus[OnErrorDetailEventListener::class])
+        val stateMachineListener =
+            DefaultStateMachineListener(this, adapter, eventBus[OnErrorDetailEventListener::class])
         adapter.stateMachine.subscribe(stateMachineListener)
         this.stateMachineListener = stateMachineListener
         eventDataDispatcher.enable()
@@ -145,7 +152,11 @@ class BitmovinAnalytics
             if (sourceMetadata != null) {
                 setCustomDataFunction = { sourceMetadata.setCustomData(it) }
             }
-            playerAdapter?.stateMachine?.changeCustomData(playerAdapter?.position ?: 0, customData, setCustomDataFunction)
+            playerAdapter?.stateMachine?.changeCustomData(
+                playerAdapter?.position ?: 0,
+                customData,
+                setCustomDataFunction,
+            )
         }
 
     fun setCustomDataOnce(customData: CustomData) {
@@ -183,7 +194,10 @@ class BitmovinAnalytics
     val onErrorDetailObservable: Observable<OnErrorDetailEventListener>
         get() = eventBus[OnErrorDetailEventListener::class]
 
-    override fun configureFeatures(authenticated: Boolean, featureConfigs: FeatureConfigContainer?) {
+    override fun configureFeatures(
+        authenticated: Boolean,
+        featureConfigs: FeatureConfigContainer?,
+    ) {
         featureManager.configureFeatures(authenticated, featureConfigs)
     }
 

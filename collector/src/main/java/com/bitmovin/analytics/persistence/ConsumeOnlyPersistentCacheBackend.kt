@@ -14,13 +14,15 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+private typealias Signal = Unit
+
 internal class ConsumeOnlyPersistentCacheBackend(
     scope: CoroutineScope,
     private val backend: CallbackBackend,
     private val eventQueue: ConsumeOnlyAnalyticsEventQueue,
 ) : Backend, CallbackBackend {
 
-    private val cacheFlushChannel = Channel<Boolean>(
+    private val cacheFlushChannel = Channel<Signal>(
         capacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
@@ -41,7 +43,7 @@ internal class ConsumeOnlyPersistentCacheBackend(
     ) = backend.send(
         eventData,
         success = {
-            cacheFlushChannel.trySend(true)
+            cacheFlushChannel.trySend(Signal)
             success?.onSuccess()
         },
         failure,
@@ -54,7 +56,7 @@ internal class ConsumeOnlyPersistentCacheBackend(
     ) = backend.sendAd(
         eventData,
         success = {
-            cacheFlushChannel.trySend(true)
+            cacheFlushChannel.trySend(Signal)
             success?.onSuccess()
         },
         failure,
@@ -65,11 +67,10 @@ internal class ConsumeOnlyPersistentCacheBackend(
     override fun sendAd(eventData: AdEventData) = sendAd(eventData, null, null)
 
     private fun sendNextCachedEvent() {
-        val eventData: EventData? = eventQueue.popEvent()
-        eventData?.run {
+        eventQueue.popEvent()?.let { eventData ->
             send(eventData)
-        } ?: eventQueue.popAdEvent()?.let {
-            sendAd(it)
+        } ?: eventQueue.popAdEvent()?.let { adEventData ->
+            sendAd(adEventData)
         }
     }
 }

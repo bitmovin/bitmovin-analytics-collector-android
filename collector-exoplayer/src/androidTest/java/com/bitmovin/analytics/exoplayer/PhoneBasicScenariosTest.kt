@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
+import com.bitmovin.analytics.systemtest.utils.EventDataUtils
 import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
@@ -48,7 +49,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_basicPlayPauseScenario_PlayWhenReady_Should_sendCorrectSamples() {
+    fun test_vod_playPauseWithPlayWhenReady() {
         // arrange
         val collector = IExoPlayerCollector.create(defaultAnalyticsConfig, appContext)
         // act
@@ -108,7 +109,63 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun est_nonExistingStream_Should_sendErrorSample() {
+    fun test_live_playWithAutoplay() {
+        // arrange
+        val liveSample = TestSources.IVS_LIVE_1
+        val liveSource = MediaItem.fromUri(liveSample.m3u8Url!!)
+        defaultAnalyticsConfig.isLive = true
+        defaultAnalyticsConfig.m3u8Url = liveSample.m3u8Url
+
+        val collector = IExoPlayerCollector.create(defaultAnalyticsConfig, appContext)
+
+        // act
+        mainScope.launch {
+            collector.attachPlayer(player)
+            player.playWhenReady = true
+            player.setMediaItem(liveSource)
+            player.prepare()
+        }
+
+        waitUntilPlayerIsPlaying(player)
+
+        // play for 2 seconds
+        Thread.sleep(2000)
+
+        mainScope.launch {
+            player.pause()
+        }
+
+        // wait a bit to make sure last play sample is sent
+        Thread.sleep(500)
+
+        mainScope.launch {
+            collector.detachPlayer()
+            player.release()
+        }
+
+        // assert
+        val impressionList = LogParser.extractImpressions()
+        Assertions.assertThat(impressionList.size).isEqualTo(1)
+
+        val impression = impressionList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        DataVerifier.verifyStaticData(eventDataList, defaultAnalyticsConfig, liveSample, ExoplayerConstants.playerInfo)
+        DataVerifier.verifyStartupSample(eventDataList[0])
+        DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(false))
+        DataVerifier.verifyInvariants(eventDataList)
+
+        EventDataUtils.filterNonDeterministicEvents(eventDataList)
+        DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+        // verify that no other states than startup and playing were reached
+        Assertions.assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size)
+            .isEqualTo(0)
+    }
+
+    @Test
+    fun test_nonExistingStream_Should_sendErrorSample() {
         // arrange
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(nonExistingStreamSample.uri.toString())
@@ -189,6 +246,10 @@ class PhoneBasicScenariosTest {
     private fun waitUntilPlayerHasPlayedToMs(player: ExoPlayer, playedToMs: Long) {
         PlaybackUtils.waitUntil { player.isPlaying }
         PlaybackUtils.waitUntil { player.currentPosition >= playedToMs }
+    }
+
+    private fun waitUntilPlayerIsPlaying(player: ExoPlayer) {
+        PlaybackUtils.waitUntil { player.isPlaying }
     }
 
     private fun waitUntilPlayerHasError(player: ExoPlayer) {

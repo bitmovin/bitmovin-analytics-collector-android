@@ -200,8 +200,6 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         adEventData.setEventData(eventData)
         adEventData.setAdBreak(adBreak)
         adEventData.setAdSample(adSample)
-
-        adEventData.time = Util.timestamp
         adEventData.adImpressionId = Util.uUID
         analytics.sendAdEventData(adEventData)
     }
