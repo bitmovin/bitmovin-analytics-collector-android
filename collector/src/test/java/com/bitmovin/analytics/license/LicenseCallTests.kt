@@ -24,7 +24,7 @@ class LicenseCallTests {
         every { Uri.parse(any()) } returns mockk(relaxed = true)
     }
 
-    private fun createLicenseCall(responseBody: String): LicenseCall {
+    private fun createLicenseCall(responseBody: String): DefaultLicenseCall {
         val mockedResponse = mockk<Response>()
         every { mockedResponse.body }.returns(responseBody.toResponseBody("text/json".toMediaType()))
         mockkConstructor(HttpClient::class)
@@ -32,7 +32,7 @@ class LicenseCallTests {
         every { anyConstructed<HttpClient>().post(any(), any(), capture(slot)) }.answers {
             slot.captured.onResponse(mockk(), mockedResponse)
         }
-        return LicenseCall(BitmovinAnalyticsConfig(""), mockk(relaxed = true))
+        return DefaultLicenseCall(BitmovinAnalyticsConfig(""), mockk(relaxed = true))
     }
 
     private fun getGrantedResponseBody(features: String) = "{\"status\": \"granted\"$features}"

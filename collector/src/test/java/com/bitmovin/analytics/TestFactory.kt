@@ -18,8 +18,8 @@ object TestFactory {
         isTV = false,
         locale = "locale",
         domain = "packageName",
-        screenHeight = 0,
-        screenWidth = 0,
+        screenHeight = 2400,
+        screenWidth = 1080,
     )
 
     fun createEventDataFactory(

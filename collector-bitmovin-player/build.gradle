@@ -90,6 +90,7 @@ dependencies {
     androidTestImplementation "com.google.ads.interactivemedia.v3:interactivemedia:${rootProject.ext.imaSdkVersion}"
     androidTestImplementation "com.google.android.gms:play-services-ads:${rootProject.ext.playServicesAdsVersion}"
     androidTestImplementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
 
     androidTestImplementation project(':example-shared')
     androidTestImplementation project(':systemtest-utils')

@@ -65,7 +65,7 @@ dependencies {
 <td> Player Version </td> <td> Dependency </td>
 </tr>
 <tr>
-<td>  <= v2.18.5 <br/> >= v2.18.0 </td>
+<td> >= v2.18.0 </td>
 <td>
 
 ```gradle
