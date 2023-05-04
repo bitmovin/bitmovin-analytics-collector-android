@@ -26,8 +26,6 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
         }
     }
 
-    // TODO: Should this be configurable per table?
-    // TODO: Should this be a part of EventDatabase creation instead of being mutable?
     var ageLimit: Duration = DEFAULT_AGE_LIMIT
         set(value) {
             field = value
@@ -64,10 +62,10 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
         EventDatabaseTable.AdEvents.pop(transaction = this)
     }
 
-    override fun purge(): List<EventDatabaseEntry> = dbHelper.catchingTransaction {
+    override fun purge(): Int = dbHelper.catchingTransaction {
         cleanupDatabase()
-        EventDatabaseTable.allTables.flatMap { it.purge(transaction = this) }
-    } ?: emptyList()
+        EventDatabaseTable.allTables.sumOf { it.purge(transaction = this) }
+    } ?: 0
 
     private fun Transaction.cleanupDatabase() {
         EventDatabaseTable.allTables.forEach { table ->

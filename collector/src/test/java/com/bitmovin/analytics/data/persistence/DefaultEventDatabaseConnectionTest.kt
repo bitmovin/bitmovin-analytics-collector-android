@@ -54,16 +54,15 @@ class DefaultEventDatabaseConnectionTest {
         }
 
         // purge (query all + delete database)
-        val readEvents = purge()
-        Assert.assertEquals(events.size, readEvents.size)
-        Assert.assertArrayEquals(events.toTypedArray(), readEvents.toTypedArray())
+        val deletedRowsCount = purge()
+        Assert.assertEquals(events.size, deletedRowsCount)
 
         // database should be empty after purging!
-        Assert.assertEquals(0, purge().size)
+        Assert.assertEquals(0, purge())
     }
 
     @Test
-    fun testPurgeEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1.toDuration(DurationUnit.SECONDS)) {
+     fun testPurgeEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1.toDuration(DurationUnit.SECONDS)) {
         // insert multiple and wait for "expiration" -> should be completely clean
         push(createRandomEvent())
         push(createRandomEvent())
@@ -71,14 +70,14 @@ class DefaultEventDatabaseConnectionTest {
 
         Thread.sleep(1500)
 
-        Assert.assertEquals(0, purge().size)
+        Assert.assertEquals(0, purge())
 
         // insert multiple and query immediately (no expiration) -> should contain all elements
         push(createRandomEvent())
         push(createRandomEvent())
         push(createRandomEvent())
 
-        Assert.assertEquals(3, purge().size)
+        Assert.assertEquals(3, purge())
 
         // insert 2 elements, wait for expiration, insert one again -> should contain only the latest
         push(createRandomEvent())
@@ -87,9 +86,8 @@ class DefaultEventDatabaseConnectionTest {
         val latest = createRandomEvent()
         push(latest)
 
-        val read = purge()
-        Assert.assertEquals(1, read.size)
-        Assert.assertEquals(latest, read.first())
+        val deletedRowsCount = purge()
+        Assert.assertEquals(1, deletedRowsCount)
     }
 
     @Test
@@ -128,12 +126,8 @@ class DefaultEventDatabaseConnectionTest {
         val events = listOf(createRandomEvent(), createRandomEvent(), createRandomEvent())
         events.forEach { push(it) }
 
-        val read = purge()
-        Assert.assertEquals(2, read.size)
-        Assert.assertArrayEquals(
-            events.subList(1, events.size).toTypedArray(),
-            read.toTypedArray(),
-        )
+        val deletedRowsCount = purge()
+        Assert.assertEquals(2, deletedRowsCount)
     }
 
     @Test

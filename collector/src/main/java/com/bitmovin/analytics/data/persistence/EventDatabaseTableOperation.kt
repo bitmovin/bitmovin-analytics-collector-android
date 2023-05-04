@@ -23,9 +23,9 @@ internal interface EventDatabaseTableOperation {
 
     /**
      * Clears the database
-     * @return a of entries
+     * @return number of rows affected
      */
-    fun purge(transaction: Transaction): List<EventDatabaseEntry>
+    fun purge(transaction: Transaction): Int
 
     /**
      * Removes all entries older than the passed [ageLimit]

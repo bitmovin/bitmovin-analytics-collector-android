@@ -32,7 +32,7 @@ internal interface EventDatabaseConnection {
 
     /**
      * Clears the database
-     * @return a of entries
+     * @return number of rows affected
      */
-    fun purge(): List<EventDatabaseEntry>
+    fun purge(): Int
 }

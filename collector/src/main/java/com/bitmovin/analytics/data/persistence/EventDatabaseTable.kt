@@ -92,53 +92,8 @@ internal sealed class EventDatabaseTable(
         return row.entry
     }
 
-    // TODO: Why don't we delete the whole db file?
-    override fun purge(transaction: Transaction): List<EventDatabaseEntry> {
-        val rows: List<Row> = transaction.db.query(
-            /* table = */
-            tableName,
-            /* columns = */
-            arrayOf(
-                COLUMN_INTERNAL_ID,
-                COLUMN_EVENT_TIMESTAMP,
-                COLUMN_EVENT_DATA,
-            ),
-            /* selection = */
-            null,
-            /* selectionArgs = */
-            null,
-            /* groupBy = */
-            null,
-            /* having = */
-            null,
-            /* orderBy = */
-            "$COLUMN_EVENT_TIMESTAMP ASC",
-            /* limit = */
-            null,
-        ).use {
-            it.getAllRows()
-        }
-
-        // it is not possible to delete more than 999 elements at a time (delete by ID)
-        // this number is hardcoded in `sqlite3.c`, see here: https://stackoverflow.com/a/15313495/21555458
-        rows
-            .chunked(999)
-            .forEach { subList ->
-                val affectedRows = transaction.db.delete(
-                    /* table = */
-                    tableName,
-                    /* whereClause = */
-                    "$COLUMN_INTERNAL_ID in (${subList.joinToString { "?" }})",
-                    /* whereArgs = */
-                    subList.map { it.internalId.toString() }.toTypedArray(),
-                )
-                if (affectedRows != subList.size) {
-                    // Deletion didn't work -> throw to cancel the transaction
-                    throw SQLiteException("Cannot delete all rows")
-                }
-            }
-        return rows.map { it.entry }
-    }
+    override fun purge(transaction: Transaction): Int =
+        transaction.db.delete(tableName, null, null)
 
     override fun cleanupByAge(
         transaction: Transaction,
