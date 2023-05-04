@@ -57,6 +57,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttp3Version}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
 
     // required for @Keep annotation to avoid pro guard issues with obfuscated dtos
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
@@ -68,6 +69,7 @@ dependencies {
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
     testImplementation "org.robolectric:robolectric:${rootProject.ext.robolectricVersion}"
     testImplementation "androidx.test:core:${rootProject.ext.testCoreXVersion}"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${rootProject.ext.coroutinesVersion}"
 
     androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
