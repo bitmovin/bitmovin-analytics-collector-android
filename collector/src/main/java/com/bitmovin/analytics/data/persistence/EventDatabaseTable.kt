@@ -61,7 +61,7 @@ internal sealed class EventDatabaseTable(
                 COLUMN_INTERNAL_ID,
                 COLUMN_SESSION_ID,
                 COLUMN_EVENT_TIMESTAMP,
-                COLUMN_EVENT_DATA
+                COLUMN_EVENT_DATA,
             ),
             /* selection = */ null,
             /* selectionArgs = */ null,
@@ -155,7 +155,7 @@ internal sealed class EventDatabaseTable(
                     EventDatabaseEntry(
                         sessionId = sessionId,
                         eventTimestamp = eventTimestamp,
-                        data = eventData
+                        data = eventData,
                     ),
                 ),
             )
