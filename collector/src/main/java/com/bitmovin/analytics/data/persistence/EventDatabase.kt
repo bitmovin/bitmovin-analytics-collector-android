@@ -29,7 +29,20 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
     // TODO: Should this be configurable per table?
     // TODO: Should this be a part of EventDatabase creation instead of being mutable?
     var ageLimit: Duration = DEFAULT_AGE_LIMIT
+        set(value) {
+            field = value
+            dbHelper.catchingTransaction {
+                cleanupDatabase()
+            }
+        }
+
     var maxEntries: Int = DEFAULT_MAX_ENTRIES
+        set(value) {
+            field = value
+            dbHelper.catchingTransaction {
+                cleanupDatabase()
+            }
+        }
 
     override fun push(entry: EventDatabaseEntry): Boolean = dbHelper.catchingTransaction {
         cleanupDatabase()
@@ -58,7 +71,7 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
 
     private fun Transaction.cleanupDatabase() {
         EventDatabaseTable.allTables.forEach { table ->
-            table.cleanupByTime(transaction = this, ageLimit = ageLimit)
+            table.cleanupByAge(transaction = this, ageLimit = ageLimit)
             table.cleanupByCount(transaction = this, maximumCountOfEvents = maxEntries)
         }
     }

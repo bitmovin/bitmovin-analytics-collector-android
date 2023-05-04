@@ -16,10 +16,7 @@ internal sealed class EventDatabaseTable(
     object Events : EventDatabaseTable(tableName = "events")
     object AdEvents : EventDatabaseTable(tableName = "adEvents")
 
-    /**
-     * Creates a table to the provided [db]
-     */
-    fun create(db: SQLiteDatabase) = with(db) {
+    override fun create(database: SQLiteDatabase) = with(database) {
         execSQL(
             """
             CREATE TABLE IF NOT EXISTS $tableName
@@ -95,6 +92,7 @@ internal sealed class EventDatabaseTable(
         return row.entry
     }
 
+    // TODO: Why don't we delete the whole db file?
     override fun purge(transaction: Transaction): List<EventDatabaseEntry> {
         val rows: List<Row> = transaction.db.query(
             /* table = */
@@ -142,7 +140,7 @@ internal sealed class EventDatabaseTable(
         return rows.map { it.entry }
     }
 
-    override fun cleanupByTime(
+    override fun cleanupByAge(
         transaction: Transaction,
         ageLimit: Duration
     ) {
