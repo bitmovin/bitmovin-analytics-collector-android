@@ -102,7 +102,7 @@ internal sealed class EventDatabaseTable(
         )
     }
 
-    override fun findPurgableSessions(
+    override fun findPurgeableSessions(
         transaction: Transaction,
         retentionConfig: RetentionConfig,
     ) = listOf(

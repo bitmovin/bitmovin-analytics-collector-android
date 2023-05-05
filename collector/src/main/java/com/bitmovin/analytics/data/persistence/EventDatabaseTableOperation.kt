@@ -34,7 +34,7 @@ internal interface EventDatabaseTableOperation {
     /**
      * Finds a list of sessions ready to be deleted.
      */
-    fun findPurgableSessions(
+    fun findPurgeableSessions(
         transaction: Transaction,
         retentionConfig: RetentionConfig,
     ): List<String>

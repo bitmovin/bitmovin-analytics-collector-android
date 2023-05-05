@@ -38,7 +38,7 @@ private fun EventDatabaseEntry.toEventData() = DataSerializer.deserialize(
 )
 
 private fun AdEventData.toEventDatabaseEntry() = EventDatabaseEntry(
-    sessionId = videoImpressionId!!,
+    sessionId = videoImpressionId,
     eventTimestamp = time,
     data = DataSerializer.serialize(this)!!,
 )

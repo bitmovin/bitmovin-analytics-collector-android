@@ -70,7 +70,7 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
         val deletableSessionIds = retentionConfig
             .referenceTables(EventDatabaseTable.allTables)
             .flatMap {
-                it.findPurgableSessions(
+                it.findPurgeableSessions(
                     transaction = this,
                     retentionConfig = retentionConfig,
                 )

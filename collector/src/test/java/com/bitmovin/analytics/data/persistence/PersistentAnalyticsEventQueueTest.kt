@@ -47,7 +47,7 @@ class PersistentAnalyticsEventQueueTest {
     fun `pushing an AdEventData pushes an according AdEventDatabaseEntry to the event database`() {
         val event = TestFactory.createAdEventData()
         val eventDatabaseEntry = EventDatabaseEntry(
-            sessionId = event.videoImpressionId!!,
+            sessionId = event.videoImpressionId,
             eventTimestamp = event.time,
             data = DataSerializer.serialize(event)!!,
         )
@@ -87,7 +87,7 @@ class PersistentAnalyticsEventQueueTest {
     fun `popping an AdEventData pops from the event database`() {
         val event = TestFactory.createAdEventData()
         val eventDatabaseEntry = EventDatabaseEntry(
-            sessionId = event.videoImpressionId!!,
+            sessionId = event.videoImpressionId,
             eventTimestamp = event.time,
             data = DataSerializer.serialize(event)!!,
         )
