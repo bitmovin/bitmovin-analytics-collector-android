@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.bitmovin.analytics.persistence
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
@@ -12,6 +14,8 @@ import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
+import com.bitmovin.analytics.utils.TestScopeProvider
+import com.bitmovin.analytics.utils.areScopesCancelled
 import io.mockk.called
 import io.mockk.clearMocks
 import io.mockk.every
@@ -19,6 +23,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import io.mockk.verifyOrder
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -30,11 +35,13 @@ class OfflineAuthenticatedDispatcherTest {
     private val backend: Backend = mockk()
     private val licenseCall: LicenseCall = mockk()
     private val analyticsEventQueue: AnalyticsEventQueue = mockk()
+    private lateinit var scopeProvider: TestScopeProvider
     private lateinit var offlineAuthenticatedDispatcher: OfflineAuthenticatedDispatcher
 
     @Before
     fun setup() {
-        every { backendFactory.createBackend(any(), any()) } returns backend
+        scopeProvider = TestScopeProvider()
+        every { backendFactory.createBackend(any(), any(), any()) } returns backend
 
         offlineAuthenticatedDispatcher = OfflineAuthenticatedDispatcher(
             mockk(),
@@ -43,6 +50,7 @@ class OfflineAuthenticatedDispatcherTest {
             backendFactory,
             licenseCall,
             analyticsEventQueue,
+            scopeProvider,
         )
     }
 
@@ -235,6 +243,22 @@ class OfflineAuthenticatedDispatcherTest {
             val expectedSequenceNumber = index + 1
             assertThat(event.sequenceNumber).isEqualTo(expectedSequenceNumber)
         }
+    }
+
+    @Test
+    fun `disabling the dispatcher cancels all scopes`() {
+        offlineAuthenticatedDispatcher.disable()
+
+        assertThat(scopeProvider.areScopesCancelled).isTrue
+    }
+
+    @Test
+    fun `enabling the dispatcher after it was disabled recreates scope and backend`() {
+        offlineAuthenticatedDispatcher.disable()
+        offlineAuthenticatedDispatcher.enable()
+
+        assertThat(scopeProvider.areScopesCancelled).isFalse
+        verify(exactly = 2) { backendFactory.createBackend(any(), any(), any()) }
     }
 
     @Test

@@ -24,6 +24,7 @@ import com.bitmovin.analytics.persistence.OfflineAuthenticatedDispatcher
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
+import com.bitmovin.analytics.utils.ScopeProvider
 
 /**
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
@@ -69,6 +70,7 @@ class BitmovinAnalytics
                 ),
                 licenseCall = DefaultLicenseCall(config, context),
                 eventQueue = eventQueue,
+                scopeProvider = ScopeProvider.create(),
             )
         } else {
             SimpleEventDataDispatcher(
@@ -76,6 +78,7 @@ class BitmovinAnalytics
                 config = config,
                 callback = this,
                 backendFactory = BackendFactory(eventQueue),
+                scopeProvider = ScopeProvider.create(),
             )
         },
         debugCallback,
