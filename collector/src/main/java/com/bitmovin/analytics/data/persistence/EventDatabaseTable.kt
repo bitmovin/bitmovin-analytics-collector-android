@@ -95,11 +95,20 @@ internal sealed class EventDatabaseTable(
     }
 
     override fun deleteSessions(transaction: Transaction, sessions: List<String>) {
-        transaction.db.delete(
-            /* table = */ tableName,
-            /* whereClause = */ "$COLUMN_SESSION_ID in (${sessions.joinToString { "?" }})",
-            /* whereArgs = */ sessions.toTypedArray(),
-        )
+        // it is not possible to delete more than 999 elements at a time by ID
+        // this number is hardcoded in `sqlite3.c`
+        // see here: https://stackoverflow.com/a/15313495/21555458
+        sessions
+            .chunked(999)
+            .forEach { sessionIdsToDelete ->
+                transaction.db.delete(
+                    /* table = */ tableName,
+                    /* whereClause = */ "$COLUMN_SESSION_ID in (${
+                        sessionIdsToDelete.joinToString { "?" }
+                    })",
+                    /* whereArgs = */ sessionIdsToDelete.toTypedArray(),
+                )
+            }
     }
 
     override fun findPurgeableSessions(
