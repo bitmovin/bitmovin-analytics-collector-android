@@ -96,7 +96,6 @@ class DefaultEventDatabaseConnectionTest {
     @Test
     fun testPopEventWhenAllEventsAreOlderThanTheLimit() = databaseTest(eventTimeLimit = 1.seconds) {
         every { Util.timestamp } returns 0
-        // insert multiple and wait for "expiration" -> should be completely clean
         push(createRandomEvent(eventTimestamp = 1000))
         push(createRandomEvent(eventTimestamp = 2000))
         push(createRandomEvent(eventTimestamp = 3000))
@@ -108,7 +107,6 @@ class DefaultEventDatabaseConnectionTest {
     @Test
     fun testPopEventWhenAllEventsAreWithinTheTimeLimit() = databaseTest(eventTimeLimit = 1.seconds) {
         every { Util.timestamp } returns 0
-        // insert multiple and query immediately (no expiration) -> should return the very first inserted
         val first = createRandomEvent(eventTimestamp = 3500)
         push(first)
         push(createRandomEvent(eventTimestamp = 3500))
@@ -121,7 +119,6 @@ class DefaultEventDatabaseConnectionTest {
     @Test
     fun testPopEventWhenAllButTheLastEventAreOlderThanTheLimit() = databaseTest(eventTimeLimit = 1.seconds) {
         every { Util.timestamp } returns 1000
-        // insert 2 elements, wait for expiration, insert one again -> should return the last inserted (which is the single element in the list now)
         push(createRandomEvent(eventTimestamp = 1000))
         push(createRandomEvent(eventTimestamp = 1000))
         every { Util.timestamp } returns 4000
@@ -133,9 +130,102 @@ class DefaultEventDatabaseConnectionTest {
     }
 
     @Test
+    fun testPopEventWhenASessionStartedBeforeTheAgeLimitItIsDeleted() = databaseTest(eventTimeLimit = 1.seconds) {
+        every { Util.timestamp } returns 0
+        push(createRandomEvent(sessionId = "commonSession", eventTimestamp = 1000))
+        push(createRandomEvent(sessionId = "commonSession", eventTimestamp = 1500))
+        push(createRandomEvent(sessionId = "commonSession", eventTimestamp = 2000))
+        push(createRandomEvent(sessionId = "commonSession", eventTimestamp = 2500))
+        push(createRandomEvent(sessionId = "commonSession", eventTimestamp = 4000))
+        every { Util.timestamp } returns 4000
+        val unrelatedNewSessionEntry = createRandomEvent(sessionId = "otherSession", eventTimestamp = 4000)
+        push(unrelatedNewSessionEntry)
+
+        val read = pop()
+        Assert.assertEquals(unrelatedNewSessionEntry, read)
+
+        Assert.assertNull(pop())
+    }
+
+    @Test
+    fun testPopEventWhenASessionStartedBeforeTheAgeLimitItIsDeletedInEventsAndAdEvents() = databaseTest(eventTimeLimit = 1.seconds) {
+        every { Util.timestamp } returns 0
+        listOf(
+            createRandomEvent(sessionId = "commonSession", eventTimestamp = 1000),
+            createRandomEvent(sessionId = "commonSession", eventTimestamp = 1500),
+            createRandomEvent(sessionId = "commonSession", eventTimestamp = 2000),
+            createRandomEvent(sessionId = "commonSession", eventTimestamp = 2500),
+            createRandomEvent(sessionId = "commonSession", eventTimestamp = 4000),
+        ).forEach {
+            push(it)
+            pushAd(it.copy(eventTimestamp = it.eventTimestamp + 1))
+        }
+        val unrelatedNewSessionEntryForEvent = createRandomEvent(
+            sessionId = "otherSession",
+            eventTimestamp = 4000,
+        )
+        val unrelatedNewSessionEntryForAdEvent = createRandomEvent(
+            sessionId = "secondOtherSession",
+            eventTimestamp = 4000,
+        )
+        push(unrelatedNewSessionEntryForEvent)
+        pushAd(unrelatedNewSessionEntryForAdEvent)
+        every { Util.timestamp } returns 4000
+
+        val readEvent = pop()
+        val readAdEvent = popAd()
+        Assert.assertEquals(unrelatedNewSessionEntryForEvent, readEvent)
+        Assert.assertEquals(unrelatedNewSessionEntryForAdEvent, readAdEvent)
+
+        Assert.assertNull(pop())
+        Assert.assertNull(popAd())
+    }
+
+    @Test
+    fun testPopEventWhenTheCountLimitIsReachedASessionIsDeleted() = databaseTest(eventMaxCount = 5) {
+        push(createRandomEvent(sessionId = "commonSession"))
+        push(createRandomEvent(sessionId = "commonSession"))
+        push(createRandomEvent(sessionId = "commonSession"))
+        push(createRandomEvent(sessionId = "commonSession"))
+        push(createRandomEvent(sessionId = "commonSession"))
+        val unrelatedNewSessionEntry = createRandomEvent(sessionId = "otherSession")
+        push(unrelatedNewSessionEntry)
+
+        val read = pop()
+        Assert.assertEquals(unrelatedNewSessionEntry, read)
+
+        Assert.assertNull(pop())
+    }
+
+    @Test
+    fun testPopEventWhenTheCountLimitIsReachedASessionIsDeletedInEventsAndAdEvents() = databaseTest(eventMaxCount = 5) {
+        listOf(
+            createRandomEvent(sessionId = "commonSession"),
+            createRandomEvent(sessionId = "commonSession"),
+            createRandomEvent(sessionId = "commonSession"),
+            createRandomEvent(sessionId = "commonSession"),
+            createRandomEvent(sessionId = "commonSession"),
+        ).forEach {
+            push(it)
+            pushAd(it)
+        }
+        val unrelatedNewSessionEntryForEvent = createRandomEvent(sessionId = "otherSession")
+        val unrelatedNewSessionEntryForAdEvent = createRandomEvent(sessionId = "secondOtherSession")
+        push(unrelatedNewSessionEntryForEvent)
+        pushAd(unrelatedNewSessionEntryForAdEvent)
+
+        val readEvent = pop()
+        val readAdEvent = popAd()
+        Assert.assertEquals(unrelatedNewSessionEntryForEvent, readEvent)
+        Assert.assertEquals(unrelatedNewSessionEntryForAdEvent, readAdEvent)
+
+        Assert.assertNull(pop())
+        Assert.assertNull(popAd())
+    }
+
+    @Test
     fun testPopAdEventWhenAllEventsAreOlderThanTheLimit() = databaseTest(eventTimeLimit = 1.seconds) {
         every { Util.timestamp } returns 0
-        // insert multiple and wait for "expiration" -> should be completely clean
         pushAd(createRandomEvent(eventTimestamp = 1000))
         pushAd(createRandomEvent(eventTimestamp = 2000))
         pushAd(createRandomEvent(eventTimestamp = 3000))
@@ -147,7 +237,6 @@ class DefaultEventDatabaseConnectionTest {
     @Test
     fun testPopAdEventWhenAllEventsAreWithinTheTimeLimit() = databaseTest(eventTimeLimit = 1.seconds) {
         every { Util.timestamp } returns 0
-        // insert multiple and query immediately (no expiration) -> should return the very first inserted
         val first = createRandomEvent(eventTimestamp = 3500)
         pushAd(first)
         pushAd(createRandomEvent(eventTimestamp = 3500))
@@ -160,7 +249,6 @@ class DefaultEventDatabaseConnectionTest {
     @Test
     fun testPopAdEventWhenAllButTheLastEventAreOlderThanTheLimit() = databaseTest(eventTimeLimit = 1.seconds) {
         every { Util.timestamp } returns 1000
-        // insert 2 elements, wait for expiration, insert one again -> should return the last inserted (which is the single element in the list now)
         pushAd(createRandomEvent(eventTimestamp = 1000))
         pushAd(createRandomEvent(eventTimestamp = 1000))
         every { Util.timestamp } returns 4000
@@ -173,27 +261,23 @@ class DefaultEventDatabaseConnectionTest {
 
     @Test
     fun testPopEventCountLimitOverrun() = databaseTest(eventMaxCount = 2) {
-        // insert more than maximum -> should drop all over the limit (starting with the first inserted)
         createRandomEvent().also { push(it) }
         val event2 = createRandomEvent().also { push(it) }
         val event3 = createRandomEvent().also { push(it) }
 
         Assert.assertEquals(event2, pop())
         Assert.assertEquals(event3, pop())
-        // database is empty now
         Assert.assertNull(pop())
     }
 
     @Test
     fun testPopAdEventCountLimitOverrun() = databaseTest(eventMaxCount = 2) {
-        // insert more than maximum -> should drop all over the limit (starting with the first inserted)
         createRandomEvent().also { push(it) }
         val event2 = createRandomEvent().also { pushAd(it) }
         val event3 = createRandomEvent().also { pushAd(it) }
 
         Assert.assertEquals(event2, popAd())
         Assert.assertEquals(event3, popAd())
-        // database is empty now
         Assert.assertNull(popAd())
     }
 
