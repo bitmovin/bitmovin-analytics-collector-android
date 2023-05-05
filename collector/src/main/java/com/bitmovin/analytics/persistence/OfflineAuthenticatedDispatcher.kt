@@ -28,12 +28,16 @@ internal class OfflineAuthenticatedDispatcher(
     private val eventQueue: AnalyticsEventQueue,
     private val scopeProvider: ScopeProvider,
 ) : IEventDataDispatcher {
-    private var scope: CoroutineScope
-    private var backend: Backend
+    private lateinit var scope: CoroutineScope
+    private lateinit var backend: Backend
     private var operationMode = Unauthenticated
     private var sampleSequenceNumber = 0
 
     init {
+        createBackend()
+    }
+
+    private fun createBackend() {
         scope = scopeProvider.createMainScope()
         backend = backendFactory.createBackend(config, context, scope)
     }
@@ -68,8 +72,7 @@ internal class OfflineAuthenticatedDispatcher(
 
     override fun enable() {
         operationMode = Unauthenticated
-        scope = scopeProvider.createMainScope()
-        backend = backendFactory.createBackend(config, context, scope)
+        createBackend()
     }
 
     override fun disable() {

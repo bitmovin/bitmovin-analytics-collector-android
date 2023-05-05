@@ -19,17 +19,21 @@ internal class SimpleEventDataDispatcher(
     private val backendFactory: BackendFactory,
     private val scopeProvider: ScopeProvider,
 ) : IEventDataDispatcher, AuthenticationCallback {
-    private var backend: Backend
+    private lateinit var backend: Backend
+    private lateinit var scope: CoroutineScope
     private val data: Queue<EventData>
     private val adData: Queue<AdEventData>
     private var enabled = false
-    private var scope: CoroutineScope
 
     private var sampleSequenceNumber = 0
 
     init {
         data = ConcurrentLinkedQueue()
         adData = ConcurrentLinkedQueue()
+        createBackend()
+    }
+
+    private fun createBackend() {
         scope = scopeProvider.createMainScope()
         backend = backendFactory.createBackend(config, context, scope)
     }
@@ -48,6 +52,7 @@ internal class SimpleEventDataDispatcher(
                 forwardQueuedEvents()
                 true
             }
+
             is AuthenticationResponse.Denied, AuthenticationResponse.Error -> {
                 callback?.configureFeatures(false, null)
                 false
@@ -57,8 +62,7 @@ internal class SimpleEventDataDispatcher(
     }
 
     override fun enable() {
-        scope = scopeProvider.createMainScope()
-        backend = backendFactory.createBackend(config, context, scope)
+        createBackend()
         val licenseCall = DefaultLicenseCall(config, context)
         licenseCall.authenticate(this)
     }
