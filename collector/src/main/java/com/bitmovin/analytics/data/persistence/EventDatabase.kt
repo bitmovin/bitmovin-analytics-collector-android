@@ -17,6 +17,7 @@ private const val DEFAULT_MAX_ENTRIES = 10_000
 internal data class RetentionConfig(
     val ageLimit: Duration,
     val maximumEntriesPerType: Int,
+    val referenceTables: List<EventDatabaseTable>.() -> List<EventDatabaseTable> = { take(1) },
 )
 
 internal class EventDatabase private constructor(context: Context) : EventDatabaseConnection {
@@ -66,10 +67,14 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
     } ?: 0
 
     private fun Transaction.cleanupDatabase() {
-        val deletableSessionIds = EventDatabaseTable.allTables.first().findPurgableSessions(
-            transaction = this,
-            retentionConfig = retentionConfig,
-        )
+        val deletableSessionIds = retentionConfig
+            .referenceTables(EventDatabaseTable.allTables)
+            .flatMap {
+                it.findPurgableSessions(
+                    transaction = this,
+                    retentionConfig = retentionConfig,
+                )
+            }
         if (deletableSessionIds.isEmpty()) return
         EventDatabaseTable.allTables.forEach { table ->
             table.deleteSessions(
