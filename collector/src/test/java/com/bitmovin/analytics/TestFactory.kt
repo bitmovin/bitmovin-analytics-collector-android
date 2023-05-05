@@ -47,5 +47,19 @@ object TestFactory {
         playerInfo,
     )
 
-    fun createAdEventData(adId: String = "testAdId") = AdEventData(adId = adId)
+    fun createAdEventData(adId: String = "testAdId") = AdEventData(
+        adId = adId,
+        videoImpressionId = "video-impression-id",
+        userAgent = "userAgent",
+        domain = "bitmovin.com",
+        language = "en",
+        player = "bitmovin palyer",
+        screenHeight = 9,
+        screenWidth = 16,
+        platform = "android",
+        playerTech = "player tech",
+        videoWindowHeight = 9,
+        videoWindowWidth = 16,
+        userId = "testUser",
+    )
 }
