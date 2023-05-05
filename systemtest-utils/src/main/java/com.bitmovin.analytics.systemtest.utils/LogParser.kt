@@ -52,6 +52,10 @@ object LogParser {
 
                 // if eventdata includes errorMessage, next sample is errorDetail
                 if (eventData.errorMessage != null) {
+                    if (!iterator.hasNext()) {
+                        fail<Nothing>("No errorDetail was sent after eventData with errorMessage")
+                    }
+
                     val errorDetailJson = iterator.next()
                     val errorDetail = DataSerializer.deserialize(
                         errorDetailJson,

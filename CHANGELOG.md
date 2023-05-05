@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgrade example app to latest exoplayer version (v2.18.6)
 - IVS Player and ExoPlayer: Streamlined reporting of video duration for live streams to be 0, to be consistent with other players/platforms
 
+### Added
+- [internal] New `AnalyticsConfig` which can be used to create a `AnalyticsCollector`
+
 ## v2.16.0
 
 ### Changed

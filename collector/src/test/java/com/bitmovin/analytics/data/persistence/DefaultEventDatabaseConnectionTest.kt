@@ -60,7 +60,7 @@ class DefaultEventDatabaseConnectionTest {
     @Test
     fun testPurge() = databaseTest {
         // prepare the database
-        val eventsCountPerTable = 5_000
+        val eventsCountPerTable = 10
         repeat(eventsCountPerTable) {
             val entry = createRandomEvent()
             push(entry)

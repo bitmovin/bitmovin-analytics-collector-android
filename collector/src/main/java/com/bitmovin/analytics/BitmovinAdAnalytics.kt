@@ -185,7 +185,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
 
     private fun sendAnalyticsRequest(adBreak: AdBreak, adSample: AdSample? = null) {
         val eventData = playerAdapter?.createEventData() ?: return
-        val adEventData = AdEventData()
+        val adEventData = AdEventData.fromEventData(eventData)
 
         adEventData.analyticsVersion = Util.analyticsVersion
         val moduleInfo = adAdapter?.moduleInformation
@@ -197,7 +197,6 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         adEventData.playerStartupTime = 1
         adEventData.autoplay = adAdapter?.isAutoplayEnabled
 
-        adEventData.setEventData(eventData)
         adEventData.setAdBreak(adBreak)
         adEventData.setAdSample(adSample)
         adEventData.adImpressionId = Util.uUID

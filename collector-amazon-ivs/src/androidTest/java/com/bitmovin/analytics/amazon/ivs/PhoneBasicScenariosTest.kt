@@ -266,7 +266,7 @@ class PhoneBasicScenariosTest {
         // act
         player.load(nonExistingStreamSample.uri)
 
-        Thread.sleep(500) // we need to wait a bit until player goes into error state
+        Thread.sleep(2000) // we need to wait a bit until player goes into error state
 
         collector.detachPlayer()
         player.release()

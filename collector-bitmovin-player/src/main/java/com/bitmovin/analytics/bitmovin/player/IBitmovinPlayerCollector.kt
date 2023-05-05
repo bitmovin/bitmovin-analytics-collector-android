@@ -3,7 +3,9 @@ package com.bitmovin.analytics.bitmovin.player
 import android.content.Context
 import com.bitmovin.analytics.AnalyticsCollector
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.config.SourceMetadata
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.source.Source
 
@@ -11,7 +13,6 @@ import com.bitmovin.player.api.source.Source
  * Analytics Collector for the Bitmovin Player
  */
 interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
-
     /**
      * Used to configure source specific metadata that is
      * active when the specified source is loaded into the player.
@@ -28,6 +29,13 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
         @JvmStatic
         fun create(config: BitmovinAnalyticsConfig, context: Context): IBitmovinPlayerCollector {
             return BitmovinPlayerCollector(config, context)
+        }
+
+        /** @suppress */
+        @InternalBitmovinApi
+        @JvmStatic
+        fun create(config: AnalyticsConfig, context: Context): IBitmovinPlayerCollector {
+            return BitmovinPlayerCollector(BitmovinAnalyticsConfig(config), context)
         }
     }
 }

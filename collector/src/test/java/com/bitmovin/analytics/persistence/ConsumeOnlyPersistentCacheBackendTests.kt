@@ -16,6 +16,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -124,6 +126,56 @@ class ConsumeOnlyPersistentCacheBackendTests {
         }
     }
 
+    @Test
+    fun `receiving multiple EventData when a cache item is flushed does not flush more queue items`() {
+        val cachedEvent = TestFactory.createEventData(impressionId = "test-event")
+        val event = TestFactory.createEventData(impressionId = "event")
+        val cachedEventsCount = 3
+        val sendEvents = 5
+        var poppedEvents = 0
+
+        var firstCachedEventSuccessCallback: OnSuccessCallback? = null
+        every { callbackBackend.send(any(), any(), any()) } answers {
+            if (firstArg<EventData>() == cachedEvent &&
+                firstCachedEventSuccessCallback == null
+            ) {
+                firstCachedEventSuccessCallback = secondArg<OnSuccessCallback>()
+            } else {
+                secondArg<OnSuccessCallback>().onSuccess()
+            }
+        }
+        every { eventQueue.popAdEvent() } returns null
+        every { eventQueue.popEvent() } answers {
+            if (poppedEvents >= cachedEventsCount) {
+                null
+            } else {
+                poppedEvents++
+                cachedEvent
+            }
+        }
+
+        backend = ConsumeOnlyPersistentCacheBackend(
+            testScope,
+            callbackBackend,
+            eventQueue,
+        )
+
+        repeat(sendEvents) {
+            backend.send(event, null, null)
+            testScope.testScheduler.advanceUntilIdle()
+        }
+
+        verify(exactly = sendEvents) { callbackBackend.send(event, any(), any()) }
+        verify(exactly = 1) { callbackBackend.send(cachedEvent, any(), any()) }
+        verify(exactly = 1) { eventQueue.popEvent() }
+        firstCachedEventSuccessCallback!!.onSuccess()
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(exactly = cachedEventsCount) { callbackBackend.send(cachedEvent, any(), any()) }
+        assertThat(poppedEvents).isEqualTo(cachedEventsCount)
+        verify(exactly = cachedEventsCount + 1) { eventQueue.popEvent() }
+    }
+
     private fun testAdditionalSendingHappens(newEvent: Any) {
         requireEventDataOrAdEventData(newEvent)
 
@@ -154,7 +206,7 @@ class ConsumeOnlyPersistentCacheBackendTests {
             is EventData -> backend.send(newEvent, null, null)
             is AdEventData -> backend.sendAd(newEvent, null, null)
         }
-        testScope.testScheduler.runCurrent()
+        testScope.testScheduler.advanceUntilIdle()
 
         verify(exactly = 1) {
             when (newEvent) {
@@ -208,7 +260,7 @@ class ConsumeOnlyPersistentCacheBackendTests {
             is EventData -> backend.send(newEvent, null, failure = { _, _ -> })
             is AdEventData -> backend.sendAd(newEvent, null, failure = { _, _ -> })
         }
-        testScope.testScheduler.runCurrent()
+        testScope.testScheduler.advanceUntilIdle()
 
         verify(exactly = 1) {
             when (newEvent) {

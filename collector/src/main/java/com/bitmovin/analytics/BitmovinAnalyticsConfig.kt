@@ -3,7 +3,9 @@ package com.bitmovin.analytics
 import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.enums.PlayerType
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
 
 class BitmovinAnalyticsConfig() : Parcelable {
@@ -376,5 +378,54 @@ class BitmovinAnalyticsConfig() : Parcelable {
             override fun createFromParcel(parcel: Parcel) = BitmovinAnalyticsConfig(parcel)
             override fun newArray(size: Int) = arrayOfNulls<BitmovinAnalyticsConfig>(size)
         }
+
+        /**
+         * This acts as constructor, but is just a helper function to convert an [AnalyticsConfig] to [BitmovinAnalyticsConfig]
+         */
+        @InternalBitmovinApi
+        operator fun invoke(analyticsConfig: AnalyticsConfig): BitmovinAnalyticsConfig =
+            BitmovinAnalyticsConfig(
+                analyticsConfig.key,
+            ).apply {
+                cdnProvider = analyticsConfig.cdnProvider
+                customData1 = analyticsConfig.customData1
+                customData2 = analyticsConfig.customData2
+                customData3 = analyticsConfig.customData3
+                customData4 = analyticsConfig.customData4
+                customData5 = analyticsConfig.customData5
+                customData6 = analyticsConfig.customData6
+                customData7 = analyticsConfig.customData7
+                customData8 = analyticsConfig.customData8
+                customData9 = analyticsConfig.customData9
+                customData10 = analyticsConfig.customData10
+                customData11 = analyticsConfig.customData11
+                customData12 = analyticsConfig.customData12
+                customData13 = analyticsConfig.customData13
+                customData14 = analyticsConfig.customData14
+                customData15 = analyticsConfig.customData15
+                customData16 = analyticsConfig.customData16
+                customData17 = analyticsConfig.customData17
+                customData18 = analyticsConfig.customData18
+                customData19 = analyticsConfig.customData19
+                customData20 = analyticsConfig.customData20
+                customData21 = analyticsConfig.customData21
+                customData22 = analyticsConfig.customData22
+                customData23 = analyticsConfig.customData23
+                customData24 = analyticsConfig.customData24
+                customData25 = analyticsConfig.customData25
+                customData26 = analyticsConfig.customData26
+                customData27 = analyticsConfig.customData27
+                customData28 = analyticsConfig.customData28
+                customData29 = analyticsConfig.customData29
+                customData30 = analyticsConfig.customData30
+                customUserId = analyticsConfig.customUserId
+                experimentName = analyticsConfig.experimentName
+                randomizeUserId = analyticsConfig.randomizeUserId
+                config = CollectorConfig().apply {
+                    backendUrl = analyticsConfig.backendUrl
+                    tryResendDataOnFailedConnection =
+                        analyticsConfig.tryResendDataOnFailedConnection
+                }
+            }
     }
 }
