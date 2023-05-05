@@ -31,6 +31,7 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
             return BitmovinPlayerCollector(config, context)
         }
 
+        /** @suppress */
         @InternalBitmovinApi
         @JvmStatic
         fun create(config: AnalyticsConfig, context: Context): IBitmovinPlayerCollector {

@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.internal
 
 /**
- * Marks Bitmovin Player internal API.
+ * Marks Bitmovin Analytics internal API.
  * Annotated symbols are for Bitmovin internal usage only and must not be used otherwise.
  */
 @RequiresOptIn(
