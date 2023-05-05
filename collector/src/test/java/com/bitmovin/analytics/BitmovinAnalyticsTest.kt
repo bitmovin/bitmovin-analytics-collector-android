@@ -1,6 +1,6 @@
 package com.bitmovin.analytics
 
-import android.app.Activity
+import android.content.Context
 import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
@@ -20,10 +20,14 @@ import org.mockito.junit.MockitoJUnitRunner
 class BitmovinAnalyticsTest {
 
     private lateinit var bitmovinAnalyticsConfig: BitmovinAnalyticsConfig
+    private lateinit var context: Context
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
+        context = mockk {
+            every { applicationContext } returns mockk()
+        }
         bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("<ANALYTICS_KEY>")
         bitmovinAnalyticsConfig.customData1 = "customData1"
         bitmovinAnalyticsConfig.customData2 = "customData2"
@@ -40,7 +44,7 @@ class BitmovinAnalyticsTest {
     @Test
     fun testDetachPlayerShouldCallOnAnalyticsReleasingEventListener() {
         val listener = mockk<OnAnalyticsReleasingEventListener>(relaxed = true)
-        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, Activity())
+        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, context)
         analytics.onAnalyticsReleasingObservable.subscribe(listener)
         analytics.detachPlayer()
         verify(exactly = 1) { listener.onReleasing() }
@@ -50,7 +54,7 @@ class BitmovinAnalyticsTest {
     fun testOnVideoStartFailedShouldCallOnErrorDetailEventListener() {
         val listener = mockk<OnErrorDetailEventListener>(relaxed = true)
         mockkConstructor(PlayerStateMachine::class)
-        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, Activity())
+        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, context)
         val observable = ObservableSupport<OnErrorDetailEventListener>()
         val defaultStateMachineListener = DefaultStateMachineListener(analytics, mockk(relaxed = true), observable)
         val stateMachine = mockk<PlayerStateMachine>()

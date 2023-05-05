@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.contentValuesOf
 import androidx.core.database.sqlite.transaction
@@ -12,11 +13,13 @@ import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_DATA
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_EVENT_TIMESTAMP
 import com.bitmovin.analytics.data.persistence.TableDefinition.COLUMN_INTERNAL_ID
 import com.bitmovin.analytics.data.persistence.TableDefinition.TABLE_NAME
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
 internal class DefaultEventDatabaseConnection(
     context: Context,
     databaseName: String,
-    private val limitAgeInMillis: Long = DEFAULT_LIMIT_AGE_IN_MS,
+    private val ageLimit: Duration = DEFAULT_AGE_LIMIT,
     private val maximumCountOfEvents: Int = MAX_COUNT,
 ) : EventDatabaseConnection {
 
@@ -55,7 +58,8 @@ internal class DefaultEventDatabaseConnection(
 
     companion object {
         private const val VERSION = 1
-        private const val DEFAULT_LIMIT_AGE_IN_MS: Long = 30L * 24L * 60L * 60L * 1000L
+        private const val TAG = "EventDatabase"
+        private val DEFAULT_AGE_LIMIT: Duration = 30L.days
         private const val MAX_COUNT = 10_000
     }
 
@@ -154,40 +158,8 @@ internal class DefaultEventDatabaseConnection(
     }
 
     private fun Transaction.cleanupDatabase() {
-        val now = System.currentTimeMillis()
-        // cleanup by timestamp
-        db.delete(
-            /* table = */ TABLE_NAME,
-            /* whereClause = */ "$COLUMN_EVENT_TIMESTAMP < ?",
-            /* whereArgs = */ arrayOf((now - limitAgeInMillis).toString()),
-        )
-
-        // cleanup by count
-        // therefore query the maximum count + 1, get the internal id of it, and delete every event which was inserted before this element
-        val deleteStartWith: Long = db.query(
-            /* table = */ TABLE_NAME,
-            /* columns = */ arrayOf(COLUMN_INTERNAL_ID),
-            /* selection = */ null,
-            /* selectionArgs = */ null,
-            /* groupBy = */ null,
-            /* having = */ null,
-            /* orderBy = */ "$COLUMN_INTERNAL_ID DESC",
-            /* limit = */ (maximumCountOfEvents + 1).toString(),
-        ).use {
-            if (it.count <= maximumCountOfEvents) {
-                return@use null
-            }
-            if (!it.moveToLast()) {
-                return@use null
-            }
-            return@use it.getLong(it.getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
-        } ?: return
-
-        db.delete(
-            /* table = */ TABLE_NAME,
-            /* whereClause = */ "$COLUMN_INTERNAL_ID <= ?",
-            /* whereArgs = */ arrayOf(deleteStartWith.toString()),
-        )
+        cleanupByTime(ageLimit)
+        cleanupByCount(maximumCountOfEvents)
     }
 
     private fun <T> catchingTransaction(block: Transaction.() -> T): T? {
@@ -197,7 +169,7 @@ internal class DefaultEventDatabaseConnection(
             }
         } catch (e: Exception) {
             // database exception -> transaction is cancelled, just log (should never happen on real devices)
-            // TODO:use internal logging for this error!
+            Log.d(TAG, "Transaction failed", e)
             e.printStackTrace()
             null
         }
@@ -209,9 +181,46 @@ internal class DefaultEventDatabaseConnection(
         // otherwise (during normal app runtime) the connection to the database stays alive the whole app lifetime!
         dbHelper.close()
     }
+}
 
-    @JvmInline
-    value class Transaction(val db: SQLiteDatabase)
+@JvmInline
+private value class Transaction(val db: SQLiteDatabase)
+
+private fun Transaction.cleanupByTime(ageLimit: Duration) {
+    val now = System.currentTimeMillis()
+    db.delete(
+        /* table = */ TABLE_NAME,
+        /* whereClause = */ "$COLUMN_EVENT_TIMESTAMP < ?",
+        /* whereArgs = */ arrayOf((now - ageLimit.inWholeMilliseconds).toString()),
+    )
+}
+
+private fun Transaction.cleanupByCount(maximumCountOfEvents: Int) {
+    // query the maximum count + 1, get the internal id of it, and delete every event which was inserted before this element
+    val deleteStartWith: Long = db.query(
+        /* table = */ TABLE_NAME,
+        /* columns = */ arrayOf(COLUMN_INTERNAL_ID),
+        /* selection = */ null,
+        /* selectionArgs = */ null,
+        /* groupBy = */ null,
+        /* having = */ null,
+        /* orderBy = */ "$COLUMN_INTERNAL_ID DESC",
+        /* limit = */ (maximumCountOfEvents + 1).toString(),
+    ).use {
+        if (it.count <= maximumCountOfEvents) {
+            return@use null
+        }
+        if (!it.moveToLast()) {
+            return@use null
+        }
+        return@use it.getLong(it.getColumnIndexOrThrow(COLUMN_INTERNAL_ID))
+    } ?: return
+
+    db.delete(
+        /* table = */ TABLE_NAME,
+        /* whereClause = */ "$COLUMN_INTERNAL_ID <= ?",
+        /* whereArgs = */ arrayOf(deleteStartWith.toString()),
+    )
 }
 
 private object TableDefinition {
