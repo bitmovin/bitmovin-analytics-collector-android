@@ -6,8 +6,7 @@ import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.utils.DataSerializer
 
 internal class PersistentAnalyticsEventQueue(
-    private val eventDatabase: EventDatabaseConnection,
-    private val adEventDatabase: EventDatabaseConnection,
+    private val eventDatabase: EventDatabase,
 ) : AnalyticsEventQueue {
 
     override fun push(event: EventData) {
@@ -15,17 +14,16 @@ internal class PersistentAnalyticsEventQueue(
     }
 
     override fun push(event: AdEventData) {
-        eventDatabase.push(event.toEventDatabaseEntry())
+        eventDatabase.pushAd(event.toEventDatabaseEntry())
     }
 
     override fun clear() {
         eventDatabase.purge()
-        adEventDatabase.purge()
     }
 
     override fun popEvent() = eventDatabase.pop()?.toEventData()
 
-    override fun popAdEvent() = adEventDatabase.pop()?.toAdEventData()
+    override fun popAdEvent() = eventDatabase.popAd()?.toAdEventData()
 }
 
 private fun EventData.toEventDatabaseEntry() = EventDatabaseEntry(

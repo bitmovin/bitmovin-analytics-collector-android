@@ -12,23 +12,18 @@ import org.junit.Before
 import org.junit.Test
 
 class PersistentAnalyticsEventQueueTest {
-    private val eventDatabase: EventDatabaseConnection = mockk()
-    private val adEventDatabase: EventDatabaseConnection = mockk()
+    private val eventDatabase: EventDatabase = mockk()
     private lateinit var eventQueue: PersistentAnalyticsEventQueue
 
     @Before
     fun setup() {
-        eventQueue = PersistentAnalyticsEventQueue(
-            eventDatabase,
-            adEventDatabase,
-        )
+        eventQueue = PersistentAnalyticsEventQueue(eventDatabase)
     }
 
     @After
     fun cleanup() {
         clearMocks(
             eventDatabase,
-            adEventDatabase,
         )
     }
 
@@ -58,7 +53,7 @@ class PersistentAnalyticsEventQueueTest {
         eventQueue.push(event)
 
         verify {
-            eventDatabase.push(eventDatabaseEntry)
+            eventDatabase.pushAd(eventDatabaseEntry)
         }
     }
 
@@ -68,7 +63,6 @@ class PersistentAnalyticsEventQueueTest {
 
         verify {
             eventDatabase.purge()
-            adEventDatabase.purge()
         }
     }
 
@@ -93,7 +87,7 @@ class PersistentAnalyticsEventQueueTest {
             event.time,
             DataSerializer.serialize(event)!!,
         )
-        every { adEventDatabase.pop() } returns eventDatabaseEntry
+        every { eventDatabase.popAd() } returns eventDatabaseEntry
 
         val popEvent = eventQueue.popAdEvent()!!
 
