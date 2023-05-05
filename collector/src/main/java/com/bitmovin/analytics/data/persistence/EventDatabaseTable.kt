@@ -4,7 +4,6 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import androidx.core.content.contentValuesOf
-import kotlin.time.Duration
 
 private const val COLUMN_INTERNAL_ID: String = "_id"
 private const val COLUMN_SESSION_ID: String = "session_id"
@@ -147,18 +146,6 @@ internal sealed class EventDatabaseTable(
         ).use {
             it.getStrings(it.getColumnIndexOrThrow(COLUMN_SESSION_ID))
         }
-    }
-
-    private fun cleanupByAge(
-        transaction: Transaction,
-        ageLimit: Duration,
-    ) {
-        val now = System.currentTimeMillis()
-        transaction.db.delete(
-            /* table = */ tableName,
-            /* whereClause = */ "$COLUMN_EVENT_TIMESTAMP < ?",
-            /* whereArgs = */ arrayOf((now - ageLimit.inWholeMilliseconds).toString()),
-        )
     }
 
     private data class Row(val internalId: Long, val entry: EventDatabaseEntry)
