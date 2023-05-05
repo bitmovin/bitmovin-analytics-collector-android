@@ -1,14 +1,14 @@
 package com.bitmovin.analytics.data.persistence
 
 import androidx.test.core.app.ApplicationProvider
+import com.bitmovin.analytics.utils.Util
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.util.UUID
 import kotlin.time.Duration
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(
     RobolectricTestRunner::class,
@@ -79,66 +79,63 @@ class DefaultEventDatabaseConnectionTest {
     }
 
     @Test
-    fun testPopEventTimeLimitOverrun() =
-        databaseTest(eventTimeLimit = 1.toDuration(DurationUnit.SECONDS)) {
-            // insert multiple and wait for "expiration" -> should be completely clean
-            push(createRandomEvent())
-            push(createRandomEvent())
-            push(createRandomEvent())
+    fun testPopEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1.seconds) {
+        // insert multiple and wait for "expiration" -> should be completely clean
+        push(createRandomEvent())
+        push(createRandomEvent())
+        push(createRandomEvent())
 
-            Thread.sleep(1500)
+        Thread.sleep(1500)
 
-            Assert.assertNull(pop())
+        Assert.assertNull(pop())
 
-            // insert multiple and query immediately (no expiration) -> should return the very first inserted
-            val first = createRandomEvent()
-            push(first)
-            push(createRandomEvent())
-            push(createRandomEvent())
+        // insert multiple and query immediately (no expiration) -> should return the very first inserted
+        val first = createRandomEvent()
+        push(first)
+        push(createRandomEvent())
+        push(createRandomEvent())
 
-            Assert.assertEquals(first, pop())
+        Assert.assertEquals(first, pop())
 
-            // insert 2 elements, wait for expiration, insert one again -> should return the last inserted (which is the single element in the list now)
-            push(createRandomEvent())
-            push(createRandomEvent())
-            Thread.sleep(1200)
-            val latest = createRandomEvent()
-            push(latest)
+        // insert 2 elements, wait for expiration, insert one again -> should return the last inserted (which is the single element in the list now)
+        push(createRandomEvent())
+        push(createRandomEvent())
+        Thread.sleep(1200)
+        val latest = createRandomEvent()
+        push(latest)
 
-            val read = pop()
-            Assert.assertEquals(latest, read)
-        }
+        val read = pop()
+        Assert.assertEquals(latest, read)
+    }
 
     @Test
-    fun testPopAdEventTimeLimitOverrun() =
-        databaseTest(eventTimeLimit = 1.toDuration(DurationUnit.SECONDS)) {
-            // insert multiple and wait for "expiration" -> should be completely clean
-            push(createRandomEvent())
-            push(createRandomEvent())
-            push(createRandomEvent())
+    fun testPopAdEventTimeLimitOverrun() = databaseTest(eventTimeLimit = 1.seconds) {
+        // insert multiple and wait for "expiration" -> should be completely clean
+        push(createRandomEvent())
+        push(createRandomEvent())
+        push(createRandomEvent())
+        Thread.sleep(1500)
 
-            Thread.sleep(1500)
+        Assert.assertNull(popAd())
 
-            Assert.assertNull(popAd())
+        // insert multiple and query immediately (no expiration) -> should return the very first inserted
+        val first = createRandomEvent()
+        pushAd(first)
+        pushAd(createRandomEvent())
+        pushAd(createRandomEvent())
 
-            // insert multiple and query immediately (no expiration) -> should return the very first inserted
-            val first = createRandomEvent()
-            pushAd(first)
-            pushAd(createRandomEvent())
-            pushAd(createRandomEvent())
+        Assert.assertEquals(first, popAd())
 
-            Assert.assertEquals(first, popAd())
+        // insert 2 elements, wait for expiration, insert one again -> should return the last inserted (which is the single element in the list now)
+        pushAd(createRandomEvent())
+        pushAd(createRandomEvent())
+        Thread.sleep(1200)
+        val latest = createRandomEvent()
+        pushAd(latest)
 
-            // insert 2 elements, wait for expiration, insert one again -> should return the last inserted (which is the single element in the list now)
-            pushAd(createRandomEvent())
-            pushAd(createRandomEvent())
-            Thread.sleep(1200)
-            val latest = createRandomEvent()
-            pushAd(latest)
-
-            val read = popAd()
-            Assert.assertEquals(latest, read)
-        }
+        val read = popAd()
+        Assert.assertEquals(latest, read)
+    }
 
     @Test
     fun testPopEventCountLimitOverrun() = databaseTest(eventMaxCount = 2) {
@@ -166,10 +163,12 @@ class DefaultEventDatabaseConnectionTest {
         Assert.assertNull(popAd())
     }
 
-    private fun createRandomEvent(): EventDatabaseEntry =
-        EventDatabaseEntry(
-            sessionId = UUID.randomUUID().toString(),
-            eventTimestamp = System.currentTimeMillis(),
-            data = UUID.randomUUID().toString(),
-        )
+    private fun createRandomEvent(
+        sessionId: String = UUID.randomUUID().toString(),
+        eventTimestamp: Long = Util.timestamp,
+    ): EventDatabaseEntry = EventDatabaseEntry(
+        sessionId = sessionId,
+        eventTimestamp = eventTimestamp,
+        data = UUID.randomUUID().toString(),
+    )
 }

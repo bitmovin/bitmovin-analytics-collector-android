@@ -4,6 +4,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import androidx.core.content.contentValuesOf
+import com.bitmovin.analytics.utils.Util
 
 private const val COLUMN_INTERNAL_ID: String = "_id"
 private const val COLUMN_SESSION_ID: String = "session_id"
@@ -131,7 +132,7 @@ internal sealed class EventDatabaseTable(
         transaction: Transaction,
         retentionConfig: RetentionConfig,
     ): List<String> {
-        val now = System.currentTimeMillis()
+        val now = Util.timestamp
         return transaction.db.query(
             /* table = */ tableName,
             /* columns = */ arrayOf(COLUMN_SESSION_ID),
