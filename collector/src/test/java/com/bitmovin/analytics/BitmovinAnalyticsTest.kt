@@ -38,7 +38,7 @@ class BitmovinAnalyticsTest {
         bitmovinAnalyticsConfig.customData7 = "customData7"
 
         mockkConstructor(BackendFactory::class)
-        every { anyConstructed<BackendFactory>().createBackend(any(), any()) } returns mockk(relaxed = true)
+        every { anyConstructed<BackendFactory>().createBackend(any(), any(), any()) } returns mockk(relaxed = true)
     }
 
     @Test

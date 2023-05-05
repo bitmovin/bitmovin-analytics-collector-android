@@ -6,31 +6,36 @@ import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.DefaultLicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
+import com.bitmovin.analytics.utils.ScopeProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class SimpleEventDataDispatcher(
-    context: Context,
-    config: BitmovinAnalyticsConfig,
-    callback: LicenseCallback?,
-    backendFactory: BackendFactory,
+internal class SimpleEventDataDispatcher(
+    private val context: Context,
+    private val config: BitmovinAnalyticsConfig,
+    private val callback: LicenseCallback?,
+    private val backendFactory: BackendFactory,
+    private val scopeProvider: ScopeProvider,
 ) : IEventDataDispatcher, AuthenticationCallback {
-    private val backend: Backend
+    private lateinit var backend: Backend
+    private lateinit var scope: CoroutineScope
     private val data: Queue<EventData>
     private val adData: Queue<AdEventData>
     private var enabled = false
-    private val config: BitmovinAnalyticsConfig
-    private val callback: LicenseCallback?
-    private val context: Context
+
     private var sampleSequenceNumber = 0
 
     init {
         data = ConcurrentLinkedQueue()
         adData = ConcurrentLinkedQueue()
-        this.config = config
-        this.callback = callback
-        this.context = context
-        backend = backendFactory.createBackend(config, context)
+        createBackend()
+    }
+
+    private fun createBackend() {
+        scope = scopeProvider.createMainScope()
+        backend = backendFactory.createBackend(config, context, scope)
     }
 
     @Synchronized
@@ -47,6 +52,7 @@ class SimpleEventDataDispatcher(
                 forwardQueuedEvents()
                 true
             }
+
             is AuthenticationResponse.Denied, AuthenticationResponse.Error -> {
                 callback?.configureFeatures(false, null)
                 false
@@ -56,6 +62,7 @@ class SimpleEventDataDispatcher(
     }
 
     override fun enable() {
+        createBackend()
         val licenseCall = DefaultLicenseCall(config, context)
         licenseCall.authenticate(this)
     }
@@ -63,6 +70,7 @@ class SimpleEventDataDispatcher(
     override fun disable() {
         data.clear()
         adData.clear()
+        scope.cancel()
         enabled = false
         sampleSequenceNumber = 0
     }

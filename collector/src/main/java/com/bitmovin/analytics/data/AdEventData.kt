@@ -75,9 +75,9 @@ data class AdEventData(
     var adFallbackIndex: Long = 0,
     var adModule: String? = null,
     var adModuleVersion: String? = null,
-    var videoImpressionId: String? = null,
-    var userAgent: String? = null,
-    var language: String? = null,
+    var videoImpressionId: String,
+    var userAgent: String,
+    var language: String,
     var cdnProvider: String? = null,
     var customData1: String? = null,
     var customData2: String? = null,
@@ -110,84 +110,86 @@ data class AdEventData(
     var customData29: String? = null,
     var customData30: String? = null,
     var customUserId: String? = null,
-    var domain: String? = null,
+    var domain: String,
     var experimentName: String? = null,
     var key: String? = null,
     var path: String? = null,
-    var player: String? = null,
+    var player: String,
     var playerKey: String? = null,
-    var playerTech: String? = null,
-    var screenHeight: Int? = null,
-    var screenWidth: Int? = null,
+    var playerTech: String,
+    var screenHeight: Int,
+    var screenWidth: Int,
     var version: String? = null,
-    var userId: String? = null,
+    var userId: String,
     var videoId: String? = null,
     var videoTitle: String? = null,
-    var videoWindowHeight: Int? = null,
-    var videoWindowWidth: Int? = null,
+    var videoWindowHeight: Int,
+    var videoWindowWidth: Int,
     var playerStartupTime: Long? = null,
     var analyticsVersion: String? = null,
     var autoplay: Boolean? = null,
-    var platform: String? = null,
+    var platform: String,
     var audioCodec: String? = null,
     var videoCodec: String? = null,
     var retryCount: Int = 0,
 ) {
 
-    fun setEventData(eventData: EventData) {
-        this.videoImpressionId = eventData.impressionId
-        this.userAgent = eventData.userAgent
-        this.language = eventData.language
-        this.cdnProvider = eventData.cdnProvider
-        this.customData1 = eventData.customData1
-        this.customData2 = eventData.customData2
-        this.customData3 = eventData.customData3
-        this.customData4 = eventData.customData4
-        this.customData5 = eventData.customData5
-        this.customData6 = eventData.customData6
-        this.customData7 = eventData.customData7
-        this.customData8 = eventData.customData8
-        this.customData9 = eventData.customData9
-        this.customData10 = eventData.customData10
-        this.customData11 = eventData.customData11
-        this.customData12 = eventData.customData12
-        this.customData13 = eventData.customData13
-        this.customData14 = eventData.customData14
-        this.customData15 = eventData.customData15
-        this.customData16 = eventData.customData16
-        this.customData17 = eventData.customData17
-        this.customData18 = eventData.customData18
-        this.customData19 = eventData.customData19
-        this.customData20 = eventData.customData20
-        this.customData21 = eventData.customData21
-        this.customData22 = eventData.customData22
-        this.customData23 = eventData.customData23
-        this.customData24 = eventData.customData24
-        this.customData25 = eventData.customData25
-        this.customData26 = eventData.customData26
-        this.customData27 = eventData.customData27
-        this.customData28 = eventData.customData28
-        this.customData29 = eventData.customData29
-        this.customData30 = eventData.customData30
-        this.customUserId = eventData.customUserId
-        this.domain = eventData.domain
-        this.experimentName = eventData.experimentName
-        this.key = eventData.key
-        this.path = eventData.path
-        this.player = eventData.player
-        this.playerKey = eventData.playerKey
-        this.playerTech = eventData.playerTech
-        this.screenHeight = eventData.screenHeight
-        this.screenWidth = eventData.screenWidth
-        this.version = eventData.version
-        this.userId = eventData.userId
-        this.videoId = eventData.videoId
-        this.videoTitle = eventData.videoTitle
-        this.videoWindowHeight = eventData.videoWindowHeight
-        this.videoWindowWidth = eventData.videoWindowWidth
-        this.platform = eventData.platform
-        this.audioCodec = eventData.audioCodec
-        this.videoCodec = eventData.videoCodec
+    companion object {
+        fun fromEventData(eventData: EventData): AdEventData = AdEventData(
+            videoImpressionId = eventData.impressionId,
+            userAgent = eventData.userAgent,
+            language = eventData.language,
+            cdnProvider = eventData.cdnProvider,
+            customData1 = eventData.customData1,
+            customData2 = eventData.customData2,
+            customData3 = eventData.customData3,
+            customData4 = eventData.customData4,
+            customData5 = eventData.customData5,
+            customData6 = eventData.customData6,
+            customData7 = eventData.customData7,
+            customData8 = eventData.customData8,
+            customData9 = eventData.customData9,
+            customData10 = eventData.customData10,
+            customData11 = eventData.customData11,
+            customData12 = eventData.customData12,
+            customData13 = eventData.customData13,
+            customData14 = eventData.customData14,
+            customData15 = eventData.customData15,
+            customData16 = eventData.customData16,
+            customData17 = eventData.customData17,
+            customData18 = eventData.customData18,
+            customData19 = eventData.customData19,
+            customData20 = eventData.customData20,
+            customData21 = eventData.customData21,
+            customData22 = eventData.customData22,
+            customData23 = eventData.customData23,
+            customData24 = eventData.customData24,
+            customData25 = eventData.customData25,
+            customData26 = eventData.customData26,
+            customData27 = eventData.customData27,
+            customData28 = eventData.customData28,
+            customData29 = eventData.customData29,
+            customData30 = eventData.customData30,
+            customUserId = eventData.customUserId,
+            domain = eventData.domain,
+            experimentName = eventData.experimentName,
+            key = eventData.key,
+            path = eventData.path,
+            player = eventData.player,
+            playerKey = eventData.playerKey,
+            playerTech = eventData.playerTech,
+            screenHeight = eventData.screenHeight,
+            screenWidth = eventData.screenWidth,
+            version = eventData.version,
+            userId = eventData.userId,
+            videoId = eventData.videoId,
+            videoTitle = eventData.videoTitle,
+            videoWindowHeight = eventData.videoWindowHeight,
+            videoWindowWidth = eventData.videoWindowWidth,
+            platform = eventData.platform,
+            audioCodec = eventData.audioCodec,
+            videoCodec = eventData.videoCodec,
+        )
     }
 
     fun setAdBreak(adBreak: AdBreak) {
