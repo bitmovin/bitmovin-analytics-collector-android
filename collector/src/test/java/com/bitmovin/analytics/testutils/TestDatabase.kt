@@ -19,5 +19,5 @@ class TestDatabase(
 }
 
 internal fun <R> TestDatabase.transaction(block: (Transaction.() -> R)): R = Transaction(
-    writableDatabase
+    writableDatabase,
 ).block()
