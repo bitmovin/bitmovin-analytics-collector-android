@@ -60,6 +60,6 @@ object TestFactory {
         playerTech = "player tech",
         videoWindowHeight = 9,
         videoWindowWidth = 16,
-        userId = "testUser"
+        userId = "testUser",
     )
 }
