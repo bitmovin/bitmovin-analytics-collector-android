@@ -2,23 +2,26 @@ package com.bitmovin.analytics.testutils
 
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
+import java.util.LinkedList
+import java.util.Queue
 
 internal class TestEventQueue : TestableAnalyticsEventQueue {
-    private val eventQueue = TestQueue<EventData>()
-    private val adEventQueue = TestQueue<AdEventData>()
+    private val eventQueue: Queue<EventData> = LinkedList()
+    private val adEventQueue: Queue<AdEventData> = LinkedList()
+
+    override val size = eventQueue.size + adEventQueue.size
 
     override fun push(event: EventData) {
-        eventQueue.push(event)
+        eventQueue.offer(event)
     }
 
     override fun push(event: AdEventData) {
-        adEventQueue.push(event)
+        adEventQueue.offer(event)
     }
 
-    override fun popEvent() = eventQueue.pop()
+    override fun popEvent() = eventQueue.poll()
 
-    override fun popAdEvent() = adEventQueue.pop()
+    override fun popAdEvent() = adEventQueue.poll()
 
     override fun clear() {
         eventQueue.clear()
