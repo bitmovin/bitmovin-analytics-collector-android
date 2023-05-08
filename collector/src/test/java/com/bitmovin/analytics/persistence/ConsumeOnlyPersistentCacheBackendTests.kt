@@ -21,6 +21,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.math.exp
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConsumeOnlyPersistentCacheBackendTests {
@@ -154,12 +155,6 @@ class ConsumeOnlyPersistentCacheBackendTests {
             }
         }
 
-        backend = ConsumeOnlyPersistentCacheBackend(
-            testScope,
-            callbackBackend,
-            eventQueue,
-        )
-
         repeat(sendEvents) {
             backend.send(event, null, null)
             testScope.testScheduler.advanceUntilIdle()
@@ -174,6 +169,35 @@ class ConsumeOnlyPersistentCacheBackendTests {
         verify(exactly = cachedEventsCount) { callbackBackend.send(cachedEvent, any(), any()) }
         assertThat(poppedEvents).isEqualTo(cachedEventsCount)
         verify(exactly = cachedEventsCount + 1) { eventQueue.popEvent() }
+    }
+
+    @Test
+    fun `starting flushing the cache consumes the elements in the event queue`() {
+        var poppedEvents = 0
+        val expectedSendEvents = 3
+        every { eventQueue.popEvent() } answers {
+            poppedEvents++
+            if (poppedEvents <= expectedSendEvents) {
+                TestFactory.createEventData(impressionId = poppedEvents.toString())
+            } else {
+                null
+            }
+        }
+        every { callbackBackend.send(any(), any(), any()) } answers {
+            secondArg<OnSuccessCallback>().onSuccess()
+        }
+
+        backend.startCacheFlushing()
+        testScope.advanceUntilIdle()
+
+        val events = mutableListOf<EventData>()
+        verify(exactly = expectedSendEvents) { callbackBackend.send(capture(events), any(), any()) }
+        verify(exactly = expectedSendEvents + 1) { eventQueue.popEvent() }
+        assertThat(
+            events.map { it.impressionId.toInt() }
+        ).isEqualTo(
+            (1..expectedSendEvents).toList()
+        )
     }
 
     private fun testAdditionalSendingHappens(newEvent: Any) {
