@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
+import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.config.SourceMetadata
@@ -48,7 +49,9 @@ class PhoneBasicScenariosTest {
     private var defaultSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
 
     @Before
-    fun setupPlayer() {
+    fun setup() {
+        // logging to mark new test run for logparsing
+        Log.d("SystemTest", "Systemtest started")
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
         defaultPlayer = Player.create(appContext, playerConfig)
     }
@@ -350,7 +353,7 @@ class PhoneBasicScenariosTest {
         waitUntilPlaybackStarted(localPlayer)
 
         // wait a bit for livestream to start playing
-        Thread.sleep(2000)
+        Thread.sleep(10000)
 
         mainScope.launch {
             localPlayer.pause()

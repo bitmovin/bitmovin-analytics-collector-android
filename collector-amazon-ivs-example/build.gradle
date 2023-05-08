@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+
 android {
     compileSdk rootProject.ext.compileSdkVersion
     namespace "com.bitmovin.analytics.amazonivs.example"
@@ -12,6 +12,10 @@ android {
 
         versionCode 1
         versionName "1.0"
+    }
+
+    buildFeatures{
+        viewBinding = true
     }
 
     buildTypes {

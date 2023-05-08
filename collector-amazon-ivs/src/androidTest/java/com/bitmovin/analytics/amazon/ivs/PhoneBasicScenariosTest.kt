@@ -2,6 +2,7 @@ package com.bitmovin.analytics.amazon.ivs
 
 import android.net.Uri
 import android.os.Looper
+import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
@@ -36,6 +37,8 @@ class PhoneBasicScenariosTest {
 
     @Before
     fun setupPlayer() {
+        // logging to mark new test run for logparsing
+        Log.d("SystemTest", "Systemtest started")
         player = Player.Factory.create(appContext)
         player.isMuted = true
     }

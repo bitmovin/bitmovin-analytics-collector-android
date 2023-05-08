@@ -2,6 +2,7 @@ package com.bitmovin.analytics.amazon.ivs
 
 import android.net.Uri
 import android.os.Looper
+import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
@@ -10,6 +11,7 @@ import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,6 +26,12 @@ class TVBasicScenariosTest {
         fun setup() {
             Looper.prepare()
         }
+    }
+
+    @Before
+    fun markTestRun() {
+        // logging to mark new test run for logparsing
+        Log.d("SystemTest", "Systemtest started")
     }
 
     @Test

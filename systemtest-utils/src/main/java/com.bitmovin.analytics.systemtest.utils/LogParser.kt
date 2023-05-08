@@ -93,7 +93,7 @@ object LogParser {
 
         // find starting of logs of most recent test run (this is a bit of a hack because I couldn't get
         // clearing of logcat after a test run working)
-        val testRunLogStartedIdx = logLines.indexOfLast { x -> x.contains("Initialized Analytics HTTP Backend") }
+        val testRunLogStartedIdx = logLines.indexOfLast { x -> x.contains("Systemtest started") }
         val testRunLines = logLines.subList(testRunLogStartedIdx, logLines.size)
 
         // filter for log lines that contain the network requests
