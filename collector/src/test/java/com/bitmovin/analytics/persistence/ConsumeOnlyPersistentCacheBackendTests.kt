@@ -21,7 +21,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.math.exp
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConsumeOnlyPersistentCacheBackendTests {
@@ -194,9 +193,9 @@ class ConsumeOnlyPersistentCacheBackendTests {
         verify(exactly = expectedSendEvents) { callbackBackend.send(capture(events), any(), any()) }
         verify(exactly = expectedSendEvents + 1) { eventQueue.popEvent() }
         assertThat(
-            events.map { it.impressionId.toInt() }
+            events.map { it.impressionId.toInt() },
         ).isEqualTo(
-            (1..expectedSendEvents).toList()
+            (1..expectedSendEvents).toList(),
         )
     }
 

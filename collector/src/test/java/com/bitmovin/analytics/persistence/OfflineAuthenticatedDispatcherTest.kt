@@ -7,6 +7,7 @@ import com.bitmovin.analytics.TestFactory.createAdEventData
 import com.bitmovin.analytics.TestFactory.createEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.BackendFactory
+import com.bitmovin.analytics.data.CacheConsumingBackend
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
@@ -16,6 +17,7 @@ import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.utils.TestScopeProvider
 import com.bitmovin.analytics.utils.areScopesCancelled
+import io.mockk.Called
 import io.mockk.called
 import io.mockk.clearMocks
 import io.mockk.every
@@ -32,7 +34,9 @@ import org.junit.Test
 class OfflineAuthenticatedDispatcherTest {
     private val outerLicenseCallback: LicenseCallback = mockk(relaxed = true)
     private val backendFactory: BackendFactory = mockk()
-    private val backend: Backend = mockk()
+    private val backend: Backend = mockk(
+        moreInterfaces = arrayOf(CacheConsumingBackend::class),
+    )
     private val licenseCall: LicenseCall = mockk()
     private val analyticsEventQueue: AnalyticsEventQueue = mockk()
     private lateinit var scopeProvider: TestScopeProvider
@@ -276,6 +280,14 @@ class OfflineAuthenticatedDispatcherTest {
     }
 
     @Test
+    fun `receiving a granting licensing response starts flushing the cache`() {
+        triggerAuthenticationCallback(AuthenticationResponse.Granted(null))
+
+        assertThat(backend).isInstanceOf(CacheConsumingBackend::class.java)
+        verify(exactly = 1) { (backend as CacheConsumingBackend).startCacheFlushing() }
+    }
+
+    @Test
     fun `receiving a denying licensing response it calls the license callback`() {
         triggerAuthenticationCallback(
             AuthenticationResponse.Denied("Some Message"),
@@ -331,6 +343,14 @@ class OfflineAuthenticatedDispatcherTest {
             outerLicenseCallback.configureFeatures(any(), any())
             outerLicenseCallback.authenticationCompleted(any())
         }
+    }
+
+    @Test
+    fun `receiving an error licensing response does not flush the cache`() {
+        triggerAuthenticationCallback(AuthenticationResponse.Error)
+
+        assertThat(backend).isInstanceOf(CacheConsumingBackend::class.java)
+        verify(exactly = 0) { backend wasNot Called }
     }
 
     private fun triggerAuthenticationCallback(response: AuthenticationResponse) {
