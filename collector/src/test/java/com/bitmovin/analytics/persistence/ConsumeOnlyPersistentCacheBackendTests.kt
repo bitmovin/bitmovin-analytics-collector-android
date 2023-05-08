@@ -7,7 +7,7 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.OnSuccessCallback
 import com.bitmovin.analytics.persistence.queue.ConsumeOnlyAnalyticsEventQueue
-import com.bitmovin.analytics.persistence.queue.InMemoryEventQueue
+import com.bitmovin.analytics.testutils.InMemoryEventQueue
 import io.mockk.Call
 import io.mockk.MockKAnswerScope
 import io.mockk.clearMocks
@@ -16,7 +16,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before

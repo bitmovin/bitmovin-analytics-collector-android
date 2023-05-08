@@ -1,7 +1,8 @@
-package com.bitmovin.analytics.persistence.queue
+package com.bitmovin.analytics.testutils
 
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 
 internal class InMemoryEventQueue : AnalyticsEventQueue {
     private val eventQueue = InMemoryQueue<EventData>()

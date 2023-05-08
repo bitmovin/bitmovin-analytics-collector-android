@@ -1,5 +1,6 @@
-package com.bitmovin.analytics.persistence.queue
+package com.bitmovin.analytics.testutils
 
+import com.bitmovin.analytics.persistence.queue.EventQueue
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
