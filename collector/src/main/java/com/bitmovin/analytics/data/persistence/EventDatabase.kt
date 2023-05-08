@@ -15,9 +15,25 @@ private val DEFAULT_AGE_LIMIT: Duration = 30L.days
 private const val DEFAULT_MAX_ENTRIES = 10_000
 
 internal data class RetentionConfig(
-    val ageLimit: Duration,
-    val maximumEntriesPerType: Int,
-    val referenceTables: List<EventDatabaseTable>.() -> List<EventDatabaseTable> = { take(1) },
+    /**
+     * The limit on the age of a session. Age of a sessions is counted from the first event in it.
+     */
+    val ageLimit: Duration = DEFAULT_AGE_LIMIT,
+    /**
+     * The maximum allowed count of entries of the different event types e.g. EventData, AdEventData
+     */
+    val maximumEntriesPerType: Int = DEFAULT_MAX_ENTRIES,
+    /**
+     * A function to select the tables that should be used to find sessions not meeting the limits.
+     * Deletion of sessions is happening globally anyway.
+     *
+     * Per default the first [EventDatabaseTable] is used.
+     */
+    val selectTablesUsedToFindSessions: List<EventDatabaseTable>.() -> List<EventDatabaseTable> = {
+        take(
+            1
+        )
+    },
 )
 
 internal class EventDatabase private constructor(context: Context) : EventDatabaseConnection {
@@ -68,7 +84,7 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
 
     private fun Transaction.cleanupDatabase() {
         val deletableSessionIds = retentionConfig
-            .referenceTables(EventDatabaseTable.allTables)
+            .selectTablesUsedToFindSessions(EventDatabaseTable.allTables)
             .flatMap {
                 it.findPurgeableSessions(
                     transaction = this,
