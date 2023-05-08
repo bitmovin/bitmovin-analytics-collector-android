@@ -4,9 +4,9 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 
-internal class InMemoryEventQueue : AnalyticsEventQueue {
-    private val eventQueue = InMemoryQueue<EventData>()
-    private val adEventQueue = InMemoryQueue<AdEventData>()
+internal class TestEventQueue : TestableAnalyticsEventQueue {
+    private val eventQueue = TestQueue<EventData>()
+    private val adEventQueue = TestQueue<AdEventData>()
 
     override fun push(event: EventData) {
         eventQueue.push(event)
