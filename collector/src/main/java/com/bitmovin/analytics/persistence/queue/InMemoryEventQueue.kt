@@ -8,10 +8,12 @@ internal class InMemoryEventQueue : AnalyticsEventQueue {
     private val adEventQueue = InMemoryQueue<AdEventData>()
 
     override fun push(event: EventData) {
+        event.delayed = true
         eventQueue.push(event)
     }
 
     override fun push(event: AdEventData) {
+        event.delayed = true
         adEventQueue.push(event)
     }
 
