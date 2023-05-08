@@ -1,9 +1,11 @@
 package com.bitmovin.analytics.data.persistence
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.contentValuesOf
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -122,3 +124,45 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
         }
     }
 }
+
+internal fun Transaction.insert(
+    tableName: String,
+    nullColumnHack: String? = null,
+    values: ContentValues,
+) = db.insert(
+    tableName,
+    nullColumnHack,
+    values,
+)
+
+
+internal fun Transaction.query(
+    tableName: String,
+    columns: List<String>,
+    selection: String? = null,
+    selectionArgs: List<String>? = null,
+    groupBy: String? = null,
+    having: String? = null,
+    orderBy: String? = null,
+    limit: String? = null,
+) = db.query(
+    tableName,
+    columns.toTypedArray(),
+    selection,
+    selectionArgs?.toTypedArray(),
+    groupBy,
+    having,
+    orderBy,
+    limit,
+)
+
+internal fun Transaction.delete(
+    tableName: String,
+    whereClause: String? = null,
+    whereArgs: List<String>? = null,
+) = db.delete(
+    tableName,
+    whereClause,
+    whereArgs?.toTypedArray(),
+)
+
