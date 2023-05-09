@@ -26,11 +26,7 @@ internal data class RetentionConfig(
      *
      * Per default the first [EventDatabaseTable] is used.
      */
-    val selectTablesUsedToFindSessions: List<EventDatabaseTable>.() -> List<EventDatabaseTable> = {
-        take(
-            1,
-        )
-    },
+    val tablesUsedToFindSessions: List<EventDatabaseTable> = EventDatabaseTable.allTables.take(1)
 )
 
 internal class EventDatabase private constructor(context: Context) : EventDatabaseConnection {
