@@ -30,7 +30,7 @@ class DefaultEventDatabaseConnectionTest {
         databaseConnection.retentionConfig = RetentionConfig(
             eventTimeLimit,
             eventMaxCount,
-            listOf(EventDatabaseTable.Events),
+            EventDatabaseTable.allTables,
         )
         block(databaseConnection)
         databaseConnection.close()
