@@ -20,7 +20,7 @@ import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.license.DefaultLicenseCall
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.LicenseCallback
-import com.bitmovin.analytics.persistence.OfflineAuthenticatedDispatcher
+import com.bitmovin.analytics.persistence.PersistingAuthenticatedDispatcher
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
@@ -60,7 +60,7 @@ class BitmovinAnalytics
     private val eventDataDispatcher = DebuggingEventDataDispatcher(
         // TODO replace with config flag once feature is enabled
         if (false) {
-            OfflineAuthenticatedDispatcher(
+            PersistingAuthenticatedDispatcher(
                 context = context,
                 config = config,
                 callback = this,
