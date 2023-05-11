@@ -48,26 +48,26 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
     var retentionConfig: RetentionConfig = RetentionConfig(DEFAULT_AGE_LIMIT, DEFAULT_MAX_ENTRIES)
         set(value) {
             field = value
-            dbHelper.catchingTransaction { cleanupDatabase() }
+            dbHelper.catchingTransaction { cleanupWithRetentionPolicy() }
         }
 
     override fun push(entry: EventDatabaseEntry): Boolean = dbHelper.catchingTransaction {
-        cleanupDatabase()
+        cleanupWithRetentionPolicy()
         EventDatabaseTable.Events.push(transaction = this, entry = entry)
     } ?: false
 
     override fun pushAd(entry: EventDatabaseEntry): Boolean = dbHelper.catchingTransaction {
-        cleanupDatabase()
+        cleanupWithRetentionPolicy()
         EventDatabaseTable.AdEvents.push(transaction = this, entry = entry)
     } ?: false
 
     override fun pop(): EventDatabaseEntry? = dbHelper.catchingTransaction {
-        cleanupDatabase()
+        cleanupWithRetentionPolicy()
         EventDatabaseTable.Events.pop(transaction = this)
     }
 
     override fun popAd(): EventDatabaseEntry? = dbHelper.catchingTransaction {
-        cleanupDatabase()
+        cleanupWithRetentionPolicy()
         EventDatabaseTable.AdEvents.pop(transaction = this)
     }
 
@@ -75,7 +75,7 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
         EventDatabaseTable.allTables.sumOf { it.purge(transaction = this) }
     } ?: 0
 
-    private fun Transaction.cleanupDatabase() {
+    private fun Transaction.cleanupWithRetentionPolicy() {
         val deletableSessionIds = retentionConfig
             .tablesUsedToFindSessions
             .flatMap {
