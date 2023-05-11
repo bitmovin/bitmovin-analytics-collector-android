@@ -21,7 +21,7 @@ internal data class RetentionConfig(
      */
     val maximumEntriesPerType: Int = DEFAULT_MAX_ENTRIES,
     /**
-     * A function to select the tables that should be used to find sessions not meeting the limits.
+     * The tables that should be used to find sessions not meeting the limits.
      * Deletion of sessions is happening globally anyway.
      *
      * Per default the first [EventDatabaseTable] is used.
@@ -77,7 +77,7 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
 
     private fun Transaction.cleanupDatabase() {
         val deletableSessionIds = retentionConfig
-            .selectTablesUsedToFindSessions(EventDatabaseTable.allTables)
+            .tablesUsedToFindSessions
             .flatMap {
                 it.findPurgeableSessions(
                     transaction = this,
