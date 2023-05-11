@@ -19,7 +19,7 @@ import com.bitmovin.analytics.utils.ScopeProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 
-internal class OfflineAuthenticatedDispatcher(
+internal class PersistingAuthenticatedDispatcher(
     private val context: Context,
     private val config: BitmovinAnalyticsConfig,
     callback: LicenseCallback?,
@@ -50,6 +50,7 @@ internal class OfflineAuthenticatedDispatcher(
                     featureConfigs = response.featureConfigContainer,
                 )
                 operationMode = Authenticated
+                // TODO trigger cache flushing
                 true
             }
 

@@ -7,7 +7,7 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.OnSuccessCallback
 import com.bitmovin.analytics.persistence.queue.ConsumeOnlyAnalyticsEventQueue
-import com.bitmovin.analytics.persistence.queue.InMemoryEventQueue
+import com.bitmovin.analytics.testutils.TestEventQueue
 import io.mockk.Call
 import io.mockk.MockKAnswerScope
 import io.mockk.clearMocks
@@ -16,7 +16,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -179,7 +178,7 @@ class ConsumeOnlyPersistentCacheBackendTests {
     private fun testAdditionalSendingHappens(newEvent: Any) {
         requireEventDataOrAdEventData(newEvent)
 
-        val testQueue = InMemoryEventQueue()
+        val testQueue = TestEventQueue()
         val enqueuedEvent = TestFactory.createEventData(impressionId = "enqueuedId")
         val enqueuedAdEvent = TestFactory.createAdEventData("enqueuedAdId")
         val enqueuedEventCount = 2
@@ -225,7 +224,7 @@ class ConsumeOnlyPersistentCacheBackendTests {
     private fun testNoAdditionalSendingHappens(newEvent: Any) {
         requireEventDataOrAdEventData(newEvent)
 
-        val testQueue = InMemoryEventQueue()
+        val testQueue = TestEventQueue()
         val enqueuedEvent = TestFactory.createEventData()
         val enqueuedAdEvent = TestFactory.createAdEventData("enqueuedAdId")
         val enqueuedEventCount = 2
