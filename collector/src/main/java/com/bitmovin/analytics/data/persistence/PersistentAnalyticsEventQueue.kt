@@ -18,10 +18,12 @@ internal class PersistentAnalyticsEventQueue(
     }
 
     override fun push(event: EventData) {
+        event.delayed = true
         eventDatabase.push(event.toEventDatabaseEntry())
     }
 
     override fun push(event: AdEventData) {
+        event.delayed = true
         eventDatabase.pushAd(event.toEventDatabaseEntry())
     }
 
