@@ -29,8 +29,9 @@ internal class PersistentAnalyticsEventQueue(
 }
 
 private fun EventData.toEventDatabaseEntry() = EventDatabaseEntry(
-    time,
-    DataSerializer.serialize(this)!!,
+    sessionId = impressionId,
+    eventTimestamp = time,
+    data = DataSerializer.serialize(this)!!,
 )
 
 private fun EventDatabaseEntry.toEventData() = DataSerializer.deserialize(
@@ -39,8 +40,9 @@ private fun EventDatabaseEntry.toEventData() = DataSerializer.deserialize(
 )
 
 private fun AdEventData.toEventDatabaseEntry() = EventDatabaseEntry(
-    time,
-    DataSerializer.serialize(this)!!,
+    sessionId = videoImpressionId,
+    eventTimestamp = time,
+    data = DataSerializer.serialize(this)!!,
 )
 
 private fun EventDatabaseEntry.toAdEventData() = DataSerializer.deserialize(

@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.data.persistence
 
 internal data class EventDatabaseEntry(
+    val sessionId: String,
     val eventTimestamp: Long,
     val data: String,
 )

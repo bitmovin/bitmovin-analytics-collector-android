@@ -53,7 +53,7 @@ object TestFactory {
         userAgent = "userAgent",
         domain = "bitmovin.com",
         language = "en",
-        player = "bitmovin palyer",
+        player = "bitmovin player",
         screenHeight = 9,
         screenWidth = 16,
         platform = "android",

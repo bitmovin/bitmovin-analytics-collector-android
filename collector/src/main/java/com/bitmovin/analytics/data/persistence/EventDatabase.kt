@@ -7,12 +7,27 @@ import androidx.annotation.VisibleForTesting
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
-@JvmInline
-internal value class Transaction(val db: SQLiteDatabase)
-
 private const val VERSION = 1
-private val DEFAULT_AGE_LIMIT: Duration = 30L.days
-private const val DEFAULT_MAX_ENTRIES = 10_000
+private val DEFAULT_AGE_LIMIT: Duration = 14.days
+private const val DEFAULT_MAX_ENTRIES = 5_000
+
+internal data class RetentionConfig(
+    /**
+     * The limit on the age of a session. Age of a sessions is counted from the first event in it.
+     */
+    val ageLimit: Duration = DEFAULT_AGE_LIMIT,
+    /**
+     * The maximum allowed count of entries of the different event types e.g. EventData, AdEventData
+     */
+    val maximumEntriesPerType: Int = DEFAULT_MAX_ENTRIES,
+    /**
+     * The tables that should be used to find sessions not meeting the limits.
+     * Deletion of sessions is happening globally anyway.
+     *
+     * Per default the first [EventDatabaseTable] is used.
+     */
+    val tablesUsedToFindSessions: List<EventDatabaseTable> = EventDatabaseTable.allTables.take(1),
+)
 
 internal class EventDatabase private constructor(context: Context) : EventDatabaseConnection {
     private val dbHelper = object : SQLiteOpenHelper(
@@ -30,39 +45,29 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
         }
     }
 
-    var ageLimit: Duration = DEFAULT_AGE_LIMIT
+    var retentionConfig: RetentionConfig = RetentionConfig(DEFAULT_AGE_LIMIT, DEFAULT_MAX_ENTRIES)
         set(value) {
             field = value
-            dbHelper.catchingTransaction {
-                cleanupDatabase()
-            }
-        }
-
-    var maxEntries: Int = DEFAULT_MAX_ENTRIES
-        set(value) {
-            field = value
-            dbHelper.catchingTransaction {
-                cleanupDatabase()
-            }
+            dbHelper.catchingTransaction { cleanupWithRetentionPolicy() }
         }
 
     override fun push(entry: EventDatabaseEntry): Boolean = dbHelper.catchingTransaction {
-        cleanupDatabase()
+        cleanupWithRetentionPolicy()
         EventDatabaseTable.Events.push(transaction = this, entry = entry)
     } ?: false
 
     override fun pushAd(entry: EventDatabaseEntry): Boolean = dbHelper.catchingTransaction {
-        cleanupDatabase()
+        cleanupWithRetentionPolicy()
         EventDatabaseTable.AdEvents.push(transaction = this, entry = entry)
     } ?: false
 
     override fun pop(): EventDatabaseEntry? = dbHelper.catchingTransaction {
-        cleanupDatabase()
+        cleanupWithRetentionPolicy()
         EventDatabaseTable.Events.pop(transaction = this)
     }
 
     override fun popAd(): EventDatabaseEntry? = dbHelper.catchingTransaction {
-        cleanupDatabase()
+        cleanupWithRetentionPolicy()
         EventDatabaseTable.AdEvents.pop(transaction = this)
     }
 
@@ -70,10 +75,21 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
         EventDatabaseTable.allTables.sumOf { it.purge(transaction = this) }
     } ?: 0
 
-    private fun Transaction.cleanupDatabase() {
+    private fun Transaction.cleanupWithRetentionPolicy() {
+        val deletableSessionIds = retentionConfig
+            .tablesUsedToFindSessions
+            .flatMap {
+                it.findPurgeableSessions(
+                    transaction = this,
+                    retentionConfig = retentionConfig,
+                )
+            }
+        if (deletableSessionIds.isEmpty()) return
         EventDatabaseTable.allTables.forEach { table ->
-            table.cleanupByAge(transaction = this, ageLimit = ageLimit)
-            table.cleanupByCount(transaction = this, maximumCountOfEvents = maxEntries)
+            table.deleteSessions(
+                transaction = this,
+                sessions = deletableSessionIds,
+            )
         }
     }
 
