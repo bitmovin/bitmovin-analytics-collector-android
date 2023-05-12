@@ -2,12 +2,20 @@ package com.bitmovin.analytics.data.persistence
 
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.persistence.EventQueueConfig
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.utils.DataSerializer
 
 internal class PersistentAnalyticsEventQueue(
+    eventQueueConfig: EventQueueConfig,
     private val eventDatabase: EventDatabase,
 ) : AnalyticsEventQueue {
+    init {
+        eventDatabase.retentionConfig = RetentionConfig(
+            ageLimit = eventQueueConfig.maximumSessionStartAge,
+            maximumEntriesPerType = eventQueueConfig.maximumOverallEntriesPerEventType,
+        )
+    }
 
     override fun push(event: EventData) {
         eventDatabase.push(event.toEventDatabaseEntry())
