@@ -114,6 +114,7 @@ class EventData(
     var downloadSpeedInfo: DownloadSpeedInfo? = null
     var retryCount: Int = 0
     val player: String = playerInfo.playerType.toString()
+    var delayed: Boolean = false
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

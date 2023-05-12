@@ -28,12 +28,16 @@ class PersistentAnalyticsEventQueueTest {
     }
 
     @Test
-    fun `pushing an EventData pushes an according EventDatabaseEntry to the event database`() {
-        val event = TestFactory.createEventData()
+    fun `pushing an EventData pushes an EventDatabaseEntry to the event database`() {
+        val event = TestFactory.createEventData(impressionId = "id")
+        val expectedEvent = TestFactory.createEventData(impressionId = "id").apply {
+            delayed = true
+            time = event.time
+        }
         val eventDatabaseEntry = EventDatabaseEntry(
-            sessionId = event.impressionId,
-            eventTimestamp = event.time,
-            data = DataSerializer.serialize(event)!!,
+            sessionId = expectedEvent.impressionId,
+            eventTimestamp = expectedEvent.time,
+            data = DataSerializer.serialize(expectedEvent)!!,
         )
 
         eventQueue.push(event)
@@ -44,12 +48,15 @@ class PersistentAnalyticsEventQueueTest {
     }
 
     @Test
-    fun `pushing an AdEventData pushes an according AdEventDatabaseEntry to the event database`() {
-        val event = TestFactory.createAdEventData()
+    fun `pushing an AdEventData pushes an AdEventDatabaseEntry to the event database`() {
+        val event = TestFactory.createAdEventData(adId = "id")
+        val expectedEvent = TestFactory.createAdEventData(adId = "id").apply {
+            delayed = true
+        }
         val eventDatabaseEntry = EventDatabaseEntry(
-            sessionId = event.videoImpressionId,
-            eventTimestamp = event.time,
-            data = DataSerializer.serialize(event)!!,
+            sessionId = expectedEvent.videoImpressionId,
+            eventTimestamp = expectedEvent.time,
+            data = DataSerializer.serialize(expectedEvent)!!,
         )
 
         eventQueue.push(event)
