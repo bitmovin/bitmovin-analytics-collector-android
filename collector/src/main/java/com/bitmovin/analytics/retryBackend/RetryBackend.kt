@@ -46,11 +46,11 @@ class RetryBackend(private val next: CallbackBackend, private val scheduleSample
         }
 
         if (retrySample.eventData is EventData) {
-            Log.d(TAG, "sending sample ${retrySample.eventData?.sequenceNumber} retry ${retrySample.retry}")
+            Log.d(TAG, "sending sample ${retrySample.eventData.sequenceNumber} retry ${retrySample.retry}")
             retrySample.eventData.retryCount = retrySample.retry
             this.next.send(retrySample.eventData, failure = callback)
         } else if (retrySample.eventData is AdEventData) {
-            Log.d(TAG, "sending ad sample ${retrySample.eventData?.adId} retry ${retrySample.retry}")
+            Log.d(TAG, "sending ad sample ${retrySample.eventData.adId} retry ${retrySample.retry}")
             retrySample.eventData.retryCount = retrySample.retry
             this.next.sendAd(retrySample.eventData, failure = callback)
         }
