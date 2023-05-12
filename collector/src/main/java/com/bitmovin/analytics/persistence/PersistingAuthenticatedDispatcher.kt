@@ -5,6 +5,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.BackendFactory
+import com.bitmovin.analytics.data.CacheConsumingBackend
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.IEventDataDispatcher
 import com.bitmovin.analytics.license.AuthenticationCallback
@@ -50,7 +51,7 @@ internal class PersistingAuthenticatedDispatcher(
                     featureConfigs = response.featureConfigContainer,
                 )
                 operationMode = Authenticated
-                // TODO trigger cache flushing
+                (backend as? CacheConsumingBackend)?.startCacheFlushing()
                 true
             }
 

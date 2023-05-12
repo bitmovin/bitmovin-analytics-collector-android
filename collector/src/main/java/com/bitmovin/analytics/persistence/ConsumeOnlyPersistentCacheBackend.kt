@@ -2,6 +2,7 @@ package com.bitmovin.analytics.persistence
 
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
+import com.bitmovin.analytics.data.CacheConsumingBackend
 import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
@@ -22,7 +23,7 @@ internal class ConsumeOnlyPersistentCacheBackend(
     scope: CoroutineScope,
     private val backend: CallbackBackend,
     private val eventQueue: ConsumeOnlyAnalyticsEventQueue,
-) : Backend, CallbackBackend {
+) : Backend, CacheConsumingBackend {
 
     // A channel that can only hold one element. Can be used
     // to conflate multiple signals into one.
@@ -73,6 +74,10 @@ internal class ConsumeOnlyPersistentCacheBackend(
     } ?: eventQueue.popAdEvent()?.let { adEventData ->
         sendAdSuspended(adEventData)
     } ?: false
+
+    override fun startCacheFlushing() {
+        cacheFlushChannel.trySend(Signal)
+    }
 }
 
 private suspend fun CallbackBackend.sendSuspended(
