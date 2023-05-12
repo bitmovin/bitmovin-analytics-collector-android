@@ -8,8 +8,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
 private const val VERSION = 1
-private val DEFAULT_AGE_LIMIT: Duration = 30L.days
-private const val DEFAULT_MAX_ENTRIES = 10_000
+private val DEFAULT_AGE_LIMIT: Duration = 14.days
+private const val DEFAULT_MAX_ENTRIES = 5_000
 
 internal data class RetentionConfig(
     /**
