@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.data.persistence
 
 import android.database.sqlite.SQLiteDatabase
-import kotlin.time.Duration
 
 internal interface EventDatabaseTableOperation {
     /**
@@ -28,12 +27,15 @@ internal interface EventDatabaseTableOperation {
     fun purge(transaction: Transaction): Int
 
     /**
-     * Removes all entries older than the passed [ageLimit]
+     * Removes all entries associated to the session.
      */
-    fun cleanupByAge(transaction: Transaction, ageLimit: Duration)
+    fun deleteSessions(transaction: Transaction, sessions: List<String>)
 
     /**
-     * Removes the first [maximumCountOfEvents] elements
+     * Finds a list of sessions ready to be deleted.
      */
-    fun cleanupByCount(transaction: Transaction, maximumCountOfEvents: Int)
+    fun findPurgeableSessions(
+        transaction: Transaction,
+        retentionConfig: RetentionConfig,
+    ): List<String>
 }

@@ -2,6 +2,7 @@ package com.bitmovin.analytics.systemtest.utils
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.config.SourceMetadata
+import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import org.assertj.core.api.Assertions.assertThat
@@ -130,9 +131,10 @@ object DataVerifier {
         assertThat(eventData.videoId).isEqualTo(analyticsConfig.videoId)
         assertThat(eventData.cdnProvider).isEqualTo(analyticsConfig.cdnProvider)
         assertThat(eventData.customUserId).isEqualTo(analyticsConfig.customUserId)
-        assertThat(eventData.experimentName).isEqualTo(analyticsConfig.experimentName)
         assertThat(eventData.path).isEqualTo(analyticsConfig.path)
 
+        // assert all customDatafields from config
+        assertThat(eventData.experimentName).isEqualTo(analyticsConfig.experimentName)
         assertThat(eventData.customData1).isEqualTo(analyticsConfig.customData1)
         assertThat(eventData.customData2).isEqualTo(analyticsConfig.customData2)
         assertThat(eventData.customData3).isEqualTo(analyticsConfig.customData3)
@@ -140,6 +142,63 @@ object DataVerifier {
         assertThat(eventData.customData5).isEqualTo(analyticsConfig.customData5)
         assertThat(eventData.customData6).isEqualTo(analyticsConfig.customData6)
         assertThat(eventData.customData7).isEqualTo(analyticsConfig.customData7)
+        assertThat(eventData.customData8).isEqualTo(analyticsConfig.customData8)
+        assertThat(eventData.customData9).isEqualTo(analyticsConfig.customData9)
+        assertThat(eventData.customData10).isEqualTo(analyticsConfig.customData10)
+        assertThat(eventData.customData11).isEqualTo(analyticsConfig.customData11)
+        assertThat(eventData.customData12).isEqualTo(analyticsConfig.customData12)
+        assertThat(eventData.customData13).isEqualTo(analyticsConfig.customData13)
+        assertThat(eventData.customData14).isEqualTo(analyticsConfig.customData14)
+        assertThat(eventData.customData15).isEqualTo(analyticsConfig.customData15)
+        assertThat(eventData.customData16).isEqualTo(analyticsConfig.customData16)
+        assertThat(eventData.customData17).isEqualTo(analyticsConfig.customData17)
+        assertThat(eventData.customData18).isEqualTo(analyticsConfig.customData18)
+        assertThat(eventData.customData19).isEqualTo(analyticsConfig.customData19)
+        assertThat(eventData.customData20).isEqualTo(analyticsConfig.customData20)
+        assertThat(eventData.customData21).isEqualTo(analyticsConfig.customData21)
+        assertThat(eventData.customData22).isEqualTo(analyticsConfig.customData22)
+        assertThat(eventData.customData23).isEqualTo(analyticsConfig.customData23)
+        assertThat(eventData.customData24).isEqualTo(analyticsConfig.customData24)
+        assertThat(eventData.customData25).isEqualTo(analyticsConfig.customData25)
+        assertThat(eventData.customData26).isEqualTo(analyticsConfig.customData26)
+        assertThat(eventData.customData27).isEqualTo(analyticsConfig.customData27)
+        assertThat(eventData.customData28).isEqualTo(analyticsConfig.customData28)
+        assertThat(eventData.customData29).isEqualTo(analyticsConfig.customData29)
+        assertThat(eventData.customData30).isEqualTo(analyticsConfig.customData30)
+    }
+
+    fun verifyCustomData(eventData: EventData, customData: CustomData) {
+        assertThat(eventData.experimentName).isEqualTo(customData.experimentName)
+        assertThat(eventData.customData1).isEqualTo(customData.customData1)
+        assertThat(eventData.customData2).isEqualTo(customData.customData2)
+        assertThat(eventData.customData3).isEqualTo(customData.customData3)
+        assertThat(eventData.customData4).isEqualTo(customData.customData4)
+        assertThat(eventData.customData5).isEqualTo(customData.customData5)
+        assertThat(eventData.customData6).isEqualTo(customData.customData6)
+        assertThat(eventData.customData7).isEqualTo(customData.customData7)
+        assertThat(eventData.customData8).isEqualTo(customData.customData8)
+        assertThat(eventData.customData9).isEqualTo(customData.customData9)
+        assertThat(eventData.customData10).isEqualTo(customData.customData10)
+        assertThat(eventData.customData11).isEqualTo(customData.customData11)
+        assertThat(eventData.customData12).isEqualTo(customData.customData12)
+        assertThat(eventData.customData13).isEqualTo(customData.customData13)
+        assertThat(eventData.customData14).isEqualTo(customData.customData14)
+        assertThat(eventData.customData15).isEqualTo(customData.customData15)
+        assertThat(eventData.customData16).isEqualTo(customData.customData16)
+        assertThat(eventData.customData17).isEqualTo(customData.customData17)
+        assertThat(eventData.customData18).isEqualTo(customData.customData18)
+        assertThat(eventData.customData19).isEqualTo(customData.customData19)
+        assertThat(eventData.customData20).isEqualTo(customData.customData20)
+        assertThat(eventData.customData21).isEqualTo(customData.customData21)
+        assertThat(eventData.customData22).isEqualTo(customData.customData22)
+        assertThat(eventData.customData23).isEqualTo(customData.customData23)
+        assertThat(eventData.customData24).isEqualTo(customData.customData24)
+        assertThat(eventData.customData25).isEqualTo(customData.customData25)
+        assertThat(eventData.customData26).isEqualTo(customData.customData26)
+        assertThat(eventData.customData27).isEqualTo(customData.customData27)
+        assertThat(eventData.customData28).isEqualTo(customData.customData28)
+        assertThat(eventData.customData29).isEqualTo(customData.customData29)
+        assertThat(eventData.customData30).isEqualTo(customData.customData30)
     }
 
     fun verifySourceMetadata(eventData: EventData, sourceMetadata: SourceMetadata) {

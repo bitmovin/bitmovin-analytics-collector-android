@@ -5,6 +5,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.BackendFactory
+import com.bitmovin.analytics.data.CacheConsumingBackend
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.IEventDataDispatcher
 import com.bitmovin.analytics.license.AuthenticationCallback
@@ -19,7 +20,7 @@ import com.bitmovin.analytics.utils.ScopeProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 
-internal class OfflineAuthenticatedDispatcher(
+internal class PersistingAuthenticatedDispatcher(
     private val context: Context,
     private val config: BitmovinAnalyticsConfig,
     callback: LicenseCallback?,
@@ -50,6 +51,7 @@ internal class OfflineAuthenticatedDispatcher(
                     featureConfigs = response.featureConfigContainer,
                 )
                 operationMode = Authenticated
+                (backend as? CacheConsumingBackend)?.startCacheFlushing()
                 true
             }
 

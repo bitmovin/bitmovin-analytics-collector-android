@@ -7,7 +7,7 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.OnSuccessCallback
 import com.bitmovin.analytics.persistence.queue.ConsumeOnlyAnalyticsEventQueue
-import com.bitmovin.analytics.persistence.queue.InMemoryEventQueue
+import com.bitmovin.analytics.testutils.TestEventQueue
 import io.mockk.Call
 import io.mockk.MockKAnswerScope
 import io.mockk.clearMocks
@@ -16,7 +16,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -154,12 +153,6 @@ class ConsumeOnlyPersistentCacheBackendTests {
             }
         }
 
-        backend = ConsumeOnlyPersistentCacheBackend(
-            testScope,
-            callbackBackend,
-            eventQueue,
-        )
-
         repeat(sendEvents) {
             backend.send(event, null, null)
             testScope.testScheduler.advanceUntilIdle()
@@ -176,10 +169,39 @@ class ConsumeOnlyPersistentCacheBackendTests {
         verify(exactly = cachedEventsCount + 1) { eventQueue.popEvent() }
     }
 
+    @Test
+    fun `starting flushing the cache consumes the elements in the event queue`() {
+        var poppedEvents = 0
+        val expectedSendEvents = 3
+        every { eventQueue.popEvent() } answers {
+            poppedEvents++
+            if (poppedEvents <= expectedSendEvents) {
+                TestFactory.createEventData(impressionId = poppedEvents.toString())
+            } else {
+                null
+            }
+        }
+        every { callbackBackend.send(any(), any(), any()) } answers {
+            secondArg<OnSuccessCallback>().onSuccess()
+        }
+
+        backend.startCacheFlushing()
+        testScope.testScheduler.advanceUntilIdle()
+
+        val events = mutableListOf<EventData>()
+        verify(exactly = expectedSendEvents) { callbackBackend.send(capture(events), any(), any()) }
+        verify(exactly = expectedSendEvents + 1) { eventQueue.popEvent() }
+        assertThat(
+            events.map { it.impressionId.toInt() },
+        ).isEqualTo(
+            (1..expectedSendEvents).toList(),
+        )
+    }
+
     private fun testAdditionalSendingHappens(newEvent: Any) {
         requireEventDataOrAdEventData(newEvent)
 
-        val testQueue = InMemoryEventQueue()
+        val testQueue = TestEventQueue()
         val enqueuedEvent = TestFactory.createEventData(impressionId = "enqueuedId")
         val enqueuedAdEvent = TestFactory.createAdEventData("enqueuedAdId")
         val enqueuedEventCount = 2
@@ -225,7 +247,7 @@ class ConsumeOnlyPersistentCacheBackendTests {
     private fun testNoAdditionalSendingHappens(newEvent: Any) {
         requireEventDataOrAdEventData(newEvent)
 
-        val testQueue = InMemoryEventQueue()
+        val testQueue = TestEventQueue()
         val enqueuedEvent = TestFactory.createEventData()
         val enqueuedAdEvent = TestFactory.createAdEventData("enqueuedAdId")
         val enqueuedEventCount = 2

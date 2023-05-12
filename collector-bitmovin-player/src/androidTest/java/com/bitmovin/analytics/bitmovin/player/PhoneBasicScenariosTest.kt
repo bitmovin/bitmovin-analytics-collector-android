@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.config.SourceMetadata
+import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
@@ -179,7 +180,7 @@ class PhoneBasicScenariosTest {
         mainScope.launch {
             collector.attachPlayer(defaultPlayer)
             defaultPlayer.load(defaultSource)
-            defaultPlayer.play() // calling play immediatly, is similar to configuring autoplay
+            defaultPlayer.play() // calling play immediately, is similar to configuring autoplay
         }
 
         waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
@@ -263,6 +264,111 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
         // verify that no other states than startup and playing were reached
         assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
+    }
+
+    @Test
+    fun test_vod_setCustomDataOnce() {
+        // arrange
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
+        val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
+        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
+        val localPlayer = Player.create(appContext, playerConfig)
+
+        // act
+        mainScope.launch {
+            collector.attachPlayer(localPlayer)
+            localPlayer.load(defaultSource)
+        }
+
+        waitUntilPlayerPlayedToMs(localPlayer, 2000)
+
+        val customDataSentOnce = CustomData(customData1 = "setCustomDataThroughApiCalls1", customData30 = "setCustomDataThroughApiCalls30")
+        collector.setCustomDataOnce(customDataSentOnce)
+
+        waitUntilPlayerPlayedToMs(localPlayer, 4000)
+
+        mainScope.launch {
+            localPlayer.pause()
+        }
+
+        // wait a bit to make sure last play sample is sent
+        Thread.sleep(500)
+
+        mainScope.launch {
+            collector.detachPlayer()
+            localPlayer.destroy()
+        }
+
+        // assert
+        val impressionList = LogParser.extractImpressions()
+        assertThat(impressionList.size).isEqualTo(1)
+
+        val impression = impressionList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+
+        val customDataChangeEvents = eventDataList.filter { x -> x.state == "customdatachange" }
+        val otherEvents = eventDataList.filter { x -> x.state != "customdatachange" }
+
+        assertThat(customDataChangeEvents.size).isEqualTo(1)
+        DataVerifier.verifyCustomData(customDataChangeEvents[0], customDataSentOnce)
+
+        otherEvents.forEach { DataVerifier.verifyAnalyticsConfig(it, defaultAnalyticsConfig) }
+    }
+
+    @Test
+    fun test_vod_setCustomData() {
+        // arrange
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
+        val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
+        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
+        val localPlayer = Player.create(appContext, playerConfig)
+
+        // act
+        mainScope.launch {
+            collector.attachPlayer(localPlayer)
+            localPlayer.load(defaultSource)
+        }
+
+        waitUntilPlayerPlayedToMs(localPlayer, 2000)
+
+        val newCustomData = CustomData(customData1 = "newCustomData1", customData30 = "newCustomData30")
+        collector.customData = newCustomData
+
+        waitUntilPlayerPlayedToMs(localPlayer, 4000)
+
+        mainScope.launch {
+            localPlayer.pause()
+        }
+
+        // wait a bit to make sure last play sample is sent
+        Thread.sleep(500)
+
+        mainScope.launch {
+            collector.detachPlayer()
+            localPlayer.destroy()
+        }
+
+        // assert
+        val impressionList = LogParser.extractImpressions()
+        assertThat(impressionList.size).isEqualTo(1)
+
+        val impression = impressionList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        val startingIndexOfNewCustomData = eventDataList.indexOfFirst { x -> x.customData1 == newCustomData.customData1 }
+        val eventsWithOldCustomData = eventDataList.subList(0, startingIndexOfNewCustomData)
+        val eventsWithNewCustomData = eventDataList.subList(startingIndexOfNewCustomData, eventDataList.size)
+
+        // we need to create a new config for comparison of the first events with identical options than the
+        // defaultconfig that is passed into the collector since the one passed into the collector
+        // is changed through the api call.
+        val expectedAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(defaultSample.m3u8Url!!)
+
+        eventsWithOldCustomData.forEach { DataVerifier.verifyAnalyticsConfig(it, expectedAnalyticsConfig) }
+        eventsWithNewCustomData.forEach { DataVerifier.verifyAnalyticsConfig(it, defaultAnalyticsConfig) }
     }
 
     @Ignore("ads currently don't work on gradle managed devices")
