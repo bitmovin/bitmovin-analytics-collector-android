@@ -18,28 +18,31 @@ class BackendFactory(
         context: Context,
         scope: CoroutineScope,
     ): Backend {
-        val httpBackend = HttpBackend(config.config, context)
-
-        return if (usePersistentEventCacheOnFailedConnections) {
-            ConsumeOnlyPersistentCacheBackend(
-                scope,
-                PersistentCacheBackend(
-                    httpBackend,
+        val innerBackend = HttpBackend(config.config, context).let {
+            when {
+                usePersistentEventCacheOnFailedConnections -> PersistentCacheBackend(
+                    it,
                     eventQueue,
-                ),
-                eventQueue,
-            )
-        } else {
-            val backend = ConsumeOnlyPersistentCacheBackend(
-                scope,
-                httpBackend,
-                eventQueue,
-            )
-            if (config.config.tryResendDataOnFailedConnection) {
-                RetryBackend(backend, Handler())
-            } else {
-                backend
+                )
+
+                else -> it
             }
+        }
+
+        val backend = ConsumeOnlyPersistentCacheBackend(
+            scope,
+            innerBackend,
+            eventQueue,
+        )
+        // The persistent event cache already tries resending events
+        // The RetryBackend and the PersistentCacheBackend may not be mixed,
+        // to avoid "fighting" implementations.
+        return if (config.config.tryResendDataOnFailedConnection &&
+            !usePersistentEventCacheOnFailedConnections
+        ) {
+            RetryBackend(backend, Handler())
+        } else {
+            backend
         }
     }
 }
