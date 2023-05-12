@@ -186,7 +186,7 @@ class ConsumeOnlyPersistentCacheBackendTests {
         }
 
         backend.startCacheFlushing()
-        testScope.advanceUntilIdle()
+        testScope.testScheduler.advanceUntilIdle()
 
         val events = mutableListOf<EventData>()
         verify(exactly = expectedSendEvents) { callbackBackend.send(capture(events), any(), any()) }
