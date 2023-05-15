@@ -56,10 +56,8 @@ class BitmovinAnalytics
 
     private val eventQueue = PersistentAnalyticsEventQueue(EventDatabase.getInstance(context))
 
-    @Suppress("ConstantConditionIf")
     private val eventDataDispatcher = DebuggingEventDataDispatcher(
-        // TODO replace with config flag once feature is enabled
-        if (false) {
+        if (config.config.longTermRetryEnabled) {
             PersistingAuthenticatedDispatcher(
                 context = context,
                 config = config,
