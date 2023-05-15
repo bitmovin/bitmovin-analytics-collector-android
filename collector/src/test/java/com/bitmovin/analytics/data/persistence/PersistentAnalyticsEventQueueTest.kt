@@ -117,4 +117,80 @@ class PersistentAnalyticsEventQueueTest {
 
         assertThat(popEvent).isEqualTo(event)
     }
+
+    @Test
+    fun `popping a corrupted AdEventData pops from the event database until a proper AdEventData`() {
+        val expectedEvent = TestFactory.createAdEventData()
+        val entries = listOf(
+            EventDatabaseEntry("sessionId", 0, ""),
+            EventDatabaseEntry("sessionId", 1, ""),
+            EventDatabaseEntry("sessionId", 2, ""),
+            EventDatabaseEntry("sessionId", expectedEvent.time, DataSerializer.serialize(expectedEvent)!!),
+        )
+
+        var entryIndex = 0
+        every { eventDatabase.popAd() } answers {
+            entries.getOrNull(entryIndex++)
+        }
+
+        val popEvent = eventQueue.popAdEvent()!!
+
+        Assertions.assertThat(popEvent).isEqualTo(expectedEvent)
+    }
+
+    @Test
+    fun `popping an AdEventData when there are only corrupted entries pops entries until the database is empty`() {
+        val entries = listOf(
+            EventDatabaseEntry("sessionId", 0, ""),
+            EventDatabaseEntry("sessionId", 1, ""),
+            EventDatabaseEntry("sessionId", 2, ""),
+        )
+
+        var entryIndex = 0
+        every { eventDatabase.popAd() } answers {
+            entries.getOrNull(entryIndex++)
+        }
+
+        val popEvent = eventQueue.popAdEvent()
+
+        Assertions.assertThat(popEvent).isNull()
+    }
+
+    @Test
+    fun `popping a corrupted EventData pops from the event database until a proper EventData`() {
+        val expectedEvent = TestFactory.createEventData()
+        val entries = listOf(
+            EventDatabaseEntry("sessionId", 0, ""),
+            EventDatabaseEntry("sessionId", 1, ""),
+            EventDatabaseEntry("sessionId", 2, ""),
+            EventDatabaseEntry("sessionId", expectedEvent.time, DataSerializer.serialize(expectedEvent)!!),
+        )
+
+        var entryIndex = 0
+        every { eventDatabase.pop() } answers {
+            entries.getOrNull(entryIndex++)
+        }
+
+        val popEvent = eventQueue.popEvent()!!
+
+        Assertions.assertThat(popEvent).isEqualTo(expectedEvent)
+    }
+
+    @Test
+    fun `popping an EventData when there are only corrupted entries pops entries until the database is empty`() {
+        val entries = listOf(
+            EventDatabaseEntry("sessionId", 0, ""),
+            EventDatabaseEntry("sessionId", 1, ""),
+            EventDatabaseEntry("sessionId", 2, ""),
+        )
+
+        var entryIndex = 0
+        every { eventDatabase.pop() } answers {
+            entries.getOrNull(entryIndex++)
+        }
+
+        val popEvent = eventQueue.popEvent()
+
+        Assertions.assertThat(popEvent).isNull()
+    }
 }

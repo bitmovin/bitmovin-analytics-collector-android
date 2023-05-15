@@ -31,9 +31,25 @@ internal class PersistentAnalyticsEventQueue(
         eventDatabase.purge()
     }
 
-    override fun popEvent() = eventDatabase.pop()?.toEventData()
+    override fun popEvent() = eventDatabase.popUntilTransformationIsSuccessful(
+        EventDatabase::pop,
+    ) { toEventData() }
 
-    override fun popAdEvent() = eventDatabase.popAd()?.toAdEventData()
+    override fun popAdEvent() = eventDatabase.popUntilTransformationIsSuccessful(
+        EventDatabase::popAd,
+    ) { toAdEventData() }
+}
+
+private fun <T> EventDatabase.popUntilTransformationIsSuccessful(
+    popBlock: EventDatabase.() -> EventDatabaseEntry?,
+    transform: EventDatabaseEntry.() -> T,
+): T? {
+    var event: T?
+    do {
+        val databaseEntry = popBlock() ?: return null
+        event = databaseEntry.transform()
+    } while (event == null)
+    return event
 }
 
 private fun EventData.toEventDatabaseEntry() = EventDatabaseEntry(

@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
+
+### Changed
+- Upgrade example app to latest bitmovin player (v3.37.2)
+
 ### Added
 - [internal] `delayed` property to `EventData` and `AdEventData` to indicate potentially longer delay between the actual event time and send time
 

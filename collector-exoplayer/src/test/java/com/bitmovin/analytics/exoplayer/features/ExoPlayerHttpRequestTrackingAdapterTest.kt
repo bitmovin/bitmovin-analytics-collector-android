@@ -15,19 +15,19 @@ class ExoPlayerHttpRequestTrackingAdapterTest {
     }
 
     @Test
-    fun `extractStatusCode should return 200 on "HTTP11 200 OK" status`() {
+    fun `extractStatusCode should return 200 on HTTP11 200 OK status`() {
         val loadEventInfo = LoadEventInfo(1L, mockk(relaxed = true), mockk(relaxed = true), LoadEventInfoTestUtils.getResponseHeaderMap("HTTP/1.1 200 OK"), 456L, 456L, 456L)
         assertThat(loadEventInfo.extractStatusCode).isEqualTo(200)
     }
 
     @Test
-    fun `extractStatusCode should return 400 on "HTTP11 400 BAD REQUEST" status`() {
+    fun `extractStatusCode should return 400 on HTTP11 400 BAD REQUEST status`() {
         val loadEventInfo = LoadEventInfo(1L, mockk(relaxed = true), mockk(relaxed = true), LoadEventInfoTestUtils.getResponseHeaderMap("HTTP/1.1 400 BAD REQUEST"), 456L, 456L, 456L)
         assertThat(loadEventInfo.extractStatusCode).isEqualTo(400)
     }
 
     @Test
-    fun `extractStatusCode should return 404 on "HTTP12 404 NOT FOUND" status`() {
+    fun `extractStatusCode should return 404 on HTTP12 404 NOT FOUND status`() {
         val loadEventInfo = LoadEventInfo(1L, mockk(relaxed = true), mockk(relaxed = true), LoadEventInfoTestUtils.getResponseHeaderMap("HTTP/1.2 404 NOT FOUND"), 456L, 456L, 456L)
         assertThat(loadEventInfo.extractStatusCode).isEqualTo(404)
     }

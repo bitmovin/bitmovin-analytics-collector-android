@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.change_source).setOnClickListener {
             bitmovinPlayerCollector?.detachPlayer()
-            val player = this.player ?: return@setOnClickListener
+            val player = this.player
 
             val bitmovinAnalyticsConfig = createBitmovinAnalyticsConfig()
             bitmovinAnalyticsConfig.videoId = "DRMVideo-id"
@@ -88,7 +88,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.seek_next_source).setOnClickListener {
             currentPlaylistItemIndex++
             val nextSource = player.playlist.sources[currentPlaylistItemIndex]
-                ?: return@setOnClickListener
             player.playlist.seek(nextSource, 10.0)
         }
 

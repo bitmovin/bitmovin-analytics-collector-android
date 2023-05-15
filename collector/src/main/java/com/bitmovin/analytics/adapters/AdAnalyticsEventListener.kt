@@ -9,7 +9,7 @@ interface AdAnalyticsEventListener {
     fun onAdFinished()
     fun onAdBreakStarted(adBreak: AdBreak)
     fun onAdBreakFinished()
-    fun onAdClicked(url: String?)
+    fun onAdClicked(clickThroughUrl: String?)
     fun onAdError(adBreak: AdBreak, code: Int?, message: String?)
     fun onAdSkipped()
     fun onAdManifestLoaded(adBreak: AdBreak, downloadTime: Long)

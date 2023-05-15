@@ -95,7 +95,7 @@ ext {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
 
     // player versions
-    bitmovinPlayerVersion = '3.37.0'
+    bitmovinPlayerVersion = '3.37.2'
     exoplayerVersion = '2.18.6'
     amazonIvsPlayerVersion = '1.18.0'
 
@@ -194,9 +194,9 @@ apiValidation {
                         "collector-bitmovin-player-tv-example",
                         "collector-exoplayer-example",
                         "collector-amazon-ivs-example",
-                        "collector-amazon-ivs",
                         "collector",    // excluded until we have a better structure with internal package
-                        "example-shared"]
+                        "example-shared",
+                        "systemtest-utils"]
 }
 
 project(":collector-exoplayer-example") {

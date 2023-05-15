@@ -336,6 +336,7 @@ internal class ExoPlayerAdapter(
             }
 
             // TODO AN-3298 Refactor code to work in new method
+            @Deprecated("Deprecated in Java")
             override fun onSeekStarted(eventTime: AnalyticsListener.EventTime) {
                 try {
                     Log.d(TAG, "onSeekStarted on position: " + eventTime.currentPlaybackPositionMs)
