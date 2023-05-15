@@ -135,7 +135,7 @@ class PersistentAnalyticsEventQueueTest {
 
         val popEvent = eventQueue.popAdEvent()!!
 
-        Assertions.assertThat(popEvent).isEqualTo(expectedEvent)
+        assertThat(popEvent).isEqualTo(expectedEvent)
     }
 
     @Test
@@ -153,7 +153,7 @@ class PersistentAnalyticsEventQueueTest {
 
         val popEvent = eventQueue.popAdEvent()
 
-        Assertions.assertThat(popEvent).isNull()
+        assertThat(popEvent).isNull()
     }
 
     @Test
@@ -173,7 +173,7 @@ class PersistentAnalyticsEventQueueTest {
 
         val popEvent = eventQueue.popEvent()!!
 
-        Assertions.assertThat(popEvent).isEqualTo(expectedEvent)
+        assertThat(popEvent).isEqualTo(expectedEvent)
     }
 
     @Test
@@ -191,6 +191,6 @@ class PersistentAnalyticsEventQueueTest {
 
         val popEvent = eventQueue.popEvent()
 
-        Assertions.assertThat(popEvent).isNull()
+        assertThat(popEvent).isNull()
     }
 }
