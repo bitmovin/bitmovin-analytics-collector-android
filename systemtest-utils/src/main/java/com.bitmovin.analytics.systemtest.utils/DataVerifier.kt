@@ -126,6 +126,12 @@ object DataVerifier {
         assertThat(eventData.videoPlaybackWidth).isGreaterThan(8)
     }
 
+    fun verifyAnalyticsConfig(eventData: List<EventData>, analyticsConfig: BitmovinAnalyticsConfig) {
+        for (event in eventData) {
+            verifyAnalyticsConfig(event, analyticsConfig)
+        }
+    }
+
     fun verifyAnalyticsConfig(eventData: EventData, analyticsConfig: BitmovinAnalyticsConfig) {
         assertThat(eventData.videoTitle).isEqualTo(analyticsConfig.title)
         assertThat(eventData.videoId).isEqualTo(analyticsConfig.videoId)
@@ -165,6 +171,12 @@ object DataVerifier {
         assertThat(eventData.customData28).isEqualTo(analyticsConfig.customData28)
         assertThat(eventData.customData29).isEqualTo(analyticsConfig.customData29)
         assertThat(eventData.customData30).isEqualTo(analyticsConfig.customData30)
+    }
+
+    fun verifyCustomData(eventDataList: List<EventData>, customData: CustomData) {
+        for (eventData in eventDataList) {
+            verifyCustomData(eventData, customData)
+        }
     }
 
     fun verifyCustomData(eventData: EventData, customData: CustomData) {

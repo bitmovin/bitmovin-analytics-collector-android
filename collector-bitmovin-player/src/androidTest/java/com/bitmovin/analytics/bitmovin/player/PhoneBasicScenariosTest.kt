@@ -672,6 +672,164 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    fun test_vod_2ImpressionsWithPlaylist_Should_SetCustomDataOnFirstSourceOnly() {
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig("dummyURL")
+        val hlsSample = TestSources.HLS_REDBULL
+        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+        val dashSample = TestSources.DASH
+        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+
+        val hlsMetadata = SourceMetadata(
+            videoId = "hls-video-id",
+            title = "hlsTitle",
+            m3u8Url = hlsSample.m3u8Url,
+        )
+
+        val dashMetadata = SourceMetadata(
+            videoId = "dash-video-id",
+            title = "dashTitle",
+            mpdUrl = dashSample.mpdUrl,
+        )
+
+        val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
+        collector.addSourceMetadata(hlsSource, hlsMetadata)
+        collector.addSourceMetadata(dashSource, dashMetadata)
+
+        val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
+
+        // act
+        mainScope.launch {
+            collector.attachPlayer(defaultPlayer)
+            defaultPlayer.load(playlistConfig)
+            defaultPlayer.play()
+        }
+
+        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        val changedCustomData = CustomData(customData1 = "setOnSource1")
+        collector.customData = changedCustomData
+
+        // seek to almost end of first track
+        val seekTo = hlsSample.duration / 1000 - 1.0
+        mainScope.launch {
+            defaultPlayer.seek(seekTo)
+        }
+
+        waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+        }
+
+        Thread.sleep(500)
+
+        mainScope.launch {
+            collector.detachPlayer()
+            defaultPlayer.destroy()
+        }
+
+        // assert
+        val impressions = LogParser.extractImpressions()
+        assertThat(impressions.size).isEqualTo(2)
+
+        val impression1 = impressions[0]
+        val impression2 = impressions[1]
+
+        DataVerifier.verifyHasNoErrorSamples(impression1)
+        DataVerifier.verifyHasNoErrorSamples(impression2)
+
+        val samplesBeforeCustomDataChange = impression1.eventDataList.filter {
+                x ->
+            x.customData1 != "setOnSource1"
+        }
+
+        val samplesAfterCustomDataChange = impression1.eventDataList.filter {
+                x ->
+            x.customData1 == "setOnSource1"
+        }
+
+        assertThat(samplesBeforeCustomDataChange.size).isGreaterThan(0)
+        assertThat(samplesAfterCustomDataChange.size).isGreaterThan(0)
+
+        // initial customData is null for all fields
+        DataVerifier.verifyCustomData(samplesBeforeCustomDataChange, CustomData())
+        DataVerifier.verifyCustomData(samplesAfterCustomDataChange, changedCustomData)
+
+        DataVerifier.verifyCustomData(impression2.eventDataList, CustomData())
+    }
+
+    @Test
+    fun test_vod_2ImpressionsWithPlaylist_Should_SetCustomDataOnConfigAcrossSources() {
+        val hlsSample = TestSources.HLS_REDBULL
+        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+        val dashSample = TestSources.DASH
+        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(hlsSample.m3u8Url!!)
+
+        val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
+        val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
+
+        // act
+        mainScope.launch {
+            collector.attachPlayer(defaultPlayer)
+            defaultPlayer.load(playlistConfig)
+            defaultPlayer.play()
+        }
+
+        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        val changedCustomData = CustomData(customData1 = "setOnSource1")
+        collector.customData = changedCustomData
+
+        // seek to almost end of first track
+        val seekTo = hlsSample.duration / 1000 - 1.0
+        mainScope.launch {
+            defaultPlayer.seek(seekTo)
+        }
+
+        waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+        }
+
+        Thread.sleep(500)
+
+        mainScope.launch {
+            collector.detachPlayer()
+            defaultPlayer.destroy()
+        }
+
+        // assert
+        val impressions = LogParser.extractImpressions()
+        assertThat(impressions.size).isEqualTo(2)
+
+        val impression1 = impressions[0]
+        val impression2 = impressions[1]
+
+        DataVerifier.verifyHasNoErrorSamples(impression1)
+        DataVerifier.verifyHasNoErrorSamples(impression2)
+
+        val samplesBeforeCustomDataChange = impression1.eventDataList.filter {
+                x ->
+            x.customData1 != "setOnSource1"
+        }
+
+        val samplesAfterCustomDataChange = impression1.eventDataList.filter {
+                x ->
+            x.customData1 == "setOnSource1"
+        }
+
+        assertThat(samplesBeforeCustomDataChange.size).isGreaterThan(0)
+        assertThat(samplesAfterCustomDataChange.size).isGreaterThan(0)
+
+        // initial customData is null for all fields
+        val expectedAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig("dummyURL")
+        DataVerifier.verifyAnalyticsConfig(samplesBeforeCustomDataChange, expectedAnalyticsConfig)
+        DataVerifier.verifyCustomData(samplesAfterCustomDataChange, changedCustomData)
+        DataVerifier.verifyCustomData(impression2.eventDataList, changedCustomData)
+    }
+
+    @Test
     fun test_nonExistingStream_Should_sendErrorSample() {
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
         val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()))
