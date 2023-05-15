@@ -59,7 +59,11 @@ class PhoneBasicScenariosTest {
 
     @After
     fun tearDown() {
-        defaultPlayer.destroy()
+        mainScope.launch {
+            defaultPlayer.destroy()
+        }
+        // wait a bit for player to be destroyed
+        Thread.sleep(100)
     }
 
     @Test
@@ -94,7 +98,6 @@ class PhoneBasicScenariosTest {
         mainScope.launch {
             defaultPlayer.pause()
             collector.detachPlayer()
-            defaultPlayer.destroy()
         }
 
         Thread.sleep(500)
@@ -152,7 +155,6 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             collector.detachPlayer()
-            defaultPlayer.destroy()
         }
 
         Thread.sleep(500)
@@ -195,7 +197,6 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             collector.detachPlayer()
-            defaultPlayer.destroy()
         }
 
         Thread.sleep(200) // wait a bit for player being destroyed
@@ -408,7 +409,6 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             collector.detachPlayer()
-            localPlayer.destroy()
         }
 
         // assert
@@ -470,7 +470,6 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             collector.detachPlayer()
-            localPlayer.destroy()
         }
 
         // assert
@@ -533,7 +532,6 @@ class PhoneBasicScenariosTest {
             defaultPlayer.pause()
             defaultPlayer.play()
             collector.detachPlayer()
-            defaultPlayer.destroy()
         }
 
         // wait a bit for player to be cleaned up
@@ -637,7 +635,6 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             collector.detachPlayer()
-            defaultPlayer.destroy()
         }
 
         // assert
@@ -724,7 +721,6 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             collector.detachPlayer()
-            defaultPlayer.destroy()
         }
 
         // assert
@@ -796,7 +792,6 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             collector.detachPlayer()
-            defaultPlayer.destroy()
         }
 
         // assert
@@ -847,8 +842,11 @@ class PhoneBasicScenariosTest {
         // it seems to take a while until the error is consistently reported
         Thread.sleep(10000)
 
-        collector.detachPlayer()
-        defaultPlayer.destroy()
+        mainScope.launch {
+            collector.detachPlayer()
+        }
+
+        Thread.sleep(100)
 
         // assert
         val impressionList = LogParser.extractImpressions()
