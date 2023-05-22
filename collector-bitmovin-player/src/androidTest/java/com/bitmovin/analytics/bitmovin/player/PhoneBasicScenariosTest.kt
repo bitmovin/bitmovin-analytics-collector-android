@@ -872,6 +872,78 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    fun test_vod_2Impressions_UsingAddSourceMetadata_ShouldReportSourceMetadata() {
+        val hlsSample = TestSources.HLS_REDBULL
+        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", experimentName = "experimentNameSource1", m3u8Url = hlsSample.m3u8Url, path = "path/Source1", customData1 = "source1CustomData1", customData30 = "source1CustomData30")
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(hlsSample.m3u8Url!!)
+        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+        val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
+
+        val dashSample = TestSources.DASH
+        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", experimentName = "experimentNameSource2", mpdUrl = dashSample.mpdUrl, path = "path/Source2", customData1 = "source2CustomData1", customData30 = "source2CustomData30")
+
+        // act
+        mainScope.launch {
+            collector.addSourceMetadata(hlsSource, sourceMetadata1)
+            collector.addSourceMetadata(dashSource, sourceMetadata2)
+            collector.attachPlayer(defaultPlayer)
+            defaultPlayer.load(hlsSource)
+            defaultPlayer.play()
+        }
+
+        waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+            defaultPlayer.play()
+
+            // load new source to test that new sourcemetadata is applied
+            defaultPlayer.load(dashSource)
+            defaultPlayer.play()
+        }
+
+        // wait a bit for the source change to happen
+        Thread.sleep(500)
+
+        waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+            defaultPlayer.play()
+            collector.detachPlayer()
+        }
+
+        // wait a bit for player to be cleaned up
+        Thread.sleep(500)
+
+        val impressions = LogParser.extractImpressions()
+        assertThat(impressions.size).isEqualTo(2)
+
+        val impression1 = impressions[0]
+        val impression2 = impressions[1]
+
+        DataVerifier.verifyHasNoErrorSamples(impression1)
+        DataVerifier.verifyHasNoErrorSamples(impression2)
+
+        DataVerifier.verifyStaticData(impression1.eventDataList, sourceMetadata1, hlsSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyInvariants(impression1.eventDataList)
+        DataVerifier.verifyStaticData(impression2.eventDataList, sourceMetadata2, dashSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyInvariants(impression2.eventDataList)
+
+        val startupSampleImpression1 = impression1.eventDataList.first()
+        val startupSampleImpression2 = impression2.eventDataList.first()
+
+        DataVerifier.verifyStartupSample(startupSampleImpression1)
+        DataVerifier.verifyStartupSample(startupSampleImpression2, false)
+
+        val lastSampleImpression1 = impression1.eventDataList.last()
+
+        // make sure that data is not carried over from impression before
+        assertThat(lastSampleImpression1.videoBitrate).isNotEqualTo(startupSampleImpression2.videoBitrate)
+    }
+
+    @Test
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         // arrange
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(defaultSample.m3u8Url!!, "nonExistingKey")
