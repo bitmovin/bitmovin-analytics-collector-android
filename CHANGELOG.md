@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - `CollectorConfig.longTermRetryEnabled` with default value of `false`. When set to `true`, analytics events that have failed to be sent are cached in a persistent way and re-sent as soon as there is network again
-- [internal] `delayed` property to `EventData` and `AdEventData` to indicate potentially longer delay between the actual event time and send time
 
 ## v2.17.0
 
