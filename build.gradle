@@ -96,7 +96,7 @@ ext {
 
     // player versions
     bitmovinPlayerVersion = '3.38.0'
-    exoplayerVersion = '2.18.6'
+    exoplayerVersion = '2.18.7'
     amazonIvsPlayerVersion = '1.18.0'
 
     // collector dependencies
