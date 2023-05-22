@@ -14,6 +14,15 @@ class CollectorConfig() : Parcelable {
      */
     var tryResendDataOnFailedConnection = false
 
+    /**
+     * When set to `true`, analytics events that have failed to be sent are cached in a persistent way. Cached elements
+     * from within 14 days are retried at a later point in time, once a network connection is established again. There
+     * will be at most 5,000 elements cached in total and at most 500 elements per playback session.
+     *
+     * Disabling this config flag does not disable the retrying of already cached elements.
+     */
+    var longTermRetryEnabled = false
+
     private constructor(parcel: Parcel) : this() {
         backendUrl = parcel.readString() ?: DEFAULT_BACKEND_URL
     }
