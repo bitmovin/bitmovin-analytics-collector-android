@@ -9,9 +9,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Upgrade example app to latest bitmovin player (v3.38.0)
 
-### Added
-- [internal] `delayed` property to `EventData` and `AdEventData` to indicate potentially longer delay between the actual event time and send time
-
 ## v2.17.0
 
 ### Changed
