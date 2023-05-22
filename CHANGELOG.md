@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Upgrade example app to latest bitmovin player (v3.38.0)
 
+### Added
+- `CollectorConfig.longTermRetryEnabled` with default value of `false`. When set to `true`, analytics events that have failed to be sent are cached in a persistent way and re-sent as soon as there is network again
+
 ## v2.17.0
 
 ### Changed
