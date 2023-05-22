@@ -132,7 +132,6 @@ data class AdEventData(
     var audioCodec: String? = null,
     var videoCodec: String? = null,
     var retryCount: Int = 0,
-    var delayed: Boolean = false,
 ) {
 
     companion object {
