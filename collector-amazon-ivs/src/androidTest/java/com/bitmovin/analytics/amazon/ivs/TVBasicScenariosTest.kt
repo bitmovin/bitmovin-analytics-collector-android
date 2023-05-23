@@ -2,7 +2,6 @@ package com.bitmovin.analytics.amazon.ivs
 
 import android.net.Uri
 import android.os.Looper
-import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
@@ -31,7 +30,7 @@ class TVBasicScenariosTest {
     @Before
     fun markTestRun() {
         // logging to mark new test run for logparsing
-        Log.d("SystemTest", "Systemtest started")
+        LogParser.startTracking()
     }
 
     @Test
