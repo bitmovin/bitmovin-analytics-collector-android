@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.systemtest.utils
 
+import android.util.Log
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
@@ -8,12 +9,18 @@ import org.assertj.core.api.Assertions.fail
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
+private const val START_MARKER = "Systemtest started"
+
 object LogParser {
+
+    fun startTracking() {
+        Log.d("SystemTest", START_MARKER)
+    }
 
     fun extractImpressions(): List<Impression> {
         val jsonSamples = extractHttpClientJsonLogLines()
-        val impressionList = mutableListOf<Impression>()
         var currentImpression = Impression()
+        val impressionList = mutableListOf(currentImpression)
 
         // remove license call (but keep errorDetail, evenData and adEventData, thus filter for impressionId or adImpressionId)
         jsonSamples.removeAll { x -> (!x.contains("impressionId") && !x.contains("adImpressionId")) }
@@ -43,7 +50,7 @@ object LogParser {
             )
 
             if (eventData != null) {
-                if (isNewImpressionSample(eventData)) {
+                if (isNewImpressionSample(eventData) && !currentImpression.isEmpty()) {
                     currentImpression = Impression()
                     impressionList.add(currentImpression)
                 }
@@ -93,7 +100,7 @@ object LogParser {
 
         // find starting of logs of most recent test run (this is a bit of a hack because I couldn't get
         // clearing of logcat after a test run working)
-        val testRunLogStartedIdx = logLines.indexOfLast { x -> x.contains("Systemtest started") }
+        val testRunLogStartedIdx = logLines.indexOfLast { x -> x.contains(START_MARKER) }
         val testRunLines = logLines.subList(testRunLogStartedIdx, logLines.size)
 
         // filter for log lines that contain the network requests
