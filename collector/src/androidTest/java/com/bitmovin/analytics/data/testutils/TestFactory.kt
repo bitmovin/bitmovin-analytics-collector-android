@@ -9,6 +9,7 @@ import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.utils.Util
+import java.util.UUID
 
 object TestFactory {
     private val testDeviceInformation = DeviceInformation(
@@ -23,7 +24,7 @@ object TestFactory {
 
     fun createAdEventData(
         adId: String = "testAdId",
-        videoImpressionId: String = "video-impression-id",
+        videoImpressionId: String = UUID.randomUUID().toString(),
         adImpressionId: String? = null,
         time: Long? = null,
     ) = AdEventData(
@@ -45,7 +46,7 @@ object TestFactory {
     )
 
     fun createEventData(
-        impressionId: String = "test-impression",
+        impressionId: String = UUID.randomUUID().toString(),
         sequenceNumber: Int? = null,
         userId: String = "testUser",
         config: BitmovinAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(),
