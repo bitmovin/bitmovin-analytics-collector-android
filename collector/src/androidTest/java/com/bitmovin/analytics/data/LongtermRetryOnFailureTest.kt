@@ -497,7 +497,7 @@ private class DummyPlayerAdapter(
     }
 
     override fun createEventData(): EventData {
-        return TestFactory.createEventData()
+        return TestFactory.createEventData(createTestImpressionId(1001))
     }
 }
 

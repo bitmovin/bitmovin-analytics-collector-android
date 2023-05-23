@@ -24,8 +24,9 @@ object TestFactory {
 
     fun createAdEventData(
         adId: String = "testAdId",
-        videoImpressionId: String = UUID.randomUUID().toString(),
-        adImpressionId: String? = null,
+        videoImpressionId: String,
+        adImpressionId: String = UUID.randomUUID().toString(),
+        playerInfo: PlayerInfo = PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         time: Long? = null,
     ) = AdEventData(
         adId = adId,
@@ -34,11 +35,11 @@ object TestFactory {
         userAgent = "userAgent",
         domain = "bitmovin.com",
         language = "en",
-        player = "bitmovin player",
+        player = playerInfo.playerType.toString(),
         screenHeight = 9,
         screenWidth = 16,
         platform = "android",
-        playerTech = "player tech",
+        playerTech = playerInfo.playerTech,
         videoWindowHeight = 9,
         videoWindowWidth = 16,
         userId = "testUser",
@@ -46,7 +47,7 @@ object TestFactory {
     )
 
     fun createEventData(
-        impressionId: String = UUID.randomUUID().toString(),
+        impressionId: String,
         sequenceNumber: Int? = null,
         userId: String = "testUser",
         config: BitmovinAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(),
