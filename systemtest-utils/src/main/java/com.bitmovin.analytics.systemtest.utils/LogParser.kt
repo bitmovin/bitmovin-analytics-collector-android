@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.systemtest.utils
 
+import android.util.Log
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
@@ -8,12 +9,18 @@ import org.assertj.core.api.Assertions.fail
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
+private const val START_MARKER = "Systemtest started"
+
 object LogParser {
+
+    fun startTracking() {
+        Log.d("SystemTest", START_MARKER)
+    }
 
     fun extractImpressions(): List<Impression> {
         val jsonSamples = extractHttpClientJsonLogLines()
-        val impressionList = mutableListOf<Impression>()
         var currentImpression = Impression()
+        val impressionList = mutableListOf(currentImpression)
 
         // remove license call (but keep errorDetail, evenData and adEventData, thus filter for impressionId or adImpressionId)
         jsonSamples.removeAll { x -> (!x.contains("impressionId") && !x.contains("adImpressionId")) }
@@ -43,7 +50,7 @@ object LogParser {
             )
 
             if (eventData != null) {
-                if (isNewImpressionSample(eventData)) {
+                if (isNewImpressionSample(eventData) && !currentImpression.isEmpty()) {
                     currentImpression = Impression()
                     impressionList.add(currentImpression)
                 }
@@ -72,7 +79,7 @@ object LogParser {
             }
         }
 
-        return impressionList
+        return impressionList.filter { !it.isEmpty() }
     }
 
     private fun isNewImpressionSample(eventData: EventData): Boolean {
@@ -93,7 +100,7 @@ object LogParser {
 
         // find starting of logs of most recent test run (this is a bit of a hack because I couldn't get
         // clearing of logcat after a test run working)
-        val testRunLogStartedIdx = logLines.indexOfLast { x -> x.contains("Systemtest started") }
+        val testRunLogStartedIdx = logLines.indexOfLast { x -> x.contains(START_MARKER) }
         val testRunLines = logLines.subList(testRunLogStartedIdx, logLines.size)
 
         // filter for log lines that contain the network requests
@@ -104,8 +111,7 @@ object LogParser {
         // due to limited logcat maxLine size) we cut off at the last "," and add a "}"
         // this way we have a valid json and can at least parse most of the sample
         // this workaround allows us to test ads without changing how we log samples in the collector
-        val test = analyticsSamplesLogLines.map {
-                x ->
+        val test = analyticsSamplesLogLines.map { x ->
             if (x.endsWith("}")) { // if sample ends with } it wasnt cut of and we don't transform it
                 x
             } else {

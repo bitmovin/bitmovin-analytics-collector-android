@@ -50,8 +50,10 @@ internal class PersistingAuthenticatedDispatcher(
                     authenticated = true,
                     featureConfigs = response.featureConfigContainer,
                 )
+                if (operationMode != Authenticated) {
+                    (backend as? CacheConsumingBackend)?.startCacheFlushing()
+                }
                 operationMode = Authenticated
-                (backend as? CacheConsumingBackend)?.startCacheFlushing()
                 true
             }
 

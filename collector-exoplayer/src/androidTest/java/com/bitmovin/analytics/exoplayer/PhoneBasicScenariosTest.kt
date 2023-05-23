@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.exoplayer
 
-import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.example.shared.Samples
@@ -41,7 +40,7 @@ class PhoneBasicScenariosTest {
     @Before
     fun setup() {
         // logging to mark new test run for logparsing
-        Log.d("SystemTest", "Systemtest started")
+        LogParser.startTracking()
         channel = Channel(0)
         player = ExoPlayer.Builder(appContext).build()
     }

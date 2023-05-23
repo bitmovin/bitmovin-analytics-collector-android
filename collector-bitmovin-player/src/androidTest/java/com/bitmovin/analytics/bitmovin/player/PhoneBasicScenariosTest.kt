@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.bitmovin.player
 
-import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.config.SourceMetadata
@@ -52,7 +51,7 @@ class PhoneBasicScenariosTest {
     @Before
     fun setup() {
         // logging to mark new test run for logparsing
-        Log.d("SystemTest", "Systemtest started")
+        LogParser.startTracking()
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
         defaultPlayer = Player.create(appContext, playerConfig)
     }
