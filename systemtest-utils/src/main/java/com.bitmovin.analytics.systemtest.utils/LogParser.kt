@@ -79,7 +79,7 @@ object LogParser {
             }
         }
 
-        return impressionList
+        return impressionList.filter { !it.isEmpty() }
     }
 
     private fun isNewImpressionSample(eventData: EventData): Boolean {
@@ -111,8 +111,7 @@ object LogParser {
         // due to limited logcat maxLine size) we cut off at the last "," and add a "}"
         // this way we have a valid json and can at least parse most of the sample
         // this workaround allows us to test ads without changing how we log samples in the collector
-        val test = analyticsSamplesLogLines.map {
-                x ->
+        val test = analyticsSamplesLogLines.map { x ->
             if (x.endsWith("}")) { // if sample ends with } it wasnt cut of and we don't transform it
                 x
             } else {
