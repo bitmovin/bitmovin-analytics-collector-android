@@ -95,18 +95,12 @@ class LongtermRetryOnFailureTest {
     fun test_sending_ad_eventdata_sends_the_adevents() {
         val sessionId = createTestImpressionId()
 
-        // The testing framework checks for the `adImpressionId`, even though the `videoImpressionId` is
-        // copied from the EventData to the AdEventData
-        // TODO is that a bug?
         val eventData: List<AdEventData> = MutableList(5) {
             TestFactory.createAdEventData(
                 adImpressionId = sessionId,
                 videoImpressionId = sessionId,
             )
         }
-
-        // The testing framework only recognises sessions if there is at least one EventData send
-        bitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = sessionId))
 
         eventData.forEach {
             bitmovinAnalytics.sendAdEventData(it)
