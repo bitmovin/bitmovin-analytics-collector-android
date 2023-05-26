@@ -4,9 +4,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.CustomData
+import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
+import com.bitmovin.analytics.systemtest.utils.Impression
 import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
@@ -50,6 +52,9 @@ class PhoneBasicScenariosTest {
 
     @Before
     fun setup() {
+        // purging database to have a clean state for each test
+        EventDatabaseTestHelper.purge(appContext)
+
         // logging to mark new test run for logparsing
         LogParser.startTracking()
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
@@ -974,6 +979,73 @@ class PhoneBasicScenariosTest {
         assertThat(impressions.size).isEqualTo(0)
     }
 
+    @Test
+    fun test_firstSessionOffline_ShouldSendOfflineSessionDataOnSecondOnlineSession() {
+        // arrange
+        // simulate offline session through wrong backend url
+        val analyticsOfflineConfig = TestConfig.createBitmovinAnalyticsConfig(defaultSample.m3u8Url!!, title = "offlineSession")
+        analyticsOfflineConfig.apply {
+            config.backendUrl = "https://nonexistingdomain123.com"
+            config.longTermRetryEnabled = true
+        }
+
+        val offlineCollector = IBitmovinPlayerCollector.create(analyticsOfflineConfig, appContext)
+
+        // act
+        mainScope.launch {
+            offlineCollector.attachPlayer(defaultPlayer)
+            defaultPlayer.load(defaultSource)
+            defaultPlayer.play()
+        }
+
+        waitUntilPlayerPlayedToMs(defaultPlayer, 5000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+            defaultPlayer.play()
+        }
+
+        waitUntilPlayerPlayedToMs(defaultPlayer, 10000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+            offlineCollector.detachPlayer()
+        }
+
+        Thread.sleep(300)
+
+        // since license call fails for the offline session we don't expect any impressions (not even in the log output)
+        val offlineImpressions = LogParser.extractImpressions()
+        assertThat(offlineImpressions.size).isEqualTo(0)
+
+        val analyticsOnlineConfig = TestConfig.createBitmovinAnalyticsConfig(defaultSample.m3u8Url!!, title = "onlineSession")
+        val onlineCollector = IBitmovinPlayerCollector.create(analyticsOnlineConfig, appContext)
+
+        mainScope.launch {
+            onlineCollector.attachPlayer(defaultPlayer)
+            defaultPlayer.load(defaultSource)
+            defaultPlayer.play()
+        }
+
+        waitUntilPlayerPlayedToMs(defaultPlayer, 5000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+            onlineCollector.detachPlayer()
+        }
+
+        Thread.sleep(300)
+
+        val impressions = LogParser.extractImpressions()
+
+        // the log parser is currently relying of a linear order of events
+        // thus we need to do some normalization by impressionId for the offline
+        // feature where the events are not sent linear
+        // this should be fixed inside the logparser eventually to not rely on order of events
+        val normalizedImpressions = impressions.combineByImpressionId()
+        assertThat(normalizedImpressions.size).isEqualTo(2)
+    }
+
     private fun waitUntilPlaybackFinished(player: Player) {
         PlaybackUtils.waitUntil { !player.isPlaying }
     }
@@ -1004,5 +1076,17 @@ class PhoneBasicScenariosTest {
 
         PlaybackUtils.waitUntil { player.isPlaying }
         PlaybackUtils.waitUntil { player.currentTime > (playedTo / 1000).toDouble() }
+    }
+
+    private fun List<Impression>.combineByImpressionId(): Map<String, Impression> {
+        val events = flatMap { it.eventDataList }.groupBy { it.impressionId }
+        val adEvents = flatMap { it.adEventDataList }.groupBy { it.videoImpressionId }
+
+        return (events.keys + adEvents.keys).associateWith {
+            Impression(
+                events[it]?.toMutableList() ?: mutableListOf(),
+                adEvents[it]?.toMutableList() ?: mutableListOf(),
+            )
+        }
     }
 }

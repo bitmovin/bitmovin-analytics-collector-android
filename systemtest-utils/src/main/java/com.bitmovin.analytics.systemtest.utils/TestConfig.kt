@@ -5,10 +5,10 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 object TestConfig {
 
     /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
-    fun createBitmovinAnalyticsConfig(m3u8Url: String? = null, analyticsKey: String = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0"): BitmovinAnalyticsConfig {
+    fun createBitmovinAnalyticsConfig(m3u8Url: String? = null, analyticsKey: String = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", title: String = "dummy title"): BitmovinAnalyticsConfig {
         val bitmovinAnalyticsConfig =
             BitmovinAnalyticsConfig(analyticsKey)
-        bitmovinAnalyticsConfig.title = "dummy title"
+        bitmovinAnalyticsConfig.title = title
         bitmovinAnalyticsConfig.videoId = "dummy-videoId"
         bitmovinAnalyticsConfig.customUserId = "customBitmovinUserId1"
         bitmovinAnalyticsConfig.experimentName = "experiment-1"

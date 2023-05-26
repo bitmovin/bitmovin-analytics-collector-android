@@ -115,3 +115,12 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
         }
     }
 }
+
+@VisibleForTesting
+class EventDatabaseTestHelper {
+    companion object {
+        fun purge(context: Context) {
+            EventDatabase.getInstance(context).purge()
+        }
+    }
+}

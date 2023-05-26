@@ -50,7 +50,7 @@ object TestFactory {
         impressionId: String,
         sequenceNumber: Int? = null,
         userId: String = "testUser",
-        config: BitmovinAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(),
+        config: BitmovinAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(title = "LongTermRetryOnFailureTest"),
         userAgent: String = "testingUserAgent",
         sourceMetadata: SourceMetadata? = null,
         deviceInformation: DeviceInformation = testDeviceInformation,
