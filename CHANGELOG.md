@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v2.18.0
+
 ### Changed
 - Upgrade example app to latest bitmovin player (v3.38.0) and latest exoplayer version (v2.18.7)
 
