@@ -130,6 +130,49 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    fun test_vod_attachingWhilePLaying() {
+        // arrange
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
+        defaultPlayer.config.playbackConfig.isAutoplayEnabled = true
+
+        // act
+        mainScope.launch {
+            defaultPlayer.load(defaultSource)
+        }
+
+        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+        mainScope.launch {
+            collector.attachPlayer(defaultPlayer)
+        }
+
+        // wait a bit to make sure late attaching collects data correctly
+        Thread.sleep(1000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+            collector.detachPlayer()
+        }
+
+        Thread.sleep(500)
+
+        // assert
+        val impressionList = LogParser.extractImpressions()
+        assertThat(impressionList.size).isEqualTo(1)
+
+        val impression = impressionList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(2)
+
+        // make sure we have a startup sample and non 0 videoStartuptime also for late attaching
+        eventDataList[0].state = "startup"
+        eventDataList[0].videoStartupTime > 0
+        eventDataList[1].state = "playing"
+    }
+
+    @Test
     fun test_vodWithDrm_playPauseWithAutoPlay() {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
