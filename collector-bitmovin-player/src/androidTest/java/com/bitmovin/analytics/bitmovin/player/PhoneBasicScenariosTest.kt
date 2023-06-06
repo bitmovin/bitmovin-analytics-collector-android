@@ -17,10 +17,6 @@ import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
-import com.bitmovin.player.api.advertising.AdItem
-import com.bitmovin.player.api.advertising.AdSource
-import com.bitmovin.player.api.advertising.AdSourceType
-import com.bitmovin.player.api.advertising.AdvertisingConfig
 import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
@@ -31,7 +27,6 @@ import kotlinx.coroutines.launch
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -82,7 +77,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.load(defaultSource)
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -97,7 +92,7 @@ class PhoneBasicScenariosTest {
 
         // we wait a bit longer to increase probability of a qualitychange event
         val playedToMs = 10000L
-        waitUntilPlayerPlayedToMs(defaultPlayer, playedToMs)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, playedToMs)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -130,49 +125,6 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vod_attachingWhilePLaying() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
-        defaultPlayer.config.playbackConfig.isAutoplayEnabled = true
-
-        // act
-        mainScope.launch {
-            defaultPlayer.load(defaultSource)
-        }
-
-        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
-
-        mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-        }
-
-        // wait a bit to make sure late attaching collects data correctly
-        Thread.sleep(1000)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(500)
-
-        // assert
-        val impressionList = LogParser.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-        assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(2)
-
-        // make sure we have a startup sample and non 0 videoStartuptime also for late attaching
-        eventDataList[0].state = "startup"
-        eventDataList[0].videoStartupTime > 0
-        eventDataList[1].state = "playing"
-    }
-
-    @Test
     fun test_vodWithDrm_playPauseWithAutoPlay() {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
@@ -192,7 +144,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.load(drmSource)
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -232,7 +184,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.play() // calling play immediately, is similar to configuring autoplay
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
 
         // seek to almost end of track
         val seekTo = defaultSample.duration / 1000 - 1.0
@@ -280,7 +232,7 @@ class PhoneBasicScenariosTest {
             localPlayer.load(defaultSource)
         }
 
-        waitUntilPlayerPlayedToMs(localPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
 
         mainScope.launch {
             localPlayer.pause()
@@ -328,12 +280,12 @@ class PhoneBasicScenariosTest {
             localPlayer.load(defaultSource)
         }
 
-        waitUntilPlayerPlayedToMs(localPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
 
         val customDataSentOnce = CustomData(customData1 = "setCustomDataThroughApiCalls1", customData30 = "setCustomDataThroughApiCalls30")
         collector.setCustomDataOnce(customDataSentOnce)
 
-        waitUntilPlayerPlayedToMs(localPlayer, 4000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 4000)
 
         mainScope.launch {
             localPlayer.pause()
@@ -379,12 +331,12 @@ class PhoneBasicScenariosTest {
             localPlayer.load(defaultSource)
         }
 
-        waitUntilPlayerPlayedToMs(localPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
 
         val newCustomData = CustomData(customData1 = "newCustomData1", customData30 = "newCustomData30")
         collector.customData = newCustomData
 
-        waitUntilPlayerPlayedToMs(localPlayer, 4000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 4000)
 
         mainScope.launch {
             localPlayer.pause()
@@ -417,70 +369,6 @@ class PhoneBasicScenariosTest {
 
         eventsWithOldCustomData.forEach { DataVerifier.verifyAnalyticsConfig(it, expectedAnalyticsConfig) }
         eventsWithNewCustomData.forEach { DataVerifier.verifyAnalyticsConfig(it, defaultAnalyticsConfig) }
-    }
-
-    @Ignore("ads currently don't work on gradle managed devices")
-    @Test
-    fun test_vodWithAds_playWithAutoplayAndMuted() {
-        // arrange
-        // https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/tags
-        val imaTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator="
-        val adSource = AdSource(AdSourceType.Ima, imaTag)
-
-        // Setup a pre-roll ad
-        val preRoll = AdItem("pre", adSource)
-        // play midroll after 3seconds
-        val midRoll = AdItem("3", adSource)
-        val advertisingConfig = AdvertisingConfig(preRoll, midRoll)
-
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
-        val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
-        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig, advertisingConfig = advertisingConfig)
-        val localPlayer = Player.create(appContext, playerConfig)
-
-        // act
-        mainScope.launch {
-            collector.attachPlayer(localPlayer)
-            localPlayer.load(defaultSource)
-        }
-
-        // wait until midRoll ad is played
-        waitUntilPlayerPlayedToMs(localPlayer, 8000)
-
-        mainScope.launch {
-            localPlayer.pause()
-        }
-
-        // wait a bit to make sure last play sample is sent
-        Thread.sleep(500)
-
-        mainScope.launch {
-            collector.detachPlayer()
-        }
-
-        // assert
-        val impressionList = LogParser.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        // we expect 2 adEventData to be sent
-        assertThat(impression.adEventDataList.size).isEqualTo(2)
-        val eventDataWithAdState = impression.eventDataList.filter { x -> x.ad == 1 }
-        assertThat(eventDataWithAdState.size).isEqualTo(2)
-
-        val eventDataList = impression.eventDataList
-        DataVerifier.verifyStaticData(eventDataList, defaultAnalyticsConfig, defaultSample, BitmovinPlayerConstants.playerInfo)
-        DataVerifier.verifyStartupSample(eventDataList[0])
-        DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
-        DataVerifier.verifyInvariants(eventDataList)
-
-        EventDataUtils.filterNonDeterministicEvents(eventDataList)
-        DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
-        // verify that no other states than startup, playing and ad were reached
-        assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" && x.state != "ad" }.size).isEqualTo(0)
     }
 
     @Test
@@ -553,7 +441,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.play()
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
 
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
@@ -573,7 +461,7 @@ class PhoneBasicScenariosTest {
         // wait a bit for the source change to happen
         Thread.sleep(500)
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -656,7 +544,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.play()
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
 
         // seek to almost end of first track
         val seekTo = hlsSample.duration / 1000 - 1.0
@@ -664,7 +552,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.seek(seekTo)
         }
 
-        waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
 
         // seek to almost end of second track
         val seekTo2 = dashSample.duration / 1000 - 1.0
@@ -672,7 +560,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.seek(seekTo2)
         }
 
-        waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -748,7 +636,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.play()
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
         val changedCustomData = CustomData(customData1 = "setOnSource1")
         collector.customData = changedCustomData
 
@@ -758,7 +646,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.seek(seekTo)
         }
 
-        waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -819,7 +707,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.play()
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
         val changedCustomData = CustomData(customData1 = "setOnSource1")
         collector.customData = changedCustomData
 
@@ -829,7 +717,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.seek(seekTo)
         }
 
-        waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -939,7 +827,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.play()
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -953,7 +841,7 @@ class PhoneBasicScenariosTest {
         // wait a bit for the source change to happen
         Thread.sleep(500)
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -1003,7 +891,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.play()
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -1041,14 +929,14 @@ class PhoneBasicScenariosTest {
             defaultPlayer.play()
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 5000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 5000)
 
         mainScope.launch {
             defaultPlayer.pause()
             defaultPlayer.play()
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 10000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 10000)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -1070,7 +958,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.play()
         }
 
-        waitUntilPlayerPlayedToMs(defaultPlayer, 5000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 5000)
 
         mainScope.launch {
             defaultPlayer.pause()
@@ -1097,29 +985,22 @@ class PhoneBasicScenariosTest {
         PlaybackUtils.waitUntil { player.isPlaying }
     }
 
-    private fun waitUntilPlayerPlayedToMs(player: Player, playedTo: Long) {
-        PlaybackUtils.waitUntil { player.isPlaying }
-
-        // we ignore ads here to make sure the player is actual playing to position on source
-        PlaybackUtils.waitUntil { player.currentTime > (playedTo / 1000).toDouble() && !player.isAd }
-    }
-
     private fun waitUntilPlayerIsPaused(player: Player) {
         PlaybackUtils.waitUntil { player.isPaused }
     }
 
-    private fun waitUntilNextSourcePlayedToMs(player: Player, playedTo: Long) {
-        val currentSource = player.source
-        PlaybackUtils.waitUntil { player.source != currentSource }
-
-        // we need to wait a bit for the player to report position of new source
-        // this is a workaround, since this is due to the asynchronous nature of the player
-        Thread.sleep(300)
-        assertThat(player.currentTime).isLessThan(4.0)
-
-        PlaybackUtils.waitUntil { player.isPlaying }
-        PlaybackUtils.waitUntil { player.currentTime > (playedTo / 1000).toDouble() }
-    }
+//    private fun waitUntilNextSourcePlayedToMs(player: Player, playedTo: Long) {
+//        val currentSource = player.source
+//        PlaybackUtils.waitUntil { player.source != currentSource }
+//
+//        // we need to wait a bit for the player to report position of new source
+//        // this is a workaround, since this is due to the asynchronous nature of the player
+//        Thread.sleep(300)
+//        assertThat(player.currentTime).isLessThan(4.0)
+//
+//        PlaybackUtils.waitUntil { player.isPlaying }
+//        PlaybackUtils.waitUntil { player.currentTime > (playedTo / 1000).toDouble() }
+//    }
 
     private fun List<Impression>.combineByImpressionId(): Map<String, Impression> {
         val events = flatMap { it.eventDataList }.groupBy { it.impressionId }

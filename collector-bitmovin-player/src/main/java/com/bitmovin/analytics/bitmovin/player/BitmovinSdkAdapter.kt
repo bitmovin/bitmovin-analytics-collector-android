@@ -273,10 +273,16 @@ internal class BitmovinSdkAdapter(
      * Because of the late initialization of the Adapter we do not get the first
      * couple of events so in case the player starts a video due to autoplay=true we
      * need to transition into startup state manually
+     *
+     * TODO [AN-3602]: Is this really true? Since this would mean that customers are attaching after loading the source.
+     * And thus we might run into issues in case customer attaches before loading the source and
+     * has autoplay enabled for the current source. This could then create another impression if
+     * customer is not loading the source immediately for some reason.
      */
     private fun checkAutoplayStartup() {
         val playbackConfig = player.config.playbackConfig
         val source = player.source
+
         if (source != null && playbackConfig.isAutoplayEnabled) {
             Log.d(TAG, "Detected Autoplay going to startup")
             startup()
