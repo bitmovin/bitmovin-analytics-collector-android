@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.features.errordetails
 
-import com.bitmovin.analytics.CollectorConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend.Companion.copyTruncateHttpRequests
 import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend.Companion.copyTruncateStringsAndUrls
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
@@ -107,7 +107,7 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testWillPostWhenEnabled() {
-        val backend = ErrorDetailBackend(CollectorConfig().also { it.backendUrl = "http://localhost" }, mockk(relaxed = true), httpClientMock)
+        val backend = ErrorDetailBackend(AnalyticsConfig("test", backendUrl = "http://localhost"), mockk(relaxed = true), httpClientMock)
         backend.enabled = true
         backend.send(getErrorDetail(0))
         verify(exactly = 1) { httpClientMock.post(any(), any(), any()) }
@@ -115,7 +115,7 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testWillFlushToHttpClientIfEnabled() {
-        val backend = ErrorDetailBackend(CollectorConfig().also { it.backendUrl = "http://localhost" }, mockk(relaxed = true), httpClientMock)
+        val backend = ErrorDetailBackend(AnalyticsConfig("test", backendUrl = "http://localhost"), mockk(relaxed = true), httpClientMock)
         backend.send(getErrorDetail(0))
         backend.enabled = true
         verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }

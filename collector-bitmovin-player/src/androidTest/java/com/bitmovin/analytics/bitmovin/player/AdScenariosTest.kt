@@ -2,6 +2,7 @@ package com.bitmovin.analytics.bitmovin.player
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
@@ -34,7 +35,6 @@ class AdScenariosTest {
     private lateinit var defaultPlayer: Player
 
     private var defaultSample = TestSources.HLS_REDBULL
-    private var defaultAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(defaultSample.m3u8Url!!)
     private var defaultSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
 
     @Before
@@ -61,14 +61,16 @@ class AdScenariosTest {
         val midRoll = AdItem("3", adSource)
         val advertisingConfig = AdvertisingConfig(preRoll, midRoll)
 
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
+        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig, advertisingConfig = advertisingConfig)
         val localPlayer = Player.create(appContext, playerConfig)
+        val sourceMetadata = SourceMetadata(title = "adTest")
 
         // act
         mainScope.launch {
             collector.attachPlayer(localPlayer)
+            collector.setCurrentSourceMetadata(sourceMetadata)
             localPlayer.load(defaultSource)
         }
 
@@ -99,7 +101,7 @@ class AdScenariosTest {
         Assertions.assertThat(eventDataWithAdState.size).isEqualTo(2)
 
         val eventDataList = impression.eventDataList
-        DataVerifier.verifyStaticData(eventDataList, defaultAnalyticsConfig, defaultSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(eventDataList, sourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))

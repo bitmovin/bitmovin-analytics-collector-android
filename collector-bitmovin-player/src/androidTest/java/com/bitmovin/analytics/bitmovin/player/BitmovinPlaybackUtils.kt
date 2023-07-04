@@ -25,4 +25,15 @@ object BitmovinPlaybackUtils {
         PlaybackUtils.waitUntil { player.isPlaying }
         PlaybackUtils.waitUntil { player.currentTime > (playedTo / 1000).toDouble() }
     }
+    fun waitUntilPlaybackFinished(player: Player) {
+        PlaybackUtils.waitUntil { !player.isPlaying }
+    }
+
+    fun waitUntilPlaybackStarted(player: Player) {
+        PlaybackUtils.waitUntil { player.isPlaying }
+    }
+
+    fun waitUntilPlayerIsPaused(player: Player) {
+        PlaybackUtils.waitUntil { player.isPaused }
+    }
 }

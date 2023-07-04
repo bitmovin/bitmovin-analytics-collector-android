@@ -1,16 +1,17 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import android.util.Log
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
 import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
-import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
@@ -39,20 +40,21 @@ import com.bitmovin.player.api.source.SourceType
 
 internal class BitmovinSdkAdapter(
     private val player: Player,
-    config: BitmovinAnalyticsConfig,
+    config: AnalyticsConfig,
     stateMachine: PlayerStateMachine,
     featureFactory: FeatureFactory,
-    private val sourceMetadataMap: Map<Source, SourceMetadata>,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
     private val playerLicenseProvider: PlayerLicenseProvider,
     private val playbackQualityProvider: PlaybackQualityProvider,
+    metadataProvider: MetadataProvider,
 ) : DefaultPlayerAdapter(
     config,
     eventDataFactory,
     stateMachine,
     featureFactory,
     deviceInformationProvider,
+    metadataProvider,
 ),
     EventDataManipulator {
     private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
@@ -136,17 +138,12 @@ internal class BitmovinSdkAdapter(
     private val currentSource: Source?
         get() = overrideCurrentSource ?: player.source
 
-    override val currentSourceMetadata: SourceMetadata?
-        get() {
-            val source = currentSource ?: return null
-            return sourceMetadataMap[source]
-        }
-
+    // TODO: refactor to use separate manipulators for this method
     override fun manipulate(data: EventData) {
-        // if this sample
         val source = currentSource
-        val sourceMetadata = currentSourceMetadata
-        var fallbackIsLive = config.isLive == true
+        val sourceMetadata = this.getCurrentSourceMetadata()
+
+        var fallbackIsLive = false
         if (sourceMetadata != null) {
             fallbackIsLive = sourceMetadata.isLive == true
         }
@@ -231,11 +228,7 @@ internal class BitmovinSdkAdapter(
             data.audioLanguage = audioTrack.language
         }
 
-        // we fall back to using the key from the player config or manifest
-        // in case it is not specified in the analytics config
-        if (config.playerKey.isBlank()) {
-            data.playerKey = playerLicenseProvider.getBitmovinPlayerLicenseKey(player.config)
-        }
+        data.playerKey = playerLicenseProvider.getBitmovinPlayerLicenseKey(player.config)
 
         data.isMuted = player.isMuted
     }
@@ -267,6 +260,18 @@ internal class BitmovinSdkAdapter(
     override fun clearValues() {}
     override fun createAdAdapter(): AdAdapter {
         return BitmovinSdkAdAdapter(player)
+    }
+
+    override fun getCurrentSourceMetadata(): SourceMetadata {
+        val activeSourceForSample = overrideCurrentSource ?: this.player.source
+        if (activeSourceForSample != null) {
+            val currentSourceMetadata = metadataProvider.getSourceMetadata(activeSourceForSample)
+            if (currentSourceMetadata != null) {
+                return currentSourceMetadata
+            }
+        }
+
+        return metadataProvider.getSourceMetadata() ?: SourceMetadata()
     }
 
     /*

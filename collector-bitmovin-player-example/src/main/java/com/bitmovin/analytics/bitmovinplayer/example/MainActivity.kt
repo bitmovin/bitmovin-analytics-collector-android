@@ -5,11 +5,11 @@ import android.view.Menu
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovin.player.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
-import com.bitmovin.analytics.config.SourceMetadata
-import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.player.api.PlaybackConfig
@@ -78,6 +78,7 @@ class MainActivity : AppCompatActivity() {
             val bitmovinAnalyticsConfig = createBitmovinAnalyticsConfig()
             bitmovinAnalyticsConfig.videoId = "DRMVideo-id"
             bitmovinAnalyticsConfig.title = "DRM Video Title"
+
             val collector = BitmovinPlayerCollector(bitmovinAnalyticsConfig, applicationContext)
             this.bitmovinPlayerCollector = collector
 
@@ -174,10 +175,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun setCustomData() {
         val collector = bitmovinPlayerCollector ?: return
-        val customData: CustomData = collector.customData
-        customData.customData2 = "custom_data_2_changed"
-        customData.customData4 = "custom_data_4_changed"
-        collector.customData = customData
+        val customData = collector.getDefaultCustomData() ?: CustomData()
+
+        val changedCustomData = customData.copy(
+            customData2 = "custom_data_2_changed",
+            customData4 = "custom_data_4_changed",
+        )
+
+        collector.setDefaultCustomData(changedCustomData)
     }
 
     companion object {

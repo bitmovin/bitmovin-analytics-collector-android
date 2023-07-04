@@ -2,7 +2,7 @@ package com.bitmovin.analytics.data
 
 import android.content.Context
 import android.os.Handler
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.persistence.ConsumeOnlyPersistentCacheBackend
 import com.bitmovin.analytics.persistence.PersistentCacheBackend
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
@@ -14,11 +14,11 @@ class BackendFactory(
     private val usePersistentEventCacheOnFailedConnections: Boolean = false,
 ) {
     fun createBackend(
-        config: BitmovinAnalyticsConfig,
+        config: AnalyticsConfig,
         context: Context,
         scope: CoroutineScope,
     ): Backend {
-        val innerBackend = HttpBackend(config.config, context).let {
+        val innerBackend = HttpBackend(config, context).let {
             when {
                 usePersistentEventCacheOnFailedConnections -> PersistentCacheBackend(
                     it,
@@ -37,7 +37,7 @@ class BackendFactory(
         // The persistent event cache already tries resending events
         // The RetryBackend and the PersistentCacheBackend may not be mixed,
         // to avoid "fighting" implementations.
-        return if (config.config.tryResendDataOnFailedConnection &&
+        return if (config.inMemoryRetryEnabled &&
             !usePersistentEventCacheOnFailedConnections
         ) {
             RetryBackend(backend, Handler())

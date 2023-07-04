@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.data
 
 import android.content.Context
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.DefaultLicenseCall
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 internal class SimpleEventDataDispatcher(
     private val context: Context,
-    private val config: BitmovinAnalyticsConfig,
+    private val config: AnalyticsConfig,
     private val callback: LicenseCallback?,
     private val backendFactory: BackendFactory,
     private val scopeProvider: ScopeProvider,

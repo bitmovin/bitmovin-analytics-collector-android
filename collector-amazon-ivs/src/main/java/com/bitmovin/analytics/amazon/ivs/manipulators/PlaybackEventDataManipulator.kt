@@ -2,15 +2,15 @@ package com.bitmovin.analytics.amazon.ivs.manipulators
 
 import android.util.Log
 import com.amazonaws.ivs.player.Player
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.amazon.ivs.Utils
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.StreamFormat
 
 internal class PlaybackEventDataManipulator(
     private val player: Player,
-    private val config: BitmovinAnalyticsConfig,
+    private val metadataProvider: MetadataProvider,
 ) : EventDataManipulator {
     override fun manipulate(data: EventData) {
         try {
@@ -31,8 +31,11 @@ internal class PlaybackEventDataManipulator(
         }
     }
 
+    // TODO: this might be a bug, since we should only use the config as a fallback in
+    // case we can not yet determine if the stream is live or not
+    // this is the implemented behavior for the other players (double check though)
     private fun setLive(data: EventData) {
-        val configIsLive = config.isLive
+        val configIsLive = metadataProvider.getSourceMetadata()?.isLive
         if (configIsLive != null) {
             data.isLive = configIsLive
         } else {

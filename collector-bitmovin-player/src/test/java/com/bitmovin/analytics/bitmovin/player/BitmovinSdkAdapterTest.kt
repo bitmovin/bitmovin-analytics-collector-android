@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player
 
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
-import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.QualityChangeEventLimiter
@@ -58,11 +58,11 @@ class BitmovinSdkAdapterTest {
             mockk(relaxed = true),
             playerStateMachine,
             mockk(relaxed = true),
-            sourceMap,
             mockk(relaxed = true),
             mockk(relaxed = true),
             mockk(relaxed = true),
             playbackQualityProvider,
+            mockk(relaxed = true),
         )
     }
 

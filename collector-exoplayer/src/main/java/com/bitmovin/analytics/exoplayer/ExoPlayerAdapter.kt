@@ -1,12 +1,12 @@
 package com.bitmovin.analytics.exoplayer
 
 import android.util.Log
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
-import com.bitmovin.analytics.config.SourceMetadata
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.SpeedMeasurement
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
@@ -40,19 +40,22 @@ import com.google.android.exoplayer2.source.hls.HlsManifest
 import com.google.android.exoplayer2.source.hls.playlist.HlsMultivariantPlaylist
 import java.util.Date
 
+// TODO: refactor this class (move listener in different class, move manipulator in differnet class)
 internal class ExoPlayerAdapter(
     private val exoplayer: ExoPlayer,
-    config: BitmovinAnalyticsConfig,
+    config: AnalyticsConfig,
     stateMachine: PlayerStateMachine,
     featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
+    metadataProvider: MetadataProvider,
 ) : DefaultPlayerAdapter(
     config,
     eventDataFactory,
     stateMachine,
     featureFactory,
     deviceInformationProvider,
+    metadataProvider,
 ),
     EventDataManipulator {
     private val isDashManifestClassLoaded by lazy {
@@ -98,11 +101,6 @@ internal class ExoPlayerAdapter(
         checkAutoplayStartup()
         return features
     }
-
-    /* Adapter doesn't support source-specific metadata */
-    override val currentSourceMetadata: SourceMetadata?
-        get() = /* Adapter doesn't support source-specific metadata */
-            null
 
     override val playerInfo: PlayerInfo
         get() = PLAYER_INFO
@@ -159,7 +157,7 @@ internal class ExoPlayerAdapter(
         // isLive
         data.isLive = Util.getIsLiveFromConfigOrPlayer(
             playerIsReady,
-            config.isLive,
+            metadataProvider.getSourceMetadata()?.isLive,
             exoplayer.isCurrentMediaItemDynamic,
         )
 
@@ -180,6 +178,7 @@ internal class ExoPlayerAdapter(
         data.droppedFrames = totalDroppedVideoFrames
         totalDroppedVideoFrames = 0
 
+        // todo rework this
         // streamFormat, mpdUrl, and m3u8Url
         val manifest = exoplayer.currentManifest
         if (isDashManifestClassLoaded && manifest is DashManifest) {

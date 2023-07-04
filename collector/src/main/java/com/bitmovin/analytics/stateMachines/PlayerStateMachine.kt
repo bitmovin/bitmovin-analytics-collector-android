@@ -5,7 +5,6 @@ import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.PlayerContext
-import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
@@ -214,14 +213,11 @@ class PlayerStateMachine(
         transitionState(PlayerStates.ADFINISHED, videoTimeEnd)
     }
 
-    fun changeCustomData(position: Long, customData: CustomData, setCustomDataFunction: (CustomData) -> Unit) {
+    fun closeCurrentSampleForCustomDataChangeIfNeeded(position: Long) {
         val originalState = currentState
         val shouldTransition = isPlayingOrPaused
         if (shouldTransition) {
             this.transitionState(PlayerStates.CUSTOMDATACHANGE, position)
-        }
-        setCustomDataFunction(customData)
-        if (shouldTransition) {
             this.transitionState(originalState, position)
         }
     }

@@ -1,6 +1,8 @@
 package com.bitmovin.analytics
 
-import com.bitmovin.analytics.config.SourceMetadata
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
@@ -23,7 +25,7 @@ object TestFactory {
     )
 
     fun createEventDataFactory(
-        config: BitmovinAnalyticsConfig,
+        config: AnalyticsConfig,
         userIdProvider: UserIdProvider? = null,
         userAgentProvider: UserAgentProvider? = null,
     ): EventDataFactory {
@@ -35,14 +37,16 @@ object TestFactory {
     }
 
     fun createEventData(
-        config: BitmovinAnalyticsConfig = BitmovinAnalyticsConfig(),
+        config: AnalyticsConfig = AnalyticsConfig("test-key"),
         impressionId: String = "test-impression",
         sourceMetadata: SourceMetadata? = null,
+        defaultMetadata: DefaultMetadata = DefaultMetadata(),
         deviceInformation: DeviceInformation = testDeviceInformation,
         playerInfo: PlayerInfo = PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
     ): EventData = createEventDataFactory(config).create(
         impressionId,
         sourceMetadata,
+        defaultMetadata,
         deviceInformation,
         playerInfo,
     )

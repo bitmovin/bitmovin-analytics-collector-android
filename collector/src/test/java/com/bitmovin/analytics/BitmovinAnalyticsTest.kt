@@ -1,6 +1,7 @@
 package com.bitmovin.analytics
 
 import android.content.Context
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
@@ -19,7 +20,7 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class BitmovinAnalyticsTest {
 
-    private lateinit var bitmovinAnalyticsConfig: BitmovinAnalyticsConfig
+    private lateinit var bitmovinAnalyticsConfig: AnalyticsConfig
     private lateinit var context: Context
 
     @Before
@@ -28,14 +29,14 @@ class BitmovinAnalyticsTest {
         context = mockk {
             every { applicationContext } returns mockk()
         }
-        bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("<ANALYTICS_KEY>")
-        bitmovinAnalyticsConfig.customData1 = "customData1"
-        bitmovinAnalyticsConfig.customData2 = "customData2"
-        bitmovinAnalyticsConfig.customData3 = "customData3"
-        bitmovinAnalyticsConfig.customData4 = "customData4"
-        bitmovinAnalyticsConfig.customData5 = "customData5"
-        bitmovinAnalyticsConfig.customData6 = "customData6"
-        bitmovinAnalyticsConfig.customData7 = "customData7"
+        bitmovinAnalyticsConfig = AnalyticsConfig("<ANALYTICS_KEY>")
+//        bitmovinAnalyticsConfig.customData1 = "customData1"
+//        bitmovinAnalyticsConfig.customData2 = "customData2"
+//        bitmovinAnalyticsConfig.customData3 = "customData3"
+//        bitmovinAnalyticsConfig.customData4 = "customData4"
+//        bitmovinAnalyticsConfig.customData5 = "customData5"
+//        bitmovinAnalyticsConfig.customData6 = "customData6"
+//        bitmovinAnalyticsConfig.customData7 = "customData7"
 
         mockkConstructor(BackendFactory::class)
         every { anyConstructed<BackendFactory>().createBackend(any(), any(), any()) } returns mockk(relaxed = true)

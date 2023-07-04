@@ -5,6 +5,7 @@ import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
@@ -46,8 +47,16 @@ class PhoneBasicScenariosTest {
     fun test_live_playPause() {
         // arrange
         val liveStreamSample = TestSources.IVS_LIVE_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample.m3u8Url!!)
-        val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
+        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
+        val sourceMetadata = SourceMetadata(
+            m3u8Url = liveStreamSample.m3u8Url,
+            title = "title1",
+            isLive = true,
+            videoId = "videoId1",
+            customData = TestConfig.createDummyCustomData("ivsLive1_"),
+        )
+        collector.setCurrentSourceMetadata(sourceMetadata)
         collector.attachPlayer(player)
 
         // act
@@ -75,14 +84,14 @@ class PhoneBasicScenariosTest {
 
         val eventDataList = impressionSamples.first().eventDataList
 
-        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, liveStreamSample, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(eventDataList, sourceMetadata, liveStreamSample, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyInvariants(eventDataList)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)
 
         // there need to be at least 4 events
         // startup, playing, pause, playing
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
+        assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(4)
 
         DataVerifier.verifyStartupSample(eventDataList[0])
         assertThat(eventDataList[1].state).isEqualTo("playing")
@@ -96,12 +105,21 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_live_2ImpressionsScenario() {
         // arrange
-        val liveStreamSample1 = TestSources.IVS_LIVE_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample1.m3u8Url!!)
-        val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         player.isMuted = false
-        collector.attachPlayer(player)
+        val liveStreamSample1 = TestSources.IVS_LIVE_1
+        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
 
+        val sourceMetadata1 = SourceMetadata(
+            m3u8Url = liveStreamSample1.m3u8Url,
+            title = "title1",
+            isLive = true,
+            videoId = "videoId1",
+            customData = TestConfig.createDummyCustomData("ivsLive1_"),
+        )
+
+        collector.setCurrentSourceMetadata(sourceMetadata1)
+        collector.attachPlayer(player)
         // act
         player.load(Uri.parse(liveStreamSample1.m3u8Url))
         player.play()
@@ -113,7 +131,15 @@ class PhoneBasicScenariosTest {
         collector.detachPlayer()
 
         val liveStreamSample2 = TestSources.IVS_LIVE_2
-        analyticsConfig.m3u8Url = liveStreamSample2.m3u8Url
+        val sourceMetadata2 = SourceMetadata(
+            m3u8Url = liveStreamSample2.m3u8Url,
+            title = "title2",
+            isLive = true,
+            videoId = "videoId2",
+            customData = TestConfig.createDummyCustomData("ivsLive2_"),
+        )
+
+        collector.setCurrentSourceMetadata(sourceMetadata2)
         collector.attachPlayer(player)
 
         player.load(Uri.parse(liveStreamSample2.m3u8Url))
@@ -131,15 +157,15 @@ class PhoneBasicScenariosTest {
         // assert
         val impressionList = LogParser.extractImpressions()
 
-        assertThat(impressionList.size).isEqualTo(2)
+        assertThat(impressionList).hasSize(2)
         val firstImpressionSamples = impressionList[0].eventDataList
         val secondImpressionSamples = impressionList[1].eventDataList
 
         // verify that two session have different impression_id
         assertThat(firstImpressionSamples.first().impressionId).isNotEqualTo(secondImpressionSamples.first().impressionId)
 
-        DataVerifier.verifyStaticData(firstImpressionSamples, analyticsConfig, liveStreamSample1, IvsPlayerConstants.playerInfo)
-        DataVerifier.verifyStaticData(secondImpressionSamples, analyticsConfig, liveStreamSample2, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(firstImpressionSamples, sourceMetadata1, liveStreamSample1, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(secondImpressionSamples, sourceMetadata2, liveStreamSample2, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyPlayerSetting(firstImpressionSamples, PlayerSettings(false))
         DataVerifier.verifyPlayerSetting(secondImpressionSamples, PlayerSettings(true))
         DataVerifier.verifyInvariants(firstImpressionSamples)
@@ -150,8 +176,8 @@ class PhoneBasicScenariosTest {
 
         // there need to be at least 2 events per session
         // startup, playing
-        assertThat(firstImpressionSamples.size).isGreaterThanOrEqualTo(2)
-        assertThat(secondImpressionSamples.size).isGreaterThanOrEqualTo(2)
+        assertThat(firstImpressionSamples).hasSizeGreaterThanOrEqualTo(2)
+        assertThat(secondImpressionSamples).hasSizeGreaterThanOrEqualTo(2)
 
         DataVerifier.verifyStartupSample(firstImpressionSamples.first())
         DataVerifier.verifyStartupSample(secondImpressionSamples.first(), false)
@@ -170,8 +196,16 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_playSeekWithAutoplay() {
         val vodStreamSample = TestSources.IVS_VOD_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(vodStreamSample.m3u8Url!!)
-        val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
+        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
+        val sourceMetadata = SourceMetadata(
+            m3u8Url = vodStreamSample.m3u8Url,
+            title = "title",
+            isLive = false,
+            videoId = "videoId",
+            customData = TestConfig.createDummyCustomData("ivsVod_"),
+        )
+        collector.setCurrentSourceMetadata(sourceMetadata)
         collector.attachPlayer(player)
 
         // act
@@ -191,13 +225,13 @@ class PhoneBasicScenariosTest {
 
         // assert
         val impressionsList = LogParser.extractImpressions()
-        assertThat(impressionsList.size).isEqualTo(1)
+        assertThat(impressionsList).hasSize(1)
 
         val impression = impressionsList.first()
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, vodStreamSample, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(eventDataList, sourceMetadata, vodStreamSample, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
 
@@ -205,7 +239,7 @@ class PhoneBasicScenariosTest {
 
         // there need to be at least 3 events
         // startup, playing, seeking
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(3)
+        assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(3)
 
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyThereWasExactlyOneSeekingSample(eventDataList)
@@ -213,10 +247,19 @@ class PhoneBasicScenariosTest {
 
     @Test
     fun test_vod_play() {
+        // arrange
         val vodStreamSample = TestSources.IVS_VOD_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(vodStreamSample.m3u8Url!!)
-        val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
+        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
         collector.attachPlayer(player)
+        val sourceMetadata = SourceMetadata(
+            m3u8Url = vodStreamSample.m3u8Url,
+            title = "title",
+            isLive = false,
+            videoId = "videoId",
+            customData = TestConfig.createDummyCustomData("ivsVod_"),
+        )
+        collector.setCurrentSourceMetadata(sourceMetadata)
 
         // act
         player.load(Uri.parse(vodStreamSample.m3u8Url))
@@ -235,13 +278,13 @@ class PhoneBasicScenariosTest {
 
         // assert
         val impressionsList = LogParser.extractImpressions()
-        assertThat(impressionsList.size).isEqualTo(1)
+        assertThat(impressionsList).hasSize(1)
 
         val impression = impressionsList.first()
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, vodStreamSample, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(eventDataList, sourceMetadata, vodStreamSample, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
         DataVerifier.verifyInvariants(eventDataList)
@@ -250,7 +293,7 @@ class PhoneBasicScenariosTest {
 
         // there need to be at least 2 events
         // startup, playing
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
+        assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(2)
         DataVerifier.verifyStartupSample(eventDataList[0])
 
         val playedDuration = eventDataList.sumOf { it.played }
@@ -261,8 +304,10 @@ class PhoneBasicScenariosTest {
     fun test_nonExistingStream_Should_sendErrorSample() {
         // arrange
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(nonExistingStreamSample.uri.toString())
-        val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
+        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
+        val nonExistingStreamSourceMetadata = SourceMetadata(title = "non-existing-stream", isLive = false, mpdUrl = nonExistingStreamSample.uri.toString(), customData = TestConfig.createDummyCustomData("noneExitingStreamData"))
+        collector.setCurrentSourceMetadata(nonExistingStreamSourceMetadata)
         collector.attachPlayer(player)
 
         // act
@@ -284,12 +329,12 @@ class PhoneBasicScenariosTest {
         assertThat(eventData.errorCode).isEqualTo(11)
 
         DataVerifier.verifyStartupSampleOnError(eventData, IvsPlayerConstants.playerInfo)
-        DataVerifier.verifyAnalyticsConfig(eventData, analyticsConfig)
+        DataVerifier.verifySourceMetadata(eventData, nonExistingStreamSourceMetadata)
 
-        assertThat(impression.errorDetailList.size).isEqualTo(1)
+        assertThat(impression.errorDetailList).hasSize(1)
         val errorDetail = impression.errorDetailList.first()
-        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.key)
-        assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
+        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.licenseKey)
+        assertThat(errorDetail.data.exceptionStacktrace).hasSizeGreaterThan(0)
         assertThat(errorDetail.data.exceptionMessage).isEqualTo("MasterPlaylist : ERROR_NOT_AVAILABLE : 404 : Failed to load playlist")
     }
 
@@ -297,8 +342,8 @@ class PhoneBasicScenariosTest {
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         // arrange
         val sample = TestSources.HLS_REDBULL
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(sample.m3u8Url!!, "nonExistingKey")
-        val collector = IAmazonIvsPlayerCollector.Factory.create(analyticsConfig, appContext)
+        val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey")
+        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
         collector.attachPlayer(player)
         player.load(Uri.parse(sample.m3u8Url))
 
@@ -315,6 +360,6 @@ class PhoneBasicScenariosTest {
 
         // assert that no samples are sent
         val impressions = LogParser.extractImpressions()
-        assertThat(impressions.size).isEqualTo(0)
+        assertThat(impressions).hasSize(0)
     }
 }

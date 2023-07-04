@@ -14,7 +14,7 @@ internal class BitmovinFeatureFactory(private val analytics: BitmovinAnalytics, 
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
         val httpRequestTrackingAdapter = BitmovinHttpRequestTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
         val httpRequestTracking = HttpRequestTracking(httpRequestTrackingAdapter)
-        val errorDetailsBackend = ErrorDetailBackend(analytics.config.config, analytics.context)
+        val errorDetailsBackend = ErrorDetailBackend(analytics.config, analytics.context)
         val errorDetailTracking = ErrorDetailTracking(analytics.context, analytics.config, errorDetailsBackend, httpRequestTracking, analytics.onErrorDetailObservable)
         features.add(errorDetailTracking)
         return features

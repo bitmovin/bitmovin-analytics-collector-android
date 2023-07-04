@@ -2,6 +2,7 @@ package com.bitmovin.analytics.exoplayer
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
@@ -13,11 +14,8 @@ import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,29 +29,32 @@ class PhoneBasicScenariosTest {
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var player: ExoPlayer
-    private lateinit var channel: Channel<Unit>
 
-    private var defaultSample = TestSources.HLS_REDBULL
-    private var defaultAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(defaultSample.m3u8Url!!)
-    private var defaultMediaItem = MediaItem.fromUri(defaultSample.m3u8Url!!)
+    private val defaultSample = TestSources.HLS_REDBULL
+    private val defaultAnalyticsConfig = TestConfig.createAnalyticsConfig()
+    private val defaultMediaItem = MediaItem.fromUri(defaultSample.m3u8Url!!)
+    private val defaultSourceMetadata = SourceMetadata(
+        title = "hls_redbull",
+        videoId = "hls_redbull_id",
+        path = "hls_redbull_path",
+        m3u8Url = defaultSample.m3u8Url,
+        customData = TestConfig.createDummyCustomData(),
+        cdnProvider = "cdn_provider",
+    )
 
     @Before
     fun setup() {
         // logging to mark new test run for logparsing
         LogParser.startTracking()
-        channel = Channel(0)
         player = ExoPlayer.Builder(appContext).build()
-    }
-
-    @After
-    fun cleanup() {
-        channel.close()
     }
 
     @Test
     fun test_vod_playPauseWithPlayWhenReady() {
         // arrange
-        val collector = IExoPlayerCollector.create(defaultAnalyticsConfig, appContext)
+        val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+        collector.setCurrentSourceMetadata(defaultSourceMetadata)
+
         // act
         mainScope.launch {
             player.volume = 0.0f
@@ -88,12 +89,9 @@ class PhoneBasicScenariosTest {
             player.pause()
             collector.detachPlayer()
             player.release()
-            channel.send(Unit)
         }
 
-        runBlocking {
-            channel.receive()
-        }
+        Thread.sleep(300)
 
         val impressions = LogParser.extractImpressions()
         Assertions.assertThat(impressions.size).isEqualTo(1)
@@ -103,7 +101,7 @@ class PhoneBasicScenariosTest {
 
         val eventDataList = impression.eventDataList
 
-        DataVerifier.verifyStaticData(eventDataList, defaultAnalyticsConfig, defaultSample, ExoplayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(eventDataList, defaultSourceMetadata, defaultSample, ExoplayerConstants.playerInfo)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyInvariants(eventDataList)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
@@ -115,16 +113,16 @@ class PhoneBasicScenariosTest {
         // arrange
         val liveSample = TestSources.IVS_LIVE_1
         val liveSource = MediaItem.fromUri(liveSample.m3u8Url!!)
-        defaultAnalyticsConfig.isLive = true
-        defaultAnalyticsConfig.m3u8Url = liveSample.m3u8Url
+        val liveSourceMetadata = SourceMetadata(m3u8Url = liveSample.m3u8Url, title = "liveSource", videoId = "liveSourceId", cdnProvider = "cdn_provider", customData = TestConfig.createDummyCustomData(), isLive = true)
 
-        val collector = IExoPlayerCollector.create(defaultAnalyticsConfig, appContext)
+        val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
         // act
         mainScope.launch {
             collector.attachPlayer(player)
             player.playWhenReady = true
             player.setMediaItem(liveSource)
+            collector.setCurrentSourceMetadata(liveSourceMetadata)
             player.prepare()
         }
 
@@ -145,6 +143,8 @@ class PhoneBasicScenariosTest {
             player.release()
         }
 
+        Thread.sleep(300)
+
         // assert
         val impressionList = LogParser.extractImpressions()
         Assertions.assertThat(impressionList.size).isEqualTo(1)
@@ -153,7 +153,7 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        DataVerifier.verifyStaticData(eventDataList, defaultAnalyticsConfig, liveSample, ExoplayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(eventDataList, liveSourceMetadata, liveSample, ExoplayerConstants.playerInfo)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(false))
@@ -170,12 +170,13 @@ class PhoneBasicScenariosTest {
     fun test_nonExistingStream_Should_sendErrorSample() {
         // arrange
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(nonExistingStreamSample.uri.toString())
-        val collector = IExoPlayerCollector.create(analyticsConfig, appContext)
+        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val collector = IExoPlayerCollector.create(appContext, analyticsConfig)
 
         // act
         mainScope.launch {
             collector.attachPlayer(player)
+            collector.setCurrentSourceMetadata(defaultSourceMetadata)
             player.setMediaItem(MediaItem.fromUri(nonExistingStreamSample.uri))
             player.prepare()
         }
@@ -203,11 +204,11 @@ class PhoneBasicScenariosTest {
 //      Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS) // switch to this once https://bitmovin.atlassian.net/browse/AN-3520 is implemented
 
         DataVerifier.verifyStartupSampleOnError(eventData, ExoplayerConstants.playerInfo)
-        DataVerifier.verifyAnalyticsConfig(eventData, analyticsConfig)
+        DataVerifier.verifySourceMetadata(eventData, sourceMetadata = defaultSourceMetadata)
 
         Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)
         val errorDetail = impression.errorDetailList.first()
-        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.key)
+        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.licenseKey)
         Assertions.assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
         Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Data Source request failed with HTTP status: 404")
     }
@@ -215,8 +216,8 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         val sample = Samples.HLS_REDBULL
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(sample.uri.toString(), "nonExistingKey")
-        val collector = ExoPlayerCollector(analyticsConfig, appContext)
+        val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey")
+        val collector = IExoPlayerCollector.create(appContext, analyticsConfig)
 
         mainScope.launch {
             collector.attachPlayer(player)

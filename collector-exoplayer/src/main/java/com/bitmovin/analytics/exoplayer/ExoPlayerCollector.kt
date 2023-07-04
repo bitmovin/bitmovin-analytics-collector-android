@@ -5,12 +5,14 @@ import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
 import com.bitmovin.analytics.adapters.PlayerAdapter
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.exoplayer.features.ExoPlayerFeatureFactory
 import com.bitmovin.analytics.exoplayer.player.ExoPlayerContext
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.SystemInformationProvider
 import com.bitmovin.analytics.utils.UserAgentProvider
 import com.bitmovin.analytics.utils.Util
@@ -19,24 +21,30 @@ import com.google.android.exoplayer2.ExoPlayer
 /**
  * Bitmovin Analytics
  *
- * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
+ * @param analyticsConfig [AnalyticsConfig]
  * @param context [Context]
  */
-class ExoPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, private val context: Context) :
-    DefaultCollector<ExoPlayer>(bitmovinAnalyticsConfig, context), IExoPlayerCollector {
 
-    /**
-     * Bitmovin Analytics
-     *
-     * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
-     */
+@Deprecated(
+    "Use IExoPlayerCollector.Factory.create(context, analyticsConfig) instead",
+    ReplaceWith(
+        "IExoPlayerCollector.Factory.create(context, analyticsConfig)",
+        "com.bitmovin.analytics.exoplayer.IExoPlayerCollector",
+    ),
+)
+class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, private val context: Context) :
+    DefaultCollector<ExoPlayer>(analyticsConfig, context), IExoPlayerCollector {
+
     @Deprecated(
-        """Please use {@link #ExoPlayerCollector(BitmovinAnalyticsConfig, Context)} and pass
-          {@link Context} separately.""",
+        "Use IExoPlayerCollector.Factory.create(context, analyticsConfig) instead",
+        ReplaceWith(
+            "IExoPlayerCollector.Factory.create(context, analyticsConfig)",
+            "com.bitmovin.analytics.exoplayer.IExoPlayerCollector",
+        ),
     )
-    constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) : this(
-        bitmovinAnalyticsConfig,
-        bitmovinAnalyticsConfig.context ?: throw IllegalArgumentException("Context cannot be null"),
+    constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : this(
+        ApiV3Utils.extractAnalyticsConfig(bitmovinAnalyticsConfig),
+        context,
     )
 
     override fun createAdapter(
@@ -60,6 +68,7 @@ class ExoPlayerCollector(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, priva
             featureFactory,
             eventDataFactory,
             deviceInformationProvider,
+            metadataProvider,
         )
     }
 }

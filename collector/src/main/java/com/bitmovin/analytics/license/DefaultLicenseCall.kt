@@ -3,7 +3,7 @@ package com.bitmovin.analytics.license
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.LicenseCallData
 import com.bitmovin.analytics.data.LicenseResponse
 import com.bitmovin.analytics.utils.ClientFactory
@@ -17,14 +17,14 @@ import okhttp3.Response
 import java.io.IOException
 
 class DefaultLicenseCall(
-    private val config: BitmovinAnalyticsConfig,
+    private val config: AnalyticsConfig,
     private val context: Context,
 ) : LicenseCall {
     private val backendUrl: String
     private val httpClient: HttpClient
 
     init {
-        backendUrl = Uri.parse(config.config.backendUrl)
+        backendUrl = Uri.parse(config.backendUrl)
             .buildUpon()
             .appendEncodedPath("licensing")
             .build()
@@ -34,13 +34,13 @@ class DefaultLicenseCall(
         httpClient = HttpClient(
             context,
             ClientFactory().createClient(
-                config.config,
+                config,
             ),
         )
     }
 
     override fun authenticate(callback: AuthenticationCallback) {
-        val data = LicenseCallData(config.key, Util.analyticsVersion, Util.getDomain(context))
+        val data = LicenseCallData(config.licenseKey, Util.analyticsVersion, Util.getDomain(context))
         val json = serialize(data)
         httpClient.post(
             backendUrl,

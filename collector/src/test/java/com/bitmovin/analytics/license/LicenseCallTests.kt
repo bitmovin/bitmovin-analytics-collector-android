@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.license
 
 import android.net.Uri
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.features.errordetails.ErrorDetailTrackingConfig
 import com.bitmovin.analytics.utils.HttpClient
 import io.mockk.every
@@ -32,7 +32,7 @@ class LicenseCallTests {
         every { anyConstructed<HttpClient>().post(any(), any(), capture(slot)) }.answers {
             slot.captured.onResponse(mockk(), mockedResponse)
         }
-        return DefaultLicenseCall(BitmovinAnalyticsConfig(""), mockk(relaxed = true))
+        return DefaultLicenseCall(AnalyticsConfig(""), mockk(relaxed = true))
     }
 
     private fun getGrantedResponseBody(features: String) = "{\"status\": \"granted\"$features}"

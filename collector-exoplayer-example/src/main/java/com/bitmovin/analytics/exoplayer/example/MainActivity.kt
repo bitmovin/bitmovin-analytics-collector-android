@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.data.CustomData
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Sample
 import com.bitmovin.analytics.example.shared.Samples
@@ -147,17 +147,20 @@ class MainActivity : AppCompatActivity(), Player.Listener {
 
     private fun changeCustomData() {
         val bitmovinAnalytics = bitmovinAnalytics ?: return
-        val customData = bitmovinAnalytics.customData
-        customData.customData1 = "custom_data_1_changed"
-        customData.customData2 = "custom_data_2_changed"
-        this.bitmovinAnalytics?.customData = customData
+        val changedCustomData = bitmovinAnalytics.defaultMetadata?.customData?.copy(
+            customData1 = "custom_data_1_changed",
+            customData2 = "custom_data_2_changed",
+        )
+
+        this.bitmovinAnalytics?.setDefaultCustomData(changedCustomData ?: CustomData())
     }
 
     private fun setCustomDataOnce() {
-        val customData = CustomData()
-        customData.customData1 = "custom_data_1_changed_once"
-        customData.customData2 = "custom_data_2_changed_once"
-        this.bitmovinAnalytics?.setCustomDataOnce(customData)
+        val customData = CustomData(
+            customData1 = "custom_data_1_changed_once",
+            customData2 = "custom_data_2_changed_once",
+        )
+        this.bitmovinAnalytics?.sendCustomDataEvent(customData)
     }
 
     private fun createBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {

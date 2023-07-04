@@ -1,8 +1,9 @@
 package com.bitmovin.analytics.retryBackend
 
 import android.os.Handler
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.TestFactory
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
@@ -20,7 +21,7 @@ import java.util.Date
 
 class RetryBackendTest {
 
-    private val config = BitmovinAnalyticsConfig()
+    private val config = AnalyticsConfig("123")
     private val backendMock = mockk<CallbackBackend>(relaxed = true)
     private val handlerMock = mockk<Handler>(relaxed = true)
     private val deviceInformation =
@@ -66,6 +67,7 @@ class RetryBackendTest {
         val eventData = TestFactory.createEventDataFactory(config).create(
             "testImpressionId",
             null,
+            DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         )

@@ -51,8 +51,8 @@ internal class QualityEventDataManipulator(private val playbackQualityProvider: 
                 return CodecInfo(null, null)
             }
 
-            var videoCodec: String?
-            var audioCodec: String?
+            val videoCodec: String?
+            val audioCodec: String?
 
             // it is expected but not guaranteed that first item
             // in codecs is video codec and second item is audio codec

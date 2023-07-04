@@ -1,7 +1,8 @@
 package com.bitmovin.analytics.retryBackend
 
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.TestFactory
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.PlayerInfo
@@ -15,7 +16,7 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 class RetryQueueTest {
-    private val config = BitmovinAnalyticsConfig()
+    private val config = AnalyticsConfig("123")
     private val deviceInformation =
         DeviceInformation("manufacturer", "model", false, "locale", "packageName", 0, 0)
 
@@ -29,6 +30,7 @@ class RetryQueueTest {
         var eventData = TestFactory.createEventDataFactory(config).create(
             "testImpressionId",
             null,
+            DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         )

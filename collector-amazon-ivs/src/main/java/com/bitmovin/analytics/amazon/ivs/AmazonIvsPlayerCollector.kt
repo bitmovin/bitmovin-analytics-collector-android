@@ -3,7 +3,6 @@ package com.bitmovin.analytics.amazon.ivs
 import android.content.Context
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalytics
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.amazon.ivs.features.AmazonIvsPlayerFeatureFactory
@@ -16,6 +15,7 @@ import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerContext
 import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
 import com.bitmovin.analytics.amazon.ivs.player.PlaybackQualityProvider
 import com.bitmovin.analytics.amazon.ivs.player.PlayerStatisticsProvider
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
@@ -27,13 +27,13 @@ import com.bitmovin.analytics.utils.Util
 /**
  * Bitmovin Analytics
  *
- * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
+ * @param analyticsConfig [AnalyticsConfig]
  * @param context [Context]
  */
 internal class AmazonIvsPlayerCollector(
-    bitmovinAnalyticsConfig: BitmovinAnalyticsConfig,
+    analyticsConfig: AnalyticsConfig,
     private val context: Context,
-) : DefaultCollector<Player>(bitmovinAnalyticsConfig, context), IAmazonIvsPlayerCollector {
+) : DefaultCollector<Player>(analyticsConfig, context), IAmazonIvsPlayerCollector {
 
     override fun createAdapter(
         player: Player,
@@ -44,7 +44,7 @@ internal class AmazonIvsPlayerCollector(
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext)
 
         val playbackService = PlaybackService(stateMachine)
-        val playbackManipulator = PlaybackEventDataManipulator(player, config)
+        val playbackManipulator = PlaybackEventDataManipulator(player, metadataProvider)
         val playbackQualityProvider = PlaybackQualityProvider()
         val videoStartupService = VideoStartupService(stateMachine, player, playbackQualityProvider)
         val playerStatisticsProvider = PlayerStatisticsProvider(player)
@@ -64,6 +64,7 @@ internal class AmazonIvsPlayerCollector(
             Util.getPackageInfoOrNull(context),
             SystemInformationProvider.getProperty("http.agent"),
         )
+
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val manipulators = listOf(playbackManipulator, playerInfoManipulator, qualityManipulator)
         val deviceInformationProvider = DeviceInformationProvider(context)
@@ -79,6 +80,7 @@ internal class AmazonIvsPlayerCollector(
             manipulators,
             playerStatisticsProvider,
             playerContext,
+            metadataProvider,
         )
     }
 }

@@ -2,14 +2,11 @@ package com.bitmovin.analytics
 
 import android.content.Context
 import android.util.Log
-import com.bitmovin.analytics.BitmovinAnalyticsConfigExtension.Companion.getCustomData
-import com.bitmovin.analytics.BitmovinAnalyticsConfigExtension.Companion.setCustomData
-import com.bitmovin.analytics.SourceMetadataExtension.Companion.getCustomData
-import com.bitmovin.analytics.SourceMetadataExtension.Companion.setCustomData
 import com.bitmovin.analytics.adapters.PlayerAdapter
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.BackendFactory
-import com.bitmovin.analytics.data.CustomData
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher
@@ -25,11 +22,12 @@ import com.bitmovin.analytics.persistence.PersistingAuthenticatedDispatcher
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
+import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.ScopeProvider
 
 /**
  * An analytics plugin that sends video playback analytics to Bitmovin Analytics servers. Currently
- * supports analytics of ExoPlayer video players
+ * supports analytics of ExoPlayer video players and the Amazon IVS video player.
  */
 class BitmovinAnalytics
 /**
@@ -38,7 +36,7 @@ class BitmovinAnalytics
  * @param bitmovinAnalyticsConfig [BitmovinAnalyticsConfig]
  * @param context [Context]
  */
-(val config: BitmovinAnalyticsConfig, val context: Context) : LicenseCallback {
+(val config: AnalyticsConfig, val context: Context) : LicenseCallback {
     private val debugCallback: DebugCallback = object : DebugCallback {
         override fun dispatchEventData(data: EventData) {
             eventBus.notify(DebugListener::class) { it.onDispatchEventData(data) }
@@ -61,7 +59,7 @@ class BitmovinAnalytics
     )
 
     private val eventDataDispatcher = DebuggingEventDataDispatcher(
-        if (config.config.longTermRetryEnabled) {
+        if (config.longTermRetryEnabled) {
             PersistingAuthenticatedDispatcher(
                 context = context,
                 config = config,
@@ -89,7 +87,7 @@ class BitmovinAnalytics
     private var playerAdapter: PlayerAdapter? = null
     private var stateMachineListener: StateMachineListener? = null
     private val adAnalytics: BitmovinAdAnalytics? =
-        if (config.ads) BitmovinAdAnalytics(this) else null
+        if (!config.adTrackingDisabled) BitmovinAdAnalytics(this) else null
 
     // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
     // first startup sample, in case the collector supports multiple sources)
@@ -146,43 +144,30 @@ class BitmovinAnalytics
         playerAdapter?.resetSourceRelatedState()
     }
 
-    var customData: CustomData
+    val customData: CustomData
         get() {
-            val sourceMetadata = playerAdapter?.currentSourceMetadata
-            return sourceMetadata?.getCustomData() ?: config.getCustomData()
-        }
-        set(customData) {
-            var setCustomDataFunction: (CustomData) -> Unit = { config.setCustomData(it) }
-            val sourceMetadata = playerAdapter?.currentSourceMetadata
-            if (sourceMetadata != null) {
-                setCustomDataFunction = { sourceMetadata.setCustomData(it) }
-            }
-            playerAdapter?.stateMachine?.changeCustomData(
-                playerAdapter?.position ?: 0,
-                customData,
-                setCustomDataFunction,
-            )
+            val sourceMetadata = playerAdapter?.getCurrentSourceMetadata()
+            val defaultMetadata = playerAdapter?.defaultMetadata
+            return ApiV3Utils.mergeCustomData(sourceMetadata?.customData, defaultMetadata?.customData)
         }
 
-    fun setCustomDataOnce(customData: CustomData) {
+    fun closeCurrentSampleForCustomDataChangeIfNeeded() {
+        playerAdapter?.stateMachine?.closeCurrentSampleForCustomDataChangeIfNeeded(playerAdapter?.position ?: 0)
+    }
+
+    fun sendCustomDataEvent(customData: CustomData) {
         val playerAdapter = this.playerAdapter
         if (playerAdapter == null) {
-            Log.d(TAG, "Custom data could not be set because player is not attached")
+            Log.d(TAG, "Custom data event could not be sent because player is not attached")
             return
         }
-        var getCustomDataFunction: () -> CustomData = { config.getCustomData() }
-        var setCustomDataFunction: (CustomData) -> Unit = { config.setCustomData(it) }
-        val sourceMetadata = playerAdapter.currentSourceMetadata
-        if (sourceMetadata != null) {
-            getCustomDataFunction = { sourceMetadata.getCustomData() }
-            setCustomDataFunction = { sourceMetadata.setCustomData(it) }
-        }
-        val currentCustomData = getCustomDataFunction()
-        setCustomDataFunction(customData)
-        val eventData = playerAdapter.createEventData()
+
+        val mergedSourceMetadata = ApiV3Utils.mergeSourceMetadata(playerAdapter.getCurrentSourceMetadata(), playerAdapter.defaultMetadata)
+        val mergedCustomData = ApiV3Utils.mergeCustomData(customData, mergedSourceMetadata.customData)
+        val activeSourceMetadata = mergedSourceMetadata.copy(customData = mergedCustomData)
+        val eventData = playerAdapter.createEventDataForCustomDataEvent(activeSourceMetadata)
         eventData.state = PlayerStates.CUSTOMDATACHANGE.name
         sendEventData(eventData)
-        setCustomDataFunction(currentCustomData)
     }
 
     fun sendEventData(data: EventData) {

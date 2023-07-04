@@ -1,5 +1,7 @@
 package com.bitmovin.analytics
 
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.enums.PlayerType
@@ -11,9 +13,8 @@ class DeviceInformationDtoDataSerializationTest {
     @Test
     fun testSerializesEventDataDeviceInformationCorrectly() {
         // #region Mocking
-        val config = BitmovinAnalyticsConfig(
+        val config = AnalyticsConfig(
             "9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac",
-            "18ca6ad5-9768-4129-bdf6-17685e0d14d2",
         )
 
         val deviceInformation =
@@ -23,6 +24,7 @@ class DeviceInformationDtoDataSerializationTest {
         val data = TestFactory.createEventDataFactory(config).create(
             "null",
             null,
+            DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         )

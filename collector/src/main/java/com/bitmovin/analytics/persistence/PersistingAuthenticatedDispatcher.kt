@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.persistence
 
 import android.content.Context
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.BackendFactory
@@ -22,7 +22,7 @@ import kotlinx.coroutines.cancel
 
 internal class PersistingAuthenticatedDispatcher(
     private val context: Context,
-    private val config: BitmovinAnalyticsConfig,
+    private val config: AnalyticsConfig,
     callback: LicenseCallback?,
     private val backendFactory: BackendFactory,
     private val licenseCall: LicenseCall,

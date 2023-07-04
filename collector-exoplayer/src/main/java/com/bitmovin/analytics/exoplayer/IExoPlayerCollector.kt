@@ -1,8 +1,11 @@
 package com.bitmovin.analytics.exoplayer
 
 import android.content.Context
-import com.bitmovin.analytics.AnalyticsCollector
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.AnalyticsCollector
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.utils.ApiV3Utils
 import com.google.android.exoplayer2.ExoPlayer
 
 /**
@@ -14,9 +17,25 @@ interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
         /**
          * Creates a collector instance configured via the provided [config].
          */
+        @Deprecated(
+            "Use IExoPlayerCollector.Factory.create(context, analyticsConfig) instead",
+            ReplaceWith(
+                "IExoPlayerCollector.Factory.create(context, analyticsConfig)",
+                "com.bitmovin.analytics.exoplayer.IExoPlayerCollector",
+            ),
+        )
         @JvmStatic
         fun create(config: BitmovinAnalyticsConfig, context: Context): IExoPlayerCollector {
-            return ExoPlayerCollector(config, context)
+            val collector = ExoPlayerCollector(ApiV3Utils.extractAnalyticsConfig(config), context)
+            collector.setDeprecatedBitmovinAnalyticsConfig(config)
+            return collector
+        }
+
+        @JvmStatic
+        fun create(context: Context, config: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IExoPlayerCollector {
+            val collector = ExoPlayerCollector(config, context)
+            collector.defaultMetadata = defaultMetadata
+            return collector
         }
     }
 }

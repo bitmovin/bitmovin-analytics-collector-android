@@ -3,7 +3,7 @@ package com.bitmovin.analytics.data
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.bitmovin.analytics.CollectorConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.utils.ClientFactory
 import com.bitmovin.analytics.utils.DataSerializer.serialize
 import com.bitmovin.analytics.utils.HttpClient
@@ -12,7 +12,7 @@ import okhttp3.Callback
 import okhttp3.Response
 import java.io.IOException
 
-class HttpBackend(config: CollectorConfig, context: Context) : Backend, CallbackBackend {
+class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, CallbackBackend {
     private val httpClient: HttpClient
     private val analyticsBackendUrl: String
     private val adsAnalyticsBackendUrl: String

@@ -5,6 +5,7 @@ import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.TestConfig
@@ -42,9 +43,11 @@ class TVBasicScenariosTest {
 
         val liveSample = TestSources.IVS_LIVE_1
 
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveSample.m3u8Url)
-        val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
+        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val sourceMetadata = SourceMetadata(title = "tvTest", m3u8Url = liveSample.m3u8Url, customData = TestConfig.createDummyCustomData("tvTest"))
+        val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
         collector.attachPlayer(player)
+        collector.setCurrentSourceMetadata(sourceMetadata)
 
         // act
         player.load(Uri.parse(liveSample.m3u8Url))
@@ -67,7 +70,7 @@ class TVBasicScenariosTest {
         assertThat(impression.errorDetailList.size).isEqualTo(0)
 
         val eventDataList = impression.eventDataList
-        DataVerifier.verifyStaticData(eventDataList, analyticsConfig, liveSample, IvsPlayerConstants.playerInfo, true)
+        DataVerifier.verifyStaticData(eventDataList, sourceMetadata, liveSample, IvsPlayerConstants.playerInfo, true)
         DataVerifier.verifyStartupSample(eventDataList[0])
     }
 }

@@ -3,6 +3,7 @@ package com.bitmovin.analytics
 import android.os.Parcel
 import android.os.Parcelable
 
+@Deprecated("Use AnalyticsConfig instead")
 class CollectorConfig() : Parcelable {
     /**
      * The URL of the Bitmovin Analytics backend.

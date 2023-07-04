@@ -1,7 +1,7 @@
 # accept all sdk licenses
 yes | /Users/$USER/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
-# run systemtest for collector
+# run systemtest for collector core
 ## clean test to make sure we run test everytime
 ./gradlew :collector:cleanPixel6api30DebugAndroidTest
 ## run system tests
@@ -24,6 +24,7 @@ yes | /Users/$USER/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager --lic
 ./gradlew :collector-bitmovin-player:cleanPixel6api30DebugAndroidTest
 ## run test
 ./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.PhoneBasicScenariosTest || exit
+./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.ApiUsageScenariosTest || exit
 
 ## command to run specific test (with regex) in a loop (can be used to verify flaky test is stable)
 #for i in {1..50}; do

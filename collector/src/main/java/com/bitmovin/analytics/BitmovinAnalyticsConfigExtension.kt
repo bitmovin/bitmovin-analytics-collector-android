@@ -1,7 +1,9 @@
 package com.bitmovin.analytics
 
-import com.bitmovin.analytics.data.CustomData
+import com.bitmovin.analytics.api.CustomData
 
+// TODO: what deprecation message makes sense here?
+@Deprecated("Use AnalyticsConfig and DefaultMetadata instead")
 internal class BitmovinAnalyticsConfigExtension {
     companion object {
         fun BitmovinAnalyticsConfig.setCustomData(customData: CustomData) {
@@ -35,7 +37,6 @@ internal class BitmovinAnalyticsConfigExtension {
             customData28 = customData.customData28
             customData29 = customData.customData29
             customData30 = customData.customData30
-            experimentName = customData.experimentName
         }
 
         fun BitmovinAnalyticsConfig.getCustomData(): CustomData {
@@ -70,7 +71,6 @@ internal class BitmovinAnalyticsConfigExtension {
                 customData28,
                 customData29,
                 customData30,
-                experimentName,
             )
         }
     }

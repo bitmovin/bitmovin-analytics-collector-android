@@ -1,8 +1,8 @@
 package com.bitmovin.analytics.amazon.ivs.manipulators
 
 import com.amazonaws.ivs.player.Player
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.amazon.ivs.TestUtils
+import com.bitmovin.analytics.data.MetadataProvider
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -11,12 +11,12 @@ import org.junit.Test
 internal class PlaybackEventDataManipulatorTest {
 
     @Test
-    fun `manipulate should set is live from config`() {
+    fun `manipulate should set is live from sourceMetadata`() {
         // arrange
-        val mockedConfig = mockk<BitmovinAnalyticsConfig>(relaxed = true)
-        every { mockedConfig.isLive } returns true
+        val mockedMetadataProvider = mockk<MetadataProvider>(relaxed = true)
+        every { mockedMetadataProvider.getSourceMetadata()?.isLive } returns true
 
-        val manipulator = createPlaybackEventDataManipulator(config = mockedConfig)
+        val manipulator = createPlaybackEventDataManipulator(metadataProvider = mockedMetadataProvider)
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -32,10 +32,10 @@ internal class PlaybackEventDataManipulatorTest {
         val mockedPlayer = mockk<Player>(relaxed = true)
         every { mockedPlayer.duration } returns -1L
 
-        val mockedConfig = mockk<BitmovinAnalyticsConfig>(relaxed = true)
-        every { mockedConfig.isLive } returns null
+        val mockedMetadataProvider = mockk<MetadataProvider>(relaxed = true)
+        every { mockedMetadataProvider.getSourceMetadata()?.isLive } returns null
 
-        val manipulator = createPlaybackEventDataManipulator(mockedPlayer, mockedConfig)
+        val manipulator = createPlaybackEventDataManipulator(mockedPlayer, mockedMetadataProvider)
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -47,8 +47,8 @@ internal class PlaybackEventDataManipulatorTest {
 
     private fun createPlaybackEventDataManipulator(
         player: Player = mockk(relaxed = true),
-        config: BitmovinAnalyticsConfig = mockk(relaxed = true),
+        metadataProvider: MetadataProvider = mockk(relaxed = true),
     ): PlaybackEventDataManipulator {
-        return PlaybackEventDataManipulator(player, config)
+        return PlaybackEventDataManipulator(player, metadataProvider)
     }
 }

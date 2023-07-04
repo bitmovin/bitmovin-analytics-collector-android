@@ -2,9 +2,9 @@
 
 package com.bitmovin.analytics.persistence
 
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.TestFactory.createAdEventData
 import com.bitmovin.analytics.TestFactory.createEventData
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.data.CacheConsumingBackend
@@ -49,7 +49,7 @@ class PersistingAuthenticatedDispatcherTest {
 
         persistingAuthenticatedDispatcher = PersistingAuthenticatedDispatcher(
             mockk(),
-            BitmovinAnalyticsConfig(),
+            AnalyticsConfig("dummy"),
             outerLicenseCallback,
             backendFactory,
             licenseCall,

@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.features.errordetails
 
 import android.content.Context
-import com.bitmovin.analytics.CollectorConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.HttpClient
@@ -9,8 +9,8 @@ import com.bitmovin.analytics.utils.Util
 import okhttp3.OkHttpClient
 import java.util.LinkedList
 
-class ErrorDetailBackend(collectorConfig: CollectorConfig, context: Context, private val httpClient: HttpClient = HttpClient(context, OkHttpClient())) {
-    private val backendUrl = Util.joinUrl(collectorConfig.backendUrl, "/analytics/error")
+class ErrorDetailBackend(config: AnalyticsConfig, context: Context, private val httpClient: HttpClient = HttpClient(context, OkHttpClient())) {
+    private val backendUrl = Util.joinUrl(config.backendUrl, "/analytics/error")
     private val _queue = LinkedList<ErrorDetail>()
     val queue: List<ErrorDetail> = _queue
     var enabled: Boolean = false

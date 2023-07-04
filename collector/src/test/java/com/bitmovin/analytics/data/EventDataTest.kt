@@ -1,7 +1,8 @@
 package com.bitmovin.analytics.data
 
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.TestFactory
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.enums.PlayerType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -9,25 +10,25 @@ import org.junit.Test
 import java.util.UUID
 
 class EventDataTest {
-    private val playerKey = UUID.randomUUID().toString()
     private val licenseKey = UUID.randomUUID().toString()
     private val impressionId = UUID.randomUUID().toString()
     private val userId = UUID.randomUUID().toString()
 
-    private lateinit var bitmovinAnalyticsConfig: BitmovinAnalyticsConfig
+    private lateinit var analyticsConfig: AnalyticsConfig
 
     @Before
     fun setup() {
-        bitmovinAnalyticsConfig = BitmovinAnalyticsConfig(licenseKey, playerKey)
+        analyticsConfig = AnalyticsConfig(licenseKey = licenseKey)
     }
 
     @Test
     fun testEventDataContainsDeviceInformation() {
         val deviceInformation =
             DeviceInformation("myManufacturer", "myModel", false, "de", "package-name", 100, 200)
-        val eventData = TestFactory.createEventDataFactory(bitmovinAnalyticsConfig).create(
+        val eventData = TestFactory.createEventDataFactory(analyticsConfig).create(
             impressionId,
             null,
+            DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         )
@@ -46,9 +47,10 @@ class EventDataTest {
     fun testEventDataSetsPlatformToAndroidTVIfDeviceInformationIsTVIsTrue() {
         val deviceInformation =
             DeviceInformation("myManufacturer", "myModel", true, "de", "package-name", 100, 200)
-        val eventData = TestFactory.createEventDataFactory(bitmovinAnalyticsConfig).create(
+        val eventData = TestFactory.createEventDataFactory(analyticsConfig).create(
             impressionId,
             null,
+            DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         )
@@ -63,29 +65,32 @@ class EventDataTest {
         var randomizedUserIdProvider = RandomizedUserIdIdProvider()
         var randomizedUserIdProvider1 = RandomizedUserIdIdProvider()
         var eventData = TestFactory.createEventDataFactory(
-            bitmovinAnalyticsConfig,
+            analyticsConfig,
             randomizedUserIdProvider,
         ).create(
             impressionId,
             null,
+            DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         )
         var eventData1 = TestFactory.createEventDataFactory(
-            bitmovinAnalyticsConfig,
+            analyticsConfig,
             randomizedUserIdProvider,
         ).create(
             impressionId,
             null,
+            DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         )
         var eventData2 = TestFactory.createEventDataFactory(
-            bitmovinAnalyticsConfig,
+            analyticsConfig,
             randomizedUserIdProvider1,
         ).create(
             impressionId,
             null,
+            DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         )

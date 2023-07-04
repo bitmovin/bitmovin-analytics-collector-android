@@ -1,6 +1,7 @@
 package com.bitmovin.analytics
 
 import android.content.Context
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.BackendFactory
 import io.mockk.every
 import io.mockk.mockk
@@ -10,7 +11,7 @@ import org.junit.Before
 import org.junit.Test
 
 class BitmovinAnalyticsDebugListenerTests {
-    private val config = BitmovinAnalyticsConfig("key")
+    private val config = AnalyticsConfig("key")
     private lateinit var analytics: BitmovinAnalytics
 
     @Before

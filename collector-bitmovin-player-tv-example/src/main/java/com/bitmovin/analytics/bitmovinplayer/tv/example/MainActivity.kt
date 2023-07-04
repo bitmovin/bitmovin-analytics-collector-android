@@ -5,9 +5,9 @@ import android.util.Log
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovinplayer.tv.example.databinding.ActivityMainBinding
-import com.bitmovin.analytics.config.SourceMetadata
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.player.api.PlaybackConfig
