@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
+- Upgraded to Kotlin 1.8.20
 - Initial v3 API changes
-- Upgrade example app to latest bitmovin player (v3.38.1) and latest amazon ivs player (v1.19.0)
+- Upgrade example app to latest bitmovin player (v3.39.0) and latest amazon ivs player (v1.19.0)
 
 ## v2.18.0
 

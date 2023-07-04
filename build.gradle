@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.7.20'
+    ext.kotlin_version = '1.8.20'
 
     repositories {
         google()
@@ -95,7 +95,7 @@ ext {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
 
     // player versions
-    bitmovinPlayerVersion = '3.38.1'
+    bitmovinPlayerVersion = '3.39.0'
     exoplayerVersion = '2.18.7'
     amazonIvsPlayerVersion = '1.19.0'
 
