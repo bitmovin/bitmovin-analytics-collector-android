@@ -30,10 +30,8 @@ import com.bitmovin.analytics.utils.Util
  * @param analyticsConfig [AnalyticsConfig]
  * @param context [Context]
  */
-internal class AmazonIvsPlayerCollector(
-    analyticsConfig: AnalyticsConfig,
-    private val context: Context,
-) : DefaultCollector<Player>(analyticsConfig, context), IAmazonIvsPlayerCollector {
+internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
+    DefaultCollector<Player>(analyticsConfig, context.applicationContext), IAmazonIvsPlayerCollector {
 
     override fun createAdapter(
         player: Player,
@@ -60,14 +58,14 @@ internal class AmazonIvsPlayerCollector(
         val playerInfoManipulator = PlayerInfoEventDataManipulator(player)
         val qualityManipulator = QualityEventDataManipulator(playbackQualityProvider, playerStatisticsProvider)
         val userAgentProvider = UserAgentProvider(
-            Util.getApplicationInfoOrNull(context),
-            Util.getPackageInfoOrNull(context),
+            Util.getApplicationInfoOrNull(analytics.context),
+            Util.getPackageInfoOrNull(analytics.context),
             SystemInformationProvider.getProperty("http.agent"),
         )
 
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val manipulators = listOf(playbackManipulator, playerInfoManipulator, qualityManipulator)
-        val deviceInformationProvider = DeviceInformationProvider(context)
+        val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         return AmazonIvsPlayerAdapter(
             player,
             config,

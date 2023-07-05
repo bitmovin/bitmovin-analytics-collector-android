@@ -32,8 +32,8 @@ import com.google.android.exoplayer2.ExoPlayer
         "com.bitmovin.analytics.exoplayer.IExoPlayerCollector",
     ),
 )
-class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, private val context: Context) :
-    DefaultCollector<ExoPlayer>(analyticsConfig, context), IExoPlayerCollector {
+class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
+    DefaultCollector<ExoPlayer>(analyticsConfig, context.applicationContext), IExoPlayerCollector {
 
     @Deprecated(
         "Use IExoPlayerCollector.Factory.create(context, analyticsConfig) instead",
@@ -53,12 +53,12 @@ class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, private val context: 
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = ExoPlayerFeatureFactory(analytics, player)
         val userAgentProvider = UserAgentProvider(
-            Util.getApplicationInfoOrNull(context),
-            Util.getPackageInfoOrNull(context),
+            Util.getApplicationInfoOrNull(analytics.context),
+            Util.getPackageInfoOrNull(analytics.context),
             SystemInformationProvider.getProperty("http.agent"),
         )
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
-        val deviceInformationProvider = DeviceInformationProvider(context)
+        val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         val playerContext = ExoPlayerContext(player)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext)
         return ExoPlayerAdapter(

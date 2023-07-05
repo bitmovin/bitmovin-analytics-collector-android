@@ -37,8 +37,8 @@ import com.bitmovin.player.api.source.Source
         imports = ["com.bitmovin.analytics.bitmovin.player.IBitmovinPlayerCollector"],
     ),
 )
-class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, private val context: Context) :
-    DefaultCollector<Player>(analyticsConfig, context), IBitmovinPlayerCollector {
+class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
+    DefaultCollector<Player>(analyticsConfig, context.applicationContext), IBitmovinPlayerCollector {
 
     private var player: Player? = null
 
@@ -71,13 +71,13 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, private val cont
         this.player = player
         val featureFactory: FeatureFactory = BitmovinFeatureFactory(analytics, player)
         val userAgentProvider = UserAgentProvider(
-            Util.getApplicationInfoOrNull(context),
-            Util.getPackageInfoOrNull(context),
+            Util.getApplicationInfoOrNull(analytics.context),
+            Util.getPackageInfoOrNull(analytics.context),
             SystemInformationProvider.getProperty("http.agent"),
         )
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
-        val deviceInformationProvider = DeviceInformationProvider(context)
-        val playerLicenseProvider = PlayerLicenseProvider(context)
+        val deviceInformationProvider = DeviceInformationProvider(analytics.context)
+        val playerLicenseProvider = PlayerLicenseProvider(analytics.context)
         val playerContext = BitmovinPlayerContext(player)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext)
         val playbackQualityProvider = PlaybackQualityProvider(player)

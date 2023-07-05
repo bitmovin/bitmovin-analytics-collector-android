@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Initial v3 API changes
 - Upgrade example app to latest bitmovin player (v3.39.0) and latest amazon ivs player (v1.19.0)
 
+### Fixed
+- Prevent context leaking through using context.applicationContext in constructors
+
 ## v2.18.0
 
 ### Changed
