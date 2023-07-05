@@ -57,6 +57,7 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
         }
 
         @JvmStatic
+        @JvmOverloads
         fun create(context: Context, analyticsConfig: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IBitmovinPlayerCollector {
             val collector = BitmovinPlayerCollector(analyticsConfig, context)
             collector.defaultMetadata = defaultMetadata

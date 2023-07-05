@@ -26,17 +26,17 @@ public class IBitmovinPlayerCollectorJavaTest {
         Assert.assertNotNull(collector2);
     }
 
-//    @Test
-//    public void testFactory_shouldCreateNewCollectorObjectWithAnalyticsConfig() {
-//        AnalyticsConfig analyticsConfig = new AnalyticsConfig("analytics_key", "player_key");
-//        Context context = TestUtils.Companion.createMockContext();
-//
-//        IBitmovinPlayerCollector collector = IBitmovinPlayerCollector.Factory.create(analyticsConfig, context);
-//        Assert.assertNotNull(collector);
-//        Assert.assertEquals(analyticsConfig.getKey(), collector.getConfig().getKey());
-//
-//        IBitmovinPlayerCollector collector2 = IBitmovinPlayerCollector.create(analyticsConfig, context);
-//        Assert.assertNotNull(collector2);
-//        Assert.assertEquals(analyticsConfig.getKey(), collector2.getConfig().getKey());
-//    }
+    @Test
+    public void testFactory_shouldCreateNewCollectorObjectWithAnalyticsConfig() {
+        AnalyticsConfig analyticsConfig = new AnalyticsConfig("analytics_key");
+        Context context = TestUtils.Companion.createMockContext();
+
+        IBitmovinPlayerCollector collector = IBitmovinPlayerCollector.Factory.create(context, analyticsConfig);
+        Assert.assertNotNull(collector);
+        Assert.assertEquals(analyticsConfig.getLicenseKey(), collector.getConfig().getLicenseKey());
+
+        IBitmovinPlayerCollector collector2 = IBitmovinPlayerCollector.create(context, analyticsConfig);
+        Assert.assertNotNull(collector2);
+        Assert.assertEquals(analyticsConfig.getLicenseKey(), collector2.getConfig().getLicenseKey());
+    }
 }

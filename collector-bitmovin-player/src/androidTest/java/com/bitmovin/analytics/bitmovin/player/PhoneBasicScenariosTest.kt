@@ -289,7 +289,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_sendCustomDataEvent() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig(), DefaultMetadata(customUserId = "customUserId"))
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
         val localPlayer = Player.create(appContext, playerConfig)

@@ -14,6 +14,8 @@ class BitmovinAnalyticsDebugListenerTests {
     private val config = AnalyticsConfig("key")
     private lateinit var analytics: BitmovinAnalytics
 
+    // TODO: verify why tests are throwing null pointer exception (and still succeeding)
+
     @Before
     fun setup() {
         mockkConstructor(BackendFactory::class)

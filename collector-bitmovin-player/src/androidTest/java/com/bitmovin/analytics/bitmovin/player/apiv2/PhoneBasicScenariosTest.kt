@@ -324,67 +324,12 @@ class PhoneBasicScenariosTest {
         otherEvents.forEach { DataVerifier.verifyAnalyticsConfig(it, defaultAnalyticsConfig) }
     }
 
-//    @Test
-//    fun test_vod_setCustomData() {
-//        // arrange
-//        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
-//        val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
-//        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
-//        val localPlayer = Player.create(appContext, playerConfig)
-//
-//        // act
-//        mainScope.launch {
-//            collector.attachPlayer(localPlayer)
-//            localPlayer.load(defaultSource)
-//        }
-//
-//        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
-//
-//        val newCustomData = CustomData(customData1 = "newCustomData1", customData30 = "newCustomData30")
-//        collector.customData = newCustomData
-//
-//        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 4000)
-//
-//        mainScope.launch {
-//            localPlayer.pause()
-//        }
-//
-//        // wait a bit to make sure last play sample is sent
-//        Thread.sleep(500)
-//
-//        mainScope.launch {
-//            collector.detachPlayer()
-//            localPlayer.destroy()
-//        }
-//
-//        // assert
-//        val impressionList = LogParser.extractImpressions()
-//        assertThat(impressionList.size).isEqualTo(1)
-//
-//        val impression = impressionList.first()
-//        DataVerifier.verifyHasNoErrorSamples(impression)
-//
-//        val eventDataList = impression.eventDataList
-//        val startingIndexOfNewCustomData = eventDataList.indexOfFirst { x -> x.customData1 == newCustomData.customData1 }
-//        val eventsWithOldCustomData = eventDataList.subList(0, startingIndexOfNewCustomData)
-//        val eventsWithNewCustomData = eventDataList.subList(startingIndexOfNewCustomData, eventDataList.size)
-//
-//        // we need to create a new config for comparison of the first events with identical options than the
-//        // defaultconfig that is passed into the collector since the one passed into the collector
-//        // is changed through the api call.
-//        val expectedAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(defaultSample.m3u8Url!!)
-//
-//        eventsWithOldCustomData.forEach { DataVerifier.verifyAnalyticsConfig(it, expectedAnalyticsConfig) }
-//        eventsWithNewCustomData.forEach { DataVerifier.verifyAnalyticsConfig(it, defaultAnalyticsConfig) }
-//    }
-
     @Test
     fun test_live_playWithAutoplayAndMuted() {
         // arrange
         val liveSample = TestSources.DASH_LIVE
         val liveSource = Source.create(SourceConfig.fromUrl(liveSample.mpdUrl!!))
 
-        // TODO: new way of doing things
         val localAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(null).apply {
             isLive = true
             mpdUrl = liveSample.mpdUrl!!
@@ -699,7 +644,6 @@ class PhoneBasicScenariosTest {
         assertThat(samplesAfterCustomDataChange).hasSizeGreaterThan(0)
 
         // verify customData with a change during the impression
-        // TODO: simplify test
         DataVerifier.verifyCustomData(samplesBeforeCustomDataChange, MetadataUtils.mergeCustomData(initialHlsMetadata.customData, initialMetadata.customData))
         DataVerifier.verifyCustomData(samplesAfterCustomDataChange, MetadataUtils.mergeCustomData(changedCustomData, initialMetadata.customData))
 
@@ -783,8 +727,6 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyAnalyticsConfig(samplesBeforeCustomDataChange, expectedAnalyticsConfig)
         DataVerifier.verifyCustomData(samplesAfterCustomDataChange, changedCustomData)
         DataVerifier.verifyCustomData(impression2.eventDataList, changedCustomData)
-
-        // TODO: verify that all data that is not customData stayed the same over the session
     }
 
     @Test

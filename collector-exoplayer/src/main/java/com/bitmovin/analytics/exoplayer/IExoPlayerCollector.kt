@@ -32,6 +32,7 @@ interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
         }
 
         @JvmStatic
+        @JvmOverloads
         fun create(context: Context, config: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IExoPlayerCollector {
             val collector = ExoPlayerCollector(config, context)
             collector.defaultMetadata = defaultMetadata

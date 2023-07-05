@@ -20,8 +20,9 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class BitmovinAnalyticsTest {
 
-    private lateinit var bitmovinAnalyticsConfig: AnalyticsConfig
+    private lateinit var analyticsConfig: AnalyticsConfig
     private lateinit var context: Context
+    // TODO: verify why tests are throwing null pointer exception (and still succeeding)
 
     @Before
     fun setup() {
@@ -29,15 +30,7 @@ class BitmovinAnalyticsTest {
         context = mockk {
             every { applicationContext } returns mockk()
         }
-        bitmovinAnalyticsConfig = AnalyticsConfig("<ANALYTICS_KEY>")
-//        bitmovinAnalyticsConfig.customData1 = "customData1"
-//        bitmovinAnalyticsConfig.customData2 = "customData2"
-//        bitmovinAnalyticsConfig.customData3 = "customData3"
-//        bitmovinAnalyticsConfig.customData4 = "customData4"
-//        bitmovinAnalyticsConfig.customData5 = "customData5"
-//        bitmovinAnalyticsConfig.customData6 = "customData6"
-//        bitmovinAnalyticsConfig.customData7 = "customData7"
-
+        analyticsConfig = AnalyticsConfig("<ANALYTICS_KEY>")
         mockkConstructor(BackendFactory::class)
         every { anyConstructed<BackendFactory>().createBackend(any(), any(), any()) } returns mockk(relaxed = true)
     }
@@ -45,7 +38,7 @@ class BitmovinAnalyticsTest {
     @Test
     fun testDetachPlayerShouldCallOnAnalyticsReleasingEventListener() {
         val listener = mockk<OnAnalyticsReleasingEventListener>(relaxed = true)
-        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, context)
+        val analytics = BitmovinAnalytics(analyticsConfig, context)
         analytics.onAnalyticsReleasingObservable.subscribe(listener)
         analytics.detachPlayer()
         verify(exactly = 1) { listener.onReleasing() }
@@ -55,7 +48,7 @@ class BitmovinAnalyticsTest {
     fun testOnVideoStartFailedShouldCallOnErrorDetailEventListener() {
         val listener = mockk<OnErrorDetailEventListener>(relaxed = true)
         mockkConstructor(PlayerStateMachine::class)
-        val analytics = BitmovinAnalytics(bitmovinAnalyticsConfig, context)
+        val analytics = BitmovinAnalytics(analyticsConfig, context)
         val observable = ObservableSupport<OnErrorDetailEventListener>()
         val defaultStateMachineListener = DefaultStateMachineListener(analytics, mockk(relaxed = true), observable)
         val stateMachine = mockk<PlayerStateMachine>()

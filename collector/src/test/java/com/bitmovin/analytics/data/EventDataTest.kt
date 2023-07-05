@@ -3,6 +3,7 @@ package com.bitmovin.analytics.data
 import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.enums.PlayerType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -27,7 +28,7 @@ class EventDataTest {
             DeviceInformation("myManufacturer", "myModel", false, "de", "package-name", 100, 200)
         val eventData = TestFactory.createEventDataFactory(analyticsConfig).create(
             impressionId,
-            null,
+            SourceMetadata(),
             DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
@@ -49,7 +50,7 @@ class EventDataTest {
             DeviceInformation("myManufacturer", "myModel", true, "de", "package-name", 100, 200)
         val eventData = TestFactory.createEventDataFactory(analyticsConfig).create(
             impressionId,
-            null,
+            SourceMetadata(),
             DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
@@ -69,7 +70,7 @@ class EventDataTest {
             randomizedUserIdProvider,
         ).create(
             impressionId,
-            null,
+            SourceMetadata(),
             DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
@@ -79,7 +80,7 @@ class EventDataTest {
             randomizedUserIdProvider,
         ).create(
             impressionId,
-            null,
+            SourceMetadata(),
             DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
@@ -89,7 +90,7 @@ class EventDataTest {
             randomizedUserIdProvider1,
         ).create(
             impressionId,
-            null,
+            SourceMetadata(),
             DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),

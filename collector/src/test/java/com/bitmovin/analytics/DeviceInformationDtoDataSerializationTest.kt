@@ -2,6 +2,7 @@ package com.bitmovin.analytics
 
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.enums.PlayerType
@@ -23,7 +24,7 @@ class DeviceInformationDtoDataSerializationTest {
 
         val data = TestFactory.createEventDataFactory(config).create(
             "null",
-            null,
+            SourceMetadata(),
             DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),

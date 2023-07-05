@@ -13,7 +13,6 @@ import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import com.bitmovin.analytics.data.UserIdProvider
 import com.bitmovin.analytics.utils.Util
 
-// TODO: we should probably move this class into API package
 abstract class DefaultCollector<TPlayer> protected constructor(
     final override val config: AnalyticsConfig,
     context: Context,

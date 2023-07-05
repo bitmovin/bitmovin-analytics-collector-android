@@ -30,6 +30,7 @@ interface IAmazonIvsPlayerCollector : AnalyticsCollector<Player> {
         }
 
         @JvmStatic
+        @JvmOverloads
         fun create(context: Context, analyticsConfig: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IAmazonIvsPlayerCollector {
             val collector = AmazonIvsPlayerCollector(analyticsConfig, context)
             collector.defaultMetadata = defaultMetadata

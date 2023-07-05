@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.amazon.ivs
 
 import android.content.Context
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.PlayerInfo
@@ -26,15 +27,9 @@ class TestUtils {
             val playerInfo = PlayerInfo("playerTech", PlayerType.AMAZON_IVS)
 
             return EventData(
-                deviceInfo, playerInfo, "aaa", "bbb", null,
+                deviceInfo, playerInfo, CustomData(), "aaa", "bbb",
                 null, null, null, null, null,
-                null, null, null, null, null,
-                null, null, null, null, null,
-                null, null, null, null, null,
-                null, null, null, null, null,
-                null, null, null, null, null,
-                null, null, null, null, null,
-                null, null, "testUserAgent",
+                null, "testUserAgent",
             )
         }
 

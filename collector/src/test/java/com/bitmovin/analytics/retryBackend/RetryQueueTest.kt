@@ -3,6 +3,7 @@ package com.bitmovin.analytics.retryBackend
 import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.PlayerInfo
@@ -29,7 +30,7 @@ class RetryQueueTest {
     private fun setupEventData(sequenceNumber: Int): EventData {
         var eventData = TestFactory.createEventDataFactory(config).create(
             "testImpressionId",
-            null,
+            SourceMetadata(),
             DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),

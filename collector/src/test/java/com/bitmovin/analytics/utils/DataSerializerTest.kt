@@ -4,6 +4,7 @@ import com.bitmovin.analytics.BuildConfig
 import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.DeviceClass
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.DeviceInformationDto
@@ -49,7 +50,7 @@ class DataSerializerTest {
         // act
         val eventData = eventDataFactory.create(
             impressionId,
-            null,
+            SourceMetadata(),
             DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
@@ -97,7 +98,7 @@ class DataSerializerTest {
         // act
         val eventData = eventDataFactory.create(
             impressionId,
-            null,
+            SourceMetadata(),
             DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),

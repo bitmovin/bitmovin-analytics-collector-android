@@ -1,51 +1,21 @@
 package com.bitmovin.analytics.data
 
 import androidx.annotation.Keep
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.utils.Util
 
 @Keep // Protect from obfuscation in case customers are using proguard
 class EventData(
     deviceInfo: DeviceInformation,
     playerInfo: PlayerInfo,
+    customData: CustomData, // TODO: verify that customData change is save with offline feature and that serialization works on ingress side
     val impressionId: String,
     val userId: String,
     val key: String?,
-    var playerKey: String?,
-    var videoId: String?,
+    val videoId: String?,
     val videoTitle: String?,
     val customUserId: String?,
-    val customData1: String?,
-    val customData2: String?,
-    val customData3: String?,
-    val customData4: String?,
-    val customData5: String?,
-    val customData6: String?,
-    val customData7: String?,
-    val customData8: String?,
-    val customData9: String?,
-    val customData10: String?,
-    val customData11: String?,
-    val customData12: String?,
-    val customData13: String?,
-    val customData14: String?,
-    val customData15: String?,
-    val customData16: String?,
-    val customData17: String?,
-    val customData18: String?,
-    val customData19: String?,
-    val customData20: String?,
-    val customData21: String?,
-    val customData22: String?,
-    val customData23: String?,
-    val customData24: String?,
-    val customData25: String?,
-    val customData26: String?,
-    val customData27: String?,
-    val customData28: String?,
-    val customData29: String?,
-    val customData30: String?,
     val path: String?,
-    val experimentName: String?,
     val cdnProvider: String?,
     val userAgent: String,
 ) {
@@ -114,6 +84,39 @@ class EventData(
     var downloadSpeedInfo: DownloadSpeedInfo? = null
     var retryCount: Int = 0
     val player: String = playerInfo.playerType.toString()
+    var playerKey: String? = null
+
+    val customData1 = customData.customData1
+    val customData2 = customData.customData2
+    val customData3 = customData.customData3
+    val customData4 = customData.customData4
+    val customData5 = customData.customData5
+    val customData6 = customData.customData6
+    val customData7 = customData.customData7
+    val customData8 = customData.customData8
+    val customData9 = customData.customData9
+    val customData10 = customData.customData10
+    val customData11 = customData.customData11
+    val customData12 = customData.customData12
+    val customData13 = customData.customData13
+    val customData14 = customData.customData14
+    val customData15 = customData.customData15
+    val customData16 = customData.customData16
+    val customData17 = customData.customData17
+    val customData18 = customData.customData18
+    val customData19 = customData.customData19
+    val customData20 = customData.customData20
+    val customData21 = customData.customData21
+    val customData22 = customData.customData22
+    val customData23 = customData.customData23
+    val customData24 = customData.customData24
+    val customData25 = customData.customData25
+    val customData26 = customData.customData26
+    val customData27 = customData.customData27
+    val customData28 = customData.customData28
+    val customData29 = customData.customData29
+    val customData30 = customData.customData30
+    val experimentName = customData.experimentName
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

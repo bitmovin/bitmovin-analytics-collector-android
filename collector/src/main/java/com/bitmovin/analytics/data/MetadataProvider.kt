@@ -7,8 +7,9 @@ import com.bitmovin.analytics.utils.ApiV3Utils
 import java.util.concurrent.ConcurrentHashMap
 
 class MetadataProvider {
-
     private val sourceMetadataMap = ConcurrentHashMap<Any, SourceMetadata?>()
+
+    // TODO: we should probably use thread save references for default metadata and deprecated bitmovin analytics config
     var deprecatedBitmovinAnalyticsConfig: BitmovinAnalyticsConfig? = null
 
     fun setSourceMetadata(source: Any, sourceMetadata: SourceMetadata?) {

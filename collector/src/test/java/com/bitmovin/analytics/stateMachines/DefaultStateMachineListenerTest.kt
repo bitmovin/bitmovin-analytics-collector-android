@@ -2,6 +2,7 @@ package com.bitmovin.analytics.stateMachines
 
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.data.EventData
 import io.mockk.every
 import io.mockk.mockk
@@ -13,7 +14,7 @@ class DefaultStateMachineListenerTest {
 
     @Test
     fun onQualityChange_ShouldSetAllData() {
-        // arrage
+        // arrange
         val analyticsMock = mockk<BitmovinAnalytics>(relaxed = true)
         val playerAdapterMock = mockk<PlayerAdapter>(relaxed = true)
         val listener = DefaultStateMachineListener(analyticsMock, playerAdapterMock, mockk(relaxed = true))
@@ -41,13 +42,9 @@ class DefaultStateMachineListenerTest {
 
     private fun createDefaultEventData(): EventData {
         return EventData(
-            mockk(relaxed = true), mockk(relaxed = true), "uuid", "userId", null,
-            null, null, null, null, null, null, null,
-            null, null, null, null, null, null, null,
+            mockk(relaxed = true), mockk(relaxed = true), CustomData(), "uuid", "userId",
             null, null, null, null, null, null,
-            null, null, null, null, null, null,
-            null, null, null, null, null, null,
-            null, null, null, null, null, "testAgent",
+            "testAgent",
         )
     }
 }

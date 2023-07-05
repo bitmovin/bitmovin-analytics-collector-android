@@ -39,7 +39,7 @@ object TestFactory {
     fun createEventData(
         config: AnalyticsConfig = AnalyticsConfig("test-key"),
         impressionId: String = "test-impression",
-        sourceMetadata: SourceMetadata? = null,
+        sourceMetadata: SourceMetadata = SourceMetadata(),
         defaultMetadata: DefaultMetadata = DefaultMetadata(),
         deviceInformation: DeviceInformation = testDeviceInformation,
         playerInfo: PlayerInfo = PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),

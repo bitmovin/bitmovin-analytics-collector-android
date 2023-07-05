@@ -4,6 +4,7 @@ import android.os.Handler
 import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
@@ -66,7 +67,7 @@ class RetryBackendTest {
     private fun setupEventData(sequenceNumber: Int): EventData {
         val eventData = TestFactory.createEventDataFactory(config).create(
             "testImpressionId",
-            null,
+            SourceMetadata(),
             DefaultMetadata(),
             deviceInformation,
             PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
