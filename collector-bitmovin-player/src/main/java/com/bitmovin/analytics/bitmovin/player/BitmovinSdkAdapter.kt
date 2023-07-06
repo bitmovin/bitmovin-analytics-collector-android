@@ -142,11 +142,8 @@ internal class BitmovinSdkAdapter(
     override fun manipulate(data: EventData) {
         val source = currentSource
         val sourceMetadata = this.getCurrentSourceMetadata()
+        val fallbackIsLive = sourceMetadata.isLive == true
 
-        var fallbackIsLive = false
-        if (sourceMetadata != null) {
-            fallbackIsLive = sourceMetadata.isLive == true
-        }
         // duration and isLive, streamFormat, mpdUrl, and m3u8Url
         if (source != null) {
             val duration = source.duration
@@ -263,7 +260,7 @@ internal class BitmovinSdkAdapter(
     }
 
     override fun getCurrentSourceMetadata(): SourceMetadata {
-        val activeSourceForSample = overrideCurrentSource ?: this.player.source
+        val activeSourceForSample = currentSource
         if (activeSourceForSample != null) {
             val currentSourceMetadata = metadataProvider.getSourceMetadata(activeSourceForSample)
             if (currentSourceMetadata != null) {

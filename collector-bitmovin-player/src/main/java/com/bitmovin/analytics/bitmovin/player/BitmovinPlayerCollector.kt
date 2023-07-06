@@ -148,6 +148,7 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
 
     // TODO: should we make it nullable or not?
     override fun getCurrentSourceMetadata(): SourceMetadata {
+        // TODO: do we need to use overrideCurrentSource here?
         val activeSource = this.player?.source
         if (activeSource != null) {
             val currentSourceMetadata = metadataProvider.getSourceMetadata(activeSource)

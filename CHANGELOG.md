@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Prevent context leaking through using context.applicationContext in constructors
+- Ignore isLive property for IVS player since it is just a fallback in case the player
+  does not provide the information and IVS player doesn't differenciate between
+  live and source not loaded, so it cannot be used there. This streamlines the behaviour with other players.
 
 ## v2.18.0
 

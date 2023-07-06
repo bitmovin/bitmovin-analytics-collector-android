@@ -100,6 +100,6 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     }
 
     fun setDeprecatedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) {
-        metadataProvider.deprecatedBitmovinAnalyticsConfig = bitmovinAnalyticsConfig
+        metadataProvider.setDeprectedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig)
     }
 }
