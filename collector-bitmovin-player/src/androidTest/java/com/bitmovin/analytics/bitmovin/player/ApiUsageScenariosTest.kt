@@ -93,8 +93,8 @@ class ApiUsageScenariosTest {
     @Test
     fun playlistAndNonPlaylistApiMixed1() {
         val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
-        collector.setSourceMetadata(source1, sourceMetadata1)
-        collector.setSourceMetadata(source2, sourceMetadata2)
+        collector.setSourceMetadata(sourceMetadata1, source1)
+        collector.setSourceMetadata(sourceMetadata2, source2)
 
         // calling setCurrentSourceMetadata before source is loaded means
         // that it cannot determine the currently active source
@@ -146,9 +146,9 @@ class ApiUsageScenariosTest {
     @Test
     fun playlistAndNonPlaylistApiMixed2() {
         val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
-        collector.setSourceMetadata(source1, sourceMetadata1)
-        collector.setSourceMetadata(source2, sourceMetadata2)
-        collector.setSourceMetadata(source3, sourceMetadata3)
+        collector.setSourceMetadata(sourceMetadata1, source1)
+        collector.setSourceMetadata(sourceMetadata2, source2)
+        collector.setSourceMetadata(sourceMetadata3, source3)
 
         // act
         mainScope.launch {
@@ -291,7 +291,7 @@ class ApiUsageScenariosTest {
         val defaultMetadata = DefaultMetadata(cdnProvider = "defaultCdnProvider", customUserId = "defaultCustomUserId", customData = TestConfig.createDummyCustomData("default"))
 
         collector.defaultMetadata = defaultMetadata
-        collector.setSourceMetadata(source1, sourceMetadata1)
+        collector.setSourceMetadata(sourceMetadata1, source1)
 
         // act
         mainScope.launch {

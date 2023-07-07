@@ -96,13 +96,13 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
 
     @Deprecated(
         "Use setSourceMetadata instead",
-        ReplaceWith("setSourceMetadata(playerSource, sourceMetadata)"),
+        ReplaceWith("setSourceMetadata(sourceMetadata, playerSource)"),
     )
     override fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata) {
-        this.setSourceMetadata(playerSource, sourceMetadata)
+        this.setSourceMetadata(sourceMetadata, playerSource)
     }
 
-    override fun setSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata) {
+    override fun setSourceMetadata(sourceMetadata: SourceMetadata, playerSource: Source) {
         metadataProvider.setSourceMetadata(playerSource, sourceMetadata)
     }
 

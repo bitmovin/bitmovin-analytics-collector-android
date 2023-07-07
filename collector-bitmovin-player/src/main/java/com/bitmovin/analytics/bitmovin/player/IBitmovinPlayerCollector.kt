@@ -24,7 +24,7 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
 
     @Deprecated(
         "Use setSourceMetadata instead",
-        ReplaceWith("setSourceMetadata(playerSource, sourceMetadata)"),
+        ReplaceWith("setSourceMetadata(sourceMetadata, playerSource)"),
     )
     fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
 
@@ -35,7 +35,7 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
      * This allows for example to use the Playlist feature of the bitmovin player
      * and send source metadata that is specific for each source in the playlist.
      */
-    fun setSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
+    fun setSourceMetadata(sourceMetadata: SourceMetadata, playerSource: Source)
 
     // TODO: needed?
     fun getSourceMetadata(playerSource: Source): SourceMetadata

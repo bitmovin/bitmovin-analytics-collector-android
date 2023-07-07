@@ -17,7 +17,7 @@ class EventDataFactory(
 
     fun create(impressionId: String, sourceMetadata: SourceMetadata, defaultMetadata: DefaultMetadata, deviceInformation: DeviceInformation, playerInfo: PlayerInfo): EventData {
         val mergedCustomData = ApiV3Utils.mergeCustomData(sourceMetadata.customData, defaultMetadata.customData)
-        val mergedCdnProvider = if (sourceMetadata.cdnProvider == null) defaultMetadata.cdnProvider else sourceMetadata.cdnProvider
+        val mergedCdnProvider = sourceMetadata.cdnProvider ?: defaultMetadata.cdnProvider
 
         val eventData = EventData(
             deviceInformation,
