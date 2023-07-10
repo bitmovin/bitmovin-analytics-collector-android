@@ -10,13 +10,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded to Kotlin 1.8.20
 - ExoPlayer: More specific PlaybackException mapping (using errorCodes instead of error types and errorCode names are now part of description)
 - Initial v3 API changes
-- Upgrade example app to latest bitmovin player (v3.39.0) and latest amazon ivs player (v1.19.0)
+- Upgrade example app to latest bitmovin player (v3.39.1), latest ivs player (v1.19.0) and latest exoplayer (v2.19.0)
 
 ### Fixed
 - Prevent context leaking through using context.applicationContext in constructors
-- Ignore isLive property for IVS player since it is just a fallback in case the player
+- IVS Player: Ignore isLive property for IVS player since it is just a fallback in case the player
   does not provide the information and IVS player doesn't differenciate between
   live and source not loaded, so it cannot be used there. This streamlines the behaviour with other players.
+- ExoPlayer: More reliable tracking if player is muted
 
 ## v2.18.0
 
