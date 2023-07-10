@@ -7,7 +7,6 @@ import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
 import com.bitmovin.analytics.systemtest.utils.LogParser
-import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
@@ -64,13 +63,13 @@ class PhoneBasicScenariosTest {
         }
 
         // we wait until player is in ready state before we call play to test this specific scenario
-        waitUntilPlayerIsReady(player)
+        ExoPlayerPlaybackUtils.waitUntilPlayerIsReady(player)
 
         mainScope.launch {
             player.play()
         }
 
-        waitUntilPlayerHasPlayedToMs(player, 500)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 500)
 
         mainScope.launch {
             player.pause()
@@ -83,7 +82,7 @@ class PhoneBasicScenariosTest {
         }
 
         // we sleep a bit longer to increase probability of a qualitychange event
-        waitUntilPlayerHasPlayedToMs(player, 10000)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 10000)
 
         mainScope.launch {
             player.pause()
@@ -126,7 +125,7 @@ class PhoneBasicScenariosTest {
             player.prepare()
         }
 
-        waitUntilPlayerIsPlaying(player)
+        ExoPlayerPlaybackUtils.waitUntilPlayerIsPlaying(player)
 
         // play for 2 seconds
         Thread.sleep(2000)
@@ -167,53 +166,6 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_nonExistingStream_Should_sendErrorSample() {
-        // arrange
-        val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IExoPlayerCollector.create(appContext, analyticsConfig)
-
-        // act
-        mainScope.launch {
-            collector.attachPlayer(player)
-            collector.setCurrentSourceMetadata(defaultSourceMetadata)
-            player.setMediaItem(MediaItem.fromUri(nonExistingStreamSample.uri))
-            player.prepare()
-        }
-
-        waitUntilPlayerHasError(player)
-
-        // wait a bit for samples being sent out
-        Thread.sleep(300)
-
-        mainScope.launch {
-            collector.detachPlayer()
-            player.release()
-        }
-
-        // assert
-        val impressions = LogParser.extractImpressions()
-        val impression = impressions.first()
-
-        Assertions.assertThat(impression.eventDataList.size).isEqualTo(1)
-        val eventData = impression.eventDataList.first()
-        val impressionId = eventData.impressionId
-        Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: InvalidResponseCodeException (Status Code: 404")
-        Assertions.assertThat(eventData.errorCode).isEqualTo(0)
-
-//      Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS) // switch to this once https://bitmovin.atlassian.net/browse/AN-3520 is implemented
-
-        DataVerifier.verifyStartupSampleOnError(eventData, ExoplayerConstants.playerInfo)
-        DataVerifier.verifySourceMetadata(eventData, sourceMetadata = defaultSourceMetadata)
-
-        Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)
-        val errorDetail = impression.errorDetailList.first()
-        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.licenseKey)
-        Assertions.assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
-        Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Data Source request failed with HTTP status: 404")
-    }
-
-    @Test
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         val sample = Samples.HLS_REDBULL
         val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey")
@@ -226,7 +178,7 @@ class PhoneBasicScenariosTest {
             player.play()
         }
 
-        waitUntilPlayerHasPlayedToMs(player, 2000)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
 
         mainScope.launch {
             player.pause()
@@ -240,22 +192,5 @@ class PhoneBasicScenariosTest {
         // assert that no samples are sent
         val impressions = LogParser.extractImpressions()
         Assertions.assertThat(impressions.size).isEqualTo(0)
-    }
-
-    private fun waitUntilPlayerIsReady(player: ExoPlayer) {
-        PlaybackUtils.waitUntil { player.playbackState == ExoPlayer.STATE_READY }
-    }
-
-    private fun waitUntilPlayerHasPlayedToMs(player: ExoPlayer, playedToMs: Long) {
-        PlaybackUtils.waitUntil { player.isPlaying }
-        PlaybackUtils.waitUntil { player.currentPosition >= playedToMs }
-    }
-
-    private fun waitUntilPlayerIsPlaying(player: ExoPlayer) {
-        PlaybackUtils.waitUntil { player.isPlaying }
-    }
-
-    private fun waitUntilPlayerHasError(player: ExoPlayer) {
-        PlaybackUtils.waitUntil { player.playerError != null }
     }
 }

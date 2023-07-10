@@ -64,6 +64,9 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     }
 
     override fun sendCustomDataEvent(customData: CustomData) {
+        // TODO: we might need to make sure this event is
+        // handled by the main looper, since we might access to player from a different thread, which
+        // could cause issues. (we should discuss thread safety in general with player folks)
         analytics.sendCustomDataEvent(customData)
     }
 
@@ -74,6 +77,9 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         }
 
     override fun setDefaultCustomData(customData: CustomData) {
+        // TODO: we might need to make sure this event is
+        // handled by the main looper, since we might access to player from a different thread, which
+        // could cause issues. (we should discuss thread safety in general with player folks)
         analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
         metadataProvider.defaultMetadata = metadataProvider.defaultMetadata.copy(customData = customData)
     }
@@ -83,6 +89,9 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     }
 
     override fun setCurrentSourceCustomData(customData: CustomData) {
+        // TODO: we might need to make sure this event is
+        // handled by the main looper, since we might access to player from a different thread, which
+        // could cause issues. (we should discuss thread safety in general with player folks)
         analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
         this.setCurrentSourceMetadata(this.getCurrentSourceMetadata().copy(customData = customData))
     }

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Upgraded to Kotlin 1.8.20
+- ExoPlayer: More specific PlaybackException mapping (using errorCodes instead of error types and errorCode names are now part of description)
 - Initial v3 API changes
 - Upgrade example app to latest bitmovin player (v3.39.0) and latest amazon ivs player (v1.19.0)
 

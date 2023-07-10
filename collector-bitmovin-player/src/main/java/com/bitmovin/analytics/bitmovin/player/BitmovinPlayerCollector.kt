@@ -113,6 +113,8 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
     override fun setCurrentSourceCustomData(customData: CustomData) {
         // we cannot put this logic into the adapter since the adapter is created on attaching
         // and this method might be called earlier
+
+        // TODO: might be possible to push into metadataprovider
         analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
         val activeSource = this.player?.source
         if (activeSource != null) {

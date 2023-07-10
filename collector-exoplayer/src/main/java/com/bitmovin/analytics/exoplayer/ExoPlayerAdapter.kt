@@ -14,7 +14,6 @@ import com.bitmovin.analytics.enums.DRMType
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.enums.VideoStartFailedReason
-import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.exoplayer.manipulators.QualityEventDataManipulator
 import com.bitmovin.analytics.exoplayer.player.ExoPlayerContext
 import com.bitmovin.analytics.features.Feature
@@ -64,7 +63,6 @@ internal class ExoPlayerAdapter(
     private val isHlsManifestClassLoaded by lazy {
         Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
     }
-    private val exceptionMapper: ExceptionMapper<Throwable> = ExoPlayerExceptionMapper()
     private val qualityEventDataManipulator = QualityEventDataManipulator(exoplayer)
     private val meter = DownloadSpeedMeter()
     private val exoplayerContext = ExoPlayerContext(exoplayer)
@@ -446,9 +444,10 @@ internal class ExoPlayerAdapter(
             override fun onPlayerError(error: PlaybackException) {
                 try {
                     Log.d(TAG, "onPlayerError")
+
                     val videoTime = position
                     error.printStackTrace()
-                    val errorCode = exceptionMapper.map(error)
+                    val errorCode = ExoPlayerExceptionMapper.map(error)
                     if (!stateMachine.isStartupFinished) {
                         stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
                     }
