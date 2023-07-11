@@ -8,7 +8,7 @@ import com.bitmovin.analytics.utils.Util
 class EventData(
     deviceInfo: DeviceInformation,
     playerInfo: PlayerInfo,
-    customData: CustomData, // TODO: verify that customData change is save with offline feature and that serialization works on ingress side
+    customData: CustomData,
     val impressionId: String,
     val userId: String,
     val key: String?,
