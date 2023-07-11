@@ -108,6 +108,68 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    fun test_sendCustomDataEvent() {
+        // arrange
+        val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+        collector.setCurrentSourceMetadata(defaultSourceMetadata)
+        val customData1 = TestConfig.createDummyCustomData("customData1")
+        val customData2 = TestConfig.createDummyCustomData("customData2")
+        val customData3 = TestConfig.createDummyCustomData("customData3")
+        val customData4 = TestConfig.createDummyCustomData("customData4")
+        val customData5 = TestConfig.createDummyCustomData("customData5")
+        // act
+        mainScope.launch {
+            collector.sendCustomDataEvent(customData1) // since we are not attached this shouldn't be sent
+            collector.attachPlayer(player)
+            player.setMediaItem(defaultMediaItem)
+            player.prepare()
+            collector.sendCustomDataEvent(customData2)
+        }
+
+        // we wait until player is in ready state before we call play to test this specific scenario
+        ExoPlayerPlaybackUtils.waitUntilPlayerIsReady(player)
+
+        mainScope.launch {
+            player.play()
+        }
+
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2001)
+
+        mainScope.launch {
+            collector.sendCustomDataEvent(customData3)
+            player.pause()
+            collector.sendCustomDataEvent(customData4)
+            collector.detachPlayer()
+            player.release()
+            collector.sendCustomDataEvent(customData5) // this event should not be sent since collector is detached
+        }
+
+        Thread.sleep(300)
+
+        val impressions = LogParser.extractImpressions()
+        Assertions.assertThat(impressions.size).isEqualTo(1)
+
+        val impression = impressions.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        val customDataEvents = eventDataList.filter { it.state == "customdatachange" }
+
+        Assertions.assertThat(customDataEvents).hasSize(3)
+        DataVerifier.verifySourceMetadata(customDataEvents[0], defaultSourceMetadata.copy(customData = customData2))
+        Assertions.assertThat(customDataEvents[0].videoTimeStart).isEqualTo(0)
+        Assertions.assertThat(customDataEvents[0].videoTimeEnd).isEqualTo(0)
+
+        DataVerifier.verifySourceMetadata(customDataEvents[1], defaultSourceMetadata.copy(customData = customData3))
+        Assertions.assertThat(customDataEvents[1].videoTimeStart).isNotEqualTo(0)
+        Assertions.assertThat(customDataEvents[1].videoTimeEnd).isNotEqualTo(0)
+
+        DataVerifier.verifySourceMetadata(customDataEvents[2], defaultSourceMetadata.copy(customData = customData4))
+        Assertions.assertThat(customDataEvents[2].videoTimeStart).isGreaterThan(2000)
+        Assertions.assertThat(customDataEvents[2].videoTimeEnd).isGreaterThan(2000)
+    }
+
+    @Test
     fun test_live_playWithAutoplay() {
         // arrange
         val liveSample = TestSources.IVS_LIVE_1

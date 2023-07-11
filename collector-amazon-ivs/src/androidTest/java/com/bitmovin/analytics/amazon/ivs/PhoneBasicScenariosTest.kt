@@ -13,6 +13,7 @@ import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.BeforeClass
@@ -361,5 +362,69 @@ class PhoneBasicScenariosTest {
         // assert that no samples are sent
         val impressions = LogParser.extractImpressions()
         assertThat(impressions).hasSize(0)
+    }
+
+    @Test
+    fun test_sendCustomDataEvent() {
+        // arrange
+        val vodStreamSample = TestSources.IVS_VOD_1
+        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
+        val sourceMetadata = SourceMetadata(
+            m3u8Url = vodStreamSample.m3u8Url,
+            title = "title",
+            isLive = false,
+            videoId = "videoId",
+            customData = TestConfig.createDummyCustomData("ivsVod_"),
+        )
+        collector.setCurrentSourceMetadata(sourceMetadata)
+        val customData1 = TestConfig.createDummyCustomData("customData1")
+        val customData2 = TestConfig.createDummyCustomData("customData2")
+        val customData3 = TestConfig.createDummyCustomData("customData3")
+        val customData4 = TestConfig.createDummyCustomData("customData4")
+        val customData5 = TestConfig.createDummyCustomData("customData5")
+
+        // act
+        collector.sendCustomDataEvent(customData1) // since we are not attached this shouldn't be sent
+        collector.attachPlayer(player)
+
+        player.load(Uri.parse(vodStreamSample.m3u8Url))
+        collector.sendCustomDataEvent(customData2)
+
+        player.play()
+
+        IvsTestUtils.waitUntilPlayerPlayedToMs(player, 2001)
+        collector.sendCustomDataEvent(customData3)
+
+        player.pause()
+
+        collector.sendCustomDataEvent(customData4)
+        collector.detachPlayer()
+        player.release()
+        collector.sendCustomDataEvent(customData5) // this event should not be sent since collector is detached
+
+        Thread.sleep(300)
+
+        val impressions = LogParser.extractImpressions()
+        assertThat(impressions.size).isEqualTo(1)
+
+        val impression = impressions.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        val customDataEvents = eventDataList.filter { it.state == "customdatachange" }
+
+        Assertions.assertThat(customDataEvents).hasSize(3)
+        DataVerifier.verifySourceMetadata(customDataEvents[0], sourceMetadata.copy(customData = customData2))
+        Assertions.assertThat(customDataEvents[0].videoTimeStart).isEqualTo(0)
+        Assertions.assertThat(customDataEvents[0].videoTimeEnd).isEqualTo(0)
+
+        DataVerifier.verifySourceMetadata(customDataEvents[1], sourceMetadata.copy(customData = customData3))
+        Assertions.assertThat(customDataEvents[1].videoTimeStart).isNotEqualTo(0)
+        Assertions.assertThat(customDataEvents[1].videoTimeEnd).isNotEqualTo(0)
+
+        DataVerifier.verifySourceMetadata(customDataEvents[2], sourceMetadata.copy(customData = customData4))
+        Assertions.assertThat(customDataEvents[2].videoTimeStart).isGreaterThan(2000)
+        Assertions.assertThat(customDataEvents[2].videoTimeEnd).isGreaterThan(2000)
     }
 }

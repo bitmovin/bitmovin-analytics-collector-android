@@ -60,7 +60,7 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         ReplaceWith("sendCustomDataEvent(customData)"),
     )
     override fun setCustomDataOnce(customData: CustomData) {
-        analytics.sendCustomDataEvent(customData)
+        this.sendCustomDataEvent(customData)
     }
 
     override fun sendCustomDataEvent(customData: CustomData) {

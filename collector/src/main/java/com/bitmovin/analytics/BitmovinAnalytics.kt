@@ -159,6 +159,8 @@ class BitmovinAnalytics(val config: AnalyticsConfig, val context: Context) : Lic
         val activeSourceMetadata = mergedSourceMetadata.copy(customData = mergedCustomData)
         val eventData = playerAdapter.createEventDataForCustomDataEvent(activeSourceMetadata)
         eventData.state = PlayerStates.CUSTOMDATACHANGE.name
+        eventData.videoTimeStart = playerAdapter.position
+        eventData.videoTimeEnd = eventData.videoTimeStart
         sendEventData(eventData)
     }
 

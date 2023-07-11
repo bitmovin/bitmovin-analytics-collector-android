@@ -287,61 +287,6 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vod_sendCustomDataEvent() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig(), DefaultMetadata(customUserId = "customUserId"))
-        val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
-        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
-        val localPlayer = Player.create(appContext, playerConfig)
-
-        // act
-        mainScope.launch {
-            collector.setCurrentSourceMetadata(defaultSourceMetadata)
-            collector.attachPlayer(localPlayer)
-            localPlayer.load(defaultSource)
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
-
-        val customDataEvent = CustomData(customData1 = "setCustomDataThroughApiCalls1", customData30 = "setCustomDataThroughApiCalls30")
-        collector.sendCustomDataEvent(customDataEvent)
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 4000)
-
-        mainScope.launch {
-            localPlayer.pause()
-        }
-
-        // wait a bit to make sure last play sample is sent
-        Thread.sleep(500)
-
-        mainScope.launch {
-            collector.detachPlayer()
-            localPlayer.destroy()
-        }
-
-        // assert
-        val impressionList = LogParser.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-
-        val customDataChangeEvents = eventDataList.filter { x -> x.state == "customdatachange" }
-        val otherEvents = eventDataList.filter { x -> x.state != "customdatachange" }
-
-        assertThat(customDataChangeEvents.size).isEqualTo(1)
-
-        // TODO: do we want to merge with existing customData or do we want to just use what was specified in setCustomDataOnce?
-        val expectedCustomData = MetadataUtils.mergeCustomData(customDataEvent, defaultSourceMetadata.customData)
-        DataVerifier.verifyCustomData(customDataChangeEvents[0], expectedCustomData)
-
-        otherEvents.forEach { DataVerifier.verifySourceMetadata(it, defaultSourceMetadata) }
-    }
-
-    @Test
     fun test_live_playWithAutoplayAndMuted() {
         // arrange
         val liveSample = TestSources.DASH_LIVE
@@ -1012,5 +957,68 @@ class PhoneBasicScenariosTest {
         // verify that url is determined automatically when no metadata is set
         DataVerifier.verifyStaticData(eventDataList, SourceMetadata(m3u8Url = defaultSample.m3u8Url), defaultSample, BitmovinPlayerConstants.playerInfo)
         DataVerifier.verifyStartupSample(eventDataList[0])
+    }
+
+    @Test
+    fun test_sendCustomDataEvent() {
+        // arrange
+        val vodStreamSample = TestSources.HLS_REDBULL
+        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val collector = IBitmovinPlayerCollector.Factory.create(appContext, analyticsConfig)
+        val sourceMetadata = SourceMetadata(
+            m3u8Url = vodStreamSample.m3u8Url,
+            title = "title",
+            isLive = false,
+            videoId = "videoId",
+            customData = TestConfig.createDummyCustomData("vod_"),
+        )
+        collector.setCurrentSourceMetadata(sourceMetadata)
+        val customData1 = TestConfig.createDummyCustomData("customData1")
+        val customData2 = TestConfig.createDummyCustomData("customData2")
+        val customData3 = TestConfig.createDummyCustomData("customData3")
+        val customData4 = TestConfig.createDummyCustomData("customData4")
+        val customData5 = TestConfig.createDummyCustomData("customData5")
+
+        mainScope.launch {
+            collector.sendCustomDataEvent(customData1) // since we are not attached this shouldn't be sent
+            collector.attachPlayer(defaultPlayer)
+            defaultPlayer.load(defaultSource)
+            collector.sendCustomDataEvent(customData2)
+            defaultPlayer.play()
+        }
+
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2001)
+        collector.sendCustomDataEvent(customData3)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+            collector.sendCustomDataEvent(customData4)
+            collector.detachPlayer()
+            collector.sendCustomDataEvent(customData5) // this event should not be sent since collector is detached
+        }
+
+        Thread.sleep(300)
+
+        val impressions = LogParser.extractImpressions()
+        assertThat(impressions.size).isEqualTo(1)
+
+        val impression = impressions.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        val customDataEvents = eventDataList.filter { it.state == "customdatachange" }
+
+        assertThat(customDataEvents).hasSize(3)
+        DataVerifier.verifySourceMetadata(customDataEvents[0], sourceMetadata.copy(customData = customData2))
+        assertThat(customDataEvents[0].videoTimeStart).isEqualTo(0)
+        assertThat(customDataEvents[0].videoTimeEnd).isEqualTo(0)
+
+        DataVerifier.verifySourceMetadata(customDataEvents[1], sourceMetadata.copy(customData = customData3))
+        assertThat(customDataEvents[1].videoTimeStart).isNotEqualTo(0)
+        assertThat(customDataEvents[1].videoTimeEnd).isNotEqualTo(0)
+
+        DataVerifier.verifySourceMetadata(customDataEvents[2], sourceMetadata.copy(customData = customData4))
+        assertThat(customDataEvents[2].videoTimeStart).isGreaterThan(2000)
+        assertThat(customDataEvents[2].videoTimeEnd).isGreaterThan(2000)
     }
 }
