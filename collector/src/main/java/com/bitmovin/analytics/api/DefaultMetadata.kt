@@ -19,7 +19,7 @@ constructor(
      */
     val cdnProvider: String? = null,
     /**
-     * User-ID in the cus
+     * Field that can be used to mark a session with the internal User-ID.
      */
     val customUserId: String? = null,
     /**
