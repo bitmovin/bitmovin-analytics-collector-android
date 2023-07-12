@@ -35,9 +35,10 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
      * This allows for example to use the Playlist feature of the bitmovin player
      * and send source metadata that is specific for each source in the playlist.
      */
+
+    // TODO: check for order of parameters?
     fun setSourceMetadata(sourceMetadata: SourceMetadata, playerSource: Source)
 
-    // TODO: needed?
     fun getSourceMetadata(playerSource: Source): SourceMetadata
 
     companion object Factory {
@@ -56,6 +57,7 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
             return BitmovinPlayerCollector(config, context)
         }
 
+        // TODO: add method description
         @JvmStatic
         @JvmOverloads
         fun create(context: Context, analyticsConfig: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IBitmovinPlayerCollector {
