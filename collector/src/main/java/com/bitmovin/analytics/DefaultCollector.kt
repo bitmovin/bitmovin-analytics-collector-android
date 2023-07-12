@@ -11,6 +11,7 @@ import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.RandomizedUserIdIdProvider
 import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import com.bitmovin.analytics.data.UserIdProvider
+import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.Util
 
 abstract class DefaultCollector<TPlayer> protected constructor(
@@ -78,10 +79,18 @@ abstract class DefaultCollector<TPlayer> protected constructor(
 
     override fun setDefaultCustomData(customData: CustomData) {
         // TODO: we might need to make sure this event is
-        // handled by the main looper, since we might access to player from a different thread, which
+        // handled by the main looper (at least with exoplayer), since we might access the player from a different thread, which
         // could cause issues. (we should discuss thread safety in general with player folks)
-        analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
-        metadataProvider.defaultMetadata = metadataProvider.defaultMetadata.copy(customData = customData)
+
+        // if new defaultCustomData merged with sourceMetadata is the same as the current active one (merged from sourceMetadata and defaultMetadata)
+        // we don't close the current sample since effectively nothing changed (this might save us a couple of samples)
+        // TODO: cover this with unittests
+        val newDefaultCustomData = customData
+        val newMergedCustomData = ApiV3Utils.mergeCustomData(this.getCurrentSourceCustomData(), newDefaultCustomData)
+        if (newMergedCustomData != analytics.customData) {
+            analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
+        }
+        metadataProvider.defaultMetadata = metadataProvider.defaultMetadata.copy(customData = newDefaultCustomData)
     }
 
     override fun getDefaultCustomData(): CustomData {
@@ -90,9 +99,16 @@ abstract class DefaultCollector<TPlayer> protected constructor(
 
     override fun setCurrentSourceCustomData(customData: CustomData) {
         // TODO: we might need to make sure this event is
-        // handled by the main looper, since we might access to player from a different thread, which
+        // handled by the main looper (at least for exoplayer), since we might access to player from a different thread, which
         // could cause issues. (we should discuss thread safety in general with player folks)
-        analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
+
+        // if new customData merged with defaultMetadata is the same as the current active one (merged from sourceMetadata and defaultMetadata)
+        // we don't close the current sample since effectively nothing changed (this might save us a couple of samples)
+        // TODO: cover this with unittests
+        val newMergedCustomData = ApiV3Utils.mergeCustomData(customData, metadataProvider.defaultMetadata.customData)
+        if (newMergedCustomData != this.customData) {
+            analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
+        }
         this.setCurrentSourceMetadata(this.getCurrentSourceMetadata().copy(customData = customData))
     }
 

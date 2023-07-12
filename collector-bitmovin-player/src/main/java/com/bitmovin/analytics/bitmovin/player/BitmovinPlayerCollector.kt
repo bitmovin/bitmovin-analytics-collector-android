@@ -112,10 +112,10 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
 
     override fun setSourceCustomData(playerSource: Source, customData: CustomData) {
         if (playerSource.isActive) {
-            setCurrentSourceCustomData(customData)
-        } else {
-            metadataProvider.setSourceMetadata(playerSource, getSourceMetadata(playerSource).copy(customData = customData))
+            analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
         }
+
+        metadataProvider.setSourceMetadata(playerSource, getSourceMetadata(playerSource).copy(customData = customData))
     }
 
     override fun getSourceCustomData(playerSource: Source): CustomData {
@@ -160,7 +160,6 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         metadataProvider.setSourceMetadata(sourceMetadata)
     }
 
-    // TODO: should we make it nullable or not?
     override fun getCurrentSourceMetadata(): SourceMetadata {
         // TODO: do we need to use overrideCurrentSource here?
         val activeSource = this.player?.source

@@ -18,13 +18,6 @@ import com.bitmovin.analytics.utils.UserAgentProvider
 import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.ExoPlayer
 
-/**
- * Bitmovin Analytics
- *
- * @param analyticsConfig [AnalyticsConfig]
- * @param context [Context]
- */
-
 @Deprecated(
     "Use IExoPlayerCollector.Factory.create(context, analyticsConfig) instead",
     ReplaceWith(
