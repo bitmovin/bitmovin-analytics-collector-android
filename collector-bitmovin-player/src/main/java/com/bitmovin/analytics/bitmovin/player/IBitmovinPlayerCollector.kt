@@ -4,6 +4,7 @@ import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.api.AnalyticsCollector
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.player.api.Player
@@ -24,7 +25,7 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
 
     @Deprecated(
         "Use setSourceMetadata instead",
-        ReplaceWith("setSourceMetadata(sourceMetadata, playerSource)"),
+        ReplaceWith("setSourceMetadata(playerSource, sourceMetadata)"),
     )
     fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
 
@@ -37,9 +38,13 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
      */
 
     // TODO: check for order of parameters?
-    fun setSourceMetadata(sourceMetadata: SourceMetadata, playerSource: Source)
+    fun setSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
 
     fun getSourceMetadata(playerSource: Source): SourceMetadata
+
+    fun setSourceCustomData(playerSource: Source, customData: CustomData)
+
+    fun getSourceCustomData(playerSource: Source): CustomData
 
     companion object Factory {
         /**

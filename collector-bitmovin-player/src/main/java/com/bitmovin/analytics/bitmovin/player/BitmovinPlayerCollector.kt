@@ -99,15 +99,27 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         ReplaceWith("setSourceMetadata(sourceMetadata, playerSource)"),
     )
     override fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata) {
-        this.setSourceMetadata(sourceMetadata, playerSource)
+        this.setSourceMetadata(playerSource, sourceMetadata)
     }
 
-    override fun setSourceMetadata(sourceMetadata: SourceMetadata, playerSource: Source) {
+    override fun setSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata) {
         metadataProvider.setSourceMetadata(playerSource, sourceMetadata)
     }
 
     override fun getSourceMetadata(playerSource: Source): SourceMetadata {
         return metadataProvider.getSourceMetadata(playerSource) ?: SourceMetadata()
+    }
+
+    override fun setSourceCustomData(playerSource: Source, customData: CustomData) {
+        if (playerSource.isActive) {
+            setCurrentSourceCustomData(customData)
+        } else {
+            metadataProvider.setSourceMetadata(playerSource, getSourceMetadata(playerSource).copy(customData = customData))
+        }
+    }
+
+    override fun getSourceCustomData(playerSource: Source): CustomData {
+        return getSourceMetadata(playerSource).customData
     }
 
     override fun setCurrentSourceCustomData(customData: CustomData) {

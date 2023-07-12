@@ -25,6 +25,7 @@ internal object ExoPlayerExceptionMapper {
         val cause = playbackException.cause
         val exceptionMessage = playbackException.message ?: ""
 
+        // TODO: check if we should add more error types
         if (cause != null) {
             when (cause) {
                 is HttpDataSource.InvalidResponseCodeException -> {

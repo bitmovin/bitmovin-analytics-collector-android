@@ -456,9 +456,9 @@ class PhoneBasicScenariosTest {
         )
 
         val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
-        collector.setSourceMetadata(hlsMetadata, hlsSource)
-        collector.setSourceMetadata(dashMetadata, dashSource)
-        collector.setSourceMetadata(progMetadata, progSource)
+        collector.setSourceMetadata(hlsSource, hlsMetadata)
+        collector.setSourceMetadata(dashSource, dashMetadata)
+        collector.setSourceMetadata(progSource, progMetadata)
         collector.defaultMetadata = defaultMetadata
 
         val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource, progSource), PlaylistOptions())
@@ -559,8 +559,8 @@ class PhoneBasicScenariosTest {
         )
 
         val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig, defaultMetadata)
-        collector.setSourceMetadata(hlsMetadata, hlsSource)
-        collector.setSourceMetadata(dashMetadata, dashSource)
+        collector.setSourceMetadata(hlsSource, hlsMetadata)
+        collector.setSourceMetadata(dashSource, dashMetadata)
 
         val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
 
@@ -772,8 +772,8 @@ class PhoneBasicScenariosTest {
 
         // act
         mainScope.launch {
-            collector.setSourceMetadata(sourceMetadata1, hlsSource)
-            collector.setSourceMetadata(sourceMetadata2, dashSource)
+            collector.setSourceMetadata(hlsSource, sourceMetadata1)
+            collector.setSourceMetadata(dashSource, sourceMetadata2)
             collector.attachPlayer(defaultPlayer)
             defaultPlayer.load(hlsSource)
             defaultPlayer.play()
