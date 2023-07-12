@@ -34,6 +34,7 @@ constructor(
 
     /**
      * Specifies if failed requests should be resent again. With permanent storage.
+     * See https://developer.bitmovin.com/playback/docs/is-tracking-of-analytics-data-support-in-offline-mode for more information.
      */
     val longTermRetryEnabled: Boolean = false,
 ) : Parcelable {

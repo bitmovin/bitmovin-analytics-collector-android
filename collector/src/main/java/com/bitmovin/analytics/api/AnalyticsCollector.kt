@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.api
 
-// TODO: add descriptions
+// TODO: add missing descriptions
 
 /**
  * Public interface which is shared by all collectors
