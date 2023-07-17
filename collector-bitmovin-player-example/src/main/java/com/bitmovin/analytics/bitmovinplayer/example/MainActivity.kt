@@ -8,7 +8,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
-import com.bitmovin.analytics.bitmovin.player.IBitmovinPlayerCollector
+import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Samples

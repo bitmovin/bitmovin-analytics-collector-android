@@ -6,7 +6,7 @@ import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector
 import com.bitmovin.analytics.exoplayer.ExoPlayerPlaybackUtils
 import com.bitmovin.analytics.exoplayer.ExoplayerConstants
-import com.bitmovin.analytics.exoplayer.IExoPlayerCollector
+import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
 import com.bitmovin.analytics.systemtest.utils.LogParser

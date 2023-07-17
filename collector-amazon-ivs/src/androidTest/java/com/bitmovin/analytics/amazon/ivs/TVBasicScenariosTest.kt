@@ -5,6 +5,7 @@ import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
+import com.bitmovin.analytics.amazon.ivs.api.IAmazonIvsPlayerCollector
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.LogParser

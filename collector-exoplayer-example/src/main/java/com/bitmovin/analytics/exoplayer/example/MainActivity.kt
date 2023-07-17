@@ -8,7 +8,7 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Sample
 import com.bitmovin.analytics.example.shared.Samples
-import com.bitmovin.analytics.exoplayer.IExoPlayerCollector
+import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import com.bitmovin.analytics.exoplayer.example.databinding.ActivityMainBinding
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem

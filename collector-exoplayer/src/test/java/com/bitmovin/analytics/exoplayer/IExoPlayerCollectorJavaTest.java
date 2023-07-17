@@ -3,6 +3,7 @@ package com.bitmovin.analytics.exoplayer;
 import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.bitmovin.player
+package com.bitmovin.analytics.bitmovin.player.api
 
 import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
@@ -7,6 +7,7 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.source.Source
 
@@ -37,7 +38,6 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
      * and send source metadata that is specific for each source in the playlist.
      */
 
-    // TODO: check for order of parameters?
     fun setSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
 
     fun getSourceMetadata(playerSource: Source): SourceMetadata
@@ -55,7 +55,7 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
             "Use create(context, analyticsConfig) instead",
             ReplaceWith(
                 "IBitmovinPlayerCollector.create(context, analyticsConfig)",
-                "com.bitmovin.analytics.bitmovin.player.IBitmovinPlayerCollector",
+                "com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector",
             ),
         )
         fun create(config: BitmovinAnalyticsConfig, context: Context): IBitmovinPlayerCollector {

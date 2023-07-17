@@ -3,6 +3,7 @@ package com.bitmovin.analytics.exoplayer
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.example.shared.Samples
+import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.TestConfig

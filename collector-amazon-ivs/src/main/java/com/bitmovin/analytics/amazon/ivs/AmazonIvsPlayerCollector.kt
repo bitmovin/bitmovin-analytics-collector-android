@@ -5,6 +5,7 @@ import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.DefaultCollector
 import com.bitmovin.analytics.adapters.PlayerAdapter
+import com.bitmovin.analytics.amazon.ivs.api.IAmazonIvsPlayerCollector
 import com.bitmovin.analytics.amazon.ivs.features.AmazonIvsPlayerFeatureFactory
 import com.bitmovin.analytics.amazon.ivs.manipulators.PlaybackEventDataManipulator
 import com.bitmovin.analytics.amazon.ivs.manipulators.PlayerInfoEventDataManipulator
@@ -24,14 +25,9 @@ import com.bitmovin.analytics.utils.SystemInformationProvider
 import com.bitmovin.analytics.utils.UserAgentProvider
 import com.bitmovin.analytics.utils.Util
 
-/**
- * Bitmovin Analytics
- *
- * @param analyticsConfig [AnalyticsConfig]
- * @param context [Context]
- */
 internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
-    DefaultCollector<Player>(analyticsConfig, context.applicationContext), IAmazonIvsPlayerCollector {
+    DefaultCollector<Player>(analyticsConfig, context.applicationContext),
+    IAmazonIvsPlayerCollector {
 
     override fun createAdapter(
         player: Player,

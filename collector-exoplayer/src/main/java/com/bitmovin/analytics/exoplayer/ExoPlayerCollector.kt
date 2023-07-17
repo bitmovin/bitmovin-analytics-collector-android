@@ -8,6 +8,7 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
+import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import com.bitmovin.analytics.exoplayer.features.ExoPlayerFeatureFactory
 import com.bitmovin.analytics.exoplayer.player.ExoPlayerContext
 import com.bitmovin.analytics.features.FeatureFactory
@@ -22,7 +23,7 @@ import com.google.android.exoplayer2.ExoPlayer
     "Use IExoPlayerCollector.Factory.create(context, analyticsConfig) instead",
     ReplaceWith(
         "IExoPlayerCollector.Factory.create(context, analyticsConfig)",
-        "com.bitmovin.analytics.exoplayer.IExoPlayerCollector",
+        "com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector",
     ),
 )
 class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
@@ -32,7 +33,7 @@ class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
         "Use IExoPlayerCollector.Factory.create(context, analyticsConfig) instead",
         ReplaceWith(
             "IExoPlayerCollector.Factory.create(context, analyticsConfig)",
-            "com.bitmovin.analytics.exoplayer.IExoPlayerCollector",
+            "com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector",
         ),
     )
     constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : this(

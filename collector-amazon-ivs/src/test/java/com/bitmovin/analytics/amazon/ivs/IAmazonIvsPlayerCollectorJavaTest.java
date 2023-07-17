@@ -3,6 +3,7 @@ package com.bitmovin.analytics.amazon.ivs;
 import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.amazon.ivs.api.IAmazonIvsPlayerCollector;
 
 import org.junit.Assert;
 import org.junit.Test;

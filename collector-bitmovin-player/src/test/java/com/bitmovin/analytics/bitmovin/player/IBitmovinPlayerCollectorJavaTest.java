@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.api.AnalyticsConfig;
+import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.amazon.ivs
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.amazon.ivs.api.IAmazonIvsPlayerCollector
 import io.mockk.mockk
 import org.junit.Test
 

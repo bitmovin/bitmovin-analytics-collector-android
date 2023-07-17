@@ -3,6 +3,7 @@ package com.bitmovin.analytics.bitmovin.player
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils

@@ -8,6 +8,7 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory
 import com.bitmovin.analytics.bitmovin.player.player.BitmovinPlayerContext
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
@@ -23,22 +24,16 @@ import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.source.Source
 
-/**
- * Bitmovin Analytics
- *
- * @param analyticsConfig [AnalyticsConfig]
- * @param context [Context]
- */
-
 @Deprecated(
     "Please use {@link IBitmovinCollector.Factory instead} instead.",
     replaceWith = ReplaceWith(
         expression = "IBitmovinPlayerCollector.Factory.create(context, analyticsConfig)",
-        imports = ["com.bitmovin.analytics.bitmovin.player.IBitmovinPlayerCollector"],
+        imports = ["com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector"],
     ),
 )
 class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
-    DefaultCollector<Player>(analyticsConfig, context.applicationContext), IBitmovinPlayerCollector {
+    DefaultCollector<Player>(analyticsConfig, context.applicationContext),
+    IBitmovinPlayerCollector {
 
     private var player: Player? = null
 
@@ -52,7 +47,7 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         "Please use {@link IBitmovinCollector.Factory instead} instead.",
         replaceWith = ReplaceWith(
             expression = "IBitmovinPlayerCollector.Factory.create(context, analyticsConfig)",
-            imports = ["com.bitmovin.analytics.bitmovin.player.IBitmovinPlayerCollector"],
+            imports = ["com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector"],
         ),
     )
     constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : this(

@@ -8,7 +8,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.amazon.ivs.IAmazonIvsPlayerCollector
+import com.bitmovin.analytics.amazon.ivs.api.IAmazonIvsPlayerCollector
 
 // source: https://github.com/aws-samples/amazon-ivs-player-android-sample
 class MainActivity : AppCompatActivity() {

@@ -1,8 +1,9 @@
-package com.bitmovin.analytics.amazon.ivs
+package com.bitmovin.analytics.amazon.ivs.api
 
 import android.content.Context
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.amazon.ivs.AmazonIvsPlayerCollector
 import com.bitmovin.analytics.api.AnalyticsCollector
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata

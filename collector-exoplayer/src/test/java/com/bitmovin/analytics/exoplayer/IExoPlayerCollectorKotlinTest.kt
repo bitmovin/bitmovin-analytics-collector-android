@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.exoplayer
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import io.mockk.mockk
 import org.junit.Test
 

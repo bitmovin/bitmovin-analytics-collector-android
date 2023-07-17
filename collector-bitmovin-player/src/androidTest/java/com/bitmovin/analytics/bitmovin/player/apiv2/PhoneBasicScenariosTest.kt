@@ -6,7 +6,7 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlaybackUtils
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerConstants
-import com.bitmovin.analytics.bitmovin.player.IBitmovinPlayerCollector
+import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
