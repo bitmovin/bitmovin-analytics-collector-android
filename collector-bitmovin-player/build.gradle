@@ -27,6 +27,7 @@ android {
     kotlinOptions {
         jvmTarget = rootProject.ext.jvmTarget
         freeCompilerArgs += "-opt-in=com.bitmovin.player.core.internal.InternalBitmovinApi"
+        freeCompilerArgs += "-opt-in=com.bitmovin.player.base.internal.InternalBitmovinApi"
         freeCompilerArgs += "-opt-in=com.bitmovin.analytics.internal.InternalBitmovinApi"
     }
 
@@ -69,6 +70,7 @@ dependencies {
     }
 
     compileOnly "com.bitmovin.player:player-core:${rootProject.ext.bitmovinPlayerVersion}"
+    compileOnly "com.bitmovin.player:player-base:${rootProject.ext.bitmovinPlayerVersion}"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 

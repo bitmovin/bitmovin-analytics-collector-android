@@ -7,6 +7,8 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
 import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
+import com.bitmovin.analytics.bitmovin.player.player.attachCollector
+import com.bitmovin.analytics.bitmovin.player.player.detachCollector
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.EventData
@@ -75,6 +77,7 @@ internal class BitmovinSdkAdapter(
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = super.init()
+        player.attachCollector()
         resetSourceRelatedState()
         addPlayerListeners()
         checkAutoplayStartup()
@@ -242,6 +245,7 @@ internal class BitmovinSdkAdapter(
         removePlayerListener()
         resetSourceRelatedState()
         stateMachine.resetStateMachine()
+        player.detachCollector()
     }
 
     override fun resetSourceRelatedState() {

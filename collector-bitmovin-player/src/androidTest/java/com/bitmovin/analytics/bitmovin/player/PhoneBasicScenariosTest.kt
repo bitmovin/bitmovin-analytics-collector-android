@@ -27,6 +27,7 @@ import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -1021,5 +1022,45 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifySourceMetadata(customDataEvents[2], sourceMetadata.copy(customData = customData4))
         assertThat(customDataEvents[2].videoTimeStart).isGreaterThan(2000)
         assertThat(customDataEvents[2].videoTimeEnd).isGreaterThan(2000)
+    }
+
+    @Test
+    fun test_attach2CollectorInstances_shouldThrowExceptionOnSecondAttach() {
+        // arrange
+        val collector1 = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+        val collector2 = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+
+        // act
+        mainScope.launch {
+            collector1.attachPlayer(defaultPlayer)
+            defaultPlayer.load(defaultSource)
+            defaultPlayer.play()
+
+            try {
+                collector2.attachPlayer(defaultPlayer)
+                fail("Expected IllegalStateException to be thrown")
+            } catch (e: IllegalStateException) {
+                // expected
+            } catch (e: Exception) {
+                fail("Expected IllegalStateException to be thrown")
+            }
+        }
+
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+        mainScope.run {
+            defaultPlayer.pause()
+            collector1.detachPlayer()
+            collector2.detachPlayer()
+        }
+
+        // assert
+        val impressionList = LogParser.extractImpressions()
+        assertThat(impressionList).hasSize(1)
+
+        val impression = impressionList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        assertThat(impression.eventDataList).hasSizeGreaterThanOrEqualTo(2) // startup and at least 1 playing sample
     }
 }
