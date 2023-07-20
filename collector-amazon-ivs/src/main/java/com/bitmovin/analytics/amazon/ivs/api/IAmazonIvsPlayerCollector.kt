@@ -6,18 +6,20 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.amazon.ivs.AmazonIvsPlayerCollector
 import com.bitmovin.analytics.api.AnalyticsCollector
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.utils.ApiV3Utils
 
-// TODO: should we move this into API package??
 /**
  * Analytics Collector for the Amazon IVS Player
  */
 interface IAmazonIvsPlayerCollector : AnalyticsCollector<Player> {
+
+    var sourceMetadata: SourceMetadata
+    var sourceCustomData: CustomData
+
     companion object Factory {
-        /**
-         * Creates a collector instance configured via the provided [config].
-         */
         @JvmStatic
         @Deprecated(
             "Use IAmazonIvsPlayerCollector.Factory.create(context, analyticsConfig) instead",

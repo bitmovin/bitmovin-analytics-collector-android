@@ -53,7 +53,7 @@ class PhoneBasicScenariosTest {
     fun test_vod_playPauseWithPlayWhenReady() {
         // arrange
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        collector.setCurrentSourceMetadata(defaultSourceMetadata)
+        collector.sourceMetadata = defaultSourceMetadata
 
         // act
         mainScope.launch {
@@ -112,7 +112,7 @@ class PhoneBasicScenariosTest {
     fun test_sendCustomDataEvent() {
         // arrange
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        collector.setCurrentSourceMetadata(defaultSourceMetadata)
+        collector.sourceMetadata = defaultSourceMetadata
         val customData1 = TestConfig.createDummyCustomData("customData1")
         val customData2 = TestConfig.createDummyCustomData("customData2")
         val customData3 = TestConfig.createDummyCustomData("customData3")
@@ -120,11 +120,11 @@ class PhoneBasicScenariosTest {
         val customData5 = TestConfig.createDummyCustomData("customData5")
         // act
         mainScope.launch {
-            collector.sendCustomDataEvent(customData1) // since we are not attached this shouldn't be sent
+            collector.sendCustomData(customData1) // since we are not attached this shouldn't be sent
             collector.attachPlayer(player)
             player.setMediaItem(defaultMediaItem)
             player.prepare()
-            collector.sendCustomDataEvent(customData2)
+            collector.sendCustomData(customData2)
         }
 
         // we wait until player is in ready state before we call play to test this specific scenario
@@ -137,12 +137,12 @@ class PhoneBasicScenariosTest {
         ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2001)
 
         mainScope.launch {
-            collector.sendCustomDataEvent(customData3)
+            collector.sendCustomData(customData3)
             player.pause()
-            collector.sendCustomDataEvent(customData4)
+            collector.sendCustomData(customData4)
             collector.detachPlayer()
             player.release()
-            collector.sendCustomDataEvent(customData5) // this event should not be sent since collector is detached
+            collector.sendCustomData(customData5) // this event should not be sent since collector is detached
         }
 
         Thread.sleep(300)
@@ -184,7 +184,7 @@ class PhoneBasicScenariosTest {
             collector.attachPlayer(player)
             player.playWhenReady = true
             player.setMediaItem(liveSource)
-            collector.setCurrentSourceMetadata(liveSourceMetadata)
+            collector.sourceMetadata = liveSourceMetadata
             player.prepare()
         }
 

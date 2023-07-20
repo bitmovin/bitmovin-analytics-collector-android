@@ -4,7 +4,6 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import io.mockk.mockk
-import org.junit.Assert
 import org.junit.Test
 
 class IBitmovinPlayerCollectorKotlinTest {
@@ -24,10 +23,7 @@ class IBitmovinPlayerCollectorKotlinTest {
     @Test
     fun testFactory_shouldCreateNewCollectorObjectWithAnalyticsConfig() {
         val analyticsConfig = AnalyticsConfig("analytics_key")
-        val collector = IBitmovinPlayerCollector.Factory.create(mockk(relaxed = true), analyticsConfig)
-        Assert.assertEquals(analyticsConfig.licenseKey, collector.config.licenseKey)
-
-        val collector2 = IBitmovinPlayerCollector.create(mockk(relaxed = true), analyticsConfig)
-        Assert.assertEquals(analyticsConfig.licenseKey, collector2.config.licenseKey)
+        IBitmovinPlayerCollector.Factory.create(mockk(relaxed = true), analyticsConfig)
+        IBitmovinPlayerCollector.create(mockk(relaxed = true), analyticsConfig)
     }
 }

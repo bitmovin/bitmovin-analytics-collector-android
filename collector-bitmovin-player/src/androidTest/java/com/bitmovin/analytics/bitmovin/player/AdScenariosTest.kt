@@ -71,7 +71,7 @@ class AdScenariosTest {
         // act
         mainScope.launch {
             collector.attachPlayer(localPlayer)
-            collector.setCurrentSourceMetadata(sourceMetadata)
+            collector.setSourceMetadata(defaultSource, sourceMetadata)
             localPlayer.load(defaultSource)
         }
 

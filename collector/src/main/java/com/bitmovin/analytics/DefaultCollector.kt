@@ -12,10 +12,10 @@ import com.bitmovin.analytics.data.RandomizedUserIdIdProvider
 import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import com.bitmovin.analytics.data.UserIdProvider
 import com.bitmovin.analytics.utils.ApiV3Utils
-import com.bitmovin.analytics.utils.Util
 
+// TODO: annotation?
 abstract class DefaultCollector<TPlayer> protected constructor(
-    final override val config: AnalyticsConfig,
+    val config: AnalyticsConfig,
     context: Context,
 ) : AnalyticsCollector<TPlayer> {
     protected val analytics by lazy { BitmovinAnalytics(config, context) }
@@ -33,14 +33,8 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     override val impressionId: String?
         get() = analytics.impressionId
 
-    override val version: String
-        get() = Util.analyticsVersion
-
     override val userId: String
         get() = userIdProvider.userId()
-
-    override val customData: CustomData
-        get() = analytics.customData
 
     protected abstract fun createAdapter(
         player: TPlayer,
@@ -61,43 +55,23 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         ReplaceWith("sendCustomDataEvent(customData)"),
     )
     override fun setCustomDataOnce(customData: CustomData) {
-        this.sendCustomDataEvent(customData)
+        this.sendCustomData(customData)
     }
 
-    override fun sendCustomDataEvent(customData: CustomData) {
+    override fun sendCustomData(customData: CustomData) {
         // TODO: we might need to make sure this event is
         // handled by the main looper, since we might access to player from a different thread, which
         // could cause issues. (we should discuss thread safety in general with player folks)
         analytics.sendCustomDataEvent(customData)
     }
 
-    override var defaultMetadata: DefaultMetadata
+    var defaultMetadata: DefaultMetadata
         get() = metadataProvider.defaultMetadata
         set(value) {
             metadataProvider.defaultMetadata = value
         }
 
-    override fun setDefaultCustomData(customData: CustomData) {
-        // TODO: we might need to make sure this event is
-        // handled by the main looper (at least with exoplayer), since we might access the player from a different thread, which
-        // could cause issues. (we should discuss thread safety in general with player folks)
-
-        // if new defaultCustomData merged with sourceMetadata is the same as the current active one (merged from sourceMetadata and defaultMetadata)
-        // we don't close the current sample since effectively nothing changed (this might save us a couple of samples)
-        // TODO: cover this with unittests
-        val newDefaultCustomData = customData
-        val newMergedCustomData = ApiV3Utils.mergeCustomData(this.getCurrentSourceCustomData(), newDefaultCustomData)
-        if (newMergedCustomData != analytics.customData) {
-            analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
-        }
-        metadataProvider.defaultMetadata = metadataProvider.defaultMetadata.copy(customData = newDefaultCustomData)
-    }
-
-    override fun getDefaultCustomData(): CustomData {
-        return metadataProvider.defaultMetadata.customData
-    }
-
-    override fun setCurrentSourceCustomData(customData: CustomData) {
+    open fun setCustomDataForCurrentSource(customData: CustomData) {
         // TODO: we might need to make sure this event is
         // handled by the main looper (at least for exoplayer), since we might access to player from a different thread, which
         // could cause issues. (we should discuss thread safety in general with player folks)
@@ -106,21 +80,25 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         // we don't close the current sample since effectively nothing changed (this might save us a couple of samples)
         // TODO: cover this with unittests
         val newMergedCustomData = ApiV3Utils.mergeCustomData(customData, metadataProvider.defaultMetadata.customData)
-        if (newMergedCustomData != this.customData) {
+        if (newMergedCustomData != analytics.customData) {
             analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
         }
         this.setCurrentSourceMetadata(this.getCurrentSourceMetadata().copy(customData = customData))
     }
 
-    override fun getCurrentSourceCustomData(): CustomData {
+    open fun getCustomDataOfCurrentSource(): CustomData {
         return metadataProvider.getSourceMetadata()?.customData ?: CustomData()
     }
 
-    override fun setCurrentSourceMetadata(sourceMetadata: SourceMetadata) {
+    protected fun getCurrentSourceCustomData(): CustomData {
+        return metadataProvider.getSourceMetadata()?.customData ?: CustomData()
+    }
+
+    protected fun setCurrentSourceMetadata(sourceMetadata: SourceMetadata) {
         metadataProvider.setSourceMetadata(sourceMetadata)
     }
 
-    override fun getCurrentSourceMetadata(): SourceMetadata {
+    protected fun getCurrentSourceMetadata(): SourceMetadata {
         return metadataProvider.getSourceMetadata() ?: SourceMetadata()
     }
 

@@ -600,7 +600,7 @@ class PhoneBasicScenariosTest {
 
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
         val changedCustomData = CustomData(customData1 = "setOnSource1")
-        collector.setCurrentSourceCustomData(changedCustomData)
+        defaultPlayer.source?.let { collector.setCustomData(it, changedCustomData) }
 
         // seek to almost end of first track
         val seekTo = hlsSample.duration / 1000 - 1.0
@@ -677,9 +677,13 @@ class PhoneBasicScenariosTest {
         }
 
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
-        val changedCustomData = CustomData(customData1 = "setOnSource1")
+        val playerSource = defaultPlayer.source
+        var changedCustomData = CustomData()
+        if (playerSource != null) {
+            val changedCustomData = collector.getCustomData(playerSource).copy(customData1 = "setOnSource1")
+            collector.setCustomData(playerSource, changedCustomData)
+        }
 
-        collector.setDefaultCustomData(changedCustomData)
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
 
         // seek to almost end of first track
@@ -726,7 +730,7 @@ class PhoneBasicScenariosTest {
         val expectedAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig("dummyURL")
         DataVerifier.verifyAnalyticsConfig(samplesBeforeCustomDataChange, expectedAnalyticsConfig)
         DataVerifier.verifyCustomData(samplesAfterCustomDataChange, changedCustomData)
-        DataVerifier.verifyCustomData(impression2.eventDataList, changedCustomData)
+        DataVerifier.verifyCustomData(impression2.eventDataList, CustomData())
     }
 
     @Test

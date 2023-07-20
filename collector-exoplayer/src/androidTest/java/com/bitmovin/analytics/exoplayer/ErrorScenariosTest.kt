@@ -52,7 +52,7 @@ class ErrorScenariosTest {
         // act
         mainScope.launch {
             collector.attachPlayer(player)
-            collector.setCurrentSourceMetadata(defaultSourceMetadata)
+            collector.sourceMetadata = defaultSourceMetadata
             player.setMediaItem(MediaItem.fromUri(nonExistingStreamSample.uri))
             player.prepare()
         }
@@ -106,7 +106,7 @@ class ErrorScenariosTest {
         // act
         mainScope.launch {
             collector.attachPlayer(player)
-            collector.setCurrentSourceMetadata(sourceMetadata)
+            collector.sourceMetadata = sourceMetadata
             player.setMediaItem(MediaItem.fromUri(corruptedStream.uri))
             player.prepare()
             player.play()
@@ -162,7 +162,7 @@ class ErrorScenariosTest {
         // act
         mainScope.launch {
             collector.attachPlayer(player)
-            collector.setCurrentSourceMetadata(sourceMetadata)
+            collector.sourceMetadata = sourceMetadata
             player.setMediaItem(MediaItem.fromUri(missingSegmentStream.uri))
             player.prepare()
             player.play()

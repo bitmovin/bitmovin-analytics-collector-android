@@ -4,7 +4,9 @@ import android.content.Context
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.api.AnalyticsCollector
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector
 import com.bitmovin.analytics.utils.ApiV3Utils
 import com.google.android.exoplayer2.ExoPlayer
@@ -13,6 +15,10 @@ import com.google.android.exoplayer2.ExoPlayer
  * Analytics Collector for the ExoPlayer
  */
 interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
+
+    var sourceMetadata: SourceMetadata
+    var sourceCustomData: CustomData
+
     companion object Factory {
 
         /**

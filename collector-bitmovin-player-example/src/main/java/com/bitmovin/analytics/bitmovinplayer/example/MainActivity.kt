@@ -5,7 +5,6 @@ import android.view.Menu
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
-import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
@@ -175,14 +174,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun setCustomData() {
         val collector = bitmovinPlayerCollector ?: return
-        val customData = collector.getDefaultCustomData() ?: CustomData()
+
+        val source = player.source ?: return
+
+        val customData = collector.getCustomData(source)
 
         val changedCustomData = customData.copy(
             customData2 = "custom_data_2_changed",
             customData4 = "custom_data_4_changed",
         )
-
-        collector.setDefaultCustomData(changedCustomData)
+        collector.setCustomData(source, changedCustomData)
     }
 
     companion object {

@@ -1,16 +1,9 @@
 package com.bitmovin.analytics.api
 
-// TODO: add missing descriptions
-
 /**
  * Public interface which is shared by all collectors
  */
 interface AnalyticsCollector<TPlayer> {
-
-    /**
-     * The active configuration of the analytics collector.
-     */
-    val config: AnalyticsConfig
 
     /**
      * The impressionId of the current session
@@ -18,28 +11,10 @@ interface AnalyticsCollector<TPlayer> {
     val impressionId: String?
 
     /**
-     * The version of the analytics collector
-     */
-    val version: String
-
-    /**
      * The userId that is sent with each analytics sample.
      * (ANDROID_ID or a random String, depending on the analytics configuration)
      */
     val userId: String
-
-    // TODO: discuss with player folks when to use properties and when to use explicit getter/setter methods
-    val customData: CustomData
-
-    var defaultMetadata: DefaultMetadata
-
-    fun setCurrentSourceMetadata(sourceMetadata: SourceMetadata)
-    fun getCurrentSourceMetadata(): SourceMetadata
-
-    fun setDefaultCustomData(customData: CustomData)
-    fun getDefaultCustomData(): CustomData?
-    fun setCurrentSourceCustomData(customData: CustomData)
-    fun getCurrentSourceCustomData(): CustomData?
 
     /**
      * Attaches player to the analytics collector and starts listening to player events
@@ -67,12 +42,13 @@ interface AnalyticsCollector<TPlayer> {
     )
     fun setCustomDataOnce(customData: CustomData)
 
+    // TODO: clarify behaviour a bit more
     /**
-     * sendCustomDataEvent sends a sample with state='customdatachanged' containing the [customData].
-     * It does not change the permanently configured customData that is set through metadata or setCustomData.
+     * sendCustomData sends a sample with state='customdatachanged' containing the [customData].
+     * It does not change the permanently configured customData that is set through defaultMetadata or sourceMetadata.
      *
      * More information can be found here:
      * https://developer.bitmovin.com/playback/docs/how-can-values-of-customdata-and-other-metadata-fields-be-changed
      */
-    fun sendCustomDataEvent(customData: CustomData)
+    fun sendCustomData(customData: CustomData)
 }

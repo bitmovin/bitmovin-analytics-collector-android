@@ -30,21 +30,16 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
     )
     fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
 
-    /**
-     * Used to configure source specific metadata that is
-     * active when the specified source is loaded into the player.
-     *
-     * This allows for example to use the Playlist feature of the bitmovin player
-     * and send source metadata that is specific for each source in the playlist.
-     */
+    // TODO: add proper method description
 
     fun setSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
 
+    // TODO: add proper method description
     fun getSourceMetadata(playerSource: Source): SourceMetadata
 
-    fun setSourceCustomData(playerSource: Source, customData: CustomData)
+    fun setCustomData(playerSource: Source, customData: CustomData)
 
-    fun getSourceCustomData(playerSource: Source): CustomData
+    fun getCustomData(playerSource: Source): CustomData
 
     companion object Factory {
         /**

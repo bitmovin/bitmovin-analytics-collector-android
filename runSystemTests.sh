@@ -24,7 +24,6 @@ yes | /Users/$USER/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager --lic
 ./gradlew :collector-bitmovin-player:cleanPixel6api30DebugAndroidTest
 ## run test
 ./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.PhoneBasicScenariosTest || exit
-./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.ApiUsageScenariosTest || exit
 
 ## command to run specific test (with regex) in a loop (can be used to verify flaky test is stable)
 #for i in {1..50}; do

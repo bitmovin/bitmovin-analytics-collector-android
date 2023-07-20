@@ -17,6 +17,8 @@ import com.bitmovin.analytics.amazon.ivs.player.IvsPlayerListener
 import com.bitmovin.analytics.amazon.ivs.player.PlaybackQualityProvider
 import com.bitmovin.analytics.amazon.ivs.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
@@ -28,6 +30,18 @@ import com.bitmovin.analytics.utils.Util
 internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
     DefaultCollector<Player>(analyticsConfig, context.applicationContext),
     IAmazonIvsPlayerCollector {
+
+    override var sourceMetadata: SourceMetadata
+        get() = metadataProvider.getSourceMetadata() ?: SourceMetadata()
+        set(value) {
+            metadataProvider.setSourceMetadata(value)
+        }
+
+    override var sourceCustomData: CustomData
+        get() = super.getCustomDataOfCurrentSource()
+        set(value) {
+            super.setCustomDataForCurrentSource(value)
+        }
 
     override fun createAdapter(
         player: Player,

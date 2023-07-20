@@ -27,6 +27,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class PhoneBasicScenariosTest {
 
+    // TODO: add test for change of customData while playing
+
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var player: Player
 
@@ -58,7 +60,7 @@ class PhoneBasicScenariosTest {
             videoId = "videoId1",
             customData = TestConfig.createDummyCustomData("ivsLive1_"),
         )
-        collector.setCurrentSourceMetadata(sourceMetadata)
+        collector.sourceMetadata = sourceMetadata
         collector.attachPlayer(player)
 
         // act
@@ -120,7 +122,7 @@ class PhoneBasicScenariosTest {
             customData = TestConfig.createDummyCustomData("ivsLive1_"),
         )
 
-        collector.setCurrentSourceMetadata(sourceMetadata1)
+        collector.sourceMetadata = sourceMetadata1
         collector.attachPlayer(player)
         // act
         player.load(Uri.parse(liveStreamSample1.m3u8Url))
@@ -141,7 +143,7 @@ class PhoneBasicScenariosTest {
             customData = TestConfig.createDummyCustomData("ivsLive2_"),
         )
 
-        collector.setCurrentSourceMetadata(sourceMetadata2)
+        collector.sourceMetadata = sourceMetadata2
         collector.attachPlayer(player)
 
         player.load(Uri.parse(liveStreamSample2.m3u8Url))
@@ -207,7 +209,7 @@ class PhoneBasicScenariosTest {
             videoId = "videoId",
             customData = TestConfig.createDummyCustomData("ivsVod_"),
         )
-        collector.setCurrentSourceMetadata(sourceMetadata)
+        collector.sourceMetadata = sourceMetadata
         collector.attachPlayer(player)
 
         // act
@@ -261,7 +263,7 @@ class PhoneBasicScenariosTest {
             videoId = "videoId",
             customData = TestConfig.createDummyCustomData("ivsVod_"),
         )
-        collector.setCurrentSourceMetadata(sourceMetadata)
+        collector.sourceMetadata = sourceMetadata
 
         // act
         player.load(Uri.parse(vodStreamSample.m3u8Url))
@@ -309,7 +311,7 @@ class PhoneBasicScenariosTest {
         val analyticsConfig = TestConfig.createAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
         val nonExistingStreamSourceMetadata = SourceMetadata(title = "non-existing-stream", isLive = false, mpdUrl = nonExistingStreamSample.uri.toString(), customData = TestConfig.createDummyCustomData("noneExitingStreamData"))
-        collector.setCurrentSourceMetadata(nonExistingStreamSourceMetadata)
+        collector.sourceMetadata = nonExistingStreamSourceMetadata
         collector.attachPlayer(player)
 
         // act
@@ -378,7 +380,7 @@ class PhoneBasicScenariosTest {
             videoId = "videoId",
             customData = TestConfig.createDummyCustomData("ivsVod_"),
         )
-        collector.setCurrentSourceMetadata(sourceMetadata)
+        collector.sourceMetadata = sourceMetadata
         val customData1 = TestConfig.createDummyCustomData("customData1")
         val customData2 = TestConfig.createDummyCustomData("customData2")
         val customData3 = TestConfig.createDummyCustomData("customData3")
@@ -386,23 +388,23 @@ class PhoneBasicScenariosTest {
         val customData5 = TestConfig.createDummyCustomData("customData5")
 
         // act
-        collector.sendCustomDataEvent(customData1) // since we are not attached this shouldn't be sent
+        collector.sendCustomData(customData1) // since we are not attached this shouldn't be sent
         collector.attachPlayer(player)
 
         player.load(Uri.parse(vodStreamSample.m3u8Url))
-        collector.sendCustomDataEvent(customData2)
+        collector.sendCustomData(customData2)
 
         player.play()
 
         IvsTestUtils.waitUntilPlayerPlayedToMs(player, 2001)
-        collector.sendCustomDataEvent(customData3)
+        collector.sendCustomData(customData3)
 
         player.pause()
 
-        collector.sendCustomDataEvent(customData4)
+        collector.sendCustomData(customData4)
         collector.detachPlayer()
         player.release()
-        collector.sendCustomDataEvent(customData5) // this event should not be sent since collector is detached
+        collector.sendCustomData(customData5) // this event should not be sent since collector is detached
 
         Thread.sleep(300)
 

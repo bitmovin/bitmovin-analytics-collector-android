@@ -147,12 +147,12 @@ class MainActivity : AppCompatActivity(), Player.Listener {
 
     private fun changeCustomData() {
         val bitmovinAnalytics = bitmovinAnalytics ?: return
-        val changedCustomData = bitmovinAnalytics.defaultMetadata?.customData?.copy(
+        val changedCustomData = bitmovinAnalytics.sourceCustomData.copy(
             customData1 = "custom_data_1_changed",
             customData2 = "custom_data_2_changed",
         )
 
-        this.bitmovinAnalytics?.setDefaultCustomData(changedCustomData ?: CustomData())
+        bitmovinAnalytics.sourceCustomData = changedCustomData
     }
 
     private fun setCustomDataOnce() {
@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
             customData1 = "custom_data_1_changed_once",
             customData2 = "custom_data_2_changed_once",
         )
-        this.bitmovinAnalytics?.sendCustomDataEvent(customData)
+        this.bitmovinAnalytics?.sendCustomData(customData)
     }
 
     private fun createBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {

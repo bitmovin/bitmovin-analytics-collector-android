@@ -35,8 +35,6 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
     DefaultCollector<Player>(analyticsConfig, context.applicationContext),
     IBitmovinPlayerCollector {
 
-    private var player: Player? = null
-
     /**
      * Bitmovin Analytics
      *
@@ -61,9 +59,6 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         player: Player,
         analytics: BitmovinAnalytics,
     ): PlayerAdapter {
-        // TODO: storing the player explicitly here is not nice, we should see how we can retrieve
-        // the source without storing the player explicitly here
-        this.player = player
         val featureFactory: FeatureFactory = BitmovinFeatureFactory(analytics, player)
         val userAgentProvider = UserAgentProvider(
             Util.getApplicationInfoOrNull(analytics.context),
@@ -105,66 +100,23 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         return metadataProvider.getSourceMetadata(playerSource) ?: SourceMetadata()
     }
 
-    override fun setSourceCustomData(playerSource: Source, customData: CustomData) {
+    override fun setCustomData(playerSource: Source, customData: CustomData) {
+        // we cannot put this logic into the adapter since the adapter is created on attaching
+        // and this method might be called earlier
         if (playerSource.isActive) {
             analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
         }
 
-        metadataProvider.setSourceMetadata(playerSource, getSourceMetadata(playerSource).copy(customData = customData))
-    }
-
-    override fun getSourceCustomData(playerSource: Source): CustomData {
-        return getSourceMetadata(playerSource).customData
-    }
-
-    override fun setCurrentSourceCustomData(customData: CustomData) {
-        // we cannot put this logic into the adapter since the adapter is created on attaching
-        // and this method might be called earlier
-
-        // TODO: might be possible to push into metadataprovider
-        analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
-        val activeSource = this.player?.source
-        if (activeSource != null) {
-            val currentSourceMetadata = metadataProvider.getSourceMetadata(activeSource)
-            if (currentSourceMetadata != null) {
-                metadataProvider.setSourceMetadata(activeSource, currentSourceMetadata.copy(customData = customData))
-                return
-            }
-        }
-
-        val sourceMetadata = metadataProvider.getSourceMetadata()
+        val sourceMetadata = metadataProvider.getSourceMetadata(playerSource)
         if (sourceMetadata != null) {
-            metadataProvider.setSourceMetadata(sourceMetadata.copy(customData = customData))
-            return
+            metadataProvider.setSourceMetadata(playerSource, sourceMetadata.copy(customData = customData))
+        } else {
+            metadataProvider.setSourceMetadata(playerSource, SourceMetadata(customData = customData))
         }
-
-        metadataProvider.setSourceMetadata(SourceMetadata(customData = customData))
-        return
     }
 
-    override fun setCurrentSourceMetadata(sourceMetadata: SourceMetadata) {
-        val activeSource = this.player?.source
-        if (activeSource != null) {
-            val currentSourceMetadata = metadataProvider.getSourceMetadata(activeSource)
-            if (currentSourceMetadata != null) {
-                metadataProvider.setSourceMetadata(activeSource, sourceMetadata)
-                return
-            }
-        }
-
-        metadataProvider.setSourceMetadata(sourceMetadata)
-    }
-
-    override fun getCurrentSourceMetadata(): SourceMetadata {
-        // TODO: do we need to use overrideCurrentSource here?
-        val activeSource = this.player?.source
-        if (activeSource != null) {
-            val currentSourceMetadata = metadataProvider.getSourceMetadata(activeSource)
-            if (currentSourceMetadata != null) {
-                return currentSourceMetadata
-            }
-        }
-
-        return metadataProvider.getSourceMetadata() ?: SourceMetadata()
+    override fun getCustomData(playerSource: Source): CustomData {
+        val currentSourceMetadata = metadataProvider.getSourceMetadata(playerSource)
+        return currentSourceMetadata?.customData ?: CustomData()
     }
 }
