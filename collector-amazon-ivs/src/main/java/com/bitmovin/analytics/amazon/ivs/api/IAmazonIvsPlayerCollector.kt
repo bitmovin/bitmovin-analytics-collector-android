@@ -16,6 +16,7 @@ import com.bitmovin.analytics.utils.ApiV3Utils
  */
 interface IAmazonIvsPlayerCollector : AnalyticsCollector<Player> {
 
+    // TODO: proper docs
     var sourceMetadata: SourceMetadata
     var sourceCustomData: CustomData
 

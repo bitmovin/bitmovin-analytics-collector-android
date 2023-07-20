@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.ExoPlayer
  */
 interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
 
+    // TODO: proper docs
     var sourceMetadata: SourceMetadata
     var sourceCustomData: CustomData
 

@@ -6,6 +6,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.amazon.ivs.api.IAmazonIvsPlayerCollector
+import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
@@ -26,8 +28,6 @@ import org.junit.runner.RunWith
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh in the root folder
 @RunWith(AndroidJUnit4::class)
 class PhoneBasicScenariosTest {
-
-    // TODO: add test for change of customData while playing
 
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var player: Player
@@ -368,7 +368,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_sendCustomDataEvent() {
+    fun test_sendCustomData() {
         // arrange
         val vodStreamSample = TestSources.IVS_VOD_1
         val analyticsConfig = TestConfig.createAnalyticsConfig()
@@ -429,5 +429,61 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifySourceMetadata(customDataEvents[2], sourceMetadata.copy(customData = customData4))
         Assertions.assertThat(customDataEvents[2].videoTimeStart).isGreaterThan(2000)
         Assertions.assertThat(customDataEvents[2].videoTimeEnd).isGreaterThan(2000)
+    }
+
+    @Test
+    fun test_changeCustomDataWhilePlaying() {
+        // arrange
+        val vodStreamSample = TestSources.IVS_VOD_1
+        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val defaultCustomData = CustomData(customData1 = "v1.2.3", customData2 = "videoID123")
+        val defaultMetadata = DefaultMetadata(cdnProvider = "testCdnPovider", customUserId = "testCustomUserId", customData = defaultCustomData)
+        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig, defaultMetadata)
+        val sourceMetadata = SourceMetadata(
+            m3u8Url = vodStreamSample.m3u8Url,
+            title = "title",
+            isLive = false,
+            videoId = "videoId",
+            customData = CustomData(customData3 = "beforeSetCustomData"),
+        )
+        collector.sourceMetadata = sourceMetadata
+
+        // act
+        collector.attachPlayer(player)
+        player.load(Uri.parse(vodStreamSample.m3u8Url))
+        player.play()
+
+        IvsTestUtils.waitUntilPlayerPlayedToMs(player, 2000)
+        collector.sourceCustomData = CustomData(customData3 = "afterSetCustomData")
+        IvsTestUtils.waitUntilPlayerPlayedToMs(player, 10000)
+        player.pause()
+
+        collector.detachPlayer()
+        player.release()
+
+        // assert
+        val impressions = LogParser.extractImpressions()
+        assertThat(impressions.size).isEqualTo(1)
+
+        val impression = impressions.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        val beforeCustomDataChange = eventDataList.filter { it.customData3 == "beforeSetCustomData" }
+        val afterCustomDataChange = eventDataList.filter { it.customData3 == "afterSetCustomData" }
+
+        assertThat(beforeCustomDataChange).hasSizeGreaterThanOrEqualTo(2)
+        assertThat(afterCustomDataChange).hasSizeGreaterThanOrEqualTo(1)
+
+        // make sure that setCustomData closed all sample
+        assertThat(beforeCustomDataChange.last().videoTimeEnd).isBetween(2000, 2100)
+        assertThat(afterCustomDataChange[0].videoTimeStart).isBetween(2000, 2100)
+
+        eventDataList.forEach {
+            assertThat(it.customData1).isEqualTo(defaultCustomData.customData1)
+            assertThat(it.customData2).isEqualTo(defaultCustomData.customData2)
+            assertThat(it.customUserId).isEqualTo(defaultMetadata.customUserId)
+            assertThat(it.cdnProvider).isEqualTo(defaultMetadata.cdnProvider)
+        }
     }
 }

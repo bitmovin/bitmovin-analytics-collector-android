@@ -42,7 +42,6 @@ interface AnalyticsCollector<TPlayer> {
     )
     fun setCustomDataOnce(customData: CustomData)
 
-    // TODO: clarify behaviour a bit more
     /**
      * sendCustomData sends a sample with state='customdatachanged' containing the [customData].
      * It does not change the permanently configured customData that is set through defaultMetadata or sourceMetadata.
