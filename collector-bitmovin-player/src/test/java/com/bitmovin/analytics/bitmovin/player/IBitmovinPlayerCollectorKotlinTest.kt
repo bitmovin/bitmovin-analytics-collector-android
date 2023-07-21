@@ -26,4 +26,10 @@ class IBitmovinPlayerCollectorKotlinTest {
         IBitmovinPlayerCollector.Factory.create(mockk(relaxed = true), analyticsConfig)
         IBitmovinPlayerCollector.create(mockk(relaxed = true), analyticsConfig)
     }
+
+    @Test
+    fun testSdkVersion_shouldReturnVersionString() {
+        // act
+        val sdkVersion = IBitmovinPlayerCollector.sdkVersion
+    }
 }

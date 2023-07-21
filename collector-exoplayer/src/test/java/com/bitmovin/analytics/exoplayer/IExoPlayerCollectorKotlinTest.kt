@@ -17,4 +17,10 @@ class IExoPlayerCollectorKotlinTest {
         val collector = IExoPlayerCollector.Factory.create(config, mockk(relaxed = true))
         val collector2 = IExoPlayerCollector.create(config, mockk(relaxed = true))
     }
+
+    @Test
+    fun testSdkVersion_shouldReturnVersionString() {
+        // act
+        val sdkVersion = IExoPlayerCollector.sdkVersion
+    }
 }

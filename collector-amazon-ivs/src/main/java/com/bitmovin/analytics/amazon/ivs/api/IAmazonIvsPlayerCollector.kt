@@ -10,6 +10,7 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.utils.ApiV3Utils
+import com.bitmovin.analytics.utils.Util
 
 /**
  * Analytics Collector for the Amazon IVS Player
@@ -21,6 +22,14 @@ interface IAmazonIvsPlayerCollector : AnalyticsCollector<Player> {
     var sourceCustomData: CustomData
 
     companion object Factory {
+        /**
+         * The version of the analytics collector
+         *
+         * For example "3.0.0"
+         */
+        @JvmStatic
+        val sdkVersion = Util.analyticsVersion
+
         @JvmStatic
         @Deprecated(
             "Use IAmazonIvsPlayerCollector.Factory.create(context, analyticsConfig) instead",

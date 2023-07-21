@@ -38,4 +38,13 @@ public class IBitmovinPlayerCollectorJavaTest {
         IBitmovinPlayerCollector collector2 = IBitmovinPlayerCollector.create(context, analyticsConfig);
         Assert.assertNotNull(collector2);
     }
+
+    @Test
+    public void testSdkVersion_shouldReturnVersionString(){
+        // act
+        String sdkVersion = IBitmovinPlayerCollector.getSdkVersion();
+
+        // assert
+        Assert.assertNotNull(sdkVersion);
+    }
 }

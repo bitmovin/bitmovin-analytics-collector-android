@@ -25,4 +25,13 @@ public class IExoPlayerCollectorJavaTest {
         Assert.assertNotNull(collector);
         Assert.assertNotNull(collector2);
     }
+
+    @Test
+    public void testSdkVersion_shouldReturnVersionString(){
+        // act
+        String sdkVersion = IExoPlayerCollector.getSdkVersion();
+
+        // assert
+        Assert.assertNotNull(sdkVersion);
+    }
 }

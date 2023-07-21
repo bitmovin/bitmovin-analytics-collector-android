@@ -9,6 +9,7 @@ import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector
 import com.bitmovin.analytics.utils.ApiV3Utils
+import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.ExoPlayer
 
 /**
@@ -21,6 +22,14 @@ interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
     var sourceCustomData: CustomData
 
     companion object Factory {
+
+        /**
+         * The version of the analytics collector
+         *
+         * For example "3.0.0"
+         */
+        @JvmStatic
+        val sdkVersion = Util.analyticsVersion
 
         /**
          * Creates a collector instance configured via the provided [config].

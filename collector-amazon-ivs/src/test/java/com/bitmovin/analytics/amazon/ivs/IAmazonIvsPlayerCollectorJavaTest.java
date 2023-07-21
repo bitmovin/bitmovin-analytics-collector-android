@@ -20,9 +20,20 @@ public class IAmazonIvsPlayerCollectorJavaTest {
         // act
         IAmazonIvsPlayerCollector collector = IAmazonIvsPlayerCollector.Factory.create(config, context);
         IAmazonIvsPlayerCollector collector2 = IAmazonIvsPlayerCollector.create(config, context);
+        String sdkVersion = IAmazonIvsPlayerCollector.getSdkVersion();
 
         // assert
         Assert.assertNotNull(collector);
         Assert.assertNotNull(collector2);
+        Assert.assertNotNull(sdkVersion);
+    }
+
+    @Test
+    public void testSdkVersion_shouldReturnVersionString(){
+        // act
+        String sdkVersion = IAmazonIvsPlayerCollector.getSdkVersion();
+
+        // assert
+        Assert.assertNotNull(sdkVersion);
     }
 }

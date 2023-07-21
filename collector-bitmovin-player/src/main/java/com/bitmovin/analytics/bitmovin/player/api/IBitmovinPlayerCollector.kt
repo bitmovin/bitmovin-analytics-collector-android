@@ -8,6 +8,7 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
+import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.source.Source
 
@@ -42,6 +43,15 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
     fun getCustomData(playerSource: Source): CustomData
 
     companion object Factory {
+
+        /**
+         * The version of the analytics collector
+         *
+         * For example "3.0.0"
+         */
+        @JvmStatic
+        val sdkVersion = Util.analyticsVersion
+
         /**
          * Creates a collector instance configured via the provided [config].
          */
@@ -57,7 +67,9 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
             return BitmovinPlayerCollector(config, context)
         }
 
-        // TODO: add method description
+        /**
+         * Creates a collector instance configured via the provided [analyticsConfig] and using the provided [defaultMetadata].
+         */
         @JvmStatic
         @JvmOverloads
         fun create(context: Context, analyticsConfig: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IBitmovinPlayerCollector {

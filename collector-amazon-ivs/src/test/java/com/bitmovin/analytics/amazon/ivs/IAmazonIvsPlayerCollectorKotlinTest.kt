@@ -17,4 +17,10 @@ class IAmazonIvsPlayerCollectorKotlinTest {
         val collector = IAmazonIvsPlayerCollector.Factory.create(config, mockk(relaxed = true))
         val collector2 = IAmazonIvsPlayerCollector.create(config, mockk(relaxed = true))
     }
+
+    @Test
+    fun testSdkVersion_shouldReturnVersionString() {
+        // act
+        val sdkVersion = IAmazonIvsPlayerCollector.sdkVersion
+    }
 }
