@@ -131,12 +131,12 @@ class MainActivity : AppCompatActivity(), Player.Listener {
 
     private fun changeCustomData() {
         val bitmovinAnalytics = bitmovinAnalytics ?: return
-        val changedCustomData = bitmovinAnalytics.sourceCustomData.copy(
+        val changedCustomData = bitmovinAnalytics.customData.copy(
             customData1 = "custom_data_1_changed",
             customData2 = "custom_data_2_changed",
         )
 
-        bitmovinAnalytics.sourceCustomData = changedCustomData
+        bitmovinAnalytics.customData = changedCustomData
     }
 
     private fun setToLiveStream() {

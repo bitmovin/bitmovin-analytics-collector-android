@@ -37,7 +37,7 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
             metadataProvider.setSourceMetadata(value)
         }
 
-    override var sourceCustomData: CustomData
+    override var customData: CustomData
         get() = super.getCustomDataOfCurrentSource()
         set(value) {
             super.setCustomDataForCurrentSource(value)

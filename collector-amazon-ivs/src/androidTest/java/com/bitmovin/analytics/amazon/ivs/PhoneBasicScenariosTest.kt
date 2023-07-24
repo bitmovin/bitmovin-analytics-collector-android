@@ -454,7 +454,7 @@ class PhoneBasicScenariosTest {
         player.play()
 
         IvsTestUtils.waitUntilPlayerPlayedToMs(player, 2000)
-        collector.sourceCustomData = CustomData(customData3 = "afterSetCustomData")
+        collector.customData = CustomData(customData3 = "afterSetCustomData")
         IvsTestUtils.waitUntilPlayerPlayedToMs(player, 10000)
         player.pause()
 

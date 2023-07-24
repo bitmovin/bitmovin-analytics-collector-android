@@ -17,9 +17,16 @@ import com.bitmovin.analytics.utils.Util
  */
 interface IAmazonIvsPlayerCollector : AnalyticsCollector<Player> {
 
-    // TODO: proper docs
+    /**
+     * SourceMetadata is used to enrich the analytics data with source specific
+     * metadata.
+     */
     var sourceMetadata: SourceMetadata
-    var sourceCustomData: CustomData
+
+    /**
+     * TODO: proper docs
+     */
+    var customData: CustomData
 
     companion object Factory {
         /**

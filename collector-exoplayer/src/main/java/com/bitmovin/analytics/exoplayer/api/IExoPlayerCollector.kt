@@ -17,9 +17,13 @@ import com.google.android.exoplayer2.ExoPlayer
  */
 interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
 
-    // TODO: proper docs
+    /**
+     * SourceMetadata is used to enrich the analytics data with source specific
+     * metadata.
+     */
     var sourceMetadata: SourceMetadata
-    var sourceCustomData: CustomData
+
+    var customData: CustomData
 
     companion object Factory {
 
