@@ -4,9 +4,10 @@ import android.os.Bundle
 import android.view.Menu
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
@@ -72,20 +73,18 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.change_source).setOnClickListener {
             bitmovinPlayerCollector?.detachPlayer()
-            val player = this.player
-
-            val bitmovinAnalyticsConfig = createBitmovinAnalyticsConfig()
-            bitmovinAnalyticsConfig.videoId = "DRMVideo-id"
-            bitmovinAnalyticsConfig.title = "DRM Video Title"
-
-            val collector = BitmovinPlayerCollector(bitmovinAnalyticsConfig, applicationContext)
-            this.bitmovinPlayerCollector = collector
-
-            collector.attachPlayer(player)
-            player.load(createDRMSourceConfig())
+            val drmSourceMetadata = SourceMetadata(
+                title = "DRM Video Title",
+                videoId = "drmVideoId",
+            )
+            val source = Source.create(createDRMSourceConfig())
+            this.bitmovinPlayerCollector?.setSourceMetadata(source, drmSourceMetadata)
+            this.bitmovinPlayerCollector?.attachPlayer(player)
+            this.player.load(source)
         }
 
         findViewById<Button>(R.id.seek_next_source).setOnClickListener {
+            // TODO: review this code to make it error proof
             currentPlaylistItemIndex++
             val nextSource = player.playlist.sources[currentPlaylistItemIndex]
             player.playlist.seek(nextSource, 10.0)
@@ -118,33 +117,49 @@ class MainActivity : AppCompatActivity() {
 
         player = Player.create(this, playerConfig).also { binding.playerView.player = it }
 
-        val collector = IBitmovinPlayerCollector.Factory.create(createBitmovinAnalyticsConfig(), applicationContext)
+        val analyticsConfig = AnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
+        val defaultMetadata = DefaultMetadata(
+            customUserId = "customBitmovinUserId1",
+            cdnProvider = CDNProvider.BITMOVIN,
+            customData = CustomData(
+                experimentName = "experiment-1",
+                customData1 = "customData1",
+                customData2 = "customData2",
+                customData3 = "customData3",
+                customData4 = "customData4",
+                customData5 = "customData5",
+                customData6 = "customData6",
+                customData7 = "customData7",
+            ),
+        )
+
+        val collector = IBitmovinPlayerCollector.Factory.create(applicationContext, analyticsConfig, defaultMetadata)
         this.bitmovinPlayerCollector = collector
 
         val redbullMetadata = SourceMetadata(
             videoId = "source-video-id",
             title = "redbull",
+            customData = CustomData(customData1 = "redbullSourceCustomData"),
         )
-        collector.addSourceMetadata(redbullSource, redbullMetadata)
+        collector.setSourceMetadata(redbullSource, redbullMetadata)
 
         val sintelMetadata = SourceMetadata(
             videoId = "source-video-id-2",
             title = "sintel",
+            customData = CustomData(customData1 = "sintelSourceCustomData"),
         )
-        collector.addSourceMetadata(sintelSource, sintelMetadata)
+        collector.setSourceMetadata(sintelSource, sintelMetadata)
 
         val liveSimMetadata = SourceMetadata(
-            videoId = "source-video-id",
+            videoId = "source-video-id-3",
             title = "livesims",
+            customData = CustomData(customData1 = "livesimsSourceCustomData"),
         )
-        collector.addSourceMetadata(liveSimSource, liveSimMetadata)
-
+        collector.setSourceMetadata(liveSimSource, liveSimMetadata)
         collector.attachPlayer(player)
 
-        // playlistConfig for casting
-        // val playlistConfig = PlaylistConfig(listOf(bbbSource, progresiveSource), PlaylistOptions())
         val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource), PlaylistOptions())
-        player.load(redbullSource)
+        player.load(playlistConfig)
     }
 
     override fun onStart() {
@@ -174,12 +189,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setCustomData() {
         val collector = bitmovinPlayerCollector ?: return
-
         val source = player.source ?: return
-
-        val customData = collector.getCustomData(source)
-
-        val changedCustomData = customData.copy(
+        val changedCustomData = collector.getCustomData(source).copy(
             customData2 = "custom_data_2_changed",
             customData4 = "custom_data_4_changed",
         )
@@ -193,29 +204,6 @@ class MainActivity : AppCompatActivity() {
         private val corruptedSource = Source.create(SourceConfig.fromUrl(Samples.CORRUPT_DASH.uri.toString()))
         private val bbbSource = Source.create(SourceConfig.fromUrl(Samples.BBB.uri.toString()))
         private val progresiveSource = Source.create(SourceConfig.fromUrl(Samples.PROGRESSIVE.uri.toString()))
-
-        private fun createBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {
-            /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
-            val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
-
-            bitmovinAnalyticsConfig.videoId = "androidVideoDASHStatic"
-            bitmovinAnalyticsConfig.title = "Android Bitmovin player video with DASH"
-            bitmovinAnalyticsConfig.customUserId = "customBitmovinUserId1"
-            bitmovinAnalyticsConfig.cdnProvider = CDNProvider.BITMOVIN
-            bitmovinAnalyticsConfig.experimentName = "experiment-1"
-            bitmovinAnalyticsConfig.customData1 = "customData1"
-            bitmovinAnalyticsConfig.customData2 = "customData2"
-            bitmovinAnalyticsConfig.customData3 = "customData3"
-            bitmovinAnalyticsConfig.customData4 = "customData4"
-            bitmovinAnalyticsConfig.customData5 = "customData5"
-            bitmovinAnalyticsConfig.customData6 = "customData6"
-            bitmovinAnalyticsConfig.customData7 = "customData7"
-            bitmovinAnalyticsConfig.path = "/vod/new/"
-            bitmovinAnalyticsConfig.ads = true
-            bitmovinAnalyticsConfig.isLive = false
-
-            return bitmovinAnalyticsConfig
-        }
 
         private fun createDRMSourceConfig(): SourceConfig {
             // Create a new source config

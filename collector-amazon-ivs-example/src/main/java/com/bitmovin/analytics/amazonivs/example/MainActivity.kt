@@ -1,19 +1,19 @@
 package com.bitmovin.analytics.amazonivs.example
 
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.amazonaws.ivs.player.Player
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.amazon.ivs.api.IAmazonIvsPlayerCollector
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.SourceMetadata
 
 // source: https://github.com/aws-samples/amazon-ivs-player-android-sample
 class MainActivity : AppCompatActivity() {
-    private val TAG = "MainActivity"
-
     private lateinit var playerController: IVSPlayerControlHelper
 
     // PlayerView is an easy to use wrapper around the MediaPlayer object.
@@ -37,14 +37,35 @@ class MainActivity : AppCompatActivity() {
             player,
         )
 
-        val config = createBitmovinAnalyticsConfig()
-        collector = IAmazonIvsPlayerCollector.Factory.create(config, applicationContext)
+        val analyticsConfig = AnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
+        val defaultMetadata = DefaultMetadata(
+            customUserId = "customBitmovinUserId1",
+            customData = CustomData(
+                experimentName = "experiment-1",
+                customData1 = "customData1",
+                customData2 = "customData2",
+                customData3 = "customData3",
+                customData4 = "customData4",
+                customData5 = "customData5",
+                customData6 = "customData6",
+                customData7 = "customData7",
+            ),
+        )
+        collector = IAmazonIvsPlayerCollector.Factory.create(applicationContext, analyticsConfig, defaultMetadata)
+        collector.sourceMetadata = SourceMetadata(
+            title = "ivs live stream 2",
+            cdnProvider = "amazon",
+            videoId = "ivsLiveVideoId",
+            path = "com.bitmovin.analytics.amazonivs.example.mainactivity",
+            m3u8Url = VideoSources.liveStream2Source.path,
+            customData = CustomData(customData1 = "customGenre"),
+        )
 
         collector.attachPlayer(player)
 
         // Set Listener for Player callback events
         addDebugListener()
-        loadSource()
+        player.load(VideoSources.liveStream2Source)
     }
 
     private fun initNewPlayer() {
@@ -53,10 +74,6 @@ class MainActivity : AppCompatActivity() {
         player.isMuted = true
         playerController.bindPlayer(player)
         collector.attachPlayer(player)
-    }
-
-    private fun loadSource(source: Uri = VideoSources.liveStream2Source) {
-        player.load(source)
     }
 
     private fun setupButtonClickListeners() {
@@ -68,11 +85,20 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.create_button).setOnClickListener {
             Log.d(TAG, "on_create_button_clicked")
             initNewPlayer()
-            loadSource()
+            player.load(VideoSources.liveStream2Source)
         }
         findViewById<Button>(R.id.change_source_button).setOnClickListener {
             Log.d(TAG, "on_change_source_button_clicked")
-            loadSource(VideoSources.liveStream2Source)
+            collector.detachPlayer()
+
+            collector.sourceMetadata = SourceMetadata(
+                title = "ivs live stream 1",
+                videoId = "ivs-live-stream-1",
+                m3u8Url = VideoSources.liveStream1Source.path,
+                customData = CustomData(customData1 = "customGenre"),
+            )
+            collector.attachPlayer(player)
+            player.load(VideoSources.liveStream1Source)
             player.play()
         }
         findViewById<Button>(R.id.custom_data_button).setOnClickListener {
@@ -82,7 +108,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-//        player.play()
+        player.play()
     }
 
     override fun onStop() {
@@ -99,24 +125,7 @@ class MainActivity : AppCompatActivity() {
         player.addListener(LoggingIVSPlayerEventListener(player))
     }
 
-    private fun createBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {
-        /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
-        val bitmovinAnalyticsConfig =
-            BitmovinAnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
-
-        bitmovinAnalyticsConfig.title = "Android Amazon IVS player video"
-        bitmovinAnalyticsConfig.customUserId = "customBitmovinUserId1"
-        bitmovinAnalyticsConfig.experimentName = "experiment-1"
-        bitmovinAnalyticsConfig.customData1 = "customData1"
-        bitmovinAnalyticsConfig.customData2 = "customData2"
-        bitmovinAnalyticsConfig.customData3 = "customData3"
-        bitmovinAnalyticsConfig.customData4 = "customData4"
-        bitmovinAnalyticsConfig.customData5 = "customData5"
-        bitmovinAnalyticsConfig.customData6 = "customData6"
-        bitmovinAnalyticsConfig.customData7 = "customData7"
-        bitmovinAnalyticsConfig.path = "/customPath/new/"
-        bitmovinAnalyticsConfig.m3u8Url = VideoSources.liveStream2Source.toString()
-
-        return bitmovinAnalyticsConfig
+    companion object {
+        const val TAG = "MainActivity"
     }
 }

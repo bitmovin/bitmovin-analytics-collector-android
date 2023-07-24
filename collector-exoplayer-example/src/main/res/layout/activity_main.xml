@@ -63,10 +63,10 @@
                     android:text="Change custom data" />
 
                 <Button
-                    android:id="@+id/set_custom_data_once"
+                    android:id="@+id/send_custom_data_event"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Set custom data once" />
+                    android:text="SEND CUSTOM DATA EVENT" />
             </TableRow>
 
         </TableLayout>
