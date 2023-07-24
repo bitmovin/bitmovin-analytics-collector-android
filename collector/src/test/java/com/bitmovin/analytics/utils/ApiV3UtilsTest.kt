@@ -4,6 +4,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.RetryPolicy
 import com.bitmovin.analytics.api.SourceMetadata
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
@@ -30,8 +31,7 @@ class ApiV3UtilsTest {
             adTrackingDisabled = true,
             randomizeUserId = true,
             backendUrl = "backendUrl",
-            inMemoryRetryEnabled = true,
-            longTermRetryEnabled = true,
+            retryPolicy = RetryPolicy.LONG_TERM,
         )
         assertThat(newConfig).isEqualTo(expectedConfig)
     }

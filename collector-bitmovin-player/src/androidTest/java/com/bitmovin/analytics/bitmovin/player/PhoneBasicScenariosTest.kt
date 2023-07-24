@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.RetryPolicy
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
@@ -869,8 +870,10 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_firstSessionOffline_ShouldSendOfflineSessionDataOnSecondOnlineSession() {
         // arrange
+        RetryPolicy.SHORT_TERM
+
         // simulate offline session through wrong backend url
-        val analyticsOfflineConfig = TestConfig.createAnalyticsConfig().copy(backendUrl = "https://nonexistingdomain123.com", longTermRetryEnabled = true)
+        val analyticsOfflineConfig = TestConfig.createAnalyticsConfig().copy(backendUrl = "https://nonexistingdomain123.com", retryPolicy = RetryPolicy.LONG_TERM)
         val offlineCollector = IBitmovinPlayerCollector.create(appContext, analyticsOfflineConfig)
         offlineCollector.setSourceMetadata(defaultSource, SourceMetadata(title = "offlineTitle"))
 

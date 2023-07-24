@@ -7,6 +7,7 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.RetryPolicy
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.persistence.EventDatabase
 import com.bitmovin.analytics.data.persistence.PersistentAnalyticsEventQueue
@@ -42,7 +43,7 @@ class LongtermRetryOnFailureTest {
     @Before
     fun setup() {
         LogParser.startTracking()
-        config = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", longTermRetryEnabled = true)
+        config = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM)
 
         bitmovinAnalytics = BitmovinAnalytics(
             config = config,

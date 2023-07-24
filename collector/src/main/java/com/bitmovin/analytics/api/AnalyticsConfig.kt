@@ -28,17 +28,37 @@ constructor(
     val backendUrl: String = DEFAULT_BACKEND_URL,
 
     /**
-     * Specifies if failed requests should be resent again. Without permanent storage.
+     * Specifies if failing analytics requests should be resent again.
      */
-    val inMemoryRetryEnabled: Boolean = false,
+    val retryPolicy: RetryPolicy = RetryPolicy.NO_RETRY,
 
-    /**
-     * Specifies if failed requests should be resent again. With permanent storage.
-     * See https://developer.bitmovin.com/playback/docs/is-tracking-of-analytics-data-support-in-offline-mode for more information.
-     */
-    val longTermRetryEnabled: Boolean = false,
 ) : Parcelable {
     companion object {
         internal const val DEFAULT_BACKEND_URL = "https://analytics-ingress-global.bitmovin.com/"
     }
+}
+
+enum class RetryPolicy {
+
+    // TODO: refine docs, and add link to docs explaining this in more detail.
+    /**
+     * No retry in case an analytics request cannot be sent to the analytics backend
+     */
+    NO_RETRY,
+
+    /**
+     * A failing request is retried for a maximum of 300 seconds, while the collector instance
+     * is still alive. The initial license call to verify the analytics license needs to be successful.
+     */
+    SHORT_TERM,
+
+    /**
+     * A failing request is retried for up to 14 days. The analytics request is stored
+     * permanently until it is sent successfully or the max lifetime is reached.
+     * This policy can be used for tracking of offline playback.
+     *
+     * See https://developer.bitmovin.com/playback/docs/is-tracking-of-analytics-data-support-in-offline-mode
+     * for more information.
+     */
+    LONG_TERM,
 }

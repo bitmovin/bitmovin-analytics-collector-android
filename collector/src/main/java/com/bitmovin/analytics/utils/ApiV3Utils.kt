@@ -4,6 +4,7 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.RetryPolicy
 import com.bitmovin.analytics.api.SourceMetadata
 
 object ApiV3Utils {
@@ -14,8 +15,7 @@ object ApiV3Utils {
             adTrackingDisabled = !bitmovinAnalyticsConfig.ads,
             randomizeUserId = bitmovinAnalyticsConfig.randomizeUserId,
             backendUrl = bitmovinAnalyticsConfig.config.backendUrl,
-            inMemoryRetryEnabled = bitmovinAnalyticsConfig.config.tryResendDataOnFailedConnection,
-            longTermRetryEnabled = bitmovinAnalyticsConfig.config.longTermRetryEnabled,
+            retryPolicy = bitmovinAnalyticsConfig.retryPolicy,
         )
     }
 
@@ -129,5 +129,11 @@ object ApiV3Utils {
             customData30 = mainCustomData?.customData30 ?: fallbackCustomData?.customData30,
             experimentName = mainCustomData?.experimentName ?: fallbackCustomData?.experimentName,
         )
+    }
+
+    private val BitmovinAnalyticsConfig.retryPolicy get() = when {
+        config.longTermRetryEnabled -> RetryPolicy.LONG_TERM
+        config.tryResendDataOnFailedConnection -> RetryPolicy.SHORT_TERM
+        else -> RetryPolicy.NO_RETRY
     }
 }

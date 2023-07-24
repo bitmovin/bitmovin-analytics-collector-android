@@ -5,6 +5,7 @@ import android.util.Log
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.api.RetryPolicy
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher
@@ -50,14 +51,13 @@ class BitmovinAnalytics(val config: AnalyticsConfig, val context: Context) : Lic
     )
 
     private val eventDataDispatcher = DebuggingEventDataDispatcher(
-        if (config.longTermRetryEnabled) {
+        if (config.retryPolicy == RetryPolicy.LONG_TERM) {
             PersistingAuthenticatedDispatcher(
                 context = context,
                 config = config,
                 callback = this,
                 backendFactory = BackendFactory(
                     eventQueue,
-                    true,
                 ),
                 licenseCall = DefaultLicenseCall(config, context),
                 eventQueue = eventQueue,
