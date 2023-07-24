@@ -984,21 +984,21 @@ class PhoneBasicScenariosTest {
         val customData5 = TestConfig.createDummyCustomData("customData5")
 
         mainScope.launch {
-            collector.sendCustomData(customData1) // since we are not attached this shouldn't be sent
+            collector.sendCustomDataEvent(customData1) // since we are not attached this shouldn't be sent
             collector.attachPlayer(defaultPlayer)
             defaultPlayer.load(defaultSource)
-            collector.sendCustomData(customData2)
+            collector.sendCustomDataEvent(customData2)
             defaultPlayer.play()
         }
 
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2001)
-        collector.sendCustomData(customData3)
+        collector.sendCustomDataEvent(customData3)
 
         mainScope.launch {
             defaultPlayer.pause()
-            collector.sendCustomData(customData4)
+            collector.sendCustomDataEvent(customData4)
             collector.detachPlayer()
-            collector.sendCustomData(customData5) // this event should not be sent since collector is detached
+            collector.sendCustomDataEvent(customData5) // this event should not be sent since collector is detached
         }
 
         Thread.sleep(300)

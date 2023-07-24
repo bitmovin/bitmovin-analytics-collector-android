@@ -31,7 +31,7 @@ interface AnalyticsCollector<TPlayer> {
 
     /**
      * setCustomDataOnce sends a sample with state='customdatachanged' containing the [customData].
-     * It does not change the permanently configured customData that is set through metadata or setCustomData.
+     * It does not change the configured customData that is set through defaultMetadata or sourceMetadata..
      *
      * More information can be found here:
      * https://developer.bitmovin.com/playback/docs/how-can-values-of-customdata-and-other-metadata-fields-be-changed
@@ -43,11 +43,11 @@ interface AnalyticsCollector<TPlayer> {
     fun setCustomDataOnce(customData: CustomData)
 
     /**
-     * sendCustomData sends a sample with state='customdatachanged' containing the [customData].
-     * It does not change the permanently configured customData that is set through defaultMetadata or sourceMetadata.
+     * sendCustomDataEvent sends a sample with state='customdatachanged' containing the [customData].
+     * It does not change the configured customData that is set through defaultMetadata or sourceMetadata.
      *
      * More information can be found here:
      * https://developer.bitmovin.com/playback/docs/how-can-values-of-customdata-and-other-metadata-fields-be-changed
      */
-    fun sendCustomData(customData: CustomData)
+    fun sendCustomDataEvent(customData: CustomData)
 }

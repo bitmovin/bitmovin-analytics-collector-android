@@ -120,11 +120,11 @@ class PhoneBasicScenariosTest {
         val customData5 = TestConfig.createDummyCustomData("customData5")
         // act
         mainScope.launch {
-            collector.sendCustomData(customData1) // since we are not attached this shouldn't be sent
+            collector.sendCustomDataEvent(customData1) // since we are not attached this shouldn't be sent
             collector.attachPlayer(player)
             player.setMediaItem(defaultMediaItem)
             player.prepare()
-            collector.sendCustomData(customData2)
+            collector.sendCustomDataEvent(customData2)
         }
 
         // we wait until player is in ready state before we call play to test this specific scenario
@@ -137,12 +137,12 @@ class PhoneBasicScenariosTest {
         ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2001)
 
         mainScope.launch {
-            collector.sendCustomData(customData3)
+            collector.sendCustomDataEvent(customData3)
             player.pause()
-            collector.sendCustomData(customData4)
+            collector.sendCustomDataEvent(customData4)
             collector.detachPlayer()
             player.release()
-            collector.sendCustomData(customData5) // this event should not be sent since collector is detached
+            collector.sendCustomDataEvent(customData5) // this event should not be sent since collector is detached
         }
 
         Thread.sleep(300)

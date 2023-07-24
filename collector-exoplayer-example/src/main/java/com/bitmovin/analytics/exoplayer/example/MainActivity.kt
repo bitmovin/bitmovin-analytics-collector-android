@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
             customData1 = "custom_data_1_changed_once",
             customData2 = "custom_data_2_changed_once",
         )
-        this.bitmovinAnalytics?.sendCustomData(customData)
+        this.bitmovinAnalytics?.sendCustomDataEvent(customData)
     }
 
     private fun createBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig {

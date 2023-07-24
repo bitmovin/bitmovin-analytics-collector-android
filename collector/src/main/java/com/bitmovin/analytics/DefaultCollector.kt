@@ -55,10 +55,10 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         ReplaceWith("sendCustomDataEvent(customData)"),
     )
     override fun setCustomDataOnce(customData: CustomData) {
-        this.sendCustomData(customData)
+        this.sendCustomDataEvent(customData)
     }
 
-    override fun sendCustomData(customData: CustomData) {
+    override fun sendCustomDataEvent(customData: CustomData) {
         // TODO: we might need to make sure this event is
         // handled by the main looper, since we might access to player from a different thread, which
         // could cause issues. (we should discuss thread safety in general with player folks)

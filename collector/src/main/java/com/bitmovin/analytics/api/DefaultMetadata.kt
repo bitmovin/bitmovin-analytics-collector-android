@@ -23,7 +23,7 @@ constructor(
      */
     val customUserId: String? = null,
     /**
-     * Free-form data that can be used to enrich the analytics data
+     * Free-form data that can be used to enrich the analytics data.
      * If customData is specified in SourceMetadata and DefaultMetadata
      * data is merged on a field basis with SourceMetadata taking precedence.
      */

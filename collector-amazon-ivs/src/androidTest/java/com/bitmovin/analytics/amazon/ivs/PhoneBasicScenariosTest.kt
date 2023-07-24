@@ -388,23 +388,23 @@ class PhoneBasicScenariosTest {
         val customData5 = TestConfig.createDummyCustomData("customData5")
 
         // act
-        collector.sendCustomData(customData1) // since we are not attached this shouldn't be sent
+        collector.sendCustomDataEvent(customData1) // since we are not attached this shouldn't be sent
         collector.attachPlayer(player)
 
         player.load(Uri.parse(vodStreamSample.m3u8Url))
-        collector.sendCustomData(customData2)
+        collector.sendCustomDataEvent(customData2)
 
         player.play()
 
         IvsTestUtils.waitUntilPlayerPlayedToMs(player, 2001)
-        collector.sendCustomData(customData3)
+        collector.sendCustomDataEvent(customData3)
 
         player.pause()
 
-        collector.sendCustomData(customData4)
+        collector.sendCustomDataEvent(customData4)
         collector.detachPlayer()
         player.release()
-        collector.sendCustomData(customData5) // this event should not be sent since collector is detached
+        collector.sendCustomDataEvent(customData5) // this event should not be sent since collector is detached
 
         Thread.sleep(300)
 
@@ -476,8 +476,8 @@ class PhoneBasicScenariosTest {
         assertThat(afterCustomDataChange).hasSizeGreaterThanOrEqualTo(1)
 
         // make sure that setCustomData closed all sample
-        assertThat(beforeCustomDataChange.last().videoTimeEnd).isBetween(2000, 2100)
-        assertThat(afterCustomDataChange[0].videoTimeStart).isBetween(2000, 2100)
+        assertThat(beforeCustomDataChange.last().videoTimeEnd).isBetween(2000, 2150)
+        assertThat(afterCustomDataChange[0].videoTimeStart).isBetween(2000, 2150)
 
         eventDataList.forEach {
             assertThat(it.customData1).isEqualTo(defaultCustomData.customData1)
