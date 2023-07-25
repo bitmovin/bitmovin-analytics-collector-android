@@ -36,7 +36,7 @@ And this line, depending on your player version, to your main project `build.gra
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:2.18.0'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:3.0.0'
 }
 ```
 
@@ -70,7 +70,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:2.18.0'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:3.0.0'
 }
 ```
 
@@ -130,7 +130,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-amazon-ivs:2.18.0'
+    implementation 'com.bitmovin.analytics:collector-amazon-ivs:3.0.0'
 }
 ```
 
@@ -146,11 +146,11 @@ The following example creates a BitmovinAnalyticsCollector object and attaches a
 ### Basic analytics monitoring with Bitmovin Player SDK
 
 ```kotlin
-// Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key and (optionally) your Bitmovin Player Key
-val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>", "<BITMOVIN_PLAYER_KEY>")
+// Create an AnalyticsConfig using your Bitmovin analytics license key (minimal config required)
+val analyticsConfig = AnalyticsConfig("<BITMOVIN_ANALYTICS_LICENSE_KEY>")
 
-// Create a BitmovinPlayerCollector object using the BitmovinAnalyitcsConfig you just created
-val analyticsCollector = IBitmovinPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext())
+// Create Analytics Collector for Bitmovin Player
+val analyticsCollector = IBitmovinPlayerCollector.Factory.create(getApplicationContext(), analyticsConfig)
 
 // Attach your player instance
 analyticsCollector.attachPlayer(player)
@@ -162,11 +162,11 @@ analyticsCollector.detachPlayer()
 ### Basic analytics monitoring with ExoPlayer
 
 ```kotlin
-// Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key
-val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>")
+// Create an AnalyticsConfig using your Bitmovin analytics license key (minimal config required)
+val analyticsConfig = AnalyticsConfig("<BITMOVIN_ANALYTICS_LICENSE_KEY>")
 
 // Create Analytics Collector for ExoPlayer
-val analyticsCollector = IExoPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext())
+val analyticsCollector = IExoPlayerCollector.Factory.create(getApplicationContext(), analyticsConfig)
 
 // Attach your ExoPlayer instance
 analyticsCollector.attachPlayer(player)
@@ -178,11 +178,11 @@ analyticsCollector.detachPlayer()
 ### Basic analytics monitoring with Amazon IVS Player SDK
 
 ```kotlin
-// Create a BitmovinAnalyticsConfig using your Bitmovin analytics license key
-val bitmovinAnalyticsConfig = BitmovinAnalyticsConfig("<BITMOVIN_ANALYTICS_KEY>")
+// Create an AnalyticsConfig using your Bitmovin analytics license key (minimal config required)
+val analyticsConfig = AnalyticsConfig("<BITMOVIN_ANALYTICS_LICENSE_KEY>")
 
 // Create Analytics Collector for Amazon IVS Player
-val analyticsCollector = IAmazonIvsPlayerCollector.Factory.create(bitmovinAnalyticsConfig, getApplicationContext())
+val analyticsCollector = IAmazonIvsPlayerCollector.Factory.create(getApplicationContext(), analyticsConfig)
 
 // Attach your Amazon IVS Player instance
 analyticsCollector.attachPlayer(player)
@@ -191,39 +191,107 @@ analyticsCollector.attachPlayer(player)
 analyticsCollector.detachPlayer()
 ```
 
-### Switching to a new video
+### Switching to a new Video with Bitmovin Player SDK
 
 When switching to a new video we recommend that you follow the sequence of events below.
 
 ```kotlin
+
 //Detach your player when the first video is completed
 analyticsCollector.detachPlayer()
 
-//Update your config with new optional parameters related to the new video playback
-bitmovinAnalyticsConfig.videoId = "newVideoId"
-bitmovinAnalyticsConfig.customData1 = "newCustomData"
+//Set the SourceMetadata for the new source
+val sourceMetadata = SourceMetadata(
+    title = "newTitle",
+    videoId = "newVideoId",
+
+    customData = CustomData(
+        customData1 = "genre:action",
+    )
+)
+
+analyticsCollector.setSourceMetadata(source, sourceMetadata)
 
 //Reattach your player instance
 analyticsCollector.attachPlayer(newPlayer)
+
+// Load new source after attaching
+player.load(source)
 ```
+
+### Switching to a new Video with ExoPlayer and Amazon IVS Player SDK
+
+When switching to a new video we recommend that you follow the sequence of events below.
+
+```kotlin
+
+//Detach your player when the first video is completed
+analyticsCollector.detachPlayer()
+
+//Set the SourceMetadata for the new source
+val sourceMetadata = SourceMetadata(
+    title = "newTitle",
+    videoId = "newVideoId",
+
+    customData = CustomData(
+        customData1 = "genre:action",
+    )
+)
+
+analyticsCollector.setSourceMetadata(sourceMetadata)
+
+//Reattach your player instance
+analyticsCollector.attachPlayer(newPlayer)
+
+//Load new source after attaching
+```
+
 
 ### Optional Configuration Parameters
 
 ```kotlin
-bitmovinAnalyticsConfig.title = "videoTitle1234"
-bitmovinAnalyticsConfig.videoId = "videoId1234"
-bitmovinAnalyticsConfig.cdnProvider = CDNProvider.BITMOVIN
-bitmovinAnalyticsConfig.isLive= false
-bitmovinAnalyticsConfig.experimentName = "experiment-1"
-bitmovinAnalyticsConfig.customUserId = "customUserId1"
-bitmovinAnalyticsConfig.customData1 = "customData1"
-bitmovinAnalyticsConfig.customData2 = "customData2"
-bitmovinAnalyticsConfig.customData3 = "customData3"
-bitmovinAnalyticsConfig.customData4 = "customData4"
-bitmovinAnalyticsConfig.customData5 = "customData5"
-bitmovinAnalyticsConfig.path = "path"
-bitmovinAnalyticsConfig.ads = false
-bitmovinAnalyticsConfig.randomizeUserId = false
+val analyticsConfig = AnalyticsConfig(
+    licenseKey = "<BITMOVIN_ANALYTICS_LICENSE_KEY>",    // mandatory
+    disableAdsTracking = false,                         // default is false
+    randomizeUserId = false,                            // default is false
+    retryPolicy = RetryPolicy.NO_RETRY,                 // default is NO_RETRY, other options are SHORT_TERM and LONG_TERM
+)
+
+// DefaultMetadata is optional metadata that can be used to enrich analytics data with metadata
+// that is not source specific. In case fields are present on sourceMetadata and defaultMetadata,
+// sourceMetadata takes precedence.
+val defaultMetadata = DefaultMetadata(
+    customUserId = "customUserId",
+    cdnProvider = "bitmovin",
+    customData = CustomData(
+        customData1 = "defaultCustomData1",
+        customData2 = "defaultCustomData2",
+        customData3 = "defaultCustomData3",
+        customData4 = "defaultCustomData4",
+        customData5 = "defaultCustomData5",
+        experimentName = "experiment-1",
+    )
+)
+
+// SourceMetadata is optional metadata that can be used to enrich analytics data with metadata
+// that is specific to the source.
+val sourceMetadata = SourceMetadata(
+    title = "videoTitle1234",
+    videoId = "videoId1234",
+    cdnProvider = CDNProvider.BITMOVIN,
+    path = "package.mainactivity",
+    isLive = true,
+    m3u8Url = "sourceUrl",  // TODO: adapt when sourceConfig? is implemented
+    customData = CustomData(
+        customData1 = "sourceCustomData1",
+        customData2 = "sourceCustomData2",
+        customData3 = "sourceCustomData3",
+        customData4 = "sourceCustomData4",
+        customData5 = "sourceCustomData5",
+        experimentName = "experiment-1",
+    ),
+)
+
 ```
 
 A [full example app](https://github.com/bitmovin/bitmovin-analytics-collector-android/tree/main/collector-bitmovin-player-example) can be seen in the github repo.
