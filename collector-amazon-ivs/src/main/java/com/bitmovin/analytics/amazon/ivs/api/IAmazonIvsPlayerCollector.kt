@@ -24,7 +24,9 @@ interface IAmazonIvsPlayerCollector : AnalyticsCollector<Player> {
     var sourceMetadata: SourceMetadata
 
     /**
-     * TODO: proper docs
+     * Setting customData through this property will close the current measurement with the old
+     * customData and start a new measurement with the new customData, in case the player is playing or
+     * in paused state.
      */
     var customData: CustomData
 

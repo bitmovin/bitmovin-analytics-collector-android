@@ -18,28 +18,41 @@ import com.bitmovin.player.api.source.Source
 interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
 
     /**
-     * Used to configure source specific metadata that is
-     * active when the specified source is loaded into the player.
-     *
-     * This allows for example to use the Playlist feature of the bitmovin player
-     * and send source metadata that is specific for each source in the playlist.
+     * Setting source specific metadata that is used to enrich the analytics data
+     * when the player plays the specified source.
      */
-
     @Deprecated(
         "Use setSourceMetadata instead",
         ReplaceWith("setSourceMetadata(playerSource, sourceMetadata)"),
     )
     fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
 
-    // TODO: add proper method description
-
+    /**
+     * Setting source specific metadata that is used to enrich the analytics data
+     * when the player plays the specified source.
+     */
     fun setSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
 
-    // TODO: add proper method description
+    /**
+     * Gets the configured source metadata for the specified source.
+     */
     fun getSourceMetadata(playerSource: Source): SourceMetadata
 
+    /**
+     * Setting custom data that is used to enrich the analytics data
+     * when the player plays the specified source.
+     *
+     * Setting custom data through this setter, will close the current sample with the old
+     * customData and start a new sample with the new customData, in case the player is playing
+     * or in paused state.
+     *
+     * More info can be found here:
+     */
     fun setCustomData(playerSource: Source, customData: CustomData)
 
+    /**
+     * Gets the configured custom data for the specified source.
+     */
     fun getCustomData(playerSource: Source): CustomData
 
     companion object Factory {

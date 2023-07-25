@@ -152,6 +152,71 @@ class ApiV3UtilsTest {
     }
 
     @Test
+    fun test_mergeSourceMetadata_mergedFieldsCorrectly1() {
+        // arrange
+        val sourceMetadata = SourceMetadata(
+            title = "title",
+            videoId = "videoId",
+            path = "path",
+            cdnProvider = "cdnProvider",
+            mpdUrl = "mpdUrl",
+            m3u8Url = "m3u8Url",
+            isLive = true,
+            progUrl = "progUrl",
+            customData = createDummyCustomData("test"),
+        )
+
+        val defaultMetadata = DefaultMetadata(
+            customUserId = "customUserId",
+            customData = createDummyCustomData("fallback"),
+            cdnProvider = "cdnProvider",
+        )
+
+        // act
+        val mergedSourceMetadata = ApiV3Utils.mergeSourceMetadata(sourceMetadata = sourceMetadata, defaultMetadata = defaultMetadata)
+
+        // assert
+        // since all fields are set in SourceMetadata, defaultMetadata shouldn't be used
+        assertThat(mergedSourceMetadata).isEqualTo(sourceMetadata)
+    }
+
+    @Test
+    fun test_mergeSourceMetadata_mergedFieldsCorrectly2() {
+        // arrange
+        val sourceMetadata = SourceMetadata(
+            title = "title",
+            videoId = "videoId",
+            path = "path",
+            mpdUrl = "mpdUrl",
+            m3u8Url = "m3u8Url",
+            progUrl = "progUrl",
+            customData = CustomData(customData1 = "test1", customData30 = "test30"),
+        )
+
+        val defaultMetadata = DefaultMetadata(
+            customUserId = "customUserId",
+            customData = createDummyCustomData("fallback"),
+            cdnProvider = "cdnProviderFallback",
+        )
+
+        val expectedCustomData = defaultMetadata.customData.copy(
+            customData1 = "test1",
+            customData30 = "test30",
+        )
+        val expectedSourceMetadata = sourceMetadata.copy(
+            cdnProvider = "cdnProviderFallback",
+            customData = expectedCustomData,
+        )
+
+        // act
+        val mergedSourceMetadata = ApiV3Utils.mergeSourceMetadata(sourceMetadata = sourceMetadata, defaultMetadata = defaultMetadata)
+
+        // assert
+        // since all fields are set in SourceMetadata, defaultMetadata shouldn't be used
+        assertThat(mergedSourceMetadata).isEqualTo(expectedSourceMetadata)
+    }
+
+    @Test
     fun test_mergeCustomData_mergesFieldsCorrectly1() {
         // arrage
         val mainCustomData = createDummyCustomData("test")

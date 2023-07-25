@@ -13,13 +13,14 @@ import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import com.bitmovin.analytics.data.UserIdProvider
 import com.bitmovin.analytics.utils.ApiV3Utils
 
-// TODO: annotation?
 abstract class DefaultCollector<TPlayer> protected constructor(
     val config: AnalyticsConfig,
     context: Context,
+    protected val metadataProvider: MetadataProvider = MetadataProvider(),
 ) : AnalyticsCollector<TPlayer> {
-    protected val analytics by lazy { BitmovinAnalytics(config, context) }
-    protected val metadataProvider = MetadataProvider()
+
+    // TODO: why is this lazy and not port of the constructor for easier testing?
+    protected open val analytics by lazy { BitmovinAnalytics(config, context) }
 
     protected val userIdProvider: UserIdProvider =
         if (config.randomizeUserId) {
@@ -35,6 +36,25 @@ abstract class DefaultCollector<TPlayer> protected constructor(
 
     override val userId: String
         get() = userIdProvider.userId()
+
+    var defaultMetadata: DefaultMetadata
+        get() = metadataProvider.defaultMetadata
+        set(value) {
+            metadataProvider.defaultMetadata = value
+        }
+
+    var customData: CustomData
+        get() = metadataProvider.getSourceMetadata()?.customData ?: CustomData()
+        set(newCustomData) {
+
+            val newActiveCustomData = ApiV3Utils.mergeCustomData(newCustomData, metadataProvider.defaultMetadata.customData)
+            if (newActiveCustomData != analytics.customData) {
+                analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
+            }
+
+            val newSourceMetadata = metadataProvider.getSourceMetadata()?.copy(customData = newCustomData) ?: SourceMetadata(customData = newCustomData)
+            metadataProvider.setSourceMetadata(newSourceMetadata)
+        }
 
     protected abstract fun createAdapter(
         player: TPlayer,
@@ -63,43 +83,6 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         // handled by the main looper, since we might access to player from a different thread, which
         // could cause issues. (we should discuss thread safety in general with player folks)
         analytics.sendCustomDataEvent(customData)
-    }
-
-    var defaultMetadata: DefaultMetadata
-        get() = metadataProvider.defaultMetadata
-        set(value) {
-            metadataProvider.defaultMetadata = value
-        }
-
-    open fun setCustomDataForCurrentSource(customData: CustomData) {
-        // TODO: we might need to make sure this event is
-        // handled by the main looper (at least for exoplayer), since we might access to player from a different thread, which
-        // could cause issues. (we should discuss thread safety in general with player folks)
-
-        // if new customData merged with defaultMetadata is the same as the current active one (merged from sourceMetadata and defaultMetadata)
-        // we don't close the current sample since effectively nothing changed (this might save us a couple of samples)
-        // TODO: cover this with unittests
-        val newMergedCustomData = ApiV3Utils.mergeCustomData(customData, metadataProvider.defaultMetadata.customData)
-        if (newMergedCustomData != analytics.customData) {
-            analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
-        }
-        this.setCurrentSourceMetadata(this.getCurrentSourceMetadata().copy(customData = customData))
-    }
-
-    open fun getCustomDataOfCurrentSource(): CustomData {
-        return metadataProvider.getSourceMetadata()?.customData ?: CustomData()
-    }
-
-    protected fun getCurrentSourceCustomData(): CustomData {
-        return metadataProvider.getSourceMetadata()?.customData ?: CustomData()
-    }
-
-    protected fun setCurrentSourceMetadata(sourceMetadata: SourceMetadata) {
-        metadataProvider.setSourceMetadata(sourceMetadata)
-    }
-
-    protected fun getCurrentSourceMetadata(): SourceMetadata {
-        return metadataProvider.getSourceMetadata() ?: SourceMetadata()
     }
 
     fun setDeprecatedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) {

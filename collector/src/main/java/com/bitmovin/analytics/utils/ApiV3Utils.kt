@@ -76,8 +76,6 @@ object ApiV3Utils {
             // defaultMetadata to mimic the API v2 behaviour
         )
     }
-
-    // TODO: write unittest test in case we decide to merge customData for sendCustomDataEvent
     fun mergeSourceMetadata(
         sourceMetadata: SourceMetadata?,
         defaultMetadata: DefaultMetadata?,

@@ -103,6 +103,9 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
     override fun setCustomData(playerSource: Source, customData: CustomData) {
         // we cannot put this logic into the adapter since the adapter is created on attaching
         // and this method might be called earlier
+
+        // TODO: only close if customData changed
+        // TODO: verify when isActive was added to player API
         if (playerSource.isActive) {
             analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
         }

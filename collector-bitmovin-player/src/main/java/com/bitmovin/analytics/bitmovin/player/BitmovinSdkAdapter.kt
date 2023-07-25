@@ -272,6 +272,7 @@ internal class BitmovinSdkAdapter(
             }
         }
 
+        // TODO: we probably don't need to check metadataprovider getSourceMetadata() since this will always be null for bitmovin player
         return metadataProvider.getSourceMetadata() ?: SourceMetadata()
     }
 

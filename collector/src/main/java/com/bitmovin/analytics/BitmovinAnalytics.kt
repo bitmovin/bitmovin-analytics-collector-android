@@ -154,7 +154,6 @@ class BitmovinAnalytics(val config: AnalyticsConfig, val context: Context) : Lic
         }
 
         val mergedSourceMetadata = ApiV3Utils.mergeSourceMetadata(playerAdapter.getCurrentSourceMetadata(), playerAdapter.defaultMetadata)
-        // TODO: we probably don't want to merge here
         val mergedCustomData = ApiV3Utils.mergeCustomData(customData, mergedSourceMetadata.customData)
         val activeSourceMetadata = mergedSourceMetadata.copy(customData = mergedCustomData)
         val eventData = playerAdapter.createEventDataForCustomDataEvent(activeSourceMetadata)

@@ -6,7 +6,6 @@ import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
-import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
@@ -35,12 +34,6 @@ class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
         get() = metadataProvider.getSourceMetadata() ?: SourceMetadata()
         set(value) {
             metadataProvider.setSourceMetadata(value)
-        }
-
-    override var customData: CustomData
-        get() = super.getCustomDataOfCurrentSource()
-        set(value) {
-            super.setCustomDataForCurrentSource(value)
         }
 
     @Deprecated(
