@@ -316,9 +316,7 @@ class PhoneBasicScenariosTest {
 
         assertThat(customDataChangeEvents.size).isEqualTo(1)
 
-        // TODO: do we want to merge with existing customData or do we want to just use what was specified in setCustomDataOnce?
         val expectedCustomData = MetadataUtils.mergeCustomData(customDataSentOnce, ApiV3Utils.extractDefaultMetadata(defaultAnalyticsConfig).customData)
-        // DataVerifier.verifyCustomData(customDataChangeEvents[0], customDataSentOnce)
         DataVerifier.verifyCustomData(customDataChangeEvents[0], expectedCustomData)
 
         otherEvents.forEach { DataVerifier.verifyAnalyticsConfig(it, defaultAnalyticsConfig) }

@@ -40,7 +40,7 @@ import com.google.android.exoplayer2.source.hls.HlsManifest
 import com.google.android.exoplayer2.source.hls.playlist.HlsMultivariantPlaylist
 import java.util.Date
 
-// TODO: refactor this class (move listener in different class, move manipulator in differnet class)
+// TODO: refactor this class (move listener in different class, move manipulator in different class)
 internal class ExoPlayerAdapter(
     private val exoplayer: ExoPlayer,
     config: AnalyticsConfig,

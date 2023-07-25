@@ -20,7 +20,7 @@ class DefaultCollectorTest {
 
         val defaultCollector = DummyCollector(AnalyticsConfig("fakeLicense"), mockk(relaxed = true), mockedMetadataProvider, mockedBitmovinAnalytics)
         every { mockedMetadataProvider.defaultMetadata.customData }.returns(CustomData(customData2 = "test2", customData29 = "test29"))
-        every { mockedBitmovinAnalytics.customData }.returns(CustomData(customData2 = "test2", customData29 = "test29"))
+        every { mockedBitmovinAnalytics.activeCustomData }.returns(CustomData(customData2 = "test2", customData29 = "test29"))
 
         // act
         defaultCollector.customData = CustomData(customData1 = "test1", customData30 = "test30")
@@ -37,7 +37,7 @@ class DefaultCollectorTest {
         val defaultCollector = DummyCollector(AnalyticsConfig("fakeLicense"), mockk(relaxed = true), mockedMetadataProvider, mockedBitmovinAnalytics)
 
         every { mockedMetadataProvider.defaultMetadata.customData }.returns(CustomData(customData2 = "test2", customData29 = "test29"))
-        every { mockedBitmovinAnalytics.customData }.returns(CustomData(customData2 = "test2", customData29 = "test29"))
+        every { mockedBitmovinAnalytics.activeCustomData }.returns(CustomData(customData2 = "test2", customData29 = "test29"))
 
         // act
         defaultCollector.customData = CustomData(customData2 = "test2", customData29 = "test29")

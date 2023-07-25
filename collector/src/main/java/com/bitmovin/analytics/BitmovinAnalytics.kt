@@ -135,7 +135,7 @@ class BitmovinAnalytics(val config: AnalyticsConfig, val context: Context) : Lic
         playerAdapter?.resetSourceRelatedState()
     }
 
-    val customData: CustomData
+    val activeCustomData: CustomData
         get() {
             val sourceMetadata = playerAdapter?.getCurrentSourceMetadata()
             val defaultMetadata = playerAdapter?.defaultMetadata

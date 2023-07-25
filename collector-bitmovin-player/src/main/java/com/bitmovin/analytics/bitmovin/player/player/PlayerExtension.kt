@@ -25,7 +25,7 @@ internal fun Player.attachCollector() = maybeExtensionPoint?.run {
         throw IllegalStateException("Collector already attached to player")
     }
 
-    addPlugin(CollectorPlayerPlugin())
+    this.addPlugin(CollectorPlayerPlugin())
 }
 
 /** Mark a [Player] as detached from any collector. */

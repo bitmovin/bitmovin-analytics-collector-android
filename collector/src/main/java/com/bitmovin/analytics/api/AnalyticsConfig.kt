@@ -40,7 +40,6 @@ constructor(
 
 enum class RetryPolicy {
 
-    // TODO: refine docs, and add link to docs explaining this in more detail.
     /**
      * No retry in case an analytics request cannot be sent to the analytics backend
      */

@@ -19,7 +19,7 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     protected val metadataProvider: MetadataProvider = MetadataProvider(),
 ) : AnalyticsCollector<TPlayer> {
 
-    // TODO: why is this lazy and not port of the constructor for easier testing?
+    // TODO: why is this lazy and not part of the constructor for easier testing?
     protected open val analytics by lazy { BitmovinAnalytics(config, context) }
 
     protected val userIdProvider: UserIdProvider =
@@ -48,7 +48,7 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         set(newCustomData) {
 
             val newActiveCustomData = ApiV3Utils.mergeCustomData(newCustomData, metadataProvider.defaultMetadata.customData)
-            if (newActiveCustomData != analytics.customData) {
+            if (newActiveCustomData != analytics.activeCustomData) {
                 analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
             }
 
