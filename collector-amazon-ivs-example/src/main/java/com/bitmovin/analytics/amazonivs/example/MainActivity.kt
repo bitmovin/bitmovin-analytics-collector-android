@@ -103,6 +103,8 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.custom_data_button).setOnClickListener {
             Log.d(TAG, "on_custom_data_button_clicked")
+            val newCustomData = collector.customData.copy(customData1 = "changedCustomData1")
+            collector.customData = newCustomData
         }
     }
 
