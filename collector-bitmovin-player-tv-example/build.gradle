@@ -28,6 +28,13 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute module('com.bitmovin.analytics:collector') using project(':collector') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
+        substitute module('com.bitmovin.analytics:collector-bitmovin-player') using project(':collector-bitmovin-player') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
+    }
+}
+
 dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.leanback:leanback:1.0.0'

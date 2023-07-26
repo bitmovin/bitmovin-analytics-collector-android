@@ -84,9 +84,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.seek_next_source).setOnClickListener {
-            // TODO: review this code to make it error proof
             currentPlaylistItemIndex++
-            val nextSource = player.playlist.sources[currentPlaylistItemIndex]
+            val playListSize = player.playlist.sources.size
+            val nextSource = player.playlist.sources[currentPlaylistItemIndex % playListSize]
             player.playlist.seek(nextSource, 10.0)
         }
 

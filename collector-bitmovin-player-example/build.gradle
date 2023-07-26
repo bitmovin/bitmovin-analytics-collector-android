@@ -39,9 +39,9 @@ android {
 
 // we need to exclude the bitmovin player analytics module since we work with a local development version
 // otherwise we would run into dex errors due to duplicate classes
-// TODO: this doesn't work on the examples yet, needs to be fixed!!
 configurations.all {
     resolutionStrategy.dependencySubstitution {
+        substitute module('com.bitmovin.analytics:collector') using project(':collector') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
         substitute module('com.bitmovin.analytics:collector-bitmovin-player') using project(':collector-bitmovin-player') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
     }
 }
