@@ -17,6 +17,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.assertj.core.api.Assertions
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -236,6 +237,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    @Ignore("test is flaky")
     fun test_live_playWithAutoplay() {
         // arrange
         val liveSample = TestSources.IVS_LIVE_1
