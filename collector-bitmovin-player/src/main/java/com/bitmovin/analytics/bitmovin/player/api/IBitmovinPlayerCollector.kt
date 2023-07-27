@@ -18,7 +18,7 @@ import com.bitmovin.player.api.source.Source
 interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
 
     /**
-     * Setting source specific metadata that is used to enrich the analytics data
+     * Setter for source specific [sourceMetadata] that is used to enrich the analytics data
      * when the player plays the specified source.
      */
     @Deprecated(
@@ -28,25 +28,22 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
     fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
 
     /**
-     * Setting source specific metadata that is used to enrich the analytics data
+     * Setter for source specific [sourceMetadata] that is used to enrich the analytics data
      * when the player plays the specified source.
      */
     fun setSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
 
     /**
-     * Gets the configured source metadata for the specified source.
+     * Gets the configured [SourceMetadata] for the specified source.
      */
     fun getSourceMetadata(playerSource: Source): SourceMetadata
 
     /**
-     * Setting custom data that is used to enrich the analytics data
-     * when the player plays the specified source.
+     * Sets [customData] of the [SourceMetadata] for the specified source.
      *
-     * Setting custom data through this setter, will close the current sample with the old
-     * customData and start a new sample with the new customData, in case the player is playing
-     * or in paused state.
-     *
-     * More info can be found here:
+     * Setting customData through this setter will close the current measurement with the old
+     * customData and start a new measurement with the new customData, in case the specified source
+     * is active and playing or in paused.
      */
     fun setCustomData(playerSource: Source, customData: CustomData)
 
@@ -81,7 +78,8 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
         }
 
         /**
-         * Creates a collector instance configured via the provided [analyticsConfig] and using the provided [defaultMetadata].
+         * Creates a collector instance configured via the provided [analyticsConfig], and the
+         * optional [defaultMetadata].
          */
         @JvmStatic
         @JvmOverloads

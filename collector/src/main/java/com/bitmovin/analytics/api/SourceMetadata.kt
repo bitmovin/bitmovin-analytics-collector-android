@@ -11,7 +11,7 @@ data class SourceMetadata
 @JvmOverloads
 constructor(
     /**
-     * Human readable title of the video asset currently playing
+     * Human readable title of the source.
      */
     val title: String? = null,
     /**
@@ -23,9 +23,8 @@ constructor(
      * If field is specified in SourceMetadata and DefaultMetadata, SourceMetadata takes precedence.
      */
     val cdnProvider: String? = null,
-
     /**
-     * Breadcrumb path
+     * Breadcrumb within the app. For example, the name of the current activity.
      */
     val path: String? = null,
     /**

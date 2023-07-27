@@ -13,12 +13,12 @@ constructor(
     val licenseKey: String,
 
     /**
-     * Value indicating if ads tracking is disabled.
+     * Value indicating if ad tracking is disabled.
      */
     val adTrackingDisabled: Boolean = false,
 
     /**
-     * Generate random UserId value for session
+     * Generate a random UserId for the session
      */
     val randomizeUserId: Boolean = false,
 
@@ -28,7 +28,8 @@ constructor(
     val backendUrl: String = DEFAULT_BACKEND_URL,
 
     /**
-     * Specifies if failing analytics requests should be resent again.
+     * Specifies the retry behavior in case an analytics request cannot be sent to the analytics backend.
+     * See [RetryPolicy] for the available settings.
      */
     val retryPolicy: RetryPolicy = RetryPolicy.NO_RETRY,
 

@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig;
 import com.bitmovin.analytics.api.AnalyticsConfig;
+import com.bitmovin.analytics.api.DefaultMetadata;
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector;
 
 import org.junit.Assert;
@@ -31,12 +32,19 @@ public class IBitmovinPlayerCollectorJavaTest {
     public void testFactory_shouldCreateNewCollectorObjectWithAnalyticsConfig() {
         AnalyticsConfig analyticsConfig = new AnalyticsConfig("analytics_key");
         Context context = TestUtils.Companion.createMockContext();
+        DefaultMetadata defaultMetadata = new DefaultMetadata();
 
-        IBitmovinPlayerCollector collector = IBitmovinPlayerCollector.Factory.create(context, analyticsConfig);
+        IBitmovinPlayerCollector collector = IBitmovinPlayerCollector.Factory.create(context, analyticsConfig, defaultMetadata);
         Assert.assertNotNull(collector);
 
-        IBitmovinPlayerCollector collector2 = IBitmovinPlayerCollector.create(context, analyticsConfig);
+        IBitmovinPlayerCollector collector2 = IBitmovinPlayerCollector.create(context, analyticsConfig, defaultMetadata);
         Assert.assertNotNull(collector2);
+
+        IBitmovinPlayerCollector collector3 = IBitmovinPlayerCollector.Factory.create(context, analyticsConfig);
+        Assert.assertNotNull(collector3);
+
+        IBitmovinPlayerCollector collector4 = IBitmovinPlayerCollector.create(context, analyticsConfig);
+        Assert.assertNotNull(collector4);
     }
 
     @Test

@@ -18,12 +18,14 @@ import com.google.android.exoplayer2.ExoPlayer
 interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
 
     /**
-     * SourceMetadata is used to enrich the analytics data with source specific
+     * The [sourceMetadata] which is used to enrich the analytics data with source specific
      * metadata.
      */
     var sourceMetadata: SourceMetadata
 
     /**
+     * CustomData accessor to the current configured [sourceMetadata]
+     *
      * Setting customData through this property will close the current measurement with the old
      * customData and start a new measurement with the new customData, in case the player is playing or
      * in paused state.
@@ -57,10 +59,14 @@ interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
             return collector
         }
 
+        /**
+         * Creates a collector instance configured via the provided [analyticsConfig], and the
+         * optional [defaultMetadata].
+         */
         @JvmStatic
         @JvmOverloads
-        fun create(context: Context, config: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IExoPlayerCollector {
-            val collector = ExoPlayerCollector(config, context)
+        fun create(context: Context, analyticsConfig: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IExoPlayerCollector {
+            val collector = ExoPlayerCollector(analyticsConfig, context)
             collector.defaultMetadata = defaultMetadata
             return collector
         }

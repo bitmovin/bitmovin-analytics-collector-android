@@ -2,6 +2,7 @@ package com.bitmovin.analytics.bitmovin.player
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import io.mockk.mockk
 import org.junit.Test
@@ -25,6 +26,10 @@ class IBitmovinPlayerCollectorKotlinTest {
         val analyticsConfig = AnalyticsConfig("analytics_key")
         IBitmovinPlayerCollector.Factory.create(mockk(relaxed = true), analyticsConfig)
         IBitmovinPlayerCollector.create(mockk(relaxed = true), analyticsConfig)
+
+        val defaultMetadata = DefaultMetadata()
+        IBitmovinPlayerCollector.Factory.create(mockk(relaxed = true), analyticsConfig, defaultMetadata)
+        IBitmovinPlayerCollector.create(mockk(relaxed = true), analyticsConfig, defaultMetadata)
     }
 
     @Test

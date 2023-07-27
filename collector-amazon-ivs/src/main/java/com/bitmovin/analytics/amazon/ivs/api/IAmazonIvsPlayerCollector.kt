@@ -2,14 +2,12 @@ package com.bitmovin.analytics.amazon.ivs.api
 
 import android.content.Context
 import com.amazonaws.ivs.player.Player
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.amazon.ivs.AmazonIvsPlayerCollector
 import com.bitmovin.analytics.api.AnalyticsCollector
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.Util
 
 /**
@@ -18,12 +16,14 @@ import com.bitmovin.analytics.utils.Util
 interface IAmazonIvsPlayerCollector : AnalyticsCollector<Player> {
 
     /**
-     * SourceMetadata is used to enrich the analytics data with source specific
+     * The [sourceMetadata] which is used to enrich the analytics data with source specific
      * metadata.
      */
     var sourceMetadata: SourceMetadata
 
     /**
+     * CustomData accessor to the current configured [sourceMetadata]
+     *
      * Setting customData through this property will close the current measurement with the old
      * customData and start a new measurement with the new customData, in case the player is playing or
      * in paused state.
@@ -39,18 +39,10 @@ interface IAmazonIvsPlayerCollector : AnalyticsCollector<Player> {
         @JvmStatic
         val sdkVersion = Util.analyticsVersion
 
-        @JvmStatic
-        @Deprecated(
-            "Use IAmazonIvsPlayerCollector.Factory.create(context, analyticsConfig) instead",
-            replaceWith = ReplaceWith("IAmazonIvsPlayerCollector.Factory.create(context, analyticsConfig)"),
-        )
-        fun create(config: BitmovinAnalyticsConfig, context: Context): IAmazonIvsPlayerCollector {
-            val analyticsConfig = ApiV3Utils.extractAnalyticsConfig(bitmovinAnalyticsConfig = config)
-            val collector = AmazonIvsPlayerCollector(analyticsConfig, context)
-            collector.setDeprecatedBitmovinAnalyticsConfig(config)
-            return collector
-        }
-
+        /**
+         * Creates a collector instance configured via the provided [analyticsConfig], and the
+         * optional [defaultMetadata].
+         */
         @JvmStatic
         @JvmOverloads
         fun create(context: Context, analyticsConfig: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IAmazonIvsPlayerCollector {
