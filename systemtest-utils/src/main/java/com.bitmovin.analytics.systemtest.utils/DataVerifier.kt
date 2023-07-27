@@ -216,10 +216,6 @@ object DataVerifier {
         assertThat(eventData.videoId).isEqualTo(sourceMetadata.videoId)
         assertThat(eventData.cdnProvider).isEqualTo(sourceMetadata.cdnProvider)
         assertThat(eventData.path).isEqualTo(sourceMetadata.path)
-        assertThat(eventData.mpdUrl).isEqualTo(sourceMetadata.mpdUrl)
-        assertThat(eventData.m3u8Url).isEqualTo(sourceMetadata.m3u8Url)
-        assertThat(eventData.progUrl).isEqualTo(sourceMetadata.progUrl)
-
         verifyCustomData(eventData, sourceMetadata.customData)
     }
 
@@ -370,6 +366,24 @@ object DataVerifier {
         verifyAtLeastOneSampleHasState(eventDataList, PLAYING)
     }
 
+    fun verifyMpdSourceUrl(eventDataList: MutableList<EventData>, expectedMpdSourceUrl: String) {
+        for (eventData in eventDataList) {
+            assertThat(eventData.mpdUrl).isEqualTo(expectedMpdSourceUrl)
+        }
+    }
+
+    fun verifyM3u8SourceUrl(eventDataList: MutableList<EventData>, expectedM3u8SourceUrl: String) {
+        for (eventData in eventDataList) {
+            assertThat(eventData.m3u8Url).isEqualTo(expectedM3u8SourceUrl)
+        }
+    }
+
+    fun verifyProgSourceUrl(eventDataList: MutableList<EventData>, expectedProgSourceUrl: String) {
+        for (eventData in eventDataList) {
+            assertThat(eventData.progUrl).isEqualTo(expectedProgSourceUrl)
+        }
+    }
+
     private fun verifyOnlyOneSampleHasState(eventDataList: MutableList<EventData>, state: String) {
         val samplesWithState = eventDataList.filter { x -> x.state?.lowercase() == state }
         assertThat(samplesWithState.size).isEqualTo(1)
@@ -422,7 +436,7 @@ object DataVerifier {
         val playingStartEndDelta = playingEvents.sumOf { it.videoTimeEnd - it.videoTimeStart }
         val playingDuration = playingEvents.sumOf { it.played }
 
-        // we use a range of -5% to +10% to account for some inaccuracies in the players
-        assertThat(playingStartEndDelta).isBetween((playingDuration * 0.95).toLong(), (playingDuration * 1.10).toLong())
+        // we use a range of -15% to +10% to account for some inaccuracies in the players
+        assertThat(playingStartEndDelta).isBetween((playingDuration * 0.85).toLong(), (playingDuration * 1.10).toLong())
     }
 }

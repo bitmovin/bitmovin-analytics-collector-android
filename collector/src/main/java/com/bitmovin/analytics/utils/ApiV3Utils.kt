@@ -66,9 +66,6 @@ object ApiV3Utils {
             title = bitmovinAnalyticsConfig.title,
             videoId = bitmovinAnalyticsConfig.videoId,
             cdnProvider = bitmovinAnalyticsConfig.cdnProvider,
-            mpdUrl = bitmovinAnalyticsConfig.mpdUrl,
-            m3u8Url = bitmovinAnalyticsConfig.m3u8Url,
-            progUrl = bitmovinAnalyticsConfig.progUrl,
             path = bitmovinAnalyticsConfig.path,
             isLive = bitmovinAnalyticsConfig.isLive,
 

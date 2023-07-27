@@ -51,7 +51,7 @@ class PhoneBasicScenariosTest {
         title = "hls_redbull",
         videoId = "hls_redbull_id",
         path = "hls_redbull_path",
-        m3u8Url = defaultSample.m3u8Url,
+//        m3u8Url = defaultSample.m3u8Url,
         customData = TestConfig.createDummyCustomData(),
         cdnProvider = "cdn_provider",
     )
@@ -122,6 +122,7 @@ class PhoneBasicScenariosTest {
 
         val eventDataList = impression.eventDataList
         DataVerifier.verifyStaticData(eventDataList, defaultSourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyM3u8SourceUrl(eventDataList, defaultSample.m3u8Url!!)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyExactlyOnePauseSample(eventDataList)
@@ -151,7 +152,6 @@ class PhoneBasicScenariosTest {
             title = "drm_dash_widevine",
             videoId = "drm_dash_widevine_id",
             path = "drm_dash_widevine_path",
-            mpdUrl = sample.mpdUrl,
             customData = TestConfig.createDummyCustomData(),
             cdnProvider = "cdn_provider",
         )
@@ -188,6 +188,7 @@ class PhoneBasicScenariosTest {
 
         val eventDataList = impression.eventDataList
         DataVerifier.verifyStaticData(eventDataList, drmSourceMetadata, sample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyMpdSourceUrl(eventDataList, sample.mpdUrl!!)
         DataVerifier.verifyDrmStartupSample(eventDataList[0], sample.drmSchema)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyInvariants(eventDataList)
@@ -231,6 +232,7 @@ class PhoneBasicScenariosTest {
 
         val eventDataList = impression.eventDataList
         DataVerifier.verifyStaticData(eventDataList, defaultSourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyM3u8SourceUrl(eventDataList, defaultSample.m3u8Url!!)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyInvariants(eventDataList)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
@@ -278,6 +280,7 @@ class PhoneBasicScenariosTest {
 
         val eventDataList = impression.eventDataList
         DataVerifier.verifyStaticData(eventDataList, defaultSourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyM3u8SourceUrl(eventDataList, defaultSample.m3u8Url!!)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
@@ -299,7 +302,7 @@ class PhoneBasicScenariosTest {
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
         val localPlayer = Player.create(appContext, playerConfig)
-        val liveSourceMetadata = SourceMetadata(title = "liveSourceTitle", mpdUrl = liveSample.mpdUrl, videoId = "liveSourceVideoId", customData = TestConfig.createDummyCustomData("liveSource"), isLive = true)
+        val liveSourceMetadata = SourceMetadata(title = "liveSourceTitle", videoId = "liveSourceVideoId", customData = TestConfig.createDummyCustomData("liveSource"), isLive = true)
 
         // act
         mainScope.launch {
@@ -333,6 +336,8 @@ class PhoneBasicScenariosTest {
 
         val eventDataList = impression.eventDataList
         DataVerifier.verifyStaticData(eventDataList, liveSourceMetadata, liveSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyMpdSourceUrl(eventDataList, liveSample.mpdUrl!!)
+
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
@@ -367,7 +372,6 @@ class PhoneBasicScenariosTest {
             customData = TestConfig.createDummyCustomData("dash"),
             videoId = "dashVideoId",
             cdnProvider = "dashCdnProvider",
-            mpdUrl = dashSample.mpdUrl,
             path = "dashPath",
         )
 
@@ -405,8 +409,10 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression2)
 
         DataVerifier.verifyStaticData(impression1.eventDataList, defaultSourceMetadata, hlsSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyM3u8SourceUrl(impression1.eventDataList, defaultSample.m3u8Url!!)
         DataVerifier.verifyInvariants(impression1.eventDataList)
         DataVerifier.verifyStaticData(impression2.eventDataList, dashSourceMetadata, dashSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyMpdSourceUrl(impression2.eventDataList, dashSample.mpdUrl!!)
         DataVerifier.verifyInvariants(impression2.eventDataList)
 
         val startupSampleImpression1 = impression1.eventDataList.first()
@@ -440,21 +446,18 @@ class PhoneBasicScenariosTest {
         val hlsMetadata = SourceMetadata(
             videoId = "hls-video-id",
             title = "hlsTitle",
-            m3u8Url = hlsSample.m3u8Url,
             cdnProvider = "hlsCdnProvider",
         )
 
         val dashMetadata = SourceMetadata(
             videoId = "dash-video-id",
             title = "dashTitle",
-            mpdUrl = dashSample.mpdUrl,
             cdnProvider = "dashCdnProvider",
         )
 
         val progMetadata = SourceMetadata(
             videoId = "prog-video-id",
             title = "progTitle",
-            progUrl = progSample.progUrl,
         )
 
         val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig, defaultMetadata)
@@ -515,6 +518,10 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyStaticData(impression2.eventDataList, MetadataUtils.mergeSourceMetadata(dashMetadata, defaultMetadata), dashSample, BitmovinPlayerConstants.playerInfo)
         DataVerifier.verifyStaticData(impression3.eventDataList, MetadataUtils.mergeSourceMetadata(progMetadata, defaultMetadata), progSample, BitmovinPlayerConstants.playerInfo)
 
+        DataVerifier.verifyM3u8SourceUrl(impression1.eventDataList, hlsSample.m3u8Url!!)
+        DataVerifier.verifyMpdSourceUrl(impression2.eventDataList, dashSample.mpdUrl!!)
+        DataVerifier.verifyProgSourceUrl(impression3.eventDataList, progSample.progUrl!!)
+
         DataVerifier.verifyInvariants(impression1.eventDataList)
         DataVerifier.verifyInvariants(impression2.eventDataList)
         DataVerifier.verifyInvariants(impression3.eventDataList)
@@ -549,14 +556,14 @@ class PhoneBasicScenariosTest {
         val hlsMetadata = SourceMetadata(
             videoId = "hls-video-id",
             title = "hlsTitle",
-            m3u8Url = hlsSample.m3u8Url,
+//            m3u8Url = hlsSample.m3u8Url,
             customData = CustomData(customData1 = "hlsSourceCustomData1"),
         )
 
         val dashMetadata = SourceMetadata(
             videoId = "dash-video-id",
             title = "dashTitle",
-            mpdUrl = dashSample.mpdUrl,
+//            mpdUrl = dashSample.mpdUrl,
         )
 
         val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig, defaultMetadata)
@@ -716,7 +723,7 @@ class PhoneBasicScenariosTest {
 
         val analyticsConfig = TestConfig.createAnalyticsConfig()
         val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
-        val sourceMetadata = SourceMetadata(title = "nonExistingStream", customData = CustomData(customData1 = "nonExistingStream"), m3u8Url = nonExistingStreamSample.uri.toString())
+        val sourceMetadata = SourceMetadata(title = "nonExistingStream", customData = CustomData(customData1 = "nonExistingStream"))
 
         // act
         mainScope.launch {
@@ -764,7 +771,7 @@ class PhoneBasicScenariosTest {
     fun test_vod_2Impressions_UsingSetSourceMetadata_ShouldReportSourceMetadata() {
         val hlsSample = TestSources.HLS_REDBULL
         val source1CustomData = CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
-        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", m3u8Url = hlsSample.m3u8Url, path = "path/Source1", customData = source1CustomData)
+        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", /* m3u8Url = hlsSample.m3u8Url, */ path = "path/Source1", customData = source1CustomData)
         val analyticsConfig = TestConfig.createAnalyticsConfig()
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
         val defaultMetadata = DefaultMetadata(cdnProvider = "cndProviderDefault", customData = CustomData(customData1 = "defaultCustomData1", customData30 = "defaultCustomData30", experimentName = "experimentNameDefault"))
@@ -773,7 +780,7 @@ class PhoneBasicScenariosTest {
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
         val source2CustomData = CustomData(customData1 = "source2CustomData1", customData30 = "source2CustomData30", experimentName = "experimentNameSource2")
-        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", mpdUrl = dashSample.mpdUrl, path = "path/Source2", customData = source2CustomData)
+        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", /* mpdUrl = dashSample.mpdUrl, */ path = "path/Source2", customData = source2CustomData)
 
         // act
         mainScope.launch {
@@ -870,8 +877,6 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_firstSessionOffline_ShouldSendOfflineSessionDataOnSecondOnlineSession() {
         // arrange
-        RetryPolicy.SHORT_TERM
-
         // simulate offline session through wrong backend url
         val analyticsOfflineConfig = TestConfig.createAnalyticsConfig().copy(backendUrl = "https://nonexistingdomain123.com", retryPolicy = RetryPolicy.LONG_TERM)
         val offlineCollector = IBitmovinPlayerCollector.create(appContext, analyticsOfflineConfig)
@@ -934,46 +939,11 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_notMetadataIsSet_sourceUrlIsExtracted() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
-
-        // act
-        mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
-
-        mainScope.run {
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        // assert
-        val impressionList = LogParser.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-
-        // verify that url is determined automatically when no metadata is set
-        DataVerifier.verifyStaticData(eventDataList, SourceMetadata(m3u8Url = defaultSample.m3u8Url), defaultSample, BitmovinPlayerConstants.playerInfo)
-        DataVerifier.verifyStartupSample(eventDataList[0])
-    }
-
-    @Test
     fun test_sendCustomDataEvent() {
         // arrange
-        val vodStreamSample = TestSources.HLS_REDBULL
         val analyticsConfig = TestConfig.createAnalyticsConfig()
         val collector = IBitmovinPlayerCollector.Factory.create(appContext, analyticsConfig)
         val sourceMetadata = SourceMetadata(
-            m3u8Url = vodStreamSample.m3u8Url,
             title = "title",
             isLive = false,
             videoId = "videoId",
@@ -1013,6 +983,8 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
+        DataVerifier.verifyM3u8SourceUrl(eventDataList, defaultSource.config.url)
+
         val customDataEvents = eventDataList.filter { it.state == "customdatachange" }
 
         assertThat(customDataEvents).hasSize(3)

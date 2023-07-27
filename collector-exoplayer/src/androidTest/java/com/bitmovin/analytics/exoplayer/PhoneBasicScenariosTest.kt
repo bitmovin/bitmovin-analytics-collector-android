@@ -37,7 +37,6 @@ class PhoneBasicScenariosTest {
         title = "hls_redbull",
         videoId = "hls_redbull_id",
         path = "hls_redbull_path",
-        m3u8Url = defaultSample.m3u8Url,
         customData = TestConfig.createDummyCustomData(),
         cdnProvider = "cdn_provider",
     )
@@ -50,7 +49,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vod_playPauseWithPlayWhenReady() {
+    fun test_vodHls_playPauseWithPlayWhenReady() {
         // arrange
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
         collector.sourceMetadata = defaultSourceMetadata
@@ -102,6 +101,69 @@ class PhoneBasicScenariosTest {
         val eventDataList = impression.eventDataList
 
         DataVerifier.verifyStaticData(eventDataList, defaultSourceMetadata, defaultSample, ExoplayerConstants.playerInfo)
+        DataVerifier.verifyM3u8SourceUrl(eventDataList, defaultSample.m3u8Url!!)
+        DataVerifier.verifyStartupSample(eventDataList[0])
+        DataVerifier.verifyInvariants(eventDataList)
+        DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+    }
+
+    @Test
+    fun test_vodDash_playPauseWithPlayWhenReady() {
+        // arrange
+        val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+        val dashSource = TestSources.DASH
+        val dashMediaItem = MediaItem.fromUri(dashSource.mpdUrl!!)
+
+        // act
+        mainScope.launch {
+            player.volume = 0.0f
+            collector.attachPlayer(player)
+            player.setMediaItem(dashMediaItem)
+            player.prepare()
+        }
+
+        // we wait until player is in ready state before we call play to test this specific scenario
+        ExoPlayerPlaybackUtils.waitUntilPlayerIsReady(player)
+
+        mainScope.launch {
+            player.play()
+        }
+
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 500)
+
+        mainScope.launch {
+            player.pause()
+        }
+
+        Thread.sleep(500)
+
+        mainScope.launch {
+            player.play()
+        }
+
+        // we sleep a bit longer to increase probability of a qualitychange event
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
+
+        mainScope.launch {
+            player.pause()
+            collector.detachPlayer()
+            player.release()
+        }
+
+        Thread.sleep(300)
+
+        val impressions = LogParser.extractImpressions()
+        Assertions.assertThat(impressions.size).isEqualTo(1)
+
+        val impression = impressions.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+
+        DataVerifier.verifyStaticData(eventDataList, SourceMetadata(), dashSource, ExoplayerConstants.playerInfo)
+        DataVerifier.verifyMpdSourceUrl(eventDataList, dashSource.mpdUrl!!)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyInvariants(eventDataList)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
@@ -124,13 +186,12 @@ class PhoneBasicScenariosTest {
             collector.attachPlayer(player)
             player.setMediaItem(defaultMediaItem)
             player.prepare()
-            collector.sendCustomDataEvent(customData2)
         }
 
-        // we wait until player is in ready state before we call play to test this specific scenario
         ExoPlayerPlaybackUtils.waitUntilPlayerIsReady(player)
 
         mainScope.launch {
+            collector.sendCustomDataEvent(customData2)
             player.play()
         }
 
@@ -154,7 +215,11 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        val customDataEvents = eventDataList.filter { it.state == "customdatachange" }
+
+        val customDataEvents = eventDataList.filter { it.state == "customdatachange" }.toMutableList()
+        val nonCustomDataEvents = eventDataList.filter { it.state != "customdatachange" }.toMutableList()
+        DataVerifier.verifyM3u8SourceUrl(nonCustomDataEvents, defaultSample.m3u8Url!!)
+        DataVerifier.verifyM3u8SourceUrl(customDataEvents, defaultSample.m3u8Url!!)
 
         Assertions.assertThat(customDataEvents).hasSize(3)
         DataVerifier.verifySourceMetadata(customDataEvents[0], defaultSourceMetadata.copy(customData = customData2))
@@ -175,7 +240,7 @@ class PhoneBasicScenariosTest {
         // arrange
         val liveSample = TestSources.IVS_LIVE_1
         val liveSource = MediaItem.fromUri(liveSample.m3u8Url!!)
-        val liveSourceMetadata = SourceMetadata(m3u8Url = liveSample.m3u8Url, title = "liveSource", videoId = "liveSourceId", cdnProvider = "cdn_provider", customData = TestConfig.createDummyCustomData(), isLive = true)
+        val liveSourceMetadata = SourceMetadata(title = "liveSource", videoId = "liveSourceId", cdnProvider = "cdn_provider", customData = TestConfig.createDummyCustomData(), isLive = true)
 
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
@@ -187,11 +252,7 @@ class PhoneBasicScenariosTest {
             collector.sourceMetadata = liveSourceMetadata
             player.prepare()
         }
-
-        ExoPlayerPlaybackUtils.waitUntilPlayerIsPlaying(player)
-
-        // play for 2 seconds
-        Thread.sleep(2000)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
 
         mainScope.launch {
             player.pause()
@@ -216,6 +277,7 @@ class PhoneBasicScenariosTest {
 
         val eventDataList = impression.eventDataList
         DataVerifier.verifyStaticData(eventDataList, liveSourceMetadata, liveSample, ExoplayerConstants.playerInfo)
+        DataVerifier.verifyM3u8SourceUrl(eventDataList, liveSample.m3u8Url!!)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(false))

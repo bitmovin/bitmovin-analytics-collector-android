@@ -23,21 +23,7 @@ constructor(
      * If field is specified in SourceMetadata and DefaultMetadata, SourceMetadata takes precedence.
      */
     val cdnProvider: String? = null,
-    /**
-     * Set mpd URL recorded in analytics. If not set explicitly the collector will retrieve
-     * available information from the player.
-     */
-    val mpdUrl: String? = null,
-    /**
-     * Set m3u8 URL recorded in analytics. If not set explicitly the collector will retrieve
-     * available information from the player.
-     */
-    val m3u8Url: String? = null,
-    /**
-     * Set prog URL recorded in analytics. If not set explicitly the collector will retrieve
-     * available information from the player.
-     */
-    val progUrl: String? = null,
+
     /**
      * Breadcrumb path
      */

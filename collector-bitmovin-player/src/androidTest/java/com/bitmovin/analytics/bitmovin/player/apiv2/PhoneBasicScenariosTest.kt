@@ -328,9 +328,9 @@ class PhoneBasicScenariosTest {
         val liveSample = TestSources.DASH_LIVE
         val liveSource = Source.create(SourceConfig.fromUrl(liveSample.mpdUrl!!))
 
-        val localAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(null).apply {
+        val localAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig().apply {
             isLive = true
-            mpdUrl = liveSample.mpdUrl!!
+//            mpdUrl = liveSample.mpdUrl!!
         }
 
         val collector = IBitmovinPlayerCollector.create(localAnalyticsConfig, appContext)
@@ -470,19 +470,19 @@ class PhoneBasicScenariosTest {
         val hlsMetadata = SourceMetadata(
             videoId = "hls-video-id",
             title = "hlsTitle",
-            m3u8Url = hlsSample.m3u8Url,
+//            m3u8Url = hlsSample.m3u8Url,
         )
 
         val dashMetadata = SourceMetadata(
             videoId = "dash-video-id",
             title = "dashTitle",
-            mpdUrl = dashSample.mpdUrl,
+//            mpdUrl = dashSample.mpdUrl,
         )
 
         val progMetadata = SourceMetadata(
             videoId = "prog-video-id",
             title = "progTitle",
-            progUrl = progSample.progUrl,
+//            progUrl = progSample.progUrl,
         )
 
         val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
@@ -572,7 +572,7 @@ class PhoneBasicScenariosTest {
         val hlsMetadata = SourceMetadata(
             videoId = "hls-video-id",
             title = "hlsTitle",
-            m3u8Url = hlsSample.m3u8Url,
+//            m3u8Url = hlsSample.m3u8Url,
         )
 
         val initialHlsMetadata = hlsMetadata.copy()
@@ -580,7 +580,7 @@ class PhoneBasicScenariosTest {
         val dashMetadata = SourceMetadata(
             videoId = "dash-video-id",
             title = "dashTitle",
-            mpdUrl = dashSample.mpdUrl,
+//            mpdUrl = dashSample.mpdUrl,
         )
 
         val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
@@ -782,7 +782,7 @@ class PhoneBasicScenariosTest {
     fun test_vod_2Impressions_UsingAddSourceMetadata_ShouldReportSourceMetadata() {
         val hlsSample = TestSources.HLS_REDBULL
         val source1CustomData = CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
-        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", m3u8Url = hlsSample.m3u8Url, path = "path/Source1", customData = source1CustomData)
+        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", /*m3u8Url = hlsSample.m3u8Url, */ path = "path/Source1", customData = source1CustomData)
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(hlsSample.m3u8Url!!)
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
         val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
@@ -790,7 +790,7 @@ class PhoneBasicScenariosTest {
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
         val source2CustomData = CustomData(customData1 = "source2CustomData1", customData30 = "source2CustomData30", experimentName = "experimentNameSource2")
-        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", mpdUrl = dashSample.mpdUrl, path = "path/Source2", customData = source2CustomData)
+        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", /*mpdUrl = dashSample.mpdUrl,*/ path = "path/Source2", customData = source2CustomData)
 
         // act
         mainScope.launch {

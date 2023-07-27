@@ -64,6 +64,10 @@ internal class ExoPlayerAdapter(
     private val isHlsManifestClassLoaded by lazy {
         Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
     }
+
+    private val isProgSourceClassLoaded by lazy {
+        Util.isClassLoaded(PROG_CLASSNAME, this.javaClass.classLoader)
+    }
     private val qualityEventDataManipulator = QualityEventDataManipulator(exoplayer)
     private val meter = DownloadSpeedMeter()
     private val exoplayerContext = ExoPlayerContext(exoplayer)
@@ -504,6 +508,8 @@ internal class ExoPlayerAdapter(
             "com.google.android.exoplayer2.source.dash.manifest.DashManifest"
         private const val HLS_MANIFEST_CLASSNAME =
             "com.google.android.exoplayer2.source.hls.HlsManifest"
+        private const val PROG_CLASSNAME =
+            "com.google.android.exoplayer2.source.ProgressiveMediaSource"
         private const val PLAYER_TECH = "Android:Exoplayer"
         private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.EXOPLAYER)
     }

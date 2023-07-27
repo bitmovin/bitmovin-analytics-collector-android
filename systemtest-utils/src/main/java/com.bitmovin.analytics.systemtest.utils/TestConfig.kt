@@ -7,7 +7,7 @@ import com.bitmovin.analytics.api.CustomData
 object TestConfig {
 
     /** Account: 'bitmovin-analytics', Analytics License: 'Local Development License Key" */
-    fun createBitmovinAnalyticsConfig(m3u8Url: String? = null, analyticsKey: String = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", title: String = "dummy title"): BitmovinAnalyticsConfig {
+    fun createBitmovinAnalyticsConfig(analyticsKey: String = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", title: String = "dummy title"): BitmovinAnalyticsConfig {
         val bitmovinAnalyticsConfig =
             BitmovinAnalyticsConfig(analyticsKey)
         bitmovinAnalyticsConfig.title = title
@@ -22,7 +22,6 @@ object TestConfig {
         bitmovinAnalyticsConfig.customData6 = "customData6"
         bitmovinAnalyticsConfig.customData7 = "customData7"
         bitmovinAnalyticsConfig.path = "/customPath/new/"
-        bitmovinAnalyticsConfig.m3u8Url = m3u8Url
         bitmovinAnalyticsConfig.cdnProvider = "testCdnProvider"
         return bitmovinAnalyticsConfig
     }

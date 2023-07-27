@@ -148,7 +148,6 @@ class MainActivity : AppCompatActivity(), Player.Listener {
             path = "/live/path",
             title = "DASH Live Video Title",
             videoId = liveSource.mediaId,
-            mpdUrl = Samples.DASH_LIVE.uri.path,
         )
         bitmovinAnalytics?.sourceMetadata = sourceMetadata
         bitmovinAnalytics?.attachPlayer(player!!)
@@ -163,7 +162,6 @@ class MainActivity : AppCompatActivity(), Player.Listener {
             videoId = drmMediaSource.mediaId,
             title = "DASH DRM Video Title",
             path = "drm/dash/path",
-            mpdUrl = Samples.DASH_DRM_WIDEVINE.uri.path,
         )
         bitmovinAnalytics?.sourceMetadata = sourceMetadata
         bitmovinAnalytics?.attachPlayer(player!!)

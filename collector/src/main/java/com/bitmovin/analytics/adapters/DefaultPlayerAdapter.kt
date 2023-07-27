@@ -7,7 +7,6 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
-import com.bitmovin.analytics.data.manipulators.ManifestUrlEventDataManipulator
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
@@ -25,7 +24,6 @@ abstract class DefaultPlayerAdapter(
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         eventDataManipulators.forEach { eventDataFactory.registerEventDataManipulator(it) }
-        eventDataFactory.registerEventDataManipulator(ManifestUrlEventDataManipulator(this))
         return featureFactory.createFeatures()
     }
 

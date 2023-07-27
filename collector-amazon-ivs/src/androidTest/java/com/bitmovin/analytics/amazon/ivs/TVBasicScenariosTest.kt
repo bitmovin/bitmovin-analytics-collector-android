@@ -45,7 +45,7 @@ class TVBasicScenariosTest {
         val liveSample = TestSources.IVS_LIVE_1
 
         val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val sourceMetadata = SourceMetadata(title = "tvTest", m3u8Url = liveSample.m3u8Url, customData = TestConfig.createDummyCustomData("tvTest"))
+        val sourceMetadata = SourceMetadata(title = "tvTest", customData = TestConfig.createDummyCustomData("tvTest"))
         val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
         collector.attachPlayer(player)
         collector.sourceMetadata = sourceMetadata

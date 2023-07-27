@@ -49,7 +49,7 @@ class PhoneBasicScenariosTest {
     fun test_live_playPause() {
         // arrange
         val liveStreamSample = TestSources.IVS_LIVE_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample.m3u8Url!!)
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
@@ -100,7 +100,7 @@ class PhoneBasicScenariosTest {
     fun test_live_2ImpressionsScenario() {
         // arrange
         val liveStreamSample1 = TestSources.IVS_LIVE_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveStreamSample1.m3u8Url!!)
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         player.isMuted = false
         collector.attachPlayer(player)
@@ -173,7 +173,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_playSeekWithAutoplay() {
         val vodStreamSample = TestSources.IVS_VOD_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(vodStreamSample.m3u8Url!!)
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
@@ -217,7 +217,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_play() {
         val vodStreamSample = TestSources.IVS_VOD_1
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(vodStreamSample.m3u8Url!!)
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
@@ -264,7 +264,7 @@ class PhoneBasicScenariosTest {
     fun test_nonExistingStream_Should_sendErrorSample() {
         // arrange
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(nonExistingStreamSample.uri.toString())
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 
@@ -300,7 +300,7 @@ class PhoneBasicScenariosTest {
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         // arrange
         val sample = TestSources.HLS_REDBULL
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(sample.m3u8Url!!, "nonExistingKey")
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig("nonExistingKey")
         val collector = IAmazonIvsPlayerCollector.Factory.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
         player.load(Uri.parse(sample.m3u8Url))

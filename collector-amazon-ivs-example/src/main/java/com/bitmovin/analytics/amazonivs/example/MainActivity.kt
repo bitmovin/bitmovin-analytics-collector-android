@@ -57,7 +57,6 @@ class MainActivity : AppCompatActivity() {
             cdnProvider = "amazon",
             videoId = "ivsLiveVideoId",
             path = "com.bitmovin.analytics.amazonivs.example.mainactivity",
-            m3u8Url = VideoSources.liveStream2Source.path,
             customData = CustomData(customData1 = "customGenre"),
         )
 
@@ -94,7 +93,6 @@ class MainActivity : AppCompatActivity() {
             collector.sourceMetadata = SourceMetadata(
                 title = "ivs live stream 1",
                 videoId = "ivs-live-stream-1",
-                m3u8Url = VideoSources.liveStream1Source.path,
                 customData = CustomData(customData1 = "customGenre"),
             )
             collector.attachPlayer(player)

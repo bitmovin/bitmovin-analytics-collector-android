@@ -45,7 +45,7 @@ class TVBasicScenariosTest {
 
         val liveSample = TestSources.IVS_LIVE_1
 
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(liveSample.m3u8Url)
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.create(analyticsConfig, appContext)
         collector.attachPlayer(player)
 

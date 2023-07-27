@@ -16,7 +16,6 @@ import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.BeforeClass
@@ -54,7 +53,6 @@ class PhoneBasicScenariosTest {
         val analyticsConfig = TestConfig.createAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
         val sourceMetadata = SourceMetadata(
-            m3u8Url = liveStreamSample.m3u8Url,
             title = "title1",
             isLive = true,
             videoId = "videoId1",
@@ -115,7 +113,6 @@ class PhoneBasicScenariosTest {
         val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
 
         val sourceMetadata1 = SourceMetadata(
-            m3u8Url = liveStreamSample1.m3u8Url,
             title = "title1",
             isLive = true,
             videoId = "videoId1",
@@ -136,7 +133,6 @@ class PhoneBasicScenariosTest {
 
         val liveStreamSample2 = TestSources.IVS_LIVE_2
         val sourceMetadata2 = SourceMetadata(
-            m3u8Url = liveStreamSample2.m3u8Url,
             title = "title2",
             isLive = true,
             videoId = "videoId2",
@@ -203,7 +199,6 @@ class PhoneBasicScenariosTest {
         val analyticsConfig = TestConfig.createAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
         val sourceMetadata = SourceMetadata(
-            m3u8Url = vodStreamSample.m3u8Url,
             title = "title",
             isLive = false,
             videoId = "videoId",
@@ -257,7 +252,6 @@ class PhoneBasicScenariosTest {
         val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
         collector.attachPlayer(player)
         val sourceMetadata = SourceMetadata(
-            m3u8Url = vodStreamSample.m3u8Url,
             title = "title",
             isLive = false,
             videoId = "videoId",
@@ -310,7 +304,7 @@ class PhoneBasicScenariosTest {
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
         val analyticsConfig = TestConfig.createAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
-        val nonExistingStreamSourceMetadata = SourceMetadata(title = "non-existing-stream", isLive = false, mpdUrl = nonExistingStreamSample.uri.toString(), customData = TestConfig.createDummyCustomData("noneExitingStreamData"))
+        val nonExistingStreamSourceMetadata = SourceMetadata(title = "non-existing-stream", isLive = false, customData = TestConfig.createDummyCustomData("noneExitingStreamData"))
         collector.sourceMetadata = nonExistingStreamSourceMetadata
         collector.attachPlayer(player)
 
@@ -368,13 +362,12 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_sendCustomData() {
+    fun test_sendCustomDataEvent() {
         // arrange
         val vodStreamSample = TestSources.IVS_VOD_1
         val analyticsConfig = TestConfig.createAnalyticsConfig()
         val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
         val sourceMetadata = SourceMetadata(
-            m3u8Url = vodStreamSample.m3u8Url,
             title = "title",
             isLive = false,
             videoId = "videoId",
@@ -417,18 +410,18 @@ class PhoneBasicScenariosTest {
         val eventDataList = impression.eventDataList
         val customDataEvents = eventDataList.filter { it.state == "customdatachange" }
 
-        Assertions.assertThat(customDataEvents).hasSize(3)
+        assertThat(customDataEvents).hasSize(3)
         DataVerifier.verifySourceMetadata(customDataEvents[0], sourceMetadata.copy(customData = customData2))
-        Assertions.assertThat(customDataEvents[0].videoTimeStart).isEqualTo(0)
-        Assertions.assertThat(customDataEvents[0].videoTimeEnd).isEqualTo(0)
+        assertThat(customDataEvents[0].videoTimeStart).isEqualTo(0)
+        assertThat(customDataEvents[0].videoTimeEnd).isEqualTo(0)
 
         DataVerifier.verifySourceMetadata(customDataEvents[1], sourceMetadata.copy(customData = customData3))
-        Assertions.assertThat(customDataEvents[1].videoTimeStart).isNotEqualTo(0)
-        Assertions.assertThat(customDataEvents[1].videoTimeEnd).isNotEqualTo(0)
+        assertThat(customDataEvents[1].videoTimeStart).isNotEqualTo(0)
+        assertThat(customDataEvents[1].videoTimeEnd).isNotEqualTo(0)
 
         DataVerifier.verifySourceMetadata(customDataEvents[2], sourceMetadata.copy(customData = customData4))
-        Assertions.assertThat(customDataEvents[2].videoTimeStart).isGreaterThan(2000)
-        Assertions.assertThat(customDataEvents[2].videoTimeEnd).isGreaterThan(2000)
+        assertThat(customDataEvents[2].videoTimeStart).isGreaterThan(2000)
+        assertThat(customDataEvents[2].videoTimeEnd).isGreaterThan(2000)
     }
 
     @Test
@@ -440,7 +433,6 @@ class PhoneBasicScenariosTest {
         val defaultMetadata = DefaultMetadata(cdnProvider = "testCdnPovider", customUserId = "testCustomUserId", customData = defaultCustomData)
         val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig, defaultMetadata)
         val sourceMetadata = SourceMetadata(
-            m3u8Url = vodStreamSample.m3u8Url,
             title = "title",
             isLive = false,
             videoId = "videoId",

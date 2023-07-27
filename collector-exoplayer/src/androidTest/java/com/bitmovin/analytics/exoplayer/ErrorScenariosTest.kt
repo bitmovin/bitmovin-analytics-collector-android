@@ -19,7 +19,6 @@ import org.junit.Ignore
 import org.junit.Test
 
 class ErrorScenariosTest {
-
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var player: ExoPlayer
@@ -30,7 +29,6 @@ class ErrorScenariosTest {
         title = "hls_redbull",
         videoId = "hls_redbull_id",
         path = "hls_redbull_path",
-        m3u8Url = defaultSample.m3u8Url,
         customData = TestConfig.createDummyCustomData(),
         cdnProvider = "cdn_provider",
     )
@@ -98,7 +96,6 @@ class ErrorScenariosTest {
             title = "dash_corrupted",
             videoId = "dash_corrupted_id",
             path = "dash_corrupted_path",
-            mpdUrl = corruptedStream.uri.toString(),
             customData = TestConfig.createDummyCustomData(),
             cdnProvider = "cdn_provider",
         )
@@ -131,7 +128,7 @@ class ErrorScenariosTest {
         val impressionId = eventData.impressionId
         Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED")
         Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED)
-
+        DataVerifier.verifyMpdSourceUrl(impression.eventDataList, corruptedStream.uri.toString())
         DataVerifier.verifyStartupSampleOnError(eventData, ExoplayerConstants.playerInfo)
         DataVerifier.verifySourceMetadata(eventData, sourceMetadata = sourceMetadata)
 
@@ -154,7 +151,6 @@ class ErrorScenariosTest {
             title = "dash_missing_segment",
             videoId = "dash_missing_segment_id",
             path = "dash_missing_segment_path",
-            mpdUrl = missingSegmentStream.uri.toString(),
             customData = TestConfig.createDummyCustomData(),
             cdnProvider = "cdn_provider",
         )
@@ -187,7 +183,7 @@ class ErrorScenariosTest {
         val impressionId = eventData.impressionId
         Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_IO_BAD_HTTP_STATUS")
         Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
-
+        DataVerifier.verifyMpdSourceUrl(impression.eventDataList, missingSegmentStream.uri.toString())
         DataVerifier.verifyStartupSampleOnError(eventData, ExoplayerConstants.playerInfo)
         DataVerifier.verifySourceMetadata(eventData, sourceMetadata = sourceMetadata)
 

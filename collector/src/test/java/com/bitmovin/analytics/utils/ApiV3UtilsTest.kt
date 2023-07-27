@@ -143,10 +143,7 @@ class ApiV3UtilsTest {
             videoId = "videoId",
             path = "path",
             cdnProvider = "cdnProvider",
-            mpdUrl = "mpdUrl",
-            m3u8Url = "m3u8Url",
             isLive = true,
-            progUrl = "progUrl",
         )
         assertThat(sourceMetadata).isEqualTo(expectedSourceMetadata)
     }
@@ -159,10 +156,7 @@ class ApiV3UtilsTest {
             videoId = "videoId",
             path = "path",
             cdnProvider = "cdnProvider",
-            mpdUrl = "mpdUrl",
-            m3u8Url = "m3u8Url",
             isLive = true,
-            progUrl = "progUrl",
             customData = createDummyCustomData("test"),
         )
 
@@ -187,9 +181,6 @@ class ApiV3UtilsTest {
             title = "title",
             videoId = "videoId",
             path = "path",
-            mpdUrl = "mpdUrl",
-            m3u8Url = "m3u8Url",
-            progUrl = "progUrl",
             customData = CustomData(customData1 = "test1", customData30 = "test30"),
         )
 

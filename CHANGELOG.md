@@ -7,11 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
+- Introduced new API v3 for all players with breaking changes compared to v2
 - Upgraded to Kotlin 1.8.20
 - ExoPlayer: More specific PlaybackException mapping (using errorCodes instead of error types and errorCode names are now part of description)
-- Initial v3 API changes, move Collector interfaces into API package
 - Upgrade example app to latest bitmovin player (v3.39.1), latest ivs player (v1.20.0) and latest exoplayer (v2.19.0)
 - Bitmovin Player: Throw exception if two bitmovin analytics collector instances are attached to the same player instance
+- SourceUrls are autodetected and cannot be specified through metadata anymore
 
 ### Fixed
 - Prevent context leaking through using context.applicationContext in constructors
