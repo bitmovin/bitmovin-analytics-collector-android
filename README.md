@@ -251,14 +251,14 @@ analyticsCollector.attachPlayer(newPlayer)
 
 ```kotlin
 val analyticsConfig = AnalyticsConfig(
-    licenseKey = "<BITMOVIN_ANALYTICS_LICENSE_KEY>",    // mandatory
-    disableAdsTracking = false,                         // default is false
-    randomizeUserId = false,                            // default is false
-    retryPolicy = RetryPolicy.NO_RETRY,                 // default is NO_RETRY, other options are SHORT_TERM and LONG_TERM
+    licenseKey = "<BITMOVIN_ANALYTICS_LICENSE_KEY>",
+    adTrackingDisabled = false,
+    randomizeUserId = false,
+    retryPolicy = RetryPolicy.NO_RETRY,
 )
 
 // DefaultMetadata is optional metadata that can be used to enrich analytics data with metadata
-// that is not source specific. In case fields are present on sourceMetadata and defaultMetadata,
+// that is not source specific. In case the same fields are set on sourceMetadata and defaultMetadata,
 // sourceMetadata takes precedence.
 val defaultMetadata = DefaultMetadata(
     customUserId = "customUserId",
@@ -281,7 +281,6 @@ val sourceMetadata = SourceMetadata(
     cdnProvider = CDNProvider.BITMOVIN,
     path = "package.mainactivity",
     isLive = true,
-    m3u8Url = "sourceUrl",  // TODO: adapt when sourceConfig? is implemented
     customData = CustomData(
         customData1 = "sourceCustomData1",
         customData2 = "sourceCustomData2",
