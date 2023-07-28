@@ -40,7 +40,7 @@ import com.google.android.exoplayer2.source.hls.HlsManifest
 import com.google.android.exoplayer2.source.hls.playlist.HlsMultivariantPlaylist
 import java.util.Date
 
-// TODO: refactor this class (move listener in different class, move manipulator in different class)
+// TODO[AN-3690]: refactor this class (move listener in different class, move manipulator in different class)
 internal class ExoPlayerAdapter(
     private val exoplayer: ExoPlayer,
     config: AnalyticsConfig,
@@ -65,9 +65,6 @@ internal class ExoPlayerAdapter(
         Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
     }
 
-    private val isProgSourceClassLoaded by lazy {
-        Util.isClassLoaded(PROG_CLASSNAME, this.javaClass.classLoader)
-    }
     private val qualityEventDataManipulator = QualityEventDataManipulator(exoplayer)
     private val meter = DownloadSpeedMeter()
     private val exoplayerContext = ExoPlayerContext(exoplayer)
@@ -181,8 +178,9 @@ internal class ExoPlayerAdapter(
         data.droppedFrames = totalDroppedVideoFrames
         totalDroppedVideoFrames = 0
 
-        // todo rework this
         // streamFormat, mpdUrl, and m3u8Url
+        // TODO[AN-3691]: move this into separate class and investigate if
+        // we can simplify this a bit and add detection of progressive source urls
         val manifest = exoplayer.currentManifest
         if (isDashManifestClassLoaded && manifest is DashManifest) {
             data.streamFormat = StreamFormat.DASH.value
@@ -508,8 +506,6 @@ internal class ExoPlayerAdapter(
             "com.google.android.exoplayer2.source.dash.manifest.DashManifest"
         private const val HLS_MANIFEST_CLASSNAME =
             "com.google.android.exoplayer2.source.hls.HlsManifest"
-        private const val PROG_CLASSNAME =
-            "com.google.android.exoplayer2.source.ProgressiveMediaSource"
         private const val PLAYER_TECH = "Android:Exoplayer"
         private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.EXOPLAYER)
     }

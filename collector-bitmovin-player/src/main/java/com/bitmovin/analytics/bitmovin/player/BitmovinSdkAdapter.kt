@@ -141,7 +141,7 @@ internal class BitmovinSdkAdapter(
     private val currentSource: Source?
         get() = overrideCurrentSource ?: player.source
 
-    // TODO: refactor to use separate manipulators for this method
+    // TODO [AN-3689]: refactor to use separate manipulators for this method
     override fun manipulate(data: EventData) {
         val source = currentSource
         val sourceMetadata = this.getCurrentSourceMetadata()

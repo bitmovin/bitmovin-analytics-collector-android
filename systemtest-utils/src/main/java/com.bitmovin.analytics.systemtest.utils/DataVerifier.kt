@@ -41,6 +41,7 @@ object DataVerifier {
         expectedStreamData: StreamData,
         expectedPlayerInfo: PlayerInfo,
         is4kTV: Boolean = false,
+        expectedCustomUserId: String? = null,
     ) {
         if (eventDataList.size == 0) {
             fail<Nothing>("No eventData samples collected")
@@ -50,6 +51,7 @@ object DataVerifier {
 
         for (eventData in eventDataList) {
             verifySourceMetadata(eventData, expectedSourceMetadata)
+            assertThat(eventData.customUserId).isEqualTo(expectedCustomUserId)
         }
     }
 
@@ -120,7 +122,18 @@ object DataVerifier {
         assertThat(eventData.videoDuration).isEqualTo(expectedData.duration)
 
         assertThat(eventData.videoPlaybackHeight).isGreaterThan(0)
-        assertThat(eventData.videoPlaybackWidth).isGreaterThan(8)
+        assertThat(eventData.videoPlaybackWidth).isGreaterThan(0)
+
+        // autodection of source urls only works on bitmovin player and exoplayer
+        if (eventData.player != "amazonivs") {
+            assertThat(eventData.mpdUrl).isEqualTo(expectedData.mpdUrl)
+            assertThat(eventData.m3u8Url).isEqualTo(expectedData.m3u8Url)
+
+            // (on exoplayer progressive cannot be detected right now)
+            if (eventData.player != "exoplayer") {
+                assertThat(eventData.progUrl).isEqualTo(expectedData.progUrl)
+            }
+        }
     }
 
     fun verifyAnalyticsConfig(eventData: List<EventData>, analyticsConfig: BitmovinAnalyticsConfig) {

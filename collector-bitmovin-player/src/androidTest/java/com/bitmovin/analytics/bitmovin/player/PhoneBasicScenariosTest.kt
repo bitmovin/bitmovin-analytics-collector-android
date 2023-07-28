@@ -514,9 +514,9 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression2)
         DataVerifier.verifyHasNoErrorSamples(impression3)
 
-        DataVerifier.verifyStaticData(impression1.eventDataList, MetadataUtils.mergeSourceMetadata(hlsMetadata, defaultMetadata), hlsSample, BitmovinPlayerConstants.playerInfo)
-        DataVerifier.verifyStaticData(impression2.eventDataList, MetadataUtils.mergeSourceMetadata(dashMetadata, defaultMetadata), dashSample, BitmovinPlayerConstants.playerInfo)
-        DataVerifier.verifyStaticData(impression3.eventDataList, MetadataUtils.mergeSourceMetadata(progMetadata, defaultMetadata), progSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(impression1.eventDataList, MetadataUtils.mergeSourceMetadata(hlsMetadata, defaultMetadata), hlsSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customUserId")
+        DataVerifier.verifyStaticData(impression2.eventDataList, MetadataUtils.mergeSourceMetadata(dashMetadata, defaultMetadata), dashSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customUserId")
+        DataVerifier.verifyStaticData(impression3.eventDataList, MetadataUtils.mergeSourceMetadata(progMetadata, defaultMetadata), progSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customUserId")
 
         DataVerifier.verifyM3u8SourceUrl(impression1.eventDataList, hlsSample.m3u8Url!!)
         DataVerifier.verifyMpdSourceUrl(impression2.eventDataList, dashSample.mpdUrl!!)
@@ -532,11 +532,10 @@ class PhoneBasicScenariosTest {
 
         DataVerifier.verifyStartupSample(startupSampleImpression1)
 
-        // TODO: verify default and sourceMetadata
-        // startupsample of consequent impressions have videoEndTime and start time set
+        // TODO [AN-3688] startupsample of consequent impressions have videoEndTime and start time set
         // this probably needs to be fixed in the adapter
-        // DataVerifier.verifyStartupSample(startupSampleImpression2, false)
-        // DataVerifier.verifyStartupSample(startupSampleImpression3, false)
+//        DataVerifier.verifyStartupSample(startupSampleImpression2, false)
+//        DataVerifier.verifyStartupSample(startupSampleImpression3, false)
     }
 
     @Test
@@ -658,7 +657,6 @@ class PhoneBasicScenariosTest {
 
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
 
-        // TODO: this is a bit cumbersome, better way?
         val playerSource = defaultPlayer.source
         var changedCustomData = CustomData()
         if (playerSource != null) {
@@ -709,11 +707,12 @@ class PhoneBasicScenariosTest {
         assertThat(samplesBeforeCustomDataChange).hasSizeGreaterThan(0)
         assertThat(samplesAfterCustomDataChange).hasSizeGreaterThan(0)
 
+        DataVerifier.verifyM3u8SourceUrl(impression1.eventDataList, hlsSample.m3u8Url!!)
         DataVerifier.verifyCustomData(samplesBeforeCustomDataChange, CustomData())
         DataVerifier.verifyCustomData(samplesAfterCustomDataChange, changedCustomData)
-        DataVerifier.verifyCustomData(impression2.eventDataList, CustomData())
 
-        // TODO: verify that all data that is not customData stayed the same over the session
+        DataVerifier.verifyMpdSourceUrl(impression2.eventDataList, dashSample.mpdUrl!!)
+        DataVerifier.verifyCustomData(impression2.eventDataList, CustomData())
     }
 
     @Test

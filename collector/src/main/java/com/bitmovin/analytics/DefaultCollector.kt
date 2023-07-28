@@ -19,7 +19,7 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     protected val metadataProvider: MetadataProvider = MetadataProvider(),
 ) : AnalyticsCollector<TPlayer> {
 
-    // TODO: why is this lazy and not part of the constructor for easier testing?
+    // TODO[AN-3692]: why is this lazy and not part of the constructor for easier testing?
     protected open val analytics by lazy { BitmovinAnalytics(config, context) }
 
     protected val userIdProvider: UserIdProvider =
@@ -51,9 +51,8 @@ abstract class DefaultCollector<TPlayer> protected constructor(
                 analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
             }
 
-            // for backwards compatibility we set customData on
-            // the deprecated bitmovinAnalyticsConfig if deprecated config is used
-            // and no sourceMetadata is set
+            // for backwards compatibility we set customData on the deprecated bitmovinAnalyticsConfig
+            // if deprecated config is used and no sourceMetadata is set
             // this can be removed once deprecated config is removed
             if (!metadataProvider.sourceMetadataIsSet() &&
                 metadataProvider.deprecatedBitmovinAnalyticsConfigIsSet()
@@ -89,7 +88,7 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     }
 
     override fun sendCustomDataEvent(customData: CustomData) {
-        // TODO: we might need to make sure this event is
+        // TODO[AN-3684]: we might need to make sure this event is
         // handled by the main looper, since we might access to player from a different thread, which
         // could cause issues. (we should discuss thread safety in general with player folks)
         analytics.sendCustomDataEvent(customData)
