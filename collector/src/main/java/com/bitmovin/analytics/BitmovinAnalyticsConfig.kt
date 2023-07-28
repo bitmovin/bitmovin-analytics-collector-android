@@ -5,6 +5,12 @@ import android.os.Parcelable
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
 
+/**
+ * Deprecated: Use AnalyticsConfig, DefaultMetadata and SourceMetadata instead
+ *
+ * For a detailed migration guide from API v2 to v3 see:
+ * https://developer.bitmovin.com/playback/docs/collector-migration-guide-from-api-v2-to-v3
+ */
 @Deprecated(
     "Use AnalyticsConfig, DefaultMetadata and SourceMetadata instead",
     ReplaceWith("AnalyticsConfig(licenseKey)", "com.bitmovin.analytics.api.AnalyticsConfig"),

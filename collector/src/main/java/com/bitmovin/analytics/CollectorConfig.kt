@@ -3,6 +3,12 @@ package com.bitmovin.analytics
 import android.os.Parcel
 import android.os.Parcelable
 
+/**
+ * Deprecated: Use AnalyticsConfig instead.
+ *
+ * For a detailed migration guide from API v2 to v3 see:
+ * https://developer.bitmovin.com/playback/docs/collector-migration-guide-from-api-v2-to-v3
+ */
 @Deprecated("Use AnalyticsConfig instead")
 class CollectorConfig() : Parcelable {
     /**
