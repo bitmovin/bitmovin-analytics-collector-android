@@ -50,7 +50,7 @@ object LogParser {
             )
 
             if (eventData != null) {
-                if (isNewImpressionSample(eventData) && !currentImpression.isEmpty()) {
+                if (isNewImpressionSample(eventData) && currentImpression.eventDataList.isNotEmpty()) {
                     currentImpression = Impression()
                     impressionList.add(currentImpression)
                 }

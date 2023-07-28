@@ -103,7 +103,10 @@ class AdScenariosTest {
 
         val eventDataList = impression.eventDataList
         DataVerifier.verifyStaticData(eventDataList, sourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
-        DataVerifier.verifyStartupSample(eventDataList[0])
+
+        // TODO: verify if this could cause issues
+        // startup sample is second sample (since order of events in player changed in 3.40.0
+        DataVerifier.verifyStartupSample(eventData = eventDataList[1], expectedSequenceNumber = 1)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
         DataVerifier.verifyInvariants(eventDataList)

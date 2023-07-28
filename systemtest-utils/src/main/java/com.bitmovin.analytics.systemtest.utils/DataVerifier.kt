@@ -255,7 +255,7 @@ object DataVerifier {
         assertThat(eventData.userAgent).contains("Android 1") // is dynamic so we only check that it is at least Android 1x
     }
 
-    fun verifyStartupSample(eventData: EventData, isFirstImpression: Boolean = true) {
+    fun verifyStartupSample(eventData: EventData, isFirstImpression: Boolean = true, expectedSequenceNumber: Int = 0) {
         assertThat(eventData.state).isEqualTo(STARTUP)
         assertThat(eventData.startupTime).isGreaterThan(0)
         assertThat(eventData.supportedVideoCodecs).isNotNull
@@ -268,7 +268,7 @@ object DataVerifier {
         assertThat(eventData.videoTimeStart).isEqualTo(0)
         //   assertThat(eventData.videoTimeEnd).isEqualTo(0) // we can end up with startup samples that have non 0 videoTimeEnd, this needs to be investigated
         assertThat(eventData.droppedFrames).isEqualTo(0)
-        assertThat(eventData.sequenceNumber).isEqualTo(0)
+        assertThat(eventData.sequenceNumber).isEqualTo(expectedSequenceNumber)
     }
 
     fun verifyDrmStartupSample(eventData: EventData, drmType: String?, isFirstImpression: Boolean = true, isAutoPlay: Boolean = true) {

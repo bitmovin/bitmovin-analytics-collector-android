@@ -463,11 +463,11 @@ class PhoneBasicScenariosTest {
         val extractedSourceMetadata = ApiV3Utils.extractSourceMetadata(bitmovinAnalyticsConfig)
 
         val impression1SourceMetadata = ApiV3Utils.mergeSourceMetadata(MetadataUtils.mergeSourceMetadata(hlsMetadata, defaultMetadata), extractedSourceMetadata)
-        DataVerifier.verifyStaticData(impression1.eventDataList, impression1SourceMetadata, hlsSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(impression1.eventDataList, impression1SourceMetadata, hlsSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customBitmovinUserId1")
         val impression2SourceMetadata = ApiV3Utils.mergeSourceMetadata(MetadataUtils.mergeSourceMetadata(dashMetadata, defaultMetadata), extractedSourceMetadata)
-        DataVerifier.verifyStaticData(impression2.eventDataList, impression2SourceMetadata, dashSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(impression2.eventDataList, impression2SourceMetadata, dashSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customBitmovinUserId1")
         val impression3SourceMetadata = ApiV3Utils.mergeSourceMetadata(MetadataUtils.mergeSourceMetadata(progMetadata, defaultMetadata), extractedSourceMetadata)
-        DataVerifier.verifyStaticData(impression3.eventDataList, impression3SourceMetadata, progSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(impression3.eventDataList, impression3SourceMetadata, progSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customBitmovinUserId1")
 
         DataVerifier.verifyInvariants(impression1.eventDataList)
         DataVerifier.verifyInvariants(impression2.eventDataList)
@@ -628,7 +628,7 @@ class PhoneBasicScenariosTest {
     fun test_vod_2Impressions_UsingAddSourceMetadata_ShouldReportSourceMetadata() {
         val hlsSample = TestSources.HLS_REDBULL
         val source1CustomData = CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
-        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", /*m3u8Url = hlsSample.m3u8Url, */ path = "path/Source1", customData = source1CustomData)
+        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", path = "path/Source1", customData = source1CustomData)
         val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
         val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
@@ -636,7 +636,7 @@ class PhoneBasicScenariosTest {
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
         val source2CustomData = CustomData(customData1 = "source2CustomData1", customData30 = "source2CustomData30", experimentName = "experimentNameSource2")
-        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", /*mpdUrl = dashSample.mpdUrl,*/ path = "path/Source2", customData = source2CustomData)
+        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", path = "path/Source2", customData = source2CustomData)
 
         // act
         mainScope.launch {
@@ -683,9 +683,9 @@ class PhoneBasicScenariosTest {
 
         val defaultMetadata = ApiV3Utils.extractDefaultMetadata(defaultAnalyticsConfig)
 
-        DataVerifier.verifyStaticData(impression1.eventDataList, MetadataUtils.mergeSourceMetadata(sourceMetadata1, defaultMetadata), hlsSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(impression1.eventDataList, MetadataUtils.mergeSourceMetadata(sourceMetadata1, defaultMetadata), hlsSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customBitmovinUserId1")
         DataVerifier.verifyInvariants(impression1.eventDataList)
-        DataVerifier.verifyStaticData(impression2.eventDataList, MetadataUtils.mergeSourceMetadata(sourceMetadata2, defaultMetadata), dashSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(impression2.eventDataList, MetadataUtils.mergeSourceMetadata(sourceMetadata2, defaultMetadata), dashSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customBitmovinUserId1")
         DataVerifier.verifyInvariants(impression2.eventDataList)
 
         val startupSampleImpression1 = impression1.eventDataList.first()
