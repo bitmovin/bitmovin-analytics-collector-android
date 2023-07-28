@@ -73,6 +73,18 @@ object ApiV3Utils {
             // defaultMetadata to mimic the API v2 behaviour
         )
     }
+
+    fun mergeSourceMetadata(sourceMetadata: SourceMetadata, fallBack: SourceMetadata): SourceMetadata {
+        return SourceMetadata(
+            title = sourceMetadata.title ?: fallBack.title,
+            videoId = sourceMetadata.videoId ?: fallBack.videoId,
+            cdnProvider = sourceMetadata.cdnProvider ?: fallBack.cdnProvider,
+            path = sourceMetadata.path ?: fallBack.path,
+            isLive = sourceMetadata.isLive ?: fallBack.isLive,
+            customData = mergeCustomData(sourceMetadata.customData, fallBack.customData),
+        )
+    }
+
     fun mergeSourceMetadata(
         sourceMetadata: SourceMetadata?,
         defaultMetadata: DefaultMetadata?,

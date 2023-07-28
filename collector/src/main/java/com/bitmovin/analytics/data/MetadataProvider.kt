@@ -20,16 +20,18 @@ class MetadataProvider {
     // in case there is no source metadata
     fun getSourceMetadata(source: Any): SourceMetadata? {
         val sourceMetadata = sourceMetadataMap[source]
-        if (sourceMetadata != null) {
-            return sourceMetadata
+        val deprecatedOldConfig = deprecatedBitmovinAnalyticsConfig.get()
+
+        if (deprecatedOldConfig != null) {
+            val oldSourceMetadata = ApiV3Utils.extractSourceMetadata(deprecatedOldConfig)
+            return ApiV3Utils.mergeSourceMetadata(sourceMetadata ?: SourceMetadata(), oldSourceMetadata)
         }
 
-        val config = deprecatedBitmovinAnalyticsConfig.get()
-        if (config != null) {
-            return ApiV3Utils.extractSourceMetadata(config)
-        }
+        return sourceMetadata
+    }
 
-        return null
+    fun sourceMetadataIsSet(): Boolean {
+        return sourceMetadataMap[DEFAULT_KEY] != null
     }
 
     fun getSourceMetadata(): SourceMetadata? {
@@ -42,6 +44,8 @@ class MetadataProvider {
 
     // For backwards compatibility reason we extract the data from the deprecatedAnalyticsConfig
     // in case there is no defaultMetadata
+    // if there is default metadata, it means that the new API is used (defaultMetadata can only be set
+    // through v3 factory method, and not through v2)
     var defaultMetadata: DefaultMetadata
         get() {
             val explicitSetDefaultMetadata = internalDefaultMetadata.get()
@@ -60,8 +64,16 @@ class MetadataProvider {
             internalDefaultMetadata.set(value)
         }
 
-    fun setDeprectedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) {
+    fun setDeprecatedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) {
         deprecatedBitmovinAnalyticsConfig.set(bitmovinAnalyticsConfig)
+    }
+
+    fun deprecatedBitmovinAnalyticsConfigIsSet(): Boolean {
+        return deprecatedBitmovinAnalyticsConfig.get() != null
+    }
+
+    fun getDeprecatedBitmovinAnalyticsConfig(): BitmovinAnalyticsConfig? {
+        return deprecatedBitmovinAnalyticsConfig.get()
     }
 
     companion object {

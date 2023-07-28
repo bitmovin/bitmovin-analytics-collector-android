@@ -16,6 +16,8 @@ interface AnalyticsCollector<TPlayer> {
      */
     val userId: String
 
+    var defaultMetadata: DefaultMetadata
+
     /**
      * Attaches player to the analytics collector and starts listening to player events
      */

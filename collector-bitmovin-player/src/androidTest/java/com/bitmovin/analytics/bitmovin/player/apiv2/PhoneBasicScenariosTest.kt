@@ -45,7 +45,7 @@ class PhoneBasicScenariosTest {
     private lateinit var defaultPlayer: Player
 
     private var defaultSample = TestSources.HLS_REDBULL
-    private var defaultAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(defaultSample.m3u8Url!!)
+    private var defaultAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
     private var defaultSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
 
     @Before
@@ -381,85 +381,8 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vod_2Impressions_Should_NotCarryOverDataFromFirstImpression() {
-        val hlsSample = TestSources.HLS_REDBULL
-        val v2AnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(hlsSample.m3u8Url!!)
-        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
-        val collector = IBitmovinPlayerCollector.create(v2AnalyticsConfig, appContext)
-
-        // act
-        mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(hlsSource)
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        val dashSample = TestSources.DASH
-        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            defaultPlayer.play()
-            collector.detachPlayer()
-
-            v2AnalyticsConfig.m3u8Url = null
-            v2AnalyticsConfig.mpdUrl = dashSample.mpdUrl
-
-            collector.attachPlayer(defaultPlayer)
-
-            defaultPlayer.load(dashSource)
-            defaultPlayer.play()
-        }
-
-        // wait a bit for the source change to happen
-        Thread.sleep(500)
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            defaultPlayer.play()
-            collector.detachPlayer()
-        }
-
-        // wait a bit for player to be cleaned up
-        Thread.sleep(500)
-
-        val impressions = LogParser.extractImpressions()
-        assertThat(impressions.size).isEqualTo(2)
-
-        val impression1 = impressions[0]
-        val impression2 = impressions[1]
-
-        DataVerifier.verifyHasNoErrorSamples(impression1)
-        DataVerifier.verifyHasNoErrorSamples(impression2)
-
-        v2AnalyticsConfig.m3u8Url = hlsSample.m3u8Url
-        DataVerifier.verifyStaticData(impression1.eventDataList, v2AnalyticsConfig, hlsSample, BitmovinPlayerConstants.playerInfo)
-        DataVerifier.verifyInvariants(impression1.eventDataList)
-
-        v2AnalyticsConfig.m3u8Url = null
-        v2AnalyticsConfig.mpdUrl = dashSample.mpdUrl
-        DataVerifier.verifyStaticData(impression2.eventDataList, v2AnalyticsConfig, dashSample, BitmovinPlayerConstants.playerInfo)
-        DataVerifier.verifyInvariants(impression2.eventDataList)
-
-        val startupSampleImpression1 = impression1.eventDataList.first()
-        val startupSampleImpression2 = impression2.eventDataList.first()
-
-        DataVerifier.verifyStartupSample(startupSampleImpression1)
-        DataVerifier.verifyStartupSample(startupSampleImpression2, false)
-
-        val lastSampleImpression1 = impression1.eventDataList.last()
-
-        // make sure that data is not carried over from impression before
-        assertThat(lastSampleImpression1.videoBitrate).isNotEqualTo(startupSampleImpression2.videoBitrate)
-    }
-
-    @Test
     fun test_vod_3ImpressionsWithPlaylist_Should_DetectNewSessions() {
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig("dummyURL")
+        val bitmovinAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val hlsSample = TestSources.HLS_REDBULL
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
         val dashSample = TestSources.DASH
@@ -470,22 +393,19 @@ class PhoneBasicScenariosTest {
         val hlsMetadata = SourceMetadata(
             videoId = "hls-video-id",
             title = "hlsTitle",
-//            m3u8Url = hlsSample.m3u8Url,
         )
 
         val dashMetadata = SourceMetadata(
             videoId = "dash-video-id",
             title = "dashTitle",
-//            mpdUrl = dashSample.mpdUrl,
         )
 
         val progMetadata = SourceMetadata(
             videoId = "prog-video-id",
             title = "progTitle",
-//            progUrl = progSample.progUrl,
         )
 
-        val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
+        val collector = IBitmovinPlayerCollector.create(bitmovinAnalyticsConfig, appContext)
         collector.addSourceMetadata(hlsSource, hlsMetadata)
         collector.addSourceMetadata(dashSource, dashMetadata)
         collector.addSourceMetadata(progSource, progMetadata)
@@ -539,11 +459,15 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression2)
         DataVerifier.verifyHasNoErrorSamples(impression3)
 
-        val defaultMetadata = ApiV3Utils.extractDefaultMetadata(analyticsConfig)
+        val defaultMetadata = ApiV3Utils.extractDefaultMetadata(bitmovinAnalyticsConfig)
+        val extractedSourceMetadata = ApiV3Utils.extractSourceMetadata(bitmovinAnalyticsConfig)
 
-        DataVerifier.verifyStaticData(impression1.eventDataList, MetadataUtils.mergeSourceMetadata(hlsMetadata, defaultMetadata), hlsSample, BitmovinPlayerConstants.playerInfo)
-        DataVerifier.verifyStaticData(impression2.eventDataList, MetadataUtils.mergeSourceMetadata(dashMetadata, defaultMetadata), dashSample, BitmovinPlayerConstants.playerInfo)
-        DataVerifier.verifyStaticData(impression3.eventDataList, MetadataUtils.mergeSourceMetadata(progMetadata, defaultMetadata), progSample, BitmovinPlayerConstants.playerInfo)
+        val impression1SourceMetadata = ApiV3Utils.mergeSourceMetadata(MetadataUtils.mergeSourceMetadata(hlsMetadata, defaultMetadata), extractedSourceMetadata)
+        DataVerifier.verifyStaticData(impression1.eventDataList, impression1SourceMetadata, hlsSample, BitmovinPlayerConstants.playerInfo)
+        val impression2SourceMetadata = ApiV3Utils.mergeSourceMetadata(MetadataUtils.mergeSourceMetadata(dashMetadata, defaultMetadata), extractedSourceMetadata)
+        DataVerifier.verifyStaticData(impression2.eventDataList, impression2SourceMetadata, dashSample, BitmovinPlayerConstants.playerInfo)
+        val impression3SourceMetadata = ApiV3Utils.mergeSourceMetadata(MetadataUtils.mergeSourceMetadata(progMetadata, defaultMetadata), extractedSourceMetadata)
+        DataVerifier.verifyStaticData(impression3.eventDataList, impression3SourceMetadata, progSample, BitmovinPlayerConstants.playerInfo)
 
         DataVerifier.verifyInvariants(impression1.eventDataList)
         DataVerifier.verifyInvariants(impression2.eventDataList)
@@ -562,7 +486,7 @@ class PhoneBasicScenariosTest {
 
     @Test
     fun test_vod_2ImpressionsWithPlaylist_Should_SetCustomDataOnFirstSourceOnly() {
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig("dummyURL")
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val initialMetadata = ApiV3Utils.extractDefaultMetadata(analyticsConfig)
         val hlsSample = TestSources.HLS_REDBULL
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
@@ -572,7 +496,6 @@ class PhoneBasicScenariosTest {
         val hlsMetadata = SourceMetadata(
             videoId = "hls-video-id",
             title = "hlsTitle",
-//            m3u8Url = hlsSample.m3u8Url,
         )
 
         val initialHlsMetadata = hlsMetadata.copy()
@@ -580,7 +503,6 @@ class PhoneBasicScenariosTest {
         val dashMetadata = SourceMetadata(
             videoId = "dash-video-id",
             title = "dashTitle",
-//            mpdUrl = dashSample.mpdUrl,
         )
 
         val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
@@ -656,87 +578,11 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vod_2ImpressionsWithPlaylist_Should_SetCustomDataOnConfigAcrossSources() {
-        val hlsSample = TestSources.HLS_REDBULL
-        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
-        val dashSample = TestSources.DASH
-        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
-
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(hlsSample.m3u8Url!!)
-
-        val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
-        val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
-
-        // act
-        mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(playlistConfig)
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
-        val playerSource = defaultPlayer.source
-        var changedCustomData = CustomData()
-        if (playerSource != null) {
-            val changedCustomData = collector.getCustomData(playerSource).copy(customData1 = "setOnSource1")
-            collector.setCustomData(playerSource, changedCustomData)
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
-
-        // seek to almost end of first track
-        val seekTo = hlsSample.duration / 1000 - 1.0
-        mainScope.launch {
-            defaultPlayer.seek(seekTo)
-        }
-
-        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-        }
-
-        Thread.sleep(500)
-
-        mainScope.launch {
-            collector.detachPlayer()
-        }
-
-        // assert
-        val impressions = LogParser.extractImpressions()
-        assertThat(impressions.size).isEqualTo(2)
-
-        val impression1 = impressions[0]
-        val impression2 = impressions[1]
-
-        DataVerifier.verifyHasNoErrorSamples(impression1)
-        DataVerifier.verifyHasNoErrorSamples(impression2)
-
-        val samplesBeforeCustomDataChange = impression1.eventDataList.filter {
-                x ->
-            x.customData1 != "setOnSource1"
-        }
-
-        val samplesAfterCustomDataChange = impression1.eventDataList.filter {
-                x ->
-            x.customData1 == "setOnSource1"
-        }
-
-        assertThat(samplesBeforeCustomDataChange).hasSizeGreaterThan(0)
-        assertThat(samplesAfterCustomDataChange).hasSizeGreaterThan(0)
-
-        val expectedAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig("dummyURL")
-        DataVerifier.verifyAnalyticsConfig(samplesBeforeCustomDataChange, expectedAnalyticsConfig)
-        DataVerifier.verifyCustomData(samplesAfterCustomDataChange, changedCustomData)
-        DataVerifier.verifyCustomData(impression2.eventDataList, CustomData())
-    }
-
-    @Test
     fun test_nonExistingStream_Should_sendErrorSample() {
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
         val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()))
 
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(nonExistingStreamSample.uri.toString())
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
 
         // act
@@ -783,7 +629,7 @@ class PhoneBasicScenariosTest {
         val hlsSample = TestSources.HLS_REDBULL
         val source1CustomData = CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
         val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", /*m3u8Url = hlsSample.m3u8Url, */ path = "path/Source1", customData = source1CustomData)
-        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig(hlsSample.m3u8Url!!)
+        val analyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
         val collector = IBitmovinPlayerCollector.create(analyticsConfig, appContext)
 

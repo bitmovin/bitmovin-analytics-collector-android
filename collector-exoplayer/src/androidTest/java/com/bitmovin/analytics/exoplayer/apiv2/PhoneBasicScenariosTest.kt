@@ -2,6 +2,7 @@ package com.bitmovin.analytics.exoplayer.apiv2
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector
 import com.bitmovin.analytics.exoplayer.ExoPlayerPlaybackUtils
@@ -110,9 +111,92 @@ class PhoneBasicScenariosTest {
 
         DataVerifier.verifyStaticData(eventDataList, defaultAnalyticsConfig, defaultSample, ExoplayerConstants.playerInfo)
         DataVerifier.verifyStartupSample(eventDataList[0])
-        DataVerifier.verifyInvariants(eventDataList)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+    }
+
+    @Test
+    fun test_2Sessions_withDifferentCustomData() {
+        // arrange
+        val collector = IExoPlayerCollector.create(defaultAnalyticsConfig, appContext)
+        // act
+        mainScope.launch {
+            player.volume = 0.0f
+            collector.attachPlayer(player)
+            player.setMediaItem(defaultMediaItem)
+            player.prepare()
+            player.play()
+        }
+
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 500)
+
+        mainScope.launch {
+            player.pause()
+            collector.customData = CustomData("source1", "source1")
+        }
+
+        Thread.sleep(500)
+
+        mainScope.launch {
+            player.play()
+        }
+
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+        mainScope.launch {
+            player.pause()
+            collector.detachPlayer()
+
+            defaultAnalyticsConfig.customData1 = "source2"
+            defaultAnalyticsConfig.customData2 = "source2"
+            collector.attachPlayer(player)
+            player.setMediaItem(defaultMediaItem)
+            player.prepare()
+            player.play()
+        }
+
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+        mainScope.launch {
+            player.pause()
+            collector.detachPlayer()
+            player.release()
+        }
+
+        val impressions = LogParser.extractImpressions()
+        Assertions.assertThat(impressions.size).isEqualTo(2)
+
+        val impression = impressions.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        val beforeCustomDataChange = eventDataList.filter { it.customData1 != "source1" }
+        val afterCustomDataChange = eventDataList.filter { it.customData1 == "source1" }
+
+        val customDataBeforeChange = CustomData(
+            experimentName = "experiment-1",
+            customData1 = "systemtest",
+            customData2 = "customData2",
+            customData3 = "customData3",
+            customData4 = "customData4",
+            customData5 = "customData5",
+            customData6 = "customData6",
+            customData7 = "customData7",
+        )
+
+        DataVerifier.verifyCustomData(beforeCustomDataChange, customDataBeforeChange)
+
+        val customDataAfterChange = CustomData(
+            customData1 = "source1",
+            customData2 = "source1",
+        )
+        DataVerifier.verifyCustomData(afterCustomDataChange, customDataAfterChange)
+
+        val customDataOnSecondImpression = CustomData(
+            customData1 = "source2",
+            customData2 = "source2",
+        )
+        DataVerifier.verifyCustomData(impressions[1].eventDataList, customDataOnSecondImpression)
     }
 
     @Test

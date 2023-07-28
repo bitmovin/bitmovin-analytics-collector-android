@@ -37,7 +37,7 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     override val userId: String
         get() = userIdProvider.userId()
 
-    var defaultMetadata: DefaultMetadata
+    override var defaultMetadata: DefaultMetadata
         get() = metadataProvider.defaultMetadata
         set(value) {
             metadataProvider.defaultMetadata = value
@@ -45,14 +45,24 @@ abstract class DefaultCollector<TPlayer> protected constructor(
 
     var customData: CustomData
         get() = metadataProvider.getSourceMetadata()?.customData ?: CustomData()
-        set(newCustomData) {
-
-            val newActiveCustomData = ApiV3Utils.mergeCustomData(newCustomData, metadataProvider.defaultMetadata.customData)
+        set(value) {
+            val newActiveCustomData = ApiV3Utils.mergeCustomData(value, metadataProvider.defaultMetadata.customData)
             if (newActiveCustomData != analytics.activeCustomData) {
                 analytics.closeCurrentSampleForCustomDataChangeIfNeeded()
             }
 
-            val newSourceMetadata = metadataProvider.getSourceMetadata()?.copy(customData = newCustomData) ?: SourceMetadata(customData = newCustomData)
+            // for backwards compatibility we set customData on
+            // the deprecated bitmovinAnalyticsConfig if deprecated config is used
+            // and no sourceMetadata is set
+            // this can be removed once deprecated config is removed
+            if (!metadataProvider.sourceMetadataIsSet() &&
+                metadataProvider.deprecatedBitmovinAnalyticsConfigIsSet()
+            ) {
+                setCustomDataOnDeprecatedBitmovinConfig(value)
+                return
+            }
+
+            val newSourceMetadata = metadataProvider.getSourceMetadata()?.copy(customData = value) ?: SourceMetadata(customData = value)
             metadataProvider.setSourceMetadata(newSourceMetadata)
         }
 
@@ -86,6 +96,41 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     }
 
     fun setDeprecatedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) {
-        metadataProvider.setDeprectedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig)
+        metadataProvider.setDeprecatedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig)
+    }
+
+    private fun setCustomDataOnDeprecatedBitmovinConfig(customData: CustomData) {
+        val deprecatedBitmovinAnalyticsConfig = metadataProvider.getDeprecatedBitmovinAnalyticsConfig()
+        deprecatedBitmovinAnalyticsConfig?.customData1 = customData.customData1
+        deprecatedBitmovinAnalyticsConfig?.customData2 = customData.customData2
+        deprecatedBitmovinAnalyticsConfig?.customData3 = customData.customData3
+        deprecatedBitmovinAnalyticsConfig?.customData4 = customData.customData4
+        deprecatedBitmovinAnalyticsConfig?.customData5 = customData.customData5
+        deprecatedBitmovinAnalyticsConfig?.customData6 = customData.customData6
+        deprecatedBitmovinAnalyticsConfig?.customData7 = customData.customData7
+        deprecatedBitmovinAnalyticsConfig?.customData8 = customData.customData8
+        deprecatedBitmovinAnalyticsConfig?.customData9 = customData.customData9
+        deprecatedBitmovinAnalyticsConfig?.customData10 = customData.customData10
+        deprecatedBitmovinAnalyticsConfig?.customData11 = customData.customData11
+        deprecatedBitmovinAnalyticsConfig?.customData12 = customData.customData12
+        deprecatedBitmovinAnalyticsConfig?.customData13 = customData.customData13
+        deprecatedBitmovinAnalyticsConfig?.customData14 = customData.customData14
+        deprecatedBitmovinAnalyticsConfig?.customData15 = customData.customData15
+        deprecatedBitmovinAnalyticsConfig?.customData16 = customData.customData16
+        deprecatedBitmovinAnalyticsConfig?.customData17 = customData.customData17
+        deprecatedBitmovinAnalyticsConfig?.customData18 = customData.customData18
+        deprecatedBitmovinAnalyticsConfig?.customData19 = customData.customData19
+        deprecatedBitmovinAnalyticsConfig?.customData20 = customData.customData20
+        deprecatedBitmovinAnalyticsConfig?.customData21 = customData.customData21
+        deprecatedBitmovinAnalyticsConfig?.customData22 = customData.customData22
+        deprecatedBitmovinAnalyticsConfig?.customData23 = customData.customData23
+        deprecatedBitmovinAnalyticsConfig?.customData24 = customData.customData24
+        deprecatedBitmovinAnalyticsConfig?.customData25 = customData.customData25
+        deprecatedBitmovinAnalyticsConfig?.customData26 = customData.customData26
+        deprecatedBitmovinAnalyticsConfig?.customData27 = customData.customData27
+        deprecatedBitmovinAnalyticsConfig?.customData28 = customData.customData28
+        deprecatedBitmovinAnalyticsConfig?.customData29 = customData.customData29
+        deprecatedBitmovinAnalyticsConfig?.customData30 = customData.customData30
+        deprecatedBitmovinAnalyticsConfig?.experimentName = customData.experimentName
     }
 }

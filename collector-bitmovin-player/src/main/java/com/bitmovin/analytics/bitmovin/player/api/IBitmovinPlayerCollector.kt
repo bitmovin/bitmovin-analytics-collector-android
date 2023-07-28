@@ -41,9 +41,13 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
     /**
      * Sets [customData] of the [SourceMetadata] for the specified source.
      *
-     * Setting customData through this setter will close the current measurement with the old
-     * customData and start a new measurement with the new customData, in case the specified source
-     * is active and playing or in paused.
+     * Setting customData through this setter allows to reconfigure the customData during a session.
+     * In case the player is in 'playing' or 'paused' state, an analytics event is triggered and a sample
+     * is sent containing all measurements until the point in time of calling the method and the old customData.
+     * All new samples will contain the new customData.
+     *
+     * More information can be found here:
+     * https://developer.bitmovin.com/playback/docs/how-can-values-of-customdata-and-other-metadata-fields-be-changed
      */
     fun setCustomData(playerSource: Source, customData: CustomData)
 
