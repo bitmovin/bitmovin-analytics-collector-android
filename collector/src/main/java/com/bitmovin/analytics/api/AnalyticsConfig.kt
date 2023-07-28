@@ -14,28 +14,58 @@ constructor(
 
     /**
      * Value indicating if ad tracking is disabled.
+     *
+     * Default is `false`
      */
     val adTrackingDisabled: Boolean = false,
 
     /**
      * Generate a random UserId for the session
+     *
+     * Default is `false`
      */
     val randomizeUserId: Boolean = false,
 
     /**
-     * The URL of the Bitmovin Analytics backend.
-     */
-    val backendUrl: String = DEFAULT_BACKEND_URL,
-
-    /**
      * Specifies the retry behavior in case an analytics request cannot be sent to the analytics backend.
      * See [RetryPolicy] for the available settings.
+     *
+     * Default is [RetryPolicy.NO_RETRY]
      */
     val retryPolicy: RetryPolicy = RetryPolicy.NO_RETRY,
+
+    /**
+     * The URL of the Bitmovin Analytics backend.
+     *
+     * Default is the bitmovin backend URL
+     */
+    val backendUrl: String = DEFAULT_BACKEND_URL,
 
 ) : Parcelable {
     companion object {
         internal const val DEFAULT_BACKEND_URL = "https://analytics-ingress-global.bitmovin.com/"
+    }
+
+    class Builder(val licenseKey: String) {
+        private var adTrackingDisabled: Boolean = false
+        private var randomizeUserId: Boolean = false
+        private var retryPolicy: RetryPolicy = RetryPolicy.NO_RETRY
+        private var backendUrl: String = DEFAULT_BACKEND_URL
+
+        fun setAdTrackingDisabled(adTrackingDisabled: Boolean) = apply { this.adTrackingDisabled = adTrackingDisabled }
+        fun setRandomizeUserId(randomizeUserId: Boolean) = apply { this.randomizeUserId = randomizeUserId }
+        fun setRetryPolicy(retryPolicy: RetryPolicy) = apply { this.retryPolicy = retryPolicy }
+        fun setBackendUrl(backendUrl: String) = apply { this.backendUrl = backendUrl }
+
+        fun build(): AnalyticsConfig {
+            return AnalyticsConfig(
+                licenseKey = licenseKey,
+                adTrackingDisabled = adTrackingDisabled,
+                randomizeUserId = randomizeUserId,
+                retryPolicy = retryPolicy,
+                backendUrl = backendUrl,
+            )
+        }
     }
 }
 

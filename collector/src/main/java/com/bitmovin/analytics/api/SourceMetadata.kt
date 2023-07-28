@@ -38,4 +38,32 @@ constructor(
      * data is merged on a field basis with SourceMetadata taking precedence.
      */
     val customData: CustomData = CustomData(),
-) : Parcelable
+) : Parcelable {
+
+    class Builder {
+        private var title: String? = null
+        private var videoId: String? = null
+        private var cdnProvider: String? = null
+        private var path: String? = null
+        private var isLive: Boolean? = null
+        private var customData: CustomData = CustomData()
+
+        fun setTitle(title: String?) = apply { this.title = title }
+        fun setVideoId(videoId: String?) = apply { this.videoId = videoId }
+        fun setCdnProvider(cdnProvider: String?) = apply { this.cdnProvider = cdnProvider }
+        fun setPath(path: String?) = apply { this.path = path }
+        fun setIsLive(isLive: Boolean?) = apply { this.isLive = isLive }
+        fun setCustomData(customData: CustomData) = apply { this.customData = customData }
+
+        fun build(): SourceMetadata {
+            return SourceMetadata(
+                title = title,
+                videoId = videoId,
+                cdnProvider = cdnProvider,
+                path = path,
+                isLive = isLive,
+                customData = customData,
+            )
+        }
+    }
+}

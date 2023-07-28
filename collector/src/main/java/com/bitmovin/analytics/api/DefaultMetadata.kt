@@ -28,4 +28,23 @@ constructor(
      * data is merged on a field basis with SourceMetadata taking precedence.
      */
     val customData: CustomData = CustomData(),
-) : Parcelable
+) : Parcelable {
+
+    class Builder {
+        private var cdnProvider: String? = null
+        private var customUserId: String? = null
+        private var customData: CustomData = CustomData()
+
+        fun setCdnProvider(cdnProvider: String?) = apply { this.cdnProvider = cdnProvider }
+        fun setCustomUserId(customUserId: String?) = apply { this.customUserId = customUserId }
+        fun setCustomData(customData: CustomData) = apply { this.customData = customData }
+
+        fun build(): DefaultMetadata {
+            return DefaultMetadata(
+                cdnProvider = cdnProvider,
+                customUserId = customUserId,
+                customData = customData,
+            )
+        }
+    }
+}
