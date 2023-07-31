@@ -1,8 +1,12 @@
-public final class com/bitmovin/analytics/bitmovin/player/BitmovinPlayerCollector : com/bitmovin/analytics/DefaultCollector, com/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector {
-	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;)V
+public final class com/bitmovin/analytics/bitmovin/player/BitmovinPlayerCollector : com/bitmovin/analytics/DefaultCollector, com/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector {
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)V
-	public fun addSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/config/SourceMetadata;)V
+	public fun <init> (Lcom/bitmovin/analytics/api/AnalyticsConfig;Landroid/content/Context;)V
+	public fun addSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/SourceMetadata;)V
 	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
+	public fun getCustomData (Lcom/bitmovin/player/api/source/Source;)Lcom/bitmovin/analytics/api/CustomData;
+	public fun getSourceMetadata (Lcom/bitmovin/player/api/source/Source;)Lcom/bitmovin/analytics/api/SourceMetadata;
+	public fun setCustomData (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/CustomData;)V
+	public fun setSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/SourceMetadata;)V
 }
 
 public final class com/bitmovin/analytics/bitmovin/player/BuildConfig {
@@ -12,15 +16,24 @@ public final class com/bitmovin/analytics/bitmovin/player/BuildConfig {
 	public fun <init> ()V
 }
 
-public abstract interface class com/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector : com/bitmovin/analytics/AnalyticsCollector {
-	public static final field Factory Lcom/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector$Factory;
-	public abstract fun addSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/config/SourceMetadata;)V
-	public static fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector;
-	public static fun create (Lcom/bitmovin/analytics/api/AnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector;
+public abstract interface class com/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector : com/bitmovin/analytics/api/AnalyticsCollector {
+	public static final field Factory Lcom/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector$Factory;
+	public abstract fun addSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/SourceMetadata;)V
+	public static fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;)Lcom/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector;
+	public static fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;)Lcom/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector;
+	public static fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector;
+	public abstract fun getCustomData (Lcom/bitmovin/player/api/source/Source;)Lcom/bitmovin/analytics/api/CustomData;
+	public static fun getSdkVersion ()Ljava/lang/String;
+	public abstract fun getSourceMetadata (Lcom/bitmovin/player/api/source/Source;)Lcom/bitmovin/analytics/api/SourceMetadata;
+	public abstract fun setCustomData (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/CustomData;)V
+	public abstract fun setSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/SourceMetadata;)V
 }
 
-public final class com/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector$Factory {
-	public final fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector;
-	public final fun create (Lcom/bitmovin/analytics/api/AnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/bitmovin/player/IBitmovinPlayerCollector;
+public final class com/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector$Factory {
+	public final fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;)Lcom/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector;
+	public final fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;)Lcom/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector;
+	public final fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector;
+	public static synthetic fun create$default (Lcom/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector$Factory;Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;ILjava/lang/Object;)Lcom/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector;
+	public final fun getSdkVersion ()Ljava/lang/String;
 }
 

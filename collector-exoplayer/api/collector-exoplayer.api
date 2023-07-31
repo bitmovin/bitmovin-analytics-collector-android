@@ -5,18 +5,31 @@ public final class com/bitmovin/analytics/exoplayer/BuildConfig {
 	public fun <init> ()V
 }
 
-public final class com/bitmovin/analytics/exoplayer/ExoPlayerCollector : com/bitmovin/analytics/DefaultCollector, com/bitmovin/analytics/exoplayer/IExoPlayerCollector {
-	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;)V
+public final class com/bitmovin/analytics/exoplayer/ExoPlayerCollector : com/bitmovin/analytics/DefaultCollector, com/bitmovin/analytics/exoplayer/api/IExoPlayerCollector {
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)V
+	public fun <init> (Lcom/bitmovin/analytics/api/AnalyticsConfig;Landroid/content/Context;)V
 	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
+	public fun getSourceMetadata ()Lcom/bitmovin/analytics/api/SourceMetadata;
+	public fun setSourceMetadata (Lcom/bitmovin/analytics/api/SourceMetadata;)V
 }
 
-public abstract interface class com/bitmovin/analytics/exoplayer/IExoPlayerCollector : com/bitmovin/analytics/AnalyticsCollector {
-	public static final field Factory Lcom/bitmovin/analytics/exoplayer/IExoPlayerCollector$Factory;
-	public static fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/exoplayer/IExoPlayerCollector;
+public abstract interface class com/bitmovin/analytics/exoplayer/api/IExoPlayerCollector : com/bitmovin/analytics/api/AnalyticsCollector {
+	public static final field Factory Lcom/bitmovin/analytics/exoplayer/api/IExoPlayerCollector$Factory;
+	public static fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;)Lcom/bitmovin/analytics/exoplayer/api/IExoPlayerCollector;
+	public static fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;)Lcom/bitmovin/analytics/exoplayer/api/IExoPlayerCollector;
+	public static fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/exoplayer/api/IExoPlayerCollector;
+	public abstract fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
+	public static fun getSdkVersion ()Ljava/lang/String;
+	public abstract fun getSourceMetadata ()Lcom/bitmovin/analytics/api/SourceMetadata;
+	public abstract fun setCustomData (Lcom/bitmovin/analytics/api/CustomData;)V
+	public abstract fun setSourceMetadata (Lcom/bitmovin/analytics/api/SourceMetadata;)V
 }
 
-public final class com/bitmovin/analytics/exoplayer/IExoPlayerCollector$Factory {
-	public final fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/exoplayer/IExoPlayerCollector;
+public final class com/bitmovin/analytics/exoplayer/api/IExoPlayerCollector$Factory {
+	public final fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;)Lcom/bitmovin/analytics/exoplayer/api/IExoPlayerCollector;
+	public final fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;)Lcom/bitmovin/analytics/exoplayer/api/IExoPlayerCollector;
+	public final fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/exoplayer/api/IExoPlayerCollector;
+	public static synthetic fun create$default (Lcom/bitmovin/analytics/exoplayer/api/IExoPlayerCollector$Factory;Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;ILjava/lang/Object;)Lcom/bitmovin/analytics/exoplayer/api/IExoPlayerCollector;
+	public final fun getSdkVersion ()Ljava/lang/String;
 }
 

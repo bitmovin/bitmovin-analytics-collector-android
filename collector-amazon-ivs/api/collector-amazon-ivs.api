@@ -5,12 +5,21 @@ public final class com/bitmovin/analytics/amazon/ivs/BuildConfig {
 	public fun <init> ()V
 }
 
-public abstract interface class com/bitmovin/analytics/amazon/ivs/IAmazonIvsPlayerCollector : com/bitmovin/analytics/AnalyticsCollector {
-	public static final field Factory Lcom/bitmovin/analytics/amazon/ivs/IAmazonIvsPlayerCollector$Factory;
-	public static fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/amazon/ivs/IAmazonIvsPlayerCollector;
+public abstract interface class com/bitmovin/analytics/amazon/ivs/api/IAmazonIvsPlayerCollector : com/bitmovin/analytics/api/AnalyticsCollector {
+	public static final field Factory Lcom/bitmovin/analytics/amazon/ivs/api/IAmazonIvsPlayerCollector$Factory;
+	public static fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;)Lcom/bitmovin/analytics/amazon/ivs/api/IAmazonIvsPlayerCollector;
+	public static fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;)Lcom/bitmovin/analytics/amazon/ivs/api/IAmazonIvsPlayerCollector;
+	public abstract fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
+	public static fun getSdkVersion ()Ljava/lang/String;
+	public abstract fun getSourceMetadata ()Lcom/bitmovin/analytics/api/SourceMetadata;
+	public abstract fun setCustomData (Lcom/bitmovin/analytics/api/CustomData;)V
+	public abstract fun setSourceMetadata (Lcom/bitmovin/analytics/api/SourceMetadata;)V
 }
 
-public final class com/bitmovin/analytics/amazon/ivs/IAmazonIvsPlayerCollector$Factory {
-	public final fun create (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)Lcom/bitmovin/analytics/amazon/ivs/IAmazonIvsPlayerCollector;
+public final class com/bitmovin/analytics/amazon/ivs/api/IAmazonIvsPlayerCollector$Factory {
+	public final fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;)Lcom/bitmovin/analytics/amazon/ivs/api/IAmazonIvsPlayerCollector;
+	public final fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;)Lcom/bitmovin/analytics/amazon/ivs/api/IAmazonIvsPlayerCollector;
+	public static synthetic fun create$default (Lcom/bitmovin/analytics/amazon/ivs/api/IAmazonIvsPlayerCollector$Factory;Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;ILjava/lang/Object;)Lcom/bitmovin/analytics/amazon/ivs/api/IAmazonIvsPlayerCollector;
+	public final fun getSdkVersion ()Ljava/lang/String;
 }
 
