@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.0.0
+
 ### Changed
 - Introduced new API v3 for all players with breaking changes compared to v2
 - Upgraded to Kotlin 1.8.20
