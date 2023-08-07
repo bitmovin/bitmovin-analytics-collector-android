@@ -20,6 +20,7 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.systemtest.utils.Impression
 import com.bitmovin.analytics.systemtest.utils.LogParser
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.assertj.core.api.Assertions.assertThat
@@ -120,6 +121,8 @@ class LongtermRetryOnFailureTest {
             .isEqualTo(eventData)
     }
 
+    // TODO: changing the backend url on an collector after creating is not possible anymore
+    // with API v3, in order to test this scenario we need a custom backend for testing
 //    @Test
 //    fun test_failed_ad_and_eventdata_sending_they_are_send_with_the_next_successful_one() {
 //        val cachedSessionId = createTestImpressionId()
@@ -215,59 +218,74 @@ class LongtermRetryOnFailureTest {
         assertThat(triggerImpression!!.eventDataList).hasSize(1)
     }
 
-//    @Test
-//    fun test_having_multiple_bitmovin_analytics_instance_events_are_send_once() {
-//        val firstSession = createTestImpressionId()
-//        val secondSession = createTestImpressionId(2)
-//
-//        config.config.backendUrl = "https://doesnotwork"
-//        bitmovinAnalytics.attach(dummyPlayerAdapter)
-//
-//        val secondBitmovinAnalytics = BitmovinAnalytics(
-//            config = config,
-//            context = appContext,
-//        )
-//        val secondDummyPlayerAdapter = createDummyPlayerAdapter()
-//        secondBitmovinAnalytics.attach(secondDummyPlayerAdapter)
-//
-//        val eventDataFirstCollector = MutableList(100) {
-//            TestFactory.createEventData(impressionId = firstSession)
-//        }
-//
-//        val eventDataSecondCollector = MutableList(100) {
-//            TestFactory.createEventData(impressionId = secondSession)
-//        }
-//
-//        val firstJob = mainScope.launch {
-//            eventDataFirstCollector.forEach { bitmovinAnalytics.sendEventData(it) }
-//        }
-//        val secondJob = mainScope.launch {
-//            eventDataSecondCollector.forEach { secondBitmovinAnalytics.sendEventData(it) }
-//        }
-//        runBlocking {
-//            firstJob.join()
-//            secondJob.join()
-//        }
-//        Thread.sleep(1000)
-//
-//        config.config.backendUrl = AnalyticsConfig.DEFAULT_BACKEND_URL
-//        bitmovinAnalytics.attach(dummyPlayerAdapter)
-//        secondBitmovinAnalytics.attach(secondDummyPlayerAdapter)
-//
-//        LogParser.startTracking()
-//
-//        // Trigger sending of cached data
-//        bitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = firstSession))
-//        secondBitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = secondSession))
-//
-//        Thread.sleep(40000)
-//
-//        val impressions = LogParser.extractImpressions().combineByImpressionId()
-//
-//        impressions.values.forEach {
-//            assertThat(it.eventDataList).hasSize(101)
-//        }
-//    }
+    @Test
+    fun test_having_multiple_bitmovin_analytics_instance_events_are_send_once() {
+        val offlineConfig = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM, backendUrl = "https://doesnotwork")
+        val firstSession = createTestImpressionId()
+        val secondSession = createTestImpressionId(2)
+
+        val firstBitmovinAnalytics = BitmovinAnalytics(
+            config = offlineConfig,
+            context = appContext,
+        )
+
+        val secondBitmovinAnalytics = BitmovinAnalytics(
+            config = offlineConfig,
+            context = appContext,
+        )
+        val firstDummyPlayerAdapter = createDummyPlayerAdapter()
+        firstBitmovinAnalytics.attach(firstDummyPlayerAdapter)
+
+        val secondDummyPlayerAdapter = createDummyPlayerAdapter()
+        secondBitmovinAnalytics.attach(secondDummyPlayerAdapter)
+
+        val eventDataFirstCollector = MutableList(100) {
+            TestFactory.createEventData(impressionId = firstSession)
+        }
+
+        val eventDataSecondCollector = MutableList(100) {
+            TestFactory.createEventData(impressionId = secondSession)
+        }
+
+        val firstJob = mainScope.launch {
+            eventDataFirstCollector.forEach { firstBitmovinAnalytics.sendEventData(it) }
+        }
+        val secondJob = mainScope.launch {
+            eventDataSecondCollector.forEach { secondBitmovinAnalytics.sendEventData(it) }
+        }
+        runBlocking {
+            firstJob.join()
+            secondJob.join()
+        }
+        Thread.sleep(1000)
+
+        val onlineConfig = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM)
+        val thirdBitmovinAnalytics = BitmovinAnalytics(
+            config = onlineConfig,
+            context = appContext,
+        )
+        val forthBitmovinAnalytics = BitmovinAnalytics(
+            config = onlineConfig,
+            context = appContext,
+        )
+
+        thirdBitmovinAnalytics.attach(firstDummyPlayerAdapter)
+        forthBitmovinAnalytics.attach(secondDummyPlayerAdapter)
+
+        LogParser.startTracking()
+
+        // Trigger sending of cached data
+        thirdBitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = firstSession))
+        forthBitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = secondSession))
+
+        Thread.sleep(40000)
+
+        val impressions = LogParser.extractImpressions().combineByImpressionId()
+
+        impressions.values.forEach {
+            assertThat(it.eventDataList).hasSize(101)
+        }
+    }
 
     @Test
     fun test_having_more_than_14_days_old_events_in_the_event_queue_they_are_not_send_later() {
@@ -362,66 +380,65 @@ class LongtermRetryOnFailureTest {
         assertThat(persistentQueue.popAdEvent()!!.videoImpressionId).isEqualTo(secondSessionId)
     }
 
-//    @Test
-//    fun test_events_with_sequencenumber_higher_than_500_are_not_stored() {
-//        config.config.backendUrl = "https://doesnotwork"
-//        bitmovinAnalytics.detachPlayer()
-//
-//        bitmovinAnalytics = BitmovinAnalytics(
-//            config = config,
-//            context = appContext,
-//        )
-//        dummyPlayerAdapter = createDummyPlayerAdapter()
-//
-//        val persistentQueue = PersistentAnalyticsEventQueue(
-//            EventQueueConfig(),
-//            EventDatabase.getInstance(appContext),
-//        )
-//
-//        val sessionId = UUID.randomUUID().toString()
-//        repeat(300) {
-//            bitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = sessionId))
-//            bitmovinAnalytics.sendAdEventData(
-//                TestFactory.createAdEventData(
-//                    videoImpressionId = sessionId,
-//                    adImpressionId = sessionId,
-//                ),
-//            )
-//        }
-//        // go beyond the sequence number limit
-//        repeat(300) {
-//            bitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = sessionId))
-//        }
-//        // try to send/store more ad event data
-//        repeat(300) {
-//            bitmovinAnalytics.sendAdEventData(
-//                TestFactory.createAdEventData(
-//                    videoImpressionId = sessionId,
-//                    adImpressionId = sessionId,
-//                ),
-//            )
-//        }
-//
-//        config.config.backendUrl = AnalyticsConfig.DEFAULT_BACKEND_URL
-//        bitmovinAnalytics.detachPlayer()
-//
-//        var eventCount = 0
-//        var element = persistentQueue.popEvent()
-//        while (element != null) {
-//            eventCount++
-//            assertThat(element.sequenceNumber).isLessThan(501)
-//            element = persistentQueue.popEvent()
-//        }
-//        assertThat(eventCount).isEqualTo(501)
-//
-//        var adEventCount = 0
-//        var adElement = persistentQueue.popAdEvent()
-//        while (adElement != null) {
-//            adEventCount++
-//            adElement = persistentQueue.popAdEvent()
-//        }
-//        assertThat(adEventCount).isEqualTo(300)
-//    }
+    @Test
+    fun test_events_with_sequencenumber_higher_than_500_are_not_stored() {
+        val offlineConfig = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM, backendUrl = "https://doesnotwork")
+        bitmovinAnalytics.detachPlayer()
+
+        bitmovinAnalytics = BitmovinAnalytics(
+            config = offlineConfig,
+            context = appContext,
+        )
+        dummyPlayerAdapter = createDummyPlayerAdapter()
+
+        val persistentQueue = PersistentAnalyticsEventQueue(
+            EventQueueConfig(),
+            EventDatabase.getInstance(appContext),
+        )
+
+        val sessionId = UUID.randomUUID().toString()
+        repeat(300) {
+            bitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = sessionId))
+            bitmovinAnalytics.sendAdEventData(
+                TestFactory.createAdEventData(
+                    videoImpressionId = sessionId,
+                    adImpressionId = sessionId,
+                ),
+            )
+        }
+        // go beyond the sequence number limit
+        repeat(300) {
+            bitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = sessionId))
+        }
+        // try to send/store more ad event data
+        repeat(300) {
+            bitmovinAnalytics.sendAdEventData(
+                TestFactory.createAdEventData(
+                    videoImpressionId = sessionId,
+                    adImpressionId = sessionId,
+                ),
+            )
+        }
+
+        bitmovinAnalytics.detachPlayer()
+
+        var eventCount = 0
+        var element = persistentQueue.popEvent()
+        while (element != null) {
+            eventCount++
+            assertThat(element.sequenceNumber).isLessThan(501)
+            element = persistentQueue.popEvent()
+        }
+        assertThat(eventCount).isEqualTo(501)
+
+        var adEventCount = 0
+        var adElement = persistentQueue.popAdEvent()
+        while (adElement != null) {
+            adEventCount++
+            adElement = persistentQueue.popAdEvent()
+        }
+        assertThat(adEventCount).isEqualTo(300)
+    }
 }
 
 private fun List<Impression>.combineByImpressionId(): Map<String, Impression> {

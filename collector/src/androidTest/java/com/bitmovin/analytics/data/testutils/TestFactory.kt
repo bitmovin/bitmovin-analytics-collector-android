@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.data.testutils
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.DeviceInformation
@@ -29,12 +30,14 @@ object TestFactory {
         adImpressionId: String = UUID.randomUUID().toString(),
         playerInfo: PlayerInfo = PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
         time: Long? = null,
+        analyticsConfig: AnalyticsConfig = TestConfig.createAnalyticsConfig(),
     ) = AdEventData(
         adId = adId,
+        analyticsVersion = Util.analyticsVersion,
         videoImpressionId = videoImpressionId,
         adImpressionId = adImpressionId,
         userAgent = "userAgent",
-        domain = "bitmovin.com",
+        domain = "com.bitmovin.analytics.test",
         language = "en",
         player = playerInfo.playerType.toString(),
         screenHeight = 9,
@@ -45,6 +48,8 @@ object TestFactory {
         videoWindowWidth = 16,
         userId = "testUser",
         time = time ?: Util.timestamp,
+        adClickthroughUrl = "test+easy",
+        key = analyticsConfig.licenseKey,
     )
 
     fun createEventData(
