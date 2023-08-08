@@ -20,13 +20,18 @@ import com.bitmovin.analytics.systemtest.utils.combineByImpressionId
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
+import com.bitmovin.player.api.analytics.AnalyticsApi.Companion.analytics
+import com.bitmovin.player.api.analytics.SourceAnalyticsApi.Companion.analytics
+import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.After
@@ -39,14 +44,12 @@ import org.junit.runner.RunWith
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
 // Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
-class PhoneBasicScenariosTest {
-
+class BundledAnalyticsTest {
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var defaultPlayer: Player
 
     private val defaultSample = TestSources.HLS_REDBULL
-    private val defaultSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
     private val defaultSourceMetadata = SourceMetadata(
         title = "hls_redbull",
         videoId = "hls_redbull_id",
@@ -54,6 +57,9 @@ class PhoneBasicScenariosTest {
         customData = TestConfig.createDummyCustomData(),
         cdnProvider = "cdn_provider",
     )
+    private val defaultSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), defaultSourceMetadata)
+    private val defaultPlayerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
+    private val defaultAnalyticsConfig = TestConfig.createAnalyticsConfig()
 
     @Before
     fun setup() {
@@ -62,29 +68,26 @@ class PhoneBasicScenariosTest {
 
         // logging to mark new test run for logparsing
         LogParser.startTracking()
-        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
-        defaultPlayer = Player.create(appContext, playerConfig)
+
+        runBlockingOnMainScope {
+            defaultPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig)
+        }
     }
 
     @After
     fun tearDown() {
-        mainScope.launch {
+        runBlockingOnMainScope {
             defaultPlayer.destroy()
         }
-        // wait a bit for player to be destroyed
-        Thread.sleep(100)
     }
 
     @Test
     fun test_vod_playPauseWithAutoPlay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
         defaultPlayer.config.playbackConfig.isAutoplayEnabled = true
 
         // act
         mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
             defaultPlayer.load(defaultSource)
         }
 
@@ -107,7 +110,6 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             defaultPlayer.pause()
-            collector.detachPlayer()
         }
 
         Thread.sleep(500)
@@ -140,13 +142,8 @@ class PhoneBasicScenariosTest {
     fun test_vodWithDrm_playPauseWithAutoPlay() {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-
         val drmSourceConfig = SourceConfig.fromUrl(sample.mpdUrl!!)
         drmSourceConfig.drmConfig = WidevineConfig(sample.drmLicenseUrl!!)
-
-        val drmSource = Source.create(drmSourceConfig)
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
         val drmSourceMetadata = SourceMetadata(
             title = "drm_dash_widevine",
             videoId = "drm_dash_widevine_id",
@@ -154,13 +151,12 @@ class PhoneBasicScenariosTest {
             customData = TestConfig.createDummyCustomData(),
             cdnProvider = "cdn_provider",
         )
+        val drmSource = Source.create(drmSourceConfig, drmSourceMetadata)
 
         defaultPlayer.config.playbackConfig.isAutoplayEnabled = true
 
         // act
         mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            collector.setSourceMetadata(drmSource, drmSourceMetadata)
             defaultPlayer.load(drmSource)
         }
 
@@ -168,12 +164,6 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             defaultPlayer.pause()
-        }
-
-        Thread.sleep(500)
-
-        mainScope.launch {
-            collector.detachPlayer()
         }
 
         Thread.sleep(500)
@@ -195,13 +185,8 @@ class PhoneBasicScenariosTest {
 
     @Test
     fun test_vod_playSeekWithAutoPlay() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
-
         // act
         mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
             defaultPlayer.load(defaultSource)
             defaultPlayer.play() // calling play immediately, is similar to configuring autoplay
         }
@@ -215,12 +200,6 @@ class PhoneBasicScenariosTest {
         }
 
         BitmovinPlaybackUtils.waitUntilPlaybackFinished(defaultPlayer)
-
-        mainScope.launch {
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(200) // wait a bit for player being destroyed
 
         // assert
         val impressionList = LogParser.extractImpressions()
@@ -244,15 +223,12 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_playWithAutoplayAndMuted() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
-        val localPlayer = Player.create(appContext, playerConfig)
-        collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+        lateinit var localPlayer: Player
 
-        // act
-        mainScope.launch {
-            collector.attachPlayer(localPlayer)
+        runBlockingOnMainScope {
+            localPlayer = Player.create(appContext, playerConfig, TestConfig.createAnalyticsConfig())
             localPlayer.load(defaultSource)
         }
 
@@ -266,7 +242,6 @@ class PhoneBasicScenariosTest {
         Thread.sleep(500)
 
         mainScope.launch {
-            collector.detachPlayer()
             localPlayer.destroy()
         }
 
@@ -295,18 +270,16 @@ class PhoneBasicScenariosTest {
     fun test_live_playWithAutoplayAndMuted() {
         // arrange
         val liveSample = TestSources.DASH_LIVE
-        val liveSource = Source.create(SourceConfig.fromUrl(liveSample.mpdUrl!!))
 
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
-        val localPlayer = Player.create(appContext, playerConfig)
         val liveSourceMetadata = SourceMetadata(title = "liveSourceTitle", videoId = "liveSourceVideoId", customData = TestConfig.createDummyCustomData("liveSource"), isLive = true)
+        val liveSource = Source.create(SourceConfig.fromUrl(liveSample.mpdUrl!!), liveSourceMetadata)
+        lateinit var localPlayer: Player
 
         // act
-        mainScope.launch {
-            collector.setSourceMetadata(liveSource, liveSourceMetadata)
-            collector.attachPlayer(localPlayer)
+        runBlockingOnMainScope {
+            localPlayer = Player.create(appContext, playerConfig, TestConfig.createAnalyticsConfig())
             localPlayer.load(liveSource)
         }
 
@@ -317,14 +290,11 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             localPlayer.pause()
+            localPlayer.destroy()
         }
 
         // wait a bit to make sure last play sample is sent
         Thread.sleep(500)
-
-        mainScope.launch {
-            collector.detachPlayer()
-        }
 
         // assert
         val impressionList = LogParser.extractImpressions()
@@ -351,13 +321,10 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_2Impressions_Should_NotCarryOverDataFromFirstImpression() {
         val hlsSample = TestSources.HLS_REDBULL
-        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), defaultSourceMetadata)
 
         // act
         mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            collector.setSourceMetadata(hlsSource, defaultSourceMetadata)
             defaultPlayer.load(hlsSource)
             defaultPlayer.play()
         }
@@ -365,7 +332,6 @@ class PhoneBasicScenariosTest {
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
 
         val dashSample = TestSources.DASH
-        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
         val dashSourceMetadata = SourceMetadata(
             title = "dashSource",
             customData = TestConfig.createDummyCustomData("dash"),
@@ -373,13 +339,11 @@ class PhoneBasicScenariosTest {
             cdnProvider = "dashCdnProvider",
             path = "dashPath",
         )
+        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashSourceMetadata)
 
         mainScope.launch {
             defaultPlayer.pause()
             defaultPlayer.play()
-            collector.detachPlayer()
-            collector.setSourceMetadata(dashSource, dashSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
             defaultPlayer.load(dashSource)
             defaultPlayer.play()
         }
@@ -392,7 +356,6 @@ class PhoneBasicScenariosTest {
         mainScope.launch {
             defaultPlayer.pause()
             defaultPlayer.play()
-            collector.detachPlayer()
         }
 
         // wait a bit for player to be cleaned up
@@ -429,12 +392,6 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_3ImpressionsWithPlaylist_Should_DetectNewSessions() {
         val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val hlsSample = TestSources.HLS_REDBULL
-        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
-        val dashSample = TestSources.DASH
-        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
-        val progSample = TestSources.PROGRESSIVE
-        val progSource = Source.create(SourceConfig.fromUrl(progSample.progUrl!!))
 
         val defaultMetadata = DefaultMetadata(
             customUserId = "customUserId",
@@ -459,47 +416,52 @@ class PhoneBasicScenariosTest {
             title = "progTitle",
         )
 
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig, defaultMetadata)
-        collector.setSourceMetadata(hlsSource, hlsMetadata)
-        collector.setSourceMetadata(dashSource, dashMetadata)
-        collector.setSourceMetadata(progSource, progMetadata)
+        val hlsSample = TestSources.HLS_REDBULL
+        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), hlsMetadata)
+        val dashSample = TestSources.DASH
+        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashMetadata)
+        val progSample = TestSources.PROGRESSIVE
+        val progSource = Source.create(SourceConfig.fromUrl(progSample.progUrl!!), progMetadata)
+
+        lateinit var localPlayer: Player
+
+        runBlockingOnMainScope {
+            localPlayer = Player.create(appContext, defaultPlayerConfig, analyticsConfig, defaultMetadata)
+            localPlayer.load(defaultSource)
+        }
 
         val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource, progSource), PlaylistOptions())
 
         // act
         mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(playlistConfig)
-            defaultPlayer.play()
+            localPlayer.load(playlistConfig)
+            localPlayer.play()
         }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
 
         // seek to almost end of first track
         val seekTo = hlsSample.duration / 1000 - 1.0
         mainScope.launch {
-            defaultPlayer.seek(seekTo)
+            localPlayer.seek(seekTo)
         }
 
-        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(localPlayer, 2000)
 
         // seek to almost end of second track
         val seekTo2 = dashSample.duration / 1000 - 1.0
         mainScope.launch {
-            defaultPlayer.seek(seekTo2)
+            localPlayer.seek(seekTo2)
         }
 
-        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(localPlayer, 2000)
 
         mainScope.launch {
-            defaultPlayer.pause()
+            localPlayer.pause()
         }
 
-        BitmovinPlaybackUtils.waitUntilPlayerIsPaused(defaultPlayer)
-
-        mainScope.launch {
-            collector.detachPlayer()
-        }
+        BitmovinPlaybackUtils.waitUntilPlayerIsPaused(localPlayer)
+        mainScope.launch { localPlayer.destroy() }
 
         // assert
         val impressions = LogParser.extractImpressions()
@@ -546,11 +508,6 @@ class PhoneBasicScenariosTest {
             cdnProvider = "defaultCdnProvider",
         )
 
-        val hlsSample = TestSources.HLS_REDBULL
-        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
-        val dashSample = TestSources.DASH
-        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
-
         val hlsMetadata = SourceMetadata(
             videoId = "hls-video-id",
             title = "hlsTitle",
@@ -562,40 +519,41 @@ class PhoneBasicScenariosTest {
             title = "dashTitle",
         )
 
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig, defaultMetadata)
-        collector.setSourceMetadata(hlsSource, hlsMetadata)
-        collector.setSourceMetadata(dashSource, dashMetadata)
-
+        val hlsSample = TestSources.HLS_REDBULL
+        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), hlsMetadata)
+        val dashSample = TestSources.DASH
+        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashMetadata)
         val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
 
-        // act
-        mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(playlistConfig)
-            defaultPlayer.play()
+        lateinit var localPlayer: Player
+
+        runBlockingOnMainScope {
+            localPlayer = Player.create(appContext, defaultPlayerConfig, analyticsConfig, defaultMetadata)
+            localPlayer.load(playlistConfig)
+            localPlayer.play()
         }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
         val changedCustomData = CustomData(customData1 = "setOnSource1")
-        defaultPlayer.source?.let { collector.setCustomData(it, changedCustomData) }
+
+        runBlockingOnMainScope {
+            localPlayer.source?.analytics?.let { it.customData = changedCustomData }
+        }
 
         // seek to almost end of first track
         val seekTo = hlsSample.duration / 1000 - 1.0
         mainScope.launch {
-            defaultPlayer.seek(seekTo)
+            localPlayer.seek(seekTo)
         }
 
-        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(localPlayer, 2000)
 
         mainScope.launch {
-            defaultPlayer.pause()
+            localPlayer.pause()
+            localPlayer.destroy()
         }
 
         Thread.sleep(500)
-
-        mainScope.launch {
-            collector.detachPlayer()
-        }
 
         // assert
         val impressions = LogParser.extractImpressions()
@@ -640,25 +598,23 @@ class PhoneBasicScenariosTest {
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
-
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
         val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
 
         // act
         mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
             defaultPlayer.load(playlistConfig)
             defaultPlayer.play()
         }
 
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
 
-        val playerSource = defaultPlayer.source
-        var changedCustomData = CustomData()
-        if (playerSource != null) {
-            changedCustomData = collector.getCustomData(playerSource).copy(customData1 = "setOnSource1")
-            collector.setCustomData(playerSource, changedCustomData)
+        lateinit var changedCustomData: CustomData
+
+        runBlockingOnMainScope {
+            defaultPlayer.source?.analytics?.let {
+                it.customData = it.customData.copy(customData1 = "setOnSource1")
+            }
+            changedCustomData = defaultPlayer.source?.analytics?.customData ?: CustomData()
         }
 
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
@@ -673,13 +629,10 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             defaultPlayer.pause()
+            defaultPlayer.destroy()
         }
 
         Thread.sleep(500)
-
-        mainScope.launch {
-            collector.detachPlayer()
-        }
 
         // assert
         val impressions = LogParser.extractImpressions()
@@ -715,28 +668,16 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_nonExistingStream_Should_sendErrorSample() {
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-        val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()))
-
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
         val sourceMetadata = SourceMetadata(title = "nonExistingStream", customData = CustomData(customData1 = "nonExistingStream"))
-
+        val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()), sourceMetadata)
         // act
         mainScope.launch {
-            collector.setSourceMetadata(nonExistingSource, sourceMetadata)
-            collector.attachPlayer(defaultPlayer)
             defaultPlayer.load(nonExistingSource)
             defaultPlayer.play()
         }
 
         // it seems to take a while until the error is consistently reported
         Thread.sleep(10000)
-
-        mainScope.launch {
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(100)
 
         // assert
         val impressionList = LogParser.extractImpressions()
@@ -755,7 +696,7 @@ class PhoneBasicScenariosTest {
         assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
         DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
 
-        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.licenseKey)
+        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
         assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
         assertThat(errorDetail.data.exceptionMessage).isEqualTo("Response code: 404")
         assertThat(errorDetail.httpRequests?.size).isGreaterThan(0)
@@ -765,52 +706,52 @@ class PhoneBasicScenariosTest {
 
     @Test
     fun test_vod_2Impressions_UsingSetSourceMetadata_ShouldReportSourceMetadata() {
+        val defaultMetadata = DefaultMetadata(cdnProvider = "cndProviderDefault", customData = CustomData(customData1 = "defaultCustomData1", customData30 = "defaultCustomData30", experimentName = "experimentNameDefault"))
+
         val hlsSample = TestSources.HLS_REDBULL
         val source1CustomData = CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
-        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", path = "path/Source1", customData = source1CustomData)
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
-        val defaultMetadata = DefaultMetadata(cdnProvider = "cndProviderDefault", customData = CustomData(customData1 = "defaultCustomData1", customData30 = "defaultCustomData30", experimentName = "experimentNameDefault"))
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig, defaultMetadata)
+        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", /* m3u8Url = hlsSample.m3u8Url, */ path = "path/Source1", customData = source1CustomData)
+        val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), sourceMetadata1)
 
-        val dashSample = TestSources.DASH
-        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
         val source2CustomData = CustomData(customData1 = "source2CustomData1", customData30 = "source2CustomData30", experimentName = "experimentNameSource2")
-        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", path = "path/Source2", customData = source2CustomData)
+        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", /* mpdUrl = dashSample.mpdUrl, */ path = "path/Source2", customData = source2CustomData)
+        val dashSample = TestSources.DASH
+        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), sourceMetadata2)
 
-        // act
-        mainScope.launch {
-            collector.setSourceMetadata(hlsSource, sourceMetadata1)
-            collector.setSourceMetadata(dashSource, sourceMetadata2)
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(hlsSource)
-            defaultPlayer.play()
+        lateinit var localPlayer: Player
+
+        runBlockingOnMainScope {
+            localPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig, defaultMetadata)
+            localPlayer.load(hlsSource)
+            localPlayer.play()
         }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 3000)
 
         mainScope.launch {
-            defaultPlayer.pause()
-            defaultPlayer.play()
+            localPlayer.pause()
+            localPlayer.play()
 
             // load new source to test that new sourcemetadata is applied
-            defaultPlayer.load(dashSource)
-            defaultPlayer.play()
+            localPlayer.load(dashSource)
+            localPlayer.play()
         }
 
         // wait a bit for the source change to happen
         Thread.sleep(500)
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 3000)
 
         mainScope.launch {
-            defaultPlayer.pause()
-            defaultPlayer.play()
-            collector.detachPlayer()
+            localPlayer.pause()
+            localPlayer.play()
         }
 
-        // wait a bit for player to be cleaned up
         Thread.sleep(500)
+
+        mainScope.launch {
+            localPlayer.destroy()
+        }
 
         val impressions = LogParser.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
@@ -841,26 +782,25 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         // arrange
-        val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey")
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
+        val wrongAnalyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey")
 
-        // act
-        mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            defaultPlayer.play()
+        lateinit var localPlayer: Player
+
+        runBlockingOnMainScope {
+            localPlayer = Player.create(appContext, defaultPlayerConfig, wrongAnalyticsConfig)
+            localPlayer.load(defaultSource)
+            localPlayer.play()
         }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
 
         mainScope.launch {
-            defaultPlayer.pause()
+            localPlayer.pause()
 
             // assert
             // make sure that player played for a couple of seconds and didn't crash
-            assertThat(defaultPlayer.currentTime).isGreaterThan(1.5)
-            collector.detachPlayer()
-            defaultPlayer.destroy()
+            assertThat(localPlayer.currentTime).isGreaterThan(1.5)
+            localPlayer.destroy()
         }
 
         Thread.sleep(300)
@@ -875,28 +815,28 @@ class PhoneBasicScenariosTest {
         // arrange
         // simulate offline session through wrong backend url
         val analyticsOfflineConfig = TestConfig.createAnalyticsConfig().copy(backendUrl = "https://nonexistingdomain123.com", retryPolicy = RetryPolicy.LONG_TERM)
-        val offlineCollector = IBitmovinPlayerCollector.create(appContext, analyticsOfflineConfig)
-        offlineCollector.setSourceMetadata(defaultSource, SourceMetadata(title = "offlineTitle"))
+        val offlineSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), SourceMetadata(title = "offlineTitle"))
 
-        // act
-        mainScope.launch {
-            offlineCollector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            defaultPlayer.play()
+        lateinit var localPlayer: Player
+
+        runBlockingOnMainScope {
+            localPlayer = Player.create(appContext, defaultPlayerConfig, analyticsOfflineConfig)
+            localPlayer.load(offlineSource)
+            localPlayer.play()
         }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 5000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 5000)
 
         mainScope.launch {
-            defaultPlayer.pause()
-            defaultPlayer.play()
+            localPlayer.pause()
+            localPlayer.play()
         }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 10000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 10000)
 
         mainScope.launch {
-            defaultPlayer.pause()
-            offlineCollector.detachPlayer()
+            localPlayer.pause()
+            localPlayer.destroy()
         }
 
         Thread.sleep(300)
@@ -905,13 +845,10 @@ class PhoneBasicScenariosTest {
         val offlineImpressions = LogParser.extractImpressions()
         assertThat(offlineImpressions.size).isEqualTo(0)
 
-        val analyticsOnlineConfig = TestConfig.createAnalyticsConfig()
-        val onlineCollector = IBitmovinPlayerCollector.create(appContext, analyticsOnlineConfig)
-        onlineCollector.setSourceMetadata(defaultSource, SourceMetadata(title = "onlineSession"))
+        val onlineSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), SourceMetadata(title = "onlineTitle"))
 
         mainScope.launch {
-            onlineCollector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
+            defaultPlayer.load(onlineSource)
             defaultPlayer.play()
         }
 
@@ -919,7 +856,6 @@ class PhoneBasicScenariosTest {
 
         mainScope.launch {
             defaultPlayer.pause()
-            onlineCollector.detachPlayer()
         }
 
         Thread.sleep(300)
@@ -937,15 +873,14 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_sendCustomDataEvent() {
         // arrange
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IBitmovinPlayerCollector.Factory.create(appContext, analyticsConfig)
         val sourceMetadata = SourceMetadata(
             title = "title",
             isLive = false,
             videoId = "videoId",
             customData = TestConfig.createDummyCustomData("vod_"),
         )
-        collector.setSourceMetadata(defaultSource, sourceMetadata)
+
+        val source = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), sourceMetadata)
         val customData1 = TestConfig.createDummyCustomData("customData1")
         val customData2 = TestConfig.createDummyCustomData("customData2")
         val customData3 = TestConfig.createDummyCustomData("customData3")
@@ -953,64 +888,66 @@ class PhoneBasicScenariosTest {
         val customData5 = TestConfig.createDummyCustomData("customData5")
 
         mainScope.launch {
-            collector.sendCustomDataEvent(customData1) // since we are not attached this shouldn't be sent
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            collector.sendCustomDataEvent(customData2)
+            defaultPlayer.analytics?.sendCustomDataEvent(customData1)
+            defaultPlayer.load(source)
+            Thread.sleep(100)
+            defaultPlayer.analytics?.sendCustomDataEvent(customData2)
             defaultPlayer.play()
         }
 
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2001)
-        collector.sendCustomDataEvent(customData3)
+        defaultPlayer.analytics?.sendCustomDataEvent(customData3)
 
         mainScope.launch {
             defaultPlayer.pause()
-            collector.sendCustomDataEvent(customData4)
-            collector.detachPlayer()
-            collector.sendCustomDataEvent(customData5) // this event should not be sent since collector is detached
+            defaultPlayer.analytics?.sendCustomDataEvent(customData4)
+            defaultPlayer.unload()
+            defaultPlayer.analytics?.sendCustomDataEvent(customData5)
         }
 
         Thread.sleep(300)
 
         val impressions = LogParser.extractImpressions()
-        assertThat(impressions.size).isEqualTo(1)
+        assertThat(impressions.size).isEqualTo(2)
 
-        val impression = impressions.first()
+        val impression = impressions[0]
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        DataVerifier.verifyM3u8SourceUrl(eventDataList, defaultSource.config.url)
+        DataVerifier.verifyM3u8SourceUrl(eventDataList.subList(1, 4), defaultSource.config.url)
 
         val customDataEvents = eventDataList.filter { it.state == "customdatachange" }
 
-        assertThat(customDataEvents).hasSize(3)
-        DataVerifier.verifySourceMetadata(customDataEvents[0], sourceMetadata.copy(customData = customData2))
+        assertThat(customDataEvents).hasSize(4)
+        DataVerifier.verifySourceMetadata(customDataEvents[0], SourceMetadata().copy(customData = customData1))
         assertThat(customDataEvents[0].videoTimeStart).isEqualTo(0)
         assertThat(customDataEvents[0].videoTimeEnd).isEqualTo(0)
 
-        DataVerifier.verifySourceMetadata(customDataEvents[1], sourceMetadata.copy(customData = customData3))
-        assertThat(customDataEvents[1].videoTimeStart).isNotEqualTo(0)
-        assertThat(customDataEvents[1].videoTimeEnd).isNotEqualTo(0)
+        DataVerifier.verifySourceMetadata(customDataEvents[1], sourceMetadata.copy(customData = customData2))
+        assertThat(customDataEvents[1].videoTimeStart).isEqualTo(0)
+        assertThat(customDataEvents[1].videoTimeEnd).isEqualTo(0)
 
-        DataVerifier.verifySourceMetadata(customDataEvents[2], sourceMetadata.copy(customData = customData4))
-        assertThat(customDataEvents[2].videoTimeStart).isGreaterThan(2000)
-        assertThat(customDataEvents[2].videoTimeEnd).isGreaterThan(2000)
+        DataVerifier.verifySourceMetadata(customDataEvents[2], sourceMetadata.copy(customData = customData3))
+        assertThat(customDataEvents[2].videoTimeStart).isNotEqualTo(0)
+        assertThat(customDataEvents[2].videoTimeEnd).isNotEqualTo(0)
+
+        DataVerifier.verifySourceMetadata(customDataEvents[3], sourceMetadata.copy(customData = customData4))
+        assertThat(customDataEvents[3].videoTimeStart).isGreaterThan(2000)
+        assertThat(customDataEvents[3].videoTimeEnd).isGreaterThan(2000)
     }
 
     @Test
-    fun test_attach2CollectorInstances_shouldThrowExceptionOnSecondAttach() {
+    fun test_attachBundledAndStandalone_shouldThrowExceptionOnStandaloneAttach() {
         // arrange
         val collector1 = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
-        val collector2 = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
 
         // act
         mainScope.launch {
-            collector1.attachPlayer(defaultPlayer)
             defaultPlayer.load(defaultSource)
             defaultPlayer.play()
 
             try {
-                collector2.attachPlayer(defaultPlayer)
+                collector1.attachPlayer(defaultPlayer)
                 fail("Expected IllegalStateException to be thrown")
             } catch (e: IllegalStateException) {
                 // expected
@@ -1024,7 +961,6 @@ class PhoneBasicScenariosTest {
         mainScope.run {
             defaultPlayer.pause()
             collector1.detachPlayer()
-            collector2.detachPlayer()
         }
 
         // assert
@@ -1035,5 +971,20 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         assertThat(impression.eventDataList).hasSizeGreaterThanOrEqualTo(2) // startup and at least 1 playing sample
+    }
+
+    private fun runBlockingOnMainScope(block: () -> Unit) {
+        val channel = Channel<Unit>()
+
+        MainScope().launch {
+            block()
+            channel.send(Unit)
+        }
+
+        runBlocking {
+            channel.receive()
+        }
+
+        channel.close()
     }
 }
