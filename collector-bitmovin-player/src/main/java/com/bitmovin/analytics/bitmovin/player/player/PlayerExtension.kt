@@ -11,7 +11,14 @@ private class CollectorPlayerPlugin : Plugin
 private class DummyAnalyticsCollectorPlugin : Plugin
 
 /** Return the [Player]'s [ExtensionPoint] if this [Player] version supports it. */
-internal val Player.maybeExtensionPoint get() = runCatching { extensionPoint }.getOrNull()
+internal val Player.maybeExtensionPoint get() =
+    try {
+        this.extensionPoint
+    } catch (e: Throwable) {
+        // we swallow the throwable, since ClassDefNotFoundError is expected on older player versions
+        // because the extension point was introduced in v3.39.0
+        null
+    }
 
 internal fun Player.attachCollector() = maybeExtensionPoint?.run {
     // We need to test if removing of plugin is supported with this player

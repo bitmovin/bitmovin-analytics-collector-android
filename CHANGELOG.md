@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
-- Upgrade example app to latest bitmovin player (v3.41.0) and latest exoplayer version (v2.18.7)
+- Upgrade example app to latest bitmovin player (v3.41.0)
+
+### Fixed
+- Backwards compatibility for bitmovin player to support versions before 3.40.0
 
 ## v3.0.0
 
