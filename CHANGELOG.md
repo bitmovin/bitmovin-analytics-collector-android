@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.0.1
+
 ### Changed
 - Upgrade example app to latest bitmovin player (v3.41.0)
 
 ### Fixed
-- Backwards compatibility for bitmovin player to support versions before 3.40.0
+- Backwards compatibility for bitmovin player to support versions before 3.39.0
 
 ## v3.0.0
 
