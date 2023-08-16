@@ -8,17 +8,18 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Samples
-import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
 import com.bitmovin.player.api.advertising.AdItem
 import com.bitmovin.player.api.advertising.AdSource
 import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdvertisingConfig
+import com.bitmovin.player.api.analytics.AnalyticsApi.Companion.analytics
+import com.bitmovin.player.api.analytics.SourceAnalyticsApi.Companion.analytics
+import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
@@ -27,10 +28,8 @@ import com.bitmovin.player.api.source.SourceConfig
 import com.google.android.gms.cast.framework.CastButtonFactory
 
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var player: Player
     private lateinit var binding: ActivityMainBinding
-    private var bitmovinPlayerCollector: IBitmovinPlayerCollector? = null
+    private lateinit var player: Player
     private var currentPlaylistItemIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,42 +43,51 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.release_button).setOnClickListener {
             player.unload()
-            bitmovinPlayerCollector?.detachPlayer()
         }
 
         findViewById<Button>(R.id.create_button).setOnClickListener {
-            initializeBitmovinPlayer()
+            initializeBitmovinPlayerWithAnalytics()
+        }
+
+        findViewById<Button>(R.id.create_with_ads).setOnClickListener {
+            // clean up before initializing new player
+            binding.playerView.player = null
+            player.destroy()
+            initializeBitmovinPlayerWithAnalytics(withAds = true)
         }
 
         findViewById<Button>(R.id.change_audio).setOnClickListener {
             val audioTracks = player.source?.availableAudioTracks
-            val index = audioTracks?.indexOf(player.source?.selectedAudioTrack)
-            val nextIndex = (index?.plus(1))?.rem(audioTracks.size)
-            if (nextIndex !== null) {
-                val id = audioTracks[nextIndex].id
-                player.source?.setAudioTrack(id)
+
+            if (audioTracks.isNullOrEmpty()) {
+                return@setOnClickListener
             }
+
+            val index = audioTracks.indexOf(player.source?.selectedAudioTrack)
+            val nextIndex = (index.plus(1)).rem(audioTracks.size)
+            val id = audioTracks[nextIndex].id
+            player.source?.setAudioTrack(id)
         }
 
         findViewById<Button>(R.id.change_subtitle).setOnClickListener {
             val subtitleTracks = player.source?.availableSubtitleTracks
-            val index = subtitleTracks?.indexOf(player.source?.selectedSubtitleTrack)
-            val nextIndex = (index?.plus(1))?.rem(subtitleTracks.size)
-            if (nextIndex !== null) {
-                val id = subtitleTracks[nextIndex].id
-                player.source?.setSubtitleTrack(id)
+
+            if (subtitleTracks.isNullOrEmpty()) {
+                return@setOnClickListener
             }
+
+            val index = subtitleTracks.indexOf(player.source?.selectedSubtitleTrack)
+            val nextIndex = (index.plus(1)).rem(subtitleTracks.size)
+            val id = subtitleTracks[nextIndex].id
+            player.source?.setSubtitleTrack(id)
         }
 
-        findViewById<Button>(R.id.change_source).setOnClickListener {
-            bitmovinPlayerCollector?.detachPlayer()
+        findViewById<Button>(R.id.use_drm_source).setOnClickListener {
             val drmSourceMetadata = SourceMetadata(
                 title = "DRM Video Title",
                 videoId = "drmVideoId",
             )
-            val source = Source.create(createDRMSourceConfig())
-            this.bitmovinPlayerCollector?.setSourceMetadata(source, drmSourceMetadata)
-            this.bitmovinPlayerCollector?.attachPlayer(player)
+            val source = Source.create(createDRMSourceConfig(), drmSourceMetadata)
             this.player.load(source)
         }
 
@@ -87,14 +95,24 @@ class MainActivity : AppCompatActivity() {
             currentPlaylistItemIndex++
             val playListSize = player.playlist.sources.size
             val nextSource = player.playlist.sources[currentPlaylistItemIndex % playListSize]
-            player.playlist.seek(nextSource, 10.0)
+            player.playlist.seek(nextSource, 0.0)
         }
 
-        findViewById<Button>(R.id.setCustomData).setOnClickListener {
-            setCustomData()
+        findViewById<Button>(R.id.changeCustomData).setOnClickListener {
+            player.source?.analytics?.let {
+                it.customData = it.customData.copy(
+                    customData2 = "custom_data_2_changed",
+                    customData4 = "custom_data_4_changed",
+                )
+            }
         }
 
-        initializeBitmovinPlayer()
+        findViewById<Button>(R.id.sendCustomDataEvent).setOnClickListener {
+            val customData = CustomData(customData1 = "sendWithCustomDataEvent")
+            player.analytics?.sendCustomDataEvent(customData)
+        }
+
+        initializeBitmovinPlayerWithAnalytics()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -108,15 +126,11 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun initializeBitmovinPlayer() {
-        val playbackConfig = PlaybackConfig()
-        playbackConfig.isMuted = false
-        playbackConfig.isAutoplayEnabled = false
-        val playerConfig = PlayerConfig(playbackConfig = playbackConfig)
-        playerConfig.advertisingConfig = createAdvertisingConfig()
-
-        player = Player.create(this, playerConfig).also { binding.playerView.player = it }
-
+    private fun initializeBitmovinPlayerWithAnalytics(withAds: Boolean = false) {
+        val playerConfig = PlayerConfig()
+        if (withAds) {
+            playerConfig.advertisingConfig = createAdvertisingConfig()
+        }
         val analyticsConfig = AnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
         val defaultMetadata = DefaultMetadata(
             customUserId = "customBitmovinUserId1",
@@ -132,33 +146,31 @@ class MainActivity : AppCompatActivity() {
                 customData7 = "customData7",
             ),
         )
-
-        val collector = IBitmovinPlayerCollector.Factory.create(applicationContext, analyticsConfig, defaultMetadata)
-        this.bitmovinPlayerCollector = collector
+        // create player instance with analytics config and default metadata
+        player = Player.create(this, playerConfig, analyticsConfig, defaultMetadata).also { binding.playerView.player = it }
 
         val redbullMetadata = SourceMetadata(
             videoId = "source-video-id",
             title = "redbull",
             customData = CustomData(customData1 = "redbullSourceCustomData"),
         )
-        collector.setSourceMetadata(redbullSource, redbullMetadata)
-
         val sintelMetadata = SourceMetadata(
             videoId = "source-video-id-2",
             title = "sintel",
             customData = CustomData(customData1 = "sintelSourceCustomData"),
         )
-        collector.setSourceMetadata(sintelSource, sintelMetadata)
-
         val liveSimMetadata = SourceMetadata(
             videoId = "source-video-id-3",
             title = "livesims",
             customData = CustomData(customData1 = "livesimsSourceCustomData"),
         )
-        collector.setSourceMetadata(liveSimSource, liveSimMetadata)
-        collector.attachPlayer(player)
 
-        val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource), PlaylistOptions())
+        // add metadata to sources
+        val liveSimSource = Source.create(SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()), liveSimMetadata)
+        val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()), redbullMetadata)
+        val sintelSource = Source.create(SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()), sintelMetadata)
+
+        val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource, liveSimSource), PlaylistOptions())
         player.load(playlistConfig)
     }
 
@@ -187,20 +199,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun setCustomData() {
-        val collector = bitmovinPlayerCollector ?: return
-        val source = player.source ?: return
-        val changedCustomData = collector.getCustomData(source).copy(
-            customData2 = "custom_data_2_changed",
-            customData4 = "custom_data_4_changed",
-        )
-        collector.setCustomData(source, changedCustomData)
-    }
-
     companion object {
-        private val liveSimSource = Source.create(SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()))
-        private val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()))
-        private val sintelSource = Source.create(SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()))
         private val corruptedSource = Source.create(SourceConfig.fromUrl(Samples.CORRUPT_DASH.uri.toString()))
         private val bbbSource = Source.create(SourceConfig.fromUrl(Samples.BBB.uri.toString()))
         private val progresiveSource = Source.create(SourceConfig.fromUrl(Samples.PROGRESSIVE.uri.toString()))

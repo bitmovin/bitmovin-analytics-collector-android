@@ -32,62 +32,82 @@
         app:layout_constraintVertical_bias="0.0">
 
         <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <Button
                 android:id="@+id/release_button"
-                android:layout_width="77dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:text="Release" />
 
             <Button
                 android:id="@+id/create_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:text="Create" />
 
             <Button
-                android:id="@+id/change_audio"
+                android:id="@+id/create_with_ads"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/exo_track_selection_title_audio" />
-
-            <Button
-                android:id="@+id/change_subtitle"
-                android:layout_width="148dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Subtitle" />
+                android:layout_weight="0"
+                android:text="With Ads" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <Button
-                android:id="@+id/change_source"
+                android:id="@+id/use_drm_source"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Change Source" />
+                android:text="DRM" />
 
             <Button
                 android:id="@+id/seek_next_source"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Seek to Next Source" />
+                android:text="Seek to next" />
 
             <Button
-                android:id="@+id/setCustomData"
+                android:id="@+id/change_audio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="Next Audio" />
+
+            <Button
+                android:id="@+id/change_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="Next Sub" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/changeCustomData"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Set custom data" />
+                android:text="Change custom data" />
+
+            <Button
+                android:id="@+id/sendCustomDataEvent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Send custom data event" />
         </TableRow>
 
     </TableLayout>

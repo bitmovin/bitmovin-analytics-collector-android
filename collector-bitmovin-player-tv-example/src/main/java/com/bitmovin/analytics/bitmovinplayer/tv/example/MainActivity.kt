@@ -8,13 +8,13 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovinplayer.tv.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
+import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.deficiency.ErrorEvent
 import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.event.PlayerEvent
@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var player: Player
     private lateinit var binding: ActivityMainBinding
     private var pendingSeekTarget: Double? = null
-    private var bitmovinPlayerCollector: IBitmovinPlayerCollector? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Switch from splash screen to main theme when we are done loading
@@ -41,16 +40,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         initializePlayer()
     }
 
     private fun initializePlayer() {
-        // Initialize PlayerView from layout and attach a new Player instance
-        player = Player.create(this, createPlayerConfig()).also {
-            binding.playerView.player = it
-        }
-
         val analyticsConfig = AnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
         val defaultMetadata = DefaultMetadata(
             customUserId = "customBitmovinUserId1",
@@ -67,34 +60,38 @@ class MainActivity : AppCompatActivity() {
             ),
         )
 
-        val collector = IBitmovinPlayerCollector.create(applicationContext, analyticsConfig, defaultMetadata)
-        this.bitmovinPlayerCollector = collector
+        // Initialize PlayerView from layout and attach a new Player instance
+        player = Player.create(this, createPlayerConfig(), analyticsConfig, defaultMetadata).also {
+            binding.playerView.player = it
+        }
 
         val redbullMetadata = SourceMetadata(
             videoId = "source-video-id",
             title = "redbull",
             customData = CustomData(customData1 = "customData_source_redbull"),
         )
-        collector.setSourceMetadata(redbullSource, redbullMetadata)
-
         val sintelMetadata = SourceMetadata(
             videoId = "source-video-id-2",
             title = "sintel",
             customData = CustomData(customData1 = "customData_source_sintel"),
         )
-        collector.setSourceMetadata(sintelSource, sintelMetadata)
-
         val liveSimMetadata = SourceMetadata(
             videoId = "source-video-id",
             title = "livesims",
             customData = CustomData(customData1 = "customData_source_livesims"),
         )
-        collector.setSourceMetadata(liveSimSource, liveSimMetadata)
+        val drmMetadata = SourceMetadata(
+            videoId = "drm-source-video-id",
+            title = "widevine",
+            customData = CustomData(customData1 = "customData_source_widevine"),
+        )
 
-        collector.attachPlayer(player)
+        val liveSimSource = Source.create(SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()), liveSimMetadata)
+        val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()), redbullMetadata)
+        val sintelSource = Source.create(SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()), sintelMetadata)
+        val drmSource = Source.create(createDRMSourceConfig(), drmMetadata)
 
-        val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource), PlaylistOptions())
-
+        val playlistConfig = PlaylistConfig(listOf(drmSource, redbullSource, sintelSource, liveSimSource), PlaylistOptions())
         player.load(playlistConfig)
         addEventListener()
     }
@@ -228,9 +225,6 @@ class MainActivity : AppCompatActivity() {
     )
 
     companion object {
-        private val liveSimSource = Source.create(SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()))
-        private val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()))
-        private val sintelSource = Source.create(SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()))
         private val corruptedSource = Source.create(SourceConfig.fromUrl(Samples.CORRUPT_DASH.uri.toString()))
 
         private fun createDRMSourceConfig(): SourceConfig {
