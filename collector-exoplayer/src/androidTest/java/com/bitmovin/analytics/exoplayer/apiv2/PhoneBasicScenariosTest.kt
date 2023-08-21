@@ -2,6 +2,7 @@ package com.bitmovin.analytics.exoplayer.apiv2
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.exoplayer.ExoPlayerCollector
@@ -10,7 +11,7 @@ import com.bitmovin.analytics.exoplayer.ExoplayerConstants
 import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
-import com.bitmovin.analytics.systemtest.utils.LogParser
+import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
@@ -40,13 +41,15 @@ class PhoneBasicScenariosTest {
     private lateinit var channel: Channel<Unit>
 
     private var defaultSample = TestSources.HLS_REDBULL
-    private var defaultAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig()
     private var defaultMediaItem = MediaItem.fromUri(defaultSample.m3u8Url!!)
+
+    private lateinit var defaultAnalyticsConfig: BitmovinAnalyticsConfig
+    private lateinit var mockedIngressUrl: String
 
     @Before
     fun setup() {
-        // logging to mark new test run for logparsing
-        LogParser.startTracking()
+        mockedIngressUrl = MockedIngress.startServer()
+        defaultAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(backendUrl = mockedIngressUrl)
         channel = Channel(0)
         player = ExoPlayer.Builder(appContext).build()
     }
@@ -54,6 +57,7 @@ class PhoneBasicScenariosTest {
     @After
     fun cleanup() {
         channel.close()
+        MockedIngress.stopServer()
     }
 
     @Test
@@ -101,7 +105,7 @@ class PhoneBasicScenariosTest {
             channel.receive()
         }
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         Assertions.assertThat(impressions.size).isEqualTo(1)
 
         val impression = impressions.first()
@@ -163,7 +167,7 @@ class PhoneBasicScenariosTest {
             player.release()
         }
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         Assertions.assertThat(impressions.size).isEqualTo(2)
 
         val impression = impressions.first()
@@ -234,7 +238,7 @@ class PhoneBasicScenariosTest {
         }
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         Assertions.assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -279,7 +283,7 @@ class PhoneBasicScenariosTest {
         Thread.sleep(300)
 
         // assert that no samples are sent
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         Assertions.assertThat(impressions.size).isEqualTo(0)
     }
 }
