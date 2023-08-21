@@ -6,13 +6,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.amazon.ivs.api.IAmazonIvsPlayerCollector
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
-import com.bitmovin.analytics.systemtest.utils.LogParser
+import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
@@ -30,26 +31,29 @@ class PhoneBasicScenariosTest {
 
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var player: Player
+    private lateinit var defaultAnalyticsConfig: AnalyticsConfig
+    private lateinit var mockedIngressUrl: String
 
     companion object {
         @BeforeClass @JvmStatic
-        fun setup() {
+        fun setupLooper() {
             Looper.prepare()
         }
     }
 
     @Before
-    fun setupPlayer() {
+    fun setup() {
         player = Player.Factory.create(appContext)
         player.isMuted = true
+        mockedIngressUrl = MockedIngress.startServer()
+        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
     }
 
     @Test
     fun test_live_playPause() {
         // arrange
         val liveStreamSample = TestSources.IVS_LIVE_1
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
+        val collector = IAmazonIvsPlayerCollector.create(appContext, defaultAnalyticsConfig)
         val sourceMetadata = SourceMetadata(
             title = "title1",
             isLive = true,
@@ -76,7 +80,7 @@ class PhoneBasicScenariosTest {
         player.release()
 
         // assert
-        val impressionSamples = LogParser.extractImpressions()
+        val impressionSamples = MockedIngress.extractImpressions()
 
         // only one impression is generated and no errors are sent
         assertThat(impressionSamples.size).isEqualTo(1)
@@ -107,8 +111,7 @@ class PhoneBasicScenariosTest {
         // arrange
         player.isMuted = false
         val liveStreamSample1 = TestSources.IVS_LIVE_1
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
+        val collector = IAmazonIvsPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
         val sourceMetadata1 = SourceMetadata(
             title = "title1",
@@ -153,7 +156,7 @@ class PhoneBasicScenariosTest {
         player.release()
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
 
         assertThat(impressionList).hasSize(2)
         val firstImpressionSamples = impressionList[0].eventDataList
@@ -194,8 +197,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_playSeekWithAutoplay() {
         val vodStreamSample = TestSources.IVS_VOD_1
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
+        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, defaultAnalyticsConfig)
         val sourceMetadata = SourceMetadata(
             title = "title",
             isLive = false,
@@ -221,7 +223,7 @@ class PhoneBasicScenariosTest {
         player.release()
 
         // assert
-        val impressionsList = LogParser.extractImpressions()
+        val impressionsList = MockedIngress.extractImpressions()
         assertThat(impressionsList).hasSize(1)
 
         val impression = impressionsList.first()
@@ -246,8 +248,7 @@ class PhoneBasicScenariosTest {
     fun test_vod_play() {
         // arrange
         val vodStreamSample = TestSources.IVS_VOD_1
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
+        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, defaultAnalyticsConfig)
         collector.attachPlayer(player)
         val sourceMetadata = SourceMetadata(
             title = "title",
@@ -273,7 +274,7 @@ class PhoneBasicScenariosTest {
         player.release()
 
         // assert
-        val impressionsList = LogParser.extractImpressions()
+        val impressionsList = MockedIngress.extractImpressions()
         assertThat(impressionsList).hasSize(1)
 
         val impression = impressionsList.first()
@@ -300,8 +301,7 @@ class PhoneBasicScenariosTest {
     fun test_nonExistingStream_Should_sendErrorSample() {
         // arrange
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
+        val collector = IAmazonIvsPlayerCollector.create(appContext, defaultAnalyticsConfig)
         val nonExistingStreamSourceMetadata = SourceMetadata(title = "non-existing-stream", isLive = false, customData = TestConfig.createDummyCustomData("noneExitingStreamData"))
         collector.sourceMetadata = nonExistingStreamSourceMetadata
         collector.attachPlayer(player)
@@ -315,7 +315,7 @@ class PhoneBasicScenariosTest {
         player.release()
 
         // assert
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         val impression = impressions.first()
 
         assertThat(impression.eventDataList.size).isEqualTo(1)
@@ -329,7 +329,7 @@ class PhoneBasicScenariosTest {
 
         assertThat(impression.errorDetailList).hasSize(1)
         val errorDetail = impression.errorDetailList.first()
-        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.licenseKey)
+        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
         assertThat(errorDetail.data.exceptionStacktrace).hasSizeGreaterThan(0)
         assertThat(errorDetail.data.exceptionMessage).isEqualTo("MasterPlaylist : ERROR_NOT_AVAILABLE : 404 : Failed to load playlist")
     }
@@ -338,7 +338,7 @@ class PhoneBasicScenariosTest {
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         // arrange
         val sample = TestSources.HLS_REDBULL
-        val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey")
+        val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey", backendUrl = mockedIngressUrl)
         val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
         collector.attachPlayer(player)
         player.load(Uri.parse(sample.m3u8Url))
@@ -355,7 +355,7 @@ class PhoneBasicScenariosTest {
         Thread.sleep(300)
 
         // assert that no samples are sent
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions).hasSize(0)
     }
 
@@ -363,8 +363,7 @@ class PhoneBasicScenariosTest {
     fun test_sendCustomDataEvent() {
         // arrange
         val vodStreamSample = TestSources.IVS_VOD_1
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
+        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, defaultAnalyticsConfig)
         val sourceMetadata = SourceMetadata(
             title = "title",
             isLive = false,
@@ -399,7 +398,7 @@ class PhoneBasicScenariosTest {
 
         Thread.sleep(300)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(1)
 
         val impression = impressions.first()
@@ -426,10 +425,9 @@ class PhoneBasicScenariosTest {
     fun test_changeCustomDataWhilePlaying() {
         // arrange
         val vodStreamSample = TestSources.IVS_VOD_1
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
         val defaultCustomData = CustomData(customData1 = "v1.2.3", customData2 = "videoID123")
         val defaultMetadata = DefaultMetadata(cdnProvider = "testCdnPovider", customUserId = "testCustomUserId", customData = defaultCustomData)
-        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig, defaultMetadata)
+        val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, defaultAnalyticsConfig, defaultMetadata)
         val sourceMetadata = SourceMetadata(
             title = "title",
             isLive = false,
@@ -452,7 +450,7 @@ class PhoneBasicScenariosTest {
         player.release()
 
         // assert
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(1)
 
         val impression = impressions.first()

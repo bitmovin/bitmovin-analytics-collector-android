@@ -6,9 +6,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.amazon.ivs.api.IAmazonIvsPlayerCollector
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.LogParser
+import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
 import org.assertj.core.api.Assertions.assertThat
@@ -22,17 +23,20 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TVBasicScenariosTest {
 
+    private lateinit var defaultAnalyticsConfig: AnalyticsConfig
+    private lateinit var mockedIngressUrl: String
+
     companion object {
         @BeforeClass @JvmStatic
-        fun setup() {
+        fun setupLooper() {
             Looper.prepare()
         }
     }
 
     @Before
-    fun markTestRun() {
-        // logging to mark new test run for logparsing
-        LogParser.startTracking()
+    fun setup() {
+        mockedIngressUrl = MockedIngress.startServer()
+        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
     }
 
     @Test
@@ -44,9 +48,8 @@ class TVBasicScenariosTest {
 
         val liveSample = TestSources.IVS_LIVE_1
 
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
         val sourceMetadata = SourceMetadata(title = "tvTest", customData = TestConfig.createDummyCustomData("tvTest"))
-        val collector = IAmazonIvsPlayerCollector.create(appContext, analyticsConfig)
+        val collector = IAmazonIvsPlayerCollector.create(appContext, defaultAnalyticsConfig)
         collector.attachPlayer(player)
         collector.sourceMetadata = sourceMetadata
 
@@ -63,7 +66,7 @@ class TVBasicScenariosTest {
         player.release()
 
         // assert
-        val impressionsList = LogParser.extractImpressions()
+        val impressionsList = MockedIngress.extractImpressions()
 
         assertThat(impressionsList.size).isEqualTo(1)
 
