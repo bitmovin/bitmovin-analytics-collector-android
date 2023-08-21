@@ -40,8 +40,6 @@ class PhoneBasicScenariosTest {
 
     @Before
     fun setupPlayer() {
-        // logging to mark new test run for logparsing
-        LogParser.startTracking()
         player = Player.Factory.create(appContext)
         player.isMuted = true
     }

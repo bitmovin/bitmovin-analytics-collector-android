@@ -6,6 +6,7 @@ import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.LogParser
+import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.google.android.exoplayer2.ExoPlayer
@@ -44,7 +45,8 @@ class ErrorScenariosTest {
     fun test_nonExistingStream_Should_sendErrorSample() {
         // arrange
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
+        val basePath = MockedIngress.startServer()
+        val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = basePath)
         val collector = IExoPlayerCollector.create(appContext, analyticsConfig)
 
         // act
@@ -66,7 +68,7 @@ class ErrorScenariosTest {
         }
 
         // assert
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         val impression = impressions.first()
 
         Assertions.assertThat(impression.eventDataList.size).isEqualTo(1)

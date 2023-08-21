@@ -28,4 +28,5 @@ dependencies {
     implementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     implementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
+    implementation("com.squareup.okhttp3:mockwebserver:4.11.0")
 }

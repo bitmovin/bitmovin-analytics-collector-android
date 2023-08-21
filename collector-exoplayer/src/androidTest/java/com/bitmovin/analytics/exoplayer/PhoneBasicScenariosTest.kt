@@ -2,12 +2,13 @@ package com.bitmovin.analytics.exoplayer
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
-import com.bitmovin.analytics.systemtest.utils.LogParser
+import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
@@ -16,6 +17,7 @@ import com.google.android.exoplayer2.MediaItem
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.assertj.core.api.Assertions
+import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -29,10 +31,7 @@ import org.junit.runner.RunWith
 class PhoneBasicScenariosTest {
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-    private lateinit var player: ExoPlayer
-
     private val defaultSample = TestSources.HLS_REDBULL
-    private val defaultAnalyticsConfig = TestConfig.createAnalyticsConfig()
     private val defaultMediaItem = MediaItem.fromUri(defaultSample.m3u8Url!!)
     private val defaultSourceMetadata = SourceMetadata(
         title = "hls_redbull",
@@ -42,11 +41,20 @@ class PhoneBasicScenariosTest {
         cdnProvider = "cdn_provider",
     )
 
+    private lateinit var player: ExoPlayer
+    private lateinit var defaultAnalyticsConfig: AnalyticsConfig
+    private lateinit var mockedIngressUrl: String
+
     @Before
     fun setup() {
-        // logging to mark new test run for logparsing
-        LogParser.startTracking()
+        mockedIngressUrl = MockedIngress.startServer()
+        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
         player = ExoPlayer.Builder(appContext).build()
+    }
+
+    @After
+    fun teardown() {
+        MockedIngress.stopServer()
     }
 
     @Test
@@ -93,7 +101,7 @@ class PhoneBasicScenariosTest {
 
         Thread.sleep(300)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         Assertions.assertThat(impressions.size).isEqualTo(1)
 
         val impression = impressions.first()
@@ -113,7 +121,6 @@ class PhoneBasicScenariosTest {
     fun test_vodDash_playPauseWithPlayWhenReady() {
         // arrange
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
-
         val dashSource = TestSources.DASH
         val dashMediaItem = MediaItem.fromUri(dashSource.mpdUrl!!)
 
@@ -155,7 +162,7 @@ class PhoneBasicScenariosTest {
 
         Thread.sleep(300)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         Assertions.assertThat(impressions.size).isEqualTo(1)
 
         val impression = impressions.first()
@@ -209,7 +216,7 @@ class PhoneBasicScenariosTest {
 
         Thread.sleep(300)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         Assertions.assertThat(impressions.size).isEqualTo(1)
 
         val impression = impressions.first()
@@ -271,7 +278,7 @@ class PhoneBasicScenariosTest {
         Thread.sleep(300)
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         Assertions.assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -295,7 +302,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         val sample = Samples.HLS_REDBULL
-        val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey")
+        val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey", backendUrl = mockedIngressUrl)
         val collector = IExoPlayerCollector.create(appContext, analyticsConfig)
 
         mainScope.launch {
@@ -317,7 +324,7 @@ class PhoneBasicScenariosTest {
         Thread.sleep(300)
 
         // assert that no samples are sent
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         Assertions.assertThat(impressions.size).isEqualTo(0)
     }
 }

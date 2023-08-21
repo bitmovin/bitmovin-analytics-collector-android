@@ -82,7 +82,7 @@ object LogParser {
         return impressionList.filter { !it.isEmpty() }
     }
 
-    private fun isNewImpressionSample(eventData: EventData): Boolean {
+    fun isNewImpressionSample(eventData: EventData): Boolean {
         return eventData.sequenceNumber == 0
     }
 

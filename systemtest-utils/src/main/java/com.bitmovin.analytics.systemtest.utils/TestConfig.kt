@@ -26,9 +26,16 @@ object TestConfig {
         return bitmovinAnalyticsConfig
     }
 
-    fun createAnalyticsConfig(analyticsKey: String = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0"): AnalyticsConfig {
+    fun createAnalyticsConfig(analyticsKey: String = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", backendUrl: String? = null): AnalyticsConfig {
+        if (backendUrl == null) {
+            return AnalyticsConfig(
+                licenseKey = analyticsKey,
+            )
+        }
+
         return AnalyticsConfig(
             licenseKey = analyticsKey,
+            backendUrl = backendUrl,
         )
     }
 
