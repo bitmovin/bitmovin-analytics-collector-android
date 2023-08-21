@@ -93,9 +93,17 @@ object MockedIngress {
 
         for (entry in eventDataMap.entries) {
             val impression = Impression()
-            impression.eventDataList.addAll(entry.value)
-            impression.adEventDataList.addAll(adEventDataMap[entry.key] ?: listOf())
-            impression.errorDetailList.addAll(errorDetailMap[entry.key] ?: listOf())
+            val eventDataList = entry.value.sortedBy { it.sequenceNumber }
+            impression.eventDataList.addAll(eventDataList)
+
+            val adEventDataList = adEventDataMap[entry.key] ?: listOf()
+            adEventDataList.sortedBy { it.time }
+            impression.adEventDataList.addAll(adEventDataList)
+
+            val errorDetailList = errorDetailMap[entry.key] ?: listOf()
+            errorDetailList.sortedBy { it.timestamp }
+            impression.errorDetailList.addAll(errorDetailList)
+
             impressionList.add(impression)
         }
 
