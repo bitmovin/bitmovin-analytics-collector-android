@@ -18,7 +18,7 @@ import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.persistence.EventQueueConfig
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.systemtest.utils.Impression
-import com.bitmovin.analytics.systemtest.utils.LogParser
+import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -43,15 +43,14 @@ class LongtermRetryOnFailureTest {
 
     @Before
     fun setup() {
-        LogParser.startTracking()
-        config = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM)
+        val mockedIngressUrl = MockedIngress.startServer()
+        config = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM, backendUrl = mockedIngressUrl)
 
         bitmovinAnalytics = BitmovinAnalytics(
             config = config,
             context = appContext,
         )
         dummyPlayerAdapter = createDummyPlayerAdapter()
-        bitmovinAnalytics.attach(dummyPlayerAdapter)
     }
 
     private fun createDummyPlayerAdapter(): DummyPlayerAdapter = runBlocking {
@@ -66,12 +65,14 @@ class LongtermRetryOnFailureTest {
 
     @After
     fun tearDown() {
+        MockedIngress.stopServer()
         bitmovinAnalytics.detachPlayer()
         EventDatabase.getInstance(appContext).purge()
     }
 
     @Test
     fun test_sending_eventdata_sends_the_events() {
+        bitmovinAnalytics.attach(dummyPlayerAdapter)
         val sessionId = createTestImpressionId()
         val eventData = MutableList(5) {
             TestFactory.createEventData(impressionId = sessionId)
@@ -87,7 +88,7 @@ class LongtermRetryOnFailureTest {
 
         Thread.sleep(500)
 
-        val impressionList = LogParser.extractImpressions().combineByImpressionId()
+        val impressionList = MockedIngress.extractImpressions().combineByImpressionId()
         assertThat(impressionList).hasSize(1)
         assertThat(impressionList.values.first().eventDataList)
             .hasSize(5)
@@ -95,7 +96,72 @@ class LongtermRetryOnFailureTest {
     }
 
     @Test
+    fun test_online_offline_online_sends_all_eventdata() {
+        // this test uses a hardcoded port, since we cannot go online/offline/online due to
+        // the fact that the server socket cannot be reused if port 0 is used (if there is traffic as it seems)
+        val mockedIngressUrl = MockedIngress.startServer(61123)
+        config = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM, backendUrl = mockedIngressUrl)
+
+        bitmovinAnalytics = BitmovinAnalytics(
+            config = config,
+            context = appContext,
+        )
+        dummyPlayerAdapter = createDummyPlayerAdapter()
+        bitmovinAnalytics.attach(dummyPlayerAdapter)
+        val sessionId = createTestImpressionId()
+        val eventData = MutableList(2) {
+            TestFactory.createEventData(impressionId = sessionId)
+        }
+
+        eventData.forEach {
+            bitmovinAnalytics.sendEventData(it)
+
+            // waiting a bit here after each call, to make it more likely that the license
+            // authentication call is already done
+            Thread.sleep(400)
+        }
+
+        Thread.sleep(500)
+
+        val impressionsBeforeOffline = MockedIngress.extractImpressions().combineByImpressionId()
+        assertThat(impressionsBeforeOffline).hasSize(1)
+        assertThat(impressionsBeforeOffline.values.first().eventDataList)
+            .hasSize(2)
+
+        MockedIngress.setServerOffline()
+
+        eventData.forEach {
+            bitmovinAnalytics.sendEventData(it)
+
+            // waiting a bit here after each call, to make it more likely that the license
+            // authentication call is already done
+            Thread.sleep(400)
+        }
+
+        Thread.sleep(500)
+        // server didn't receive any new requests since it is offline
+        assertThat(MockedIngress.requestCount()).isEqualTo(3)
+
+        MockedIngress.setServerOnline()
+
+        eventData.forEach {
+            bitmovinAnalytics.sendEventData(it)
+
+            // waiting a bit here after each call, to make it more likely that the license
+            // authentication call is already done
+            Thread.sleep(400)
+        }
+
+        // all samples in queue are sent together with the new samples
+        val impressionsAfterOffline = MockedIngress.extractImpressions().combineByImpressionId()
+        assertThat(impressionsAfterOffline).hasSize(1)
+        assertThat(impressionsAfterOffline.values.first().eventDataList)
+            .hasSize(4)
+    }
+
+    @Test
     fun test_sending_ad_eventdata_sends_the_adevents() {
+        bitmovinAnalytics.attach(dummyPlayerAdapter)
         val sessionId = createTestImpressionId()
 
         val eventData: List<AdEventData> = MutableList(5) {
@@ -114,64 +180,61 @@ class LongtermRetryOnFailureTest {
         }
         Thread.sleep(500)
 
-        val impressions = LogParser.extractImpressions().combineByImpressionId()
+        val impressions = MockedIngress.extractImpressions().combineByImpressionId()
         assertThat(impressions).hasSize(1)
         assertThat(impressions.values.first().adEventDataList)
             .hasSize(5)
             .isEqualTo(eventData)
     }
 
-    // TODO: changing the backend url on an collector after creating is not possible anymore
-    // with API v3, in order to test this scenario we need a custom backend for testing
-//    @Test
-//    fun test_failed_ad_and_eventdata_sending_they_are_send_with_the_next_successful_one() {
-//        val cachedSessionId = createTestImpressionId()
-//        val sessionId = createTestImpressionId(2)
-//
-//        config.config.backendUrl = "https://doesnotwork"
-//        bitmovinAnalytics.attach(dummyPlayerAdapter)
-//
-//        val eventData = MutableList(5) {
-//            TestFactory.createEventData(impressionId = cachedSessionId)
-//        }
-//
-//        val adEventData: List<AdEventData> = MutableList(5) {
-//            TestFactory.createAdEventData(
-//                adImpressionId = cachedSessionId,
-//                videoImpressionId = cachedSessionId,
-//            )
-//        }
-//
-//        eventData.forEach { bitmovinAnalytics.sendEventData(it) }
-//        adEventData.forEach { bitmovinAnalytics.sendAdEventData(it) }
-//        Thread.sleep(500)
-//
-//        LogParser.startTracking()
-//
-//        config.config.backendUrl = AnalyticsConfig.DEFAULT_BACKEND_URL
-//        bitmovinAnalytics.attach(dummyPlayerAdapter)
-//
-//        // Trigger sending of cached data
-//        bitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = sessionId))
-//        Thread.sleep(5000)
-//
-//        val impressions = LogParser.extractImpressions().combineByImpressionId()
-//        assertThat(impressions).hasSize(2)
-//        assertThat(impressions[cachedSessionId]!!.eventDataList)
-//            .hasSize(5)
-//        assertThat(impressions[cachedSessionId]!!.adEventDataList)
-//            .hasSize(5)
-//    }
+    @Test
+    fun test_failed_ad_and_eventdata_sending_they_are_send_with_the_next_successful_one() {
+        MockedIngress.setServerOffline()
+        val cachedSessionId = createTestImpressionId()
+        val sessionId = createTestImpressionId(2)
+        bitmovinAnalytics.attach(dummyPlayerAdapter)
+
+        val eventData = MutableList(5) {
+            TestFactory.createEventData(impressionId = cachedSessionId)
+        }
+
+        val adEventData: List<AdEventData> = MutableList(5) {
+            TestFactory.createAdEventData(
+                adImpressionId = cachedSessionId,
+                videoImpressionId = cachedSessionId,
+            )
+        }
+
+        eventData.forEach { bitmovinAnalytics.sendEventData(it) }
+        adEventData.forEach { bitmovinAnalytics.sendAdEventData(it) }
+        Thread.sleep(1000)
+
+        assertThat(MockedIngress.hasNoSamplesReceived()).isTrue
+
+        // activate ingress backend again
+        MockedIngress.setServerOnline()
+        bitmovinAnalytics.attach(dummyPlayerAdapter)
+
+        // Trigger sending of cached data
+        bitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = sessionId))
+        Thread.sleep(5000)
+
+        val impressions = MockedIngress.extractImpressions().combineByImpressionId()
+        assertThat(impressions).hasSize(2)
+        assertThat(impressions[cachedSessionId]!!.eventDataList)
+            .hasSize(5)
+        assertThat(impressions[cachedSessionId]!!.adEventDataList)
+            .hasSize(5)
+    }
 
     @Test
     fun test_failed_ad_and_eventdata_sending_are_send_by_another_bitmovin_analytics_instance() {
         val cachedSessionId = createTestImpressionId()
         val sessionId = createTestImpressionId(2)
-
-        config = config.copy(backendUrl = "https://doesnotwork")
+        val offlineConfig = config.copy(backendUrl = "https://doesnotwork")
 
         bitmovinAnalytics = BitmovinAnalytics(
-            config = config,
+            config = offlineConfig,
             context = appContext,
         )
 
@@ -193,10 +256,6 @@ class LongtermRetryOnFailureTest {
         Thread.sleep(1000)
         bitmovinAnalytics.detachPlayer()
 
-        LogParser.startTracking()
-
-        config = config.copy(backendUrl = AnalyticsConfig.DEFAULT_BACKEND_URL)
-
         val secondInstance = BitmovinAnalytics(
             config = config,
             context = appContext,
@@ -206,10 +265,9 @@ class LongtermRetryOnFailureTest {
 
         // Trigger sending of cached data
         secondInstance.sendEventData(TestFactory.createEventData(impressionId = sessionId))
-
         Thread.sleep(5000)
 
-        val impressions = LogParser.extractImpressions().combineByImpressionId()
+        val impressions = MockedIngress.extractImpressions().combineByImpressionId()
         assertThat(impressions).hasSize(2)
         val cachedImpression = impressions[cachedSessionId]
         val triggerImpression = impressions[sessionId]
@@ -272,15 +330,13 @@ class LongtermRetryOnFailureTest {
         thirdBitmovinAnalytics.attach(firstDummyPlayerAdapter)
         forthBitmovinAnalytics.attach(secondDummyPlayerAdapter)
 
-        LogParser.startTracking()
-
         // Trigger sending of cached data
         thirdBitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = firstSession))
         forthBitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = secondSession))
 
         Thread.sleep(40000)
 
-        val impressions = LogParser.extractImpressions().combineByImpressionId()
+        val impressions = MockedIngress.extractImpressions().combineByImpressionId()
 
         impressions.values.forEach {
             assertThat(it.eventDataList).hasSize(101)
@@ -289,6 +345,7 @@ class LongtermRetryOnFailureTest {
 
     @Test
     fun test_having_more_than_14_days_old_events_in_the_event_queue_they_are_not_send_later() {
+        bitmovinAnalytics.attach(dummyPlayerAdapter)
         val oldSession1 = createTestImpressionId(1)
         val oldSession2 = createTestImpressionId(2)
         val newSession = createTestImpressionId(1337)
@@ -345,7 +402,7 @@ class LongtermRetryOnFailureTest {
 
         Thread.sleep(1000)
 
-        val impressions = LogParser.extractImpressions().combineByImpressionId()
+        val impressions = MockedIngress.extractImpressions().combineByImpressionId()
         assertThat(impressions.values).hasSize(1)
         assertThat(impressions.values.first().eventDataList).hasSize(1)
     }
@@ -382,9 +439,7 @@ class LongtermRetryOnFailureTest {
 
     @Test
     fun test_events_with_sequencenumber_higher_than_500_are_not_stored() {
-        val offlineConfig = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM, backendUrl = "https://doesnotwork")
-        bitmovinAnalytics.detachPlayer()
-
+        val offlineConfig = config.copy(backendUrl = "https://doesnotwork")
         bitmovinAnalytics = BitmovinAnalytics(
             config = offlineConfig,
             context = appContext,

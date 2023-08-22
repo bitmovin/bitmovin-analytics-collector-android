@@ -11,16 +11,37 @@ import okhttp3.mockwebserver.RecordedRequest
 
 object MockedIngress {
     private lateinit var server: MockWebServer
+    private var currentPort: Int = 0
 
-    fun startServer(): String {
+    fun startServer(port: Int = 0): String {
         server = MockWebServer()
         server.dispatcher = dispatcher
-        server.start()
+        server.start(port)
+        currentPort = server.port
         return server.url("/").toString()
     }
 
     fun stopServer() {
         server.shutdown()
+    }
+
+    fun setServerOffline() {
+        server.shutdown()
+        Thread.sleep(1000)
+    }
+
+    fun hasNoSamplesReceived(): Boolean {
+        return server.requestCount == 0
+    }
+
+    fun requestCount(): Int {
+        return server.requestCount
+    }
+
+    fun setServerOnline() {
+        server = MockWebServer()
+        server.dispatcher = dispatcher
+        server.start(currentPort)
     }
 
     private val dispatcher: Dispatcher = object : Dispatcher() {
@@ -62,7 +83,7 @@ object MockedIngress {
                         } ?: eventDataMap.put(eventData.impressionId, listOf(eventData))
                     }
                 }
-                "/analytics/ad" -> {
+                "/analytics/a" -> {
                     val adEventData = DataSerializer.deserialize(
                         body,
                         AdEventData::class.java,
@@ -91,22 +112,35 @@ object MockedIngress {
 
         val impressionList = mutableListOf<Impression>()
 
-        for (entry in eventDataMap.entries) {
-            val impression = Impression()
-            val eventDataList = entry.value.sortedBy { it.sequenceNumber }
-            impression.eventDataList.addAll(eventDataList)
+        if (eventDataMap.isEmpty()) {
+            for (entry in adEventDataMap.entries) {
+                val impression = Impression()
+                val adEventDataList = adEventDataMap[entry.key] ?: listOf()
+                adEventDataList.sortedBy { it.time }
+                impression.adEventDataList.addAll(adEventDataList)
 
-            val adEventDataList = adEventDataMap[entry.key] ?: listOf()
-            adEventDataList.sortedBy { it.time }
-            impression.adEventDataList.addAll(adEventDataList)
+                val errorDetailList = errorDetailMap[entry.key] ?: listOf()
+                errorDetailList.sortedBy { it.timestamp }
+                impression.errorDetailList.addAll(errorDetailList)
+                impressionList.add(impression)
+            }
+        } else {
+            for (entry in eventDataMap.entries) {
+                val impression = Impression()
+                val eventDataList = entry.value.sortedBy { it.sequenceNumber }
+                impression.eventDataList.addAll(eventDataList)
 
-            val errorDetailList = errorDetailMap[entry.key] ?: listOf()
-            errorDetailList.sortedBy { it.timestamp }
-            impression.errorDetailList.addAll(errorDetailList)
+                val adEventDataList = adEventDataMap[entry.key] ?: listOf()
+                adEventDataList.sortedBy { it.time }
+                impression.adEventDataList.addAll(adEventDataList)
 
-            impressionList.add(impression)
+                val errorDetailList = errorDetailMap[entry.key] ?: listOf()
+                errorDetailList.sortedBy { it.timestamp }
+                impression.errorDetailList.addAll(errorDetailList)
+
+                impressionList.add(impression)
+            }
         }
-
         return impressionList
     }
 }
