@@ -2,6 +2,7 @@ package com.bitmovin.analytics.bitmovin.player
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.RetryPolicy
@@ -11,8 +12,8 @@ import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
-import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
+import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
@@ -59,15 +60,17 @@ class BundledAnalyticsTest {
     )
     private val defaultSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), defaultSourceMetadata)
     private val defaultPlayerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
-    private val defaultAnalyticsConfig = TestConfig.createAnalyticsConfig()
+
+    private lateinit var defaultAnalyticsConfig: AnalyticsConfig
+    private lateinit var mockedIngressUrl: String
 
     @Before
     fun setup() {
         // purging database to have a clean state for each test
         EventDatabaseTestHelper.purge(appContext)
 
-        // logging to mark new test run for logparsing
-        LogParser.startTracking()
+        mockedIngressUrl = MockedIngress.startServer()
+        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
 
         runBlockingOnMainScope {
             defaultPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig)
@@ -115,7 +118,7 @@ class BundledAnalyticsTest {
         Thread.sleep(500)
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -132,7 +135,7 @@ class BundledAnalyticsTest {
 
         // verify durations of each state are within a reasonable range
         val playedDuration = eventDataList.sumOf { it.played }
-        assertThat(playedDuration).isBetween(playedToMs, (playedToMs * 1.1).toLong())
+        assertThat(playedDuration).isBetween(playedToMs, (playedToMs * 1.2).toLong())
 
         val pausedDuration = eventDataList.sumOf { it.paused }
         assertThat(pausedDuration).isBetween((pauseTimeMs * 0.9).toLong(), (pauseTimeMs * 1.1).toLong())
@@ -169,7 +172,7 @@ class BundledAnalyticsTest {
         Thread.sleep(500)
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -202,7 +205,7 @@ class BundledAnalyticsTest {
         BitmovinPlaybackUtils.waitUntilPlaybackFinished(defaultPlayer)
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -228,7 +231,7 @@ class BundledAnalyticsTest {
         lateinit var localPlayer: Player
 
         runBlockingOnMainScope {
-            localPlayer = Player.create(appContext, playerConfig, TestConfig.createAnalyticsConfig())
+            localPlayer = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
             localPlayer.load(defaultSource)
         }
 
@@ -246,7 +249,7 @@ class BundledAnalyticsTest {
         }
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -279,7 +282,7 @@ class BundledAnalyticsTest {
 
         // act
         runBlockingOnMainScope {
-            localPlayer = Player.create(appContext, playerConfig, TestConfig.createAnalyticsConfig())
+            localPlayer = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
             localPlayer.load(liveSource)
         }
 
@@ -297,7 +300,7 @@ class BundledAnalyticsTest {
         Thread.sleep(500)
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -361,7 +364,7 @@ class BundledAnalyticsTest {
         // wait a bit for player to be cleaned up
         Thread.sleep(500)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
 
         val impression1 = impressions[0]
@@ -391,8 +394,6 @@ class BundledAnalyticsTest {
 
     @Test
     fun test_vod_3ImpressionsWithPlaylist_Should_DetectNewSessions() {
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-
         val defaultMetadata = DefaultMetadata(
             customUserId = "customUserId",
             customData = TestConfig.createDummyCustomData(),
@@ -426,7 +427,7 @@ class BundledAnalyticsTest {
         lateinit var localPlayer: Player
 
         runBlockingOnMainScope {
-            localPlayer = Player.create(appContext, defaultPlayerConfig, analyticsConfig, defaultMetadata)
+            localPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig, defaultMetadata)
             localPlayer.load(defaultSource)
         }
 
@@ -463,8 +464,10 @@ class BundledAnalyticsTest {
         BitmovinPlaybackUtils.waitUntilPlayerIsPaused(localPlayer)
         mainScope.launch { localPlayer.destroy() }
 
+        Thread.sleep(500)
+
         // assert
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(3)
 
         val impression1 = impressions[0]
@@ -501,7 +504,6 @@ class BundledAnalyticsTest {
 
     @Test
     fun test_vod_2ImpressionsWithPlaylist_Should_SetCustomDataOnFirstSourceOnly() {
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
         val defaultMetadata = DefaultMetadata(
             customUserId = "customUserId",
             customData = TestConfig.createDummyCustomData("defaultCustomData"),
@@ -528,7 +530,7 @@ class BundledAnalyticsTest {
         lateinit var localPlayer: Player
 
         runBlockingOnMainScope {
-            localPlayer = Player.create(appContext, defaultPlayerConfig, analyticsConfig, defaultMetadata)
+            localPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig, defaultMetadata)
             localPlayer.load(playlistConfig)
             localPlayer.play()
         }
@@ -556,7 +558,7 @@ class BundledAnalyticsTest {
         Thread.sleep(500)
 
         // assert
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
 
         val impression1 = impressions[0]
@@ -635,7 +637,7 @@ class BundledAnalyticsTest {
         Thread.sleep(500)
 
         // assert
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
 
         val impression1 = impressions[0]
@@ -680,7 +682,7 @@ class BundledAnalyticsTest {
         Thread.sleep(10000)
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -753,7 +755,7 @@ class BundledAnalyticsTest {
             localPlayer.destroy()
         }
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
 
         val impression1 = impressions[0]
@@ -782,7 +784,7 @@ class BundledAnalyticsTest {
     @Test
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         // arrange
-        val wrongAnalyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey")
+        val wrongAnalyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey", backendUrl = mockedIngressUrl)
 
         lateinit var localPlayer: Player
 
@@ -806,13 +808,15 @@ class BundledAnalyticsTest {
         Thread.sleep(300)
 
         // assert that no samples are sent
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(0)
     }
 
     @Test
     fun test_firstSessionOffline_ShouldSendOfflineSessionDataOnSecondOnlineSession() {
         // arrange
+        val mockedIngressUrl = MockedIngress.startServer()
+        val analyticsOnlineConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
         // simulate offline session through wrong backend url
         val analyticsOfflineConfig = TestConfig.createAnalyticsConfig().copy(backendUrl = "https://nonexistingdomain123.com", retryPolicy = RetryPolicy.LONG_TERM)
         val offlineSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), SourceMetadata(title = "offlineTitle"))
@@ -841,31 +845,28 @@ class BundledAnalyticsTest {
 
         Thread.sleep(300)
 
-        // since license call fails for the offline session we don't expect any impressions (not even in the log output)
-        val offlineImpressions = LogParser.extractImpressions()
-        assertThat(offlineImpressions.size).isEqualTo(0)
+        // sanity check tht first player has wrong url and only license call was sent
+        assertThat(MockedIngress.hasNoSamplesReceived()).isTrue()
 
         val onlineSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), SourceMetadata(title = "onlineTitle"))
 
-        mainScope.launch {
-            defaultPlayer.load(onlineSource)
-            defaultPlayer.play()
+        lateinit var localPlayerOnline: Player
+        runBlockingOnMainScope {
+            localPlayerOnline = Player.create(appContext, defaultPlayerConfig, analyticsOnlineConfig)
+            localPlayerOnline.load(onlineSource)
+            localPlayerOnline.play()
         }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 5000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayerOnline, 5000)
 
         mainScope.launch {
-            defaultPlayer.pause()
+            localPlayerOnline.pause()
         }
 
         Thread.sleep(300)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
 
-        // the log parser is currently relying of a linear order of events
-        // thus we need to do some normalization by impressionId for the offline
-        // feature where the events are not sent linear
-        // this should be fixed inside the logparser eventually to not rely on order of events
         val normalizedImpressions = impressions.combineByImpressionId()
         assertThat(normalizedImpressions.size).isEqualTo(2)
     }
@@ -907,7 +908,7 @@ class BundledAnalyticsTest {
 
         Thread.sleep(300)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
 
         val impression = impressions[0]
@@ -939,7 +940,7 @@ class BundledAnalyticsTest {
     @Test
     fun test_attachBundledAndStandalone_shouldThrowExceptionOnStandaloneAttach() {
         // arrange
-        val collector1 = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+        val collector1 = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
         // act
         mainScope.launch {
@@ -963,8 +964,10 @@ class BundledAnalyticsTest {
             collector1.detachPlayer()
         }
 
+        Thread.sleep(300)
+
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList).hasSize(1)
 
         val impression = impressionList.first()

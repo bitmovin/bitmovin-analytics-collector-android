@@ -2,6 +2,7 @@ package com.bitmovin.analytics.bitmovin.player
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.RetryPolicy
@@ -11,8 +12,8 @@ import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
-import com.bitmovin.analytics.systemtest.utils.LogParser
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
+import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
@@ -55,13 +56,16 @@ class PhoneBasicScenariosTest {
         cdnProvider = "cdn_provider",
     )
 
+    private lateinit var defaultAnalyticsConfig: AnalyticsConfig
+    private lateinit var mockedIngressUrl: String
+
     @Before
     fun setup() {
         // purging database to have a clean state for each test
         EventDatabaseTestHelper.purge(appContext)
 
-        // logging to mark new test run for logparsing
-        LogParser.startTracking()
+        mockedIngressUrl = MockedIngress.startServer()
+        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
         defaultPlayer = Player.create(appContext, playerConfig)
     }
@@ -78,7 +82,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_playPauseWithAutoPlay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
         defaultPlayer.config.playbackConfig.isAutoplayEnabled = true
 
         // act
@@ -113,7 +117,7 @@ class PhoneBasicScenariosTest {
         Thread.sleep(500)
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -140,13 +144,12 @@ class PhoneBasicScenariosTest {
     fun test_vodWithDrm_playPauseWithAutoPlay() {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
 
         val drmSourceConfig = SourceConfig.fromUrl(sample.mpdUrl!!)
         drmSourceConfig.drmConfig = WidevineConfig(sample.drmLicenseUrl!!)
 
         val drmSource = Source.create(drmSourceConfig)
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
         val drmSourceMetadata = SourceMetadata(
             title = "drm_dash_widevine",
             videoId = "drm_dash_widevine_id",
@@ -179,7 +182,7 @@ class PhoneBasicScenariosTest {
         Thread.sleep(500)
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -196,7 +199,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_playSeekWithAutoPlay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
         // act
         mainScope.launch {
@@ -223,7 +226,7 @@ class PhoneBasicScenariosTest {
         Thread.sleep(200) // wait a bit for player being destroyed
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -244,7 +247,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_playWithAutoplayAndMuted() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
         val localPlayer = Player.create(appContext, playerConfig)
@@ -271,7 +274,7 @@ class PhoneBasicScenariosTest {
         }
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -297,7 +300,7 @@ class PhoneBasicScenariosTest {
         val liveSample = TestSources.DASH_LIVE
         val liveSource = Source.create(SourceConfig.fromUrl(liveSample.mpdUrl!!))
 
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
         val localPlayer = Player.create(appContext, playerConfig)
@@ -327,7 +330,7 @@ class PhoneBasicScenariosTest {
         }
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -352,7 +355,7 @@ class PhoneBasicScenariosTest {
     fun test_vod_2Impressions_Should_NotCarryOverDataFromFirstImpression() {
         val hlsSample = TestSources.HLS_REDBULL
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
         // act
         mainScope.launch {
@@ -398,7 +401,7 @@ class PhoneBasicScenariosTest {
         // wait a bit for player to be cleaned up
         Thread.sleep(500)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
 
         val impression1 = impressions[0]
@@ -428,7 +431,6 @@ class PhoneBasicScenariosTest {
 
     @Test
     fun test_vod_3ImpressionsWithPlaylist_Should_DetectNewSessions() {
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
         val hlsSample = TestSources.HLS_REDBULL
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
         val dashSample = TestSources.DASH
@@ -459,7 +461,7 @@ class PhoneBasicScenariosTest {
             title = "progTitle",
         )
 
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig, defaultMetadata)
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
         collector.setSourceMetadata(hlsSource, hlsMetadata)
         collector.setSourceMetadata(dashSource, dashMetadata)
         collector.setSourceMetadata(progSource, progMetadata)
@@ -502,7 +504,7 @@ class PhoneBasicScenariosTest {
         }
 
         // assert
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(3)
 
         val impression1 = impressions[0]
@@ -539,7 +541,6 @@ class PhoneBasicScenariosTest {
 
     @Test
     fun test_vod_2ImpressionsWithPlaylist_Should_SetCustomDataOnFirstSourceOnly() {
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
         val defaultMetadata = DefaultMetadata(
             customUserId = "customUserId",
             customData = TestConfig.createDummyCustomData("defaultCustomData"),
@@ -562,7 +563,7 @@ class PhoneBasicScenariosTest {
             title = "dashTitle",
         )
 
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig, defaultMetadata)
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
         collector.setSourceMetadata(hlsSource, hlsMetadata)
         collector.setSourceMetadata(dashSource, dashMetadata)
 
@@ -598,7 +599,7 @@ class PhoneBasicScenariosTest {
         }
 
         // assert
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
 
         val impression1 = impressions[0]
@@ -641,8 +642,7 @@ class PhoneBasicScenariosTest {
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
 
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
         val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
 
         // act
@@ -682,7 +682,7 @@ class PhoneBasicScenariosTest {
         }
 
         // assert
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
 
         val impression1 = impressions[0]
@@ -717,8 +717,7 @@ class PhoneBasicScenariosTest {
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
         val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()))
 
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
         val sourceMetadata = SourceMetadata(title = "nonExistingStream", customData = CustomData(customData1 = "nonExistingStream"))
 
         // act
@@ -739,7 +738,7 @@ class PhoneBasicScenariosTest {
         Thread.sleep(100)
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -755,7 +754,7 @@ class PhoneBasicScenariosTest {
         assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
         DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
 
-        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, analyticsConfig.licenseKey)
+        DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
         assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
         assertThat(errorDetail.data.exceptionMessage).isEqualTo("Response code: 404")
         assertThat(errorDetail.httpRequests?.size).isGreaterThan(0)
@@ -768,10 +767,9 @@ class PhoneBasicScenariosTest {
         val hlsSample = TestSources.HLS_REDBULL
         val source1CustomData = CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
         val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", path = "path/Source1", customData = source1CustomData)
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
         val defaultMetadata = DefaultMetadata(cdnProvider = "cndProviderDefault", customData = CustomData(customData1 = "defaultCustomData1", customData30 = "defaultCustomData30", experimentName = "experimentNameDefault"))
-        val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig, defaultMetadata)
+        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
@@ -812,7 +810,7 @@ class PhoneBasicScenariosTest {
         // wait a bit for player to be cleaned up
         Thread.sleep(500)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(2)
 
         val impression1 = impressions[0]
@@ -841,7 +839,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         // arrange
-        val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey")
+        val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey", backendUrl = mockedIngressUrl)
         val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
 
         // act
@@ -866,7 +864,7 @@ class PhoneBasicScenariosTest {
         Thread.sleep(300)
 
         // assert that no samples are sent
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(0)
     }
 
@@ -902,11 +900,10 @@ class PhoneBasicScenariosTest {
         Thread.sleep(300)
 
         // since license call fails for the offline session we don't expect any impressions (not even in the log output)
-        val offlineImpressions = LogParser.extractImpressions()
+        val offlineImpressions = MockedIngress.extractImpressions()
         assertThat(offlineImpressions.size).isEqualTo(0)
 
-        val analyticsOnlineConfig = TestConfig.createAnalyticsConfig()
-        val onlineCollector = IBitmovinPlayerCollector.create(appContext, analyticsOnlineConfig)
+        val onlineCollector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
         onlineCollector.setSourceMetadata(defaultSource, SourceMetadata(title = "onlineSession"))
 
         mainScope.launch {
@@ -924,7 +921,7 @@ class PhoneBasicScenariosTest {
 
         Thread.sleep(300)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
 
         // the log parser is currently relying of a linear order of events
         // thus we need to do some normalization by impressionId for the offline
@@ -937,8 +934,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_sendCustomDataEvent() {
         // arrange
-        val analyticsConfig = TestConfig.createAnalyticsConfig()
-        val collector = IBitmovinPlayerCollector.Factory.create(appContext, analyticsConfig)
+        val collector = IBitmovinPlayerCollector.Factory.create(appContext, defaultAnalyticsConfig)
         val sourceMetadata = SourceMetadata(
             title = "title",
             isLive = false,
@@ -972,7 +968,7 @@ class PhoneBasicScenariosTest {
 
         Thread.sleep(300)
 
-        val impressions = LogParser.extractImpressions()
+        val impressions = MockedIngress.extractImpressions()
         assertThat(impressions.size).isEqualTo(1)
 
         val impression = impressions.first()
@@ -1000,8 +996,8 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_attach2CollectorInstances_shouldThrowExceptionOnSecondAttach() {
         // arrange
-        val collector1 = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
-        val collector2 = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
+        val collector1 = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+        val collector2 = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
         // act
         mainScope.launch {
@@ -1027,8 +1023,10 @@ class PhoneBasicScenariosTest {
             collector2.detachPlayer()
         }
 
+        Thread.sleep(300)
+
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         assertThat(impressionList).hasSize(1)
 
         val impression = impressionList.first()

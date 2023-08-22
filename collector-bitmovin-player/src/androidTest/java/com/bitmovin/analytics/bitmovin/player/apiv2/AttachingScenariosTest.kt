@@ -1,11 +1,13 @@
-package com.bitmovin.analytics.bitmovin.player
+package com.bitmovin.analytics.bitmovin.player.apiv2
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.bitmovin.player.BitmovinPlaybackUtils
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.LogParser
+import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.bitmovin.player.api.PlaybackConfig
@@ -31,26 +33,27 @@ class AttachingScenariosTest {
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
     private var defaultSample1 = TestSources.HLS_REDBULL
-    private var defaultAnalyticsConfig1 = TestConfig.createBitmovinAnalyticsConfig()
     private var defaultSource1 = Source.create(SourceConfig.fromUrl(defaultSample1.m3u8Url!!))
 
     private var defaultSample2 = TestSources.DASH
-    private var defaultAnalyticsConfig2 = TestConfig.createBitmovinAnalyticsConfig()
     private var defaultSource2 = Source.create(SourceConfig.fromUrl(defaultSample2.mpdUrl!!))
+
+    private lateinit var defaultAnalyticsConfig: BitmovinAnalyticsConfig
+    private lateinit var mockedIngressUrl: String
 
     @Before
     fun setup() {
         // purging database to have a clean state for each test
         EventDatabaseTestHelper.purge(appContext)
 
-        // logging to mark new test run for logparsing
-        LogParser.startTracking()
+        mockedIngressUrl = MockedIngress.startServer()
+        defaultAnalyticsConfig = TestConfig.createBitmovinAnalyticsConfig(backendUrl = mockedIngressUrl)
     }
 
     @Test
     fun test_vod2ItemsPlaylist_attachingOnPlaylistTransitionEventWithSlowSeekAndAutoplay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig2, appContext)
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig()
         playbackConfig.isAutoplayEnabled = true
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
@@ -68,7 +71,7 @@ class AttachingScenariosTest {
     @Ignore("Attaching on playlist transition event is not supported!")
     fun test_vod2ItemsPlaylist_attachingOnPlaylistTransitionEventWithSlowSeekAndWithoutAutoplay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig2, appContext)
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig()
         playbackConfig.isAutoplayEnabled = false
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
@@ -85,7 +88,7 @@ class AttachingScenariosTest {
     @Test
     fun test_vod2ItemsPlaylist_attachOnPlaylistTransitionEventWithFastSeekAndAutoplay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig2, appContext)
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig()
         playbackConfig.isAutoplayEnabled = true
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
@@ -103,7 +106,7 @@ class AttachingScenariosTest {
     @Ignore("Attaching on playlist transition event is not supported!")
     fun test_vod2ItemsPlaylist_attachOnPlaylistTransitionEventWithFastSeekWithoutAutoplay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig2, appContext)
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig()
         playbackConfig.isAutoplayEnabled = false
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
@@ -120,7 +123,7 @@ class AttachingScenariosTest {
     @Test
     fun test_vod2ItemsPlaylist_attachImmediatelyAfterFastSeekToSecondItemWithAutoplay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig2, appContext)
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig()
         playbackConfig.isAutoplayEnabled = true
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
@@ -137,7 +140,7 @@ class AttachingScenariosTest {
     @Test
     fun test_vod2ItemsPlaylist_attachImmediatelyAfterFastSeekToSecondItemWithoutAutoplay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig2, appContext)
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig()
         playbackConfig.isAutoplayEnabled = false
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
@@ -155,7 +158,7 @@ class AttachingScenariosTest {
     @Ignore("Late attaching not supported")
     fun test_vod_lateAttachingWhilePlayingWithoutAutoplay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig1, appContext)
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig()
         playbackConfig.isAutoplayEnabled = false
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
@@ -171,7 +174,7 @@ class AttachingScenariosTest {
     @Test
     fun test_vod_lateAttachingWhilePlayingWithAutoplay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig1, appContext)
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig()
         playbackConfig.isAutoplayEnabled = true
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
@@ -191,7 +194,7 @@ class AttachingScenariosTest {
     @Ignore("reveals a bug in our current implementation")
     fun test_vod2Impressions_attachingBeforeLoadOfSecondImpressionWithAutoplay() {
         // arrange
-        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig1, appContext)
+        val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig()
         playbackConfig.isAutoplayEnabled = true
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
@@ -229,7 +232,7 @@ class AttachingScenariosTest {
         Thread.sleep(500)
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         Assertions.assertThat(impressionList.size).isEqualTo(2)
     }
 
@@ -351,7 +354,7 @@ class AttachingScenariosTest {
     }
 
     private fun verifyExactlyOneSessionWithStartupSample() {
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         Assertions.assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
