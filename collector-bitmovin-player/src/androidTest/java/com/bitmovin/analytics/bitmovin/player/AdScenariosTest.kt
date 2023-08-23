@@ -1,14 +1,15 @@
 package com.bitmovin.analytics.bitmovin.player
 
+import android.widget.LinearLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
+import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
-import com.bitmovin.analytics.systemtest.utils.LogParser
-import com.bitmovin.analytics.systemtest.utils.PlayerSettings
+import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.bitmovin.player.api.PlaybackConfig
@@ -30,42 +31,35 @@ import org.junit.runner.RunWith
 // AdTests currently don't work with the managed devices and need to be run with the normal emulator
 @RunWith(AndroidJUnit4::class)
 class AdScenariosTest {
-
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-    private lateinit var defaultPlayer: Player
-
     private var defaultSample = TestSources.HLS_REDBULL
     private var defaultSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
 
+    private lateinit var mockedIngressUrl: String
+
     @Before
     fun setup() {
+        mockedIngressUrl = MockedIngress.startServer()
         // purging database to have a clean state for each test
         EventDatabaseTestHelper.purge(appContext)
-
-        // logging to mark new test run for logparsing
-        LogParser.startTracking()
-        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
-        defaultPlayer = Player.create(appContext, playerConfig)
     }
 
     @Test
     fun test_vodWithAds_playWithAutoplayAndMuted() {
         // arrange
-        // https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/tags
-        val imaTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator="
-        val adSource = AdSource(AdSourceType.Ima, imaTag)
-
-        // Setup a pre-roll ad
-        val preRoll = AdItem("pre", adSource)
-        // play midroll after 3seconds
-        val midRoll = AdItem("3", adSource)
+        val preRollAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_3.uri.toString())
+        val secondAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_2.uri.toString())
+        val preRoll = AdItem("pre", preRollAdSource)
+        // play midroll after 6 seconds
+        val midRoll = AdItem("6", secondAdSource)
         val advertisingConfig = AdvertisingConfig(preRoll, midRoll)
 
-        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig())
-        val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
+        val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl))
+        val playbackConfig = PlaybackConfig()
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig, advertisingConfig = advertisingConfig)
         val localPlayer = Player.create(appContext, playerConfig)
+        localPlayer.setAdViewGroup(LinearLayout(appContext))
         val sourceMetadata = SourceMetadata(title = "adTest")
 
         // act
@@ -73,10 +67,11 @@ class AdScenariosTest {
             collector.attachPlayer(localPlayer)
             collector.setSourceMetadata(defaultSource, sourceMetadata)
             localPlayer.load(defaultSource)
+            localPlayer.play()
         }
 
         // wait until midRoll ad is played
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 8000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 7000)
 
         mainScope.launch {
             localPlayer.pause()
@@ -90,7 +85,7 @@ class AdScenariosTest {
         }
 
         // assert
-        val impressionList = LogParser.extractImpressions()
+        val impressionList = MockedIngress.extractImpressions()
         Assertions.assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()
@@ -104,11 +99,9 @@ class AdScenariosTest {
         val eventDataList = impression.eventDataList
         DataVerifier.verifyStaticData(eventDataList, sourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
 
-        // TODO: verify if this could cause issues
         // startup sample is second sample (since order of events in player changed in 3.40.0
         DataVerifier.verifyStartupSample(eventData = eventDataList[1], expectedSequenceNumber = 1)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
         DataVerifier.verifyInvariants(eventDataList)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)

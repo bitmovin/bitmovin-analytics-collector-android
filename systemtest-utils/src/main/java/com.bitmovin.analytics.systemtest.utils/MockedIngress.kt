@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.systemtest.utils
 
+import android.util.Log
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
@@ -90,7 +91,7 @@ object MockedIngress {
                     )
 
                     if (adEventData != null) {
-                        adEventDataMap[adEventData.adImpressionId]?.let {
+                        adEventDataMap[adEventData.videoImpressionId]?.let {
                             adEventDataMap.put(adEventData.videoImpressionId, it.plus(adEventData))
                         } ?: adEventDataMap.put(adEventData.videoImpressionId, listOf(adEventData))
                     }
@@ -141,6 +142,21 @@ object MockedIngress {
                 impressionList.add(impression)
             }
         }
+
+        for (impression in impressionList) {
+            impression.eventDataList.forEach() {
+                Log.d("MockedIngress", "Sample: $it")
+            }
+
+            impression.adEventDataList.forEach() {
+                Log.d("MockedIngress", "AdSample: $it")
+            }
+
+            impression.errorDetailList.forEach() {
+                Log.d("MockedIngress", "ErrorDetailSample: $it")
+            }
+        }
+
         return impressionList
     }
 }
