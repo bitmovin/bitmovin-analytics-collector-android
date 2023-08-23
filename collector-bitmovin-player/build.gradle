@@ -50,8 +50,7 @@ android {
                     device = "Pixel 6"
                     // Use only API levels 27 and higher.
                     apiLevel = 30
-                    // To include Google services, use "google-atd".
-                    systemImageSource = "google-atd"
+                    systemImageSource = "aosp-atd"
                 }
             }
         }

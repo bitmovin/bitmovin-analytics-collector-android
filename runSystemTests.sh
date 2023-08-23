@@ -22,11 +22,20 @@ yes | /Users/$USER/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager --lic
 # run systemtest for bitmovin-player
 ## clean test to make sure we run test everytime
 ./gradlew :collector-bitmovin-player:cleanPixel6api30DebugAndroidTest
+
 ## run test
-./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.PhoneBasicScenariosTest || exit
-./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.apiv2.PhoneBasicScenariosTest || exit
-./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.apiv2.AttachingScenariosTest || exit
-./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.BundledAnalyticsTest || exit
+./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest
+
+
+
+## Commands that can be used for local testing of specific test classes and tests
+
+## commands to run specific test classes
+#./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.PhoneBasicScenariosTest || exit
+#./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.apiv2.PhoneBasicScenariosTest || exit
+#./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.apiv2.AttachingScenariosTest || exit
+#./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.BundledAnalyticsTest || exit
+#./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.BundledAnalyticsTest || exit
 
 ## command to run specific test (with regex) in a loop (can be used to verify flaky test is stable)
 #for i in {1..50}; do
