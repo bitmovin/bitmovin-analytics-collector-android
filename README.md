@@ -25,6 +25,15 @@ And this line, depending on your player version, to your main project `build.gra
 
 ### Bitmovin Player
 
+#### Integrated Analytics with Bitmovin Player
+
+We recommend to use the integrated analytics that comes with the bitmovin player.
+This setup simplifies usage since you don't have to attach/detach the player instance and source metadata is attached directly to the source object.
+
+Check the [Getting Started Guide](https://developer.bitmovin.com/playback/docs/getting-started-android) of the bitmovin player for more information on how to setup the integrated analytics.
+
+#### Standalone Analytics with Bitmovin Player
+
 <table>
 <tr>
 <td> Player Version </td> <td> Dependency </td>
@@ -89,33 +98,8 @@ dependencies {
 
 </td>
 </tr>
-
-<tr>
-<td> < v2.17.0 <br/> >= v2.12.0  </td>
-<td>
-
-```gradle
-dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:2.6.2'
-}
-```
-
-</td>
-</tr>
-
-<tr>
-<td> < v2.12.0 </td>
-<td>
-
-```gradle
-dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:1.36.0'
-}
-```
-
-</td>
-</tr>
 </table>
+
 
 ### IVS Player
 
@@ -141,9 +125,18 @@ dependencies {
 
 ## Examples
 
-The following example creates a BitmovinAnalyticsCollector object and attaches a Player instance to it.
+The following examples create an analyticsCollector and attache a player instance to it.
 
 ### Basic analytics monitoring with Bitmovin Player SDK
+
+#### Integrated Analytics with Bitmovin Player
+
+We recommend to use the integrated analytics that comes with the bitmovin player.
+This setup simplifies usage since you don't have to attach/detach the player instance and source metadata is attached directly to the source object.
+
+Check the [Getting Started Guide](https://developer.bitmovin.com/playback/docs/getting-started-android) of the bitmovin player for more information on how to setup the integrated analytics.
+
+#### Standalone Analytics with Bitmovin Player
 
 ```kotlin
 // Create an AnalyticsConfig using your Bitmovin analytics license key (minimal config required)
