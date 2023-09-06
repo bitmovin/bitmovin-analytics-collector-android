@@ -125,7 +125,7 @@ dependencies {
 
 ## Examples
 
-The following examples create an analyticsCollector and attache a player instance to it.
+The following examples create an analyticsCollector and attach a player instance to it.
 
 ### Basic analytics monitoring with Bitmovin Player SDK
 
