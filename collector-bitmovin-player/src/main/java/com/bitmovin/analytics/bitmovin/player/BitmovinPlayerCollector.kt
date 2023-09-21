@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import android.content.Context
+import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
@@ -69,7 +70,8 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         val playerLicenseProvider = PlayerLicenseProvider(analytics.context)
         val playerContext = BitmovinPlayerContext(player)
-        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext)
+        val handler = Handler(analytics.context.mainLooper)
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
         val playbackQualityProvider = PlaybackQualityProvider(player)
         return BitmovinSdkAdapter(
             player,

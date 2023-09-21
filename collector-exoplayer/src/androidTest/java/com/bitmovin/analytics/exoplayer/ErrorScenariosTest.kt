@@ -8,6 +8,8 @@ import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.TestConfig
+import com.bitmovin.analytics.systemtest.utils.TestSources
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
@@ -31,8 +33,6 @@ class ErrorScenariosTest {
         customData = TestConfig.createDummyCustomData(),
         cdnProvider = "cdn_provider",
     )
-
-    // TODO: add test with failing drm config
 
     @Before
     fun setup() {
@@ -188,5 +188,54 @@ class ErrorScenariosTest {
         DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
         Assertions.assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
         Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Data Source request failed with HTTP status: 403")
+    }
+
+    @Test
+    fun test_vodWithDrm_wrongConfig() {
+        // arrange
+        val sample = TestSources.DRM_DASH_WIDEVINE
+        val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+        // using clearkey_uuid instead of widevine to simulate error
+        val mediaItem = MediaItem.Builder()
+            .setDrmConfiguration(
+                MediaItem.DrmConfiguration.Builder(C.CLEARKEY_UUID)
+                    .setLicenseUri(sample.drmLicenseUrl)
+                    .build(),
+            )
+            .setUri(sample.mpdUrl)
+            .build()
+        val drmSourceMetadata = SourceMetadata(
+            title = "drmTest",
+            videoId = "drmTest",
+            cdnProvider = "cdn_provider",
+            customData = TestConfig.createDummyCustomData(),
+        )
+
+        // act
+        mainScope.launch {
+            collector.attachPlayer(player)
+            player.playWhenReady = true
+            player.setMediaItem(mediaItem)
+            collector.sourceMetadata = drmSourceMetadata
+            player.prepare()
+        }
+
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasError(player)
+
+        // wait a bit to make sure the error samples are sent
+        Thread.sleep(300)
+
+        val impressionsList = MockedIngress.extractImpressions()
+        val impression = impressionsList.first()
+        val startupSample = impression.eventDataList.first()
+        Assertions.assertThat(startupSample.videoStartFailed).isTrue
+        Assertions.assertThat(startupSample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+        Assertions.assertThat(startupSample.errorMessage).startsWith("Source Error: ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED")
+        Assertions.assertThat(startupSample.errorCode).isEqualTo(PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED)
+
+        val errorDetail = impression.errorDetailList.first()
+        Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Source error ")
+        Assertions.assertThat(errorDetail.data.exceptionStacktrace).isNotEmpty
     }
 }

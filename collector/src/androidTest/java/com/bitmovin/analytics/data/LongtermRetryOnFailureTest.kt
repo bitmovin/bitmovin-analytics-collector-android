@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.data
 
+import android.os.Handler
+import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.BitmovinAnalytics
@@ -556,6 +558,7 @@ private class DummyPlayerAdapter(
     override val stateMachine: PlayerStateMachine = PlayerStateMachine.Factory.create(
         analytics,
         playerContext,
+        Handler(Looper.getMainLooper()),
     )
     override val position: Long
         get() = 0

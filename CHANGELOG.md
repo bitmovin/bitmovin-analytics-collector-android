@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Upgrade example apps to latest bitmovin player (v3.42.0), ivs player (v1.21.0) and exoplayer (v2.19.1)
 - [internal] Refactoring of exoplayer collector + increase of testcoverage
+- [internal] AN-3404 - Replaced usage of deprecated Handler() with explicit usage of looper (Handler(looper))
 
 ## v3.0.1
 

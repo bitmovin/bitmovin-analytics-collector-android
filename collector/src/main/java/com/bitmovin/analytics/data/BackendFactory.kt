@@ -35,8 +35,7 @@ class BackendFactory(
         // The RetryBackend and the PersistentCacheBackend may not be mixed,
         // to avoid "fighting" implementations.
         return if (config.retryPolicy == RetryPolicy.SHORT_TERM) {
-            // TODO (AN-3404): get rid of the deprecated Handler()
-            RetryBackend(backend, Handler())
+            RetryBackend(backend, Handler(context.mainLooper))
         } else {
             backend
         }
