@@ -18,7 +18,10 @@ interface PlayerAdapter {
     fun init(): Collection<Feature<FeatureConfigContainer, *>>
     fun release()
     fun resetSourceRelatedState()
-    fun clearValues()
+
+    // Called after sending EventData
+    // Should clear all values that are only needed per sample
+    fun clearValuesAfterSendingOfSample()
     fun createEventData(): EventData
     fun createEventDataForCustomDataEvent(sourceMetadata: SourceMetadata): EventData
 

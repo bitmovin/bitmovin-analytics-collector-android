@@ -2,6 +2,7 @@ package com.bitmovin.analytics.exoplayer.manipulators
 
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.exoplayer.ExoUtil
 import com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO
 import com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO
 import com.google.android.exoplayer2.ExoPlayer
@@ -10,6 +11,11 @@ import com.google.android.exoplayer2.Format
 internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataManipulator {
     var currentAudioFormat: Format? = null
     var currentVideoFormat: Format? = null
+
+    override fun manipulate(data: EventData) {
+        applyVideoFormat(data, currentVideoFormat)
+        applyAudioFormat(data, currentAudioFormat)
+    }
 
     fun hasAudioFormatChanged(newFormat: Format?): Boolean {
         newFormat ?: return false
@@ -24,11 +30,6 @@ internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : E
             newFormat.bitrate.toLong() != oldFormat.bitrate.toLong() ||
             newFormat.width != oldFormat.width ||
             newFormat.height != oldFormat.height
-    }
-
-    override fun manipulate(data: EventData) {
-        applyVideoFormat(data, currentVideoFormat)
-        applyAudioFormat(data, currentAudioFormat)
     }
 
     fun reset() {
@@ -58,21 +59,7 @@ internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : E
     }
 
     fun setFormatsFromPlayer() {
-        currentVideoFormat = exoplayer.videoFormat ?: getCurrentFormatFromPlayer(TRACK_TYPE_VIDEO)
-        currentAudioFormat = exoplayer.audioFormat ?: getCurrentFormatFromPlayer(TRACK_TYPE_AUDIO)
-    }
-
-    private fun getCurrentFormatFromPlayer(trackType: Int): Format? {
-        val trackInfo = exoplayer.currentTracks.groups.firstOrNull { track -> track.type == trackType }
-            ?: return null
-
-        var format = trackInfo.mediaTrackGroup.getFormat(0)
-        try {
-            val getSelectedFormatMethod = trackInfo.javaClass.getMethod("getSelectedFormat")
-            format = getSelectedFormatMethod.invoke(trackInfo) as Format
-        } catch (e: Exception) {
-        }
-
-        return format
+        currentVideoFormat = exoplayer.videoFormat ?: ExoUtil.getSelectedFormatFromPlayer(exoplayer, TRACK_TYPE_VIDEO)
+        currentAudioFormat = exoplayer.audioFormat ?: ExoUtil.getSelectedFormatFromPlayer(exoplayer, TRACK_TYPE_AUDIO)
     }
 }

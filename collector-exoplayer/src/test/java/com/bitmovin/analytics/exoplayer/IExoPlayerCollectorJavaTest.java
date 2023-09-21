@@ -17,7 +17,7 @@ public class IExoPlayerCollectorJavaTest {
     public void testFactory_shouldCreateNewCollectorObject(){
         // arrange
         BitmovinAnalyticsConfig config = new BitmovinAnalyticsConfig("test-analytics-key", "test-player-key");
-        Context context = TestUtils.Companion.createMockContext();
+        Context context = TestUtils.INSTANCE.createMockContext();
         DefaultMetadata defaultMetadata = new DefaultMetadata();
 
         // act
@@ -35,7 +35,7 @@ public class IExoPlayerCollectorJavaTest {
     public void testFactory_shouldCreateNewCollectorObjectWithAnalyticsConfig(){
         // arrange
         AnalyticsConfig config = new AnalyticsConfig("test-analytics-key");
-        Context context = TestUtils.Companion.createMockContext();
+        Context context = TestUtils.INSTANCE.createMockContext();
         DefaultMetadata defaultMetadata = new DefaultMetadata();
 
         // act

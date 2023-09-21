@@ -165,7 +165,7 @@ class BitmovinAnalytics(val config: AnalyticsConfig, val context: Context) : Lic
 
     fun sendEventData(data: EventData) {
         eventDataDispatcher.add(data)
-        playerAdapter?.clearValues()
+        playerAdapter?.clearValuesAfterSendingOfSample()
     }
 
     fun sendAdEventData(data: AdEventData) {

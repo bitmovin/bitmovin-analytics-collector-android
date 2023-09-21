@@ -2,7 +2,9 @@ package com.bitmovin.analytics.exoplayer
 
 import android.os.Handler
 import android.os.Looper
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerLibraryInfo
+import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.Player
 
 internal object ExoUtil {
@@ -41,5 +43,47 @@ internal object ExoUtil {
         } else {
             function.invoke()
         }
+    }
+
+    // TODO: verify if this is correct
+    /**
+     * Exoplayer organizes audio, video, subtitles, etc.. in track groups.
+     * A track group is a collection of tracks that are of the same type (e.g. video, audio, text, etc.).
+     * Each track corresponds to a Format object.
+     *
+     * Each track group has a field that determines if the group is selected, and an array which specifies
+     * which tracks in the group are selected specifically.
+     * TODO: verify which player team why we can have track groups with several tracks being selected for video
+     * (can be reproduced with test_live_playWithAutoplay and using IVS_LIVE_1 source)
+     *
+     *
+     * Example
+     * TrackGroup1 -> video with tracks for bitrate 1kb, 2kb, 3kb, etc..
+     * TrackGroup2 -> audio english with tracks for stereo, surround, etc..
+     * TrackGroup3 -> audio german with tracks for stereo, surround, etc..
+     * TrackGroup4 -> subtitles english with 1 track for english
+     * TrackGroup5 -> subtitles german with 1 track for german
+     */
+    fun getSelectedFormatFromPlayer(exoPlayer: ExoPlayer, trackType: Int): Format? {
+        try {
+            if (!exoPlayer.isCommandAvailable(Player.COMMAND_GET_TRACKS)) {
+                return null
+            }
+
+            val trackGroups = exoPlayer.currentTracks.groups
+            val trackGroupsWithTrackType = trackGroups.filter { track -> track.type == trackType }
+            val selectedTrackGroup = trackGroupsWithTrackType.firstOrNull { it.isSelected } ?: return null
+
+            // bit cumbersome to find the actual track in the track group that is selected
+            // but I couldn't find a better way
+            for (index in 0 until selectedTrackGroup.length) {
+                if (selectedTrackGroup.isTrackSelected(index)) {
+                    return selectedTrackGroup.getTrackFormat(index)
+                }
+            }
+        } catch (_: Exception) {
+        }
+
+        return null
     }
 }

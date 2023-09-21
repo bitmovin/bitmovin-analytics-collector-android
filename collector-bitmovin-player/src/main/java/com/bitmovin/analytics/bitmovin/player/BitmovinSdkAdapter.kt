@@ -258,7 +258,7 @@ internal class BitmovinSdkAdapter(
     override val position: Long
         get() = BitmovinUtil.getCurrentTimeInMs(player)
 
-    override fun clearValues() {}
+    override fun clearValuesAfterSendingOfSample() {}
     override fun createAdAdapter(): AdAdapter {
         return BitmovinSdkAdAdapter(player)
     }
@@ -581,7 +581,7 @@ internal class BitmovinSdkAdapter(
             // source or seeking to another source. In both cases, we set the
             // videoEndTime to the duration of the old source.
             val videoEndTimeOfPreviousSource =
-                Util.secondsToMillis(overrideCurrentSource!!.duration)
+                Util.secondsToMillis(overrideCurrentSource?.duration)
             val shouldStartup = player.isPlaying
             stateMachine.sourceChange(videoEndTimeOfPreviousSource, position, shouldStartup)
         } catch (e: Exception) {

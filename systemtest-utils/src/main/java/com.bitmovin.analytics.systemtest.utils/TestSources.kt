@@ -34,6 +34,39 @@ object TestSources {
         0,
     )
 
+    /**
+     * Sintel
+     * Source with 5 subtitle tracks
+     * Audio language: en_stereo
+     * Subtitle languages: [en, de, es, fr, img]
+     */
+    val DASH_SINTEL_WITH_SUBTITLES = StreamData(
+        "avc1.",
+        "mp4a.40.2",
+        null,
+        null,
+        "https://bitmovin-a.akamaihd.net/content/sintel/sintel_single_quality.mpd",
+        "dash",
+        false,
+        888000,
+    )
+
+    /**
+     * Source with two audio tracks with two qualities each as well as four subtitle tracks.
+     * Audio languages: [en, dubbing]
+     * Audio qualities: [stereo, surround]
+     */
+    val HLS_MULTIPLE_AUDIO_LANGUAGES = StreamData(
+        "avc1.",
+        "mp4a.40.2",
+        "https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+        null,
+        null,
+        "hls",
+        false,
+        888000,
+    )
+
     val PROGRESSIVE = StreamData(
         "avc1.",
         "mp4a.40.2",

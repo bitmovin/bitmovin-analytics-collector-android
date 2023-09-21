@@ -17,7 +17,7 @@ public class IAmazonIvsPlayerCollectorJavaTest {
     public void testFactory_shouldCreateNewCollectorObjectForAnalyticsConfig(){
         // arrange
         AnalyticsConfig config = new AnalyticsConfig("test-analytics-key");
-        Context context = TestUtils.Companion.createMockContext();
+        Context context = TestUtils.INSTANCE.createMockContext();
         DefaultMetadata defaultMetadata = new DefaultMetadata();
 
         // act

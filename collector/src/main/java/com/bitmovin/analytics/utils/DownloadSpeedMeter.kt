@@ -52,7 +52,7 @@ class DownloadSpeedMeter {
             return 0.0f
         }
         // the slowest one to download
-        return measures.map { it.speed }.maxOrNull()?.times(8) // bytes per millisecond to kbps
+        return measures.maxOfOrNull { it.speed }?.times(8) // bytes per millisecond to kbps
     }
 
     private fun maxSpeed(): Float? {
@@ -60,7 +60,7 @@ class DownloadSpeedMeter {
             return 0.0f
         }
         // the fastest one to download
-        return measures.map { it.speed }.minOrNull()?.times(8); // bytes per millisecond to kbps
+        return measures.minOfOrNull { it.speed }?.times(8); // bytes per millisecond to kbps
     }
 
     private fun totalTime(): Long {

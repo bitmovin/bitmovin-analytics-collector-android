@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.stateMachines
 
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.ObservableSupport
@@ -18,7 +19,7 @@ class PlayerStateMachine(
     internal val qualityChangeEventLimiter: QualityChangeEventLimiter,
     internal val videoStartTimeoutTimer: ObservableTimer,
     private val playerContext: PlayerContext,
-    private val heartbeatHandler: Handler = Handler(), // TODO (AN-3404) fix deprecated Handler constructor
+    private val heartbeatHandler: Handler = Handler(Looper.getMainLooper()), // TODO (AN-3404) fix deprecated Handler constructor
 ) {
     internal val listeners = ObservableSupport<StateMachineListener>()
 
@@ -111,11 +112,14 @@ class PlayerStateMachine(
         disableRebufferHeartbeat()
         impressionId = Util.uUID
         videoStartFailedReason = null
-        startupTime = 0
         isStartupFinished = false
+
+        startupTime = 0
+
         videoStartTimeoutTimer.cancel()
         bufferingTimeoutTimer.cancel()
         qualityChangeEventLimiter.reset()
+
         analytics.resetSourceRelatedState()
     }
 

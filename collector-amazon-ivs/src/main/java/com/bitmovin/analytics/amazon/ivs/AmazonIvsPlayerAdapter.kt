@@ -77,7 +77,7 @@ internal class AmazonIvsPlayerAdapter(
         playerStatisticsProvider.reset()
     }
 
-    override fun clearValues() {
+    override fun clearValuesAfterSendingOfSample() {
         // this method should clear values after sample is sent, no action needed
     }
 

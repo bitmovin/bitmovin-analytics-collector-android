@@ -34,4 +34,6 @@ internal class ExoPlayerContext(private val player: Player) : PlayerContext {
             }
             return 0
         }
+
+    val playWhenReady get() = player.playWhenReady
 }

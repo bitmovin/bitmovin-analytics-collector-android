@@ -579,7 +579,7 @@ private class DummyPlayerAdapter(
     override fun resetSourceRelatedState() {
     }
 
-    override fun clearValues() {
+    override fun clearValuesAfterSendingOfSample() {
     }
 
     override fun createEventData(): EventData {

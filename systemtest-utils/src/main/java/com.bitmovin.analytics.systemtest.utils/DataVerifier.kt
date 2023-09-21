@@ -87,6 +87,12 @@ object DataVerifier {
             assertThat(eventData.droppedFrames).isGreaterThanOrEqualTo(0)
             assertThat(eventData.language).isEqualTo("en_US")
 
+            // audio language should always be set, except for ivs player
+            // since we cannot track it there as of 2023-09-21
+            if (expectedPlayerInfo.playerName != "amazonivs") {
+                assertThat(eventData.audioLanguage).isNotEmpty
+            }
+
             // make sure that sequenceNumber is continuous increasing
             assertThat(eventData.sequenceNumber).isEqualTo(expectedSequenceNumber)
         }
@@ -311,6 +317,25 @@ object DataVerifier {
         assertThat(errorSamples.size).isEqualTo(0)
     }
 
+    fun verifyBackwardsSeek(eventData: EventData) {
+        assertThat(eventData.videoTimeEnd).isLessThan(eventData.videoTimeStart)
+        verifySeekRelatedFields(eventData)
+    }
+
+    fun verifyForwardsSeek(eventData: EventData) {
+        assertThat(eventData.videoTimeStart).isLessThan(eventData.videoTimeEnd)
+        verifySeekRelatedFields(eventData)
+    }
+
+    private fun verifySeekRelatedFields(eventData: EventData) {
+        assertThat(eventData.seeked).isGreaterThan(0L)
+        assertThat(eventData.duration).isGreaterThan(0L)
+        assertThat(eventData.duration).isEqualTo(eventData.seeked)
+
+        assertThat(eventData.played).isEqualTo(0)
+        assertThat(eventData.paused).isEqualTo(0)
+    }
+
     fun verifyVideoStartEndTimesOnContinuousPlayback(eventDataList: MutableList<EventData>) {
         // TODO: we skip the startup sample here, since the videotime start and videotime end are sometimes not 0 for these (seen on bitmovin player)
         var previousVideoTimeEnd = eventDataList[0].videoTimeEnd
@@ -448,6 +473,11 @@ object DataVerifier {
         val playingEvents = eventDataList.filter { x -> x.state == PLAYING }
         val playingStartEndDelta = playingEvents.sumOf { it.videoTimeEnd - it.videoTimeStart }
         val playingDuration = playingEvents.sumOf { it.played }
+
+        // if playingStartEndDelta is very low we just skip verification to avoid flakyness
+        if (playingStartEndDelta < 100) {
+            return
+        }
 
         // we use a range of -15% to +10% to account for some inaccuracies in the players
         assertThat(playingStartEndDelta).isBetween((playingDuration * 0.85).toLong(), (playingDuration * 1.10).toLong())

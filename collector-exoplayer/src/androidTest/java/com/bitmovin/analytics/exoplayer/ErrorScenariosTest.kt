@@ -32,6 +32,8 @@ class ErrorScenariosTest {
         cdnProvider = "cdn_provider",
     )
 
+    // TODO: add test with failing drm config
+
     @Before
     fun setup() {
         mockedIngressUrl = MockedIngress.startServer()

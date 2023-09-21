@@ -8,34 +8,32 @@ import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.enums.PlayerType
 import io.mockk.mockk
 
-class TestUtils {
-    companion object {
-        fun createMinimalEventData(): EventData {
-            val deviceInfo = DeviceInformation(
-                "manufactorer",
-                "model",
-                false,
-                "locale",
-                "domain",
-                0,
-                0,
-                null,
-                null,
-                null,
-                null,
-            )
-            val playerInfo = PlayerInfo("playerTech", PlayerType.AMAZON_IVS)
+object TestUtils {
+    fun createMinimalEventData(): EventData {
+        val deviceInfo = DeviceInformation(
+            "manufactorer",
+            "model",
+            false,
+            "locale",
+            "domain",
+            0,
+            0,
+            null,
+            null,
+            null,
+            null,
+        )
+        val playerInfo = PlayerInfo("playerTech", PlayerType.AMAZON_IVS)
 
-            return EventData(
-                deviceInfo, playerInfo, CustomData(), "aaa", "bbb",
-                null, null, null, null, null,
-                null, "testUserAgent",
-            )
-        }
+        return EventData(
+            deviceInfo, playerInfo, CustomData(), "aaa", "bbb",
+            null, null, null, null, null,
+            null, "testUserAgent",
+        )
+    }
 
-        // helper to create a context mock for the java tests
-        fun createMockContext(): Context {
-            return mockk(relaxed = true)
-        }
+    // helper to create a context mock for the java tests
+    fun createMockContext(): Context {
+        return mockk(relaxed = true)
     }
 }
