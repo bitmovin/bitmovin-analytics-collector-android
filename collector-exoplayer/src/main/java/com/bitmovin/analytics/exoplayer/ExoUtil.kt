@@ -45,17 +45,14 @@ internal object ExoUtil {
         }
     }
 
-    // TODO: verify if this is correct
     /**
      * Exoplayer organizes audio, video, subtitles, etc.. in track groups.
-     * A track group is a collection of tracks that are of the same type (e.g. video, audio, text, etc.).
-     * Each track corresponds to a Format object.
+     * reference: https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/source/TrackGroup.html
      *
      * Each track group has a field that determines if the group is selected, and an array which specifies
      * which tracks in the group are selected specifically.
      * TODO: verify which player team why we can have track groups with several tracks being selected for video
      * (can be reproduced with test_live_playWithAutoplay and using IVS_LIVE_1 source)
-     *
      *
      * Example
      * TrackGroup1 -> video with tracks for bitrate 1kb, 2kb, 3kb, etc..
@@ -63,6 +60,8 @@ internal object ExoUtil {
      * TrackGroup3 -> audio german with tracks for stereo, surround, etc..
      * TrackGroup4 -> subtitles english with 1 track for english
      * TrackGroup5 -> subtitles german with 1 track for german
+     *
+     *
      */
     fun getSelectedFormatFromPlayer(exoPlayer: ExoPlayer, trackType: Int): Format? {
         try {

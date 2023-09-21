@@ -102,7 +102,6 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         return metadataProvider.getSourceMetadata(playerSource) ?: SourceMetadata()
     }
 
-    // TODO: cover with unittests/systemtests
     override fun setCustomData(playerSource: Source, customData: CustomData) {
         // we cannot put this logic into the adapter since the adapter is created on attaching
         // and this method might be called earlier
