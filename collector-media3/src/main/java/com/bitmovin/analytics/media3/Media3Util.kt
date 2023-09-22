@@ -1,13 +1,14 @@
-package com.bitmovin.analytics.exoplayer
+package com.bitmovin.analytics.media3
 
 import android.os.Handler
 import android.os.Looper
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.ExoPlayerLibraryInfo
-import com.google.android.exoplayer2.Format
-import com.google.android.exoplayer2.Player
+import androidx.media3.common.Format
+import androidx.media3.common.MediaLibraryInfo
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 
-internal object ExoUtil {
+@UnstableApi
+internal object Media3Util {
     fun exoStateToString(state: Int): String {
         return when (state) {
             Player.STATE_IDLE -> "Idle"
@@ -23,9 +24,9 @@ internal object ExoUtil {
             try {
                 // we use reflective access here since otherwise the static version field
                 // is compiled into the class and not evaluated during runtime
-                // thus if customer is using a different version of exoplayer it will not be
+                // thus if customer is using a different version of media3 it will not be
                 // taken into account!
-                val versionField = ExoPlayerLibraryInfo::class.java.getField("VERSION")
+                val versionField = MediaLibraryInfo::class.java.getField("VERSION")
                 return versionField[null] as String
             } catch (ignored: NoSuchFieldException) {
             } catch (ignored: IllegalAccessException) {
@@ -68,13 +69,13 @@ internal object ExoUtil {
      *
      *
      */
-    fun getSelectedFormatFromPlayer(exoPlayer: ExoPlayer, trackType: Int): Format? {
+    fun getSelectedFormatFromPlayer(player: Player, trackType: Int): Format? {
         try {
-            if (!exoPlayer.isCommandAvailable(Player.COMMAND_GET_TRACKS)) {
+            if (!player.isCommandAvailable(Player.COMMAND_GET_TRACKS)) {
                 return null
             }
 
-            val trackGroups = exoPlayer.currentTracks.groups
+            val trackGroups = player.currentTracks.groups
             val trackGroupsWithTrackType = trackGroups.filter { track -> track.type == trackType }
             val selectedTrackGroup = trackGroupsWithTrackType.firstOrNull { it.isSelected } ?: return null
 

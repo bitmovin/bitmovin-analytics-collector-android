@@ -1,23 +1,25 @@
-package com.bitmovin.analytics.exoplayer.manipulators
+package com.bitmovin.analytics.media3.manipulators
 
+import androidx.media3.common.C
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.dash.manifest.DashManifest
+import androidx.media3.exoplayer.hls.HlsManifest
+import androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat
-import com.bitmovin.analytics.exoplayer.ExoUtil
-import com.bitmovin.analytics.exoplayer.player.DrmInfoProvider
-import com.bitmovin.analytics.exoplayer.player.PlaybackInfoProvider
-import com.bitmovin.analytics.exoplayer.player.PlayerStatisticsProvider
+import com.bitmovin.analytics.media3.Media3Util
+import com.bitmovin.analytics.media3.player.DrmInfoProvider
+import com.bitmovin.analytics.media3.player.PlaybackInfoProvider
+import com.bitmovin.analytics.media3.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.bitmovin.analytics.utils.Util
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.source.dash.manifest.DashManifest
-import com.google.android.exoplayer2.source.hls.HlsManifest
-import com.google.android.exoplayer2.source.hls.playlist.HlsMultivariantPlaylist
 
+@UnstableApi
 internal class PlaybackEventDataManipulator(
     private val exoPlayer: ExoPlayer,
     private val playbackInfoProvider: PlaybackInfoProvider,
@@ -58,21 +60,10 @@ internal class PlaybackEventDataManipulator(
         }
 
         // version
-        data.version = PlayerType.EXOPLAYER.toString() + "-" + ExoUtil.playerVersion
+        data.version = PlayerType.MEDIA3_EXOPLAYER.toString() + "-" + Media3Util.playerVersion
 
         // DroppedVideoFrames
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
-
-        // streamFormat, mpdUrl, and m3u8Url
-        val manifest = exoPlayer.currentManifest
-        if (isDashManifestClassLoaded && manifest is DashManifest) {
-            data.streamFormat = StreamFormat.DASH.value
-            data.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
-        } else if (isHlsManifestClassLoaded && manifest is HlsManifest) {
-            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
-            data.streamFormat = StreamFormat.HLS.value
-            data.m3u8Url = masterPlaylist.baseUri
-        }
 
         data.downloadSpeedInfo = downloadSpeedMeter.getInfo()
 
@@ -82,6 +73,7 @@ internal class PlaybackEventDataManipulator(
         data.isMuted = isMuted(exoPlayer)
 
         setSubtitleInfo(data)
+        setStreamFormatAndUrl(data)
     }
 
     // it is enough to have volume OR deviceVolume set to muted
@@ -103,15 +95,31 @@ internal class PlaybackEventDataManipulator(
     }
 
     private fun setSubtitleInfo(eventData: EventData) {
-        val textTrack = ExoUtil.getSelectedFormatFromPlayer(exoPlayer, C.TRACK_TYPE_TEXT)
+        val textTrack = Media3Util.getSelectedFormatFromPlayer(exoPlayer, C.TRACK_TYPE_TEXT)
         eventData.subtitleEnabled = textTrack != null
         eventData.subtitleLanguage = textTrack?.language
     }
 
+    private fun setStreamFormatAndUrl(eventData: EventData) {
+        val manifest = exoPlayer.currentManifest
+
+        // we check if the corresponding class is loaded, since
+        // media3 exoplayer is modular and the dash or hls modules
+        // might not be included in the dependencies
+        if (isDashManifestClassLoaded && manifest is DashManifest) {
+            eventData.streamFormat = StreamFormat.DASH.value
+            eventData.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
+        } else if (isHlsManifestClassLoaded && manifest is HlsManifest) {
+            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
+            eventData.streamFormat = StreamFormat.HLS.value
+            eventData.m3u8Url = masterPlaylist.baseUri
+        }
+    }
+
     companion object {
         private const val DASH_MANIFEST_CLASSNAME =
-            "com.google.android.exoplayer2.source.dash.manifest.DashManifest"
+            "androidx.media3.exoplayer.dash.manifest.DashManifest"
         private const val HLS_MANIFEST_CLASSNAME =
-            "com.google.android.exoplayer2.source.hls.HlsManifest"
+            "androidx.media3.exoplayer.hls.HlsManifest"
     }
 }

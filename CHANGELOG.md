@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Added
+- Support for media3-exoplayer
 - Subtitle tracking for exoplayer
 
 ### Changed

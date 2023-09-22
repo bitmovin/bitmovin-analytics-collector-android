@@ -1,17 +1,17 @@
-package com.bitmovin.analytics.exoplayer.manipulators
+package com.bitmovin.analytics.media3.manipulators
 
 import android.net.Uri
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.dash.manifest.DashManifest
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.DownloadSpeedInfo
 import com.bitmovin.analytics.data.MetadataProvider
-import com.bitmovin.analytics.exoplayer.TestUtils
-import com.bitmovin.analytics.exoplayer.player.DrmInfoProvider
-import com.bitmovin.analytics.exoplayer.player.PlaybackInfoProvider
-import com.bitmovin.analytics.exoplayer.player.PlayerStatisticsProvider
+import com.bitmovin.analytics.media3.TestUtils
+import com.bitmovin.analytics.media3.player.DrmInfoProvider
+import com.bitmovin.analytics.media3.player.PlaybackInfoProvider
+import com.bitmovin.analytics.media3.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.source.dash.manifest.DashManifest
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat

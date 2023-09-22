@@ -26,6 +26,12 @@ yes | sdkmanager --licenses
 ## run test
 ./gradlew :collector-exoplayer:pixel6api30DebugAndroidTest || exit
 
+# run systemtest for media3-exoplayer
+## clean test to make sure we run test everytime
+./gradlew :collector-media3:cleanPixel6api30DebugAndroidTest
+## run test
+./gradlew :collector-media3:pixel6api30DebugAndroidTest || exit
+
 # run systemtest for bitmovin-player
 ## clean test to make sure we run test everytime
 ./gradlew :collector-bitmovin-player:cleanPixel6api30DebugAndroidTest
