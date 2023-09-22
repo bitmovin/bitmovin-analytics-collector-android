@@ -523,7 +523,7 @@ class PhoneBasicScenariosTest {
         // second sample is playing sample triggered through playing heartbeat
         val secondSample = impression.eventDataList[1]
         assertThat(secondSample.state).isEqualTo(DataVerifier.PLAYING)
-        assertThat(secondSample.played).isGreaterThan(55000L)
+        assertThat(secondSample.played).isGreaterThan(59000L)
     }
 
     @Test

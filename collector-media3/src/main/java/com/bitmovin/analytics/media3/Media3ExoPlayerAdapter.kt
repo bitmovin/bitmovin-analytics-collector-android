@@ -161,7 +161,7 @@ internal class Media3ExoPlayerAdapter(
     }
 
     companion object {
-        private const val TAG = "ExoPlayerAdapter"
+        private const val TAG = "Media3ExoPlayerAdapter"
         private const val PLAYER_TECH = "Android:Media3"
         private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.MEDIA3_EXOPLAYER)
     }

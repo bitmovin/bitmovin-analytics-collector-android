@@ -74,10 +74,7 @@ dependencies {
     def compileVersion = rootProject.ext.media3PlayerVersion
     def testVersion = compileVersion
 
-    // media3 dependencies
-    compileOnly "androidx.media3:media3-common:${compileVersion}"
-    compileOnly "androidx.media3:media3-datasource:${compileVersion}"
-    // exoplayer default implementation
+    // exoplayer default implementation of media3 player
     compileOnly "androidx.media3:media3-exoplayer:${compileVersion}"
     // For DASH playback support with ExoPlayer
     compileOnly "androidx.media3:media3-exoplayer-dash:${compileVersion}"
@@ -86,8 +83,6 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 
-    testImplementation "androidx.media3:media3-common:${testVersion}"
-    testImplementation "androidx.media3:media3-datasource:${testVersion}"
     testImplementation "androidx.media3:media3-exoplayer:${testVersion}"
     testImplementation "androidx.media3:media3-exoplayer-dash:${testVersion}"
     testImplementation "androidx.media3:media3-exoplayer-hls:${testVersion}"
@@ -98,8 +93,6 @@ dependencies {
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
     testImplementation "org.robolectric:robolectric:${rootProject.ext.robolectricVersion}"
 
-    androidTestImplementation "androidx.media3:media3-common:${testVersion}"
-    androidTestImplementation "androidx.media3:media3-datasource:${testVersion}"
     androidTestImplementation "androidx.media3:media3-exoplayer:${testVersion}"
     androidTestImplementation "androidx.media3:media3-exoplayer-dash:${testVersion}"
     androidTestImplementation "androidx.media3:media3-exoplayer-hls:${testVersion}"
