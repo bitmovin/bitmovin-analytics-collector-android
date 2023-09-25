@@ -27,7 +27,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-// AdTests currently don't work with the managed devices and need to be run with the normal emulator
 @RunWith(AndroidJUnit4::class)
 class AdScenariosTest {
     private val mainScope = MainScope()
@@ -55,7 +54,7 @@ class AdScenariosTest {
         val advertisingConfig = AdvertisingConfig(preRoll, midRoll)
 
         val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl))
-        val playbackConfig = PlaybackConfig()
+        val playbackConfig = PlaybackConfig(isMuted = true)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig, advertisingConfig = advertisingConfig)
         val localPlayer = Player.create(appContext, playerConfig)
         localPlayer.setAdViewGroup(LinearLayout(appContext))
