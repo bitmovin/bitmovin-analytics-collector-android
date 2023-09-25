@@ -284,6 +284,11 @@ object DataVerifier {
 
         if (isAutoPlay) {
             assertThat(eventData.drmLoadTime).isLessThan(eventData.videoStartupTime)
+        } else {
+            // since we wait until player is ready, drmLoadTime should be greater
+            // than videoStartupTime. Drm load time is the actual request time
+            // and videoStartupTime the perceived time of the user
+            assertThat(eventData.drmLoadTime).isGreaterThan(eventData.videoStartupTime)
         }
     }
 

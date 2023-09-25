@@ -360,6 +360,51 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    fun test_vodWithDrm_playWithoutAutoplay() {
+        // arrange
+        val sample = TestSources.DRM_DASH_WIDEVINE
+        val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+        val mediaItem = MediaItem.Builder()
+            .setDrmConfiguration(
+                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setLicenseUri(sample.drmLicenseUrl)
+                    .build(),
+            )
+            .setUri(sample.mpdUrl)
+            .build()
+        val drmSourceMetadata = SourceMetadata(title = "drmTest", videoId = "drmTest", cdnProvider = "cdn_provider", customData = TestConfig.createDummyCustomData())
+
+        // act
+        mainScope.launch {
+            collector.attachPlayer(player)
+            player.setMediaItem(mediaItem)
+            collector.sourceMetadata = drmSourceMetadata
+            player.prepare()
+        }
+
+        Media3PlayerPlaybackUtils.waitUntilPlayerIsReady(player)
+
+        mainScope.launch {
+            player.play()
+        }
+
+        Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 5000)
+
+        mainScope.launch {
+            player.pause()
+        }
+
+        Thread.sleep(300)
+        val impressions = MockedIngress.extractImpressions()
+        assertThat(impressions).hasSize(1)
+
+        val drmImpression = impressions[0]
+        DataVerifier.verifyHasNoErrorSamples(drmImpression)
+        val startupSample = drmImpression.eventDataList.first()
+        DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, isAutoPlay = false)
+    }
+
+    @Test
     fun test_vod_2Impressions_shouldReportSourceMetadataCorrectly() {
         // first dash impression
         // arrange

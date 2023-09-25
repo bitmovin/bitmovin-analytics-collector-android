@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
             exoPlayer.setMediaItem(mediaItem)
 
             // autoplay
-            exoPlayer.playWhenReady = false
+            exoPlayer.playWhenReady = true
             exoPlayer.addListener(this)
 
             // Step 5: prepare player
