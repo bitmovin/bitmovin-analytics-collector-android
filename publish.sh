@@ -79,6 +79,7 @@ echo "Artifacts to publish:"
 echo "  - com.bitmovin.analytics:collector:$VERSION (:collector project)"
 echo "  - com.bitmovin.analytics:collector-bitmovin-player:$VERSION (:collector-bitmovin-player project)"
 echo "  - com.bitmovin.analytics:collector-exoplayer:$VERSION (:collector-exoplayer project)"
+echo "  - com.bitmovin.analytics:collector-media3-exoplayer:$VERSION (:collector-media3-exoplayer project)"
 echo "  - com.bitmovin.analytics:collector-amazon-ivs:$VERSION (:collector-amazon-ivs project)"
 echo "\nAre all tokens, artifacts and versions correct ?"
 read -p "(Press enter to continue)"
@@ -125,6 +126,14 @@ echo "\n:collector-amazon-ivs project build and publishing..."
 ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-amazon-ivs:publishToMavenLocal || exit
 echo "\n:collector-amazon-ivs project built and published!"
 
+echo "\n:collector-media3-exoplayer project build and publishing..."
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-media3-exoplayer:clean || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-media3-exoplayer:build || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-media3-exoplayer:assembleRelease || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-media3-exoplayer:artifactoryPublish || exit
+./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector-media3-exoplayer:publishToMavenLocal || exit
+echo "\n:collector-media3-exoplayer project built and published!"
+
 echo "\nGit release"
 echo "\nGit create tag 'v$VERSION' ..."
 git tag -a v$VERSION -m "v$VERSION"
@@ -163,12 +172,16 @@ curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifac
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-bitmovin-player/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-bitmovin-player/${VERSION}"
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-exoplayer/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-exoplayer/${VERSION}"
 curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-amazon-ivs/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-amazon-ivs/${VERSION}"
+curl -H "Content-Type: application/json" -X POST -u ${artifactoryUser}:${artifactoryPassword} "https://bitmovin.jfrog.io/bitmovin/api/copy/libs-release-local/com/bitmovin/analytics/collector-media3-exoplayer/${VERSION}?to=/public-releases/com/bitmovin/analytics/collector-media3-exoplayer/${VERSION}"
 
 echo "\nCopied artifacts to public jfrog repo."
 
+
+echo "\nNotifying bitmovin api about new release..."
 notifyApi "android-bitmovin" $VERSION "collector-bitmovin-player"
 notifyApi "android-exo" $VERSION "collector-exoplayer"
 notifyApi "android-amazon-ivs" $VERSION "collector-amazon-ivs"
+notifyApi "android-media3-exo" $VERSION "collector-media3-exoplayer"
 
 echo "Don't forget to update the changelog in readme.io"
 open "https://dash.readme.com/project/bitmovin-playback/v1/docs/analytics-collector-android-releases"
