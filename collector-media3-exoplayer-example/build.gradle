@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace 'com.bitmovin.analytics.exoplayer.example'
+    namespace 'com.bitmovin.analytics.media3.exoplayer.example'
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.bitmovin.analytics.exoplayer.example"
+        applicationId "com.bitmovin.analytics.media3.exoplayer.example"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode
@@ -43,6 +43,8 @@ android {
 }
 
 dependencies {
+    def testVersion = rootProject.ext.media3PlayerVersion
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
@@ -50,12 +52,15 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:${rootProject.ext.workRuntimeKtxVersion}"
     implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
 
-    implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
+    implementation "androidx.media3:media3-exoplayer:${testVersion}"
+    implementation "androidx.media3:media3-exoplayer-dash:${testVersion}"
+    implementation "androidx.media3:media3-exoplayer-hls:${testVersion}"
+    implementation "androidx.media3:media3-ui:${testVersion}"
 
     if (rootProject.ext.developLocal) {
-        implementation project(':collector-exoplayer')
+        implementation project(':collector-media3-exoplayer')
     } else {
-        implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
+        implementation "com.bitmovin.analytics:collector--media3-exoplayer:${rootProject.ext.version}"
     }
     implementation project(':example-shared')
 }
