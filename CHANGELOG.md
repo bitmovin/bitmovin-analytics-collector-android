@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.1.0-beta1
+
 ### Added
 - Support for media3-exoplayer
 - Subtitle tracking for exoplayer
