@@ -5,7 +5,7 @@ include 'collector-exoplayer'
 include ':collector-exoplayer-example'
 include ':collector-amazon-ivs'
 include ':collector-amazon-ivs-example'
-include 'collector-media3'
+include 'collector-media3-exoplayer'
 
 include ':example-shared'
 include ':collector-bitmovin-player-tv-example'
