@@ -10,7 +10,7 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.source.LoadEventInfo
 import androidx.media3.exoplayer.source.MediaLoadData
 import com.bitmovin.analytics.data.SpeedMeasurement
-import com.bitmovin.analytics.media3.exoplayer.Media3ExoplayerUtil
+import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerUtil
 import com.bitmovin.analytics.media3.exoplayer.manipulators.QualityEventDataManipulator
 import com.bitmovin.analytics.media3.exoplayer.player.DrmInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.Media3ExoPlayerContext
@@ -79,7 +79,7 @@ internal class AnalyticsEventListener(
                 TAG,
                 String.format(
                     "onPlaybackStateChanged: %s playWhenready: %b isPlaying: %b",
-                    Media3ExoplayerUtil.exoStateToString(state),
+                    Media3ExoPlayerUtil.exoStateToString(state),
                     exoPlayerContext.playWhenReady,
                     exoPlayerContext.isPlaying(),
                 ),

@@ -19,7 +19,7 @@ import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestType
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
-import com.bitmovin.analytics.media3.exoplayer.Media3ExoplayerUtil
+import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerUtil
 import com.bitmovin.analytics.utils.Util
 import java.io.IOException
 
@@ -81,7 +81,7 @@ internal class Media3ExoPlayerHttpRequestTrackingAdapter(private val player: Exo
         // we need to run this on the application thread to prevent exoplayer from crashing
         // when calling the api from a non application thread
         // (this is potentially called from okhttp callback which is on a separate thread)
-        Media3ExoplayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
+        Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
             try {
                 player.removeAnalyticsListener(analyticsListener)
             } catch (e: Exception) {

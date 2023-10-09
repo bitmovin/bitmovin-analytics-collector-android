@@ -11,7 +11,7 @@ import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat
-import com.bitmovin.analytics.media3.exoplayer.Media3ExoplayerUtil
+import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerUtil
 import com.bitmovin.analytics.media3.exoplayer.player.DrmInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.PlaybackInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.PlayerStatisticsProvider
@@ -58,7 +58,7 @@ internal class PlaybackEventDataManipulator(
         }
 
         // version
-        data.version = PlayerType.MEDIA3_EXOPLAYER.toString() + "-" + Media3ExoplayerUtil.playerVersion
+        data.version = PlayerType.MEDIA3_EXOPLAYER.toString() + "-" + Media3ExoPlayerUtil.playerVersion
 
         // DroppedVideoFrames
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
@@ -93,7 +93,7 @@ internal class PlaybackEventDataManipulator(
     }
 
     private fun setSubtitleInfo(eventData: EventData) {
-        val textTrack = Media3ExoplayerUtil.getSelectedFormatFromPlayer(player, C.TRACK_TYPE_TEXT)
+        val textTrack = Media3ExoPlayerUtil.getSelectedFormatFromPlayer(player, C.TRACK_TYPE_TEXT)
         eventData.subtitleEnabled = textTrack != null
         eventData.subtitleLanguage = textTrack?.language
     }

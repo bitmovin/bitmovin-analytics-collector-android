@@ -7,7 +7,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
-import com.bitmovin.analytics.media3.exoplayer.Media3ExoplayerUtil
+import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerUtil
 
 internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataManipulator {
     var currentAudioFormat: Format? = null
@@ -66,7 +66,7 @@ internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : E
     @androidx.annotation.OptIn(UnstableApi::class)
     fun setFormatsFromPlayer() {
         // TODO: clarify why we are using the fallback here.
-        currentVideoFormat = exoplayer.videoFormat ?: Media3ExoplayerUtil.getSelectedFormatFromPlayer(exoplayer, TRACK_TYPE_VIDEO)
-        currentAudioFormat = exoplayer.audioFormat ?: Media3ExoplayerUtil.getSelectedFormatFromPlayer(exoplayer, TRACK_TYPE_AUDIO)
+        currentVideoFormat = exoplayer.videoFormat ?: Media3ExoPlayerUtil.getSelectedFormatFromPlayer(exoplayer, TRACK_TYPE_VIDEO)
+        currentAudioFormat = exoplayer.audioFormat ?: Media3ExoPlayerUtil.getSelectedFormatFromPlayer(exoplayer, TRACK_TYPE_AUDIO)
     }
 }

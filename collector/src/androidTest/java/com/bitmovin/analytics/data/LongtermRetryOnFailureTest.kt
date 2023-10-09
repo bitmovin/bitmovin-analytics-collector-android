@@ -18,6 +18,8 @@ import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.persistence.EventQueueConfig
+import com.bitmovin.analytics.persistence.EventQueueFactory
+import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.systemtest.utils.Impression
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
@@ -42,15 +44,21 @@ class LongtermRetryOnFailureTest {
     private lateinit var dummyPlayerAdapter: PlayerAdapter
     private lateinit var config: AnalyticsConfig
     private lateinit var bitmovinAnalytics: BitmovinAnalytics
+    private lateinit var eventQueue: AnalyticsEventQueue
 
     @Before
     fun setup() {
         val mockedIngressUrl = MockedIngress.startServer()
         config = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM, backendUrl = mockedIngressUrl)
+        eventQueue = EventQueueFactory.createPersistentEventQueue(
+            EventQueueConfig(),
+            EventDatabase.getInstance(appContext),
+        )
 
         bitmovinAnalytics = BitmovinAnalytics(
             config = config,
             context = appContext,
+            eventQueue = eventQueue,
         )
         dummyPlayerAdapter = createDummyPlayerAdapter()
     }
@@ -107,6 +115,7 @@ class LongtermRetryOnFailureTest {
         bitmovinAnalytics = BitmovinAnalytics(
             config = config,
             context = appContext,
+            eventQueue = eventQueue,
         )
         dummyPlayerAdapter = createDummyPlayerAdapter()
         bitmovinAnalytics.attach(dummyPlayerAdapter)
@@ -238,6 +247,7 @@ class LongtermRetryOnFailureTest {
         bitmovinAnalytics = BitmovinAnalytics(
             config = offlineConfig,
             context = appContext,
+            eventQueue = eventQueue,
         )
 
         bitmovinAnalytics.attach(dummyPlayerAdapter)
@@ -261,6 +271,7 @@ class LongtermRetryOnFailureTest {
         val secondInstance = BitmovinAnalytics(
             config = config,
             context = appContext,
+            eventQueue = eventQueue,
         )
         dummyPlayerAdapter = createDummyPlayerAdapter()
         secondInstance.attach(dummyPlayerAdapter)
@@ -287,11 +298,13 @@ class LongtermRetryOnFailureTest {
         val firstBitmovinAnalytics = BitmovinAnalytics(
             config = offlineConfig,
             context = appContext,
+            eventQueue = eventQueue,
         )
 
         val secondBitmovinAnalytics = BitmovinAnalytics(
             config = offlineConfig,
             context = appContext,
+            eventQueue = eventQueue,
         )
         val firstDummyPlayerAdapter = createDummyPlayerAdapter()
         firstBitmovinAnalytics.attach(firstDummyPlayerAdapter)
@@ -323,10 +336,12 @@ class LongtermRetryOnFailureTest {
         val thirdBitmovinAnalytics = BitmovinAnalytics(
             config = onlineConfig,
             context = appContext,
+            eventQueue = eventQueue,
         )
         val forthBitmovinAnalytics = BitmovinAnalytics(
             config = onlineConfig,
             context = appContext,
+            eventQueue = eventQueue,
         )
 
         thirdBitmovinAnalytics.attach(firstDummyPlayerAdapter)
@@ -415,6 +430,7 @@ class LongtermRetryOnFailureTest {
         bitmovinAnalytics = BitmovinAnalytics(
             config = config,
             context = appContext,
+            eventQueue = eventQueue,
         )
 
         bitmovinAnalytics.attach(dummyPlayerAdapter)
@@ -445,6 +461,7 @@ class LongtermRetryOnFailureTest {
         bitmovinAnalytics = BitmovinAnalytics(
             config = offlineConfig,
             context = appContext,
+            eventQueue = eventQueue,
         )
         dummyPlayerAdapter = createDummyPlayerAdapter()
 

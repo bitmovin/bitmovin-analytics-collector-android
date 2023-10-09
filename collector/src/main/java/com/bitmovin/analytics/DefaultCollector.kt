@@ -11,6 +11,10 @@ import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.RandomizedUserIdIdProvider
 import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import com.bitmovin.analytics.data.UserIdProvider
+import com.bitmovin.analytics.data.persistence.EventDatabase
+import com.bitmovin.analytics.persistence.EventQueueConfig
+import com.bitmovin.analytics.persistence.EventQueueFactory
+import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.utils.ApiV3Utils
 
 abstract class DefaultCollector<TPlayer> protected constructor(
@@ -20,7 +24,13 @@ abstract class DefaultCollector<TPlayer> protected constructor(
 ) : AnalyticsCollector<TPlayer> {
 
     // TODO[AN-3692]: why is this lazy and not part of the constructor for easier testing?
-    protected open val analytics by lazy { BitmovinAnalytics(config, context) }
+    protected open val analytics by lazy {
+        val eventQueue: AnalyticsEventQueue = EventQueueFactory.createPersistentEventQueue(
+            EventQueueConfig(),
+            EventDatabase.getInstance(context),
+        )
+        BitmovinAnalytics(config, context, eventQueue)
+    }
 
     protected val userIdProvider: UserIdProvider =
         if (config.randomizeUserId) {

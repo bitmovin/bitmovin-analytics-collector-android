@@ -7,7 +7,7 @@ import androidx.media3.common.MediaLibraryInfo
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 
-internal object Media3ExoplayerUtil {
+internal object Media3ExoPlayerUtil {
     fun exoStateToString(state: Int): String {
         return when (state) {
             Player.STATE_IDLE -> "Idle"

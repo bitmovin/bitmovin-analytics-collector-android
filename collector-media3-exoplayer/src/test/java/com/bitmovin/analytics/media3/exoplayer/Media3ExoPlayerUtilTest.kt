@@ -22,7 +22,7 @@ class Media3ExoPlayerUtilTest {
         val atomicInt = AtomicInteger(0)
 
         // act
-        Media3ExoplayerUtil.executeSyncOrAsyncOnLooperThread(Looper.getMainLooper()) {
+        Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(Looper.getMainLooper()) {
             Thread.sleep(1)
             atomicInt.incrementAndGet()
         }
@@ -43,7 +43,7 @@ class Media3ExoPlayerUtilTest {
         val handler = Handler(thread.looper)
 
         // act
-        Media3ExoplayerUtil.executeSyncOrAsyncOnLooperThread(handler.looper) {
+        Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(handler.looper) {
             Thread.sleep(1)
             atomicInt.incrementAndGet()
         }

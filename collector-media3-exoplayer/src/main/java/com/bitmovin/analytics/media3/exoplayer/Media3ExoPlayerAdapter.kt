@@ -85,7 +85,7 @@ internal class Media3ExoPlayerAdapter(
         // when calling the api from a non application thread
         // (this is potentially called from okhttp callback which is on a separate thread)
         // we execute the whole method on the main thread to make sure the order is kept
-        Media3ExoplayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
+        Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
             try {
                 player.removeListener(defaultPlayerEventListener)
                 player.removeAnalyticsListener(defaultAnalyticsListener)

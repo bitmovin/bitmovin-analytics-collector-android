@@ -5,6 +5,7 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
+import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import io.mockk.every
@@ -22,7 +23,6 @@ class BitmovinAnalyticsTest {
 
     private lateinit var analyticsConfig: AnalyticsConfig
     private lateinit var context: Context
-    // TODO: verify why tests are throwing null pointer exception (and still succeeding)
 
     @Before
     fun setup() {
@@ -38,7 +38,8 @@ class BitmovinAnalyticsTest {
     @Test
     fun testDetachPlayerShouldCallOnAnalyticsReleasingEventListener() {
         val listener = mockk<OnAnalyticsReleasingEventListener>(relaxed = true)
-        val analytics = BitmovinAnalytics(analyticsConfig, context)
+        val eventQueue = mockk<AnalyticsEventQueue>(relaxed = true)
+        val analytics = BitmovinAnalytics(analyticsConfig, context, eventQueue)
         analytics.onAnalyticsReleasingObservable.subscribe(listener)
         analytics.detachPlayer()
         verify(exactly = 1) { listener.onReleasing() }
@@ -48,7 +49,8 @@ class BitmovinAnalyticsTest {
     fun testOnVideoStartFailedShouldCallOnErrorDetailEventListener() {
         val listener = mockk<OnErrorDetailEventListener>(relaxed = true)
         mockkConstructor(PlayerStateMachine::class)
-        val analytics = BitmovinAnalytics(analyticsConfig, context)
+        val eventQueue = mockk<AnalyticsEventQueue>(relaxed = true)
+        val analytics = BitmovinAnalytics(analyticsConfig, context, eventQueue)
         val observable = ObservableSupport<OnErrorDetailEventListener>()
         val defaultStateMachineListener = DefaultStateMachineListener(analytics, mockk(relaxed = true), observable)
         val stateMachine = mockk<PlayerStateMachine>()

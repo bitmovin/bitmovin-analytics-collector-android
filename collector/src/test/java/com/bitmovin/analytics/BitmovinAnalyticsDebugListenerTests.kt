@@ -3,6 +3,7 @@ package com.bitmovin.analytics
 import android.content.Context
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.BackendFactory
+import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkConstructor
@@ -14,8 +15,6 @@ class BitmovinAnalyticsDebugListenerTests {
     private val config = AnalyticsConfig("key")
     private lateinit var analytics: BitmovinAnalytics
 
-    // TODO: verify why tests are throwing null pointer exception (and still succeeding)
-
     @Before
     fun setup() {
         mockkConstructor(BackendFactory::class)
@@ -23,7 +22,8 @@ class BitmovinAnalyticsDebugListenerTests {
         val context = mockk<Context> {
             every { applicationContext } returns mockk()
         }
-        analytics = BitmovinAnalytics(config, context)
+        val eventQueue = mockk<AnalyticsEventQueue>(relaxed = true)
+        analytics = BitmovinAnalytics(config, context, eventQueue)
     }
 
     @Test

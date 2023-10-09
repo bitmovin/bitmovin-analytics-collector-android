@@ -11,16 +11,14 @@ import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.data.DebuggingEventDataDispatcher
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher
-import com.bitmovin.analytics.data.persistence.EventDatabase
 import com.bitmovin.analytics.features.FeatureManager
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.license.DefaultLicenseCall
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.LicenseCallback
-import com.bitmovin.analytics.persistence.EventQueueConfig
-import com.bitmovin.analytics.persistence.EventQueueFactory
 import com.bitmovin.analytics.persistence.PersistingAuthenticatedDispatcher
+import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
@@ -28,7 +26,11 @@ import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.ScopeProvider
 
 @InternalBitmovinApi
-class BitmovinAnalytics(val config: AnalyticsConfig, val context: Context) : LicenseCallback {
+class BitmovinAnalytics(
+    val config: AnalyticsConfig,
+    val context: Context,
+    val eventQueue: AnalyticsEventQueue,
+) : LicenseCallback {
     private val debugCallback: DebugCallback = object : DebugCallback {
         override fun dispatchEventData(data: EventData) {
             eventBus.notify(DebugListener::class) { it.onDispatchEventData(data) }
@@ -44,11 +46,6 @@ class BitmovinAnalytics(val config: AnalyticsConfig, val context: Context) : Lic
     }
     private val featureManager = FeatureManager<FeatureConfigContainer>()
     private val eventBus = EventBus()
-
-    private val eventQueue = EventQueueFactory.createPersistentEventQueue(
-        EventQueueConfig(),
-        EventDatabase.getInstance(context),
-    )
 
     private val eventDataDispatcher = DebuggingEventDataDispatcher(
         if (config.retryPolicy == RetryPolicy.LONG_TERM) {
