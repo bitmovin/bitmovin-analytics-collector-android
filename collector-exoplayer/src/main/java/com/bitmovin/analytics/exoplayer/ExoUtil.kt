@@ -2,12 +2,19 @@ package com.bitmovin.analytics.exoplayer
 
 import android.os.Handler
 import android.os.Looper
+import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerLibraryInfo
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.Player
 
 internal object ExoUtil {
+
+    private const val DASH_MANIFEST_CLASSNAME =
+        "com.google.android.exoplayer2.source.dash.manifest.DashManifest"
+    private const val HLS_MANIFEST_CLASSNAME =
+        "com.google.android.exoplayer2.source.hls.HlsManifest"
+
     fun exoStateToString(state: Int): String {
         return when (state) {
             Player.STATE_IDLE -> "Idle"
@@ -16,6 +23,14 @@ internal object ExoUtil {
             Player.STATE_ENDED -> "Ended"
             else -> "Unknown PlayerState"
         }
+    }
+
+    val isDashManifestClassLoaded by lazy {
+        Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
+    }
+
+    val isHlsManifestClassLoaded by lazy {
+        Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, this.javaClass.classLoader)
     }
 
     val playerVersion: String

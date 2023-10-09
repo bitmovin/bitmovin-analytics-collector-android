@@ -334,7 +334,6 @@ class PhoneBasicScenariosTest {
 
         val localAnalyticsConfig = defaultAnalyticsConfig.apply {
             isLive = true
-//            mpdUrl = liveSample.mpdUrl!!
         }
 
         val collector = IBitmovinPlayerCollector.create(localAnalyticsConfig, appContext)

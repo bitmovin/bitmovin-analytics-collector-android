@@ -6,8 +6,25 @@ import androidx.media3.common.Format
 import androidx.media3.common.MediaLibraryInfo
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import com.bitmovin.analytics.utils.Util
 
 internal object Media3ExoPlayerUtil {
+
+    private const val DASH_MANIFEST_CLASSNAME =
+        "androidx.media3.exoplayer.dash.manifest.DashManifest"
+    private const val HLS_MANIFEST_CLASSNAME =
+        "androidx.media3.exoplayer.hls.HlsManifest"
+
+    // TODO: verify if lazy can be used here? what if class is loaded after this is called?
+    // or two different drm providers are used??
+    val isDashManifestClassLoaded by lazy {
+        Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
+    }
+
+    val isHlsManifestClassLoaded by lazy {
+        Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, this.javaClass.classLoader)
+    }
+
     fun exoStateToString(state: Int): String {
         return when (state) {
             Player.STATE_IDLE -> "Idle"

@@ -96,10 +96,12 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
     }
 
     private val playerEventPlayListener: (PlayerEvent.Play) -> Unit = {
+// TODO: why is this commented out??
 //        adAnalytics.onPlay()
     }
 
     private val playerEventPausedListener: (PlayerEvent.Paused) -> Unit = {
+// TODO: why is this commented out??
 //        adAnalytics.onPause()
     }
 

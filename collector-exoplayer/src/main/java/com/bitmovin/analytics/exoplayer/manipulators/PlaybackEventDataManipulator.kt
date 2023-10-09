@@ -27,13 +27,6 @@ internal class PlaybackEventDataManipulator(
     private val downloadSpeedMeter: DownloadSpeedMeter,
 ) : EventDataManipulator {
 
-    private val isDashManifestClassLoaded by lazy {
-        Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
-    }
-    private val isHlsManifestClassLoaded by lazy {
-        Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, this.javaClass.classLoader)
-    }
-
     override fun manipulate(data: EventData) {
         // ad
         if (exoPlayer.isPlayingAd) {
@@ -65,10 +58,10 @@ internal class PlaybackEventDataManipulator(
 
         // streamFormat, mpdUrl, and m3u8Url
         val manifest = exoPlayer.currentManifest
-        if (isDashManifestClassLoaded && manifest is DashManifest) {
+        if (ExoUtil.isDashManifestClassLoaded && manifest is DashManifest) {
             data.streamFormat = StreamFormat.DASH.value
             data.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
-        } else if (isHlsManifestClassLoaded && manifest is HlsManifest) {
+        } else if (ExoUtil.isHlsManifestClassLoaded && manifest is HlsManifest) {
             val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
             data.streamFormat = StreamFormat.HLS.value
             data.m3u8Url = masterPlaylist.baseUri
@@ -106,12 +99,5 @@ internal class PlaybackEventDataManipulator(
         val textTrack = ExoUtil.getSelectedFormatFromPlayer(exoPlayer, C.TRACK_TYPE_TEXT)
         eventData.subtitleEnabled = textTrack != null
         eventData.subtitleLanguage = textTrack?.language
-    }
-
-    companion object {
-        private const val DASH_MANIFEST_CLASSNAME =
-            "com.google.android.exoplayer2.source.dash.manifest.DashManifest"
-        private const val HLS_MANIFEST_CLASSNAME =
-            "com.google.android.exoplayer2.source.hls.HlsManifest"
     }
 }

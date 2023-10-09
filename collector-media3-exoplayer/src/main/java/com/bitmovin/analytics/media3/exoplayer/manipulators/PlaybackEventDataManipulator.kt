@@ -27,13 +27,6 @@ internal class PlaybackEventDataManipulator(
     private val downloadSpeedMeter: DownloadSpeedMeter,
 ) : EventDataManipulator {
 
-    private val isDashManifestClassLoaded by lazy {
-        Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
-    }
-    private val isHlsManifestClassLoaded by lazy {
-        Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, this.javaClass.classLoader)
-    }
-
     override fun manipulate(data: EventData) {
         // ad
         if (player.isPlayingAd) {
@@ -105,20 +98,13 @@ internal class PlaybackEventDataManipulator(
         // we check if the corresponding class is loaded, since
         // media3 exoplayer is modular and the dash or hls modules
         // might not be included in the dependencies
-        if (isDashManifestClassLoaded && manifest is DashManifest) {
+        if (Media3ExoPlayerUtil.isDashManifestClassLoaded && manifest is DashManifest) {
             eventData.streamFormat = StreamFormat.DASH.value
             eventData.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
-        } else if (isHlsManifestClassLoaded && manifest is HlsManifest) {
+        } else if (Media3ExoPlayerUtil.isHlsManifestClassLoaded && manifest is HlsManifest) {
             val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
             eventData.streamFormat = StreamFormat.HLS.value
             eventData.m3u8Url = masterPlaylist.baseUri
         }
-    }
-
-    companion object {
-        private const val DASH_MANIFEST_CLASSNAME =
-            "androidx.media3.exoplayer.dash.manifest.DashManifest"
-        private const val HLS_MANIFEST_CLASSNAME =
-            "androidx.media3.exoplayer.hls.HlsManifest"
     }
 }

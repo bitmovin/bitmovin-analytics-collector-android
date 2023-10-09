@@ -173,12 +173,9 @@ internal class Media3ExoPlayerHttpRequestTrackingAdapter(private val player: Exo
             else -> HttpRequestType.UNKNOWN
         }
 
-        private const val HLS_MANIFEST_CLASSNAME = "com.google.android.exoplayer2.source.hls.HlsManifest"
-        private val isHlsManifestClassLoaded
-            get() = Util.isClassLoaded(HLS_MANIFEST_CLASSNAME, Media3ExoPlayerHttpRequestTrackingAdapter::class.java.classLoader)
-
+        // TODO: cover with systemtest if possible
         private fun mapDrmType(eventTime: AnalyticsListener.EventTime): HttpRequestType {
-            if (isHlsManifestClassLoaded) {
+            if (Media3ExoPlayerUtil.isHlsManifestClassLoaded) {
                 try {
                     val window = Timeline.Window()
                     // we want the window corresponding to the eventTime that was part of the triggered event
