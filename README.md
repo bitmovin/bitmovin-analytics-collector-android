@@ -1,6 +1,6 @@
 # [![bitmovin](http://bitmovin-a.akamaihd.net/webpages/bitmovin-logo-github.png)](http://www.bitmovin.com)
 
-Android client that allows you to monitor your Bitmovin Native SDK, ExoPlayer or Amazon IVS Player playback with [Bitmovin Analytics](https://bitmovin.com/video-analytics/).
+Android client that allows you to monitor your Bitmovin Native SDK, Media3 ExoPlayer, ExoPlayer or Amazon IVS Player playback with [Bitmovin Analytics](https://bitmovin.com/video-analytics/).
 
 # Getting started
 
@@ -67,7 +67,27 @@ dependencies {
 
 </table>
 
-### Exoplayer
+### Media3 ExoPlayer
+
+<table>
+<tr>
+<td> Player Version </td> <td> Dependency </td>
+</tr>
+<tr>
+<td> >= v1.0.0 </td>
+<td>
+
+```gradle
+dependencies {
+    implementation 'com.bitmovin.analytics:collector-media3-exoplayer:3.0.1'
+}
+```
+
+</td>
+</tr>
+</table>
+
+### ExoPlayer
 
 <table>
 <tr>
@@ -152,6 +172,22 @@ analyticsCollector.attachPlayer(player)
 analyticsCollector.detachPlayer()
 ```
 
+### Basic analytics monitoring with Media3 ExoPlayer
+
+```kotlin
+// Create an AnalyticsConfig using your Bitmovin analytics license key (minimal config required)
+val analyticsConfig = AnalyticsConfig("<BITMOVIN_ANALYTICS_LICENSE_KEY>")
+
+// Create Analytics Collector for Media3 ExoPlayer
+val analyticsCollector = IMedia3ExoPlayerCollector.Factory.create(getApplicationContext(), analyticsConfig)
+
+// Attach your ExoPlayer instance
+analyticsCollector.attachPlayer(player)
+
+// Detach your player when you are done. For example, call this method when you call ExoPlayer's release() method
+analyticsCollector.detachPlayer()
+```
+
 ### Basic analytics monitoring with ExoPlayer
 
 ```kotlin
@@ -212,7 +248,7 @@ analyticsCollector.attachPlayer(newPlayer)
 player.load(source)
 ```
 
-### Switching to a new Video with ExoPlayer and Amazon IVS Player SDK
+### Switching to a new Video with Media3 ExoPlayer, ExoPlayer and Amazon IVS Player SDK
 
 When switching to a new video we recommend that you follow the sequence of events below.
 
