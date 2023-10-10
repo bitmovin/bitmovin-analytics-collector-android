@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Upgrade example apps to latest bitmovin player (v3.46.0) and ivs player (v1.22.0)
+- ExoPlayer/Media3 ExoPlayer: Use position of event object instead of player.position on seek events
 
 ## v3.1.0-beta1
 

@@ -127,16 +127,11 @@ internal class AnalyticsEventListener(
         }
     }
 
-    // TODO AN-3298 Refactor code to work in new method
-    @Deprecated("Deprecated in Java")
     override fun onSeekStarted(eventTime: AnalyticsListener.EventTime) {
         try {
-            Log.d(TAG, "onSeekStarted on position: " + eventTime.currentPlaybackPositionMs)
-            val videoTime = position
-            stateMachine.transitionState(
-                PlayerStates.SEEKING,
-                videoTime,
-            )
+            val videoTime = eventTime.currentPlaybackPositionMs
+            Log.d(TAG, "onSeekStarted on position: $videoTime")
+            stateMachine.seekStarted(videoTime)
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }

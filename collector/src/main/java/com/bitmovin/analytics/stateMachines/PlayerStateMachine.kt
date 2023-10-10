@@ -225,6 +225,10 @@ class PlayerStateMachine(
         }
     }
 
+    fun seekStarted(videoTime: Long) {
+        transitionState(PlayerStates.SEEKING, videoTime)
+    }
+
     // This can be used as a template for all the quality changed methods,
     // as it is correctly setting the old values in the StateMachineListener
     fun subtitleChanged(videoTime: Long, oldValue: SubtitleDto?, newValue: SubtitleDto?) {
