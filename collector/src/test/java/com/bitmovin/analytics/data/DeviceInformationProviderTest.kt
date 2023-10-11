@@ -93,8 +93,8 @@ class DeviceInformationProviderTest {
     }
 
     @Test
-    @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [17])
-    fun testGetDeviceInformation_4kTV_API_V17_ShouldReturnInfo() {
+    @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [21])
+    fun testGetDeviceInformation_4kTV_API_V21_ShouldReturnInfo() {
         // arrange
         val context = ApplicationProvider.getApplicationContext<Context>()
         setTvMode(context)

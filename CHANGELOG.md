@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
+- Changed minimum required android version to android 5.0 (API level 21)
 - Upgrade example apps to latest bitmovin player (v3.46.0) and ivs player (v1.22.0)
 - ExoPlayer/Media3 ExoPlayer: Use position of event object instead of player.position on seek events
 

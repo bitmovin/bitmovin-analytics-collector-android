@@ -88,7 +88,7 @@ ext {
     version = System.getProperty("version", "0.0.0") + (developLocal ? '-local' : '')
 
     compileSdkVersion = 33
-    minSdkVersion = 16
+    minSdkVersion = 21
     amazonIvsMinSdkVersion = 21
     targetSdkVersion = 33
 

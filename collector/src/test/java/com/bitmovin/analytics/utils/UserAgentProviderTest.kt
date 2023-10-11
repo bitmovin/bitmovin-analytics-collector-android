@@ -39,7 +39,7 @@ class UserAgentProviderTest {
     }
 
     @Test
-    @Config(sdk = [16])
+    @Config(sdk = [21])
     fun `userAgentProvider_generatesUserAgentWhenSystemPropertyIsNull_onMinSdk`() {
         // arrange
         val applicationInfo = ApplicationInfo()
@@ -50,7 +50,7 @@ class UserAgentProviderTest {
         val userAgentProvider = UserAgentProvider(applicationInfo, packageInfo, null)
 
         // act & assert
-        Assert.assertEquals("test/1 (Linux;Android 4.1.2)", userAgentProvider.userAgent)
+        Assert.assertEquals("test/1 (Linux;Android 5.0.2)", userAgentProvider.userAgent)
     }
 
     @Test
