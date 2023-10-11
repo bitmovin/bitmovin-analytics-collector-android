@@ -20,7 +20,6 @@ import com.google.android.exoplayer2.source.LoadEventInfo
 import com.google.android.exoplayer2.source.MediaLoadData
 import java.util.Date
 
-// TODO: get under test
 internal class AnalyticsEventListener(
     private val stateMachine: PlayerStateMachine,
     private val exoPlayerContext: ExoPlayerContext,

@@ -66,6 +66,7 @@ internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : E
     @androidx.annotation.OptIn(UnstableApi::class)
     fun setFormatsFromPlayer() {
         // TODO: clarify why we are using the fallback here.
+        // is this to make sure we have some format even when player is not playing??
         currentVideoFormat = exoplayer.videoFormat ?: Media3ExoPlayerUtil.getSelectedFormatFromPlayer(exoplayer, TRACK_TYPE_VIDEO)
         currentAudioFormat = exoplayer.audioFormat ?: Media3ExoPlayerUtil.getSelectedFormatFromPlayer(exoplayer, TRACK_TYPE_AUDIO)
     }

@@ -307,7 +307,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vodWithDrm_playWithAutoPlay() {
+    fun test_vodDashWithDrmWidevine_playWithAutoPlay() {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
@@ -347,7 +347,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vodWithDrm_playWithoutAutoplay() {
+    fun test_vodDashWithDrmWidevine_playWithoutAutoplay() {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)

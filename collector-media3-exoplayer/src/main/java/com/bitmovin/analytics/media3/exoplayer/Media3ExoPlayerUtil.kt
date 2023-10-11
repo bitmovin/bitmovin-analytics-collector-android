@@ -15,8 +15,9 @@ internal object Media3ExoPlayerUtil {
     private const val HLS_MANIFEST_CLASSNAME =
         "androidx.media3.exoplayer.hls.HlsManifest"
 
-    // TODO: verify if lazy can be used here? what if class is loaded after this is called?
-    // or two different drm providers are used??
+    // used to make sure that class is loaded before we try accessing it
+    // since otherwise we might get a ClassNotFoundException especially since media3
+    // support for dash and hls is optional and a separate dependency
     val isDashManifestClassLoaded by lazy {
         Util.isClassLoaded(DASH_MANIFEST_CLASSNAME, this.javaClass.classLoader)
     }

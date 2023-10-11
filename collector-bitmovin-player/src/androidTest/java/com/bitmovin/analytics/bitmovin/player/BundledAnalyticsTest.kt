@@ -142,7 +142,7 @@ class BundledAnalyticsTest {
     }
 
     @Test
-    fun test_vodWithDrm_playPauseWithAutoPlay() {
+    fun test_vodDashWithDrm_playPauseWithAutoPlay() {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
         val drmSourceConfig = SourceConfig.fromUrl(sample.mpdUrl!!)
@@ -712,11 +712,11 @@ class BundledAnalyticsTest {
 
         val hlsSample = TestSources.HLS_REDBULL
         val source1CustomData = CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
-        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", /* m3u8Url = hlsSample.m3u8Url, */ path = "path/Source1", customData = source1CustomData)
+        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", path = "path/Source1", customData = source1CustomData)
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), sourceMetadata1)
 
         val source2CustomData = CustomData(customData1 = "source2CustomData1", customData30 = "source2CustomData30", experimentName = "experimentNameSource2")
-        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", /* mpdUrl = dashSample.mpdUrl, */ path = "path/Source2", customData = source2CustomData)
+        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", path = "path/Source2", customData = source2CustomData)
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), sourceMetadata2)
 

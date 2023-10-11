@@ -173,7 +173,7 @@ internal class Media3ExoPlayerHttpRequestTrackingAdapter(private val player: Exo
             else -> HttpRequestType.UNKNOWN
         }
 
-        // TODO: cover with systemtest if possible
+        // TODO: cover with systemtest if possible (we need proper drm protected content)
         private fun mapDrmType(eventTime: AnalyticsListener.EventTime): HttpRequestType {
             if (Media3ExoPlayerUtil.isHlsManifestClassLoaded) {
                 try {

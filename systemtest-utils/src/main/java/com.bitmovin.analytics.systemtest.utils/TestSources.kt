@@ -123,4 +123,33 @@ object TestSources {
         drmSchema = "widevine",
         drmLicenseUrl = "https://cwip-shaka-proxy.appspot.com/no_auth",
     )
+
+    // TODO: check codec and duration
+    val DRM_HLS_WIDEVINE = StreamData(
+        "avc1.",
+        "mp4a.40.2",
+        "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/m3u8s/widevine-hls.m3u8",
+        null,
+        null,
+        "hls",
+        false,
+        210000,
+        drmSchema = "widevine",
+        drmLicenseUrl = "https://cwip-shaka-proxy.appspot.com/no_auth",
+    )
+
+    // TODO: check codec and duration
+    // TODO: what does encrypted here mean?? vs DRM only?
+    val DRM_HLS_WIDEVINE_ENCRYPTED = StreamData(
+        "avc1.",
+        "mp4a.40.2",
+        "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/m3u8s/11331.m3u8",
+        null,
+        null,
+        "hls",
+        false,
+        210000,
+        drmSchema = "widevine",
+        drmLicenseUrl = "https://widevine-proxy.appspot.com/proxy",
+    )
 }
