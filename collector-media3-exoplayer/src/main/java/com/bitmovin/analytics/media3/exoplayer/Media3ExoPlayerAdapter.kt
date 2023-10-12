@@ -118,7 +118,7 @@ internal class Media3ExoPlayerAdapter(
     }
 
     private fun startup(position: Long) {
-        qualityEventDataManipulator.setFormatsFromPlayer()
+        qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
         stateMachine.transitionState(PlayerStates.STARTUP, position)
     }
 

@@ -96,7 +96,7 @@ internal class PlaybackEventDataManipulator(
     }
 
     private fun setSubtitleInfo(eventData: EventData) {
-        val textTrack = ExoUtil.getSelectedFormatFromPlayer(exoPlayer, C.TRACK_TYPE_TEXT)
+        val textTrack = ExoUtil.getActiveSubtitles(exoPlayer)
         eventData.subtitleEnabled = textTrack != null
         eventData.subtitleLanguage = textTrack?.language
     }

@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.exoplayer
+package com.bitmovin.analytics.media3.exoplayer
 
 import android.os.Handler
 import android.os.HandlerThread
@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger
 @RunWith(
     RobolectricTestRunner::class,
 )
-class ExoUtilTest {
+class Media3ExoPlayerUtilIntegrationTest {
 
     @Test
     @Config(sdk = [33])
@@ -22,7 +22,7 @@ class ExoUtilTest {
         val atomicInt = AtomicInteger(0)
 
         // act
-        ExoUtil.executeSyncOrAsyncOnLooperThread(Looper.getMainLooper()) {
+        Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(Looper.getMainLooper()) {
             Thread.sleep(1)
             atomicInt.incrementAndGet()
         }
@@ -43,7 +43,7 @@ class ExoUtilTest {
         val handler = Handler(thread.looper)
 
         // act
-        ExoUtil.executeSyncOrAsyncOnLooperThread(handler.looper) {
+        Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(handler.looper) {
             Thread.sleep(1)
             atomicInt.incrementAndGet()
         }

@@ -1,10 +1,6 @@
 package com.bitmovin.analytics.media3.exoplayer.manipulators
 
-import androidx.media3.common.C.FORMAT_HANDLED
 import androidx.media3.common.Format
-import androidx.media3.common.Player
-import androidx.media3.common.TrackGroup
-import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
 import com.bitmovin.analytics.data.EventData
 import io.mockk.every
@@ -172,25 +168,6 @@ class QualityEventDataManipulatorTest {
     }
 
     @Test
-    fun `setFormatsFromPlayer will set currentFormats from exoplayer TrackGroupInfo if exoPlayers format are null`() {
-        // arrange
-        qualityEventDataManipulator.currentAudioFormat = null
-        qualityEventDataManipulator.currentVideoFormat = null
-        val videoFormatFromExo = Format.Builder().setAverageBitrate(123).setSampleMimeType("video/mp4").build()
-        val audioFormatFromExo = Format.Builder().setAverageBitrate(321).setSampleMimeType("audio/mp3").build()
-        every { mockExoPlayer.videoFormat } answers { null }
-        every { mockExoPlayer.audioFormat } answers { null }
-        prepareExoToReturnFormat(mockExoPlayer, videoFormatFromExo, audioFormatFromExo)
-
-        // act
-        qualityEventDataManipulator.setFormatsFromPlayer()
-
-        // assert
-        assertThat(qualityEventDataManipulator.currentVideoFormat?.bitrate).isEqualTo(videoFormatFromExo.bitrate)
-        assertThat(qualityEventDataManipulator.currentAudioFormat?.bitrate).isEqualTo(audioFormatFromExo.bitrate)
-    }
-
-    @Test
     fun `setFormatsFromPlayer will set currentFormats from ExoPlayer`() {
         // arrange
         val videoFormatFromExo = Format.Builder().setAverageBitrate(123).build()
@@ -200,26 +177,10 @@ class QualityEventDataManipulatorTest {
         val qualityEventDataManipulator = QualityEventDataManipulator(mockExoPlayer)
 
         // act
-        qualityEventDataManipulator.setFormatsFromPlayer()
+        qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
 
         // assert
         assertThat(qualityEventDataManipulator.currentVideoFormat?.bitrate).isEqualTo(videoFormatFromExo.bitrate)
         assertThat(qualityEventDataManipulator.currentAudioFormat?.bitrate).isEqualTo(audioFormatFromExo.bitrate)
-    }
-
-    private fun prepareExoToReturnFormat(exoPlayer: ExoPlayer, videoFormat: Format = mockk(), audioFormat: Format = mockk()) {
-        every { exoPlayer.isCommandAvailable(Player.COMMAND_GET_TRACKS) } answers { true }
-        every { exoPlayer.currentTracks } answers { Tracks(arrayListOf(buildMockTrackSelection(videoFormat), buildMockTrackSelection(audioFormat))) }
-    }
-
-    private fun buildMockTrackSelection(selectedFormat: Format): Tracks.Group {
-        // unselected dummyFormat to test that we only return the selected ones
-        val dummyFormat = Format.Builder().setAverageBitrate(-2)
-            .setSampleMimeType(selectedFormat.sampleMimeType)
-            .build()
-
-        val trackGroup = TrackGroup(dummyFormat, selectedFormat)
-        val selectedArray = booleanArrayOf(false, true)
-        return Tracks.Group(trackGroup, false, intArrayOf(FORMAT_HANDLED, FORMAT_HANDLED), selectedArray)
     }
 }

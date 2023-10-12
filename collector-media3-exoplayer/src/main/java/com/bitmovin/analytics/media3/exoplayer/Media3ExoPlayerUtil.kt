@@ -2,6 +2,7 @@ package com.bitmovin.analytics.media3.exoplayer
 
 import android.os.Handler
 import android.os.Looper
+import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.MediaLibraryInfo
 import androidx.media3.common.Player
@@ -73,10 +74,13 @@ internal object Media3ExoPlayerUtil {
      * Exoplayer organizes audio, video, subtitles, etc.. in track groups.
      * reference: https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/source/TrackGroup.html
      *
+     * This method shouldn't be used to determine the currently played audio and video formats since
+     * it will return the first selected one in a trackgroup.
+     *
      * Each track group has a field that determines if the group is selected, and an array which specifies
-     * which tracks in the group are selected specifically.
-     * TODO: verify which player team why we can have track groups with several tracks being selected for video
-     * (can be reproduced with test_live_playWithAutoplay and using IVS_LIVE_1 source)
+     * which tracks in the group are selected specifically. Selected doesn't mean that there can only be
+     * one in a track group, for example if all video bitrates are of a track group can be played with the
+     * underlying hardware, then all of them will be selected.
      *
      * Example
      * TrackGroup1 -> video with tracks for bitrate 1kb, 2kb, 3kb, etc..
@@ -84,17 +88,17 @@ internal object Media3ExoPlayerUtil {
      * TrackGroup3 -> audio german with tracks for stereo, surround, etc..
      * TrackGroup4 -> subtitles english with 1 track for english
      * TrackGroup5 -> subtitles german with 1 track for german
-     *
-     *
      */
-    fun getSelectedFormatFromPlayer(player: Player, trackType: Int): Format? {
+    fun getActiveSubtitles(player: Player): Format? {
         try {
             if (!player.isCommandAvailable(Player.COMMAND_GET_TRACKS)) {
                 return null
             }
 
             val trackGroups = player.currentTracks.groups
-            val trackGroupsWithTrackType = trackGroups.filter { track -> track.type == trackType }
+
+            // subtitles are using C.TRACK_TYPE_TEXT
+            val trackGroupsWithTrackType = trackGroups.filter { track -> track.type == C.TRACK_TYPE_TEXT }
             val selectedTrackGroup = trackGroupsWithTrackType.firstOrNull { it.isSelected } ?: return null
 
             // bit cumbersome to find the actual track in the track group that is selected

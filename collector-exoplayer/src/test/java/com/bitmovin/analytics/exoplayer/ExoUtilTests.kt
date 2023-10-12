@@ -1,19 +1,18 @@
-package com.bitmovin.analytics.media3.exoplayer
+package com.bitmovin.analytics.exoplayer
 
-import androidx.media3.common.C
-import androidx.media3.common.Format
-import androidx.media3.common.Player
-import androidx.media3.common.TrackGroup
-import androidx.media3.common.Tracks
-import androidx.media3.exoplayer.ExoPlayer
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Tracks
+import com.google.android.exoplayer2.source.TrackGroup
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions
 import org.junit.Before
 import org.junit.Test
 
-class Media3ExoPlayerUtilTest {
-
+class ExoUtilTests {
     private lateinit var mockExoPlayer: ExoPlayer
 
     @Before
@@ -28,7 +27,7 @@ class Media3ExoPlayerUtilTest {
         prepareExoToReturnFormat(mockExoPlayer, subtitleFormat)
 
         // act
-        val selectedSubtitle = Media3ExoPlayerUtil.getActiveSubtitles(mockExoPlayer)
+        val selectedSubtitle = ExoUtil.getActiveSubtitles(mockExoPlayer)
 
         // assert
         Assertions.assertThat(selectedSubtitle?.language).isEqualTo("de")

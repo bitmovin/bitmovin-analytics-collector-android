@@ -227,7 +227,7 @@ internal class AnalyticsEventListener(
     }
 
     private fun startup(position: Long) {
-        qualityEventDataManipulator.setFormatsFromPlayer()
+        qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
         stateMachine.transitionState(PlayerStates.STARTUP, position)
     }
 

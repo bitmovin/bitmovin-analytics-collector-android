@@ -572,14 +572,14 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vod_enableSwitchAndDisableSubtitles() {
+    fun test_vod_enableGermanSwitchToEnglishAndDisableSubtitles() {
         // arrange
         val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
         collector.sourceMetadata = SourceMetadata(title = "sintel_with_subtitles")
         val mediaItem = MediaItem.fromUri(DASH_SINTEL_WITH_SUBTITLES.mpdUrl!!)
 
         // act
-        val preferEnglishSubtitle = TrackSelectionParameters.Builder()
+        val preferGermanSubtitle = TrackSelectionParameters.Builder()
             .setForceLowestBitrate(true)
             .setPreferredTextLanguage("de")
             .build()
@@ -588,8 +588,8 @@ class PhoneBasicScenariosTest {
             collector.attachPlayer(player)
             player.setMediaItem(mediaItem)
 
-            // select english as preferred subtitle
-            player.trackSelectionParameters = preferEnglishSubtitle
+            // select german as preferred subtitle
+            player.trackSelectionParameters = preferGermanSubtitle
 
             player.prepare()
             player.play()
@@ -597,14 +597,14 @@ class PhoneBasicScenariosTest {
 
         Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
-        val preferGermanSubtitle = TrackSelectionParameters.Builder()
+        val preferEnglishSubtitle = TrackSelectionParameters.Builder()
             .setForceLowestBitrate(true)
             .setPreferredTextLanguage("en")
             .build()
 
         mainScope.launch {
-            // select german as preferred subtitle
-            player.trackSelectionParameters = preferGermanSubtitle
+            // select english as preferred subtitle
+            player.trackSelectionParameters = preferEnglishSubtitle
         }
 
         Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 6000)

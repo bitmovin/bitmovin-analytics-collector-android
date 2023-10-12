@@ -2,9 +2,6 @@ package com.bitmovin.analytics.exoplayer.manipulators
 
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
-import com.bitmovin.analytics.exoplayer.ExoUtil
-import com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO
-import com.google.android.exoplayer2.C.TRACK_TYPE_VIDEO
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 
@@ -58,9 +55,8 @@ internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : E
         data.audioLanguage = audioFormat.language
     }
 
-    fun setFormatsFromPlayer() {
-        // TODO: clarify why we are using the fallback here.
-        currentVideoFormat = exoplayer.videoFormat ?: ExoUtil.getSelectedFormatFromPlayer(exoplayer, TRACK_TYPE_VIDEO)
-        currentAudioFormat = exoplayer.audioFormat ?: ExoUtil.getSelectedFormatFromPlayer(exoplayer, TRACK_TYPE_AUDIO)
+    fun setFormatsFromPlayerOnStartup() {
+        currentVideoFormat = exoplayer.videoFormat
+        currentAudioFormat = exoplayer.audioFormat
     }
 }
