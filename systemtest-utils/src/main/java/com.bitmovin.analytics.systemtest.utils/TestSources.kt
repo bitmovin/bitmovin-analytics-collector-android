@@ -124,7 +124,6 @@ object TestSources {
         drmLicenseUrl = "https://cwip-shaka-proxy.appspot.com/no_auth",
     )
 
-    // TODO: check codec and duration
     val DRM_HLS_WIDEVINE = StreamData(
         "avc1.",
         "mp4a.40.2",
@@ -138,7 +137,6 @@ object TestSources {
         drmLicenseUrl = "https://cwip-shaka-proxy.appspot.com/no_auth",
     )
 
-    // TODO: check codec and duration
     // TODO: what does encrypted here mean?? vs DRM only?
     val DRM_HLS_WIDEVINE_ENCRYPTED = StreamData(
         "avc1.",
