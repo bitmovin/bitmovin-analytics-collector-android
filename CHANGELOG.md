@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.1.0
+
 ### Changed
 - Changed minimum required android version to android 5.0 (API level 21)
 - Upgrade example apps to latest bitmovin player (v3.46.0) and ivs player (v1.22.0)
