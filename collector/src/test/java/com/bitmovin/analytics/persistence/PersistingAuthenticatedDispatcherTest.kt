@@ -31,6 +31,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+private const val TEST_LICENSE_KEY: String = "test_key"
+
 class PersistingAuthenticatedDispatcherTest {
     private val outerLicenseCallback: LicenseCallback = mockk(relaxed = true)
     private val backendFactory: BackendFactory = mockk()
@@ -49,7 +51,7 @@ class PersistingAuthenticatedDispatcherTest {
 
         persistingAuthenticatedDispatcher = PersistingAuthenticatedDispatcher(
             mockk(),
-            AnalyticsConfig("dummy"),
+            AnalyticsConfig(TEST_LICENSE_KEY),
             outerLicenseCallback,
             backendFactory,
             licenseCall,
@@ -90,7 +92,7 @@ class PersistingAuthenticatedDispatcherTest {
         val eventData = createEventData()
         persistingAuthenticatedDispatcher.add(eventData)
 
-        verify { licenseCall.authenticate(any()) }
+        verify { licenseCall.authenticate(TEST_LICENSE_KEY, any()) }
     }
 
     @Test
@@ -98,7 +100,7 @@ class PersistingAuthenticatedDispatcherTest {
         val adEventData = createAdEventData()
         persistingAuthenticatedDispatcher.addAd(adEventData)
 
-        verify { licenseCall.authenticate(any()) }
+        verify { licenseCall.authenticate(TEST_LICENSE_KEY, any()) }
     }
 
     @Test
@@ -332,7 +334,7 @@ class PersistingAuthenticatedDispatcherTest {
 
         verify { backend wasNot called }
         verify(exactly = 1) { analyticsEventQueue.push(any<EventData>()) }
-        verify(exactly = 1) { licenseCall.authenticate(any()) }
+        verify(exactly = 1) { licenseCall.authenticate(TEST_LICENSE_KEY, any()) }
     }
 
     @Test
@@ -357,7 +359,7 @@ class PersistingAuthenticatedDispatcherTest {
         val eventData = createEventData()
         persistingAuthenticatedDispatcher.add(eventData)
         val authenticationCallbackSlot = slot<AuthenticationCallback>()
-        verify { licenseCall.authenticate(capture(authenticationCallbackSlot)) }
+        verify { licenseCall.authenticate(TEST_LICENSE_KEY, capture(authenticationCallbackSlot)) }
 
         authenticationCallbackSlot.captured.authenticationCompleted(
             response,

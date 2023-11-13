@@ -17,30 +17,25 @@ import okhttp3.Response
 import java.io.IOException
 
 class DefaultLicenseCall(
-    private val config: AnalyticsConfig,
+    config: AnalyticsConfig,
     private val context: Context,
 ) : LicenseCall {
-    private val backendUrl: String
-    private val httpClient: HttpClient
+    private val backendUrl = Uri.parse(config.backendUrl)
+        .buildUpon()
+        .appendEncodedPath("licensing")
+        .build()
+        .toString()
+    private val httpClient = HttpClient(
+        context,
+        ClientFactory().createClient(config),
+    )
 
     init {
-        backendUrl = Uri.parse(config.backendUrl)
-            .buildUpon()
-            .appendEncodedPath("licensing")
-            .build()
-            .toString()
-
         Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl))
-        httpClient = HttpClient(
-            context,
-            ClientFactory().createClient(
-                config,
-            ),
-        )
     }
 
-    override fun authenticate(callback: AuthenticationCallback) {
-        val data = LicenseCallData(config.licenseKey, Util.analyticsVersion, Util.getDomain(context))
+    override fun authenticate(licenseKey: String, callback: AuthenticationCallback) {
+        val data = LicenseCallData(licenseKey, Util.analyticsVersion, Util.getDomain(context))
         val json = serialize(data)
         httpClient.post(
             backendUrl,

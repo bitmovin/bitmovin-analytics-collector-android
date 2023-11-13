@@ -31,6 +31,11 @@ class BitmovinAnalytics(
     val context: Context,
     val eventQueue: AnalyticsEventQueue,
 ) : LicenseCallback {
+    private val licenseCall = DefaultLicenseCall(config, context)
+    private val scopeProvider = ScopeProvider.create()
+    private val backendFactory = BackendFactory(eventQueue)
+    private val eventBus = EventBus()
+
     private val debugCallback: DebugCallback = object : DebugCallback {
         override fun dispatchEventData(data: EventData) {
             eventBus.notify(DebugListener::class) { it.onDispatchEventData(data) }
@@ -45,7 +50,6 @@ class BitmovinAnalytics(
         }
     }
     private val featureManager = FeatureManager<FeatureConfigContainer>()
-    private val eventBus = EventBus()
 
     private val eventDataDispatcher = DebuggingEventDataDispatcher(
         if (config.retryPolicy == RetryPolicy.LONG_TERM) {
@@ -53,20 +57,19 @@ class BitmovinAnalytics(
                 context = context,
                 config = config,
                 callback = this,
-                backendFactory = BackendFactory(
-                    eventQueue,
-                ),
-                licenseCall = DefaultLicenseCall(config, context),
+                backendFactory = backendFactory,
+                licenseCall = licenseCall,
                 eventQueue = eventQueue,
-                scopeProvider = ScopeProvider.create(),
+                scopeProvider = scopeProvider,
             )
         } else {
             SimpleEventDataDispatcher(
                 context = context,
                 config = config,
                 callback = this,
-                backendFactory = BackendFactory(eventQueue),
-                scopeProvider = ScopeProvider.create(),
+                backendFactory = backendFactory,
+                licenseCall = licenseCall,
+                scopeProvider = scopeProvider,
             )
         },
         debugCallback,

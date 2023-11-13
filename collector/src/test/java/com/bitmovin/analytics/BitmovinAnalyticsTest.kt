@@ -1,6 +1,7 @@
 package com.bitmovin.analytics
 
 import android.content.Context
+import android.net.Uri
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.enums.VideoStartFailedReason
@@ -11,6 +12,7 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkConstructor
+import io.mockk.mockkStatic
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
@@ -26,6 +28,8 @@ class BitmovinAnalyticsTest {
 
     @Before
     fun setup() {
+        mockkStatic(Uri::class)
+        every { Uri.parse(any()) } returns mockk()
         MockitoAnnotations.openMocks(this)
         context = mockk {
             every { applicationContext } returns mockk()

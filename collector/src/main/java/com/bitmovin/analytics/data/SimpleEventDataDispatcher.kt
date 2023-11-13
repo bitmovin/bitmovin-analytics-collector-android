@@ -4,7 +4,7 @@ import android.content.Context
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
-import com.bitmovin.analytics.license.DefaultLicenseCall
+import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.utils.ScopeProvider
 import kotlinx.coroutines.CoroutineScope
@@ -17,6 +17,7 @@ internal class SimpleEventDataDispatcher(
     private val config: AnalyticsConfig,
     private val callback: LicenseCallback?,
     private val backendFactory: BackendFactory,
+    private val licenseCall: LicenseCall,
     private val scopeProvider: ScopeProvider,
 ) : IEventDataDispatcher, AuthenticationCallback {
     private lateinit var backend: Backend
@@ -63,8 +64,7 @@ internal class SimpleEventDataDispatcher(
 
     override fun enable() {
         createBackend()
-        val licenseCall = DefaultLicenseCall(config, context)
-        licenseCall.authenticate(this)
+        licenseCall.authenticate(config.licenseKey, this)
     }
 
     override fun disable() {

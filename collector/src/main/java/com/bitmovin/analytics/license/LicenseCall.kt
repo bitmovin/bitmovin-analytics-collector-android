@@ -1,5 +1,5 @@
 package com.bitmovin.analytics.license
 
 internal interface LicenseCall {
-    fun authenticate(callback: AuthenticationCallback)
+    fun authenticate(licenseKey: String, callback: AuthenticationCallback)
 }

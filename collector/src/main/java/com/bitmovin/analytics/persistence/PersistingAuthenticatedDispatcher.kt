@@ -93,7 +93,7 @@ internal class PersistingAuthenticatedDispatcher(
             Authenticated -> backend.send(data)
             Unauthenticated -> {
                 eventQueue.push(data)
-                licenseCall.authenticate(authenticationCallback)
+                licenseCall.authenticate(config.licenseKey, authenticationCallback)
             }
         }
     }
@@ -104,7 +104,7 @@ internal class PersistingAuthenticatedDispatcher(
             Authenticated -> backend.sendAd(data)
             Unauthenticated -> {
                 eventQueue.push(data)
-                licenseCall.authenticate(authenticationCallback)
+                licenseCall.authenticate(config.licenseKey, authenticationCallback)
             }
         }
     }
