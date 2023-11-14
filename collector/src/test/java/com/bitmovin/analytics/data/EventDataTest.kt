@@ -2,6 +2,7 @@ package com.bitmovin.analytics.data
 
 import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.enums.PlayerType
@@ -214,5 +215,157 @@ class EventDataTest {
         assertThat(eventData1.videoTitle).isEqualTo("offlineSession")
         assertThat(eventData1.videoWindowHeight).isEqualTo(123)
         assertThat(eventData1.videoWindowWidth).isEqualTo(123)
+    }
+
+    @Test
+    fun testEventDataIsCorrectlySerialized() {
+        val eventData = EventData(
+            deviceInfo = DeviceInformation(
+                manufacturer = "manufacturer",
+                model = "model",
+                isTV = false,
+                locale = "locale",
+                domain = "packageName",
+                screenHeight = 2400,
+                screenWidth = 1080,
+            ),
+            playerInfo = PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+            customData = CustomData(
+                customData1 = "customData1",
+                customData2 = "customData2",
+                customData3 = "customData3",
+                customData4 = "customData4",
+                customData5 = "customData5",
+                customData6 = "customData6",
+                customData7 = "customData7",
+                customData8 = "customData8",
+                customData9 = "customData9",
+                customData10 = "customData10",
+                customData11 = "customData11",
+                customData12 = "customData12",
+                customData13 = "customData13",
+                customData14 = "customData14",
+                customData15 = "customData15",
+                customData16 = "customData16",
+                customData17 = "customData17",
+                customData18 = "customData18",
+                customData19 = "customData19",
+                customData20 = "customData20",
+                customData21 = "customData21",
+                customData22 = "customData22",
+                customData23 = "customData23",
+                customData24 = "customData24",
+                customData25 = "customData25",
+                customData26 = "customData26",
+                customData27 = "customData27",
+                customData28 = "customData28",
+                customData29 = "customData29",
+                customData30 = "customData30",
+                experimentName = "experimentName",
+            ),
+            impressionId = "impressionId",
+            userId = "userId",
+            key = "licenseKey",
+            videoId = "videoId",
+            customUserId = "customUserId",
+            path = "path",
+            cdnProvider = "cdnProvider",
+            userAgent = "userAgent",
+            videoTitle = "videoTitle",
+        ).apply {
+            time = 1234567890
+            drmLoadTime = 1234
+            videoDuration = 2
+            videoWindowWidth = 3
+            videoWindowHeight = 4
+            droppedFrames = 5
+            played = 6
+            buffered = 7
+            paused = 8
+            ad = 9
+            seeked = 10
+            videoPlaybackWidth = 11
+            videoPlaybackHeight = 12
+            videoBitrate = 13
+            audioBitrate = 14
+            videoTimeStart = 15
+            videoTimeEnd = 16
+            videoStartupTime = 17
+            duration = 18
+            startupTime = 19
+            playerStartupTime = 20
+            pageLoadType = 1
+            pageLoadTime = 21
+            isMuted = false
+            sequenceNumber = 22
+            state = "state"
+            errorCode = 23
+            errorMessage = "errorMessage"
+            errorData = "errorData"
+            streamFormat = "streamFormat"
+            mpdUrl = "mpdUrl"
+            m3u8Url = "m3u8Url"
+            progUrl = "progUrl"
+            videoCodec = "videoCodec"
+            audioCodec = "audioCodec"
+            supportedVideoCodecs = listOf("supportedVideoCodecs")
+            subtitleEnabled = false
+            subtitleLanguage = "subtitleLanguage"
+            audioLanguage = "audioLanguage"
+            drmType = "drmType"
+            isLive = false
+            isCasting = false
+            castTech = "castTech"
+            videoStartFailed = false
+            retryCount = 24
+            playerKey = "playerKey"
+        }
+
+        val serializedEventData = DataSerializer.serialize(eventData)
+        assertThat(serializedEventData)
+            .isEqualTo(
+                "{\"impressionId\":\"impressionId\",\"userId\":\"userId\",\"key\":\"licenseKey\"," +
+                    "\"videoId\":\"videoId\",\"videoTitle\":\"videoTitle\"," +
+                    "\"customUserId\":\"customUserId\",\"path\":\"path\"," +
+                    "\"cdnProvider\":\"cdnProvider\",\"userAgent\":\"userAgent\"," +
+                    "\"deviceInformation\":{\"manufacturer\":\"manufacturer\"," +
+                    "\"model\":\"model\",\"isTV\":false},\"language\":\"locale\"," +
+                    "\"analyticsVersion\":\"0.0.0-local\",\"playerTech\":\"Android:Exoplayer\"," +
+                    "\"domain\":\"packageName\",\"screenHeight\":2400,\"screenWidth\":1080," +
+                    "\"isLive\":false,\"isCasting\":false,\"castTech\":\"castTech\"," +
+                    "\"videoDuration\":2,\"time\":1234567890,\"videoWindowWidth\":3," +
+                    "\"videoWindowHeight\":4,\"droppedFrames\":5,\"played\":6,\"buffered\":7," +
+                    "\"paused\":8,\"ad\":9,\"seeked\":10,\"videoPlaybackWidth\":11," +
+                    "\"videoPlaybackHeight\":12,\"videoBitrate\":13,\"audioBitrate\":14," +
+                    "\"videoTimeStart\":15,\"videoTimeEnd\":16,\"videoStartupTime\":17," +
+                    "\"duration\":18,\"startupTime\":19,\"state\":\"state\",\"errorCode\":23," +
+                    "\"errorMessage\":\"errorMessage\",\"errorData\":\"errorData\"," +
+                    "\"playerStartupTime\":20,\"pageLoadType\":1,\"pageLoadTime\":21," +
+                    "\"streamFormat\":\"streamFormat\",\"mpdUrl\":\"mpdUrl\"," +
+                    "\"m3u8Url\":\"m3u8Url\",\"progUrl\":\"progUrl\",\"isMuted\":false," +
+                    "\"sequenceNumber\":22,\"platform\":\"android\"," +
+                    "\"videoCodec\":\"videoCodec\",\"audioCodec\":\"audioCodec\"," +
+                    "\"supportedVideoCodecs\":[\"supportedVideoCodecs\"]," +
+                    "\"subtitleEnabled\":false,\"subtitleLanguage\":\"subtitleLanguage\"," +
+                    "\"audioLanguage\":\"audioLanguage\",\"drmType\":\"drmType\"," +
+                    "\"drmLoadTime\":1234,\"videoStartFailed\":false,\"retryCount\":24," +
+                    "\"player\":\"exoplayer\",\"playerKey\":\"playerKey\"," +
+                    "\"customData1\":\"customData1\",\"customData2\":\"customData2\"," +
+                    "\"customData3\":\"customData3\",\"customData4\":\"customData4\"," +
+                    "\"customData5\":\"customData5\",\"customData6\":\"customData6\"," +
+                    "\"customData7\":\"customData7\",\"customData8\":\"customData8\"," +
+                    "\"customData9\":\"customData9\",\"customData10\":\"customData10\"," +
+                    "\"customData11\":\"customData11\",\"customData12\":\"customData12\"," +
+                    "\"customData13\":\"customData13\",\"customData14\":\"customData14\"," +
+                    "\"customData15\":\"customData15\",\"customData16\":\"customData16\"," +
+                    "\"customData17\":\"customData17\",\"customData18\":\"customData18\"," +
+                    "\"customData19\":\"customData19\",\"customData20\":\"customData20\"," +
+                    "\"customData21\":\"customData21\",\"customData22\":\"customData22\"," +
+                    "\"customData23\":\"customData23\",\"customData24\":\"customData24\"," +
+                    "\"customData25\":\"customData25\",\"customData26\":\"customData26\"," +
+                    "\"customData27\":\"customData27\",\"customData28\":\"customData28\"," +
+                    "\"customData29\":\"customData29\",\"customData30\":\"customData30\"," +
+                    "\"experimentName\":\"experimentName\"}",
+            )
     }
 }
