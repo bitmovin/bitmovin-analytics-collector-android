@@ -20,23 +20,18 @@ class DefaultLicenseCall(
     private val config: AnalyticsConfig,
     private val context: Context,
 ) : LicenseCall {
-    private val backendUrl: String
-    private val httpClient: HttpClient
+    private val backendUrl = Uri.parse(config.backendUrl)
+        .buildUpon()
+        .appendEncodedPath("licensing")
+        .build()
+        .toString()
+    private val httpClient = HttpClient(
+        context,
+        ClientFactory().createClient(config),
+    )
 
     init {
-        backendUrl = Uri.parse(config.backendUrl)
-            .buildUpon()
-            .appendEncodedPath("licensing")
-            .build()
-            .toString()
-
         Log.d(TAG, String.format("Initialized License Call with backendUrl: %s", backendUrl))
-        httpClient = HttpClient(
-            context,
-            ClientFactory().createClient(
-                config,
-            ),
-        )
     }
 
     override fun authenticate(callback: AuthenticationCallback) {

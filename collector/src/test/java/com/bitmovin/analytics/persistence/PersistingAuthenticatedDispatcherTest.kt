@@ -31,6 +31,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+private const val TEST_LICENSE_KEY: String = "test_key"
+
 class PersistingAuthenticatedDispatcherTest {
     private val outerLicenseCallback: LicenseCallback = mockk(relaxed = true)
     private val backendFactory: BackendFactory = mockk()
@@ -49,7 +51,7 @@ class PersistingAuthenticatedDispatcherTest {
 
         persistingAuthenticatedDispatcher = PersistingAuthenticatedDispatcher(
             mockk(),
-            AnalyticsConfig("dummy"),
+            AnalyticsConfig(TEST_LICENSE_KEY),
             outerLicenseCallback,
             backendFactory,
             licenseCall,
