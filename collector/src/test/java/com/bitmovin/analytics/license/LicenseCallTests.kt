@@ -40,7 +40,7 @@ class LicenseCallTests {
     private fun verifyLicenseResponse(responseBody: String, expectedAuthenticationResponse: AuthenticationResponse) {
         val licenseCall = createLicenseCall(responseBody)
         val callback = mockk<AuthenticationCallback>(relaxed = true)
-        licenseCall.authenticate("test_license_key", callback)
+        licenseCall.authenticate(callback)
 
         verify { callback.authenticationCompleted(expectedAuthenticationResponse) }
     }

@@ -92,7 +92,7 @@ class PersistingAuthenticatedDispatcherTest {
         val eventData = createEventData()
         persistingAuthenticatedDispatcher.add(eventData)
 
-        verify { licenseCall.authenticate(TEST_LICENSE_KEY, any()) }
+        verify { licenseCall.authenticate(any()) }
     }
 
     @Test
@@ -100,7 +100,7 @@ class PersistingAuthenticatedDispatcherTest {
         val adEventData = createAdEventData()
         persistingAuthenticatedDispatcher.addAd(adEventData)
 
-        verify { licenseCall.authenticate(TEST_LICENSE_KEY, any()) }
+        verify { licenseCall.authenticate(any()) }
     }
 
     @Test
@@ -334,7 +334,7 @@ class PersistingAuthenticatedDispatcherTest {
 
         verify { backend wasNot called }
         verify(exactly = 1) { analyticsEventQueue.push(any<EventData>()) }
-        verify(exactly = 1) { licenseCall.authenticate(TEST_LICENSE_KEY, any()) }
+        verify(exactly = 1) { licenseCall.authenticate(any()) }
     }
 
     @Test
@@ -359,7 +359,7 @@ class PersistingAuthenticatedDispatcherTest {
         val eventData = createEventData()
         persistingAuthenticatedDispatcher.add(eventData)
         val authenticationCallbackSlot = slot<AuthenticationCallback>()
-        verify { licenseCall.authenticate(TEST_LICENSE_KEY, capture(authenticationCallbackSlot)) }
+        verify { licenseCall.authenticate(capture(authenticationCallbackSlot)) }
 
         authenticationCallbackSlot.captured.authenticationCompleted(
             response,

@@ -64,7 +64,7 @@ internal class SimpleEventDataDispatcher(
 
     override fun enable() {
         createBackend()
-        licenseCall.authenticate(config.licenseKey, this)
+        licenseCall.authenticate(this)
     }
 
     override fun disable() {
