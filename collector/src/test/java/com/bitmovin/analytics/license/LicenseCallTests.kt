@@ -95,6 +95,34 @@ class LicenseCallTests {
     }
 
     @Test
+    fun testLicenseCallUsesLicenseKeyFromLicenseKeyProvider() = runTest {
+        val mockedResponse = mockk<Response> {
+            every { body }.returns(
+                getGrantedResponseBody("").toResponseBody("text/json".toMediaType()),
+            )
+        }
+        val callbackSlot = slot<Callback>()
+        val httpClient = mockk<HttpClient> {
+            every { post(any(), any(), capture(callbackSlot)) }.answers {
+                callbackSlot.captured.onResponse(mockk(), mockedResponse)
+            }
+        }
+        val licenseCall = DefaultLicenseCall(
+            config = AnalyticsConfig("wrong"),
+            licenseKeyProvider = DeferredLicenseKeyProvider(MutableStateFlow(LicenseKeyState.Provided(TEST_LICENSE_KEY))),
+            context = mockk(),
+            httpClient = httpClient,
+        )
+        val callback = mockk<AuthenticationCallback> {
+            every { authenticationCompleted(any()) } just runs
+        }
+
+        licenseCall.authenticate(callback)
+
+        verify(exactly = 1) { httpClient.post(any(), match { it.contains(TEST_LICENSE_KEY) }, any()) }
+    }
+
+    @Test
     fun testLicenseResponseShouldFailWithTimedOutDeferredLicense() = runTest {
         verifyDeferredLicenseKey(LicenseKeyState.Timeout, AuthenticationResponse.Error)
     }
