@@ -19,6 +19,7 @@ import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.utils.ScopeProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 internal class PersistingAuthenticatedDispatcher(
     private val context: Context,
@@ -93,7 +94,7 @@ internal class PersistingAuthenticatedDispatcher(
             Authenticated -> backend.send(data)
             Unauthenticated -> {
                 eventQueue.push(data)
-                licenseCall.authenticate(authenticationCallback)
+                scope.launch { licenseCall.authenticate(authenticationCallback) }
             }
         }
     }
@@ -104,7 +105,7 @@ internal class PersistingAuthenticatedDispatcher(
             Authenticated -> backend.sendAd(data)
             Unauthenticated -> {
                 eventQueue.push(data)
-                licenseCall.authenticate(authenticationCallback)
+                scope.launch { licenseCall.authenticate(authenticationCallback) }
             }
         }
     }

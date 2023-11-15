@@ -20,6 +20,7 @@ import com.bitmovin.analytics.utils.areScopesCancelled
 import io.mockk.Called
 import io.mockk.called
 import io.mockk.clearMocks
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -92,7 +93,7 @@ class PersistingAuthenticatedDispatcherTest {
         val eventData = createEventData()
         persistingAuthenticatedDispatcher.add(eventData)
 
-        verify { licenseCall.authenticate(any()) }
+        coVerify { licenseCall.authenticate(any()) }
     }
 
     @Test
@@ -100,7 +101,7 @@ class PersistingAuthenticatedDispatcherTest {
         val adEventData = createAdEventData()
         persistingAuthenticatedDispatcher.addAd(adEventData)
 
-        verify { licenseCall.authenticate(any()) }
+        coVerify { licenseCall.authenticate(any()) }
     }
 
     @Test
@@ -334,7 +335,7 @@ class PersistingAuthenticatedDispatcherTest {
 
         verify { backend wasNot called }
         verify(exactly = 1) { analyticsEventQueue.push(any<EventData>()) }
-        verify(exactly = 1) { licenseCall.authenticate(any()) }
+        coVerify(exactly = 1) { licenseCall.authenticate(any()) }
     }
 
     @Test
@@ -359,7 +360,7 @@ class PersistingAuthenticatedDispatcherTest {
         val eventData = createEventData()
         persistingAuthenticatedDispatcher.add(eventData)
         val authenticationCallbackSlot = slot<AuthenticationCallback>()
-        verify { licenseCall.authenticate(capture(authenticationCallbackSlot)) }
+        coVerify { licenseCall.authenticate(capture(authenticationCallbackSlot)) }
 
         authenticationCallbackSlot.captured.authenticationCompleted(
             response,

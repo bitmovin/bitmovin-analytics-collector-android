@@ -16,7 +16,9 @@ import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.license.DefaultLicenseCall
 import com.bitmovin.analytics.license.FeatureConfigContainer
+import com.bitmovin.analytics.license.InstantLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseCallback
+import com.bitmovin.analytics.license.LicenseKeyProvider
 import com.bitmovin.analytics.persistence.PersistingAuthenticatedDispatcher
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
@@ -30,8 +32,9 @@ class BitmovinAnalytics(
     val config: AnalyticsConfig,
     val context: Context,
     val eventQueue: AnalyticsEventQueue,
+    licenseKeyProvider: LicenseKeyProvider = InstantLicenseKeyProvider(config.licenseKey),
 ) : LicenseCallback {
-    private val licenseCall = DefaultLicenseCall(config, context)
+    private val licenseCall = DefaultLicenseCall(config, licenseKeyProvider, context)
     private val scopeProvider = ScopeProvider.create()
     private val backendFactory = BackendFactory(eventQueue)
     private val eventBus = EventBus()
