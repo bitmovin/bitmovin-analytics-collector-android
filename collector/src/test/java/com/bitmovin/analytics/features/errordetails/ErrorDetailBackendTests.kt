@@ -124,6 +124,23 @@ class ErrorDetailBackendTests {
     }
 
     @Test
+    fun testWillFlushToHttpClientIfEnabledAndKeyWasNotProvidedBefore() {
+        val backend = ErrorDetailBackend(
+            AnalyticsConfig("test", backendUrl = "http://localhost"),
+            mockk(relaxed = true),
+            httpClientMock,
+        )
+        backend.send(getErrorDetail(0, key = null))
+        backend.enabled = true
+        verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
+        val licenseKey = "new-test-license-key"
+        backend.flush(licenseKey)
+        verify(exactly = 1) {
+            httpClientMock.post(any(), match { it.contains(licenseKey) }, any())
+        }
+    }
+
+    @Test
     fun testWillRequeueOnFlushIfDisabled() {
         val backend = ErrorDetailBackend(mockk(relaxed = true), mockk(relaxed = true), httpClientMock)
         backend.send(getErrorDetail(0))
@@ -132,6 +149,24 @@ class ErrorDetailBackendTests {
         verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
     }
 
-    private fun getErrorDetail(httpRequestCount: Int?) = ErrorDetail("platform", "key", "domain", "impressionId", 0, 0, null, null, ErrorData(), if (httpRequestCount == null) null else (0..httpRequestCount).map { getHttpRequest() }.toMutableList())
-    private fun getHttpRequest() = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
+    private fun getErrorDetail(httpRequestCount: Int?, key: String? = "key") = ErrorDetail(
+        platform = "platform",
+        licenseKey = key,
+        domain = "domain",
+        impressionId = "impressionId",
+        errorId = 0,
+        timestamp = 0,
+        code = null,
+        message = null,
+        data = ErrorData(),
+        httpRequests = if (httpRequestCount == null) {
+            null
+        } else {
+            (0..httpRequestCount).map { getHttpRequest() }
+                .toMutableList()
+        },
+    )
+
+    private fun getHttpRequest() =
+        HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
 }
