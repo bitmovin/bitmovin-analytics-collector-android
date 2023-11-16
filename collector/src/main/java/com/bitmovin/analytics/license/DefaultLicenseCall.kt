@@ -85,7 +85,7 @@ class DefaultLicenseCall(
                     }
                     Log.d(TAG, "License response was granted")
                     callback.authenticationCompleted(
-                        AuthenticationResponse.Granted(licenseResponse.features),
+                        AuthenticationResponse.Granted(config.licenseKey, licenseResponse.features),
                     )
                 }
             },

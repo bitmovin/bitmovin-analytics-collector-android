@@ -50,7 +50,7 @@ internal class SimpleEventDataDispatcher(
                     response.featureConfigContainer,
                 )
                 enabled = true
-                forwardQueuedEvents()
+                forwardQueuedEvents(response.licenseKey)
                 true
             }
 
@@ -96,17 +96,21 @@ internal class SimpleEventDataDispatcher(
         sampleSequenceNumber = 0
     }
 
-    private fun forwardQueuedEvents() {
+    private fun forwardQueuedEvents(licenseKey: String) {
         val it = data.iterator()
         while (it.hasNext()) {
             val eventData = it.next()
-            backend.send(eventData)
+            backend.send(
+                if (eventData.key == null) eventData.copy(key = licenseKey) else eventData,
+            )
             it.remove()
         }
         val adIt = adData.iterator()
         while (adIt.hasNext()) {
             val eventData = adIt.next()
-            backend.sendAd(eventData)
+            backend.sendAd(
+                if (eventData.key == null) eventData.copy(key = licenseKey) else eventData,
+            )
             adIt.remove()
         }
     }
