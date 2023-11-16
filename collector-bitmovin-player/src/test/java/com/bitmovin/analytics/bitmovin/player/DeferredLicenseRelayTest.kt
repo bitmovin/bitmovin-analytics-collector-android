@@ -33,7 +33,7 @@ class DeferredLicenseRelayTest {
 
     @Test
     fun `detaching a player from the relay unregisters the listener`() {
-        val relay = DeferredLicenseRelay("")
+        val relay = DeferredLicenseRelay(DEFERRED_LICENSE_KEY_PLACEHOLDER)
         val player = TestEventEmitter()
 
         relay.attach(player)
