@@ -12,6 +12,7 @@ import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
+import com.bitmovin.analytics.license.LicensingState
 import com.bitmovin.analytics.persistence.OperationMode.Authenticated
 import com.bitmovin.analytics.persistence.OperationMode.Disabled
 import com.bitmovin.analytics.persistence.OperationMode.Unauthenticated
@@ -47,7 +48,7 @@ internal class PersistingAuthenticatedDispatcher(
         val success = when (response) {
             is AuthenticationResponse.Granted -> {
                 callback?.configureFeatures(
-                    authenticated = true,
+                    LicensingState.Authenticated(response.licenseKey),
                     featureConfigs = response.featureConfigContainer,
                 )
                 if (operationMode != Authenticated) {
@@ -59,7 +60,7 @@ internal class PersistingAuthenticatedDispatcher(
 
             is AuthenticationResponse.Denied -> {
                 callback?.configureFeatures(
-                    authenticated = false,
+                    LicensingState.Unauthenticated,
                     featureConfigs = null,
                 )
                 disable()

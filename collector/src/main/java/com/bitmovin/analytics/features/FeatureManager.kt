@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.features
 
 import android.util.Log
+import com.bitmovin.analytics.license.LicensingState
 
 class FeatureManager<TConfigContainer> {
     companion object {
@@ -25,20 +26,33 @@ class FeatureManager<TConfigContainer> {
         features.forEach { it.reset() }
     }
 
-    @Synchronized fun configureFeatures(authenticated: Boolean, featureConfigs: TConfigContainer?) {
-        val iterator = features.iterator()
-        while (iterator.hasNext()) {
-            val it = iterator.next()
-            val config = it.configure(authenticated, featureConfigs)
-            if (!authenticated || config?.enabled != true) {
+    @Synchronized fun configureFeatures(
+        state: LicensingState,
+        featureConfigs: TConfigContainer?,
+    ) = when (state) {
+        is LicensingState.Authenticated -> {
+            val iterator = features.iterator()
+            while (iterator.hasNext()) {
+                val it = iterator.next()
+                val config = it.configure(true, featureConfigs)
+                if (config?.enabled != true) {
+                    Log.d(TAG, "Disabling feature ${it.javaClass.simpleName} as it isn't enabled according to license callback.")
+                    it.disable()
+                    iterator.remove()
+                }
+            }
+            // This hook can be used to flush data etc. By this point
+            // all features will already be configured, in case there
+            // is a dependency on each other.
+            features.forEach { it.enabled(state.licenseKey) }
+        }
+
+        LicensingState.Unauthenticated -> {
+            features.forEach {
+                it.configure(false, featureConfigs)
                 Log.d(TAG, "Disabling feature ${it.javaClass.simpleName} as it isn't enabled according to license callback.")
                 it.disable()
-                iterator.remove()
             }
         }
-        // This hook can be used to flush data etc. By this point
-        // all features will already be configured, in case there
-        // is a dependency on each other.
-        features.forEach { it.enabled() }
     }
 }

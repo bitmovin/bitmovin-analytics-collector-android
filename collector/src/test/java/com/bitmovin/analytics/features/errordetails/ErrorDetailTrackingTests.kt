@@ -47,9 +47,9 @@ class ErrorDetailTrackingTests {
         val support = ObservableSupport<OnErrorDetailEventListener>()
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, null, support)
-        errorDetailTracking.enabled()
+        errorDetailTracking.enabled("licenseKey")
         verify { backend.enabled = true }
-        verify { backend.flush() }
+        verify { backend.flush("licenseKey") }
     }
 
     @Test

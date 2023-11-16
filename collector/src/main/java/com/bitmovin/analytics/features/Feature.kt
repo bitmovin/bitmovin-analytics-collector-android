@@ -7,7 +7,7 @@ abstract class Feature<TConfigContainer, TConfig : FeatureConfig>() {
         private set
 
     open fun configured(authenticated: Boolean, config: TConfig?) {}
-    open fun enabled() {}
+    open fun enabled(licenseKey: String) {}
     open fun disabled() {}
     open fun reset() {}
 

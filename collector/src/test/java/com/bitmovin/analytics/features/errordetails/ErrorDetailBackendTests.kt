@@ -119,7 +119,7 @@ class ErrorDetailBackendTests {
         backend.send(getErrorDetail(0))
         backend.enabled = true
         verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
-        backend.flush()
+        backend.flush("test")
         verify(exactly = 1) { httpClientMock.post(any(), any(), any()) }
     }
 
@@ -128,7 +128,7 @@ class ErrorDetailBackendTests {
         val backend = ErrorDetailBackend(mockk(relaxed = true), mockk(relaxed = true), httpClientMock)
         backend.send(getErrorDetail(0))
         verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
-        backend.flush()
+        backend.flush("test")
         verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
     }
 
