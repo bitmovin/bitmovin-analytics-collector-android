@@ -10,7 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import kotlin.reflect.KClass
 
-private const val DEFERRED_LICENSE_KEY_PLACEHOLDER = ""
+private const val DEFERRED_LICENSE_KEY_PLACEHOLDER = "DEFERRED"
 
 class DeferredLicenseRelayTest {
     @Test

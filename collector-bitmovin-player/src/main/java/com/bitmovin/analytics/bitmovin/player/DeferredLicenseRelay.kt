@@ -11,7 +11,11 @@ import com.bitmovin.player.api.event.on
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-private const val DEFERRED_LICENSE_KEY_PLACEHOLDER = ""
+/**
+ * Providing this license key will defer the loading of the license key until the
+ * [PlayerEvent.LicenseValidated] event is received.
+ */
+private const val DEFERRED_LICENSE_KEY_PLACEHOLDER = "DEFERRED"
 internal class DeferredLicenseRelay(licenseKey: String) {
     private val deferredLoadingEnabled = licenseKey == DEFERRED_LICENSE_KEY_PLACEHOLDER
     private val licenseKeyFlow = MutableStateFlow<LicenseKeyState>(LicenseKeyState.Deferred)
