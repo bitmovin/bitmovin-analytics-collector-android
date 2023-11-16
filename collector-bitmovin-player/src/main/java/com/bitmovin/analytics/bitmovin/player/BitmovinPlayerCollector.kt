@@ -35,6 +35,25 @@ import com.bitmovin.player.api.source.Source
 class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
     DefaultCollector<Player>(analyticsConfig, context.applicationContext),
     IBitmovinPlayerCollector {
+    private val deferredLicenseManager = DeferredLicenseRelay(analyticsConfig.licenseKey)
+
+    override val analytics: BitmovinAnalytics by lazy {
+        BitmovinAnalytics(
+            config = analyticsConfig,
+            context = context,
+            licenseKeyProvider = deferredLicenseManager.licenseKeyProvider,
+        )
+    }
+
+    override fun attachPlayer(player: Player) {
+        deferredLicenseManager.attach(player)
+        super.attachPlayer(player)
+    }
+
+    override fun detachPlayer() {
+        deferredLicenseManager.detach()
+        super.detachPlayer()
+    }
 
     /**
      * Bitmovin Analytics
