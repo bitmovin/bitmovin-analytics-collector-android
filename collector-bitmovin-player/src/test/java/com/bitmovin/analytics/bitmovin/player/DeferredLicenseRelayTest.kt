@@ -107,6 +107,7 @@ class DeferredLicenseRelayTest {
 @Suppress("UNCHECKED_CAST")
 private class TestEventEmitter : EventEmitter<Event> {
     val listeners = mutableListOf<(Event) -> Unit>()
+
     override fun <E : Event> next(eventClass: KClass<E>, action: (E) -> Unit) {
         on(eventClass, action)
     }
