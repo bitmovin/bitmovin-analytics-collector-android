@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
  * [PlayerEvent.LicenseValidated] event is received.
  */
 private const val DEFERRED_LICENSE_KEY_PLACEHOLDER = "DEFERRED"
+
 internal class DeferredLicenseRelay(licenseKey: String) {
     private val deferredLoadingEnabled = licenseKey == DEFERRED_LICENSE_KEY_PLACEHOLDER
     private val licenseKeyFlow = MutableStateFlow<LicenseKeyState>(LicenseKeyState.Deferred)
