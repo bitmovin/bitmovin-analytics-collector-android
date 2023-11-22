@@ -6,6 +6,7 @@ import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
+import com.bitmovin.analytics.license.LicensingState
 import com.bitmovin.analytics.utils.ScopeProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -47,7 +48,7 @@ internal class SimpleEventDataDispatcher(
         val success = when (response) {
             is AuthenticationResponse.Granted -> {
                 callback?.configureFeatures(
-                    true,
+                    LicensingState.Authenticated(response.licenseKey),
                     response.featureConfigContainer,
                 )
                 enabled = true
@@ -56,7 +57,7 @@ internal class SimpleEventDataDispatcher(
             }
 
             is AuthenticationResponse.Denied, AuthenticationResponse.Error -> {
-                callback?.configureFeatures(false, null)
+                callback?.configureFeatures(LicensingState.Unauthenticated, null)
                 false
             }
         }
