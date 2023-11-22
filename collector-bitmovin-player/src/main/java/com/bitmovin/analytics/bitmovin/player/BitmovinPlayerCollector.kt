@@ -134,8 +134,10 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
     override fun setCustomData(playerSource: Source, customData: CustomData) {
         // we cannot put this logic into the adapter since the adapter is created on attaching
         // and this method might be called earlier
-        val newActiveCustomData =
-            ApiV3Utils.mergeCustomData(customData, metadataProvider.defaultMetadata.customData)
+        val newActiveCustomData = ApiV3Utils.mergeCustomData(
+            customData, 
+            metadataProvider.defaultMetadata.customData
+        )
         val activeCustomDataChanged = analytics.activeCustomData != newActiveCustomData
 
         if (playerSource.isActive && activeCustomDataChanged) {
