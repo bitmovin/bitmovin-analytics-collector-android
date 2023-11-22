@@ -20,6 +20,7 @@ import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.utils.ScopeProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 internal class PersistingAuthenticatedDispatcher(
     private val context: Context,
@@ -30,7 +31,7 @@ internal class PersistingAuthenticatedDispatcher(
     private val eventQueue: AnalyticsEventQueue,
     private val scopeProvider: ScopeProvider,
 ) : IEventDataDispatcher {
-    private lateinit var scope: CoroutineScope
+    private lateinit var mainScope: CoroutineScope
     private lateinit var backend: Backend
     private var operationMode = Unauthenticated
     private var sampleSequenceNumber = 0
@@ -40,8 +41,8 @@ internal class PersistingAuthenticatedDispatcher(
     }
 
     private fun createBackend() {
-        scope = scopeProvider.createMainScope()
-        backend = backendFactory.createBackend(config, context, scope)
+        mainScope = scopeProvider.createMainScope()
+        backend = backendFactory.createBackend(config, context, mainScope)
     }
 
     private val authenticationCallback = AuthenticationCallback { response ->
@@ -81,7 +82,7 @@ internal class PersistingAuthenticatedDispatcher(
     }
 
     override fun disable() {
-        scope.cancel()
+        mainScope.cancel()
         operationMode = Disabled
         sampleSequenceNumber = 0
     }
@@ -94,7 +95,7 @@ internal class PersistingAuthenticatedDispatcher(
             Authenticated -> backend.send(data)
             Unauthenticated -> {
                 eventQueue.push(data)
-                licenseCall.authenticate(authenticationCallback)
+                mainScope.launch { licenseCall.authenticate(authenticationCallback) }
             }
         }
     }
@@ -105,7 +106,7 @@ internal class PersistingAuthenticatedDispatcher(
             Authenticated -> backend.sendAd(data)
             Unauthenticated -> {
                 eventQueue.push(data)
-                licenseCall.authenticate(authenticationCallback)
+                mainScope.launch { licenseCall.authenticate(authenticationCallback) }
             }
         }
     }

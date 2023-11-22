@@ -11,6 +11,7 @@ import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.utils.TestScopeProvider
 import com.bitmovin.analytics.utils.areScopesCancelled
 import io.mockk.clearMocks
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -52,7 +53,7 @@ class SimpleEventDataDispatcherTest {
     @Test
     fun `enabling the dispatcher authenticates against the license`() {
         dispatcher.enable()
-        verify { licenseCall.authenticate(dispatcher) }
+        coVerify { licenseCall.authenticate(dispatcher) }
     }
 
     @Test

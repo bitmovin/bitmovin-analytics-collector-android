@@ -10,7 +10,8 @@ import com.bitmovin.analytics.license.LicensingState
 import com.bitmovin.analytics.utils.ScopeProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
-import java.util.*
+import kotlinx.coroutines.launch
+import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 
 internal class SimpleEventDataDispatcher(
@@ -22,7 +23,7 @@ internal class SimpleEventDataDispatcher(
     private val scopeProvider: ScopeProvider,
 ) : IEventDataDispatcher, AuthenticationCallback {
     private lateinit var backend: Backend
-    private lateinit var scope: CoroutineScope
+    private lateinit var mainScope: CoroutineScope
     private val data: Queue<EventData>
     private val adData: Queue<AdEventData>
     private var enabled = false
@@ -36,8 +37,8 @@ internal class SimpleEventDataDispatcher(
     }
 
     private fun createBackend() {
-        scope = scopeProvider.createMainScope()
-        backend = backendFactory.createBackend(config, context, scope)
+        mainScope = scopeProvider.createMainScope()
+        backend = backendFactory.createBackend(config, context, mainScope)
     }
 
     @Synchronized
@@ -65,13 +66,13 @@ internal class SimpleEventDataDispatcher(
 
     override fun enable() {
         createBackend()
-        licenseCall.authenticate(this)
+        mainScope.launch { licenseCall.authenticate(this@SimpleEventDataDispatcher) }
     }
 
     override fun disable() {
         data.clear()
         adData.clear()
-        scope.cancel()
+        mainScope.cancel()
         enabled = false
         sampleSequenceNumber = 0
     }
