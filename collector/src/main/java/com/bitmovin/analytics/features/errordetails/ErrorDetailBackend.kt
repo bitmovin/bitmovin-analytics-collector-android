@@ -9,7 +9,11 @@ import com.bitmovin.analytics.utils.Util
 import okhttp3.OkHttpClient
 import java.util.LinkedList
 
-class ErrorDetailBackend(config: AnalyticsConfig, context: Context, private val httpClient: HttpClient = HttpClient(context, OkHttpClient())) {
+class ErrorDetailBackend(
+    config: AnalyticsConfig,
+    context: Context,
+    private val httpClient: HttpClient = HttpClient(context, OkHttpClient()),
+) {
     private val backendUrl = Util.joinUrl(config.backendUrl, "/analytics/error")
     private val _queue = LinkedList<ErrorDetail>()
     val queue: List<ErrorDetail> = _queue
@@ -30,13 +34,15 @@ class ErrorDetailBackend(config: AnalyticsConfig, context: Context, private val 
         }
     }
 
-    fun flush() {
+    fun flush(licenseKey: String) {
         // We create a copy of the list to avoid side-effects like ending up in an infinite loop if we always add and remove the same element.
         // This shouldn't happen as Kotlin is call-by-value, so `send` would not modify the original queue.
-        _queue.toList().forEach {
-            send(it)
-            _queue.remove(it)
-        }
+        _queue
+            .toList()
+            .forEach {
+                send(if (it.licenseKey == null) it.copy(licenseKey = licenseKey) else it)
+                _queue.remove(it)
+            }
     }
 
     fun clear() {

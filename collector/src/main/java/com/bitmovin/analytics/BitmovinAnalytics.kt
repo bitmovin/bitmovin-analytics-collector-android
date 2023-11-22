@@ -20,6 +20,7 @@ import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.InstantLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.license.LicenseKeyProvider
+import com.bitmovin.analytics.license.LicensingState
 import com.bitmovin.analytics.persistence.EventQueueConfig
 import com.bitmovin.analytics.persistence.EventQueueFactory
 import com.bitmovin.analytics.persistence.PersistingAuthenticatedDispatcher
@@ -187,10 +188,10 @@ class BitmovinAnalytics(
         get() = eventBus[OnErrorDetailEventListener::class]
 
     override fun configureFeatures(
-        authenticated: Boolean,
+        state: LicensingState,
         featureConfigs: FeatureConfigContainer?,
     ) {
-        featureManager.configureFeatures(authenticated, featureConfigs)
+        featureManager.configureFeatures(state, featureConfigs)
     }
 
     override fun authenticationCompleted(success: Boolean) {

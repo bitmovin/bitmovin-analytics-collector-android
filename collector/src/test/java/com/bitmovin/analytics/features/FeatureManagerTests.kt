@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.features
 
+import com.bitmovin.analytics.license.LicensingState
 import io.mockk.spyk
 import io.mockk.verify
 import io.mockk.verifyOrder
@@ -23,36 +24,40 @@ class FeatureManagerTests {
         val featureManager = FeatureManager<ConfigContainer>()
         featureManager.registerFeature(feature1)
         featureManager.registerFeature(feature2)
-        featureManager.configureFeatures(true, ConfigContainer(FeatureConfig1(true), FeatureConfig2(true)))
+        val licenseKey = "test"
+        featureManager.configureFeatures(
+            LicensingState.Authenticated(licenseKey),
+            ConfigContainer(FeatureConfig1(true), FeatureConfig2(true)),
+        )
         verifyOrder {
             feature1.configured(any(), any())
             feature2.configured(any(), any())
-            feature1.enabled()
-            feature2.enabled()
+            feature1.enabled(licenseKey)
+            feature2.enabled(licenseKey)
         }
     }
 
     @Test
     fun testShouldDisableFeatureIfNotAuthenticated() {
-        testShouldDisableFeature(false, null)
+        testShouldDisableFeature(LicensingState.Unauthenticated, null)
     }
 
     @Test
     fun testShouldDisableFeatureIfConfigIsntProvided() {
-        testShouldDisableFeature(true, ConfigContainer(null, null))
+        testShouldDisableFeature(LicensingState.Authenticated("test"), ConfigContainer(null, null))
     }
 
     @Test
     fun testShouldDisableFeatureIfConfigIsDisabled() {
-        testShouldDisableFeature(true, ConfigContainer(FeatureConfig1(false), null))
+        testShouldDisableFeature(LicensingState.Authenticated("test"), ConfigContainer(FeatureConfig1(false), null))
     }
 
     @Test
     fun testShouldEnableFeatureIfConfigIsPresent() {
-        testShouldEnableFeature(ConfigContainer(FeatureConfig1(true), null))
+        testShouldEnableFeature(LicensingState.Authenticated("test"), ConfigContainer(FeatureConfig1(true), null))
     }
 
-    private fun testShouldDisableFeature(authenticated: Boolean, configContainer: ConfigContainer?) {
+    private fun testShouldDisableFeature(authenticated: LicensingState, configContainer: ConfigContainer?) {
         val feature1 = spyk(object : Feature<ConfigContainer, FeatureConfig1>() {
             override fun extractConfig(featureConfigs: ConfigContainer): FeatureConfig1? = featureConfigs.feature1
         })
@@ -64,20 +69,20 @@ class FeatureManagerTests {
             feature1.configure(any(), any())
             feature1.disabled()
         }
-        verify(exactly = 0) { feature1.enabled() }
+        verify(exactly = 0) { feature1.enabled(any()) }
     }
 
-    private fun testShouldEnableFeature(configContainer: ConfigContainer?) {
+    private fun testShouldEnableFeature(state: LicensingState.Authenticated, configContainer: ConfigContainer?) {
         val feature1 = spyk(object : Feature<ConfigContainer, FeatureConfig1>() {
             override fun extractConfig(featureConfigs: ConfigContainer): FeatureConfig1? = featureConfigs.feature1
         })
 
         val featureManager = FeatureManager<ConfigContainer>()
         featureManager.registerFeature(feature1)
-        featureManager.configureFeatures(true, configContainer)
+        featureManager.configureFeatures(state, configContainer)
         verifyOrder {
             feature1.configured(any(), any())
-            feature1.enabled()
+            feature1.enabled(state.licenseKey)
         }
         verify(exactly = 0) { feature1.disabled() }
     }

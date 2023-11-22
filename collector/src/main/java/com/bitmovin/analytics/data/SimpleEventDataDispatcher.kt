@@ -6,6 +6,7 @@ import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
+import com.bitmovin.analytics.license.LicensingState
 import com.bitmovin.analytics.utils.ScopeProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -46,16 +47,16 @@ internal class SimpleEventDataDispatcher(
         val success = when (response) {
             is AuthenticationResponse.Granted -> {
                 callback?.configureFeatures(
-                    true,
+                    LicensingState.Authenticated(response.licenseKey),
                     response.featureConfigContainer,
                 )
                 enabled = true
-                forwardQueuedEvents()
+                forwardQueuedEvents(response.licenseKey)
                 true
             }
 
             is AuthenticationResponse.Denied, AuthenticationResponse.Error -> {
-                callback?.configureFeatures(false, null)
+                callback?.configureFeatures(LicensingState.Unauthenticated, null)
                 false
             }
         }
@@ -96,17 +97,21 @@ internal class SimpleEventDataDispatcher(
         sampleSequenceNumber = 0
     }
 
-    private fun forwardQueuedEvents() {
+    private fun forwardQueuedEvents(licenseKey: String) {
         val it = data.iterator()
         while (it.hasNext()) {
             val eventData = it.next()
-            backend.send(eventData)
+            backend.send(
+                if (eventData.key == null) eventData.copy(key = licenseKey) else eventData,
+            )
             it.remove()
         }
         val adIt = adData.iterator()
         while (adIt.hasNext()) {
             val eventData = adIt.next()
-            backend.sendAd(eventData)
+            backend.sendAd(
+                if (eventData.key == null) eventData.copy(key = licenseKey) else eventData,
+            )
             adIt.remove()
         }
     }
