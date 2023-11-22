@@ -79,7 +79,11 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         player: Player,
         analytics: BitmovinAnalytics,
     ): PlayerAdapter {
-        val featureFactory: FeatureFactory = BitmovinFeatureFactory(analytics, player)
+        val featureFactory: FeatureFactory = BitmovinFeatureFactory(
+            analytics,
+            player,
+            deferredLicenseManager.licenseKeyProvider,
+        )
         val userAgentProvider = UserAgentProvider(
             Util.getApplicationInfoOrNull(analytics.context),
             Util.getPackageInfoOrNull(analytics.context),
