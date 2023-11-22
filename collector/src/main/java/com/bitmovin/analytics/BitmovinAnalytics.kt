@@ -41,7 +41,7 @@ class BitmovinAnalytics(
     ),
     licenseKeyProvider: LicenseKeyProvider = InstantLicenseKeyProvider(config.licenseKey),
 ) : LicenseCallback {
-    private val licenseCall = DefaultLicenseCall(config, context)
+    private val licenseCall = DefaultLicenseCall(config, licenseKeyProvider, context)
     private val scopeProvider = ScopeProvider.create()
     private val backendFactory = BackendFactory(eventQueue)
     private val eventBus = EventBus()
