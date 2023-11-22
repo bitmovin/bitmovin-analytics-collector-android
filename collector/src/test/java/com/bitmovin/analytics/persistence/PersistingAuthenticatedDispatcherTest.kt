@@ -14,6 +14,7 @@ import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
+import com.bitmovin.analytics.license.LicensingState
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.utils.TestScopeProvider
 import com.bitmovin.analytics.utils.areScopesCancelled
@@ -276,7 +277,10 @@ class PersistingAuthenticatedDispatcherTest {
         )
 
         verifyOrder {
-            outerLicenseCallback.configureFeatures(true, featureConfigContainer)
+            outerLicenseCallback.configureFeatures(
+                LicensingState.Authenticated(TEST_LICENSE_KEY),
+                featureConfigContainer,
+            )
             outerLicenseCallback.authenticationCompleted(true)
         }
     }
@@ -296,7 +300,7 @@ class PersistingAuthenticatedDispatcherTest {
         )
 
         verifyOrder {
-            outerLicenseCallback.configureFeatures(false, null)
+            outerLicenseCallback.configureFeatures(LicensingState.Unauthenticated, null)
             outerLicenseCallback.authenticationCompleted(false)
         }
     }
