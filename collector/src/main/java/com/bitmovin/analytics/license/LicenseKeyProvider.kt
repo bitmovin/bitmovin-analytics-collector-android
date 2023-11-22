@@ -29,7 +29,8 @@ class DeferredLicenseKeyProvider(
 /**
  * A [LicenseKeyProvider] that provides the license key immediately.
  */
-internal class InstantLicenseKeyProvider(key: String) : LicenseKeyProvider {
+@InternalBitmovinApi
+class InstantLicenseKeyProvider(key: String) : LicenseKeyProvider {
     override val licenseKey: StateFlow<LicenseKeyState> = MutableStateFlow(Provided(key))
 }
 

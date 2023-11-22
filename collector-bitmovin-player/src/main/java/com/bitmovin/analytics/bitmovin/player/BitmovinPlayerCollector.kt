@@ -35,6 +35,25 @@ import com.bitmovin.player.api.source.Source
 class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
     DefaultCollector<Player>(analyticsConfig, context.applicationContext),
     IBitmovinPlayerCollector {
+    private val deferredLicenseManager = DeferredLicenseRelay(analyticsConfig.licenseKey)
+
+    override val analytics: BitmovinAnalytics by lazy {
+        BitmovinAnalytics(
+            config = analyticsConfig,
+            context = context,
+            licenseKeyProvider = deferredLicenseManager.licenseKeyProvider,
+        )
+    }
+
+    override fun attachPlayer(player: Player) {
+        deferredLicenseManager.attach(player)
+        super.attachPlayer(player)
+    }
+
+    override fun detachPlayer() {
+        deferredLicenseManager.detach()
+        super.detachPlayer()
+    }
 
     /**
      * Bitmovin Analytics
@@ -60,13 +79,23 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         player: Player,
         analytics: BitmovinAnalytics,
     ): PlayerAdapter {
-        val featureFactory: FeatureFactory = BitmovinFeatureFactory(analytics, player)
+        val licenseKeyProvider = deferredLicenseManager.licenseKeyProvider
+        val featureFactory: FeatureFactory = BitmovinFeatureFactory(
+            analytics,
+            player,
+            licenseKeyProvider,
+        )
         val userAgentProvider = UserAgentProvider(
             Util.getApplicationInfoOrNull(analytics.context),
             Util.getPackageInfoOrNull(analytics.context),
             SystemInformationProvider.getProperty("http.agent"),
         )
-        val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
+        val eventDataFactory = EventDataFactory(
+            config,
+            userIdProvider,
+            userAgentProvider,
+            licenseKeyProvider,
+        )
         val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         val playerLicenseProvider = PlayerLicenseProvider(analytics.context)
         val playerContext = BitmovinPlayerContext(player)
@@ -105,7 +134,10 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
     override fun setCustomData(playerSource: Source, customData: CustomData) {
         // we cannot put this logic into the adapter since the adapter is created on attaching
         // and this method might be called earlier
-        val newActiveCustomData = ApiV3Utils.mergeCustomData(customData, metadataProvider.defaultMetadata.customData)
+        val newActiveCustomData = ApiV3Utils.mergeCustomData(
+            customData,
+            metadataProvider.defaultMetadata.customData,
+        )
         val activeCustomDataChanged = analytics.activeCustomData != newActiveCustomData
 
         if (playerSource.isActive && activeCustomDataChanged) {
@@ -114,9 +146,15 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
 
         val sourceMetadata = metadataProvider.getSourceMetadata(playerSource)
         if (sourceMetadata != null) {
-            metadataProvider.setSourceMetadata(playerSource, sourceMetadata.copy(customData = customData))
+            metadataProvider.setSourceMetadata(
+                playerSource,
+                sourceMetadata.copy(customData = customData),
+            )
         } else {
-            metadataProvider.setSourceMetadata(playerSource, SourceMetadata(customData = customData))
+            metadataProvider.setSourceMetadata(
+                playerSource,
+                SourceMetadata(customData = customData),
+            )
         }
     }
 
