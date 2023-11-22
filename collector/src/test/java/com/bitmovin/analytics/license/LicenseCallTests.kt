@@ -20,8 +20,8 @@ import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
-private const val TEST_LICENSE_KEY = "testLicenseKey"
 
+private const val TEST_LICENSE_KEY = "test-license-key"
 class LicenseCallTests {
     @Before
     fun setup() {
@@ -56,37 +56,37 @@ class LicenseCallTests {
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithoutFeatures() = runTest {
-        verifyLicenseResponse(getGrantedResponseBody(""), AuthenticationResponse.Granted(null))
+        verifyLicenseResponse(getGrantedResponseBody(""), AuthenticationResponse.Granted(TEST_LICENSE_KEY, null))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithNullFeatures() = runTest {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": null"), AuthenticationResponse.Granted(null))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": null"), AuthenticationResponse.Granted(TEST_LICENSE_KEY, null))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEmptyFeatures() = runTest {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": {}"), AuthenticationResponse.Granted(FeatureConfigContainer(null)))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": {}"), AuthenticationResponse.Granted(TEST_LICENSE_KEY, FeatureConfigContainer(null)))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithErrorTracking() = runTest {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {} }"), AuthenticationResponse.Granted(FeatureConfigContainer(ErrorDetailTrackingConfig(false))))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {} }"), AuthenticationResponse.Granted(TEST_LICENSE_KEY, FeatureConfigContainer(ErrorDetailTrackingConfig(false))))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithDisabledErrorTracking() = runTest {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": false} }"), AuthenticationResponse.Granted(FeatureConfigContainer(ErrorDetailTrackingConfig(false))))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": false} }"), AuthenticationResponse.Granted(TEST_LICENSE_KEY, FeatureConfigContainer(ErrorDetailTrackingConfig(false))))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEnabledErrorTracking() = runTest {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfHttpRequests\": 12} }"), AuthenticationResponse.Granted(FeatureConfigContainer(ErrorDetailTrackingConfig(true, 12))))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfHttpRequests\": 12} }"), AuthenticationResponse.Granted(TEST_LICENSE_KEY, FeatureConfigContainer(ErrorDetailTrackingConfig(true, 12))))
     }
 
     @Test
     fun testLicenseResponseShouldSuccessfullyBeParsedWithEnabledErrorTrackingAndTypo() = runTest {
-        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfSeeegments\": 12} }"), AuthenticationResponse.Granted(FeatureConfigContainer(ErrorDetailTrackingConfig(true))))
+        verifyLicenseResponse(getGrantedResponseBody(", \"features\": { \"errorDetails\": {\"enabled\": true, \"numberOfSeeegments\": 12} }"), AuthenticationResponse.Granted(TEST_LICENSE_KEY, FeatureConfigContainer(ErrorDetailTrackingConfig(true))))
     }
 
     @Test
@@ -141,7 +141,7 @@ class LicenseCallTests {
     fun testLicenseResponseShouldSucceedIfDeferredLicenseIsProvidedInTime() = runTest {
         verifyDeferredLicenseKey(
             LicenseKeyState.Provided("key"),
-            AuthenticationResponse.Granted(null),
+            AuthenticationResponse.Granted("key", null),
         )
     }
 

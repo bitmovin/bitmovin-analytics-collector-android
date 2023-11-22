@@ -101,7 +101,7 @@ private class LicenseRequestCallback(
             return
         }
         Log.d(TAG, "License response was granted")
-        callback.authenticationCompleted(Granted(licenseResponse.features))
+        callback.authenticationCompleted(Granted(licenseKey, licenseResponse.features))
     }
 }
 

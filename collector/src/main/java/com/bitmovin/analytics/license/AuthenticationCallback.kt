@@ -6,6 +6,7 @@ fun interface AuthenticationCallback {
 
 sealed class AuthenticationResponse {
     data class Granted(
+        val licenseKey: String,
         val featureConfigContainer: FeatureConfigContainer?,
     ) : AuthenticationResponse()
 

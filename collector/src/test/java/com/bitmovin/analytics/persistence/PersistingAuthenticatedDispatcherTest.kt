@@ -107,7 +107,7 @@ class PersistingAuthenticatedDispatcherTest {
     @Test
     fun `adding an EventData when the dispatcher is authenticated it delegates the event to the backend`() {
         triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(null),
+            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
         )
 
         val eventData = createEventData()
@@ -119,7 +119,7 @@ class PersistingAuthenticatedDispatcherTest {
     @Test
     fun `adding an AdEventData when the dispatcher is authenticated it delegates the event to the backend`() {
         triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(null),
+            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
         )
 
         val adEventData = createAdEventData()
@@ -131,7 +131,7 @@ class PersistingAuthenticatedDispatcherTest {
     @Test
     fun `adding multiple EventData when the dispatcher is authenticated it increments the sequence number`() {
         triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(null),
+            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
         )
         persistingAuthenticatedDispatcher.resetSourceRelatedState()
         val eventData = listOf(
@@ -153,7 +153,7 @@ class PersistingAuthenticatedDispatcherTest {
     @Test
     fun `resetting source related state resets the sequence number for events`() {
         triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(null),
+            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
         )
         persistingAuthenticatedDispatcher.resetSourceRelatedState()
         val eventDataOfFirstSource = listOf(
@@ -217,7 +217,7 @@ class PersistingAuthenticatedDispatcherTest {
     @Test
     fun `disabling the dispatcher resets the sequence number for events`() {
         triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(null),
+            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
         )
         persistingAuthenticatedDispatcher.resetSourceRelatedState()
         val eventDataOfFirstSource = listOf(
@@ -236,7 +236,7 @@ class PersistingAuthenticatedDispatcherTest {
         eventDataOfFirstSource.forEach { persistingAuthenticatedDispatcher.add(it) }
         persistingAuthenticatedDispatcher.disable()
         triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(null),
+            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
         )
         eventDataOfSecondSource.forEach { persistingAuthenticatedDispatcher.add(it) }
 
@@ -273,7 +273,7 @@ class PersistingAuthenticatedDispatcherTest {
         val featureConfigContainer = FeatureConfigContainer(null)
 
         triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(featureConfigContainer),
+            AuthenticationResponse.Granted(TEST_LICENSE_KEY, featureConfigContainer),
         )
 
         verifyOrder {
@@ -284,7 +284,7 @@ class PersistingAuthenticatedDispatcherTest {
 
     @Test
     fun `receiving a granting licensing response starts flushing the cache`() {
-        triggerAuthenticationCallback(AuthenticationResponse.Granted(null))
+        triggerAuthenticationCallback(AuthenticationResponse.Granted(TEST_LICENSE_KEY, null))
 
         assertThat(backend).isInstanceOf(CacheConsumingBackend::class.java)
         verify(exactly = 1) { (backend as CacheConsumingBackend).startCacheFlushing() }

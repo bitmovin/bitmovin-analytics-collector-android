@@ -5,6 +5,9 @@ import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
+import com.bitmovin.analytics.license.InstantLicenseKeyProvider
+import com.bitmovin.analytics.license.LicenseKeyProvider
+import com.bitmovin.analytics.license.licenseKeyOrNull
 import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.UserAgentProvider
 
@@ -12,6 +15,7 @@ class EventDataFactory(
     private val config: AnalyticsConfig,
     private val userIdProvider: UserIdProvider,
     private val userAgentProvider: UserAgentProvider,
+    private val licenseKeyProvider: LicenseKeyProvider = InstantLicenseKeyProvider(config.licenseKey),
 ) : EventDataManipulatorPipeline {
     private val eventDataManipulators = mutableListOf<EventDataManipulator>()
 
@@ -25,7 +29,7 @@ class EventDataFactory(
             mergedCustomData,
             impressionId,
             userIdProvider.userId(),
-            config.licenseKey,
+            licenseKeyProvider.licenseKeyOrNull,
             sourceMetadata.videoId,
             sourceMetadata.title,
             defaultMetadata.customUserId,
