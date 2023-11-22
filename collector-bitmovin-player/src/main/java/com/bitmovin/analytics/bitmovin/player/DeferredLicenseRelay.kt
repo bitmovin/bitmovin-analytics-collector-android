@@ -27,12 +27,12 @@ internal class DeferredLicenseRelay(licenseKey: String) {
         InstantLicenseKeyProvider(licenseKey)
     }
 
-    private var unsubscribe: (() -> Unit)? = null
+    private var eventEmitter: EventEmitter<Event>? = null
 
     fun attach(eventEmitter: EventEmitter<Event>) {
         if (!deferredLoadingEnabled) return
+        this.eventEmitter = eventEmitter
         eventEmitter.on(::onPlayerLicenseValidated)
-        unsubscribe = { eventEmitter.off(::onPlayerLicenseValidated) }
     }
 
     fun detach() {
@@ -52,7 +52,7 @@ internal class DeferredLicenseRelay(licenseKey: String) {
     }
 
     private fun detachInternally() {
-        unsubscribe?.invoke()
-        unsubscribe = null
+        eventEmitter?.off(::onPlayerLicenseValidated)
+        eventEmitter = null
     }
 }
