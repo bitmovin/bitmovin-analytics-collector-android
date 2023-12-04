@@ -6,8 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- IVS Player: Added tracking of source path for ivs player version >= 1.23.0
+
 ### Changed
-- Upgrade example apps to latest bitmovin player (v3.49.0)
+- Upgraded to latest bitmovin player (v3.52.0)
+- Upgraded to latest amazon ivs player (1.23.0)
 
 ## v3.1.0
 

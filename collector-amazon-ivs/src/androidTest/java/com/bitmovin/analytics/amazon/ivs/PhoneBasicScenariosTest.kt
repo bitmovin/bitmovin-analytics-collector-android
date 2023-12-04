@@ -90,6 +90,7 @@ class PhoneBasicScenariosTest {
 
         DataVerifier.verifyStaticData(eventDataList, sourceMetadata, liveStreamSample, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyInvariants(eventDataList)
+        DataVerifier.verifyM3u8SourceUrl(eventDataList, liveStreamSample.m3u8Url!!)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)
 
@@ -171,6 +172,8 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyPlayerSetting(secondImpressionSamples, PlayerSettings(true))
         DataVerifier.verifyInvariants(firstImpressionSamples)
         DataVerifier.verifyInvariants(secondImpressionSamples)
+        DataVerifier.verifyM3u8SourceUrl(firstImpressionSamples, liveStreamSample1.m3u8Url!!)
+        DataVerifier.verifyM3u8SourceUrl(secondImpressionSamples, liveStreamSample2.m3u8Url!!)
 
         EventDataUtils.filterNonDeterministicEvents(firstImpressionSamples)
         EventDataUtils.filterNonDeterministicEvents(secondImpressionSamples)
@@ -233,6 +236,7 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyStaticData(eventDataList, sourceMetadata, vodStreamSample, IvsPlayerConstants.playerInfo)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+        DataVerifier.verifyM3u8SourceUrl(eventDataList, vodStreamSample.m3u8Url!!)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)
 
@@ -282,6 +286,7 @@ class PhoneBasicScenariosTest {
 
         val eventDataList = impression.eventDataList
         DataVerifier.verifyStaticData(eventDataList, sourceMetadata, vodStreamSample, IvsPlayerConstants.playerInfo)
+        DataVerifier.verifyM3u8SourceUrl(eventDataList, vodStreamSample.m3u8Url!!)
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
         DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
         DataVerifier.verifyInvariants(eventDataList)
@@ -326,6 +331,7 @@ class PhoneBasicScenariosTest {
 
         DataVerifier.verifyStartupSampleOnError(eventData, IvsPlayerConstants.playerInfo)
         DataVerifier.verifySourceMetadata(eventData, nonExistingStreamSourceMetadata)
+        DataVerifier.verifyM3u8SourceUrl(impression.eventDataList, nonExistingStreamSample.uri.toString())
 
         assertThat(impression.errorDetailList).hasSize(1)
         val errorDetail = impression.errorDetailList.first()
