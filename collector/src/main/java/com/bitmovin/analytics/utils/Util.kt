@@ -30,6 +30,7 @@ object Util {
         VIDEO_FORMAT_MIME_TYPE_MAP["avc"] = "video/avc"
         VIDEO_FORMAT_MIME_TYPE_MAP["hevc"] = "video/hevc"
         VIDEO_FORMAT_MIME_TYPE_MAP["vp9"] = "video/x-vnd.on2.vp9"
+        VIDEO_FORMAT_MIME_TYPE_MAP["av1"] = "video/av01"
     }
 
     val uUID: String
@@ -59,13 +60,14 @@ object Util {
             return codecs
         }
 
-    fun isMimeTypeSupported(mimeType: String?): Boolean {
+    private fun isMimeTypeSupported(mimeType: String?): Boolean {
         val numCodecs = MediaCodecList.getCodecCount()
         for (i in 0 until numCodecs) {
             val codecInfo = MediaCodecList.getCodecInfoAt(i)
             if (codecInfo.isEncoder) {
                 continue
             }
+
             val types = codecInfo.supportedTypes
             for (type in types) {
                 if (type.equals(mimeType, ignoreCase = true)) {

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - IVS Player: Added tracking of source path for ivs player version >= 1.23.0
+- All Players: Added tracking of AV1 support on device.
 
 ### Changed
 - Upgraded to latest bitmovin player (v3.52.0)

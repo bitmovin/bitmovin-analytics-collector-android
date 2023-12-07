@@ -264,7 +264,9 @@ object DataVerifier {
     fun verifyStartupSample(eventData: EventData, isFirstImpression: Boolean = true, expectedSequenceNumber: Int = 0) {
         assertThat(eventData.state).isEqualTo(STARTUP)
         assertThat(eventData.startupTime).isGreaterThan(0)
-        assertThat(eventData.supportedVideoCodecs).isNotNull
+
+        // tests are using API level 30 (thus we can assume that all of the codecs below need to be supported)
+        assertThat(eventData.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
 
         // if user watches several different videos there are several impressions but only the first one has playerStartupTime !=0
         if (isFirstImpression) {
