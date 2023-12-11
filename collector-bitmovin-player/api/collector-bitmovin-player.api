@@ -2,7 +2,10 @@ public final class com/bitmovin/analytics/bitmovin/player/BitmovinPlayerCollecto
 	public fun <init> (Lcom/bitmovin/analytics/BitmovinAnalyticsConfig;Landroid/content/Context;)V
 	public fun <init> (Lcom/bitmovin/analytics/api/AnalyticsConfig;Landroid/content/Context;)V
 	public fun addSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/SourceMetadata;)V
+	public fun attachPlayer (Lcom/bitmovin/player/api/Player;)V
+	public synthetic fun attachPlayer (Ljava/lang/Object;)V
 	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
+	public fun detachPlayer ()V
 	public fun getCustomData (Lcom/bitmovin/player/api/source/Source;)Lcom/bitmovin/analytics/api/CustomData;
 	public fun getSourceMetadata (Lcom/bitmovin/player/api/source/Source;)Lcom/bitmovin/analytics/api/SourceMetadata;
 	public fun setCustomData (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/CustomData;)V
