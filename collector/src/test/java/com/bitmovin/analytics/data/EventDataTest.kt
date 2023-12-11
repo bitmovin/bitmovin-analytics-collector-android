@@ -7,6 +7,7 @@ import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.utils.DataSerializer
+import com.bitmovin.analytics.utils.Util
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.Before
@@ -330,7 +331,8 @@ class EventDataTest {
                     "\"cdnProvider\":\"cdnProvider\",\"userAgent\":\"userAgent\"," +
                     "\"deviceInformation\":{\"manufacturer\":\"manufacturer\"," +
                     "\"model\":\"model\",\"isTV\":false},\"language\":\"locale\"," +
-                    "\"analyticsVersion\":\"0.0.0-local\",\"playerTech\":\"Android:Exoplayer\"," +
+                    "\"analyticsVersion\":\"" + Util.analyticsVersion + "\"," +
+                    "\"playerTech\":\"Android:Exoplayer\"," +
                     "\"domain\":\"packageName\",\"screenHeight\":2400,\"screenWidth\":1080," +
                     "\"isLive\":false,\"isCasting\":false,\"castTech\":\"castTech\"," +
                     "\"videoDuration\":2,\"time\":1234567890,\"videoWindowWidth\":3," +
