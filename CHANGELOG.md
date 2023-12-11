@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.2.0
+
 ### Added
 - IVS Player: Added tracking of source path for ivs player version >= 1.23.0
 - All Players: Added tracking of AV1 support on device.
