@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - All Players: Added tracking of AV1 support on device.
 
 ### Changed
-- Upgraded to latest bitmovin player (v3.52.0)
+- Upgraded to latest bitmovin player (v3.53.0)
 - Upgraded to latest amazon ivs player (1.23.0)
 
 ## v3.1.0
