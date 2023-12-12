@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace 'com.bitmovin.analytics.media3.exoplayer.example'
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
         applicationId "com.bitmovin.analytics.media3.exoplayer.example"

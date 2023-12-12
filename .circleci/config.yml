@@ -2,8 +2,9 @@ version: 2
 jobs:
   build:
     working_directory: ~/code
+    resource_class: large
     docker:
-      - image: cimg/android:2023.02.1
+      - image: cimg/android:2023.12.1
     environment:
       # https://support.circleci.com/hc/en-us/articles/360021812453-Common-Android-memory-issues
       _JAVA_OPTIONS: -Xmx3g

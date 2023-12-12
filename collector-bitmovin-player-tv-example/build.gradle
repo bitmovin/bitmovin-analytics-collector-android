@@ -20,6 +20,11 @@ android {
         viewBinding true
     }
 
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibility
+        targetCompatibility rootProject.ext.targetCompatibility
+    }
+
     buildTypes {
         release {
             minifyEnabled false

@@ -6,7 +6,7 @@ plugins {
 android {
     namespace "com.bitmovin.analytics.systemtest.utils"
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion

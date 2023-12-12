@@ -6,7 +6,7 @@ apply from: '../bitmovinpropertiesloader.gradle'
 
 android {
     namespace "com.bitmovin.analytics.exoplayer"
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -75,7 +75,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 
     testImplementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
-    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoInlineVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"

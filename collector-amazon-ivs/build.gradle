@@ -6,7 +6,7 @@ apply from: '../bitmovinpropertiesloader.gradle'
 
 android {
     namespace 'com.bitmovin.analytics.amazon.ivs'
-    compileSdk rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
         minSdkVersion rootProject.ext.amazonIvsMinSdkVersion
@@ -22,8 +22,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility rootProject.ext.sourceCompatibility
+        targetCompatibility rootProject.ext.targetCompatibility
     }
     kotlinOptions {
         jvmTarget = rootProject.ext.jvmTarget

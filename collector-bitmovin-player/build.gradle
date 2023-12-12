@@ -8,7 +8,7 @@ apply from: '../bitmovinpropertiesloader.gradle'
 
 android {
     namespace "com.bitmovin.analytics.bitmovin.player"
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -80,7 +80,7 @@ dependencies {
     testImplementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoInlineVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 
     androidTestImplementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
@@ -88,7 +88,7 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
-    androidTestImplementation "androidx.work:work-runtime-ktx:2.7.1"
+    androidTestImplementation "androidx.work:work-runtime-ktx:${rootProject.ext.workRuntimeKtxVersion}"
 
     // dependencies for ads systemtests
     androidTestImplementation "com.google.ads.interactivemedia.v3:interactivemedia:${rootProject.ext.imaSdkVersion}"

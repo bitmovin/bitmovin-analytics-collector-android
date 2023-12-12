@@ -10,12 +10,12 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath "com.diffplug.spotless:spotless-plugin-gradle:6.21.0"
+        classpath 'com.android.tools.build:gradle:8.2.0'
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:6.23.3"
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.33.1"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
-        classpath 'org.jacoco:org.jacoco.core:0.8.8'
+        classpath 'org.jacoco:org.jacoco.core:0.8.11'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -68,7 +68,7 @@ allprojects {
         }
         java {
             // apply a specific flavor of google-java-format
-            googleJavaFormat('1.8').aosp().reflowLongStrings()
+            googleJavaFormat('1.10.0').aosp().reflowLongStrings()
             // fix formatting of type annotations
             formatAnnotations()
         }
@@ -87,42 +87,42 @@ ext {
 
     version = System.getProperty("version", "0.0.0") + (developLocal ? '-local' : '')
 
-    compileSdkVersion = 33
+    compileSdk = 34
     minSdkVersion = 21
     amazonIvsMinSdkVersion = 21
-    targetSdkVersion = 33
+    targetSdkVersion = 34
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    jvmTarget = JavaVersion.VERSION_1_8.toString()
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    jvmTarget = JavaVersion.VERSION_17.toString()
 
     // player versions
     bitmovinPlayerVersion = '3.53.0'
     exoplayerVersion = '2.19.1'
     amazonIvsPlayerVersion = '1.23.0'
-    media3PlayerVersion = '1.1.1'
+    media3PlayerVersion = '1.2.0'
 
     // collector dependencies
-    gsonVersion = '2.8.9'
-    okhttp3Version = '4.10.0'
+    gsonVersion = '2.10.1'
+    okhttp3Version = '4.12.0'
     appCompatVersion = '1.6.1' // required for bitmovin player and @Keep annotation in core collector to avoid proguard issues
-    coroutinesVersion = "1.6.1"
+    coroutinesVersion = "1.7.3"
 
     // example apps dependencies
     playServicesAdsVersion = '19.8.0'
-    imaSdkVersion = '3.28.2'
+    imaSdkVersion = '3.31.0'
     constraintlayoutVersion = '2.1.4'
     multidexVersion = '2.0.1'
-    workRuntimeKtxVersion = '2.8.1'
+    workRuntimeKtxVersion = '2.9.0'
 
     // test dependencies
     testRunnerVersion = '1.5.2'
-    mockitoCoreVersion = '5.1.1'
+    mockitoInlineVersion = '5.2.0'
     junitVersion = '4.13.2'
     junitXVersion = '1.1.5'
-    mockkVersion = '1.13.4'
+    mockkVersion = '1.13.8'
     assertjCoreVersion = '3.24.2'
-    robolectricVersion = '4.9'
+    robolectricVersion = '4.11.1'
     testCoreXVersion = '1.5.0'
 }
 

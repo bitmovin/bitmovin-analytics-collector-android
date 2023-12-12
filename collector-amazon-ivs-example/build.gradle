@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdk rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdk
     namespace "com.bitmovin.analytics.amazonivs.example"
 
     defaultConfig {
@@ -16,6 +16,11 @@ android {
 
     buildFeatures{
         viewBinding = true
+    }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibility
+        targetCompatibility rootProject.ext.targetCompatibility
     }
 
     buildTypes {

@@ -11,7 +11,7 @@ apply from: '../bitmovinpropertiesloader.gradle'
 
 android {
     namespace "com.bitmovin.analytics"
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -29,7 +29,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = rootProject.ext.targetCompatibility
+        jvmTarget = rootProject.ext.jvmTarget
         freeCompilerArgs += "-opt-in=com.bitmovin.analytics.internal.InternalBitmovinApi"
     }
 
@@ -81,7 +81,7 @@ dependencies {
 
 
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoInlineVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
     testImplementation "org.robolectric:robolectric:${rootProject.ext.robolectricVersion}"
