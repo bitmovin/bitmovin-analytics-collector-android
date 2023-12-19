@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
-## v3.3.0-rc.1
+## v3.3.0 AND v3.3.0-rc.1
 
 ### Changed
 - Upgraded to Kotlin 1.9.21
