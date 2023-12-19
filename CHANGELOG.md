@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
-- Upgraded to gradle 8.2
-- Upgraded collector dependencies (okhttp3 to 4.12.0, gson to 2.10.1, kotlinx-coroutines-core to 1.7.3)
+- Upgraded to Kotlin 1.9.21
 - Upgraded compileSdk and targetSdkVersion to 34
-- [Internal] Upgraded test dependencies to latest (mockk to 1.13.8, robolectric to 4.11.1, mockito-inline to 5.2.0,
+- Upgraded collector dependencies (okhttp3 to 4.12.0, gson to 2.10.1, kotlinx-coroutines-core to 1.7.3)
+- Upgraded to latest bitmovin player (v3.54.0)
+- [Internal] Upgraded to gradle 8.2
+- [Internal] Upgraded test dependencies to latest (mockk to 1.13.7, robolectric to 4.11.1, mockito-inline to 5.2.0,
   ima to 3.31.0, work-runtime-ktx to 2.9.0)
 - [Internal] Upgraded build tools (spotless, jacoco)
 

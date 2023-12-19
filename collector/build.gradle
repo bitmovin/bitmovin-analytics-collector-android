@@ -22,7 +22,6 @@ android {
         multiDexEnabled true
     }
 
-
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibility
         targetCompatibility rootProject.ext.targetCompatibility

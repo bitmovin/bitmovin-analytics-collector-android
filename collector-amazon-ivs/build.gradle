@@ -21,10 +21,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibility
         targetCompatibility rootProject.ext.targetCompatibility
     }
+
     kotlinOptions {
         jvmTarget = rootProject.ext.jvmTarget
         freeCompilerArgs += "-opt-in=com.bitmovin.analytics.internal.InternalBitmovinApi"

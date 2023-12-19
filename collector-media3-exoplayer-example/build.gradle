@@ -16,14 +16,17 @@ android {
         multiDexEnabled true
     }
 
+    buildFeatures{
+        viewBinding = true
+    }
 
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibility
         targetCompatibility rootProject.ext.targetCompatibility
     }
 
-    buildFeatures{
-        viewBinding = true
+    kotlinOptions {
+        jvmTarget = rootProject.ext.exampleAppJvmTarget
     }
 
     buildTypes {

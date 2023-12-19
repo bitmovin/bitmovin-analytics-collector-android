@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace "com.bitmovin.analytics.bitmovinplayer.tv.example"
-    compileSdk 33
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
         applicationId "com.example.collector.bitmovin.player.tv.example"
-        minSdk 23
-        targetSdk 33
+        minSdk rootProject.ext.minSdkVersion
+        targetSdk rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -23,6 +23,10 @@ android {
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibility
         targetCompatibility rootProject.ext.targetCompatibility
+    }
+
+    kotlinOptions {
+        jvmTarget = rootProject.ext.exampleAppJvmTarget
     }
 
     buildTypes {

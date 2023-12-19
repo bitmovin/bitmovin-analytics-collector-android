@@ -16,12 +16,6 @@ android {
         multiDexEnabled true
     }
 
-
-    compileOptions {
-        sourceCompatibility rootProject.ext.sourceCompatibility
-        targetCompatibility rootProject.ext.targetCompatibility
-    }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -29,9 +23,19 @@ android {
         }
     }
 
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
     }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibility
+        targetCompatibility rootProject.ext.targetCompatibility
+    }
+
+    kotlinOptions {
+        jvmTarget = rootProject.ext.exampleAppJvmTarget
+    }
+
     lint {
         abortOnError false
     }
