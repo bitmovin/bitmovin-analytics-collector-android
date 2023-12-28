@@ -31,7 +31,6 @@ internal class AnalyticsEventListener(
     private val playbackInfoProvider: PlaybackInfoProvider,
     private val drmInfoProvider: DrmInfoProvider,
 ) : AnalyticsListener {
-
     private val position get() = exoPlayerContext.position
 
     override fun onPlayWhenReadyChanged(
@@ -94,28 +93,30 @@ internal class AnalyticsEventListener(
                         } else if (stateMachine.currentState !== PlayerStates.STARTUP && stateMachine.currentState !== PlayerStates.READY) {
                             stateMachine.transitionState(PlayerStates.READY, position)
                         }
+                    } else if (stateMachine.currentState == PlayerStates.SEEKING && !exoPlayerContext.isPlaying()) {
+                        stateMachine.transitionState(PlayerStates.PAUSE, exoPlayerContext.position)
                     }
-
-                Player.STATE_BUFFERING -> if (!stateMachine.isStartupFinished) {
-                    // this is the case when there is no preloading
-                    // player is now starting to get content before playing it
-                    if (exoPlayerContext.playWhenReady) {
-                        startup(videoTime)
-                    } else {
-                        // this is the case when preloading of content is setup
-                        // so at this point player is getting content and will start
-                        // playing
-                        // once user preses play
-                        playbackInfoProvider.isInInitialBufferState = true
+                Player.STATE_BUFFERING ->
+                    if (!stateMachine.isStartupFinished) {
+                        // this is the case when there is no preloading
+                        // player is now starting to get content before playing it
+                        if (exoPlayerContext.playWhenReady) {
+                            startup(videoTime)
+                        } else {
+                            // this is the case when preloading of content is setup
+                            // so at this point player is getting content and will start
+                            // playing
+                            // once user preses play
+                            playbackInfoProvider.isInInitialBufferState = true
+                        }
+                    } else if (playbackInfoProvider.isPlaying &&
+                        stateMachine.currentState !== PlayerStates.SEEKING
+                    ) {
+                        stateMachine.transitionState(
+                            PlayerStates.BUFFERING,
+                            videoTime,
+                        )
                     }
-                } else if (playbackInfoProvider.isPlaying &&
-                    stateMachine.currentState !== PlayerStates.SEEKING
-                ) {
-                    stateMachine.transitionState(
-                        PlayerStates.BUFFERING,
-                        videoTime,
-                    )
-                }
                 Player.STATE_IDLE -> {
                 }
                 Player.STATE_ENDED -> {
@@ -145,7 +146,10 @@ internal class AnalyticsEventListener(
         try {
             if (mediaLoadData.dataType == C.DATA_TYPE_MANIFEST) {
                 playbackInfoProvider.manifestUrl = loadEventInfo.dataSpec?.uri?.toString()
-            } else if (mediaLoadData.dataType == C.DATA_TYPE_MEDIA && mediaLoadData.trackFormat?.drmInitData != null && drmInfoProvider.drmType == null) {
+            } else if (mediaLoadData.dataType == C.DATA_TYPE_MEDIA &&
+                mediaLoadData.trackFormat?.drmInitData != null &&
+                drmInfoProvider.drmType == null
+            ) {
                 this.drmInfoProvider.evaluateDrmType(mediaLoadData)
             }
             if (mediaLoadData.trackFormat?.containerMimeType?.startsWith("video") == true) {
@@ -208,7 +212,10 @@ internal class AnalyticsEventListener(
         playbackInfoProvider.playerIsReady = true
     }
 
-    override fun onDrmSessionAcquired(eventTime: AnalyticsListener.EventTime, state: Int) {
+    override fun onDrmSessionAcquired(
+        eventTime: AnalyticsListener.EventTime,
+        state: Int,
+    ) {
         try {
             drmInfoProvider.drmLoadStartedAt(eventTime.realtimeMs)
             Log.d(TAG, String.format("DRM Session aquired %d", eventTime.realtimeMs))

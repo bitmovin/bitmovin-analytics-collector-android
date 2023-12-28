@@ -51,13 +51,14 @@ class BundledAnalyticsTest {
     private lateinit var defaultPlayer: Player
 
     private val defaultSample = TestSources.HLS_REDBULL
-    private val defaultSourceMetadata = SourceMetadata(
-        title = "hls_redbull",
-        videoId = "hls_redbull_id",
-        path = "hls_redbull_path",
-        customData = TestConfig.createDummyCustomData(),
-        cdnProvider = "cdn_provider",
-    )
+    private val defaultSourceMetadata =
+        SourceMetadata(
+            title = "hls_redbull",
+            videoId = "hls_redbull_id",
+            path = "hls_redbull_path",
+            customData = TestConfig.createDummyCustomData(),
+            cdnProvider = "cdn_provider",
+        )
     private val defaultSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), defaultSourceMetadata)
     private val defaultPlayerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
 
@@ -147,13 +148,14 @@ class BundledAnalyticsTest {
         val sample = TestSources.DRM_DASH_WIDEVINE
         val drmSourceConfig = SourceConfig.fromUrl(sample.mpdUrl!!)
         drmSourceConfig.drmConfig = WidevineConfig(sample.drmLicenseUrl!!)
-        val drmSourceMetadata = SourceMetadata(
-            title = "drm_dash_widevine",
-            videoId = "drm_dash_widevine_id",
-            path = "drm_dash_widevine_path",
-            customData = TestConfig.createDummyCustomData(),
-            cdnProvider = "cdn_provider",
-        )
+        val drmSourceMetadata =
+            SourceMetadata(
+                title = "drm_dash_widevine",
+                videoId = "drm_dash_widevine_id",
+                path = "drm_dash_widevine_path",
+                customData = TestConfig.createDummyCustomData(),
+                cdnProvider = "cdn_provider",
+            )
         val drmSource = Source.create(drmSourceConfig, drmSourceMetadata)
 
         defaultPlayer.config.playbackConfig.isAutoplayEnabled = true
@@ -276,7 +278,13 @@ class BundledAnalyticsTest {
 
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
         val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
-        val liveSourceMetadata = SourceMetadata(title = "liveSourceTitle", videoId = "liveSourceVideoId", customData = TestConfig.createDummyCustomData("liveSource"), isLive = true)
+        val liveSourceMetadata =
+            SourceMetadata(
+                title = "liveSourceTitle",
+                videoId = "liveSourceVideoId",
+                customData = TestConfig.createDummyCustomData("liveSource"),
+                isLive = true,
+            )
         val liveSource = Source.create(SourceConfig.fromUrl(liveSample.mpdUrl!!), liveSourceMetadata)
         lateinit var localPlayer: Player
 
@@ -335,13 +343,14 @@ class BundledAnalyticsTest {
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
 
         val dashSample = TestSources.DASH
-        val dashSourceMetadata = SourceMetadata(
-            title = "dashSource",
-            customData = TestConfig.createDummyCustomData("dash"),
-            videoId = "dashVideoId",
-            cdnProvider = "dashCdnProvider",
-            path = "dashPath",
-        )
+        val dashSourceMetadata =
+            SourceMetadata(
+                title = "dashSource",
+                customData = TestConfig.createDummyCustomData("dash"),
+                videoId = "dashVideoId",
+                cdnProvider = "dashCdnProvider",
+                path = "dashPath",
+            )
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashSourceMetadata)
 
         mainScope.launch {
@@ -394,28 +403,32 @@ class BundledAnalyticsTest {
 
     @Test
     fun test_vod_3ImpressionsWithPlaylist_Should_DetectNewSessions() {
-        val defaultMetadata = DefaultMetadata(
-            customUserId = "customUserId",
-            customData = TestConfig.createDummyCustomData(),
-            cdnProvider = "defaultCdnProvider",
-        )
+        val defaultMetadata =
+            DefaultMetadata(
+                customUserId = "customUserId",
+                customData = TestConfig.createDummyCustomData(),
+                cdnProvider = "defaultCdnProvider",
+            )
 
-        val hlsMetadata = SourceMetadata(
-            videoId = "hls-video-id",
-            title = "hlsTitle",
-            cdnProvider = "hlsCdnProvider",
-        )
+        val hlsMetadata =
+            SourceMetadata(
+                videoId = "hls-video-id",
+                title = "hlsTitle",
+                cdnProvider = "hlsCdnProvider",
+            )
 
-        val dashMetadata = SourceMetadata(
-            videoId = "dash-video-id",
-            title = "dashTitle",
-            cdnProvider = "dashCdnProvider",
-        )
+        val dashMetadata =
+            SourceMetadata(
+                videoId = "dash-video-id",
+                title = "dashTitle",
+                cdnProvider = "dashCdnProvider",
+            )
 
-        val progMetadata = SourceMetadata(
-            videoId = "prog-video-id",
-            title = "progTitle",
-        )
+        val progMetadata =
+            SourceMetadata(
+                videoId = "prog-video-id",
+                title = "progTitle",
+            )
 
         val hlsSample = TestSources.HLS_REDBULL
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), hlsMetadata)
@@ -478,9 +491,27 @@ class BundledAnalyticsTest {
         DataVerifier.verifyHasNoErrorSamples(impression2)
         DataVerifier.verifyHasNoErrorSamples(impression3)
 
-        DataVerifier.verifyStaticData(impression1.eventDataList, MetadataUtils.mergeSourceMetadata(hlsMetadata, defaultMetadata), hlsSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customUserId")
-        DataVerifier.verifyStaticData(impression2.eventDataList, MetadataUtils.mergeSourceMetadata(dashMetadata, defaultMetadata), dashSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customUserId")
-        DataVerifier.verifyStaticData(impression3.eventDataList, MetadataUtils.mergeSourceMetadata(progMetadata, defaultMetadata), progSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customUserId")
+        DataVerifier.verifyStaticData(
+            impression1.eventDataList,
+            MetadataUtils.mergeSourceMetadata(hlsMetadata, defaultMetadata),
+            hlsSample,
+            BitmovinPlayerConstants.playerInfo,
+            expectedCustomUserId = "customUserId",
+        )
+        DataVerifier.verifyStaticData(
+            impression2.eventDataList,
+            MetadataUtils.mergeSourceMetadata(dashMetadata, defaultMetadata),
+            dashSample,
+            BitmovinPlayerConstants.playerInfo,
+            expectedCustomUserId = "customUserId",
+        )
+        DataVerifier.verifyStaticData(
+            impression3.eventDataList,
+            MetadataUtils.mergeSourceMetadata(progMetadata, defaultMetadata),
+            progSample,
+            BitmovinPlayerConstants.playerInfo,
+            expectedCustomUserId = "customUserId",
+        )
 
         DataVerifier.verifyM3u8SourceUrl(impression1.eventDataList, hlsSample.m3u8Url!!)
         DataVerifier.verifyMpdSourceUrl(impression2.eventDataList, dashSample.mpdUrl!!)
@@ -504,22 +535,25 @@ class BundledAnalyticsTest {
 
     @Test
     fun test_vod_2ImpressionsWithPlaylist_Should_SetCustomDataOnFirstSourceOnly() {
-        val defaultMetadata = DefaultMetadata(
-            customUserId = "customUserId",
-            customData = TestConfig.createDummyCustomData("defaultCustomData"),
-            cdnProvider = "defaultCdnProvider",
-        )
+        val defaultMetadata =
+            DefaultMetadata(
+                customUserId = "customUserId",
+                customData = TestConfig.createDummyCustomData("defaultCustomData"),
+                cdnProvider = "defaultCdnProvider",
+            )
 
-        val hlsMetadata = SourceMetadata(
-            videoId = "hls-video-id",
-            title = "hlsTitle",
-            customData = CustomData(customData1 = "hlsSourceCustomData1"),
-        )
+        val hlsMetadata =
+            SourceMetadata(
+                videoId = "hls-video-id",
+                title = "hlsTitle",
+                customData = CustomData(customData1 = "hlsSourceCustomData1"),
+            )
 
-        val dashMetadata = SourceMetadata(
-            videoId = "dash-video-id",
-            title = "dashTitle",
-        )
+        val dashMetadata =
+            SourceMetadata(
+                videoId = "dash-video-id",
+                title = "dashTitle",
+            )
 
         val hlsSample = TestSources.HLS_REDBULL
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), hlsMetadata)
@@ -567,22 +601,30 @@ class BundledAnalyticsTest {
         DataVerifier.verifyHasNoErrorSamples(impression1)
         DataVerifier.verifyHasNoErrorSamples(impression2)
 
-        val samplesBeforeCustomDataChange = impression1.eventDataList.filter {
-                x ->
-            x.customData1 != "setOnSource1"
-        }
+        val samplesBeforeCustomDataChange =
+            impression1.eventDataList.filter {
+                    x ->
+                x.customData1 != "setOnSource1"
+            }
 
-        val samplesAfterCustomDataChange = impression1.eventDataList.filter {
-                x ->
-            x.customData1 == "setOnSource1"
-        }
+        val samplesAfterCustomDataChange =
+            impression1.eventDataList.filter {
+                    x ->
+                x.customData1 == "setOnSource1"
+            }
 
         assertThat(samplesBeforeCustomDataChange).hasSizeGreaterThan(0)
         assertThat(samplesAfterCustomDataChange).hasSizeGreaterThan(0)
 
         // verify customData with a change during the impression
-        DataVerifier.verifyCustomData(samplesBeforeCustomDataChange, MetadataUtils.mergeCustomData(hlsMetadata.customData, defaultMetadata.customData))
-        DataVerifier.verifyCustomData(samplesAfterCustomDataChange, MetadataUtils.mergeCustomData(changedCustomData, defaultMetadata.customData))
+        DataVerifier.verifyCustomData(
+            samplesBeforeCustomDataChange,
+            MetadataUtils.mergeCustomData(hlsMetadata.customData, defaultMetadata.customData),
+        )
+        DataVerifier.verifyCustomData(
+            samplesAfterCustomDataChange,
+            MetadataUtils.mergeCustomData(changedCustomData, defaultMetadata.customData),
+        )
 
         // verify that new impression doesn't have source customData of session before
         DataVerifier.verifyCustomData(
@@ -646,15 +688,17 @@ class BundledAnalyticsTest {
         DataVerifier.verifyHasNoErrorSamples(impression1)
         DataVerifier.verifyHasNoErrorSamples(impression2)
 
-        val samplesBeforeCustomDataChange = impression1.eventDataList.filter {
-                x ->
-            x.customData1 != "setOnSource1"
-        }
+        val samplesBeforeCustomDataChange =
+            impression1.eventDataList.filter {
+                    x ->
+                x.customData1 != "setOnSource1"
+            }
 
-        val samplesAfterCustomDataChange = impression1.eventDataList.filter {
-                x ->
-            x.customData1 == "setOnSource1"
-        }
+        val samplesAfterCustomDataChange =
+            impression1.eventDataList.filter {
+                    x ->
+                x.customData1 == "setOnSource1"
+            }
 
         assertThat(samplesBeforeCustomDataChange).hasSizeGreaterThan(0)
         assertThat(samplesAfterCustomDataChange).hasSizeGreaterThan(0)
@@ -708,15 +752,40 @@ class BundledAnalyticsTest {
 
     @Test
     fun test_vod_2Impressions_UsingSetSourceMetadata_ShouldReportSourceMetadata() {
-        val defaultMetadata = DefaultMetadata(cdnProvider = "cndProviderDefault", customData = CustomData(customData1 = "defaultCustomData1", customData30 = "defaultCustomData30", experimentName = "experimentNameDefault"))
+        val defaultMetadata =
+            DefaultMetadata(
+                cdnProvider = "cndProviderDefault",
+                customData =
+                    CustomData(
+                        customData1 = "defaultCustomData1",
+                        customData30 = "defaultCustomData30",
+                        experimentName = "experimentNameDefault",
+                    ),
+            )
 
         val hlsSample = TestSources.HLS_REDBULL
-        val source1CustomData = CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
-        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", path = "path/Source1", customData = source1CustomData)
+        val source1CustomData =
+            CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
+        val sourceMetadata1 =
+            SourceMetadata(
+                title = "titleSource1",
+                videoId = "videoIdSource1",
+                cdnProvider = "cndProviderSource1",
+                path = "path/Source1",
+                customData = source1CustomData,
+            )
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), sourceMetadata1)
 
-        val source2CustomData = CustomData(customData1 = "source2CustomData1", customData30 = "source2CustomData30", experimentName = "experimentNameSource2")
-        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", path = "path/Source2", customData = source2CustomData)
+        val source2CustomData =
+            CustomData(customData1 = "source2CustomData1", customData30 = "source2CustomData30", experimentName = "experimentNameSource2")
+        val sourceMetadata2 =
+            SourceMetadata(
+                title = "titleSource2",
+                videoId = "videoIdSource2",
+                cdnProvider = "cndProviderSource2",
+                path = "path/Source2",
+                customData = source2CustomData,
+            )
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), sourceMetadata2)
 
@@ -764,9 +833,19 @@ class BundledAnalyticsTest {
         DataVerifier.verifyHasNoErrorSamples(impression1)
         DataVerifier.verifyHasNoErrorSamples(impression2)
 
-        DataVerifier.verifyStaticData(impression1.eventDataList, MetadataUtils.mergeSourceMetadata(sourceMetadata1, defaultMetadata), hlsSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(
+            impression1.eventDataList,
+            MetadataUtils.mergeSourceMetadata(sourceMetadata1, defaultMetadata),
+            hlsSample,
+            BitmovinPlayerConstants.playerInfo,
+        )
         DataVerifier.verifyInvariants(impression1.eventDataList)
-        DataVerifier.verifyStaticData(impression2.eventDataList, MetadataUtils.mergeSourceMetadata(sourceMetadata2, defaultMetadata), dashSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyStaticData(
+            impression2.eventDataList,
+            MetadataUtils.mergeSourceMetadata(sourceMetadata2, defaultMetadata),
+            dashSample,
+            BitmovinPlayerConstants.playerInfo,
+        )
         DataVerifier.verifyInvariants(impression2.eventDataList)
 
         val startupSampleImpression1 = impression1.eventDataList.first()
@@ -818,7 +897,11 @@ class BundledAnalyticsTest {
         val mockedIngressUrl = MockedIngress.startServer()
         val analyticsOnlineConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
         // simulate offline session through wrong backend url
-        val analyticsOfflineConfig = TestConfig.createAnalyticsConfig().copy(backendUrl = "https://nonexistingdomain123.com", retryPolicy = RetryPolicy.LONG_TERM)
+        val analyticsOfflineConfig =
+            TestConfig.createAnalyticsConfig().copy(
+                backendUrl = "https://nonexistingdomain123.com",
+                retryPolicy = RetryPolicy.LONG_TERM,
+            )
         val offlineSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), SourceMetadata(title = "offlineTitle"))
 
         lateinit var localPlayer: Player
@@ -874,12 +957,13 @@ class BundledAnalyticsTest {
     @Test
     fun test_sendCustomDataEvent() {
         // arrange
-        val sourceMetadata = SourceMetadata(
-            title = "title",
-            isLive = false,
-            videoId = "videoId",
-            customData = TestConfig.createDummyCustomData("vod_"),
-        )
+        val sourceMetadata =
+            SourceMetadata(
+                title = "title",
+                isLive = false,
+                videoId = "videoId",
+                customData = TestConfig.createDummyCustomData("vod_"),
+            )
 
         val source = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), sourceMetadata)
         val customData1 = TestConfig.createDummyCustomData("customData1")
@@ -974,6 +1058,123 @@ class BundledAnalyticsTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         assertThat(impression.eventDataList).hasSizeGreaterThanOrEqualTo(2) // startup and at least 1 playing sample
+    }
+
+    @Test
+    fun test_vod_seekWhilePaused() {
+        // act
+        mainScope.launch {
+            defaultPlayer.load(defaultSource)
+            defaultPlayer.play()
+        }
+
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+            defaultPlayer.seek(60.0)
+        }
+
+        Thread.sleep(5000)
+
+        mainScope.launch {
+            defaultPlayer.play()
+        }
+
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 63000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+            defaultPlayer.destroy()
+        }
+
+        Thread.sleep(200) // wait a bit for player being destroyed
+
+        // assert
+        val impressionsList = MockedIngress.extractImpressions()
+        assertThat(impressionsList).hasSize(1)
+
+        val impression = impressionsList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val seeks = impression.eventDataList.filter { it.state == DataVerifier.SEEKING }
+        assertThat(seeks).hasSize(1)
+
+        val forwardSeek = seeks[0]
+        // a seek should be quite fast with a stable internet connection
+        // we test here that the seek is not identical with the pause
+        // which should take >4000 milliseconds
+        assertThat(forwardSeek.seeked).isLessThan(1000)
+
+        val pauseAfterSeek = impression.eventDataList[forwardSeek.sequenceNumber + 1]
+        assertThat(pauseAfterSeek.state).isEqualTo(DataVerifier.PAUSE)
+        assertThat(pauseAfterSeek.paused).isGreaterThan(4000)
+
+        val pauseBeforeSeek = impression.eventDataList[forwardSeek.sequenceNumber - 1]
+        assertThat(pauseBeforeSeek.state).isEqualTo(DataVerifier.PAUSE)
+
+        val playAfterPause = impression.eventDataList[pauseAfterSeek.sequenceNumber + 1]
+        assertThat(playAfterPause.state).isEqualTo(DataVerifier.PLAYING)
+    }
+
+    @Test
+    fun test_vodHls_seekForwardsAndBackwardsWhilePlaying() {
+        // act
+        mainScope.launch {
+            defaultPlayer.load(defaultSource)
+            defaultPlayer.play()
+        }
+
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+        mainScope.launch {
+            defaultPlayer.seek(60.0)
+        }
+
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 61000)
+
+        mainScope.launch {
+            defaultPlayer.seek(30.0)
+        }
+
+        Thread.sleep(2000)
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 32000)
+
+        mainScope.launch {
+            defaultPlayer.pause()
+            defaultPlayer.destroy()
+        }
+
+        Thread.sleep(300)
+        val impressionsList = MockedIngress.extractImpressions()
+        assertThat(impressionsList).hasSize(1)
+
+        val impression = impressionsList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val seeks =
+            impression.eventDataList.filter {
+                it.state == DataVerifier.SEEKING
+            }.sortedBy { it.sequenceNumber }
+
+        assertThat(seeks).hasSize(2)
+
+        val forwardSeek = seeks[0]
+        val backwardSeek = seeks[1]
+
+        DataVerifier.verifyForwardsSeek(forwardSeek)
+        val playingBeforeFirstSeek = impression.eventDataList[forwardSeek.sequenceNumber - 1]
+        DataVerifier.verifyIsPlayingEvent(playingBeforeFirstSeek)
+
+        val playingAfterFirstSeek = impression.eventDataList[forwardSeek.sequenceNumber + 1]
+        DataVerifier.verifyIsPlayingEvent(playingAfterFirstSeek)
+
+        DataVerifier.verifyBackwardsSeek(backwardSeek)
+        val playingBeforeSecondSeek = impression.eventDataList[backwardSeek.sequenceNumber - 1]
+        DataVerifier.verifyIsPlayingEvent(playingBeforeSecondSeek)
+
+        val playingAfterSecondSeek = impression.eventDataList[backwardSeek.sequenceNumber + 1]
+        DataVerifier.verifyIsPlayingEvent(playingAfterSecondSeek)
     }
 
     private fun runBlockingOnMainScope(block: () -> Unit) {

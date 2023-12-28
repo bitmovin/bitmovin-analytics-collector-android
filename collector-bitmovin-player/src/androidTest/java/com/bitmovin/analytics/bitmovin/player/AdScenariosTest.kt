@@ -55,7 +55,12 @@ class AdScenariosTest {
 
         val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl))
         val playbackConfig = PlaybackConfig(isMuted = true)
-        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig, advertisingConfig = advertisingConfig)
+        val playerConfig =
+            PlayerConfig(
+                key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
+                playbackConfig = playbackConfig,
+                advertisingConfig = advertisingConfig,
+            )
         val localPlayer = Player.create(appContext, playerConfig)
         localPlayer.setAdViewGroup(LinearLayout(appContext))
         val sourceMetadata = SourceMetadata(title = "adTest")
@@ -80,7 +85,10 @@ class AdScenariosTest {
 
         mainScope.launch {
             collector.detachPlayer()
+            localPlayer.destroy()
         }
+
+        Thread.sleep(200)
 
         // assert
         val impressionList = MockedIngress.extractImpressions()

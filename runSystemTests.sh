@@ -35,7 +35,6 @@ yes | sdkmanager --licenses
 # run systemtest for bitmovin-player
 ## clean test to make sure we run test everytime
 ./gradlew :collector-bitmovin-player:cleanPixel6api30DebugAndroidTest
-
 ## run test
 ./gradlew :collector-bitmovin-player:pixel6api30DebugAndroidTest
 

@@ -51,13 +51,13 @@ internal class BitmovinSdkAdapter(
     private val playbackQualityProvider: PlaybackQualityProvider,
     metadataProvider: MetadataProvider,
 ) : DefaultPlayerAdapter(
-    config,
-    eventDataFactory,
-    stateMachine,
-    featureFactory,
-    deviceInformationProvider,
-    metadataProvider,
-),
+        config,
+        eventDataFactory,
+        stateMachine,
+        featureFactory,
+        deviceInformationProvider,
+        metadataProvider,
+    ),
     EventDataManipulator {
     private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
     private var totalDroppedVideoFrames = 0
@@ -259,6 +259,7 @@ internal class BitmovinSdkAdapter(
         get() = BitmovinUtil.getCurrentTimeInMs(player)
 
     override fun clearValuesAfterSendingOfSample() {}
+
     override fun createAdAdapter(): AdAdapter {
         return BitmovinSdkAdAdapter(player)
     }
@@ -307,12 +308,16 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onSourceEventSourceLoaded(@Suppress("UNUSED_PARAMETER")event: SourceEvent.Loaded) {
+    private fun onSourceEventSourceLoaded(
+        @Suppress("UNUSED_PARAMETER")event: SourceEvent.Loaded,
+    ) {
         Log.d(TAG, "On Source Loaded")
         isVideoAttemptedPlay = false
     }
 
-    private fun onSourceEventSourceUnloaded(@Suppress("UNUSED_PARAMETER")event: SourceEvent.Unloaded) {
+    private fun onSourceEventSourceUnloaded(
+        @Suppress("UNUSED_PARAMETER")event: SourceEvent.Unloaded,
+    ) {
         try {
             Log.d(TAG, "On Source Unloaded")
             stateMachine.resetStateMachine()
@@ -321,7 +326,9 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onPlayerEventDestroy(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.Destroy) {
+    private fun onPlayerEventDestroy(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.Destroy,
+    ) {
         try {
             Log.d(TAG, "On Destroy")
             if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
@@ -333,7 +340,9 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onPlayerEventPlaybackFinished(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.PlaybackFinished) {
+    private fun onPlayerEventPlaybackFinished(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.PlaybackFinished,
+    ) {
         try {
             Log.d(TAG, "On Playback Finished Listener")
 
@@ -364,7 +373,9 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onPlayerEventPlay(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.Play) {
+    private fun onPlayerEventPlay(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.Play,
+    ) {
         try {
             Log.d(TAG, "On Play Listener")
             if (!stateMachine.isStartupFinished) {
@@ -375,7 +386,9 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onPlayerEventPlaying(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.Playing) {
+    private fun onPlayerEventPlaying(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.Playing,
+    ) {
         try {
             Log.d(TAG, "On Playing Listener " + stateMachine.currentState.name)
             stateMachine.transitionState(PlayerStates.PLAYING, position)
@@ -384,7 +397,9 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onPlayerEventTimeChanged(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.TimeChanged) {
+    private fun onPlayerEventTimeChanged(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.TimeChanged,
+    ) {
         try {
             if (!player.isStalled && !player.isPaused && player.isPlaying) {
                 stateMachine.transitionState(PlayerStates.PLAYING, position)
@@ -394,11 +409,19 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onPlayerEventSeeked(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.Seeked) {
+    private fun onPlayerEventSeeked(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.Seeked,
+    ) {
         Log.d(TAG, "On Seeked Listener")
+
+        if (player.isPaused) {
+            stateMachine.transitionState(PlayerStates.PAUSE, position)
+        }
     }
 
-    private fun onPlayerEventSeek(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.Seek) {
+    private fun onPlayerEventSeek(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.Seek,
+    ) {
         try {
             Log.d(TAG, "On Seek Listener")
             if (!stateMachine.isStartupFinished) {
@@ -410,7 +433,9 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onPlayerEventStallEnded(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.StallEnded) {
+    private fun onPlayerEventStallEnded(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.StallEnded,
+    ) {
         try {
             Log.d(TAG, "On Stall Ended: " + player.isPlaying)
             if (!stateMachine.isStartupFinished) {
@@ -430,7 +455,9 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onSourceEventAudioChanged(@Suppress("UNUSED_PARAMETER")event: SourceEvent.AudioChanged) {
+    private fun onSourceEventAudioChanged(
+        @Suppress("UNUSED_PARAMETER")event: SourceEvent.AudioChanged,
+    ) {
         try {
             Log.d(TAG, "On AudioChanged")
             // TODO AN-3298 add a audio track changed to the statemachine that will check if
@@ -464,7 +491,9 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onPlayerEventStallStarted(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.StallStarted) {
+    private fun onPlayerEventStallStarted(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.StallStarted,
+    ) {
         try {
             Log.d(TAG, "On Stall Started Listener isPlaying:" + player.isPlaying)
             if (!stateMachine.isStartupFinished) {
@@ -531,7 +560,10 @@ internal class BitmovinSdkAdapter(
         handleErrorEvent(event, exceptionMapper.map(event))
     }
 
-    private fun handleErrorEvent(@Suppress("UNUSED_PARAMETER")event: ErrorEvent, errorCode: ErrorCode) {
+    private fun handleErrorEvent(
+        @Suppress("UNUSED_PARAMETER")event: ErrorEvent,
+        errorCode: ErrorCode,
+    ) {
         try {
             val videoTime = position
             if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
@@ -543,7 +575,9 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onPlayerEventAdBreakStarted(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.AdBreakStarted) {
+    private fun onPlayerEventAdBreakStarted(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.AdBreakStarted,
+    ) {
         try {
             stateMachine.startAd(position)
         } catch (e: Exception) {
@@ -551,7 +585,9 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onPlayerEventAdBreakFinished(@Suppress("UNUSED_PARAMETER")event: PlayerEvent.AdBreakFinished) {
+    private fun onPlayerEventAdBreakFinished(
+        @Suppress("UNUSED_PARAMETER")event: PlayerEvent.AdBreakFinished,
+    ) {
         try {
             stateMachine.endAd()
         } catch (e: Exception) {

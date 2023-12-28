@@ -98,7 +98,10 @@ object DataVerifier {
         }
     }
 
-    private fun verifyPlayerAndCollectorInfo(eventData: EventData, expectedPlayerInfo: PlayerInfo) {
+    private fun verifyPlayerAndCollectorInfo(
+        eventData: EventData,
+        expectedPlayerInfo: PlayerInfo,
+    ) {
         assertThat(eventData.player).isEqualTo(expectedPlayerInfo.playerName)
         assertThat(eventData.playerTech).isEqualTo(expectedPlayerInfo.playerTech)
         assertThat(eventData.version).isEqualTo(expectedPlayerInfo.playerVersion)
@@ -106,13 +109,19 @@ object DataVerifier {
         assertThat(eventData.analyticsVersion).isEqualTo("0.0.0-local")
     }
 
-    fun verifyPlayerSetting(eventDataList: MutableList<EventData>, expectedPlayerSettings: PlayerSettings) {
+    fun verifyPlayerSetting(
+        eventDataList: MutableList<EventData>,
+        expectedPlayerSettings: PlayerSettings,
+    ) {
         for (eventData in eventDataList) {
             assertThat(eventData.isMuted).isEqualTo(expectedPlayerSettings.isMuted)
         }
     }
 
-    fun verifyStreamData(eventData: EventData, expectedData: StreamData) {
+    fun verifyStreamData(
+        eventData: EventData,
+        expectedData: StreamData,
+    ) {
         assertThat(eventData.audioCodec).isEqualTo(expectedData.audioCodec)
         assertThat(eventData.videoCodec).startsWith(expectedData.videoCodecStartsWith)
         assertThat(eventData.streamFormat).isEqualTo(expectedData.streamFormat)
@@ -142,13 +151,19 @@ object DataVerifier {
         }
     }
 
-    fun verifyAnalyticsConfig(eventData: List<EventData>, analyticsConfig: BitmovinAnalyticsConfig) {
+    fun verifyAnalyticsConfig(
+        eventData: List<EventData>,
+        analyticsConfig: BitmovinAnalyticsConfig,
+    ) {
         for (event in eventData) {
             verifyAnalyticsConfig(event, analyticsConfig)
         }
     }
 
-    fun verifyAnalyticsConfig(eventData: EventData, analyticsConfig: BitmovinAnalyticsConfig) {
+    fun verifyAnalyticsConfig(
+        eventData: EventData,
+        analyticsConfig: BitmovinAnalyticsConfig,
+    ) {
         assertThat(eventData.videoTitle).isEqualTo(analyticsConfig.title)
         assertThat(eventData.videoId).isEqualTo(analyticsConfig.videoId)
         assertThat(eventData.cdnProvider).isEqualTo(analyticsConfig.cdnProvider)
@@ -190,13 +205,19 @@ object DataVerifier {
         assertThat(eventData.customData30).isEqualTo(analyticsConfig.customData30)
     }
 
-    fun verifyCustomData(eventDataList: List<EventData>, customData: CustomData) {
+    fun verifyCustomData(
+        eventDataList: List<EventData>,
+        customData: CustomData,
+    ) {
         for (eventData in eventDataList) {
             verifyCustomData(eventData, customData)
         }
     }
 
-    fun verifyCustomData(eventData: EventData, expectedCustomData: CustomData) {
+    fun verifyCustomData(
+        eventData: EventData,
+        expectedCustomData: CustomData,
+    ) {
         assertThat(eventData.customData1).isEqualTo(expectedCustomData.customData1)
         assertThat(eventData.customData2).isEqualTo(expectedCustomData.customData2)
         assertThat(eventData.customData3).isEqualTo(expectedCustomData.customData3)
@@ -230,7 +251,10 @@ object DataVerifier {
         assertThat(eventData.experimentName).isEqualTo(expectedCustomData.experimentName)
     }
 
-    fun verifySourceMetadata(eventData: EventData, sourceMetadata: SourceMetadata) {
+    fun verifySourceMetadata(
+        eventData: EventData,
+        sourceMetadata: SourceMetadata,
+    ) {
         assertThat(eventData.videoTitle).isEqualTo(sourceMetadata.title)
         assertThat(eventData.videoId).isEqualTo(sourceMetadata.videoId)
         assertThat(eventData.cdnProvider).isEqualTo(sourceMetadata.cdnProvider)
@@ -261,7 +285,11 @@ object DataVerifier {
         assertThat(eventData.userAgent).contains("Android 1") // is dynamic so we only check that it is at least Android 1x
     }
 
-    fun verifyStartupSample(eventData: EventData, isFirstImpression: Boolean = true, expectedSequenceNumber: Int = 0) {
+    fun verifyStartupSample(
+        eventData: EventData,
+        isFirstImpression: Boolean = true,
+        expectedSequenceNumber: Int = 0,
+    ) {
         assertThat(eventData.state).isEqualTo(STARTUP)
         assertThat(eventData.startupTime).isGreaterThan(0)
 
@@ -279,7 +307,12 @@ object DataVerifier {
         assertThat(eventData.sequenceNumber).isEqualTo(expectedSequenceNumber)
     }
 
-    fun verifyDrmStartupSample(eventData: EventData, drmType: String?, isFirstImpression: Boolean = true, isAutoPlay: Boolean = true) {
+    fun verifyDrmStartupSample(
+        eventData: EventData,
+        drmType: String?,
+        isFirstImpression: Boolean = true,
+        isAutoPlay: Boolean = true,
+    ) {
         verifyStartupSample(eventData, isFirstImpression)
         assertThat(eventData.drmType).isEqualTo(drmType)
         assertThat(eventData.drmLoadTime).isGreaterThan(0)
@@ -294,7 +327,10 @@ object DataVerifier {
         }
     }
 
-    fun verifyStartupSampleOnError(eventData: EventData, expectedPlayerInfo: PlayerInfo) {
+    fun verifyStartupSampleOnError(
+        eventData: EventData,
+        expectedPlayerInfo: PlayerInfo,
+    ) {
         assertThat(eventData.state).isIn("startup", "ready") // we are ending up with ready state on exoplayer and ivs
         assertThat(eventData.videoStartupTime).isEqualTo(0)
         assertThat(eventData.videoTimeStart).isEqualTo(0)
@@ -315,11 +351,12 @@ object DataVerifier {
     fun verifyHasNoErrorSamples(impression: Impression) {
         assertThat(impression.errorDetailList.size).isEqualTo(0)
 
-        val errorSamples = impression.eventDataList.filter { x ->
-            x.errorMessage != null ||
-                x.errorData != null ||
-                x.errorCode != null
-        }
+        val errorSamples =
+            impression.eventDataList.filter { x ->
+                x.errorMessage != null ||
+                    x.errorData != null ||
+                    x.errorCode != null
+            }
 
         assertThat(errorSamples.size).isEqualTo(0)
     }
@@ -369,7 +406,11 @@ object DataVerifier {
         }
     }
 
-    fun verifyStaticErrorDetails(errorDetail: ErrorDetail, expectedImpressionId: String, expectedLicenseKey: String) {
+    fun verifyStaticErrorDetails(
+        errorDetail: ErrorDetail,
+        expectedImpressionId: String,
+        expectedLicenseKey: String,
+    ) {
         assertThat(errorDetail.impressionId).isEqualTo(expectedImpressionId)
         assertThat(errorDetail.platform).isEqualTo("android")
         assertThat(errorDetail.licenseKey).isEqualTo(expectedLicenseKey)
@@ -392,7 +433,11 @@ object DataVerifier {
         }
     }
 
-    fun verifySubtitles(eventDataList: MutableList<EventData>, enabled: Boolean = false, language: String? = null) {
+    fun verifySubtitles(
+        eventDataList: MutableList<EventData>,
+        enabled: Boolean = false,
+        language: String? = null,
+    ) {
         for (eventData in eventDataList) {
             assertThat(eventData.subtitleEnabled).isEqualTo(enabled)
             assertThat(eventData.subtitleLanguage).isEqualTo(language)
@@ -411,30 +456,53 @@ object DataVerifier {
         verifyAtLeastOneSampleHasState(eventDataList, PLAYING)
     }
 
-    fun verifyMpdSourceUrl(eventDataList: MutableList<EventData>, expectedMpdSourceUrl: String) {
+    fun verifyMpdSourceUrl(
+        eventDataList: MutableList<EventData>,
+        expectedMpdSourceUrl: String,
+    ) {
         for (eventData in eventDataList) {
             assertThat(eventData.mpdUrl).isEqualTo(expectedMpdSourceUrl)
         }
     }
 
-    fun verifyM3u8SourceUrl(eventDataList: MutableList<EventData>, expectedM3u8SourceUrl: String) {
+    fun verifyIsPlayingEvent(eventData: EventData) {
+        assertThat(eventData.state).isEqualTo(PLAYING)
+        assertThat(eventData.played).isGreaterThan(0)
+        assertThat(eventData.duration).isEqualTo(eventData.played)
+        assertThat(eventData.paused).isEqualTo(0)
+        assertThat(eventData.seeked).isEqualTo(0)
+    }
+
+    fun verifyM3u8SourceUrl(
+        eventDataList: MutableList<EventData>,
+        expectedM3u8SourceUrl: String,
+    ) {
         for (eventData in eventDataList) {
             assertThat(eventData.m3u8Url).isEqualTo(expectedM3u8SourceUrl)
         }
     }
 
-    fun verifyProgSourceUrl(eventDataList: MutableList<EventData>, expectedProgSourceUrl: String) {
+    fun verifyProgSourceUrl(
+        eventDataList: MutableList<EventData>,
+        expectedProgSourceUrl: String,
+    ) {
         for (eventData in eventDataList) {
             assertThat(eventData.progUrl).isEqualTo(expectedProgSourceUrl)
         }
     }
 
-    private fun verifyOnlyOneSampleHasState(eventDataList: MutableList<EventData>, state: String) {
+    private fun verifyOnlyOneSampleHasState(
+        eventDataList: MutableList<EventData>,
+        state: String,
+    ) {
         val samplesWithState = eventDataList.filter { x -> x.state?.lowercase() == state }
         assertThat(samplesWithState.size).isEqualTo(1)
     }
 
-    private fun verifyAtLeastOneSampleHasState(eventDataList: MutableList<EventData>, state: String) {
+    private fun verifyAtLeastOneSampleHasState(
+        eventDataList: MutableList<EventData>,
+        state: String,
+    ) {
         val samplesWithState = eventDataList.filter { x -> x.state?.lowercase() == state }
         assertThat(samplesWithState.size).isGreaterThanOrEqualTo(1)
     }

@@ -35,17 +35,19 @@ class PhoneBasicScenariosTest {
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private val defaultSample = TestSources.HLS_REDBULL
     private val defaultMediaItem = MediaItem.fromUri(defaultSample.m3u8Url!!)
-    private val defaultSourceMetadata = SourceMetadata(
-        title = "hls_redbull",
-        videoId = "hls_redbull_id",
-        path = "hls_redbull_path",
-        customData = TestConfig.createDummyCustomData(),
-        cdnProvider = "cdn_provider",
-    )
+    private val defaultSourceMetadata =
+        SourceMetadata(
+            title = "hls_redbull",
+            videoId = "hls_redbull_id",
+            path = "hls_redbull_path",
+            customData = TestConfig.createDummyCustomData(),
+            cdnProvider = "cdn_provider",
+        )
 
-    private val forceLowestQuality = TrackSelectionParameters.Builder()
-        .setForceLowestBitrate(true)
-        .build()
+    private val forceLowestQuality =
+        TrackSelectionParameters.Builder()
+            .setForceLowestBitrate(true)
+            .build()
 
     private lateinit var player: ExoPlayer
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
@@ -264,7 +266,14 @@ class PhoneBasicScenariosTest {
         // arrange
         val liveSample = TestSources.DASH_LIVE
         val liveSource = MediaItem.fromUri(liveSample.mpdUrl!!)
-        val liveSourceMetadata = SourceMetadata(title = "liveSource", videoId = "liveSourceId", cdnProvider = "cdn_provider", customData = TestConfig.createDummyCustomData(), isLive = true)
+        val liveSourceMetadata =
+            SourceMetadata(
+                title = "liveSource",
+                videoId = "liveSourceId",
+                cdnProvider = "cdn_provider",
+                customData = TestConfig.createDummyCustomData(),
+                isLive = true,
+            )
 
         val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
@@ -324,15 +333,22 @@ class PhoneBasicScenariosTest {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
         val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        val mediaItem = MediaItem.Builder()
-            .setDrmConfiguration(
-                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                    .setLicenseUri(sample.drmLicenseUrl)
-                    .build(),
+        val mediaItem =
+            MediaItem.Builder()
+                .setDrmConfiguration(
+                    MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                        .setLicenseUri(sample.drmLicenseUrl)
+                        .build(),
+                )
+                .setUri(sample.mpdUrl)
+                .build()
+        val drmSourceMetadata =
+            SourceMetadata(
+                title = "drmTest",
+                videoId = "drmTest",
+                cdnProvider = "cdn_provider",
+                customData = TestConfig.createDummyCustomData(),
             )
-            .setUri(sample.mpdUrl)
-            .build()
-        val drmSourceMetadata = SourceMetadata(title = "drmTest", videoId = "drmTest", cdnProvider = "cdn_provider", customData = TestConfig.createDummyCustomData())
 
         // act
         mainScope.launch {
@@ -364,15 +380,22 @@ class PhoneBasicScenariosTest {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
         val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        val mediaItem = MediaItem.Builder()
-            .setDrmConfiguration(
-                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                    .setLicenseUri(sample.drmLicenseUrl)
-                    .build(),
+        val mediaItem =
+            MediaItem.Builder()
+                .setDrmConfiguration(
+                    MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                        .setLicenseUri(sample.drmLicenseUrl)
+                        .build(),
+                )
+                .setUri(sample.mpdUrl)
+                .build()
+        val drmSourceMetadata =
+            SourceMetadata(
+                title = "drmTest",
+                videoId = "drmTest",
+                cdnProvider = "cdn_provider",
+                customData = TestConfig.createDummyCustomData(),
             )
-            .setUri(sample.mpdUrl)
-            .build()
-        val drmSourceMetadata = SourceMetadata(title = "drmTest", videoId = "drmTest", cdnProvider = "cdn_provider", customData = TestConfig.createDummyCustomData())
 
         // act
         mainScope.launch {
@@ -411,7 +434,13 @@ class PhoneBasicScenariosTest {
         val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
         val dashSource = TestSources.DASH
         val dashMediaItem = MediaItem.fromUri(dashSource.mpdUrl!!)
-        val dashSourceMetadata = SourceMetadata(title = "dashSource", videoId = "dashSourceId", cdnProvider = "cdn_provider", customData = TestConfig.createDummyCustomData())
+        val dashSourceMetadata =
+            SourceMetadata(
+                title = "dashSource",
+                videoId = "dashSourceId",
+                cdnProvider = "cdn_provider",
+                customData = TestConfig.createDummyCustomData(),
+            )
 
         // loading dash source
         mainScope.launch {
@@ -469,7 +498,7 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vodHls_seekForwardsAndBackwards() {
+    fun test_vodHls_seekForwardsAndBackwardsWhilePlaying() {
         // arrange
         val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
         collector.sourceMetadata = defaultSourceMetadata
@@ -484,22 +513,20 @@ class PhoneBasicScenariosTest {
             player.play()
         }
 
-        Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 5000)
+        Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
 
         mainScope.launch {
-            player.pause()
             player.seekTo(10000)
-            player.play()
         }
 
-        Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 12000)
+        Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 11000)
 
         mainScope.launch {
             player.seekTo(3000)
         }
 
         Thread.sleep(500)
-        Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 5000)
+        Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
 
         mainScope.launch {
             player.pause()
@@ -521,7 +548,82 @@ class PhoneBasicScenariosTest {
         val backwardSeek = seeks[1]
 
         DataVerifier.verifyForwardsSeek(forwardSeek)
+        val playingBeforeFirstSeek = impression.eventDataList[forwardSeek.sequenceNumber - 1]
+        DataVerifier.verifyIsPlayingEvent(playingBeforeFirstSeek)
+
+        val playingAfterFirstSeek = impression.eventDataList[forwardSeek.sequenceNumber + 1]
+        DataVerifier.verifyIsPlayingEvent(playingAfterFirstSeek)
+
         DataVerifier.verifyBackwardsSeek(backwardSeek)
+        val playingBeforeSecondSeek = impression.eventDataList[backwardSeek.sequenceNumber - 1]
+        DataVerifier.verifyIsPlayingEvent(playingBeforeSecondSeek)
+
+        val playingAfterSecondSeek = impression.eventDataList[backwardSeek.sequenceNumber + 1]
+        DataVerifier.verifyIsPlayingEvent(playingAfterSecondSeek)
+    }
+
+    @Test
+    fun test_vodHls_seekWhilePaused() {
+        // arrange
+        val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+        collector.sourceMetadata = defaultSourceMetadata
+
+        // act
+        mainScope.launch {
+            player.volume = 0.0f
+            collector.attachPlayer(player)
+            player.setMediaItem(defaultMediaItem)
+            player.trackSelectionParameters = forceLowestQuality
+            player.prepare()
+            player.play()
+        }
+
+        Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+        mainScope.launch {
+            player.pause()
+            player.seekTo(60000)
+        }
+
+        Thread.sleep(5000)
+
+        mainScope.launch {
+            player.play()
+        }
+
+        Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 63000)
+
+        mainScope.launch {
+            player.pause()
+            collector.detachPlayer()
+            player.release()
+        }
+
+        Thread.sleep(300)
+        val impressionsList = MockedIngress.extractImpressions()
+        assertThat(impressionsList).hasSize(1)
+
+        val impression = impressionsList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val seeks = impression.eventDataList.filter { it.state == DataVerifier.SEEKING }
+        assertThat(seeks).hasSize(1)
+
+        val forwardSeek = seeks[0]
+        // a seek should be quite fast with a stable internet connection
+        // we test here that the seek is not identical with the pause
+        // which should take >4000 milliseconds
+        assertThat(forwardSeek.seeked).isLessThan(1000)
+
+        val pauseAfterSeek = impression.eventDataList[forwardSeek.sequenceNumber + 1]
+        assertThat(pauseAfterSeek.state).isEqualTo(DataVerifier.PAUSE)
+        assertThat(pauseAfterSeek.paused).isGreaterThan(4000)
+
+        val pauseBeforeSeek = impression.eventDataList[forwardSeek.sequenceNumber - 1]
+        assertThat(pauseBeforeSeek.state).isEqualTo(DataVerifier.PAUSE)
+
+        val playAfterPause = impression.eventDataList[pauseAfterSeek.sequenceNumber + 1]
+        assertThat(playAfterPause.state).isEqualTo(DataVerifier.PLAYING)
     }
 
     @Test
@@ -579,10 +681,11 @@ class PhoneBasicScenariosTest {
         val mediaItem = MediaItem.fromUri(DASH_SINTEL_WITH_SUBTITLES.mpdUrl!!)
 
         // act
-        val preferGermanSubtitle = TrackSelectionParameters.Builder()
-            .setForceLowestBitrate(true)
-            .setPreferredTextLanguage("de")
-            .build()
+        val preferGermanSubtitle =
+            TrackSelectionParameters.Builder()
+                .setForceLowestBitrate(true)
+                .setPreferredTextLanguage("de")
+                .build()
 
         mainScope.launch {
             collector.attachPlayer(player)
@@ -597,10 +700,11 @@ class PhoneBasicScenariosTest {
 
         Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
-        val preferEnglishSubtitle = TrackSelectionParameters.Builder()
-            .setForceLowestBitrate(true)
-            .setPreferredTextLanguage("en")
-            .build()
+        val preferEnglishSubtitle =
+            TrackSelectionParameters.Builder()
+                .setForceLowestBitrate(true)
+                .setPreferredTextLanguage("en")
+                .build()
 
         mainScope.launch {
             // select english as preferred subtitle
@@ -609,10 +713,11 @@ class PhoneBasicScenariosTest {
 
         Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 6000)
 
-        val disableTextTrack = TrackSelectionParameters.Builder()
-            .setForceLowestBitrate(true)
-            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
-            .build()
+        val disableTextTrack =
+            TrackSelectionParameters.Builder()
+                .setForceLowestBitrate(true)
+                .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+                .build()
 
         mainScope.launch {
             player.pause()
@@ -651,7 +756,9 @@ class PhoneBasicScenariosTest {
         assertThat(subtitleDisabledSamples).hasSizeGreaterThanOrEqualTo(1)
 
         // sanity check that samples count adds up
-        assertThat(impression.eventDataList.size).isEqualTo(englishSubtitleSamples.size + germanSubtitleSamples.size + subtitleDisabledSamples.size)
+        assertThat(
+            impression.eventDataList.size,
+        ).isEqualTo(englishSubtitleSamples.size + germanSubtitleSamples.size + subtitleDisabledSamples.size)
     }
 
     @Test
@@ -661,11 +768,12 @@ class PhoneBasicScenariosTest {
         collector.sourceMetadata = SourceMetadata(title = "different_languages_test")
         val mediaItem = MediaItem.fromUri(HLS_MULTIPLE_AUDIO_LANGUAGES.m3u8Url!!)
 
-        val preferDubbingAudio = TrackSelectionParameters.Builder()
-            .setForceLowestBitrate(true)
-            .setPreferredAudioLanguage("dubbing")
-            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
-            .build()
+        val preferDubbingAudio =
+            TrackSelectionParameters.Builder()
+                .setForceLowestBitrate(true)
+                .setPreferredAudioLanguage("dubbing")
+                .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+                .build()
 
         mainScope.launch {
             collector.attachPlayer(player)
@@ -680,11 +788,12 @@ class PhoneBasicScenariosTest {
 
         Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
 
-        val preferEnglishAudio = TrackSelectionParameters.Builder()
-            .setForceLowestBitrate(true)
-            .setPreferredAudioLanguage("en")
-            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
-            .build()
+        val preferEnglishAudio =
+            TrackSelectionParameters.Builder()
+                .setForceLowestBitrate(true)
+                .setPreferredAudioLanguage("en")
+                .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+                .build()
 
         mainScope.launch {
             // switch to english audio

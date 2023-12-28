@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- Seek events in paused state not tracked correctly (bitmovin, media3, and exoplayer)
+
 ## v3.3.0 AND v3.3.0-rc.1
 
 ### Changed
