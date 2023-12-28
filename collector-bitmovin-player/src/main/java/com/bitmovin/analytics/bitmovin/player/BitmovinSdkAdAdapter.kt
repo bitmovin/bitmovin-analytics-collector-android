@@ -19,7 +19,6 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
     private val adMapper: AdMapper = AdMapper()
     private val adBreakMapper: AdBreakMapper = AdBreakMapper()
     private val adQuartileFactory: AdQuartileFactory = AdQuartileFactory()
-    private val TAG = "BitmovinSdkAdAdapter"
 
     private val playerEventAdStartedListener: (PlayerEvent.AdStarted) -> Unit = method@{ event ->
         try {
@@ -95,16 +94,6 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
         }
     }
 
-    private val playerEventPlayListener: (PlayerEvent.Play) -> Unit = {
-// TODO: why is this commented out??
-//        adAnalytics.onPlay()
-    }
-
-    private val playerEventPausedListener: (PlayerEvent.Paused) -> Unit = {
-// TODO: why is this commented out??
-//        adAnalytics.onPause()
-    }
-
     private val playerEventAdQuartileListener: (PlayerEvent.AdQuartile) -> Unit = { event ->
         try {
             observableSupport.notify { it.onAdQuartile(adQuartileFactory.FromPlayerAdQuartile(event.quartile)) }
@@ -122,8 +111,6 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
         bitmovinPlayer.on(PlayerEvent.AdError::class, playerEventAdErrorListener)
         bitmovinPlayer.on(PlayerEvent.AdSkipped::class, playerEventAdSkippedListener)
         bitmovinPlayer.on(PlayerEvent.AdManifestLoaded::class, playerEventAdManifestLoadedListener)
-        bitmovinPlayer.on(PlayerEvent.Play::class, playerEventPlayListener)
-        bitmovinPlayer.on(PlayerEvent.Paused::class, playerEventPausedListener)
         bitmovinPlayer.on(PlayerEvent.AdQuartile::class, playerEventAdQuartileListener)
     }
 
@@ -136,8 +123,6 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
         bitmovinPlayer.off(playerEventAdErrorListener)
         bitmovinPlayer.off(playerEventAdSkippedListener)
         bitmovinPlayer.off(playerEventAdManifestLoadedListener)
-        bitmovinPlayer.off(playerEventPlayListener)
-        bitmovinPlayer.off(playerEventPausedListener)
         bitmovinPlayer.off(playerEventAdQuartileListener)
     }
 
@@ -154,5 +139,9 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     override fun unsubscribe(listener: AdAnalyticsEventListener) {
         observableSupport.unsubscribe(listener)
+    }
+
+    companion object {
+        const val TAG = "BitmovinSdkAdAdapter"
     }
 }
