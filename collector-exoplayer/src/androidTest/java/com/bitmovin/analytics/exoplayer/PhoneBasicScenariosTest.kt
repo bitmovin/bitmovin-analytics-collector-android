@@ -28,7 +28,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 // System test for basic playing and error scenario using exoplayer player
-// This tests assume a phone with api level 30 for validations
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
 // Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
@@ -774,16 +773,26 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vodHls_seekWhilePaused() {
+    fun test_vodDash_seekWhilePaused() {
         // arrange
+        val dashSource = TestSources.DASH
+        val dashMediaItem = MediaItem.fromUri(dashSource.mpdUrl!!)
+        val dashSourceMetadata =
+            SourceMetadata(
+                title = "test_vodDash_seekWhilePaused",
+                videoId = "test_vodDash_seekWhilePaused_video_id",
+                cdnProvider = "cdn_provider",
+                customData = TestConfig.createDummyCustomData(),
+            )
+
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        collector.sourceMetadata = defaultSourceMetadata
+        collector.sourceMetadata = dashSourceMetadata
 
         // act
         mainScope.launch {
             player.volume = 0.0f
             collector.attachPlayer(player)
-            player.setMediaItem(defaultMediaItem)
+            player.setMediaItem(dashMediaItem)
             player.trackSelectionParameters = forceLowestQuality
             player.prepare()
             player.play()

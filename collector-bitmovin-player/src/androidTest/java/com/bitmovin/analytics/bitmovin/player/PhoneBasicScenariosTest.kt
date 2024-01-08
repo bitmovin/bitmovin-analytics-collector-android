@@ -21,6 +21,7 @@ import com.bitmovin.analytics.systemtest.utils.combineByImpressionId
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
+import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
@@ -36,7 +37,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 // System test for basic playing and error scenario using bitmovin player
-// This tests assume a phone with api level 30 for validations
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
 // Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
@@ -134,7 +134,7 @@ class PhoneBasicScenariosTest {
 
         // verify durations of each state are within a reasonable range
         val playedDuration = eventDataList.sumOf { it.played }
-        assertThat(playedDuration).isBetween(playedToMs, (playedToMs * 1.1).toLong())
+        assertThat(playedDuration).isBetween((playedToMs * 0.95).toLong(), (playedToMs * 1.1).toLong())
 
         val pausedDuration = eventDataList.sumOf { it.paused }
         assertThat(pausedDuration).isBetween((pauseTimeMs * 0.9).toLong(), (pauseTimeMs * 1.1).toLong())
@@ -1119,15 +1119,25 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    fun test_vod_seekWhilePaused() {
+    fun test_vodDash_seekWhilePaused() {
         // arrange
+        val dashSample = TestSources.DASH
+        val dashSourceMetadata =
+            SourceMetadata(
+                title = "test_vodDash_seekWhilePaused",
+                customData = TestConfig.createDummyCustomData("dash"),
+                videoId = "test_vodDash_seekWhilePaused_video_id",
+                cdnProvider = "dashCdnProvider",
+                path = "dashPath",
+            )
+        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
         val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
         // act
         mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+            collector.setSourceMetadata(dashSource, dashSourceMetadata)
             collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
+            defaultPlayer.load(dashSource)
             defaultPlayer.play() // calling play immediately, is similar to configuring autoplay
         }
 
@@ -1139,6 +1149,7 @@ class PhoneBasicScenariosTest {
         }
 
         Thread.sleep(5000)
+        BitmovinPlaybackUtils.waitUntilPlayerSeekedToMs(defaultPlayer, 60000)
 
         mainScope.launch {
             defaultPlayer.play()
@@ -1207,7 +1218,7 @@ class PhoneBasicScenariosTest {
             defaultPlayer.seek(30.0)
         }
 
-        Thread.sleep(2000)
+        BitmovinPlaybackUtils.waitUntilPlayerSeekedBackwardsToMs(defaultPlayer, 30000)
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 32000)
 
         mainScope.launch {

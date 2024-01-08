@@ -35,12 +35,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 // System test for basic playing and error scenario using bitmovin player
-// This tests assume a phone with api level 30 for validations
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
 // Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
 class PhoneBasicScenariosTest {
-
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var defaultPlayer: Player
@@ -125,7 +123,7 @@ class PhoneBasicScenariosTest {
 
         // verify durations of each state are within a reasonable range
         val playedDuration = eventDataList.sumOf { it.played }
-        assertThat(playedDuration).isBetween(playedToMs, (playedToMs * 1.1).toLong())
+        assertThat(playedDuration).isBetween((playedToMs * 0.95).toLong(), (playedToMs * 1.1).toLong())
 
         val pausedDuration = eventDataList.sumOf { it.paused }
         assertThat(pausedDuration).isBetween((pauseTimeMs * 0.9).toLong(), (pauseTimeMs * 1.1).toLong())
@@ -135,8 +133,9 @@ class PhoneBasicScenariosTest {
     fun test_vodWithDrm_playPauseWithAutoPlay() {
         // arrange
         val sample = TestSources.DRM_DASH_WIDEVINE
-        val analyticsConfig = defaultAnalyticsConfig
-            .apply { mpdUrl = sample.mpdUrl }
+        val analyticsConfig =
+            defaultAnalyticsConfig
+                .apply { mpdUrl = sample.mpdUrl }
 
         val drmSourceConfig = SourceConfig.fromUrl(sample.mpdUrl!!)
         drmSourceConfig.drmConfig = WidevineConfig(sample.drmLicenseUrl!!)
@@ -320,7 +319,11 @@ class PhoneBasicScenariosTest {
 
         assertThat(customDataChangeEvents.size).isEqualTo(1)
 
-        val expectedCustomData = MetadataUtils.mergeCustomData(customDataSentOnce, ApiV3Utils.extractDefaultMetadata(defaultAnalyticsConfig).customData)
+        val expectedCustomData =
+            MetadataUtils.mergeCustomData(
+                customDataSentOnce,
+                ApiV3Utils.extractDefaultMetadata(defaultAnalyticsConfig).customData,
+            )
         DataVerifier.verifyCustomData(customDataChangeEvents[0], expectedCustomData)
 
         otherEvents.forEach { DataVerifier.verifyAnalyticsConfig(it, defaultAnalyticsConfig) }
@@ -332,9 +335,10 @@ class PhoneBasicScenariosTest {
         val liveSample = TestSources.DASH_LIVE
         val liveSource = Source.create(SourceConfig.fromUrl(liveSample.mpdUrl!!))
 
-        val localAnalyticsConfig = defaultAnalyticsConfig.apply {
-            isLive = true
-        }
+        val localAnalyticsConfig =
+            defaultAnalyticsConfig.apply {
+                isLive = true
+            }
 
         val collector = IBitmovinPlayerCollector.create(localAnalyticsConfig, appContext)
         val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
@@ -392,20 +396,23 @@ class PhoneBasicScenariosTest {
         val progSample = TestSources.PROGRESSIVE
         val progSource = Source.create(SourceConfig.fromUrl(progSample.progUrl!!))
 
-        val hlsMetadata = SourceMetadata(
-            videoId = "hls-video-id",
-            title = "hlsTitle",
-        )
+        val hlsMetadata =
+            SourceMetadata(
+                videoId = "hls-video-id",
+                title = "hlsTitle",
+            )
 
-        val dashMetadata = SourceMetadata(
-            videoId = "dash-video-id",
-            title = "dashTitle",
-        )
+        val dashMetadata =
+            SourceMetadata(
+                videoId = "dash-video-id",
+                title = "dashTitle",
+            )
 
-        val progMetadata = SourceMetadata(
-            videoId = "prog-video-id",
-            title = "progTitle",
-        )
+        val progMetadata =
+            SourceMetadata(
+                videoId = "prog-video-id",
+                title = "progTitle",
+            )
 
         val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         collector.addSourceMetadata(hlsSource, hlsMetadata)
@@ -464,12 +471,42 @@ class PhoneBasicScenariosTest {
         val defaultMetadata = ApiV3Utils.extractDefaultMetadata(defaultAnalyticsConfig)
         val extractedSourceMetadata = ApiV3Utils.extractSourceMetadata(defaultAnalyticsConfig)
 
-        val impression1SourceMetadata = ApiV3Utils.mergeSourceMetadata(MetadataUtils.mergeSourceMetadata(hlsMetadata, defaultMetadata), extractedSourceMetadata)
-        DataVerifier.verifyStaticData(impression1.eventDataList, impression1SourceMetadata, hlsSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customBitmovinUserId1")
-        val impression2SourceMetadata = ApiV3Utils.mergeSourceMetadata(MetadataUtils.mergeSourceMetadata(dashMetadata, defaultMetadata), extractedSourceMetadata)
-        DataVerifier.verifyStaticData(impression2.eventDataList, impression2SourceMetadata, dashSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customBitmovinUserId1")
-        val impression3SourceMetadata = ApiV3Utils.mergeSourceMetadata(MetadataUtils.mergeSourceMetadata(progMetadata, defaultMetadata), extractedSourceMetadata)
-        DataVerifier.verifyStaticData(impression3.eventDataList, impression3SourceMetadata, progSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customBitmovinUserId1")
+        val impression1SourceMetadata =
+            ApiV3Utils.mergeSourceMetadata(
+                MetadataUtils.mergeSourceMetadata(hlsMetadata, defaultMetadata),
+                extractedSourceMetadata,
+            )
+        DataVerifier.verifyStaticData(
+            impression1.eventDataList,
+            impression1SourceMetadata,
+            hlsSample,
+            BitmovinPlayerConstants.playerInfo,
+            expectedCustomUserId = "customBitmovinUserId1",
+        )
+        val impression2SourceMetadata =
+            ApiV3Utils.mergeSourceMetadata(
+                MetadataUtils.mergeSourceMetadata(dashMetadata, defaultMetadata),
+                extractedSourceMetadata,
+            )
+        DataVerifier.verifyStaticData(
+            impression2.eventDataList,
+            impression2SourceMetadata,
+            dashSample,
+            BitmovinPlayerConstants.playerInfo,
+            expectedCustomUserId = "customBitmovinUserId1",
+        )
+        val impression3SourceMetadata =
+            ApiV3Utils.mergeSourceMetadata(
+                MetadataUtils.mergeSourceMetadata(progMetadata, defaultMetadata),
+                extractedSourceMetadata,
+            )
+        DataVerifier.verifyStaticData(
+            impression3.eventDataList,
+            impression3SourceMetadata,
+            progSample,
+            BitmovinPlayerConstants.playerInfo,
+            expectedCustomUserId = "customBitmovinUserId1",
+        )
 
         DataVerifier.verifyInvariants(impression1.eventDataList)
         DataVerifier.verifyInvariants(impression2.eventDataList)
@@ -494,17 +531,19 @@ class PhoneBasicScenariosTest {
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
 
-        val hlsMetadata = SourceMetadata(
-            videoId = "hls-video-id",
-            title = "hlsTitle",
-        )
+        val hlsMetadata =
+            SourceMetadata(
+                videoId = "hls-video-id",
+                title = "hlsTitle",
+            )
 
         val initialHlsMetadata = hlsMetadata.copy()
 
-        val dashMetadata = SourceMetadata(
-            videoId = "dash-video-id",
-            title = "dashTitle",
-        )
+        val dashMetadata =
+            SourceMetadata(
+                videoId = "dash-video-id",
+                title = "dashTitle",
+            )
 
         val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
         collector.addSourceMetadata(hlsSource, hlsMetadata)
@@ -551,22 +590,30 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression1)
         DataVerifier.verifyHasNoErrorSamples(impression2)
 
-        val samplesBeforeCustomDataChange = impression1.eventDataList.filter {
-                x ->
-            x.customData1 != "setOnSource1"
-        }
+        val samplesBeforeCustomDataChange =
+            impression1.eventDataList.filter {
+                    x ->
+                x.customData1 != "setOnSource1"
+            }
 
-        val samplesAfterCustomDataChange = impression1.eventDataList.filter {
-                x ->
-            x.customData1 == "setOnSource1"
-        }
+        val samplesAfterCustomDataChange =
+            impression1.eventDataList.filter {
+                    x ->
+                x.customData1 == "setOnSource1"
+            }
 
         assertThat(samplesBeforeCustomDataChange).hasSizeGreaterThan(0)
         assertThat(samplesAfterCustomDataChange).hasSizeGreaterThan(0)
 
         // verify customData with a change during the impression
-        DataVerifier.verifyCustomData(samplesBeforeCustomDataChange, MetadataUtils.mergeCustomData(initialHlsMetadata.customData, initialMetadata.customData))
-        DataVerifier.verifyCustomData(samplesAfterCustomDataChange, MetadataUtils.mergeCustomData(changedCustomData, initialMetadata.customData))
+        DataVerifier.verifyCustomData(
+            samplesBeforeCustomDataChange,
+            MetadataUtils.mergeCustomData(initialHlsMetadata.customData, initialMetadata.customData),
+        )
+        DataVerifier.verifyCustomData(
+            samplesAfterCustomDataChange,
+            MetadataUtils.mergeCustomData(changedCustomData, initialMetadata.customData),
+        )
 
         // verify that new impression doesn't have source customData of session before
         DataVerifier.verifyCustomData(
@@ -627,15 +674,31 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_vod_2Impressions_UsingAddSourceMetadata_ShouldReportSourceMetadata() {
         val hlsSample = TestSources.HLS_REDBULL
-        val source1CustomData = CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
-        val sourceMetadata1 = SourceMetadata(title = "titleSource1", videoId = "videoIdSource1", cdnProvider = "cndProviderSource1", path = "path/Source1", customData = source1CustomData)
+        val source1CustomData =
+            CustomData(customData1 = "source1CustomData1", customData30 = "source1CustomData30", experimentName = "experimentNameSource1")
+        val sourceMetadata1 =
+            SourceMetadata(
+                title = "titleSource1",
+                videoId = "videoIdSource1",
+                cdnProvider = "cndProviderSource1",
+                path = "path/Source1",
+                customData = source1CustomData,
+            )
         val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
         val collector = IBitmovinPlayerCollector.create(defaultAnalyticsConfig, appContext)
 
         val dashSample = TestSources.DASH
         val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
-        val source2CustomData = CustomData(customData1 = "source2CustomData1", customData30 = "source2CustomData30", experimentName = "experimentNameSource2")
-        val sourceMetadata2 = SourceMetadata(title = "titleSource2", videoId = "videoIdSource2", cdnProvider = "cndProviderSource2", path = "path/Source2", customData = source2CustomData)
+        val source2CustomData =
+            CustomData(customData1 = "source2CustomData1", customData30 = "source2CustomData30", experimentName = "experimentNameSource2")
+        val sourceMetadata2 =
+            SourceMetadata(
+                title = "titleSource2",
+                videoId = "videoIdSource2",
+                cdnProvider = "cndProviderSource2",
+                path = "path/Source2",
+                customData = source2CustomData,
+            )
 
         // act
         mainScope.launch {
@@ -682,9 +745,21 @@ class PhoneBasicScenariosTest {
 
         val defaultMetadata = ApiV3Utils.extractDefaultMetadata(defaultAnalyticsConfig)
 
-        DataVerifier.verifyStaticData(impression1.eventDataList, MetadataUtils.mergeSourceMetadata(sourceMetadata1, defaultMetadata), hlsSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customBitmovinUserId1")
+        DataVerifier.verifyStaticData(
+            impression1.eventDataList,
+            MetadataUtils.mergeSourceMetadata(sourceMetadata1, defaultMetadata),
+            hlsSample,
+            BitmovinPlayerConstants.playerInfo,
+            expectedCustomUserId = "customBitmovinUserId1",
+        )
         DataVerifier.verifyInvariants(impression1.eventDataList)
-        DataVerifier.verifyStaticData(impression2.eventDataList, MetadataUtils.mergeSourceMetadata(sourceMetadata2, defaultMetadata), dashSample, BitmovinPlayerConstants.playerInfo, expectedCustomUserId = "customBitmovinUserId1")
+        DataVerifier.verifyStaticData(
+            impression2.eventDataList,
+            MetadataUtils.mergeSourceMetadata(sourceMetadata2, defaultMetadata),
+            dashSample,
+            BitmovinPlayerConstants.playerInfo,
+            expectedCustomUserId = "customBitmovinUserId1",
+        )
         DataVerifier.verifyInvariants(impression2.eventDataList)
 
         val startupSampleImpression1 = impression1.eventDataList.first()

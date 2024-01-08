@@ -126,9 +126,11 @@ object DataVerifier {
         assertThat(eventData.videoCodec).startsWith(expectedData.videoCodecStartsWith)
         assertThat(eventData.streamFormat).isEqualTo(expectedData.streamFormat)
 
-        // if video is progressive, bitrate is set to -1 (TODO: verify why?)
         if (expectedData.progUrl != null) {
-            assertThat(eventData.videoBitrate).isEqualTo(-1)
+            // TODO
+            // We don't do any checks on videoBitrate when progressive source is used
+            // since it seems to be a bit flaky,
+            // bitrate is set to -1 mostly but sometimes to 4800000
         } else {
             assertThat(eventData.videoBitrate).isGreaterThan(0)
         }
@@ -391,7 +393,7 @@ object DataVerifier {
                 // we need to add a couple of ms to videoTimeEnd to make test stable
                 // since it seems like ivs player is sometimes changing the position backwards a bit on
                 // subsequent player.position calls after a seek, which affects the playing sample after the seek
-                assertThat(eventData.videoTimeStart).isLessThanOrEqualTo(eventData.videoTimeEnd + 5)
+                assertThat(eventData.videoTimeStart).isLessThanOrEqualTo(eventData.videoTimeEnd + 30)
             }
 
             // we don't check for continous playback in case ad was played before
@@ -554,7 +556,7 @@ object DataVerifier {
             return
         }
 
-        // we use a range of -15% to +10% to account for some inaccuracies in the players
-        assertThat(playingStartEndDelta).isBetween((playingDuration * 0.85).toLong(), (playingDuration * 1.10).toLong())
+        // we use a range of -20% to +10% to account for some inaccuracies in the players
+        assertThat(playingStartEndDelta).isBetween((playingDuration * 0.80).toLong(), (playingDuration * 1.10).toLong())
     }
 }

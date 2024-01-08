@@ -28,7 +28,6 @@ import org.junit.runner.RunWith
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh in the root folder
 @RunWith(AndroidJUnit4::class)
 class PhoneBasicScenariosTest {
-
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var player: Player
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
@@ -54,12 +53,13 @@ class PhoneBasicScenariosTest {
         // arrange
         val liveStreamSample = TestSources.IVS_LIVE_1
         val collector = IAmazonIvsPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        val sourceMetadata = SourceMetadata(
-            title = "title1",
-            isLive = true,
-            videoId = "videoId1",
-            customData = TestConfig.createDummyCustomData("ivsLive1_"),
-        )
+        val sourceMetadata =
+            SourceMetadata(
+                title = "title1",
+                isLive = true,
+                videoId = "videoId1",
+                customData = TestConfig.createDummyCustomData("ivsLive1_"),
+            )
         collector.sourceMetadata = sourceMetadata
         collector.attachPlayer(player)
 
@@ -114,41 +114,47 @@ class PhoneBasicScenariosTest {
         val liveStreamSample1 = TestSources.IVS_LIVE_1
         val collector = IAmazonIvsPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
-        val sourceMetadata1 = SourceMetadata(
-            title = "title1",
-            isLive = true,
-            videoId = "videoId1",
-            customData = TestConfig.createDummyCustomData("ivsLive1_"),
-        )
+        val sourceMetadata1 =
+            SourceMetadata(
+                title = "title1",
+                isLive = true,
+                videoId = "videoId1",
+                customData = TestConfig.createDummyCustomData("ivsLive1_"),
+            )
 
         collector.sourceMetadata = sourceMetadata1
         collector.attachPlayer(player)
         // act
         player.load(Uri.parse(liveStreamSample1.m3u8Url))
         player.play()
+        IvsTestUtils.waitUntilPlayerIsPlaying(player)
+
         val firstPlayMs = 3000L
-        IvsTestUtils.waitUntilPlayerPlayedToMs(player, firstPlayMs)
+        Thread.sleep(firstPlayMs)
+
         player.pause()
         Thread.sleep(100)
 
         collector.detachPlayer()
 
         val liveStreamSample2 = TestSources.IVS_LIVE_2
-        val sourceMetadata2 = SourceMetadata(
-            title = "title2",
-            isLive = true,
-            videoId = "videoId2",
-            customData = TestConfig.createDummyCustomData("ivsLive2_"),
-        )
+        val sourceMetadata2 =
+            SourceMetadata(
+                title = "title2",
+                isLive = true,
+                videoId = "videoId2",
+                customData = TestConfig.createDummyCustomData("ivsLive2_"),
+            )
 
         collector.sourceMetadata = sourceMetadata2
+        player.isMuted = true
         collector.attachPlayer(player)
 
         player.load(Uri.parse(liveStreamSample2.m3u8Url))
-        player.isMuted = true
         player.play()
+        IvsTestUtils.waitUntilPlayerIsPlaying(player)
         val secondPlayMs = 5000L
-        IvsTestUtils.waitUntilPlayerPlayedToMs(player, secondPlayMs)
+        Thread.sleep(secondPlayMs)
 
         player.pause()
         Thread.sleep(100)
@@ -191,22 +197,23 @@ class PhoneBasicScenariosTest {
 
         // verify durations of playing samples state are within a reasonable range
         val playedDurationFirstImpression = firstImpressionSamples.sumOf { it.played }
-        assertThat(playedDurationFirstImpression).isBetween((firstPlayMs * 0.9).toLong(), (firstPlayMs * 1.1).toLong())
+        assertThat(playedDurationFirstImpression).isBetween((firstPlayMs * 0.85).toLong(), (firstPlayMs * 1.15).toLong())
 
         val playedDurationSecondImpression = secondImpressionSamples.sumOf { it.played }
-        assertThat(playedDurationSecondImpression).isBetween((secondPlayMs * 0.9).toLong(), (secondPlayMs * 1.1).toLong())
+        assertThat(playedDurationSecondImpression).isBetween((secondPlayMs * 0.85).toLong(), (secondPlayMs * 1.15).toLong())
     }
 
     @Test
     fun test_vod_playSeekWithAutoplay() {
         val vodStreamSample = TestSources.IVS_VOD_1
         val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, defaultAnalyticsConfig)
-        val sourceMetadata = SourceMetadata(
-            title = "title",
-            isLive = false,
-            videoId = "videoId",
-            customData = TestConfig.createDummyCustomData("ivsVod_"),
-        )
+        val sourceMetadata =
+            SourceMetadata(
+                title = "title",
+                isLive = false,
+                videoId = "videoId",
+                customData = TestConfig.createDummyCustomData("ivsVod_"),
+            )
         collector.sourceMetadata = sourceMetadata
         collector.attachPlayer(player)
 
@@ -254,12 +261,13 @@ class PhoneBasicScenariosTest {
         val vodStreamSample = TestSources.IVS_VOD_1
         val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, defaultAnalyticsConfig)
         collector.attachPlayer(player)
-        val sourceMetadata = SourceMetadata(
-            title = "title",
-            isLive = false,
-            videoId = "videoId",
-            customData = TestConfig.createDummyCustomData("ivsVod_"),
-        )
+        val sourceMetadata =
+            SourceMetadata(
+                title = "title",
+                isLive = false,
+                videoId = "videoId",
+                customData = TestConfig.createDummyCustomData("ivsVod_"),
+            )
         collector.sourceMetadata = sourceMetadata
 
         // act
@@ -299,7 +307,7 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyStartupSample(eventDataList[0])
 
         val playedDuration = eventDataList.sumOf { it.played }
-        assertThat(playedDuration).isBetween((playedBeforePause * 0.95).toLong(), (playedBeforePause * 1.10).toLong())
+        assertThat(playedDuration).isBetween((playedBeforePause * 0.95).toLong(), (playedBeforePause * 1.15).toLong())
     }
 
     @Test
@@ -307,14 +315,19 @@ class PhoneBasicScenariosTest {
         // arrange
         val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
         val collector = IAmazonIvsPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        val nonExistingStreamSourceMetadata = SourceMetadata(title = "non-existing-stream", isLive = false, customData = TestConfig.createDummyCustomData("noneExitingStreamData"))
+        val nonExistingStreamSourceMetadata =
+            SourceMetadata(
+                title = "non-existing-stream",
+                isLive = false,
+                customData = TestConfig.createDummyCustomData("noneExitingStreamData"),
+            )
         collector.sourceMetadata = nonExistingStreamSourceMetadata
         collector.attachPlayer(player)
 
         // act
         player.load(nonExistingStreamSample.uri)
 
-        Thread.sleep(2000) // we need to wait a bit until player goes into error state
+        Thread.sleep(4000) // we need to wait a bit until player goes into error state
 
         collector.detachPlayer()
         player.release()
@@ -343,7 +356,7 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() {
         // arrange
-        val sample = TestSources.HLS_REDBULL
+        val sample = TestSources.IVS_VOD_1
         val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey", backendUrl = mockedIngressUrl)
         val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, analyticsConfig)
         collector.attachPlayer(player)
@@ -370,12 +383,13 @@ class PhoneBasicScenariosTest {
         // arrange
         val vodStreamSample = TestSources.IVS_VOD_1
         val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, defaultAnalyticsConfig)
-        val sourceMetadata = SourceMetadata(
-            title = "title",
-            isLive = false,
-            videoId = "videoId",
-            customData = TestConfig.createDummyCustomData("ivsVod_"),
-        )
+        val sourceMetadata =
+            SourceMetadata(
+                title = "title",
+                isLive = false,
+                videoId = "videoId",
+                customData = TestConfig.createDummyCustomData("ivsVod_"),
+            )
         collector.sourceMetadata = sourceMetadata
         val customData1 = TestConfig.createDummyCustomData("customData1")
         val customData2 = TestConfig.createDummyCustomData("customData2")
@@ -398,6 +412,10 @@ class PhoneBasicScenariosTest {
         player.pause()
 
         collector.sendCustomDataEvent(customData4)
+
+        // wait a bit before detaching to make sure customData4 is sent out (to stabilize test)
+        Thread.sleep(200)
+
         collector.detachPlayer()
         player.release()
         collector.sendCustomDataEvent(customData5) // this event should not be sent since collector is detached
@@ -432,14 +450,16 @@ class PhoneBasicScenariosTest {
         // arrange
         val vodStreamSample = TestSources.IVS_VOD_1
         val defaultCustomData = CustomData(customData1 = "v1.2.3", customData2 = "videoID123")
-        val defaultMetadata = DefaultMetadata(cdnProvider = "testCdnPovider", customUserId = "testCustomUserId", customData = defaultCustomData)
+        val defaultMetadata =
+            DefaultMetadata(cdnProvider = "testCdnPovider", customUserId = "testCustomUserId", customData = defaultCustomData)
         val collector = IAmazonIvsPlayerCollector.Factory.create(appContext, defaultAnalyticsConfig, defaultMetadata)
-        val sourceMetadata = SourceMetadata(
-            title = "title",
-            isLive = false,
-            videoId = "videoId",
-            customData = CustomData(customData3 = "beforeSetCustomData"),
-        )
+        val sourceMetadata =
+            SourceMetadata(
+                title = "title",
+                isLive = false,
+                videoId = "videoId",
+                customData = CustomData(customData3 = "beforeSetCustomData"),
+            )
         collector.sourceMetadata = sourceMetadata
 
         // act

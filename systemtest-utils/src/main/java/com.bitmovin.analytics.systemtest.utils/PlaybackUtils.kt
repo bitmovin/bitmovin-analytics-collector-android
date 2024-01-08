@@ -8,7 +8,10 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions
 
 object PlaybackUtils {
-    fun waitUntil(condition: () -> Boolean) {
+    fun waitUntil(
+        conditionName: String = "",
+        condition: () -> Boolean,
+    ) {
         val maxWaitMs = 45000L
         var waitingTotalMs = 0L
         val waitingDeltaMs = 100L
@@ -20,7 +23,7 @@ object PlaybackUtils {
                 waitingTotalMs += waitingDeltaMs
 
                 if (waitingTotalMs >= maxWaitMs) {
-                    Assertions.fail<Nothing>("expected condition wasn't fulfilled within $maxWaitMs ms")
+                    Assertions.fail<Nothing>("expected condition ($conditionName) wasn't fulfilled within $maxWaitMs ms")
                 }
             }
 

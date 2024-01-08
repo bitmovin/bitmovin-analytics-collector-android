@@ -36,12 +36,21 @@ android {
         // https://developer.android.com/studio/test/gradle-managed-devices
         managedDevices {
             devices {
+                pixel6api34 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                    // Use device profiles you typically see in Android Studio.
+                    device = "Pixel 6"
+                    // Use only API levels 27 and higher.
+                    apiLevel = 34
+                    // we can use aosp-atd for ivs tests (compared to google image for others)
+                    // since amazon ivs doesn't support drm (and google image is only needed for drm support)
+                    // tests got a bit flaky with google image
+                    systemImageSource = "aosp-atd"
+                }
                 pixel6api30 (com.android.build.api.dsl.ManagedVirtualDevice) {
                     // Use device profiles you typically see in Android Studio.
                     device = "Pixel 6"
                     // Use only API levels 27 and higher.
                     apiLevel = 30
-                    // To include Google services, use "google-atd".
                     systemImageSource = "aosp-atd"
                 }
             }

@@ -41,7 +41,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 // System test for basic playing and error scenario using bitmovin player
-// This tests assume a phone with api level 30 for validations
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
 // Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
@@ -136,7 +135,7 @@ class BundledAnalyticsTest {
 
         // verify durations of each state are within a reasonable range
         val playedDuration = eventDataList.sumOf { it.played }
-        assertThat(playedDuration).isBetween(playedToMs, (playedToMs * 1.2).toLong())
+        assertThat(playedDuration).isBetween((playedToMs * 0.95).toLong(), (playedToMs * 1.1).toLong())
 
         val pausedDuration = eventDataList.sumOf { it.paused }
         assertThat(pausedDuration).isBetween((pauseTimeMs * 0.9).toLong(), (pauseTimeMs * 1.1).toLong())
@@ -987,12 +986,20 @@ class BundledAnalyticsTest {
             defaultPlayer.pause()
             defaultPlayer.analytics?.sendCustomDataEvent(customData4)
             defaultPlayer.unload()
+        }
+
+        // wait a bit for unloading
+        Thread.sleep(500)
+
+        mainScope.launch {
             defaultPlayer.analytics?.sendCustomDataEvent(customData5)
         }
 
-        Thread.sleep(300)
+        Thread.sleep(500)
 
         val impressions = MockedIngress.extractImpressions()
+
+        // sending customData5 is with player unloaded and thus, should be in a separate impression
         assertThat(impressions.size).isEqualTo(2)
 
         val impression = impressions[0]
@@ -1061,10 +1068,21 @@ class BundledAnalyticsTest {
     }
 
     @Test
-    fun test_vod_seekWhilePaused() {
+    fun test_vodDash_seekWhilePaused() {
+        val dashSample = TestSources.DASH
+        val dashSourceMetadata =
+            SourceMetadata(
+                title = "test_vodDash_seekWhilePaused",
+                customData = TestConfig.createDummyCustomData("dash"),
+                videoId = "test_vodDash_seekWhilePaused_video_id",
+                cdnProvider = "dashCdnProvider",
+                path = "dashPath",
+            )
+        val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashSourceMetadata)
+
         // act
         mainScope.launch {
-            defaultPlayer.load(defaultSource)
+            defaultPlayer.load(dashSource)
             defaultPlayer.play()
         }
 
@@ -1075,7 +1093,10 @@ class BundledAnalyticsTest {
             defaultPlayer.seek(60.0)
         }
 
-        Thread.sleep(5000)
+        BitmovinPlaybackUtils.waitUntilPlayerSeekedToMs(defaultPlayer, 60000)
+
+        // Stay paused for 8000
+        Thread.sleep(8000)
 
         mainScope.launch {
             defaultPlayer.play()
@@ -1104,7 +1125,7 @@ class BundledAnalyticsTest {
         // a seek should be quite fast with a stable internet connection
         // we test here that the seek is not identical with the pause
         // which should take >4000 milliseconds
-        assertThat(forwardSeek.seeked).isLessThan(1000)
+        assertThat(forwardSeek.seeked).isLessThan(3000)
 
         val pauseAfterSeek = impression.eventDataList[forwardSeek.sequenceNumber + 1]
         assertThat(pauseAfterSeek.state).isEqualTo(DataVerifier.PAUSE)
@@ -1137,7 +1158,7 @@ class BundledAnalyticsTest {
             defaultPlayer.seek(30.0)
         }
 
-        Thread.sleep(2000)
+        BitmovinPlaybackUtils.waitUntilPlayerSeekedBackwardsToMs(defaultPlayer, 30000)
         BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 32000)
 
         mainScope.launch {

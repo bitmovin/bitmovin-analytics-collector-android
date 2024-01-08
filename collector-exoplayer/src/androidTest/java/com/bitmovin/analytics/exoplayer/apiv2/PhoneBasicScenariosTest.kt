@@ -29,12 +29,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 // System test for basic playing and error scenario using exoplayer player
-// This tests assume a phone with api level 30 for validations
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
 // Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
 class PhoneBasicScenariosTest {
-
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var player: ExoPlayer
@@ -177,29 +175,32 @@ class PhoneBasicScenariosTest {
         val beforeCustomDataChange = eventDataList.filter { it.customData1 != "source1" }
         val afterCustomDataChange = eventDataList.filter { it.customData1 == "source1" }
 
-        val customDataBeforeChange = CustomData(
-            experimentName = "experiment-1",
-            customData1 = "systemtest",
-            customData2 = "customData2",
-            customData3 = "customData3",
-            customData4 = "customData4",
-            customData5 = "customData5",
-            customData6 = "customData6",
-            customData7 = "customData7",
-        )
+        val customDataBeforeChange =
+            CustomData(
+                experimentName = "experiment-1",
+                customData1 = "systemtest",
+                customData2 = "customData2",
+                customData3 = "customData3",
+                customData4 = "customData4",
+                customData5 = "customData5",
+                customData6 = "customData6",
+                customData7 = "customData7",
+            )
 
         DataVerifier.verifyCustomData(beforeCustomDataChange, customDataBeforeChange)
 
-        val customDataAfterChange = CustomData(
-            customData1 = "source1",
-            customData2 = "source1",
-        )
+        val customDataAfterChange =
+            CustomData(
+                customData1 = "source1",
+                customData2 = "source1",
+            )
         DataVerifier.verifyCustomData(afterCustomDataChange, customDataAfterChange)
 
-        val customDataOnSecondImpression = CustomData(
-            customData1 = "source2",
-            customData2 = "source2",
-        )
+        val customDataOnSecondImpression =
+            CustomData(
+                customData1 = "source2",
+                customData2 = "source2",
+            )
         DataVerifier.verifyCustomData(impressions[1].eventDataList, customDataOnSecondImpression)
     }
 
