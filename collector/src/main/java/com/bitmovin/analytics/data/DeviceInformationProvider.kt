@@ -31,7 +31,6 @@ import android.util.Log
 import android.view.Display
 import com.bitmovin.analytics.features.FeatureManager.Companion.TAG
 import com.bitmovin.analytics.utils.Util
-import java.nio.file.Files.size
 
 open class DeviceInformationProvider(
     val context: Context,
