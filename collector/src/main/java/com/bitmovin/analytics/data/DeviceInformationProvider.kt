@@ -12,9 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-/*
+ *
  * Parts of this file are copied and adapted from https://github.com/google/ExoPlayer
  * The sections which are copied are marked with comments.
  */
@@ -25,15 +23,15 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Point
+import android.hardware.display.DisplayManager
 import android.os.Build
 import android.text.TextUtils
 import android.text.TextUtils.split
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Display
-import android.view.WindowManager
 import com.bitmovin.analytics.features.FeatureManager.Companion.TAG
 import com.bitmovin.analytics.utils.Util
+import java.nio.file.Files.size
 
 open class DeviceInformationProvider(
     val context: Context,
@@ -41,27 +39,28 @@ open class DeviceInformationProvider(
     val isTV: Boolean = Util.isTVDevice(context)
 
     fun getDeviceInformation(): DeviceInformation {
-        val windowManager: WindowManager? =
-            context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
-        val displayMetrics = DisplayMetrics()
         var width = 0
         var height = 0
 
-        if (windowManager != null) {
-            windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val displayManager = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager?
 
+        if (displayManager != null) {
+            val displayMetrics = context.resources.displayMetrics
             width = displayMetrics.widthPixels
             height = displayMetrics.heightPixels
 
-            // detecting UHD on androidTV requires some workaround
-            // this is similar to what exoplayer is doing
-            if (isTV) {
-                val displaySize = getDisplaySizeOnTV(windowManager.defaultDisplay)
+            val defaultDisplay = displayManager.getDisplay(Display.DEFAULT_DISPLAY) as Display?
+            if (defaultDisplay != null) {
+                // detecting UHD on androidTV requires some workaround
+                // this is similar to what exoplayer is doing
+                if (isTV) {
+                    val displaySize = getDisplaySizeOnTV(defaultDisplay)
 
-                // we make sure that workaround returns reasonable values
-                if (displaySize.x > 0 && displaySize.y > 0) {
-                    width = displaySize.x
-                    height = displaySize.y
+                    // we make sure that workaround returns reasonable values
+                    if (displaySize.x > 0 && displaySize.y > 0) {
+                        width = displaySize.x
+                        height = displaySize.y
+                    }
                 }
             }
         }
@@ -106,26 +105,28 @@ open class DeviceInformationProvider(
         }
 
         private val fireOSVersion: String
-            get() = when {
-                Build.VERSION.SDK_INT >= 30 -> ">=8" // https://developer.amazon.com/docs/fire-tablets/fire-os-8.html#target-your-app-for-fire-os-8-devices
-                Build.VERSION.SDK_INT >= 28 -> "7"
-                Build.VERSION.SDK_INT >= 25 -> "6"
-                Build.VERSION.SDK_INT >= 22 -> "5"
-                Build.VERSION.SDK_INT >= 19 -> "4"
-                else -> "Unknown"
-            }
+            get() =
+                when {
+                    // https://developer.amazon.com/docs/fire-tablets/fire-os-8.html#target-your-app-for-fire-os-8-devices
+                    Build.VERSION.SDK_INT >= 30 -> ">=8"
+                    Build.VERSION.SDK_INT >= 28 -> "7"
+                    Build.VERSION.SDK_INT >= 25 -> "6"
+                    Build.VERSION.SDK_INT >= 22 -> "5"
+                    Build.VERSION.SDK_INT >= 19 -> "4"
+                    else -> "Unknown"
+                }
 
         // This will also include FireTV Sticks
         // https://developer.amazon.com/docs/fire-tv/identify-amazon-fire-tv-devices.html
-        private fun isFireTV(packageManager: PackageManager) =
-            packageManager.hasSystemFeature(AMAZON_FEATURE_FIRE_TV)
+        private fun isFireTV(packageManager: PackageManager) = packageManager.hasSystemFeature(AMAZON_FEATURE_FIRE_TV)
 
         // https://developer.amazon.com/docs/fire-tablets/ft-identifying-tablet-devices.html
         private val isFireTablet: Boolean
-            get() = "Amazon".equals(Build.MANUFACTURER, true) && Build.MODEL?.startsWith(
-                "KF",
-                true,
-            ) == true
+            get() =
+                "Amazon".equals(Build.MANUFACTURER, true) && Build.MODEL?.startsWith(
+                    "KF",
+                    true,
+                ) == true
     }
 
     // This code is partly copied from exoplayer https://github.com/google/ExoPlayer and converted into Kotlin
@@ -193,7 +194,10 @@ open class DeviceInformationProvider(
 
     // This code is copied from exoplayer https://github.com/google/ExoPlayer, converted into kotlin and adapted to iterate over all display modes
     @TargetApi(23)
-    private fun getDisplaySizeV23(display: Display, outSize: Point) {
+    private fun getDisplaySizeV23(
+        display: Display,
+        outSize: Point,
+    ) {
         // Detecting display size for TVs similar as ExoPlayer does it
         // (we also go over all modes additionally since I couldn't find anything about order of these modes in the API docs)
         // https://github.com/google/ExoPlayer/blob/3a654c1f54e19f261e717282fe42168b38d7e96c/library/common/src/main/java/com/google/android/exoplayer2/util/Util.java#L2761
@@ -213,7 +217,10 @@ open class DeviceInformationProvider(
 
     // This code is copied from exoplayer https://github.com/google/ExoPlayer and converted into kotlin
     @TargetApi(17)
-    private fun getDisplaySizeV17(display: Display, outSize: Point) {
+    private fun getDisplaySizeV17(
+        display: Display,
+        outSize: Point,
+    ) {
         display.getRealSize(outSize)
     }
 

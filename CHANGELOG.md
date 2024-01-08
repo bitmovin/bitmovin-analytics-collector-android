@@ -6,9 +6,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.3.2
+
+### Fixed
+- java.lang.IllegalAccessException when using strict mode with detectIncorrectContextUse()
+  due to WindowManager usage
+
 ### Changed
 - [Internal] Changed Systemtest Managed Devices to use image with API Level 34 and moved
   all except amazon ivs tests to google image since aosp-atd doesn't support drm anymore
+
 
 ## v3.3.1
 

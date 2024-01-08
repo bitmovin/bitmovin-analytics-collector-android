@@ -1,6 +1,8 @@
 package com.bitmovin.analytics.media3.exoplayer.example
 
 import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
@@ -27,6 +29,16 @@ class MainActivity : AppCompatActivity(), Player.Listener {
     private var collector: IMedia3ExoPlayerCollector? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Set StrictMode to catch potential issues early
+        // okhttp causes android.os.strictmode.UntaggedSocketViolation
+        // which is a known issue
+        StrictMode.setVmPolicy(
+            VmPolicy.Builder()
+                .penaltyLog()
+                .detectAll()
+                .build(),
+        )
+
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
 
@@ -64,46 +76,51 @@ class MainActivity : AppCompatActivity(), Player.Listener {
         if (player == null) {
             val bandwidthMeter = DefaultBandwidthMeter.Builder(this).build()
 
-            player = ExoPlayer.Builder(this)
-                .setBandwidthMeter(bandwidthMeter)
-                .build()
+            player =
+                ExoPlayer.Builder(this)
+                    .setBandwidthMeter(bandwidthMeter)
+                    .build()
 
             val exoPlayer = player!!
             viewBinding.aMainExoplayer.player = exoPlayer
 
             // Step 1: Create your analytics config object and defaultMetadata
             val analyticsConfig = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
-            val defaultMetadata = DefaultMetadata(
-                cdnProvider = CDNProvider.BITMOVIN,
-                customData = CustomData(
-                    customData1 = "customData1",
-                    customData2 = "customData2",
-                    customData3 = "customData3",
-                    customData4 = "customData4",
-                    customData5 = "customData5",
-                    customData6 = "customData6",
-                    customData7 = "customData7",
-                    experimentName = "experiment-1",
-                ),
-            )
+            val defaultMetadata =
+                DefaultMetadata(
+                    cdnProvider = CDNProvider.BITMOVIN,
+                    customData =
+                        CustomData(
+                            customData1 = "customData1",
+                            customData2 = "customData2",
+                            customData3 = "customData3",
+                            customData4 = "customData4",
+                            customData5 = "customData5",
+                            customData6 = "customData6",
+                            customData7 = "customData7",
+                            experimentName = "experiment-1",
+                        ),
+                )
 
             // Step 2: Create Analytics Collector
-            collector = IMedia3ExoPlayerCollector.Factory.create(
-                applicationContext,
-                analyticsConfig,
-                defaultMetadata,
-            )
+            collector =
+                IMedia3ExoPlayerCollector.Factory.create(
+                    applicationContext,
+                    analyticsConfig,
+                    defaultMetadata,
+                )
 
             // Step 3: Attach ExoPlayer
             collector?.attachPlayer(exoPlayer)
 
             // Step 4: set SourceMetadata and load source into player
             val mediaItem = buildMediaItem(Samples.HLS_REDBULL)
-            val sourceMetadata = SourceMetadata(
-                videoId = mediaItem.mediaId,
-                title = mediaItem.mediaId + " title",
-                customData = CustomData(customData1 = "testGenre"),
-            )
+            val sourceMetadata =
+                SourceMetadata(
+                    videoId = mediaItem.mediaId,
+                    title = mediaItem.mediaId + " title",
+                    customData = CustomData(customData1 = "testGenre"),
+                )
             collector?.sourceMetadata = sourceMetadata
             exoPlayer.setMediaItem(mediaItem)
 
@@ -119,12 +136,16 @@ class MainActivity : AppCompatActivity(), Player.Listener {
     }
 
     // Detect media item transitions which indicate new impressions when playlists are used
-    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+    override fun onMediaItemTransition(
+        mediaItem: MediaItem?,
+        reason: Int,
+    ) {
         if (mediaItem != null) {
-            val sourceMetadata = SourceMetadata(
-                videoId = mediaItem.mediaId,
-                title = mediaItem.mediaId + " title",
-            )
+            val sourceMetadata =
+                SourceMetadata(
+                    videoId = mediaItem.mediaId,
+                    title = mediaItem.mediaId + " title",
+                )
             collector?.sourceMetadata = sourceMetadata
             collector?.attachPlayer(player!!)
         }
@@ -132,10 +153,11 @@ class MainActivity : AppCompatActivity(), Player.Listener {
 
     private fun changeCustomData() {
         val bitmovinAnalytics = collector ?: return
-        val changedCustomData = bitmovinAnalytics.customData.copy(
-            customData1 = "custom_data_1_changed",
-            customData2 = "custom_data_2_changed",
-        )
+        val changedCustomData =
+            bitmovinAnalytics.customData.copy(
+                customData1 = "custom_data_1_changed",
+                customData2 = "custom_data_2_changed",
+            )
 
         bitmovinAnalytics.customData = changedCustomData
     }
@@ -144,12 +166,13 @@ class MainActivity : AppCompatActivity(), Player.Listener {
         collector?.detachPlayer()
 
         val liveSource = buildMediaItem(Samples.DASH_LIVE)
-        val sourceMetadata = SourceMetadata(
-            isLive = true,
-            path = "/live/path",
-            title = "DASH Live Video Title",
-            videoId = liveSource.mediaId,
-        )
+        val sourceMetadata =
+            SourceMetadata(
+                isLive = true,
+                path = "/live/path",
+                title = "DASH Live Video Title",
+                videoId = liveSource.mediaId,
+            )
         collector?.sourceMetadata = sourceMetadata
         collector?.attachPlayer(player!!)
         player?.setMediaItem(liveSource)
@@ -159,36 +182,40 @@ class MainActivity : AppCompatActivity(), Player.Listener {
         collector?.detachPlayer()
 
         val drmMediaSource = buildMediaItem(Samples.DASH_DRM_WIDEVINE)
-        val sourceMetadata = SourceMetadata(
-            videoId = drmMediaSource.mediaId,
-            title = "DASH DRM Video Title",
-            path = "drm/dash/path",
-        )
+        val sourceMetadata =
+            SourceMetadata(
+                videoId = drmMediaSource.mediaId,
+                title = "DASH DRM Video Title",
+                path = "drm/dash/path",
+            )
         collector?.sourceMetadata = sourceMetadata
         collector?.attachPlayer(player!!)
         player?.setMediaItem(drmMediaSource)
     }
 
     private fun sendCustomDataEvent() {
-        val customData = CustomData(
-            customData1 = "custom_data_1_sent",
-            customData2 = "custom_data_2_sent",
-        )
+        val customData =
+            CustomData(
+                customData1 = "custom_data_1_sent",
+                customData2 = "custom_data_2_sent",
+            )
         this.collector?.sendCustomDataEvent(customData)
     }
 
     private fun buildMediaItem(sample: Sample): MediaItem {
-        val mediaItemBuilder = MediaItem.Builder()
-            .setUri(sample.uri)
-            .setMediaId(sample.name)
+        val mediaItemBuilder =
+            MediaItem.Builder()
+                .setUri(sample.uri)
+                .setMediaId(sample.name)
 
         val sampleDrmLicenseUri = sample.drmLicenseUri
         if (sample.drmScheme != null && sampleDrmLicenseUri != null) {
             val sampleDrmSchemeUUID = Util.getDrmUuid(sample.drmScheme!!)
             if (sampleDrmSchemeUUID != null) {
-                val drmConfiguration = MediaItem.DrmConfiguration.Builder(sampleDrmSchemeUUID)
-                    .setLicenseUri(sampleDrmLicenseUri)
-                    .build()
+                val drmConfiguration =
+                    MediaItem.DrmConfiguration.Builder(sampleDrmSchemeUUID)
+                        .setLicenseUri(sampleDrmLicenseUri)
+                        .build()
                 mediaItemBuilder.setDrmConfiguration(drmConfiguration)
             }
         }

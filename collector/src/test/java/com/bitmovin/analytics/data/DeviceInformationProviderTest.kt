@@ -18,7 +18,6 @@ import org.robolectric.shadows.ShadowUIModeManager
     RobolectricTestRunner::class,
 )
 class DeviceInformationProviderTest {
-
     @Test
     @Config(qualifiers = "fr-rFR-w360dp-h640dp-xhdpi")
     fun testGetDeviceInformation_Phone_targetAPI_ShouldReturnInfo() {
@@ -54,6 +53,22 @@ class DeviceInformationProviderTest {
         Assert.assertEquals(false, deviceInfo.isTV)
         Assert.assertEquals(2160, deviceInfo.screenWidth)
         Assert.assertEquals(3840, deviceInfo.screenHeight)
+    }
+
+    @Test
+    @Config(qualifiers = "en-rUS-w1080dp-h1920dp-land-xhdpi", sdk = [34])
+    fun testGetDeviceInformation_4kPhone_API_V34_LandScape_ShouldReturnInfo() {
+        // arrange
+        val dip = DeviceInformationProvider(ApplicationProvider.getApplicationContext())
+
+        // act
+        val deviceInfo = dip.getDeviceInformation()
+
+        // assert
+        Assert.assertEquals("en_US", deviceInfo.locale)
+        Assert.assertEquals(false, deviceInfo.isTV)
+        Assert.assertEquals(3840, deviceInfo.screenWidth)
+        Assert.assertEquals(2160, deviceInfo.screenHeight)
     }
 
     @Test
