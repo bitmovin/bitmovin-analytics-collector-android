@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Updated bitmovin player (v3.56.0) and media3-exoplayer (v1.2.1)
+
 ## v3.3.2
 
 ### Fixed
@@ -15,7 +18,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - [Internal] Changed Systemtest Managed Devices to use image with API Level 34 and moved
   all except amazon ivs tests to google image since aosp-atd doesn't support drm anymore
-
 
 ## v3.3.1
 
