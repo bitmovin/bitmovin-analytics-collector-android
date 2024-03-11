@@ -1,6 +1,6 @@
 # Run Systemtests automatically on a local machine
 # call './runSystemTests.sh' in order to execute all tests
-
+#
 # local setup requires gradle and android sdk
 # (if android development with android studio works, this should be the case)
 

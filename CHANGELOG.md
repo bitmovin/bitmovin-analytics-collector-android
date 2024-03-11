@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
-- Updated bitmovin player (v3.56.0) and media3-exoplayer (v1.2.1)
+- Updated bitmovin player (v3.61.0), media3-exoplayer (v1.3.0) and amazon-ivs (v1.25.0)
+
+### Fixed
+- [Internal] Optin for com.bitmovin.player.core.internal.InternalPlayerApi to have access to BuildInfo for bitmovin player version
 
 ## v3.3.2
 
