@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
+- Increased minimum required compileSdk to 34
 - Updated bitmovin player (v3.61.0), media3-exoplayer (v1.3.0) and amazon-ivs (v1.25.0)
 
 ### Fixed
