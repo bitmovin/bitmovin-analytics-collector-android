@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.4.0
+
 ### Changed
 - Increased minimum required compileSdk to 34
 - Updated bitmovin player (v3.68.0), media3-exoplayer (v1.3.1) and amazon-ivs (v1.27.0)
