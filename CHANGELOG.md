@@ -8,10 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Increased minimum required compileSdk to 34
-- Updated bitmovin player (v3.61.0), media3-exoplayer (v1.3.0) and amazon-ivs (v1.25.0)
+- Updated bitmovin player (v3.68.0), media3-exoplayer (v1.3.1) and amazon-ivs (v1.27.0)
 
 ### Fixed
 - [Internal] Optin for com.bitmovin.player.core.internal.InternalPlayerApi to have access to BuildInfo for bitmovin player version
+- [Internal] Updated systemtests for bitmovinplayer to handle newly introduced error codes in player v3.63.0
+
 
 ## v3.3.2
 

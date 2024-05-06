@@ -792,8 +792,8 @@ class PhoneBasicScenariosTest {
         val errorDetail = impression.errorDetailList.first()
 
         val impressionId = eventData.impressionId
-        assertThat(eventData.errorMessage).isEqualTo("A general error occurred: Response code: 404")
-        assertThat(eventData.errorCode).isEqualTo(2001)
+        assertThat(eventData.errorMessage).isEqualTo("An unexpected HTTP status code was received: Response code: 404")
+        assertThat(eventData.errorCode).isEqualTo(2203)
         assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
         DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
 
