@@ -10,6 +10,7 @@ public final class com/bitmovin/analytics/exoplayer/ExoPlayerCollector : com/bit
 	public fun <init> (Lcom/bitmovin/analytics/api/AnalyticsConfig;Landroid/content/Context;)V
 	public synthetic fun createAdapter (Ljava/lang/Object;Lcom/bitmovin/analytics/BitmovinAnalytics;)Lcom/bitmovin/analytics/adapters/PlayerAdapter;
 	public fun getSourceMetadata ()Lcom/bitmovin/analytics/api/SourceMetadata;
+	public fun getSsai ()Lcom/bitmovin/analytics/api/ssai/SsaiApi;
 	public fun setSourceMetadata (Lcom/bitmovin/analytics/api/SourceMetadata;)V
 }
 

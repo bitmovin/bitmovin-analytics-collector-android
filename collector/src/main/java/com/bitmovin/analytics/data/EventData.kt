@@ -34,6 +34,10 @@ data class EventData(
     var buffered: Long = 0,
     var paused: Long = 0,
     var ad: Int = 0,
+    var adPosition: String? = null,
+    var adId: String? = null,
+    var adSystem: String? = null,
+    var adIndex: Int? = null,
     var seeked: Long = 0,
     var videoPlaybackWidth: Int = 0,
     var videoPlaybackHeight: Int = 0,
@@ -105,7 +109,6 @@ data class EventData(
     val customData30: String? = null,
     val experimentName: String? = null,
 ) {
-
     constructor(
         deviceInfo: DeviceInformation,
         playerInfo: PlayerInfo,

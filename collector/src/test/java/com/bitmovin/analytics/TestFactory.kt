@@ -10,29 +10,35 @@ import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.UserIdProvider
 import com.bitmovin.analytics.enums.PlayerType
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.utils.UserAgentProvider
+import io.mockk.every
 import io.mockk.mockk
 
 object TestFactory {
-    private val testDeviceInformation = DeviceInformation(
-        manufacturer = "manufacturer",
-        model = "model",
-        isTV = false,
-        locale = "locale",
-        domain = "packageName",
-        screenHeight = 2400,
-        screenWidth = 1080,
-    )
+    private val testDeviceInformation =
+        DeviceInformation(
+            manufacturer = "manufacturer",
+            model = "model",
+            isTV = false,
+            locale = "locale",
+            domain = "packageName",
+            screenHeight = 2400,
+            screenWidth = 1080,
+        )
 
     fun createEventDataFactory(
         config: AnalyticsConfig,
         userIdProvider: UserIdProvider? = null,
         userAgentProvider: UserAgentProvider? = null,
     ): EventDataFactory {
+        val ssaiService = mockk<SsaiService>()
+        every { ssaiService.adMetadata?.customData } returns null
         return EventDataFactory(
             config,
             userIdProvider ?: mockk(relaxed = true),
             userAgentProvider ?: mockk(relaxed = true),
+            ssaiService = ssaiService,
         )
     }
 
@@ -43,27 +49,29 @@ object TestFactory {
         defaultMetadata: DefaultMetadata = DefaultMetadata(),
         deviceInformation: DeviceInformation = testDeviceInformation,
         playerInfo: PlayerInfo = PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-    ): EventData = createEventDataFactory(config).create(
-        impressionId,
-        sourceMetadata,
-        defaultMetadata,
-        deviceInformation,
-        playerInfo,
-    )
+    ): EventData =
+        createEventDataFactory(config).create(
+            impressionId,
+            sourceMetadata,
+            defaultMetadata,
+            deviceInformation,
+            playerInfo,
+        )
 
-    fun createAdEventData(adId: String = "testAdId") = AdEventData(
-        adId = adId,
-        videoImpressionId = "video-impression-id",
-        userAgent = "userAgent",
-        domain = "bitmovin.com",
-        language = "en",
-        player = "bitmovin player",
-        screenHeight = 9,
-        screenWidth = 16,
-        platform = "android",
-        playerTech = "player tech",
-        videoWindowHeight = 9,
-        videoWindowWidth = 16,
-        userId = "testUser",
-    )
+    fun createAdEventData(adId: String = "testAdId") =
+        AdEventData(
+            adId = adId,
+            videoImpressionId = "video-impression-id",
+            userAgent = "userAgent",
+            domain = "bitmovin.com",
+            language = "en",
+            player = "bitmovin player",
+            screenHeight = 9,
+            screenWidth = 16,
+            platform = "android",
+            playerTech = "player tech",
+            videoWindowHeight = 9,
+            videoWindowWidth = 16,
+            userId = "testUser",
+        )
 }

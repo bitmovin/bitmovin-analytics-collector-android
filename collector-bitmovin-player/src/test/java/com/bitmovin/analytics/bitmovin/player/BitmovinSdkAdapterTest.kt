@@ -39,28 +39,31 @@ class BitmovinSdkAdapterTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        playerStateMachine = spyk(
-            PlayerStateMachine(
-                mockk(),
-                mockk(),
-                qualityChangeEventLimiter,
-                mockk(),
-                mockk(),
-                mockk(),
-            ),
-            recordPrivateCalls = true,
-        )
-        bitmovinSdkAdapter = BitmovinSdkAdapter(
-            player,
-            mockk(relaxed = true),
-            playerStateMachine,
-            mockk(relaxed = true),
-            mockk(relaxed = true),
-            mockk(relaxed = true),
-            mockk(relaxed = true),
-            playbackQualityProvider,
-            mockk(relaxed = true),
-        )
+        playerStateMachine =
+            spyk(
+                PlayerStateMachine(
+                    mockk(),
+                    mockk(),
+                    qualityChangeEventLimiter,
+                    mockk(),
+                    mockk(),
+                    mockk(),
+                ),
+                recordPrivateCalls = true,
+            )
+        bitmovinSdkAdapter =
+            BitmovinSdkAdapter(
+                player,
+                mockk(relaxed = true),
+                playerStateMachine,
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+                playbackQualityProvider,
+                mockk(relaxed = true),
+                mockk(relaxed = true),
+            )
     }
 
     @Test
@@ -102,10 +105,11 @@ class BitmovinSdkAdapterTest {
 
         // act
         bitmovinSdkAdapter.init()
-        val audioPlaybackQualityChangedEvent = PlayerEvent.AudioPlaybackQualityChanged(
-            AudioQuality("", "", 200, null),
-            AudioQuality("", "", 300, null),
-        )
+        val audioPlaybackQualityChangedEvent =
+            PlayerEvent.AudioPlaybackQualityChanged(
+                AudioQuality("", "", 200, null),
+                AudioQuality("", "", 300, null),
+            )
         listenerSlot.captured(audioPlaybackQualityChangedEvent)
 
         // asset
@@ -119,7 +123,7 @@ class BitmovinSdkAdapterTest {
     }
 
     @Test
-    fun `playerEventAudioPlaybackQualityChangedListener doesn't change playerStateMachine, when AudioPlaybackQualityChanged event with same bitrate is triggered`() {
+    fun `quality change event doesn't change playerStateMachine, when same bitrate is reported`() {
         // arrange
         val listenerSlot = slot<(PlayerEvent.AudioPlaybackQualityChanged) -> Unit>()
         every {

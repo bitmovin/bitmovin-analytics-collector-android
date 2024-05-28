@@ -7,13 +7,13 @@
     tools:context="com.bitmovin.analytics.bitmovinplayer.example.MainActivity">
 
     <com.bitmovin.player.PlayerView
-        app:initialize_player="false"
+        android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/playerView"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentTop="true"
+        app:initialize_player="false" />
 
     <TableLayout
         android:id="@+id/tableLayout"
@@ -108,8 +108,33 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Send custom data event" />
+
         </TableRow>
 
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/ssaiStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ssai ad break start" />
+
+            <Button
+                android:id="@+id/ssaiNext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="ssai ad start" />
+
+            <Button
+                android:id="@+id/ssaiEnd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ssai ad break end" />
+        </TableRow>
     </TableLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

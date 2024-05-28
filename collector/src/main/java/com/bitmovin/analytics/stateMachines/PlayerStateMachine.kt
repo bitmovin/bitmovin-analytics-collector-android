@@ -64,10 +64,11 @@ class PlayerStateMachine(
             object : Runnable {
                 override fun run() {
                     triggerHeartbeat()
-                    currentRebufferingIntervalIndex = Math.min(
-                        currentRebufferingIntervalIndex + 1,
-                        rebufferingIntervals.size - 1,
-                    )
+                    currentRebufferingIntervalIndex =
+                        Math.min(
+                            currentRebufferingIntervalIndex + 1,
+                            rebufferingIntervals.size - 1,
+                        )
                     heartbeatHandler.postDelayed(
                         this,
                         rebufferingIntervals[currentRebufferingIntervalIndex].toLong(),
@@ -87,7 +88,7 @@ class PlayerStateMachine(
     // the player was released. This is problematic when a customer releases player but does not
     // detach our collectors, as we do not transition into pause state and will continue sending
     // samples. The below check prevents this from happening.
-    fun checkAndTriggerPlayingHeartbeat(): Boolean {
+    private fun checkAndTriggerPlayingHeartbeat(): Boolean {
         if (playerContext.isPlaying()) {
             triggerHeartbeat()
             return true
@@ -128,12 +129,19 @@ class PlayerStateMachine(
     }
 
     @Synchronized
-    fun <T> transitionState(destinationPlayerState: PlayerState<T>, videoTime: Long) {
+    fun <T> transitionState(
+        destinationPlayerState: PlayerState<T>,
+        videoTime: Long,
+    ) {
         transitionState(destinationPlayerState, videoTime, null)
     }
 
     @Synchronized
-    fun <T> transitionState(destinationPlayerState: PlayerState<T>, videoTime: Long, data: T?) {
+    fun <T> transitionState(
+        destinationPlayerState: PlayerState<T>,
+        videoTime: Long,
+        data: T?,
+    ) {
         if (!isTransitionAllowed(currentState, destinationPlayerState)) {
             return
         }
@@ -147,7 +155,10 @@ class PlayerStateMachine(
         currentState = destinationPlayerState
     }
 
-    private fun isTransitionAllowed(currentState: PlayerState<*>?, destination: PlayerState<*>?): Boolean {
+    private fun isTransitionAllowed(
+        currentState: PlayerState<*>?,
+        destination: PlayerState<*>?,
+    ): Boolean {
         if (destination === this.currentState) {
             return false
         } else if (this.currentState === PlayerStates.EXITBEFOREVIDEOSTART) {
@@ -161,7 +172,8 @@ class PlayerStateMachine(
         ) {
             return false
         } else if (currentState === PlayerStates.STARTUP && destination !== PlayerStates.READY &&
-            destination !== PlayerStates.ERROR && destination !== PlayerStates.EXITBEFOREVIDEOSTART && destination !== PlayerStates.PLAYING && destination !== PlayerStates.AD
+            destination !== PlayerStates.ERROR && destination !== PlayerStates.EXITBEFOREVIDEOSTART &&
+            destination !== PlayerStates.PLAYING && destination !== PlayerStates.AD
         ) {
             return false
         }
@@ -185,11 +197,18 @@ class PlayerStateMachine(
 
     fun getAndResetPlayerStartupTime() = analytics.getAndResetPlayerStartupTime()
 
-    fun error(videoTime: Long, errorCode: ErrorCode) {
+    fun error(
+        videoTime: Long,
+        errorCode: ErrorCode,
+    ) {
         transitionState(PlayerStates.ERROR, videoTime, errorCode)
     }
 
-    fun sourceChange(oldVideoTime: Long, newVideoTime: Long, shouldStartup: Boolean) {
+    fun sourceChange(
+        oldVideoTime: Long,
+        newVideoTime: Long,
+        shouldStartup: Boolean,
+    ) {
         transitionState(PlayerStates.SOURCE_CHANGED, oldVideoTime, null)
         resetSourceRelatedState()
         if (shouldStartup) {
@@ -231,7 +250,11 @@ class PlayerStateMachine(
 
     // This can be used as a template for all the quality changed methods,
     // as it is correctly setting the old values in the StateMachineListener
-    fun subtitleChanged(videoTime: Long, oldValue: SubtitleDto?, newValue: SubtitleDto?) {
+    fun subtitleChanged(
+        videoTime: Long,
+        oldValue: SubtitleDto?,
+        newValue: SubtitleDto?,
+    ) {
         if (!isStartupFinished) return
         if (!isPlayingOrPaused) return
         if (oldValue?.equals(newValue) == true) return
@@ -240,15 +263,35 @@ class PlayerStateMachine(
         transitionState(originalState, videoTime)
     }
 
-    fun videoQualityChanged(videoTime: Long, didQualityChange: Boolean, setQualityFunction: () -> Unit) {
+    fun videoQualityChanged(
+        videoTime: Long,
+        didQualityChange: Boolean,
+        setQualityFunction: () -> Unit,
+    ) {
         qualityChanged(videoTime, didQualityChange, setQualityFunction)
     }
 
-    fun audioQualityChanged(videoTime: Long, didQualityChange: Boolean, setQualityFunction: () -> Unit) {
+    fun audioQualityChanged(
+        videoTime: Long,
+        didQualityChange: Boolean,
+        setQualityFunction: () -> Unit,
+    ) {
         qualityChanged(videoTime, didQualityChange, setQualityFunction)
     }
 
-    private fun qualityChanged(videoTime: Long, didQualityChange: Boolean, setQualityFunction: () -> Unit) {
+    fun onPlayingHeartbeat() {
+        if (currentState != PlayerStates.PLAYING) {
+            return
+        }
+
+        triggerHeartbeat()
+    }
+
+    private fun qualityChanged(
+        videoTime: Long,
+        didQualityChange: Boolean,
+        setQualityFunction: () -> Unit,
+    ) {
         val originalState = currentState
         try {
             if (!isStartupFinished) return
@@ -291,7 +334,11 @@ class PlayerStateMachine(
     }
 
     object Factory {
-        fun create(analytics: BitmovinAnalytics, playerContext: PlayerContext, handler: Handler): PlayerStateMachine {
+        fun create(
+            analytics: BitmovinAnalytics,
+            playerContext: PlayerContext,
+            handler: Handler,
+        ): PlayerStateMachine {
             val bufferingTimeoutTimer = ObservableTimer(Util.REBUFFERING_TIMEOUT.toLong(), 1000)
             val qualityChangeCountResetTimer =
                 ObservableTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL.toLong(), 1000)

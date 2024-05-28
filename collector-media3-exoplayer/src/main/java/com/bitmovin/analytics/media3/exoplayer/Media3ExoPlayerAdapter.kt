@@ -22,6 +22,7 @@ import com.bitmovin.analytics.media3.exoplayer.player.DrmInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.Media3ExoPlayerContext
 import com.bitmovin.analytics.media3.exoplayer.player.PlaybackInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.PlayerStatisticsProvider
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
@@ -34,14 +35,15 @@ internal class Media3ExoPlayerAdapter(
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
     metadataProvider: MetadataProvider,
+    private val ssaiService: SsaiService,
 ) : DefaultPlayerAdapter(
-    config,
-    eventDataFactory,
-    stateMachine,
-    featureFactory,
-    deviceInformationProvider,
-    metadataProvider,
-) {
+        config,
+        eventDataFactory,
+        stateMachine,
+        featureFactory,
+        deviceInformationProvider,
+        metadataProvider,
+    ) {
     private val meter = DownloadSpeedMeter()
     private val exoplayerContext = Media3ExoPlayerContext(player)
     private val playerStatisticsProvider = PlayerStatisticsProvider()
@@ -49,9 +51,19 @@ internal class Media3ExoPlayerAdapter(
     private val drmInfoProvider = DrmInfoProvider()
 
     private val qualityEventDataManipulator = QualityEventDataManipulator(player)
-    private val playbackEventDataManipulator = PlaybackEventDataManipulator(player, playbackInfoProvider, metadataProvider, drmInfoProvider, playerStatisticsProvider, meter)
+    private val playbackEventDataManipulator =
+        PlaybackEventDataManipulator(player, playbackInfoProvider, metadataProvider, drmInfoProvider, playerStatisticsProvider, meter)
 
-    internal val defaultAnalyticsListener = AnalyticsEventListener(stateMachine, exoplayerContext, qualityEventDataManipulator, meter, playerStatisticsProvider, playbackInfoProvider, drmInfoProvider)
+    internal val defaultAnalyticsListener =
+        AnalyticsEventListener(
+            stateMachine,
+            exoplayerContext,
+            qualityEventDataManipulator,
+            meter,
+            playerStatisticsProvider,
+            playbackInfoProvider,
+            drmInfoProvider,
+        )
     private val defaultPlayerEventListener = PlayerEventListener(stateMachine, exoplayerContext)
 
     override val drmDownloadTime: Long?
@@ -106,6 +118,7 @@ internal class Media3ExoPlayerAdapter(
         qualityEventDataManipulator.reset()
         playerStatisticsProvider.reset()
         playbackInfoProvider.reset()
+        ssaiService.resetSourceRelatedState()
     }
 
     override val position: Long

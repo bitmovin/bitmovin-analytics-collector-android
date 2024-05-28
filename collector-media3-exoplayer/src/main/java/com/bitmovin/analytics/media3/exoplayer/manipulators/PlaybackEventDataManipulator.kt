@@ -9,6 +9,7 @@ import androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerUtil
@@ -26,19 +27,19 @@ internal class PlaybackEventDataManipulator(
     private val playerStatisticsProvider: PlayerStatisticsProvider,
     private val downloadSpeedMeter: DownloadSpeedMeter,
 ) : EventDataManipulator {
-
     override fun manipulate(data: EventData) {
         // ad
         if (player.isPlayingAd) {
-            data.ad = 1
+            data.ad = AdType.CLIENT_SIDE.value
         }
 
         // isLive
-        data.isLive = Util.getIsLiveFromConfigOrPlayer(
-            playbackInfoProvider.playerIsReady,
-            metadataProvider.getSourceMetadata()?.isLive,
-            player.isCurrentMediaItemDynamic,
-        )
+        data.isLive =
+            Util.getIsLiveFromConfigOrPlayer(
+                playbackInfoProvider.playerIsReady,
+                metadataProvider.getSourceMetadata()?.isLive,
+                player.isCurrentMediaItemDynamic,
+            )
 
         // we report 0 videoDuration for live streams to be consistent with other players/platforms
         if (data.isLive) {

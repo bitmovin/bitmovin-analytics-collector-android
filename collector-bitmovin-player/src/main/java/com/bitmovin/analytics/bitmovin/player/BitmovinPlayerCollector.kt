@@ -9,6 +9,7 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.api.ssai.SsaiApi
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory
 import com.bitmovin.analytics.bitmovin.player.player.BitmovinPlayerContext
@@ -17,6 +18,7 @@ import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.SystemInformationProvider
@@ -27,15 +29,17 @@ import com.bitmovin.player.api.source.Source
 
 @Deprecated(
     "Please use {@link IBitmovinCollector.Factory instead} instead.",
-    replaceWith = ReplaceWith(
-        expression = "IBitmovinPlayerCollector.Factory.create(context, analyticsConfig)",
-        imports = ["com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector"],
-    ),
+    replaceWith =
+        ReplaceWith(
+            expression = "IBitmovinPlayerCollector.Factory.create(context, analyticsConfig)",
+            imports = ["com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector"],
+        ),
 )
 class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
     DefaultCollector<Player>(analyticsConfig, context.applicationContext),
     IBitmovinPlayerCollector {
     private val deferredLicenseManager = DeferredLicenseRelay(analyticsConfig.licenseKey)
+    private lateinit var ssaiService: SsaiService
 
     override val analytics: BitmovinAnalytics by lazy {
         BitmovinAnalytics(
@@ -63,10 +67,11 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
      */
     @Deprecated(
         "Please use {@link IBitmovinCollector.Factory instead} instead.",
-        replaceWith = ReplaceWith(
-            expression = "IBitmovinPlayerCollector.Factory.create(context, analyticsConfig)",
-            imports = ["com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector"],
-        ),
+        replaceWith =
+            ReplaceWith(
+                expression = "IBitmovinPlayerCollector.Factory.create(context, analyticsConfig)",
+                imports = ["com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector"],
+            ),
     )
     constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : this(
         ApiV3Utils.extractAnalyticsConfig(bitmovinAnalyticsConfig),
@@ -80,27 +85,33 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         analytics: BitmovinAnalytics,
     ): PlayerAdapter {
         val licenseKeyProvider = deferredLicenseManager.licenseKeyProvider
-        val featureFactory: FeatureFactory = BitmovinFeatureFactory(
-            analytics,
-            player,
-            licenseKeyProvider,
-        )
-        val userAgentProvider = UserAgentProvider(
-            Util.getApplicationInfoOrNull(analytics.context),
-            Util.getPackageInfoOrNull(analytics.context),
-            SystemInformationProvider.getProperty("http.agent"),
-        )
-        val eventDataFactory = EventDataFactory(
-            config,
-            userIdProvider,
-            userAgentProvider,
-            licenseKeyProvider,
-        )
+        val featureFactory: FeatureFactory =
+            BitmovinFeatureFactory(
+                analytics,
+                player,
+                licenseKeyProvider,
+            )
+        val userAgentProvider =
+            UserAgentProvider(
+                Util.getApplicationInfoOrNull(analytics.context),
+                Util.getPackageInfoOrNull(analytics.context),
+                SystemInformationProvider.getProperty("http.agent"),
+            )
         val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         val playerLicenseProvider = PlayerLicenseProvider(analytics.context)
         val playerContext = BitmovinPlayerContext(player)
         val handler = Handler(analytics.context.mainLooper)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
+        this.ssaiService = SsaiService(stateMachine)
+        val eventDataFactory =
+            EventDataFactory(
+                config,
+                userIdProvider,
+                userAgentProvider,
+                licenseKeyProvider,
+                ssaiService,
+            )
+        eventDataFactory.registerEventDataManipulator(ssaiService)
         val playbackQualityProvider = PlaybackQualityProvider(player)
         return BitmovinSdkAdapter(
             player,
@@ -112,6 +123,7 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
             playerLicenseProvider,
             playbackQualityProvider,
             metadataProvider,
+            this.ssaiService,
         )
     }
 
@@ -119,11 +131,17 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         "Use setSourceMetadata instead",
         ReplaceWith("setSourceMetadata(sourceMetadata, playerSource)"),
     )
-    override fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata) {
+    override fun addSourceMetadata(
+        playerSource: Source,
+        sourceMetadata: SourceMetadata,
+    ) {
         this.setSourceMetadata(playerSource, sourceMetadata)
     }
 
-    override fun setSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata) {
+    override fun setSourceMetadata(
+        playerSource: Source,
+        sourceMetadata: SourceMetadata,
+    ) {
         metadataProvider.setSourceMetadata(playerSource, sourceMetadata)
     }
 
@@ -131,13 +149,17 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         return metadataProvider.getSourceMetadata(playerSource) ?: SourceMetadata()
     }
 
-    override fun setCustomData(playerSource: Source, customData: CustomData) {
+    override fun setCustomData(
+        playerSource: Source,
+        customData: CustomData,
+    ) {
         // we cannot put this logic into the adapter since the adapter is created on attaching
         // and this method might be called earlier
-        val newActiveCustomData = ApiV3Utils.mergeCustomData(
-            customData,
-            metadataProvider.defaultMetadata.customData,
-        )
+        val newActiveCustomData =
+            ApiV3Utils.mergeCustomData(
+                customData,
+                metadataProvider.defaultMetadata.customData,
+            )
         val activeCustomDataChanged = analytics.activeCustomData != newActiveCustomData
 
         if (playerSource.isActive && activeCustomDataChanged) {
@@ -162,4 +184,7 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         val currentSourceMetadata = metadataProvider.getSourceMetadata(playerSource)
         return currentSourceMetadata?.customData ?: CustomData()
     }
+
+    override val ssai: SsaiApi
+        get() = ssaiService
 }

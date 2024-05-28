@@ -8,18 +8,20 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
+import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
+import com.bitmovin.analytics.api.ssai.SsaiAdPosition
+import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.player.api.Player
+import com.bitmovin.player.api.PlayerBuilder
 import com.bitmovin.player.api.PlayerConfig
 import com.bitmovin.player.api.advertising.AdItem
 import com.bitmovin.player.api.advertising.AdSource
 import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdvertisingConfig
-import com.bitmovin.player.api.analytics.AnalyticsApi.Companion.analytics
-import com.bitmovin.player.api.analytics.SourceAnalyticsApi.Companion.analytics
-import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
@@ -30,6 +32,7 @@ import com.google.android.gms.cast.framework.CastButtonFactory
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var player: Player
+    private lateinit var collector: IBitmovinPlayerCollector
     private var currentPlaylistItemIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,11 +86,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.use_drm_source).setOnClickListener {
-            val drmSourceMetadata = SourceMetadata(
-                title = "DRM Video Title",
-                videoId = "drmVideoId",
-            )
-            val source = Source.create(createDRMSourceConfig(), drmSourceMetadata)
+            val drmSourceMetadata =
+                SourceMetadata(
+                    title = "DRM Video Title",
+                    videoId = "drmVideoId",
+                )
+            val source = Source.create(createDRMSourceConfig())
+            collector.setSourceMetadata(source, drmSourceMetadata)
             this.player.load(source)
         }
 
@@ -99,17 +104,32 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.changeCustomData).setOnClickListener {
-            player.source?.analytics?.let {
-                it.customData = it.customData.copy(
-                    customData2 = "custom_data_2_changed",
-                    customData4 = "custom_data_4_changed",
-                )
+            player.source?.let { source ->
+                val newCustomData =
+                    collector.getCustomData(source).copy(
+                        customData2 = "custom_data_2_changed",
+                        customData4 = "custom_data_4_changed",
+                    )
+                collector.setCustomData(source, newCustomData)
             }
         }
 
         findViewById<Button>(R.id.sendCustomDataEvent).setOnClickListener {
             val customData = CustomData(customData1 = "sendWithCustomDataEvent")
-            player.analytics?.sendCustomDataEvent(customData)
+            collector.sendCustomDataEvent(customData)
+        }
+
+        findViewById<Button>(R.id.ssaiStart).setOnClickListener {
+            collector.ssai.adBreakStart(SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL))
+        }
+
+        findViewById<Button>(R.id.ssaiNext).setOnClickListener {
+            val metadata = SsaiAdMetadata("adId1", "adSystem1", CustomData(customData1 = "ssai1 custom data"))
+            collector.ssai.adStart(metadata)
+        }
+
+        findViewById<Button>(R.id.ssaiEnd).setOnClickListener {
+            collector.ssai.adBreakEnd()
         }
 
         initializeBitmovinPlayerWithAnalytics()
@@ -132,43 +152,57 @@ class MainActivity : AppCompatActivity() {
             playerConfig.advertisingConfig = createAdvertisingConfig()
         }
         val analyticsConfig = AnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
-        val defaultMetadata = DefaultMetadata(
-            customUserId = "customBitmovinUserId1",
-            cdnProvider = CDNProvider.BITMOVIN,
-            customData = CustomData(
-                experimentName = "experiment-1",
-                customData1 = "customData1",
-                customData2 = "customData2",
-                customData3 = "customData3",
-                customData4 = "customData4",
-                customData5 = "customData5",
-                customData6 = "customData6",
-                customData7 = "customData7",
-            ),
-        )
+        val defaultMetadata =
+            DefaultMetadata(
+                customUserId = "customBitmovinUserId1",
+                cdnProvider = CDNProvider.BITMOVIN,
+                customData =
+                    CustomData(
+                        experimentName = "experiment-1",
+                        customData1 = "customData1",
+                        customData2 = "customData2",
+                        customData3 = "customData3",
+                        customData4 = "customData4",
+                        customData5 = "customData5",
+                        customData6 = "customData6",
+                        customData7 = "customData7",
+                    ),
+            )
         // create player instance with analytics config and default metadata
-        player = Player.create(this, playerConfig, analyticsConfig, defaultMetadata).also { binding.playerView.player = it }
+        val playerBuilder = PlayerBuilder(this).setPlayerConfig(playerConfig)
+        playerBuilder.disableAnalytics()
+        player = playerBuilder.build()
 
-        val redbullMetadata = SourceMetadata(
-            videoId = "source-video-id",
-            title = "redbull",
-            customData = CustomData(customData1 = "redbullSourceCustomData"),
-        )
-        val sintelMetadata = SourceMetadata(
-            videoId = "source-video-id-2",
-            title = "sintel",
-            customData = CustomData(customData1 = "sintelSourceCustomData"),
-        )
-        val liveSimMetadata = SourceMetadata(
-            videoId = "source-video-id-3",
-            title = "livesims",
-            customData = CustomData(customData1 = "livesimsSourceCustomData"),
-        )
+        collector = IBitmovinPlayerCollector.create(this, analyticsConfig, defaultMetadata)
+        collector.attachPlayer(player)
+
+        binding.playerView.player = player
+        val redbullMetadata =
+            SourceMetadata(
+                videoId = "source-video-id",
+                title = "redbull",
+                customData = CustomData(customData1 = "redbullSourceCustomData"),
+            )
+        val sintelMetadata =
+            SourceMetadata(
+                videoId = "source-video-id-2",
+                title = "sintel",
+                customData = CustomData(customData1 = "sintelSourceCustomData"),
+            )
+        val liveSimMetadata =
+            SourceMetadata(
+                videoId = "source-video-id-3",
+                title = "livesims",
+                customData = CustomData(customData1 = "livesimsSourceCustomData"),
+            )
 
         // add metadata to sources
-        val liveSimSource = Source.create(SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()), liveSimMetadata)
-        val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()), redbullMetadata)
-        val sintelSource = Source.create(SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()), sintelMetadata)
+        val liveSimSource = Source.create(SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()))
+        collector.setSourceMetadata(liveSimSource, liveSimMetadata)
+        val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()))
+        collector.setSourceMetadata(redbullSource, redbullMetadata)
+        val sintelSource = Source.create(SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()))
+        collector.setSourceMetadata(sintelSource, sintelMetadata)
 
         val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource, liveSimSource), PlaylistOptions())
         player.load(playlistConfig)

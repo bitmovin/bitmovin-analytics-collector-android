@@ -19,9 +19,11 @@ import com.bitmovin.analytics.amazon.ivs.player.PlaybackQualityProvider
 import com.bitmovin.analytics.amazon.ivs.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.api.ssai.SsaiApi
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.SystemInformationProvider
 import com.bitmovin.analytics.utils.UserAgentProvider
@@ -30,12 +32,16 @@ import com.bitmovin.analytics.utils.Util
 internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
     DefaultCollector<Player>(analyticsConfig, context.applicationContext),
     IAmazonIvsPlayerCollector {
+    private lateinit var ssaiService: SsaiService
 
     override var sourceMetadata: SourceMetadata
         get() = metadataProvider.getSourceMetadata() ?: SourceMetadata()
         set(value) {
             metadataProvider.setSourceMetadata(value)
         }
+
+    override val ssai: SsaiApi
+        get() = ssaiService
 
     override fun createAdapter(
         player: Player,
@@ -45,6 +51,7 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
         val playerContext = IvsPlayerContext(player)
         val handler = Handler(analytics.context.mainLooper)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
+        this.ssaiService = SsaiService(stateMachine)
 
         val playbackService = PlaybackService(stateMachine)
         val playbackManipulator = PlaybackEventDataManipulator(player)
@@ -62,14 +69,15 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
             )
         val playerInfoManipulator = PlayerInfoEventDataManipulator(player)
         val qualityManipulator = QualityEventDataManipulator(playbackQualityProvider, playerStatisticsProvider)
-        val userAgentProvider = UserAgentProvider(
-            Util.getApplicationInfoOrNull(analytics.context),
-            Util.getPackageInfoOrNull(analytics.context),
-            SystemInformationProvider.getProperty("http.agent"),
-        )
+        val userAgentProvider =
+            UserAgentProvider(
+                Util.getApplicationInfoOrNull(analytics.context),
+                Util.getPackageInfoOrNull(analytics.context),
+                SystemInformationProvider.getProperty("http.agent"),
+            )
 
-        val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
-        val manipulators = listOf(playbackManipulator, playerInfoManipulator, qualityManipulator)
+        val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider, ssaiService = ssaiService)
+        val manipulators = listOf(playbackManipulator, playerInfoManipulator, qualityManipulator, ssaiService)
         val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         return AmazonIvsPlayerAdapter(
             player,
@@ -84,6 +92,7 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
             playerStatisticsProvider,
             playerContext,
             metadataProvider,
+            ssaiService,
         )
     }
 }

@@ -8,6 +8,7 @@ public final class com/bitmovin/analytics/bitmovin/player/BitmovinPlayerCollecto
 	public fun detachPlayer ()V
 	public fun getCustomData (Lcom/bitmovin/player/api/source/Source;)Lcom/bitmovin/analytics/api/CustomData;
 	public fun getSourceMetadata (Lcom/bitmovin/player/api/source/Source;)Lcom/bitmovin/analytics/api/SourceMetadata;
+	public fun getSsai ()Lcom/bitmovin/analytics/api/ssai/SsaiApi;
 	public fun setCustomData (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/CustomData;)V
 	public fun setSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/SourceMetadata;)V
 }

@@ -26,6 +26,7 @@ import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.utils.Util
@@ -50,6 +51,7 @@ internal class BitmovinSdkAdapter(
     private val playerLicenseProvider: PlayerLicenseProvider,
     private val playbackQualityProvider: PlaybackQualityProvider,
     metadataProvider: MetadataProvider,
+    private val ssaiService: SsaiService,
 ) : DefaultPlayerAdapter(
         config,
         eventDataFactory,
@@ -78,7 +80,6 @@ internal class BitmovinSdkAdapter(
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = super.init()
         player.attachCollector()
-        resetSourceRelatedState()
         addPlayerListeners()
         checkAutoplayStartup()
         return features
@@ -243,7 +244,6 @@ internal class BitmovinSdkAdapter(
 
     override fun release() {
         removePlayerListener()
-        resetSourceRelatedState()
         stateMachine.resetStateMachine()
         player.detachCollector()
     }
@@ -253,6 +253,7 @@ internal class BitmovinSdkAdapter(
         totalDroppedVideoFrames = 0
         drmDownloadTime = null
         isVideoAttemptedPlay = false
+        ssaiService.resetSourceRelatedState()
     }
 
     override val position: Long
@@ -350,7 +351,6 @@ internal class BitmovinSdkAdapter(
             val videoTime =
                 if (player.duration != Double.POSITIVE_INFINITY) Util.secondsToMillis(player.duration) else position
             stateMachine.transitionState(PlayerStates.PAUSE, videoTime)
-            resetSourceRelatedState()
             stateMachine.resetStateMachine()
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)

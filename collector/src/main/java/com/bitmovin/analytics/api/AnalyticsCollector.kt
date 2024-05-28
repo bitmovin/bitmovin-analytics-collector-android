@@ -1,10 +1,11 @@
 package com.bitmovin.analytics.api
 
+import com.bitmovin.analytics.api.ssai.SsaiApi
+
 /**
  * Public interface which is shared by all collectors
  */
 interface AnalyticsCollector<TPlayer> {
-
     /**
      * The impressionId of the current session
      */
@@ -30,6 +31,11 @@ interface AnalyticsCollector<TPlayer> {
      * source for the player, followed by attaching the collector again.
      */
     fun detachPlayer()
+
+    /**
+     * Track Server side ad insertion (ssai) related data via the [ssai] Api.
+     */
+    val ssai: SsaiApi
 
     /**
      * setCustomDataOnce sends a sample with state='customdatachanged' containing the [customData].

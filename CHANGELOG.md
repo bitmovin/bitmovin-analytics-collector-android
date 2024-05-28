@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- new api to flag part of the collected information as ssai stream
+
 ## v3.4.0
 
 ### Changed

@@ -16,7 +16,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ExoPlayerAdapterTest {
-
     private val player: ExoPlayer = mockk(relaxed = true)
     private lateinit var adapter: ExoPlayerAdapter
     private val qualityChangeEventLimiter: QualityChangeEventLimiter = mockk()
@@ -25,33 +24,37 @@ class ExoPlayerAdapterTest {
     @Before
     fun setup() {
         every { player.currentMediaItemIndex } returns 0
-        val timeline = mockk<Timeline>(relaxed = true) {
-            every { windowCount } returns 1
-            every { periodCount } returns 1
-        }
+        val timeline =
+            mockk<Timeline>(relaxed = true) {
+                every { windowCount } returns 1
+                every { periodCount } returns 1
+            }
         every { player.currentTimeline } returns timeline
-        stateMachine = spyk(
-            PlayerStateMachine(
-                mockk(),
-                mockk(),
-                qualityChangeEventLimiter,
-                mockk(),
-                mockk(),
-                mockk(),
-            ),
-            recordPrivateCalls = true,
-        )
-        adapter = spyk(
-            ExoPlayerAdapter(
-                player,
-                mockk(relaxed = true),
-                stateMachine,
-                mockk(relaxed = true),
-                mockk(relaxed = true),
-                mockk(relaxed = true),
-                mockk(relaxed = true),
-            ),
-        )
+        stateMachine =
+            spyk(
+                PlayerStateMachine(
+                    mockk(),
+                    mockk(),
+                    qualityChangeEventLimiter,
+                    mockk(),
+                    mockk(),
+                    mockk(),
+                ),
+                recordPrivateCalls = true,
+            )
+        adapter =
+            spyk(
+                ExoPlayerAdapter(
+                    player,
+                    mockk(relaxed = true),
+                    stateMachine,
+                    mockk(relaxed = true),
+                    mockk(relaxed = true),
+                    mockk(relaxed = true),
+                    mockk(relaxed = true),
+                    mockk(relaxed = true),
+                ),
+            )
     }
 
     @Test

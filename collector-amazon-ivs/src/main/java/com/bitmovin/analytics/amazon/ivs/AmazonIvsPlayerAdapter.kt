@@ -17,6 +17,7 @@ import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 
 internal class AmazonIvsPlayerAdapter(
@@ -32,14 +33,15 @@ internal class AmazonIvsPlayerAdapter(
     private val playerStatisticsProvider: PlayerStatisticsProvider,
     private val playerContext: PlayerContext,
     metadataProvider: MetadataProvider,
+    private val ssaiService: SsaiService,
 ) : DefaultPlayerAdapter(
-    config,
-    eventDataFactory,
-    stateMachine,
-    featureFactory,
-    deviceInformationProvider,
-    metadataProvider,
-) {
+        config,
+        eventDataFactory,
+        stateMachine,
+        featureFactory,
+        deviceInformationProvider,
+        metadataProvider,
+    ) {
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         try {
             val features = super.init()
@@ -75,6 +77,7 @@ internal class AmazonIvsPlayerAdapter(
     override fun resetSourceRelatedState() {
         // this method is called on state machine init, on buffering timeout and on source change
         playerStatisticsProvider.reset()
+        ssaiService.resetSourceRelatedState()
     }
 
     override fun clearValuesAfterSendingOfSample() {
