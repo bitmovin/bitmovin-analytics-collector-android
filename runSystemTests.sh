@@ -19,6 +19,7 @@ yes | sdkmanager --licenses
 ./gradlew :collector-amazon-ivs:cleanPixel6api34DebugAndroidTest
 ## run PhoneBasicScenariosTest
 ./gradlew :collector-amazon-ivs:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.amazon.ivs.PhoneBasicScenariosTest || exit
+./gradlew :collector-amazon-ivs:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.amazon.ivs.SsaiScenariosTest || exit
 
 # run systemtest for exoplayer
 ## clean test to make sure we run test everytime
