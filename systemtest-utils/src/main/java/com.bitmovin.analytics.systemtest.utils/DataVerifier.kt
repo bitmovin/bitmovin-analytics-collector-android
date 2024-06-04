@@ -3,6 +3,8 @@ package com.bitmovin.analytics.systemtest.utils
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
+import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import org.assertj.core.api.Assertions.assertThat
@@ -491,6 +493,92 @@ object DataVerifier {
         for (eventData in eventDataList) {
             assertThat(eventData.progUrl).isEqualTo(expectedProgSourceUrl)
         }
+    }
+
+    fun getSsaiAdSamplesByIndex(
+        eventDataList: MutableList<EventData>,
+        adIndex: Int,
+    ): MutableList<EventData> {
+        val startIndex = eventDataList.indexOfFirst { it.adIndex == adIndex }
+        if (startIndex == -1) return mutableListOf()
+
+        val endIndex =
+            eventDataList.subList(startIndex, eventDataList.size).indexOfFirst {
+                it.adIndex == adIndex + 1 || it.ad != 2
+            }.let { if (it == -1) eventDataList.size else startIndex + it }
+
+        return eventDataList.subList(startIndex, endIndex)
+    }
+
+    fun getSamplesBeforeFirstSsaiAd(eventDataList: MutableList<EventData>): MutableList<EventData> {
+        val endIndex = eventDataList.indexOfFirst { it.ad == 2 }.let { if (it == -1) eventDataList.size else it }
+
+        return eventDataList.subList(0, endIndex)
+    }
+
+    fun getSamplesBetweenAds(
+        eventDataList: MutableList<EventData>,
+        firstAdIndex: Int,
+    ): MutableList<EventData> {
+        val firstAdIndex = eventDataList.indexOfFirst { it.adIndex == firstAdIndex }
+        if (firstAdIndex == -1) return mutableListOf()
+
+        val firstNonAdIndexRelative = eventDataList.subList(firstAdIndex, eventDataList.size).indexOfFirst { it.ad != 2 }
+        if (firstNonAdIndexRelative == -1) return mutableListOf()
+
+        val startIndex = firstAdIndex + firstNonAdIndexRelative
+        var endIndex = eventDataList.indexOfFirst { it.adIndex == firstAdIndex + 1 }.let { if (it == -1) eventDataList.size else it }
+
+        return eventDataList.subList(startIndex, endIndex)
+    }
+
+    fun getAllSamplesAfterSsaiAdWithIndex(
+        eventDataList: MutableList<EventData>,
+        adIndex: Int,
+    ): MutableList<EventData> {
+        val adStartIndex = eventDataList.indexOfFirst { it.adIndex == adIndex }
+        if (adStartIndex == -1) return mutableListOf()
+
+        val firstNonAdIndexRelative = eventDataList.subList(adStartIndex, eventDataList.size).indexOfFirst { it.ad != 2 }
+        if (firstNonAdIndexRelative == -1) return mutableListOf()
+
+        val startIndex = adStartIndex + firstNonAdIndexRelative
+
+        return eventDataList.subList(startIndex, eventDataList.size)
+    }
+
+    fun verifyDataForSsaiAdSamples(
+        eventDataList: MutableList<EventData>,
+        adBreakMetadata: SsaiAdBreakMetadata,
+        adMetadata: SsaiAdMetadata,
+        expectedCustomData: CustomData,
+        adIndex: Int,
+    ) {
+        for ((index, eventData) in eventDataList.withIndex()) {
+            assertThat(eventData.ad).isEqualTo(2)
+            if (index == 0) {
+                assertThat(eventData.adIndex).isEqualTo(adIndex)
+            } else {
+                assertThat(eventData.adIndex).isNull()
+            }
+            assertThat(eventData.adPosition).isEqualTo(adBreakMetadata.adPosition.toString())
+            assertThat(eventData.adSystem).isEqualTo(adMetadata.adSystem)
+            assertThat(eventData.adId).isEqualTo(adMetadata.adId)
+            verifyCustomData(eventData, expectedCustomData)
+        }
+    }
+
+    fun verifyHasNoSsaiAdSamples(eventDataList: List<EventData>) {
+        val errorSamples =
+            eventDataList.filter { x ->
+                x.ad == 2 ||
+                    x.adIndex != null ||
+                    x.adId != null ||
+                    x.adSystem != null ||
+                    x.adPosition != null
+            }
+
+        assertThat(errorSamples.size).isEqualTo(0)
     }
 
     private fun verifyOnlyOneSampleHasState(

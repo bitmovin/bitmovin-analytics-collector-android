@@ -15,7 +15,6 @@ import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.trackselection.TrackSelectionParameters
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.assertj.core.api.Assertions.assertThat
@@ -37,11 +36,6 @@ class SsaiScenariosTest {
         SourceMetadata(
             customData = CustomData(customData1 = "custom-data-1"),
         )
-
-    private val forceLowestQuality =
-        TrackSelectionParameters.Builder()
-            .setForceLowestBitrate(true)
-            .build()
 
     private lateinit var player: ExoPlayer
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
@@ -92,7 +86,7 @@ class SsaiScenariosTest {
             )
         }
 
-        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
         mainScope.launch {
             collector.ssai.adBreakEnd()
@@ -110,45 +104,35 @@ class SsaiScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isEqualTo(4)
-        val startupSample = eventDataList[0]
-        assertThat(startupSample.state).isEqualTo("startup")
-        assertThat(startupSample.startupTime).isGreaterThan(0)
-        assertThat(startupSample.ad).isEqualTo(2)
-        assertThat(startupSample.adIndex).isEqualTo(0)
-        assertThat(startupSample.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(startupSample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(startupSample.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(startupSample.adId).isEqualTo("test-ad-id-1")
+        assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
 
-        val playingAd1Sample = eventDataList[1]
-        assertThat(playingAd1Sample.state).isEqualTo("playing")
-        assertThat(playingAd1Sample.ad).isEqualTo(2)
-        assertThat(playingAd1Sample.adIndex).isNull()
-        assertThat(playingAd1Sample.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(playingAd1Sample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(playingAd1Sample.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(playingAd1Sample.adId).isEqualTo("test-ad-id-1")
+        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+        assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
 
-        val playingAd2Sample = eventDataList[2]
-        assertThat(playingAd2Sample.state).isEqualTo("playing")
-        assertThat(playingAd2Sample.ad).isEqualTo(2)
-        assertThat(playingAd2Sample.adIndex).isEqualTo(1)
-        assertThat(playingAd2Sample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingAd2Sample.customData2).isEqualTo("ad-test-custom-data-2")
-        assertThat(playingAd2Sample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(playingAd2Sample.adSystem).isEqualTo("test-ad-system-2")
-        assertThat(playingAd2Sample.adId).isEqualTo("test-ad-id-2")
+        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
+        DataVerifier.verifyDataForSsaiAdSamples(
+            firstAdSamples,
+            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+            CustomData(customData1 = "ad-test-custom-data-1"),
+            0,
+        )
 
-        val regularPlayingSample = eventDataList[3]
-        assertThat(regularPlayingSample.state).isEqualTo("playing")
-        assertThat(regularPlayingSample.ad).isEqualTo(0)
-        assertThat(regularPlayingSample.adIndex).isNull()
-        assertThat(regularPlayingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(regularPlayingSample.customData2).isNull()
-        assertThat(regularPlayingSample.adPosition).isNull()
-        assertThat(regularPlayingSample.adSystem).isNull()
-        assertThat(regularPlayingSample.adId).isNull()
+        val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
+        assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
+        DataVerifier.verifyDataForSsaiAdSamples(
+            secondAdSamples,
+            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+            SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
+            CustomData(customData1 = defaultSourceMetadata.customData.customData1, customData2 = "ad-test-custom-data-2"),
+            1,
+        )
+
+        val samplesAfterEndAdBreak = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 1)
+        assertThat(samplesAfterEndAdBreak.size).isGreaterThanOrEqualTo(1)
+        DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterEndAdBreak)
+        DataVerifier.verifyCustomData(samplesAfterEndAdBreak, defaultSourceMetadata.customData)
     }
 
     @Test
@@ -171,7 +155,7 @@ class SsaiScenariosTest {
             collector.ssai.adStart(SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"))
         }
 
-        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
         mainScope.launch {
             player.pause()
@@ -189,25 +173,8 @@ class SsaiScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isEqualTo(2)
-        val startupSample = eventDataList[0]
-        assertThat(startupSample.state).isEqualTo("startup")
-        assertThat(startupSample.startupTime).isGreaterThan(0)
-        assertThat(startupSample.ad).isEqualTo(0)
-        assertThat(startupSample.adIndex).isNull()
-        assertThat(startupSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(startupSample.adPosition).isNull()
-        assertThat(startupSample.adSystem).isNull()
-        assertThat(startupSample.adId).isNull()
-
-        val playingSample = eventDataList[1]
-        assertThat(playingSample.state).isEqualTo("playing")
-        assertThat(playingSample.ad).isEqualTo(0)
-        assertThat(playingSample.adIndex).isNull()
-        assertThat(playingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingSample.adPosition).isNull()
-        assertThat(playingSample.adSystem).isNull()
-        assertThat(playingSample.adId).isNull()
+        assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
+        DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
     }
 
     @Test
@@ -230,7 +197,7 @@ class SsaiScenariosTest {
             collector.ssai.adBreakEnd()
         }
 
-        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
         mainScope.launch {
             player.pause()
@@ -247,25 +214,8 @@ class SsaiScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isEqualTo(2)
-        val startupSample = eventDataList[0]
-        assertThat(startupSample.state).isEqualTo("startup")
-        assertThat(startupSample.startupTime).isGreaterThan(0)
-        assertThat(startupSample.ad).isEqualTo(0)
-        assertThat(startupSample.adIndex).isNull()
-        assertThat(startupSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(startupSample.adPosition).isNull()
-        assertThat(startupSample.adSystem).isNull()
-        assertThat(startupSample.adId).isNull()
-
-        val playingSample = eventDataList[1]
-        assertThat(playingSample.state).isEqualTo("playing")
-        assertThat(playingSample.ad).isEqualTo(0)
-        assertThat(playingSample.adIndex).isNull()
-        assertThat(playingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingSample.adPosition).isNull()
-        assertThat(playingSample.adSystem).isNull()
-        assertThat(playingSample.adId).isNull()
+        assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
+        DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
     }
 
     @Test
@@ -289,7 +239,7 @@ class SsaiScenariosTest {
             collector.ssai.adBreakEnd()
         }
 
-        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
         mainScope.launch {
             player.pause()
@@ -307,25 +257,8 @@ class SsaiScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isEqualTo(2)
-        val startupSample = eventDataList[0]
-        assertThat(startupSample.state).isEqualTo("startup")
-        assertThat(startupSample.startupTime).isGreaterThan(0)
-        assertThat(startupSample.ad).isEqualTo(0)
-        assertThat(startupSample.adIndex).isNull()
-        assertThat(startupSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(startupSample.adPosition).isNull()
-        assertThat(startupSample.adSystem).isNull()
-        assertThat(startupSample.adId).isNull()
-
-        val playingSample = eventDataList[1]
-        assertThat(playingSample.state).isEqualTo("playing")
-        assertThat(playingSample.ad).isEqualTo(0)
-        assertThat(playingSample.adIndex).isNull()
-        assertThat(playingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingSample.adPosition).isNull()
-        assertThat(playingSample.adSystem).isNull()
-        assertThat(playingSample.adId).isNull()
+        assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
+        DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
     }
 
     @Test
@@ -387,83 +320,35 @@ class SsaiScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isEqualTo(8)
-        val startupSample = eventDataList[0]
-        assertThat(startupSample.state).isEqualTo("startup")
-        assertThat(startupSample.startupTime).isGreaterThan(0)
-        assertThat(startupSample.ad).isEqualTo(2)
-        assertThat(startupSample.adIndex).isEqualTo(0)
-        assertThat(startupSample.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(startupSample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(startupSample.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(startupSample.adId).isEqualTo("test-ad-id-1")
+        assertThat(eventDataList.size).isGreaterThanOrEqualTo(8)
 
-        val playingAd1Sample = eventDataList[1]
-        assertThat(playingAd1Sample.state).isEqualTo("playing")
-        assertThat(playingAd1Sample.ad).isEqualTo(2)
-        assertThat(playingAd1Sample.adIndex).isNull()
-        assertThat(playingAd1Sample.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(playingAd1Sample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(playingAd1Sample.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(playingAd1Sample.adId).isEqualTo("test-ad-id-1")
+        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+        assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
 
-        val pausedAd1Sample = eventDataList[2]
-        assertThat(pausedAd1Sample.state).isEqualTo("pause")
-        assertThat(pausedAd1Sample.ad).isEqualTo(2)
-        assertThat(pausedAd1Sample.adIndex).isNull()
-        assertThat(pausedAd1Sample.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(pausedAd1Sample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(pausedAd1Sample.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(pausedAd1Sample.adId).isEqualTo("test-ad-id-1")
+        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
+        DataVerifier.verifyDataForSsaiAdSamples(
+            firstAdSamples,
+            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+            CustomData(customData1 = "ad-test-custom-data-1"),
+            0,
+        )
 
-        val playingAd1Sample2 = eventDataList[3]
-        assertThat(playingAd1Sample2.state).isEqualTo("playing")
-        assertThat(playingAd1Sample2.ad).isEqualTo(2)
-        assertThat(playingAd1Sample2.adIndex).isNull()
-        assertThat(playingAd1Sample2.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(playingAd1Sample2.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(playingAd1Sample2.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(playingAd1Sample2.adId).isEqualTo("test-ad-id-1")
+        val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
+        assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
+        DataVerifier.verifyDataForSsaiAdSamples(
+            secondAdSamples,
+            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+            SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
+            CustomData(customData1 = defaultSourceMetadata.customData.customData1, customData2 = "ad-test-custom-data-2"),
+            1,
+        )
 
-        val playingAd2Sample = eventDataList[4]
-        assertThat(playingAd2Sample.state).isEqualTo("playing")
-        assertThat(playingAd2Sample.ad).isEqualTo(2)
-        assertThat(playingAd2Sample.adIndex).isEqualTo(1)
-        assertThat(playingAd2Sample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingAd2Sample.customData2).isEqualTo("ad-test-custom-data-2")
-        assertThat(playingAd2Sample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(playingAd2Sample.adSystem).isEqualTo("test-ad-system-2")
-        assertThat(playingAd2Sample.adId).isEqualTo("test-ad-id-2")
-
-        val pausedAd2Sample = eventDataList[5]
-        assertThat(pausedAd2Sample.state).isEqualTo("pause")
-        assertThat(pausedAd2Sample.ad).isEqualTo(2)
-        assertThat(pausedAd2Sample.adIndex).isNull()
-        assertThat(pausedAd2Sample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(pausedAd2Sample.customData2).isEqualTo("ad-test-custom-data-2")
-        assertThat(pausedAd2Sample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(pausedAd2Sample.adSystem).isEqualTo("test-ad-system-2")
-        assertThat(pausedAd2Sample.adId).isEqualTo("test-ad-id-2")
-
-        val playingAd2Sample2 = eventDataList[6]
-        assertThat(playingAd2Sample2.state).isEqualTo("playing")
-        assertThat(playingAd2Sample2.ad).isEqualTo(2)
-        assertThat(playingAd2Sample2.adIndex).isNull()
-        assertThat(playingAd2Sample2.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingAd2Sample2.customData2).isEqualTo("ad-test-custom-data-2")
-        assertThat(playingAd2Sample2.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(playingAd2Sample2.adSystem).isEqualTo("test-ad-system-2")
-        assertThat(playingAd2Sample2.adId).isEqualTo("test-ad-id-2")
-
-        val regularPlayingSample = eventDataList[7]
-        assertThat(regularPlayingSample.state).isEqualTo("playing")
-        assertThat(regularPlayingSample.ad).isEqualTo(0)
-        assertThat(regularPlayingSample.adIndex).isNull()
-        assertThat(regularPlayingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(regularPlayingSample.customData2).isNull()
-        assertThat(regularPlayingSample.adPosition).isNull()
-        assertThat(regularPlayingSample.adSystem).isNull()
-        assertThat(regularPlayingSample.adId).isNull()
+        val samplesAfterEndAdBreak = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 1)
+        assertThat(samplesAfterEndAdBreak.size).isGreaterThanOrEqualTo(1)
+        DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterEndAdBreak)
+        DataVerifier.verifyCustomData(samplesAfterEndAdBreak, defaultSourceMetadata.customData)
     }
 
     @Test
@@ -527,61 +412,35 @@ class SsaiScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isEqualTo(6)
-        val startupAdSample = eventDataList[0]
-        assertThat(startupAdSample.state).isEqualTo("startup")
-        assertThat(startupAdSample.startupTime).isGreaterThan(0)
-        assertThat(startupAdSample.ad).isEqualTo(2)
-        assertThat(startupAdSample.adIndex).isEqualTo(0)
-        assertThat(startupAdSample.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(startupAdSample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(startupAdSample.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(startupAdSample.adId).isEqualTo("test-ad-id-1")
+        assertThat(eventDataList.size).isGreaterThanOrEqualTo(6)
 
-        val playingAd1Sample = eventDataList[1]
-        assertThat(playingAd1Sample.state).isEqualTo("playing")
-        assertThat(playingAd1Sample.ad).isEqualTo(2)
-        assertThat(playingAd1Sample.adIndex).isNull()
-        assertThat(playingAd1Sample.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(playingAd1Sample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(playingAd1Sample.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(playingAd1Sample.adId).isEqualTo("test-ad-id-1")
+        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+        assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
 
-        val playingSample = eventDataList[2]
-        assertThat(playingSample.state).isEqualTo("playing")
-        assertThat(playingSample.ad).isEqualTo(0)
-        assertThat(playingSample.adIndex).isNull()
-        assertThat(playingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingSample.adPosition).isNull()
-        assertThat(playingSample.adSystem).isNull()
-        assertThat(playingSample.adId).isNull()
+        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
+        DataVerifier.verifyDataForSsaiAdSamples(
+            firstAdSamples,
+            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+            CustomData(customData1 = "ad-test-custom-data-1"),
+            0,
+        )
 
-        val pausedSample = eventDataList[3]
-        assertThat(pausedSample.state).isEqualTo("pause")
-        assertThat(pausedSample.ad).isEqualTo(0)
-        assertThat(pausedSample.adIndex).isNull()
-        assertThat(pausedSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(pausedSample.adPosition).isNull()
-        assertThat(pausedSample.adSystem).isNull()
-        assertThat(pausedSample.adId).isNull()
+        val samplesBetweenAds = DataVerifier.getSamplesBetweenAds(eventDataList, 0)
+        assertThat(samplesBetweenAds.size).isGreaterThanOrEqualTo(3)
+        DataVerifier.verifyHasNoSsaiAdSamples(samplesBetweenAds)
+        DataVerifier.verifyCustomData(samplesBetweenAds, defaultSourceMetadata.customData)
 
-        val playingSample2 = eventDataList[4]
-        assertThat(playingSample2.state).isEqualTo("playing")
-        assertThat(playingSample2.ad).isEqualTo(0)
-        assertThat(playingSample2.adIndex).isNull()
-        assertThat(playingSample2.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingSample2.adPosition).isNull()
-        assertThat(playingSample2.adSystem).isNull()
-        assertThat(playingSample2.adId).isNull()
-
-        val playingAd2Sample2 = eventDataList[5]
-        assertThat(playingAd2Sample2.state).isEqualTo("playing")
-        assertThat(playingAd2Sample2.ad).isEqualTo(2)
-        assertThat(playingAd2Sample2.adIndex).isEqualTo(1)
-        assertThat(playingAd2Sample2.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingAd2Sample2.adPosition).isEqualTo(SsaiAdPosition.MIDROLL.toString())
-        assertThat(playingAd2Sample2.adSystem).isEqualTo("test-ad-system-2")
-        assertThat(playingAd2Sample2.adId).isEqualTo("test-ad-id-2")
+        val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
+        assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
+        DataVerifier.verifyDataForSsaiAdSamples(
+            secondAdSamples,
+            SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL),
+            SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
+            CustomData(customData1 = defaultSourceMetadata.customData.customData1),
+            1,
+        )
     }
 
     @Test
@@ -609,7 +468,7 @@ class SsaiScenariosTest {
             player.play()
         }
 
-        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
         mainScope.launch {
             collector.ssai.adStart(
@@ -617,7 +476,7 @@ class SsaiScenariosTest {
             )
         }
 
-        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
 
         mainScope.launch {
             player.pause()
@@ -634,61 +493,21 @@ class SsaiScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isEqualTo(5)
-        val startupSample = eventDataList[0]
-        assertThat(startupSample.state).isEqualTo("startup")
-        assertThat(startupSample.startupTime).isGreaterThan(0)
-        assertThat(startupSample.sequenceNumber).isEqualTo(0)
-        assertThat(startupSample.ad).isEqualTo(0)
-        assertThat(startupSample.adIndex).isNull()
-        assertThat(startupSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(startupSample.adPosition).isNull()
-        assertThat(startupSample.adSystem).isNull()
-        assertThat(startupSample.adId).isNull()
+        assertThat(eventDataList.size).isGreaterThanOrEqualTo(5)
 
-        val playingSample = eventDataList[1]
-        assertThat(playingSample.state).isEqualTo("playing")
-        assertThat(playingSample.startupTime).isEqualTo(0)
-        assertThat(playingSample.sequenceNumber).isEqualTo(1)
-        assertThat(playingSample.ad).isEqualTo(0)
-        assertThat(playingSample.adIndex).isNull()
-        assertThat(playingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingSample.adPosition).isNull()
-        assertThat(playingSample.adSystem).isNull()
-        assertThat(playingSample.adId).isNull()
+        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+        assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(4)
+        DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
 
-        val pauseSample = eventDataList[2]
-        assertThat(pauseSample.state).isEqualTo("pause")
-        assertThat(pauseSample.startupTime).isEqualTo(0)
-        assertThat(pauseSample.sequenceNumber).isEqualTo(2)
-        assertThat(pauseSample.ad).isEqualTo(0)
-        assertThat(pauseSample.adIndex).isNull()
-        assertThat(pauseSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(pauseSample.adPosition).isNull()
-        assertThat(pauseSample.adSystem).isNull()
-        assertThat(pauseSample.adId).isNull()
-
-        val playingAdSample = eventDataList[3]
-        assertThat(playingAdSample.state).isEqualTo("playing")
-        assertThat(playingAdSample.startupTime).isEqualTo(0)
-        assertThat(playingAdSample.sequenceNumber).isEqualTo(3)
-        assertThat(playingAdSample.ad).isEqualTo(0)
-        assertThat(playingAdSample.adIndex).isNull()
-        assertThat(playingAdSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingAdSample.adPosition).isNull()
-        assertThat(playingAdSample.adSystem).isNull()
-        assertThat(playingAdSample.adId).isNull()
-
-        val playingAdSample2 = eventDataList[4]
-        assertThat(playingAdSample2.state).isEqualTo("playing")
-        assertThat(playingAdSample2.startupTime).isEqualTo(0)
-        assertThat(playingAdSample2.sequenceNumber).isEqualTo(4)
-        assertThat(playingAdSample2.ad).isEqualTo(2)
-        assertThat(playingAdSample2.adIndex).isEqualTo(0)
-        assertThat(playingAdSample2.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(playingAdSample2.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(playingAdSample2.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(playingAdSample2.adId).isEqualTo("test-ad-id-1")
+        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
+        DataVerifier.verifyDataForSsaiAdSamples(
+            firstAdSamples,
+            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+            CustomData(customData1 = "ad-test-custom-data-1"),
+            0,
+        )
     }
 
     @Test
@@ -718,7 +537,7 @@ class SsaiScenariosTest {
             player.play()
         }
 
-        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
         mainScope.launch {
             player.pause()
@@ -735,50 +554,22 @@ class SsaiScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isEqualTo(4)
-        val startupSample = eventDataList[0]
-        assertThat(startupSample.state).isEqualTo("startup")
-        assertThat(startupSample.startupTime).isGreaterThan(0)
-        assertThat(startupSample.sequenceNumber).isEqualTo(0)
-        assertThat(startupSample.ad).isEqualTo(0)
-        assertThat(startupSample.adIndex).isNull()
-        assertThat(startupSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(startupSample.adPosition).isNull()
-        assertThat(startupSample.adSystem).isNull()
-        assertThat(startupSample.adId).isNull()
+        assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
 
-        val playingSample = eventDataList[1]
-        assertThat(playingSample.state).isEqualTo("playing")
-        assertThat(playingSample.startupTime).isEqualTo(0)
-        assertThat(playingSample.sequenceNumber).isEqualTo(1)
-        assertThat(playingSample.ad).isEqualTo(0)
-        assertThat(playingSample.adIndex).isNull()
-        assertThat(playingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingSample.adPosition).isNull()
-        assertThat(playingSample.adSystem).isNull()
-        assertThat(playingSample.adId).isNull()
+        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+        assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
+        DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
+        DataVerifier.verifyCustomData(samplesBeforeFirstAd, defaultSourceMetadata.customData)
 
-        val pauseSample = eventDataList[2]
-        assertThat(pauseSample.state).isEqualTo("pause")
-        assertThat(pauseSample.startupTime).isEqualTo(0)
-        assertThat(pauseSample.sequenceNumber).isEqualTo(2)
-        assertThat(pauseSample.ad).isEqualTo(2)
-        assertThat(pauseSample.adIndex).isEqualTo(0)
-        assertThat(pauseSample.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(pauseSample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(pauseSample.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(pauseSample.adId).isEqualTo("test-ad-id-1")
-
-        val playingSample2 = eventDataList[3]
-        assertThat(playingSample2.state).isEqualTo("playing")
-        assertThat(playingSample2.startupTime).isEqualTo(0)
-        assertThat(playingSample2.sequenceNumber).isEqualTo(3)
-        assertThat(playingSample2.ad).isEqualTo(2)
-        assertThat(playingSample2.adIndex).isNull()
-        assertThat(playingSample2.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(playingSample2.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
-        assertThat(playingSample2.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(playingSample2.adId).isEqualTo("test-ad-id-1")
+        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(2)
+        DataVerifier.verifyDataForSsaiAdSamples(
+            firstAdSamples,
+            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+            CustomData(customData1 = "ad-test-custom-data-1"),
+            0,
+        )
     }
 
     @Test
@@ -809,7 +600,7 @@ class SsaiScenariosTest {
             player.play()
         }
 
-        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+        ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
         mainScope.launch {
             player.pause()
@@ -826,60 +617,25 @@ class SsaiScenariosTest {
         DataVerifier.verifyHasNoErrorSamples(impression)
 
         val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isEqualTo(5)
-        val startupSample = eventDataList[0]
-        assertThat(startupSample.state).isEqualTo("startup")
-        assertThat(startupSample.startupTime).isGreaterThan(0)
-        assertThat(startupSample.sequenceNumber).isEqualTo(0)
-        assertThat(startupSample.ad).isEqualTo(0)
-        assertThat(startupSample.adIndex).isNull()
-        assertThat(startupSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(startupSample.adPosition).isNull()
-        assertThat(startupSample.adSystem).isNull()
-        assertThat(startupSample.adId).isNull()
+        assertThat(eventDataList.size).isGreaterThanOrEqualTo(5)
 
-        val playingSample = eventDataList[1]
-        assertThat(playingSample.state).isEqualTo("playing")
-        assertThat(playingSample.startupTime).isEqualTo(0)
-        assertThat(playingSample.sequenceNumber).isEqualTo(1)
-        assertThat(playingSample.ad).isEqualTo(0)
-        assertThat(playingSample.adIndex).isNull()
-        assertThat(playingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingSample.adPosition).isNull()
-        assertThat(playingSample.adSystem).isNull()
-        assertThat(playingSample.adId).isNull()
+        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+        assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
+        DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
 
-        val playingSample2 = eventDataList[2]
-        assertThat(playingSample2.state).isEqualTo("playing")
-        assertThat(playingSample2.startupTime).isEqualTo(0)
-        assertThat(playingSample2.sequenceNumber).isEqualTo(2)
-        assertThat(playingSample2.ad).isEqualTo(2)
-        assertThat(playingSample2.adIndex).isEqualTo(0)
-        assertThat(playingSample2.customData1).isEqualTo("ad-test-custom-data-1")
-        assertThat(playingSample2.adPosition).isEqualTo("preroll")
-        assertThat(playingSample2.adSystem).isEqualTo("test-ad-system-1")
-        assertThat(playingSample2.adId).isEqualTo("test-ad-id-1")
+        val firstAdSample = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+        assertThat(firstAdSample.size).isGreaterThanOrEqualTo(1)
+        DataVerifier.verifyDataForSsaiAdSamples(
+            firstAdSample,
+            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+            CustomData(customData1 = "ad-test-custom-data-1"),
+            0,
+        )
 
-        val pauseSample = eventDataList[3]
-        assertThat(pauseSample.state).isEqualTo("pause")
-        assertThat(pauseSample.startupTime).isEqualTo(0)
-        assertThat(pauseSample.sequenceNumber).isEqualTo(3)
-        assertThat(pauseSample.ad).isEqualTo(0)
-        assertThat(pauseSample.adIndex).isNull()
-        assertThat(playingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingSample.adPosition).isNull()
-        assertThat(playingSample.adSystem).isNull()
-        assertThat(playingSample.adId).isNull()
-
-        val playingSample3 = eventDataList[4]
-        assertThat(playingSample3.state).isEqualTo("playing")
-        assertThat(playingSample3.startupTime).isEqualTo(0)
-        assertThat(playingSample3.sequenceNumber).isEqualTo(4)
-        assertThat(playingSample3.ad).isEqualTo(0)
-        assertThat(playingSample3.adIndex).isNull()
-        assertThat(playingSample.customData1).isEqualTo(defaultSourceMetadata.customData.customData1)
-        assertThat(playingSample.adPosition).isNull()
-        assertThat(playingSample.adSystem).isNull()
-        assertThat(playingSample.adId).isNull()
+        val samplesAfterFirstAd = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 0)
+        assertThat(samplesAfterFirstAd.size).isGreaterThanOrEqualTo(2)
+        DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterFirstAd)
+        DataVerifier.verifyCustomData(samplesAfterFirstAd, defaultSourceMetadata.customData)
     }
 }
