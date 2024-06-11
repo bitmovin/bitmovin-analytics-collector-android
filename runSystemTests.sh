@@ -56,8 +56,6 @@ yes | sdkmanager --licenses
 #  ./gradlew :collector-bitmovin-player:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.bitmovin.player.PhoneBasicScenariosTest.test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer || exit
 #done
 
-
-
-#  ./gradlew :collector-exoplayer:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.exoplayer.PhoneBasicScenariosTest.test_vod_2Impressions_shouldReportSourceMetadataCorrectly || exit
+#  ./gradlew :collector-exoplayer:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.exoplayer.ErrorScenariosTest.test_vodWithDrm_wrongConfig || exit
 
 

@@ -26,13 +26,14 @@ class ErrorScenariosTest {
     private lateinit var mockedIngressUrl: String
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
 
-    private val defaultSourceMetadata = SourceMetadata(
-        title = "hls_redbull",
-        videoId = "hls_redbull_id",
-        path = "hls_redbull_path",
-        customData = TestConfig.createDummyCustomData(),
-        cdnProvider = "cdn_provider",
-    )
+    private val defaultSourceMetadata =
+        SourceMetadata(
+            title = "hls_redbull",
+            videoId = "hls_redbull_id",
+            path = "hls_redbull_path",
+            customData = TestConfig.createDummyCustomData(),
+            cdnProvider = "cdn_provider",
+        )
 
     @Before
     fun setup() {
@@ -91,13 +92,14 @@ class ErrorScenariosTest {
         val corruptedStream = Samples.CORRUPT_DASH
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
-        val sourceMetadata = SourceMetadata(
-            title = "dash_corrupted",
-            videoId = "dash_corrupted_id",
-            path = "dash_corrupted_path",
-            customData = TestConfig.createDummyCustomData(),
-            cdnProvider = "cdn_provider",
-        )
+        val sourceMetadata =
+            SourceMetadata(
+                title = "dash_corrupted",
+                videoId = "dash_corrupted_id",
+                path = "dash_corrupted_path",
+                customData = TestConfig.createDummyCustomData(),
+                cdnProvider = "cdn_provider",
+            )
 
         // act
         mainScope.launch {
@@ -144,13 +146,14 @@ class ErrorScenariosTest {
         val missingSegmentStream = Samples.MISSING_SEGMENT
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
-        val sourceMetadata = SourceMetadata(
-            title = "dash_missing_segment",
-            videoId = "dash_missing_segment_id",
-            path = "dash_missing_segment_path",
-            customData = TestConfig.createDummyCustomData(),
-            cdnProvider = "cdn_provider",
-        )
+        val sourceMetadata =
+            SourceMetadata(
+                title = "dash_missing_segment",
+                videoId = "dash_missing_segment_id",
+                path = "dash_missing_segment_path",
+                customData = TestConfig.createDummyCustomData(),
+                cdnProvider = "cdn_provider",
+            )
 
         // act
         mainScope.launch {
@@ -197,20 +200,22 @@ class ErrorScenariosTest {
         val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
         // using clearkey_uuid instead of widevine to simulate error
-        val mediaItem = MediaItem.Builder()
-            .setDrmConfiguration(
-                MediaItem.DrmConfiguration.Builder(C.CLEARKEY_UUID)
-                    .setLicenseUri(sample.drmLicenseUrl)
-                    .build(),
+        val mediaItem =
+            MediaItem.Builder()
+                .setDrmConfiguration(
+                    MediaItem.DrmConfiguration.Builder(C.CLEARKEY_UUID)
+                        .setLicenseUri(sample.drmLicenseUrl)
+                        .build(),
+                )
+                .setUri(sample.mpdUrl)
+                .build()
+        val drmSourceMetadata =
+            SourceMetadata(
+                title = "drmTest",
+                videoId = "drmTest",
+                cdnProvider = "cdn_provider",
+                customData = TestConfig.createDummyCustomData(),
             )
-            .setUri(sample.mpdUrl)
-            .build()
-        val drmSourceMetadata = SourceMetadata(
-            title = "drmTest",
-            videoId = "drmTest",
-            cdnProvider = "cdn_provider",
-            customData = TestConfig.createDummyCustomData(),
-        )
 
         // act
         mainScope.launch {
@@ -224,7 +229,8 @@ class ErrorScenariosTest {
         ExoPlayerPlaybackUtils.waitUntilPlayerHasError(player)
 
         // wait a bit to make sure the error samples are sent
-        Thread.sleep(300)
+        // test was flaky with 300ms, 500ms should stabilize it.
+        Thread.sleep(500)
 
         val impressionsList = MockedIngress.extractImpressions()
         val impression = impressionsList.first()
