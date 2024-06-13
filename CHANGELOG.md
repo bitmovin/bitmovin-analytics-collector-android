@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Policy violations when using `StrictMode.detectDiskWrites()`, `StrictMode.detectDiskReads()`
   and `StrictMode.detectCustomSlowCalls()`, due to mainScope usage for persistent event queue
 
+### Changed
+- [internal] API docs for ssai feature
+
 ## v3.5.0
 
 ### Added
