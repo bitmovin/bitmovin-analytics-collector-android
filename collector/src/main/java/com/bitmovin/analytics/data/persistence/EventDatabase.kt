@@ -30,60 +30,71 @@ internal data class RetentionConfig(
 )
 
 internal class EventDatabase private constructor(context: Context) : EventDatabaseConnection {
-    private val dbHelper = object : SQLiteOpenHelper(
-        /* context = */ context.applicationContext,
-        /* name = */ "eventDatabase.sqlite",
-        /* factory = */ null,
-        /* version = */ VERSION,
-    ) {
-        override fun onCreate(db: SQLiteDatabase) {
-            EventDatabaseTable.allTables.forEach { it.create(db) }
-        }
+    private val dbHelper =
+        object : SQLiteOpenHelper(
+            // context
+            context.applicationContext,
+            // name
+            "eventDatabase.sqlite",
+            // factory
+            null,
+            // version
+            VERSION,
+        ) {
+            override fun onCreate(db: SQLiteDatabase) {
+                EventDatabaseTable.allTables.forEach { it.create(db) }
+            }
 
-        override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-            // nothing to do yet
+            override fun onUpgrade(
+                db: SQLiteDatabase,
+                oldVersion: Int,
+                newVersion: Int,
+            ) {
+                // nothing to do yet
+            }
         }
-    }
 
     var retentionConfig: RetentionConfig = RetentionConfig(DEFAULT_AGE_LIMIT, DEFAULT_MAX_ENTRIES)
-        set(value) {
-            field = value
-            dbHelper.catchingTransaction { cleanupWithRetentionPolicy() }
+
+    override fun push(entry: EventDatabaseEntry): Boolean =
+        dbHelper.catchingTransaction {
+            cleanupWithRetentionPolicy()
+            EventDatabaseTable.Events.push(transaction = this, entry = entry)
+        } ?: false
+
+    override fun pushAd(entry: EventDatabaseEntry): Boolean =
+        dbHelper.catchingTransaction {
+            cleanupWithRetentionPolicy()
+            EventDatabaseTable.AdEvents.push(transaction = this, entry = entry)
+        } ?: false
+
+    override fun pop(): EventDatabaseEntry? =
+        dbHelper.catchingTransaction {
+            cleanupWithRetentionPolicy()
+            EventDatabaseTable.Events.pop(transaction = this)
         }
 
-    override fun push(entry: EventDatabaseEntry): Boolean = dbHelper.catchingTransaction {
-        cleanupWithRetentionPolicy()
-        EventDatabaseTable.Events.push(transaction = this, entry = entry)
-    } ?: false
+    override fun popAd(): EventDatabaseEntry? =
+        dbHelper.catchingTransaction {
+            cleanupWithRetentionPolicy()
+            EventDatabaseTable.AdEvents.pop(transaction = this)
+        }
 
-    override fun pushAd(entry: EventDatabaseEntry): Boolean = dbHelper.catchingTransaction {
-        cleanupWithRetentionPolicy()
-        EventDatabaseTable.AdEvents.push(transaction = this, entry = entry)
-    } ?: false
-
-    override fun pop(): EventDatabaseEntry? = dbHelper.catchingTransaction {
-        cleanupWithRetentionPolicy()
-        EventDatabaseTable.Events.pop(transaction = this)
-    }
-
-    override fun popAd(): EventDatabaseEntry? = dbHelper.catchingTransaction {
-        cleanupWithRetentionPolicy()
-        EventDatabaseTable.AdEvents.pop(transaction = this)
-    }
-
-    override fun purge(): Int = dbHelper.catchingTransaction {
-        EventDatabaseTable.allTables.sumOf { it.purge(transaction = this) }
-    } ?: 0
+    override fun purge(): Int =
+        dbHelper.catchingTransaction {
+            EventDatabaseTable.allTables.sumOf { it.purge(transaction = this) }
+        } ?: 0
 
     private fun Transaction.cleanupWithRetentionPolicy() {
-        val deletableSessionIds = retentionConfig
-            .tablesUsedToFindSessions
-            .flatMap {
-                it.findPurgeableSessions(
-                    transaction = this,
-                    retentionConfig = retentionConfig,
-                )
-            }
+        val deletableSessionIds =
+            retentionConfig
+                .tablesUsedToFindSessions
+                .flatMap {
+                    it.findPurgeableSessions(
+                        transaction = this,
+                        retentionConfig = retentionConfig,
+                    )
+                }
         if (deletableSessionIds.isEmpty()) return
         EventDatabaseTable.allTables.forEach { table ->
             table.deleteSessions(

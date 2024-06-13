@@ -16,21 +16,23 @@ class BackendFactory(
     fun createBackend(
         config: AnalyticsConfig,
         context: Context,
-        scope: CoroutineScope,
+        ioScope: CoroutineScope,
     ): Backend {
-        val innerBackend = HttpBackend(config, context).let {
-            if (config.retryPolicy == RetryPolicy.LONG_TERM) {
-                PersistentCacheBackend(it, eventQueue)
-            } else {
-                it
+        val innerBackend =
+            HttpBackend(config, context).let {
+                if (config.retryPolicy == RetryPolicy.LONG_TERM) {
+                    PersistentCacheBackend(it, eventQueue)
+                } else {
+                    it
+                }
             }
-        }
 
-        val backend = ConsumeOnlyPersistentCacheBackend(
-            scope,
-            innerBackend,
-            eventQueue,
-        )
+        val backend =
+            ConsumeOnlyPersistentCacheBackend(
+                ioScope,
+                innerBackend,
+                eventQueue,
+            )
         // The persistent event cache already tries resending events
         // The RetryBackend and the PersistentCacheBackend may not be mixed,
         // to avoid "fighting" implementations.

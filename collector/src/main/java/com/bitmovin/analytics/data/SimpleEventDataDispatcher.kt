@@ -23,7 +23,7 @@ internal class SimpleEventDataDispatcher(
     private val scopeProvider: ScopeProvider,
 ) : IEventDataDispatcher, AuthenticationCallback {
     private lateinit var backend: Backend
-    private lateinit var mainScope: CoroutineScope
+    private lateinit var ioScope: CoroutineScope
     private val data: Queue<EventData>
     private val adData: Queue<AdEventData>
     private var enabled = false
@@ -37,42 +37,41 @@ internal class SimpleEventDataDispatcher(
     }
 
     private fun createBackend() {
-        mainScope = scopeProvider.createMainScope()
-        backend = backendFactory.createBackend(config, context, mainScope)
+        ioScope = scopeProvider.createIoScope()
+        backend = backendFactory.createBackend(config, context, ioScope)
     }
 
     @Synchronized
-    override fun authenticationCompleted(
-        response: AuthenticationResponse,
-    ) {
-        val success = when (response) {
-            is AuthenticationResponse.Granted -> {
-                callback?.configureFeatures(
-                    LicensingState.Authenticated(response.licenseKey),
-                    response.featureConfigContainer,
-                )
-                enabled = true
-                forwardQueuedEvents(response.licenseKey)
-                true
-            }
+    override fun authenticationCompleted(response: AuthenticationResponse) {
+        val success =
+            when (response) {
+                is AuthenticationResponse.Granted -> {
+                    callback?.configureFeatures(
+                        LicensingState.Authenticated(response.licenseKey),
+                        response.featureConfigContainer,
+                    )
+                    enabled = true
+                    forwardQueuedEvents(response.licenseKey)
+                    true
+                }
 
-            is AuthenticationResponse.Denied, AuthenticationResponse.Error -> {
-                callback?.configureFeatures(LicensingState.Unauthenticated, null)
-                false
+                is AuthenticationResponse.Denied, AuthenticationResponse.Error -> {
+                    callback?.configureFeatures(LicensingState.Unauthenticated, null)
+                    false
+                }
             }
-        }
         callback?.authenticationCompleted(success)
     }
 
     override fun enable() {
         createBackend()
-        mainScope.launch { licenseCall.authenticate(this@SimpleEventDataDispatcher) }
+        ioScope.launch { licenseCall.authenticate(this@SimpleEventDataDispatcher) }
     }
 
     override fun disable() {
         data.clear()
         adData.clear()
-        mainScope.cancel()
+        ioScope.cancel()
         enabled = false
         sampleSequenceNumber = 0
     }

@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.bitmovinplayer.example
 
 import android.os.Bundle
+import android.os.StrictMode
 import android.view.Menu
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +38,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Policy to verify that main scope is not misused
+        // for IO calls
+        StrictMode.setThreadPolicy(
+            StrictMode.ThreadPolicy.Builder()
+                .detectDiskWrites()
+                .detectDiskReads()
+                .detectCustomSlowCalls()
+                .detectNetwork()
+                .penaltyLog()
+                .build(),
+        )
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- Policy violations when using `StrictMode.detectDiskWrites()`, `StrictMode.detectDiskReads()`
+  and `StrictMode.detectCustomSlowCalls()`, due to mainScope usage for persistent event queue
+
 ## v3.5.0
 
 ### Added

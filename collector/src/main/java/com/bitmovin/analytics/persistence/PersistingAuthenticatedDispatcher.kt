@@ -31,7 +31,7 @@ internal class PersistingAuthenticatedDispatcher(
     private val eventQueue: AnalyticsEventQueue,
     private val scopeProvider: ScopeProvider,
 ) : IEventDataDispatcher {
-    private lateinit var mainScope: CoroutineScope
+    private lateinit var ioScope: CoroutineScope
     private lateinit var backend: Backend
     private var operationMode = Unauthenticated
     private var sampleSequenceNumber = 0
@@ -41,40 +41,42 @@ internal class PersistingAuthenticatedDispatcher(
     }
 
     private fun createBackend() {
-        mainScope = scopeProvider.createMainScope()
-        backend = backendFactory.createBackend(config, context, mainScope)
+        ioScope = scopeProvider.createIoScope()
+        backend = backendFactory.createBackend(config, context, ioScope)
     }
 
-    private val authenticationCallback = AuthenticationCallback { response ->
-        val success = when (response) {
-            is AuthenticationResponse.Granted -> {
-                callback?.configureFeatures(
-                    LicensingState.Authenticated(response.licenseKey),
-                    featureConfigs = response.featureConfigContainer,
-                )
-                if (operationMode != Authenticated) {
-                    (backend as? CacheConsumingBackend)?.startCacheFlushing()
+    private val authenticationCallback =
+        AuthenticationCallback { response ->
+            val success =
+                when (response) {
+                    is AuthenticationResponse.Granted -> {
+                        callback?.configureFeatures(
+                            LicensingState.Authenticated(response.licenseKey),
+                            featureConfigs = response.featureConfigContainer,
+                        )
+                        if (operationMode != Authenticated) {
+                            (backend as? CacheConsumingBackend)?.startCacheFlushing()
+                        }
+                        operationMode = Authenticated
+                        true
+                    }
+
+                    is AuthenticationResponse.Denied -> {
+                        callback?.configureFeatures(
+                            LicensingState.Unauthenticated,
+                            featureConfigs = null,
+                        )
+                        disable()
+                        eventQueue.clear()
+                        false
+                    }
+
+                    is AuthenticationResponse.Error -> {
+                        return@AuthenticationCallback
+                    }
                 }
-                operationMode = Authenticated
-                true
-            }
-
-            is AuthenticationResponse.Denied -> {
-                callback?.configureFeatures(
-                    LicensingState.Unauthenticated,
-                    featureConfigs = null,
-                )
-                disable()
-                eventQueue.clear()
-                false
-            }
-
-            is AuthenticationResponse.Error -> {
-                return@AuthenticationCallback
-            }
+            callback?.authenticationCompleted(success)
         }
-        callback?.authenticationCompleted(success)
-    }
 
     override fun enable() {
         operationMode = Unauthenticated
@@ -82,7 +84,7 @@ internal class PersistingAuthenticatedDispatcher(
     }
 
     override fun disable() {
-        mainScope.cancel()
+        ioScope.cancel()
         operationMode = Disabled
         sampleSequenceNumber = 0
     }
@@ -95,7 +97,7 @@ internal class PersistingAuthenticatedDispatcher(
             Authenticated -> backend.send(data)
             Unauthenticated -> {
                 eventQueue.push(data)
-                mainScope.launch { licenseCall.authenticate(authenticationCallback) }
+                ioScope.launch { licenseCall.authenticate(authenticationCallback) }
             }
         }
     }
@@ -106,7 +108,7 @@ internal class PersistingAuthenticatedDispatcher(
             Authenticated -> backend.sendAd(data)
             Unauthenticated -> {
                 eventQueue.push(data)
-                mainScope.launch { licenseCall.authenticate(authenticationCallback) }
+                ioScope.launch { licenseCall.authenticate(authenticationCallback) }
             }
         }
     }
