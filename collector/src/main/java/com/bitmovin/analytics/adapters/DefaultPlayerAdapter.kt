@@ -19,6 +19,7 @@ abstract class DefaultPlayerAdapter(
     private val featureFactory: FeatureFactory,
     private val deviceInformationProvider: DeviceInformationProvider,
     protected val metadataProvider: MetadataProvider,
+    override val isAutoplayEnabled: Boolean? = null,
 ) : PlayerAdapter {
     protected abstract val eventDataManipulators: Collection<EventDataManipulator>
 

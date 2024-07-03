@@ -59,6 +59,7 @@ internal class BitmovinSdkAdapter(
         featureFactory,
         deviceInformationProvider,
         metadataProvider,
+        player.config.playbackConfig.isAutoplayEnabled
     ),
     EventDataManipulator {
     private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
