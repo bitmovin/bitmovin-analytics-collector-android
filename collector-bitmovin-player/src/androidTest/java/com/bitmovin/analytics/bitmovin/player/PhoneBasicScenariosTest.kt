@@ -285,7 +285,7 @@ class PhoneBasicScenariosTest {
         DataVerifier.verifyM3u8SourceUrl(eventDataList, defaultSample.m3u8Url!!)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true, true))
         DataVerifier.verifyInvariants(eventDataList)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)
@@ -348,7 +348,7 @@ class PhoneBasicScenariosTest {
 
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true, true))
         DataVerifier.verifyInvariants(eventDataList)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)

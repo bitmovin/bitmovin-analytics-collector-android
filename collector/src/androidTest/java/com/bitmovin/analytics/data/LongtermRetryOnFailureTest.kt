@@ -49,29 +49,37 @@ class LongtermRetryOnFailureTest {
     @Before
     fun setup() {
         val mockedIngressUrl = MockedIngress.startServer()
-        config = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM, backendUrl = mockedIngressUrl)
-        eventQueue = EventQueueFactory.createPersistentEventQueue(
-            EventQueueConfig(),
-            EventDatabase.getInstance(appContext),
-        )
+        config =
+            AnalyticsConfig(
+                licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0",
+                retryPolicy = RetryPolicy.LONG_TERM,
+                backendUrl = mockedIngressUrl,
+            )
+        eventQueue =
+            EventQueueFactory.createPersistentEventQueue(
+                EventQueueConfig(),
+                EventDatabase.getInstance(appContext),
+            )
 
-        bitmovinAnalytics = BitmovinAnalytics(
-            config = config,
-            context = appContext,
-            eventQueue = eventQueue,
-        )
+        bitmovinAnalytics =
+            BitmovinAnalytics(
+                config = config,
+                context = appContext,
+                eventQueue = eventQueue,
+            )
         dummyPlayerAdapter = createDummyPlayerAdapter()
     }
 
-    private fun createDummyPlayerAdapter(): DummyPlayerAdapter = runBlocking {
-        withContext(mainScope.coroutineContext) {
-            // Can not be created on the test thread
-            DummyPlayerAdapter(
-                bitmovinAnalytics,
-                DummyPlayerContext(),
-            )
+    private fun createDummyPlayerAdapter(): DummyPlayerAdapter =
+        runBlocking {
+            withContext(mainScope.coroutineContext) {
+                // Can not be created on the test thread
+                DummyPlayerAdapter(
+                    bitmovinAnalytics,
+                    DummyPlayerContext(),
+                )
+            }
         }
-    }
 
     @After
     fun tearDown() {
@@ -84,9 +92,10 @@ class LongtermRetryOnFailureTest {
     fun test_sending_eventdata_sends_the_events() {
         bitmovinAnalytics.attach(dummyPlayerAdapter)
         val sessionId = createTestImpressionId()
-        val eventData = MutableList(5) {
-            TestFactory.createEventData(impressionId = sessionId)
-        }
+        val eventData =
+            MutableList(5) {
+                TestFactory.createEventData(impressionId = sessionId)
+            }
 
         eventData.forEach {
             bitmovinAnalytics.sendEventData(it)
@@ -110,19 +119,26 @@ class LongtermRetryOnFailureTest {
         // this test uses a hardcoded port, since we cannot go online/offline/online due to
         // the fact that the server socket cannot be reused if port 0 is used (if there is traffic as it seems)
         val mockedIngressUrl = MockedIngress.startServer(61123)
-        config = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM, backendUrl = mockedIngressUrl)
+        config =
+            AnalyticsConfig(
+                licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0",
+                retryPolicy = RetryPolicy.LONG_TERM,
+                backendUrl = mockedIngressUrl,
+            )
 
-        bitmovinAnalytics = BitmovinAnalytics(
-            config = config,
-            context = appContext,
-            eventQueue = eventQueue,
-        )
+        bitmovinAnalytics =
+            BitmovinAnalytics(
+                config = config,
+                context = appContext,
+                eventQueue = eventQueue,
+            )
         dummyPlayerAdapter = createDummyPlayerAdapter()
         bitmovinAnalytics.attach(dummyPlayerAdapter)
         val sessionId = createTestImpressionId()
-        val eventData = MutableList(2) {
-            TestFactory.createEventData(impressionId = sessionId)
-        }
+        val eventData =
+            MutableList(2) {
+                TestFactory.createEventData(impressionId = sessionId)
+            }
 
         eventData.forEach {
             bitmovinAnalytics.sendEventData(it)
@@ -175,12 +191,13 @@ class LongtermRetryOnFailureTest {
         bitmovinAnalytics.attach(dummyPlayerAdapter)
         val sessionId = createTestImpressionId()
 
-        val eventData: List<AdEventData> = MutableList(5) {
-            TestFactory.createAdEventData(
-                adImpressionId = sessionId,
-                videoImpressionId = sessionId,
-            )
-        }
+        val eventData: List<AdEventData> =
+            MutableList(5) {
+                TestFactory.createAdEventData(
+                    adImpressionId = sessionId,
+                    videoImpressionId = sessionId,
+                )
+            }
 
         eventData.forEach {
             bitmovinAnalytics.sendAdEventData(it)
@@ -205,16 +222,18 @@ class LongtermRetryOnFailureTest {
         val sessionId = createTestImpressionId(2)
         bitmovinAnalytics.attach(dummyPlayerAdapter)
 
-        val eventData = MutableList(5) {
-            TestFactory.createEventData(impressionId = cachedSessionId)
-        }
+        val eventData =
+            MutableList(5) {
+                TestFactory.createEventData(impressionId = cachedSessionId)
+            }
 
-        val adEventData: List<AdEventData> = MutableList(5) {
-            TestFactory.createAdEventData(
-                adImpressionId = cachedSessionId,
-                videoImpressionId = cachedSessionId,
-            )
-        }
+        val adEventData: List<AdEventData> =
+            MutableList(5) {
+                TestFactory.createAdEventData(
+                    adImpressionId = cachedSessionId,
+                    videoImpressionId = cachedSessionId,
+                )
+            }
 
         eventData.forEach { bitmovinAnalytics.sendEventData(it) }
         adEventData.forEach { bitmovinAnalytics.sendAdEventData(it) }
@@ -244,35 +263,39 @@ class LongtermRetryOnFailureTest {
         val sessionId = createTestImpressionId(2)
         val offlineConfig = config.copy(backendUrl = "https://doesnotwork")
 
-        bitmovinAnalytics = BitmovinAnalytics(
-            config = offlineConfig,
-            context = appContext,
-            eventQueue = eventQueue,
-        )
+        bitmovinAnalytics =
+            BitmovinAnalytics(
+                config = offlineConfig,
+                context = appContext,
+                eventQueue = eventQueue,
+            )
 
         bitmovinAnalytics.attach(dummyPlayerAdapter)
 
-        val eventData = MutableList(5) {
-            TestFactory.createEventData(impressionId = cachedSessionId)
-        }
+        val eventData =
+            MutableList(5) {
+                TestFactory.createEventData(impressionId = cachedSessionId)
+            }
 
-        val adEventData: List<AdEventData> = MutableList(5) {
-            TestFactory.createAdEventData(
-                adImpressionId = cachedSessionId,
-                videoImpressionId = cachedSessionId,
-            )
-        }
+        val adEventData: List<AdEventData> =
+            MutableList(5) {
+                TestFactory.createAdEventData(
+                    adImpressionId = cachedSessionId,
+                    videoImpressionId = cachedSessionId,
+                )
+            }
 
         eventData.forEach { bitmovinAnalytics.sendEventData(it) }
         adEventData.forEach { bitmovinAnalytics.sendAdEventData(it) }
         Thread.sleep(1000)
         bitmovinAnalytics.detachPlayer()
 
-        val secondInstance = BitmovinAnalytics(
-            config = config,
-            context = appContext,
-            eventQueue = eventQueue,
-        )
+        val secondInstance =
+            BitmovinAnalytics(
+                config = config,
+                context = appContext,
+                eventQueue = eventQueue,
+            )
         dummyPlayerAdapter = createDummyPlayerAdapter()
         secondInstance.attach(dummyPlayerAdapter)
 
@@ -291,58 +314,75 @@ class LongtermRetryOnFailureTest {
 
     @Test
     fun test_having_multiple_bitmovin_analytics_instance_events_are_send_once() {
-        val offlineConfig = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM, backendUrl = "https://doesnotwork")
+        val offlineConfig =
+            AnalyticsConfig(
+                licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0",
+                retryPolicy = RetryPolicy.LONG_TERM,
+                backendUrl = "https://doesnotwork",
+            )
         val firstSession = createTestImpressionId()
         val secondSession = createTestImpressionId(2)
 
-        val firstBitmovinAnalytics = BitmovinAnalytics(
-            config = offlineConfig,
-            context = appContext,
-            eventQueue = eventQueue,
-        )
+        val firstBitmovinAnalytics =
+            BitmovinAnalytics(
+                config = offlineConfig,
+                context = appContext,
+                eventQueue = eventQueue,
+            )
 
-        val secondBitmovinAnalytics = BitmovinAnalytics(
-            config = offlineConfig,
-            context = appContext,
-            eventQueue = eventQueue,
-        )
+        val secondBitmovinAnalytics =
+            BitmovinAnalytics(
+                config = offlineConfig,
+                context = appContext,
+                eventQueue = eventQueue,
+            )
         val firstDummyPlayerAdapter = createDummyPlayerAdapter()
         firstBitmovinAnalytics.attach(firstDummyPlayerAdapter)
 
         val secondDummyPlayerAdapter = createDummyPlayerAdapter()
         secondBitmovinAnalytics.attach(secondDummyPlayerAdapter)
 
-        val eventDataFirstCollector = MutableList(100) {
-            TestFactory.createEventData(impressionId = firstSession)
-        }
+        val eventDataFirstCollector =
+            MutableList(100) {
+                TestFactory.createEventData(impressionId = firstSession)
+            }
 
-        val eventDataSecondCollector = MutableList(100) {
-            TestFactory.createEventData(impressionId = secondSession)
-        }
+        val eventDataSecondCollector =
+            MutableList(100) {
+                TestFactory.createEventData(impressionId = secondSession)
+            }
 
-        val firstJob = mainScope.launch {
-            eventDataFirstCollector.forEach { firstBitmovinAnalytics.sendEventData(it) }
-        }
-        val secondJob = mainScope.launch {
-            eventDataSecondCollector.forEach { secondBitmovinAnalytics.sendEventData(it) }
-        }
+        val firstJob =
+            mainScope.launch {
+                eventDataFirstCollector.forEach { firstBitmovinAnalytics.sendEventData(it) }
+            }
+        val secondJob =
+            mainScope.launch {
+                eventDataSecondCollector.forEach { secondBitmovinAnalytics.sendEventData(it) }
+            }
         runBlocking {
             firstJob.join()
             secondJob.join()
         }
         Thread.sleep(1000)
 
-        val onlineConfig = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", retryPolicy = RetryPolicy.LONG_TERM)
-        val thirdBitmovinAnalytics = BitmovinAnalytics(
-            config = onlineConfig,
-            context = appContext,
-            eventQueue = eventQueue,
-        )
-        val forthBitmovinAnalytics = BitmovinAnalytics(
-            config = onlineConfig,
-            context = appContext,
-            eventQueue = eventQueue,
-        )
+        val onlineConfig =
+            AnalyticsConfig(
+                licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0",
+                retryPolicy = RetryPolicy.LONG_TERM,
+            )
+        val thirdBitmovinAnalytics =
+            BitmovinAnalytics(
+                config = onlineConfig,
+                context = appContext,
+                eventQueue = eventQueue,
+            )
+        val forthBitmovinAnalytics =
+            BitmovinAnalytics(
+                config = onlineConfig,
+                context = appContext,
+                eventQueue = eventQueue,
+            )
 
         thirdBitmovinAnalytics.attach(firstDummyPlayerAdapter)
         forthBitmovinAnalytics.attach(secondDummyPlayerAdapter)
@@ -369,42 +409,44 @@ class LongtermRetryOnFailureTest {
 
         val oldTimestamp = (System.currentTimeMillis().milliseconds - 15.days).inWholeMilliseconds
 
-        val oldEventData = MutableList(5) {
-            TestFactory.createEventData(
-                impressionId = oldSession1,
-                time = oldTimestamp + it,
-            )
-        }.apply {
-            TestFactory.createEventData(
-                impressionId = oldSession1,
-                time = System.currentTimeMillis(),
-            )
-            repeat(5) {
-                add(
-                    TestFactory.createEventData(
-                        impressionId = oldSession2,
-                        time = oldTimestamp + it,
-                    ),
+        val oldEventData =
+            MutableList(5) {
+                TestFactory.createEventData(
+                    impressionId = oldSession1,
+                    time = oldTimestamp + it,
                 )
-            }
-        }
-        val oldAdEventData = MutableList(5) {
-            TestFactory.createAdEventData(
-                videoImpressionId = oldSession1,
-                adImpressionId = oldSession1,
-                time = oldTimestamp + it,
-            )
-        }.apply {
-            repeat(5) {
-                add(
-                    TestFactory.createAdEventData(
-                        videoImpressionId = oldSession2,
-                        adImpressionId = oldSession2,
-                        time = oldTimestamp + it,
-                    ),
+            }.apply {
+                TestFactory.createEventData(
+                    impressionId = oldSession1,
+                    time = System.currentTimeMillis(),
                 )
+                repeat(5) {
+                    add(
+                        TestFactory.createEventData(
+                            impressionId = oldSession2,
+                            time = oldTimestamp + it,
+                        ),
+                    )
+                }
             }
-        }
+        val oldAdEventData =
+            MutableList(5) {
+                TestFactory.createAdEventData(
+                    videoImpressionId = oldSession1,
+                    adImpressionId = oldSession1,
+                    time = oldTimestamp + it,
+                )
+            }.apply {
+                repeat(5) {
+                    add(
+                        TestFactory.createAdEventData(
+                            videoImpressionId = oldSession2,
+                            adImpressionId = oldSession2,
+                            time = oldTimestamp + it,
+                        ),
+                    )
+                }
+            }
 
         PersistentAnalyticsEventQueue(
             EventQueueConfig(),
@@ -427,20 +469,22 @@ class LongtermRetryOnFailureTest {
     @Test
     fun test_reaching_the_overall_count_limit_deletes_the_oldest_session() {
         config = config.copy(backendUrl = "https://doesnotwork")
-        bitmovinAnalytics = BitmovinAnalytics(
-            config = config,
-            context = appContext,
-            eventQueue = eventQueue,
-        )
+        bitmovinAnalytics =
+            BitmovinAnalytics(
+                config = config,
+                context = appContext,
+                eventQueue = eventQueue,
+            )
 
         bitmovinAnalytics.attach(dummyPlayerAdapter)
 
         val newSession = createTestImpressionId()
 
-        val persistentQueue = PersistentAnalyticsEventQueue(
-            EventQueueConfig(),
-            EventDatabase.getInstance(appContext),
-        )
+        val persistentQueue =
+            PersistentAnalyticsEventQueue(
+                EventQueueConfig(),
+                EventDatabase.getInstance(appContext),
+            )
         val sessionIds = persistentQueue.almostFillDatabaseToCountLimit()
 
         assertThat(persistentQueue.popEvent()!!.impressionId).isEqualTo(sessionIds.first())
@@ -458,17 +502,19 @@ class LongtermRetryOnFailureTest {
     @Test
     fun test_events_with_sequencenumber_higher_than_500_are_not_stored() {
         val offlineConfig = config.copy(backendUrl = "https://doesnotwork")
-        bitmovinAnalytics = BitmovinAnalytics(
-            config = offlineConfig,
-            context = appContext,
-            eventQueue = eventQueue,
-        )
+        bitmovinAnalytics =
+            BitmovinAnalytics(
+                config = offlineConfig,
+                context = appContext,
+                eventQueue = eventQueue,
+            )
         dummyPlayerAdapter = createDummyPlayerAdapter()
 
-        val persistentQueue = PersistentAnalyticsEventQueue(
-            EventQueueConfig(),
-            EventDatabase.getInstance(appContext),
-        )
+        val persistentQueue =
+            PersistentAnalyticsEventQueue(
+                EventQueueConfig(),
+                EventDatabase.getInstance(appContext),
+            )
 
         val sessionId = UUID.randomUUID().toString()
         repeat(300) {
@@ -527,9 +573,7 @@ private fun List<Impression>.combineByImpressionId(): Map<String, Impression> {
     }
 }
 
-private fun createTestImpressionId(
-    numberOfImpression: Int = 1,
-) = UUID(0xB177E57, numberOfImpression.toLong()).toString()
+private fun createTestImpressionId(numberOfImpression: Int = 1) = UUID(0xB177E57, numberOfImpression.toLong()).toString()
 
 private fun PersistentAnalyticsEventQueue.almostFillDatabaseToCountLimit(): List<String> {
     val startTime = (System.currentTimeMillis().milliseconds - 10.hours).inWholeMilliseconds
@@ -572,14 +616,17 @@ private class DummyPlayerAdapter(
     analytics: BitmovinAnalytics,
     playerContext: PlayerContext,
 ) : PlayerAdapter {
-    override val stateMachine: PlayerStateMachine = PlayerStateMachine.Factory.create(
-        analytics,
-        playerContext,
-        Handler(Looper.getMainLooper()),
-    )
+    override val stateMachine: PlayerStateMachine =
+        PlayerStateMachine.Factory.create(
+            analytics,
+            playerContext,
+            Handler(Looper.getMainLooper()),
+        )
+    override val isAutoplayEnabled: Boolean?
+        get() = null
     override val position: Long
         get() = 0
-    override val drmDownloadTime: Long?
+    override val drmDownloadTime: Long
         get() = 0
 
     override var defaultMetadata: DefaultMetadata = DefaultMetadata()

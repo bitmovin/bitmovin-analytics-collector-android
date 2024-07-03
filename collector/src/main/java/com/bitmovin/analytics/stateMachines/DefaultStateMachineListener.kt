@@ -33,6 +33,8 @@ class DefaultStateMachineListener(
         data.duration = videoStartupTime + playerStartupTime
         data.videoStartupTime = videoStartupTime
 
+        // Player specific data that the player adapter can provide.
+        data.autoplay = playerAdapter.isAutoplayEnabled
         data.drmLoadTime = playerAdapter.drmDownloadTime
 
         data.playerStartupTime = playerStartupTime

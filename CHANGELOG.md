@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- Adding auto play detection for the Bitmovin Player
+
 ## v3.5.1
 
 ### Fixed

@@ -22,6 +22,8 @@ abstract class DefaultPlayerAdapter(
 ) : PlayerAdapter {
     protected abstract val eventDataManipulators: Collection<EventDataManipulator>
 
+    override val isAutoplayEnabled: Boolean? = null
+
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         eventDataManipulators.forEach { eventDataFactory.registerEventDataManipulator(it) }
         return featureFactory.createFeatures()
@@ -52,7 +54,9 @@ abstract class DefaultPlayerAdapter(
 
     override var defaultMetadata: DefaultMetadata
         get() = metadataProvider.defaultMetadata
-        set(value) { metadataProvider.defaultMetadata = value }
+        set(value) {
+            metadataProvider.defaultMetadata = value
+        }
 
     override fun getCurrentSourceMetadata(): SourceMetadata {
         return metadataProvider.getSourceMetadata() ?: SourceMetadata()

@@ -22,6 +22,7 @@ data class EventData(
     val domain: String,
     val screenHeight: Int,
     val screenWidth: Int,
+    var autoplay: Boolean? = null,
     var isLive: Boolean = false,
     var isCasting: Boolean = false,
     var castTech: String? = null,
