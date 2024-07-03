@@ -53,13 +53,13 @@ internal class BitmovinSdkAdapter(
     metadataProvider: MetadataProvider,
     private val ssaiService: SsaiService,
 ) : DefaultPlayerAdapter(
-    config,
-    eventDataFactory,
-    stateMachine,
-    featureFactory,
-    deviceInformationProvider,
-    metadataProvider,
-),
+        config,
+        eventDataFactory,
+        stateMachine,
+        featureFactory,
+        deviceInformationProvider,
+        metadataProvider,
+    ),
     EventDataManipulator {
     private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
     private var totalDroppedVideoFrames = 0
@@ -520,7 +520,7 @@ internal class BitmovinSdkAdapter(
             Log.d(TAG, "On Video Quality Changed")
             stateMachine.videoQualityChanged(
                 position,
-                playbackQualityProvider.didVideoQualityChange(event.newVideoQuality)
+                playbackQualityProvider.didVideoQualityChange(event.newVideoQuality),
             ) {
                 playbackQualityProvider.currentVideoQuality = event.newVideoQuality
             }
@@ -542,7 +542,7 @@ internal class BitmovinSdkAdapter(
             Log.d(TAG, "On Audio Quality Changed")
             stateMachine.audioQualityChanged(
                 position,
-                playbackQualityProvider.didAudioQualityChange(event.newAudioQuality)
+                playbackQualityProvider.didAudioQualityChange(event.newAudioQuality),
             ) {
                 playbackQualityProvider.currentAudioQuality = event.newAudioQuality
             }
@@ -611,10 +611,10 @@ internal class BitmovinSdkAdapter(
             Log.d(
                 TAG,
                 "Event PlaylistTransition" +
-                        " from: " +
-                        event.from.config.url +
-                        " to: " +
-                        event.to.config.url,
+                    " from: " +
+                    event.from.config.url +
+                    " to: " +
+                    event.to.config.url,
             )
 
             // The `sourceChange` will send the remaining sample from the previous
