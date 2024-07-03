@@ -261,7 +261,54 @@ class BundledAnalyticsTest {
         DataVerifier.verifyM3u8SourceUrl(eventDataList, defaultSample.m3u8Url!!)
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true, true))
+        DataVerifier.verifyInvariants(eventDataList)
+
+        EventDataUtils.filterNonDeterministicEvents(eventDataList)
+        DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+        // verify that no other states than startup and playing were reached
+        assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
+    }
+
+    @Test
+    fun test_vod_playWithoutAutoplayAndMuted() {
+        // arrange
+        val playbackConfig = PlaybackConfig(isAutoplayEnabled = false, isMuted = false) // default values set explicitly
+        val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
+        lateinit var localPlayer: Player
+
+        runBlockingOnMainScope {
+            localPlayer = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+            localPlayer.load(defaultSource)
+            localPlayer.play()
+        }
+
+        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
+
+        mainScope.launch {
+            localPlayer.pause()
+        }
+
+        // wait a bit to make sure last play sample is sent
+        Thread.sleep(500)
+
+        mainScope.launch {
+            localPlayer.destroy()
+        }
+
+        // assert
+        val impressionList = MockedIngress.extractImpressions()
+        assertThat(impressionList.size).isEqualTo(1)
+
+        val impression = impressionList.first()
+        DataVerifier.verifyHasNoErrorSamples(impression)
+
+        val eventDataList = impression.eventDataList
+        DataVerifier.verifyStaticData(eventDataList, defaultSourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
+        DataVerifier.verifyM3u8SourceUrl(eventDataList, defaultSample.m3u8Url!!)
+        DataVerifier.verifyStartupSample(eventDataList[0])
+        DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(false, false))
         DataVerifier.verifyInvariants(eventDataList)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)
@@ -319,7 +366,7 @@ class BundledAnalyticsTest {
 
         DataVerifier.verifyStartupSample(eventDataList[0])
         DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+        DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true, true))
         DataVerifier.verifyInvariants(eventDataList)
 
         EventDataUtils.filterNonDeterministicEvents(eventDataList)

@@ -577,9 +577,11 @@ private class DummyPlayerAdapter(
         playerContext,
         Handler(Looper.getMainLooper()),
     )
+    override val isAutoplayEnabled: Boolean?
+        get() = null
     override val position: Long
         get() = 0
-    override val drmDownloadTime: Long?
+    override val drmDownloadTime: Long
         get() = 0
 
     override var defaultMetadata: DefaultMetadata = DefaultMetadata()

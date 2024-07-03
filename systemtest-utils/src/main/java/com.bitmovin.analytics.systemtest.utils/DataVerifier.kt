@@ -115,6 +115,7 @@ object DataVerifier {
         eventDataList: MutableList<EventData>,
         expectedPlayerSettings: PlayerSettings,
     ) {
+        assertThat(EventDataUtils.getStartupEvent(eventDataList).autoplay).isEqualTo(expectedPlayerSettings.isAutoPlayEnabled)
         for (eventData in eventDataList) {
             assertThat(eventData.isMuted).isEqualTo(expectedPlayerSettings.isMuted)
         }

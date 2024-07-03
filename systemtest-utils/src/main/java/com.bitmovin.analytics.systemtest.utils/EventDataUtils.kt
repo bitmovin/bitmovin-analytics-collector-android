@@ -10,4 +10,15 @@ object EventDataUtils {
         eventDataList.removeAll { x -> x.state?.lowercase() == DataVerifier.QUALITYCHANGE }
         eventDataList.removeAll { x -> x.state?.lowercase() == DataVerifier.BUFFERING }
     }
+
+    /**
+     * Returns the first startup event from the list
+     * This function assumes that there is only one startup event in the list and take the first one.
+     * @param eventDataList List of EventData
+     * @return EventData
+     * @throws NoSuchElementException if there is no startup event in the list
+     */
+    fun getStartupEvent(eventDataList: MutableList<EventData>): EventData {
+        return eventDataList.first { x -> x.state?.lowercase() == DataVerifier.STARTUP }
+    }
 }
