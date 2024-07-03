@@ -19,10 +19,10 @@ abstract class DefaultPlayerAdapter(
     private val featureFactory: FeatureFactory,
     private val deviceInformationProvider: DeviceInformationProvider,
     protected val metadataProvider: MetadataProvider,
-    override val isAutoplayEnabled: Boolean? = null,
 ) : PlayerAdapter {
     protected abstract val eventDataManipulators: Collection<EventDataManipulator>
 
+    override val isAutoplayEnabled: Boolean? = null
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         eventDataManipulators.forEach { eventDataFactory.registerEventDataManipulator(it) }
         return featureFactory.createFeatures()
