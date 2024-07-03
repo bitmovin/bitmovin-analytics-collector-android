@@ -115,9 +115,16 @@ object DataVerifier {
         eventDataList: MutableList<EventData>,
         expectedPlayerSettings: PlayerSettings,
     ) {
-        assertThat(EventDataUtils.getStartupEvent(eventDataList).autoplay).isEqualTo(expectedPlayerSettings.isAutoPlayEnabled)
         for (eventData in eventDataList) {
             assertThat(eventData.isMuted).isEqualTo(expectedPlayerSettings.isMuted)
+        }
+
+        // Autoplay should only be included in the Startup packets
+        assertThat(EventDataUtils.getStartupEvent(eventDataList).autoplay).isEqualTo(expectedPlayerSettings.isAutoPlayEnabled)
+
+        val nonStartupEvents = eventDataList.filter { it.state != STARTUP }
+        for (eventData in nonStartupEvents) {
+            assertThat(eventData.autoplay).isEqualTo(null)
         }
     }
 
