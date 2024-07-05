@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Adding auto play detection for the Bitmovin Player
 
+### Changed
+- Upgraded `gson` from `2.10.1` to `2.11.0`
+- Upgraded `kotlinx-coroutines` from `1.8.0` to `1.8.1`
+- Upgraded `appcompat` from `1.6.1` to `1.7.0`
+- [Internal] Upgraded `bitmovin player` from `3.64.0` to `3.75.0`
+- [Internal] Upgraded `amazon-ivs` from `1.27.0` to `1.29.0`
+
 ## v3.5.1
 
 ### Fixed
