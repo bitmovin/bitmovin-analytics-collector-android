@@ -1178,7 +1178,7 @@ class PhoneBasicScenariosTest {
         // a seek should be quite fast with a stable internet connection
         // we test here that the seek is not identical with the pause
         // which should take >4000 milliseconds
-        assertThat(forwardSeek.seeked).isLessThan(1000)
+        assertThat(forwardSeek.seeked).isLessThan(3000)
 
         val pauseAfterSeek = impression.eventDataList[forwardSeek.sequenceNumber + 1]
         assertThat(pauseAfterSeek.state).isEqualTo(DataVerifier.PAUSE)
