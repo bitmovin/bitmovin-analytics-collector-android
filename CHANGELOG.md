@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Added
+
+- [internal] Added the token for the Google SDK indexing to each of the non-test modules.
 - Adding auto play detection for the Bitmovin Player
 
 ### Changed
