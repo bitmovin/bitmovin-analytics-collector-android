@@ -17,9 +17,8 @@ yes | sdkmanager --licenses
 # run systemtest for ivs
 ## clean test to make sure we run test everytime
 ./gradlew :collector-amazon-ivs:cleanPixel6api34DebugAndroidTest
-## run PhoneBasicScenariosTest
-./gradlew :collector-amazon-ivs:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.amazon.ivs.PhoneBasicScenariosTest || exit
-./gradlew :collector-amazon-ivs:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.amazon.ivs.SsaiScenariosTest || exit
+## run all ivs tests except TV scenario, since TVs are not supported by gradle automated tests
+./gradlew :collector-amazon-ivs:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.notClass=com.bitmovin.analytics.amazon.ivs.TVBasicScenariosTest || exit
 
 # run systemtest for exoplayer
 ## clean test to make sure we run test everytime

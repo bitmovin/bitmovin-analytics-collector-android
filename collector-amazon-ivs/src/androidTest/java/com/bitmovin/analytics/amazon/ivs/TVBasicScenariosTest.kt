@@ -22,14 +22,15 @@ import org.junit.runner.RunWith
 // since TVs are not supported by gradle managed devices as of 2023-03-23
 @RunWith(AndroidJUnit4::class)
 class TVBasicScenariosTest {
-
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
     private lateinit var mockedIngressUrl: String
 
     companion object {
         @BeforeClass @JvmStatic
         fun setupLooper() {
-            Looper.prepare()
+            if (Looper.myLooper() == null) {
+                Looper.prepare()
+            }
         }
     }
 

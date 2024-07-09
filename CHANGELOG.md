@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded `appcompat` from `1.6.1` to `1.7.0`
 - [Internal] Upgraded `bitmovin player` from `3.64.0` to `3.75.0`
 - [Internal] Upgraded `amazon-ivs` from `1.27.0` to `1.29.0`
+- [Internal] Fixed IVS SystemTest setup to be able to run it in CI
 
 ## v3.5.1
 

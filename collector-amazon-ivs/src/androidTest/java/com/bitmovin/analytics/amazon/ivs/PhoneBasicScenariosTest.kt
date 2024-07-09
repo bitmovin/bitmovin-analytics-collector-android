@@ -36,7 +36,9 @@ class PhoneBasicScenariosTest {
     companion object {
         @BeforeClass @JvmStatic
         fun setupLooper() {
-            Looper.prepare()
+            if (Looper.myLooper() == null) {
+                Looper.prepare()
+            }
         }
     }
 
