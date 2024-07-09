@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - [internal] Added the token for the Google SDK indexing to each of the non-test modules.
 - Adding auto play detection for the Bitmovin Player
+- [Internal] Setting up a first working version for GitHub Actions.
 
 ### Changed
 - Upgraded `gson` from `2.10.1` to `2.11.0`
