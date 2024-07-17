@@ -1,15 +1,16 @@
 package com.bitmovin.analytics.bitmovin.player
-
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
 import com.bitmovin.analytics.example.shared.Samples
+import com.bitmovin.analytics.systemtest.utils.MetadataUtils
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
+import com.bitmovin.analytics.systemtest.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -23,10 +24,11 @@ import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
 import com.bitmovin.player.api.source.SourceType
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -40,12 +42,16 @@ class DeferredLicenseLoadingTest {
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var defaultPlayer: Player
 
-    private val defaultSource = Source.create(
-        SourceConfig(
-            TestSources.HLS_REDBULL.m3u8Url!!,
-            SourceType.Hls,
-        ),
-    )
+    @get:Rule
+    val metadataGenerator = MetadataUtils.MetadataGenerator()
+
+    private val defaultSource =
+        Source.create(
+            SourceConfig(
+                TestSources.HLS_REDBULL.m3u8Url!!,
+                SourceType.Hls,
+            ),
+        )
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
 
     @Before
@@ -54,194 +60,205 @@ class DeferredLicenseLoadingTest {
         EventDatabaseTestHelper.purge(appContext)
 
         val mockedIngressUrl = MockedIngress.startServer()
-        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(
-            analyticsKey = DEFERRED_LICENSE_KEY_PLACEHOLDER,
-            backendUrl = mockedIngressUrl,
-        )
+        defaultAnalyticsConfig =
+            TestConfig.createAnalyticsConfig(
+                analyticsKey = DEFERRED_LICENSE_KEY_PLACEHOLDER,
+                backendUrl = mockedIngressUrl,
+            )
     }
 
     @After
-    fun tearDown() {
-        mainScope.launch { defaultPlayer.destroy() }
-        // wait a bit for player to be destroyed
-        Thread.sleep(100)
-    }
+    fun tearDown() =
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) { defaultPlayer.destroy() }
+            // wait a bit for player to be destroyed
+            Thread.sleep(100)
+        }
 
     @Test
-    fun test_deferredLoadedLicenseKey_isUsedInEventData_whenUsingDeferredPlaceholder() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        initializePlayer()
-        lateinit var deferredLicenseKey: String
+    fun test_deferredLoadedLicenseKey_isUsedInEventData_whenUsingDeferredPlaceholder() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            initializePlayer()
+            lateinit var deferredLicenseKey: String
 
-        // act
-        mainScope.launch {
-            defaultPlayer.on<PlayerEvent.LicenseValidated> {
-                deferredLicenseKey = it.data.analytics.key!!
+            // act
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.on<PlayerEvent.LicenseValidated> {
+                    deferredLicenseKey = it.data.analytics.key!!
+                }
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
             }
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-        }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
 
-        mainScope.launch {
-            collector.detachPlayer()
-            defaultPlayer.destroy()
-        }
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        val eventDataList = impressionList.single().eventDataList
-        assertThat(eventDataList.map { it.key }.distinct()).isEqualTo(listOf(deferredLicenseKey))
-    }
-
-    @Test
-    fun test_deferredLoadedLicenseKey_isUsedInErrorDetail_whenUsingDeferredPlaceholder() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        initializePlayer()
-        val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-        val nonExistingSource = Source.create(
-            SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()),
-        )
-        lateinit var deferredLicenseKey: String
-
-        // act
-        mainScope.launch {
-            defaultPlayer.on<PlayerEvent.LicenseValidated> {
-                deferredLicenseKey = it.data.analytics.key!!
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+                defaultPlayer.destroy()
             }
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(nonExistingSource)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            val eventDataList = impressionList.single().eventDataList
+            assertThat(eventDataList.map { it.key }.distinct()).isEqualTo(listOf(deferredLicenseKey))
         }
 
-        // it seems to take a while until the error is consistently reported
-        Thread.sleep(10000)
+    @Test
+    fun test_deferredLoadedLicenseKey_isUsedInErrorDetail_whenUsingDeferredPlaceholder() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            initializePlayer()
+            val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
+            val nonExistingSource =
+                Source.create(
+                    SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()),
+                )
+            lateinit var deferredLicenseKey: String
 
-        mainScope.launch { collector.detachPlayer() }
+            // act
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.on<PlayerEvent.LicenseValidated> {
+                    deferredLicenseKey = it.data.analytics.key!!
+                }
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(nonExistingSource)
+            }
 
-        Thread.sleep(100)
+            // it seems to take a while until the error is consistently reported
+            Thread.sleep(10000)
 
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        val errorDetailList = impressionList.single().errorDetailList
-        assertThat(errorDetailList.map { it.licenseKey }.distinct())
-            .isEqualTo(listOf(deferredLicenseKey))
-    }
+            withContext(mainScope.coroutineContext) { collector.detachPlayer() }
+
+            Thread.sleep(100)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            val errorDetailList = impressionList.single().errorDetailList
+            assertThat(errorDetailList.map { it.licenseKey }.distinct())
+                .isEqualTo(listOf(deferredLicenseKey))
+        }
 
     @Test
-    fun test_deferredLoadedLicenseKey_isUsedInAdEventData_whenUsingDeferredPlaceholder() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        initializePlayer(
-            advertisingConfig = AdvertisingConfig(
-                AdItem(
-                    "pre",
-                    AdSource(
-                        AdSourceType.Progressive,
-                        "https://bitmovin-a.akamaihd.net/content/testing/ads/testad2s.mp4",
+    fun test_deferredLoadedLicenseKey_isUsedInAdEventData_whenUsingDeferredPlaceholder() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            initializePlayer(
+                advertisingConfig =
+                    AdvertisingConfig(
+                        AdItem(
+                            "pre",
+                            AdSource(
+                                AdSourceType.Progressive,
+                                "https://bitmovin-a.akamaihd.net/content/testing/ads/testad2s.mp4",
+                            ),
+                        ),
                     ),
-                ),
-            ),
-        )
-        lateinit var deferredLicenseKey: String
+            )
+            lateinit var deferredLicenseKey: String
 
-        // act
-        mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.on<PlayerEvent.LicenseValidated> {
-                deferredLicenseKey = it.data.analytics.key!!
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.on<PlayerEvent.LicenseValidated> {
+                    deferredLicenseKey = it.data.analytics.key!!
+                }
+                defaultPlayer.load(defaultSource)
             }
-            defaultPlayer.load(defaultSource)
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+                defaultPlayer.destroy()
+            }
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            val adEventDataList = impressionList.single().adEventDataList
+            assertThat(adEventDataList.map { it.key }.distinct()).isEqualTo(listOf(deferredLicenseKey))
         }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
-
-        mainScope.launch {
-            collector.detachPlayer()
-            defaultPlayer.destroy()
-        }
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        val adEventDataList = impressionList.single().adEventDataList
-        assertThat(adEventDataList.map { it.key }.distinct()).isEqualTo(listOf(deferredLicenseKey))
-    }
 
     @Test
-    fun test_deferredLoadedLicenseKey_isNotUsed_whenNotUsingDeferredPlaceholder() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(
-            appContext,
-            defaultAnalyticsConfig.copy(licenseKey = ANALYTICS_LICENSE_KEY),
-        )
-        initializePlayer()
-        var deferredLicenseKey: String? = null
+    fun test_deferredLoadedLicenseKey_isNotUsed_whenNotUsingDeferredPlaceholder() =
+        runBlockingTest {
+            // arrange
+            val collector =
+                IBitmovinPlayerCollector.create(
+                    appContext,
+                    defaultAnalyticsConfig.copy(licenseKey = ANALYTICS_LICENSE_KEY),
+                )
+            initializePlayer()
+            var deferredLicenseKey: String? = null
 
-        // act
-        mainScope.launch {
-            defaultPlayer.on<PlayerEvent.LicenseValidated> {
-                deferredLicenseKey = it.data.analytics.key
+            // act
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.on<PlayerEvent.LicenseValidated> {
+                    deferredLicenseKey = it.data.analytics.key
+                }
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
             }
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) { collector.detachPlayer() }
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            val eventDataList = impressionList.single().eventDataList
+            assertThat(eventDataList.map { it.key }.distinct()).isEqualTo(listOf(ANALYTICS_LICENSE_KEY))
+            assertThat(deferredLicenseKey).isNotNull
         }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
-
-        mainScope.launch { collector.detachPlayer() }
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        val eventDataList = impressionList.single().eventDataList
-        assertThat(eventDataList.map { it.key }.distinct()).isEqualTo(listOf(ANALYTICS_LICENSE_KEY))
-        assertThat(deferredLicenseKey).isNotNull
-    }
 
     @Test
-    fun test_doesNotAuthenticatesTheCollector_whenAttachedAfterLicenseValidateEventAndUsingDeferredLicenseKeyPlaceholder() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        initializePlayer()
-        var deferredLicenseKey: String? = null
+    fun test_doesNotAuthenticatesTheCollector_whenAttachedAfterLicenseValidateEventAndUsingDeferredLicenseKeyPlaceholder() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            initializePlayer()
+            var deferredLicenseKey: String? = null
 
-        // act
-        mainScope.launch {
-            defaultPlayer.on<PlayerEvent.LicenseValidated> {
-                deferredLicenseKey = it.data.analytics.key!!
+            // act
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.on<PlayerEvent.LicenseValidated> {
+                    deferredLicenseKey = it.data.analytics.key!!
+                }
             }
+
+            PlaybackUtils.waitUntil { deferredLicenseKey != null }
+
+            withContext(mainScope.coroutineContext) {
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+                defaultPlayer.destroy()
+            }
+
+            // assert
+            assertThat(MockedIngress.extractImpressions()).isEmpty()
         }
-
-        PlaybackUtils.waitUntil { deferredLicenseKey != null }
-
-        mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
-
-        mainScope.launch {
-            collector.detachPlayer()
-            defaultPlayer.destroy()
-        }
-
-        // assert
-        assertThat(MockedIngress.extractImpressions()).isEmpty()
-    }
 
     private fun initializePlayer(
         playbackConfig: PlaybackConfig = PlaybackConfig(isAutoplayEnabled = true),
         advertisingConfig: AdvertisingConfig = AdvertisingConfig(),
     ) {
-        defaultPlayer = Player.create(
-            appContext,
-            PlayerConfig(
-                key = PLAYER_LICENSE_KEY,
-                playbackConfig = playbackConfig,
-                advertisingConfig = advertisingConfig,
-            ),
-        )
+        defaultPlayer =
+            Player.create(
+                appContext,
+                PlayerConfig(
+                    key = PLAYER_LICENSE_KEY,
+                    playbackConfig = playbackConfig,
+                    advertisingConfig = advertisingConfig,
+                ),
+            )
     }
 }

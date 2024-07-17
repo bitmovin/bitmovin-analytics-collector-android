@@ -1,5 +1,4 @@
 package com.bitmovin.analytics.bitmovin.player
-
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
@@ -11,9 +10,11 @@ import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
+import com.bitmovin.analytics.systemtest.utils.MetadataUtils
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
+import com.bitmovin.analytics.systemtest.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -22,10 +23,11 @@ import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -39,10 +41,13 @@ class SsaiScenariosTest {
     private lateinit var defaultPlayer: Player
 
     private val defaultSample = TestSources.HLS_REDBULL
-    private val defaultSourceMetadata =
-        SourceMetadata(
-            customData = CustomData(customData1 = "custom-data-1"),
-        )
+
+    @get:Rule
+    val metadataGenerator = MetadataUtils.MetadataGenerator()
+
+    private val defaultSourceMetadata: SourceMetadata
+        inline get() = metadataGenerator.generate(customData = CustomData(customData1 = "custom-data-1"))
+
     private val defaultSource = Source(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
 
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
@@ -65,662 +70,673 @@ class SsaiScenariosTest {
     }
 
     @After
-    fun tearDown() {
-        mainScope.launch {
-            defaultPlayer.destroy()
+    fun tearDown() =
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.destroy()
+            }
+            // wait a bit for player to be destroyed
+            Thread.sleep(100)
         }
-        // wait a bit for player to be destroyed
-        Thread.sleep(100)
-    }
 
     @Test
-    fun test_adBreakStart_adStart_adStart_adBreakEnd_sets_right_values() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+    fun test_adBreakStart_adStart_adStart_adBreakEnd_sets_right_values() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
-        // act
-        mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            collector.ssai.adBreakStart(
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                )
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                )
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData2 = "ad-test-custom-data-2")),
+                )
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adBreakEnd()
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
+
+            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+            assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
+
+            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                firstAdSamples,
                 SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+                CustomData(customData1 = "ad-test-custom-data-1"),
+                0,
             )
-            collector.ssai.adStart(
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-            )
-            defaultPlayer.play()
-        }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        mainScope.launch {
-            collector.ssai.adStart(
-                SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData2 = "ad-test-custom-data-2")),
-            )
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
-
-        mainScope.launch {
-            collector.ssai.adBreakEnd()
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(500)
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
-
-        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-        assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
-
-        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
-        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            firstAdSamples,
-            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-            CustomData(customData1 = "ad-test-custom-data-1"),
-            0,
-        )
-
-        val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
-        assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            secondAdSamples,
-            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
-            CustomData(customData1 = defaultSourceMetadata.customData.customData1, customData2 = "ad-test-custom-data-2"),
-            1,
-        )
-
-        val samplesAfterEndAdBreak = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 1)
-        assertThat(samplesAfterEndAdBreak.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterEndAdBreak)
-        DataVerifier.verifyCustomData(samplesAfterEndAdBreak, defaultSourceMetadata.customData)
-    }
-
-    @Test
-    fun test_ignore_adStart_call_if_adBreakStart_has_not_been_called() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-
-        // act
-        mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        mainScope.launch {
-            collector.ssai.adStart(SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"))
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(500)
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
-        DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
-    }
-
-    @Test
-    fun test_ignore_adBreakEnd_call_if_adBreakStart_has_not_been_called() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-
-        // act
-        mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        mainScope.launch {
-            collector.ssai.adBreakEnd()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(500)
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
-        DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
-    }
-
-    @Test
-    fun test_no_sample_sent_when_adBreak_was_closed_without_adStart_call_during_adBreak() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-
-        // act
-        mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            defaultPlayer.play()
-            collector.ssai.adBreakStart(SsaiAdBreakMetadata(SsaiAdPosition.PREROLL))
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        mainScope.launch {
-            collector.ssai.adBreakEnd()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(500)
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
-        DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
-    }
-
-    @Test
-    fun test_increase_and_set_adIndex_only_on_every_first_ad_sample() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-
-        // act
-        mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            collector.ssai.adBreakStart(
-                SsaiAdBreakMetadata(
-                    SsaiAdPosition.PREROLL,
-                ),
-            )
-            collector.ssai.adStart(
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-            )
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
-
-        mainScope.launch {
-            collector.ssai.adStart(
-                SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData2 = "ad-test-custom-data-2")),
-            )
-            defaultPlayer.pause()
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
-
-        mainScope.launch {
-            collector.ssai.adBreakEnd()
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(500)
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(8)
-
-        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-        assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
-
-        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
-        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            firstAdSamples,
-            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-            CustomData(customData1 = "ad-test-custom-data-1"),
-            0,
-        )
-
-        val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
-        assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            secondAdSamples,
-            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
-            CustomData(customData1 = defaultSourceMetadata.customData.customData1, customData2 = "ad-test-custom-data-2"),
-            1,
-        )
-
-        val samplesAfterEndAdBreak = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 1)
-        assertThat(samplesAfterEndAdBreak.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterEndAdBreak)
-        DataVerifier.verifyCustomData(samplesAfterEndAdBreak, defaultSourceMetadata.customData)
-    }
-
-    @Test
-    fun test_do_not_reset_adIndex_between_adBreaks() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-
-        // act
-        mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            collector.ssai.adBreakStart(
-                SsaiAdBreakMetadata(
-                    SsaiAdPosition.PREROLL,
-                ),
-            )
-            collector.ssai.adStart(
-                SsaiAdMetadata(
-                    "test-ad-id-1",
-                    "test-ad-system-1",
-                    CustomData(customData1 = "ad-test-custom-data-1"),
-                ),
-            )
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        mainScope.launch {
-            collector.ssai.adBreakEnd()
-            defaultPlayer.pause()
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
-
-        mainScope.launch {
-            collector.ssai.adBreakStart(
-                SsaiAdBreakMetadata(
-                    SsaiAdPosition.MIDROLL,
-                ),
-            )
-            collector.ssai.adStart(SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"))
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(500)
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(6)
-
-        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-        assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
-
-        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
-        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            firstAdSamples,
-            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-            CustomData(customData1 = "ad-test-custom-data-1"),
-            0,
-        )
-
-        val samplesBetweenAds = DataVerifier.getSamplesBetweenAds(eventDataList, 0)
-        assertThat(samplesBetweenAds.size).isGreaterThanOrEqualTo(3)
-        DataVerifier.verifyHasNoSsaiAdSamples(samplesBetweenAds)
-        DataVerifier.verifyCustomData(samplesBetweenAds, defaultSourceMetadata.customData)
-
-        val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
-        assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            secondAdSamples,
-            SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL),
-            SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
-            CustomData(customData1 = defaultSourceMetadata.customData.customData1),
-            1,
-        )
-    }
-
-    @Test
-    fun test_does_not_ignore_adBreakStart_when_player_is_paused() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-
-        // act
-        mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            collector.ssai.adBreakStart(
+            val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
+            assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                secondAdSamples,
                 SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
+                CustomData(customData1 = defaultSourceMetadata.customData.customData1, customData2 = "ad-test-custom-data-2"),
+                1,
             )
-            defaultPlayer.play()
+
+            val samplesAfterEndAdBreak = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 1)
+            assertThat(samplesAfterEndAdBreak.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterEndAdBreak)
+            DataVerifier.verifyCustomData(samplesAfterEndAdBreak, defaultSourceMetadata.customData)
         }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
-
-        mainScope.launch {
-            collector.ssai.adStart(
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-            )
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(500)
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(5)
-
-        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-        assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(4)
-        DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
-
-        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
-        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            firstAdSamples,
-            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-            CustomData(customData1 = "ad-test-custom-data-1"),
-            0,
-        )
-    }
 
     @Test
-    fun test_does_not_send_sample_but_sets_metadata_when_adStart_called_with_player_paused() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+    fun test_ignore_adStart_call_if_adBreakStart_has_not_been_called() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
-        // act
-        mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            defaultPlayer.play()
-            collector.ssai.adBreakStart(
-                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            )
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adStart(SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"))
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
+            DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
         }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            collector.ssai.adStart(
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-            )
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(500)
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
-
-        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-        assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
-        DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
-        DataVerifier.verifyCustomData(samplesBeforeFirstAd, defaultSourceMetadata.customData)
-
-        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
-        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(2)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            firstAdSamples,
-            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-            CustomData(customData1 = "ad-test-custom-data-1"),
-            0,
-        )
-    }
 
     @Test
-    fun test_does_not_send_sample_but_resets_ssai_related_data_when_adBreakEnd_called_with_player_paused() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+    fun test_ignore_adBreakEnd_call_if_adBreakStart_has_not_been_called() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
-        // act
-        mainScope.launch {
-            collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(defaultSource)
-            defaultPlayer.play()
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adBreakEnd()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
+            DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
         }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
-
-        mainScope.launch {
-            collector.ssai.adBreakStart(
-                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            )
-            collector.ssai.adStart(
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-            )
-            defaultPlayer.pause()
-            collector.ssai.adBreakEnd()
-            defaultPlayer.play()
-        }
-
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
-
-        mainScope.launch {
-            defaultPlayer.pause()
-            collector.detachPlayer()
-        }
-
-        Thread.sleep(500)
-
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(1)
-
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
-
-        val eventDataList = impression.eventDataList
-        assertThat(eventDataList.size).isGreaterThanOrEqualTo(5)
-
-        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-        assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
-        DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
-
-        val firstAdSample = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
-        assertThat(firstAdSample.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            firstAdSample,
-            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-            CustomData(customData1 = "ad-test-custom-data-1"),
-            0,
-        )
-
-        val samplesAfterFirstAd = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 0)
-        assertThat(samplesAfterFirstAd.size).isGreaterThanOrEqualTo(2)
-        DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterFirstAd)
-        DataVerifier.verifyCustomData(samplesAfterFirstAd, defaultSourceMetadata.customData)
-    }
 
     @Test
-    fun test_reset_with_playlist_transition() {
-        // arrange
-        val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-        val secondSource = Source(SourceConfig.fromUrl(TestSources.DASH_SINTEL_WITH_SUBTITLES.mpdUrl!!))
-        val playlistConfig = PlaylistConfig(listOf(defaultSource, secondSource))
+    fun test_no_sample_sent_when_adBreak_was_closed_without_adStart_call_during_adBreak() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
-        // act
-        mainScope.launch {
-            collector.attachPlayer(defaultPlayer)
-            defaultPlayer.load(playlistConfig)
-            collector.ssai.adBreakStart(
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                defaultPlayer.play()
+                collector.ssai.adBreakStart(SsaiAdBreakMetadata(SsaiAdPosition.PREROLL))
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adBreakEnd()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
+            DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
+        }
+
+    @Test
+    fun test_increase_and_set_adIndex_only_on_every_first_ad_sample() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(
+                        SsaiAdPosition.PREROLL,
+                    ),
+                )
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                )
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData2 = "ad-test-custom-data-2")),
+                )
+                defaultPlayer.pause()
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adBreakEnd()
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList.size).isGreaterThanOrEqualTo(8)
+
+            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+            assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
+
+            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                firstAdSamples,
                 SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+                CustomData(customData1 = "ad-test-custom-data-1"),
+                0,
             )
-            collector.ssai.adStart(
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+
+            val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
+            assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                secondAdSamples,
+                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
+                CustomData(customData1 = defaultSourceMetadata.customData.customData1, customData2 = "ad-test-custom-data-2"),
+                1,
             )
-            defaultPlayer.play()
+
+            val samplesAfterEndAdBreak = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 1)
+            assertThat(samplesAfterEndAdBreak.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterEndAdBreak)
+            DataVerifier.verifyCustomData(samplesAfterEndAdBreak, defaultSourceMetadata.customData)
         }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+    @Test
+    fun test_do_not_reset_adIndex_between_adBreaks() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
-        mainScope.launch {
-            // prevents quality changes for the second source
-            defaultPlayer.config.adaptationConfig.maxSelectableVideoBitrate = 258157
-            // triggers a playlist transition - resulting in a new impression
-            defaultPlayer.playlist.seek(secondSource, 10.0)
-            defaultPlayer.play()
-        }
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(
+                        SsaiAdPosition.PREROLL,
+                    ),
+                )
+                collector.ssai.adStart(
+                    SsaiAdMetadata(
+                        "test-ad-id-1",
+                        "test-ad-system-1",
+                        CustomData(customData1 = "ad-test-custom-data-1"),
+                    ),
+                )
+                defaultPlayer.play()
+            }
 
-        BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
 
-        mainScope.launch {
-            collector.ssai.adBreakStart(
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adBreakEnd()
+                defaultPlayer.pause()
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(
+                        SsaiAdPosition.MIDROLL,
+                    ),
+                )
+                collector.ssai.adStart(SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"))
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList.size).isGreaterThanOrEqualTo(6)
+
+            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+            assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
+
+            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                firstAdSamples,
+                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+                CustomData(customData1 = "ad-test-custom-data-1"),
+                0,
+            )
+
+            val samplesBetweenAds = DataVerifier.getSamplesBetweenAds(eventDataList, 0)
+            assertThat(samplesBetweenAds.size).isGreaterThanOrEqualTo(3)
+            DataVerifier.verifyHasNoSsaiAdSamples(samplesBetweenAds)
+            DataVerifier.verifyCustomData(samplesBetweenAds, defaultSourceMetadata.customData)
+
+            val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
+            assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                secondAdSamples,
                 SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL),
+                SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
+                CustomData(customData1 = defaultSourceMetadata.customData.customData1),
+                1,
             )
-            collector.ssai.adStart(SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"))
-            defaultPlayer.pause()
-            collector.detachPlayer()
         }
-        Thread.sleep(500)
 
-        // assert
-        val impressionList = MockedIngress.extractImpressions()
-        assertThat(impressionList.size).isEqualTo(2)
+    @Test
+    fun test_does_not_ignore_adBreakStart_when_player_is_paused() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
-        // First Impression
-        val impression = impressionList.first()
-        DataVerifier.verifyHasNoErrorSamples(impression)
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                defaultPlayer.play()
+            }
 
-        val eventDataList1 = impression.eventDataList
-        assertThat(eventDataList1.size).isGreaterThanOrEqualTo(3)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            eventDataList1,
-            SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-            SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-            CustomData(customData1 = "ad-test-custom-data-1"),
-            0,
-        )
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
 
-        // Second Impression
-        val impression2 = impressionList[1]
-        DataVerifier.verifyHasNoErrorSamples(impression2)
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                )
+                defaultPlayer.play()
+            }
 
-        val eventDataList2 = impression2.eventDataList
-        assertThat(eventDataList2.size).isGreaterThanOrEqualTo(3)
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
 
-        val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList2)
-        assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
-        DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
-        DataVerifier.verifyCustomData(samplesBeforeFirstAd, CustomData())
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                )
+            }
 
-        val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList2, 0)
-        assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
-        DataVerifier.verifyDataForSsaiAdSamples(
-            firstAdSamples,
-            SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL),
-            SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
-            CustomData(),
-            0,
-        )
-    }
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList.size).isGreaterThanOrEqualTo(5)
+
+            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+            assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(4)
+            DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
+
+            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                firstAdSamples,
+                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+                CustomData(customData1 = "ad-test-custom-data-1"),
+                0,
+            )
+        }
+
+    @Test
+    fun test_does_not_send_sample_but_sets_metadata_when_adStart_called_with_player_paused() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                defaultPlayer.play()
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                )
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                )
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
+
+            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+            assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
+            DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
+            DataVerifier.verifyCustomData(samplesBeforeFirstAd, defaultSourceMetadata.customData)
+
+            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(2)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                firstAdSamples,
+                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+                CustomData(customData1 = "ad-test-custom-data-1"),
+                0,
+            )
+        }
+
+    @Test
+    fun test_does_not_send_sample_but_resets_ssai_related_data_when_adBreakEnd_called_with_player_paused() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                )
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                )
+                defaultPlayer.pause()
+                collector.ssai.adBreakEnd()
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList.size).isGreaterThanOrEqualTo(5)
+
+            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
+            assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
+            DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
+
+            val firstAdSample = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            assertThat(firstAdSample.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                firstAdSample,
+                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+                CustomData(customData1 = "ad-test-custom-data-1"),
+                0,
+            )
+
+            val samplesAfterFirstAd = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 0)
+            assertThat(samplesAfterFirstAd.size).isGreaterThanOrEqualTo(2)
+            DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterFirstAd)
+            DataVerifier.verifyCustomData(samplesAfterFirstAd, defaultSourceMetadata.customData)
+        }
+
+    @Test
+    fun test_reset_with_playlist_transition() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val secondSource = Source(SourceConfig.fromUrl(TestSources.DASH_SINTEL_WITH_SUBTITLES.mpdUrl!!))
+            val playlistConfig = PlaylistConfig(listOf(defaultSource, secondSource))
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(playlistConfig)
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                )
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                )
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+
+            withContext(mainScope.coroutineContext) {
+                // prevents quality changes for the second source
+                defaultPlayer.config.adaptationConfig.maxSelectableVideoBitrate = 258157
+                // triggers a playlist transition - resulting in a new impression
+                defaultPlayer.playlist.seek(secondSource, 10.0)
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL),
+                )
+                collector.ssai.adStart(SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"))
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(2)
+
+            // First Impression
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList1 = impression.eventDataList
+            assertThat(eventDataList1.size).isGreaterThanOrEqualTo(3)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                eventDataList1,
+                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
+                CustomData(customData1 = "ad-test-custom-data-1"),
+                0,
+            )
+
+            // Second Impression
+            val impression2 = impressionList[1]
+            DataVerifier.verifyHasNoErrorSamples(impression2)
+
+            val eventDataList2 = impression2.eventDataList
+            assertThat(eventDataList2.size).isGreaterThanOrEqualTo(3)
+
+            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList2)
+            assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
+            DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
+            DataVerifier.verifyCustomData(samplesBeforeFirstAd, CustomData())
+
+            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList2, 0)
+            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
+            DataVerifier.verifyDataForSsaiAdSamples(
+                firstAdSamples,
+                SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL),
+                SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
+                CustomData(),
+                0,
+            )
+        }
 }

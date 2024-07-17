@@ -13,6 +13,7 @@ import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
@@ -38,6 +39,11 @@ class TVBasicScenariosTest {
     fun setup() {
         mockedIngressUrl = MockedIngress.startServer()
         defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
+    }
+
+    @After
+    fun teardown() {
+        MockedIngress.stopServer()
     }
 
     @Test

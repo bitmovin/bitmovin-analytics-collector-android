@@ -19,7 +19,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Upgraded `bitmovin player` from `3.64.0` to `3.75.0`
 - [Internal] Upgraded `amazon-ivs` from `1.27.0` to `1.29.0`
 - [Internal] Fixed IVS SystemTest setup to be able to run it in CI
-
+- [Internal] The tests samples are now forwarded to the real server.
+- [Internal] The tests metadata are now named according to the test name.
+- [Internal] Tests that involve blocking actions are now awaited for the result to be available before continuing to increase consistency ().
 ## v3.5.1
 
 ### Fixed

@@ -23,6 +23,7 @@ import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.systemtest.utils.Impression
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
+import com.bitmovin.analytics.systemtest.utils.RepeatRule
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -30,6 +31,7 @@ import kotlinx.coroutines.withContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.UUID
@@ -45,6 +47,9 @@ class LongtermRetryOnFailureTest {
     private lateinit var config: AnalyticsConfig
     private lateinit var bitmovinAnalytics: BitmovinAnalytics
     private lateinit var eventQueue: AnalyticsEventQueue
+
+    @Rule @JvmField
+    val repeatRule = RepeatRule()
 
     @Before
     fun setup() {

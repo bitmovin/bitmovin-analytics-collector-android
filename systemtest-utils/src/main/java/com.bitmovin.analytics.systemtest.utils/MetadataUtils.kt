@@ -3,9 +3,10 @@ package com.bitmovin.analytics.systemtest.utils
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 
 object MetadataUtils {
-
     fun mergeSourceMetadata(
         sourceMetadata: SourceMetadata,
         defaultMetadata: DefaultMetadata,
@@ -13,13 +14,99 @@ object MetadataUtils {
         val mergedCustomData =
             mergeCustomData(sourceMetadata.customData, defaultMetadata.customData)
 
-        return sourceMetadata.copy(
+        return SourceMetadata(
+            title = sourceMetadata.title,
+            videoId = sourceMetadata.videoId,
+            path = sourceMetadata.path,
             cdnProvider = sourceMetadata.cdnProvider ?: defaultMetadata.cdnProvider,
             customData = mergedCustomData,
         )
     }
 
-    fun mergeCustomData(mainCustomData: CustomData, fallbackCustomData: CustomData): CustomData {
+    /**
+     * This class is a toolkit to generate appropriate Stream metadata depending of the test context.
+     * It's main feature is the `getTestTitle` method that returns the current test class+name.
+     *
+     * This have been created to make the tests more debuggable while not rewriting all names by hand.
+     *
+     * for the class to work, you need to add it as a rule in your test class:
+     * ```kotlin
+     * @get:Rule
+     * val metadataGenerator = MetadataGenerator()
+     * ... other cool stuffs ...
+     * ```
+     */
+    class MetadataGenerator : TestWatcher() {
+        companion object {
+            var currentTestNameJVM = "__NONE__"
+
+            /**
+             * Returns a name representing the current test.
+             *
+             * This variant is meant to be used when we can't access the metadataGenerator instance directly in this context.
+             * Should only be used if the test class has the MetadataGenerator rule.
+             * @see MetadataGenerator
+             */
+            fun getTestTitle(addition: String? = null): String {
+                return currentTestNameJVM + (addition?.let { " $it" } ?: "")
+            }
+        }
+
+        var currentTestName = "__NONE__"
+
+        /**
+         * Should never be called directly. It's called by the JUnit framework when a test is starting.
+         */
+        public override fun starting(description: Description) {
+            currentTestName = description.testClass.simpleName + " : " + description.methodName
+            currentTestNameJVM = currentTestName
+        }
+
+        /**
+         * Returns a name representing the current test.
+         *
+         * Should only be used if the test class has the MetadataGenerator rule.
+         * @see MetadataGenerator
+         */
+        fun getTestTitle(
+            /**
+             * If the test create multiples videos, we should add an identifier to each videos.
+             */
+            addition: String? = null,
+        ): String {
+            return currentTestName + (addition?.let { " $it" } ?: "")
+        }
+
+        /**
+         * Generate the whole SourceMetadata.
+         *
+         * Should only be used if the test class has the MetadataGenerator rule.
+         * @see MetadataGenerator
+         */
+        fun generate(
+            addition: String? = null,
+            title: String? = currentTestName,
+            videoId: String? = currentTestName + (addition?.let { "_$it" } ?: ""),
+            path: String? = null,
+            cdnProvider: String? = null,
+            customData: CustomData = TestConfig.createDummyCustomData(),
+            isLive: Boolean = false,
+        ): SourceMetadata {
+            return SourceMetadata(
+                title = title + (addition?.let { " $it" } ?: ""),
+                videoId = videoId,
+                path = path,
+                cdnProvider = cdnProvider,
+                customData = customData,
+                isLive = isLive,
+            )
+        }
+    }
+
+    fun mergeCustomData(
+        mainCustomData: CustomData,
+        fallbackCustomData: CustomData,
+    ): CustomData {
         return CustomData(
             customData1 = mainCustomData.customData1 ?: fallbackCustomData.customData1,
             customData2 = mainCustomData.customData2 ?: fallbackCustomData.customData2,

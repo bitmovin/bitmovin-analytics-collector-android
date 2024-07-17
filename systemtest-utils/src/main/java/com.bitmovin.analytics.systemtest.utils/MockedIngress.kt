@@ -5,6 +5,10 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import com.bitmovin.analytics.utils.DataSerializer
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -13,8 +17,19 @@ import okhttp3.mockwebserver.RecordedRequest
 object MockedIngress {
     private lateinit var server: MockWebServer
     private var currentPort: Int = 0
+    private var backendUrl =
+        "https://analytics-ingress-global.bitmovin.com"
+
+    val JSON_CONTENT_TYPE = "application/json; charset=utf-8".toMediaType()
+
+    val httpClient = OkHttpClient()
+
+    const val SERVER_FORWARDING: Boolean = true
 
     fun startServer(port: Int = 0): String {
+        if (::server.isInitialized) {
+            server.shutdown()
+        }
         server = MockWebServer()
         server.dispatcher = dispatcher
         server.start(port)
@@ -40,24 +55,64 @@ object MockedIngress {
     }
 
     fun setServerOnline() {
+        if (::server.isInitialized) {
+            server.shutdown()
+        }
         server = MockWebServer()
         server.dispatcher = dispatcher
         server.start(currentPort)
     }
 
-    private val dispatcher: Dispatcher = object : Dispatcher() {
-        @Throws(InterruptedException::class)
-        override fun dispatch(request: RecordedRequest): MockResponse {
-            when (request.path) {
-                "/licensing" ->
-                    return if (request.body.readUtf8().contains("nonExistingKey")) {
-                        MockResponse().setResponseCode(403)
-                            .setBody("""{"status":"denied","message":"License key not found."}""")
-                    } else {
-                        MockResponse().setResponseCode(200).setBody("""{"status":"granted","message":"There you go.","features":{"errorDetails":{"enabled":true,"numberOfHttpRequests":10}}}""")
-                    }
+    private val dispatcher: Dispatcher =
+        object : Dispatcher() {
+            @Throws(InterruptedException::class)
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                if (SERVER_FORWARDING) {
+                    sendToRealServer(request)
+                }
+                when (request.path) {
+                    "/licensing" ->
+                        return if (request.body.readUtf8().contains("nonExistingKey")) {
+                            MockResponse().setResponseCode(403)
+                                .setBody(
+                                    """
+                                    {"status":"denied","message":"License key not found."}
+                                    """.trimIndent(),
+                                )
+                        } else {
+                            MockResponse().setResponseCode(200)
+                                .setBody(
+                                    """
+                                    {
+                                        "status": "granted",
+                                        "message": "There you go.",
+                                        "features": {
+                                            "errorDetails": {
+                                                "enabled": true,
+                                                "numberOfHttpRequests": 10
+                                            }
+                                        }
+                                    }
+                                    """.trimIndent(),
+                                )
+                        }
+                }
+                return MockResponse().setResponseCode(200)
             }
-            return MockResponse().setResponseCode(200)
+        }
+
+    private fun sendToRealServer(recordedRequest: RecordedRequest) {
+        val body = recordedRequest.body.copy().readUtf8()
+        val request =
+            Request.Builder()
+                .url(backendUrl + recordedRequest.path)
+                .headers(recordedRequest.headers)
+                .post(body.toRequestBody(JSON_CONTENT_TYPE))
+                .build()
+
+        val res = httpClient.newCall(request).execute()
+        if (res.code !in 200..299) {
+            Log.e("MockedIngress", "Error while forwarding requests to the real server: ${res.code}")
         }
     }
 
@@ -73,10 +128,11 @@ object MockedIngress {
 
             when (request.path) {
                 "/analytics" -> {
-                    val eventData = DataSerializer.deserialize(
-                        body,
-                        EventData::class.java,
-                    )
+                    val eventData =
+                        DataSerializer.deserialize(
+                            body,
+                            EventData::class.java,
+                        )
 
                     if (eventData != null) {
                         eventDataMap[eventData.impressionId]?.let {
@@ -85,10 +141,11 @@ object MockedIngress {
                     }
                 }
                 "/analytics/a" -> {
-                    val adEventData = DataSerializer.deserialize(
-                        body,
-                        AdEventData::class.java,
-                    )
+                    val adEventData =
+                        DataSerializer.deserialize(
+                            body,
+                            AdEventData::class.java,
+                        )
 
                     if (adEventData != null) {
                         adEventDataMap[adEventData.videoImpressionId]?.let {
@@ -97,10 +154,11 @@ object MockedIngress {
                     }
                 }
                 "/analytics/error" -> {
-                    val errorDetail = DataSerializer.deserialize(
-                        body,
-                        ErrorDetail::class.java,
-                    )
+                    val errorDetail =
+                        DataSerializer.deserialize(
+                            body,
+                            ErrorDetail::class.java,
+                        )
 
                     if (errorDetail != null) {
                         errorDetailMap[errorDetail.impressionId]?.let {
@@ -144,15 +202,15 @@ object MockedIngress {
         }
 
         for (impression in impressionList) {
-            impression.eventDataList.forEach() {
+            impression.eventDataList.forEach {
                 Log.d("MockedIngress", "Sample: $it")
             }
 
-            impression.adEventDataList.forEach() {
+            impression.adEventDataList.forEach {
                 Log.d("MockedIngress", "AdSample: $it")
             }
 
-            impression.errorDetailList.forEach() {
+            impression.errorDetailList.forEach {
                 Log.d("MockedIngress", "ErrorDetailSample: $it")
             }
         }

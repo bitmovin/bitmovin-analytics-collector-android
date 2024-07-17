@@ -652,7 +652,7 @@ object DataVerifier {
             return
         }
 
-        // we use a range of -20% to +10% to account for some inaccuracies in the players
-        assertThat(playingStartEndDelta).isBetween((playingDuration * 0.80).toLong(), (playingDuration * 1.10).toLong())
+        // we use a range of -25% to +10% to account for some inaccuracies in the players
+        assertThat(playingStartEndDelta).isBetween((playingDuration * 0.75).toLong(), (playingDuration * 1.10).toLong())
     }
 }

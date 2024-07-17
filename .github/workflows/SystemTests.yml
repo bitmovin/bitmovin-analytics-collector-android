@@ -1,13 +1,9 @@
 
 name: SystemTests
 on:
-#  push:
-#    branches:
-#      - github-actions-testings
   pull_request:
     branches:
       - main
-      - github-actions-testings
   schedule:
     # Trigger on start of the day every working day (stolen from player nightly)
     - cron: '0 0 * * MON-FRI'
@@ -16,15 +12,17 @@ on:
 jobs:
   system-tests:
     runs-on: bitdash-4core
-    timeout-minutes: 90
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.7
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4.2.1
         with:
           distribution: 'adopt'
           java-version: '17'
+
       - name: Setup Android
         uses: android-actions/setup-android@v3
 
@@ -34,12 +32,6 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-# Cleaning the disk space is only necessary for the GitHub hosted runners, which often run out of disk space
-#      - name: Free Disk Space (Ubuntu)
-#        uses: jlumbroso/free-disk-space@v1.3.1
-#        with:
-#          android: false
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -47,42 +39,36 @@ jobs:
           cache-read-only: false
 
 # Collector Test
-
       - name: Tests Collector
         if: always()
         run: |
           ./gradlew :collector:pixel6api34DebugAndroidTest
 
 # Collector Bitmovin Player Test
-
       - name: Tests Collector Bitmovin Player
         if: always()
         run: |
           ./gradlew :collector-bitmovin-player:pixel6api34DebugAndroidTest
 
 # Collector Exo Player Test
-
       - name: Tests Collector Exoplayer
         if: always()
         run: |
           ./gradlew :collector-exoplayer:pixel6api34DebugAndroidTest
 
 # Collector Media3 Exo Player Test
-
       - name: Tests Collector Media3 Exoplayer
         if: always()
         run: |
           ./gradlew :collector-media3-exoplayer:pixel6api34DebugAndroidTest
 
 # Collector Amazon IVS Test
-
       - name: Tests Collector Amazon IVS
         if: always()
         run: |
           ./gradlew :collector-amazon-ivs:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.notClass=com.bitmovin.analytics.amazon.ivs.TVBasicScenariosTest
 
 # Report
-
       - name: Copying Reports
         if: always()
         id: copy-reports
