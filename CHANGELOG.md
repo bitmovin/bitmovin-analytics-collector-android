@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] The tests samples are now forwarded to the real server.
 - [Internal] The tests metadata are now named according to the test name.
 - [Internal] Tests that involve blocking actions are now awaited for the result to be available before continuing to increase consistency ().
+- [Internal] The runBlockingTest function hides it's presence in the stack trace to enhance readability.
 ## v3.5.1
 
 ### Fixed
