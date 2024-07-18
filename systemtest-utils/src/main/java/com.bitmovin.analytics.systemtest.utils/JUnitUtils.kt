@@ -72,11 +72,59 @@ class RepeatRule : TestRule {
  *    ...
  * }
  * ```
+ *
+ * Warning : This function will not appear in the stack trace to avoid confusion and enhance readability.
+ *
  * @since [AN-4182](https://bitmovin.atlassian.net/browse/AN-4182)
  */
 fun <T> runBlockingTest(block: suspend CoroutineScope.() -> T) {
-    runBlocking {
-        block()
+    try {
+        runBlocking {
+            block()
+        }
+    } catch (e: Throwable) {
+        val stackTrace = e.stackTrace
+        val filteredStackTrace = stackTraceCleaner(stackTrace)
+        e.stackTrace = filteredStackTrace
+        throw e
     }
-    return
+}
+
+private const val RUNNING_BLOCKING_TEST_FUN_NAME = "runBlockingTest"
+
+private fun stackTraceCleaner(stackTrace: Array<StackTraceElement>): Array<StackTraceElement> {
+    // The line that entered the runBlockingTest scope
+    val indexOfRunBlockingTestScopeEntering =
+        stackTrace.indexOfLast { it.methodName == RUNNING_BLOCKING_TEST_FUN_NAME } + 1
+
+    // The line that invoked the failing test
+    // Should look like this : com.example.TestClass.test(TestClass.kt:<Line where runBlockingTest is called>)
+    val testEnteringRunBlocking = stackTrace[indexOfRunBlockingTestScopeEntering]
+
+    val indexOfFailingLine =
+        stackTrace.indexOfFirst { it.methodName == "invokeSuspend" && it.fileName == testEnteringRunBlocking.fileName }
+
+    // The line that failed within the runBlockingTest scope
+    // Should look like this : com.example.TestClass$test$1.invokeSuspend(TestClass.kt:<Line where the real fail test happen>)
+    val valueOfErrorLine = stackTrace[indexOfFailingLine]
+
+    // Everything in the middle should be removed and replaced by wrapping up the right line error number with the test's other details
+    // Like that, the runBlockingTest scope is not visible in the stack trace.
+    // We want this : com.example.TestClass.test(TestClass.kt:<Line where the real fail test happen>)
+    val reworkedFailedTest =
+        StackTraceElement(
+            testEnteringRunBlocking.className,
+            testEnteringRunBlocking.methodName,
+            testEnteringRunBlocking.fileName,
+            valueOfErrorLine.lineNumber,
+        )
+
+    // Rebuilding the stack trace without the useless runBlockingTest scope content.
+    val filteredStackTrace =
+        stackTrace
+            .sliceArray(0 until indexOfFailingLine)
+            .plus(reworkedFailedTest)
+            .plus(stackTrace.sliceArray(indexOfRunBlockingTestScopeEntering + 1 until stackTrace.size))
+
+    return filteredStackTrace
 }
