@@ -32,6 +32,7 @@ class ErrorScenariosTest {
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()
 
+    // Source metadata title depends on the test, so it has to be generated dynamically
     private var defaultSourceMetadata: SourceMetadata
         get() =
             SourceMetadata(
@@ -41,7 +42,7 @@ class ErrorScenariosTest {
                 customData = TestConfig.createDummyCustomData(),
                 cdnProvider = "cdn_provider",
             )
-        set(value) {}
+        set(_) {}
 
     @Before
     fun setup() {
@@ -81,7 +82,7 @@ class ErrorScenariosTest {
             }
 
             // assert
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             val impression = impressions.first()
 
             Assertions.assertThat(impression.eventDataList.size).isEqualTo(1)
@@ -136,7 +137,7 @@ class ErrorScenariosTest {
             }
 
             // assert
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             val impression = impressions.first()
 
             Assertions.assertThat(impression.eventDataList.size).isEqualTo(1)
@@ -191,7 +192,7 @@ class ErrorScenariosTest {
             }
 
             // assert
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             val impression = impressions.first()
 
             Assertions.assertThat(impression.eventDataList.size).isGreaterThanOrEqualTo(2)
@@ -249,7 +250,7 @@ class ErrorScenariosTest {
             // test was flaky with 300ms, 500ms should stabilize it.
             Thread.sleep(500)
 
-            val impressionsList = MockedIngress.extractImpressions()
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
             val impression = impressionsList.first()
             val startupSample = impression.eventDataList.first()
             Assertions.assertThat(startupSample.videoStartFailed).isTrue

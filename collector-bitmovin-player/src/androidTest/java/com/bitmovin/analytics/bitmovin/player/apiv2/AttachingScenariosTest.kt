@@ -28,7 +28,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class AttachingScenariosTest {
-
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -232,11 +231,15 @@ class AttachingScenariosTest {
         Thread.sleep(500)
 
         // assert
-        val impressionList = MockedIngress.extractImpressions()
+        val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
         Assertions.assertThat(impressionList.size).isEqualTo(2)
     }
 
-    private fun lateAttachingWhilePlaying(player: Player, collector: IBitmovinPlayerCollector, playlistConfig: PlaylistConfig) {
+    private fun lateAttachingWhilePlaying(
+        player: Player,
+        collector: IBitmovinPlayerCollector,
+        playlistConfig: PlaylistConfig,
+    ) {
         // act
         mainScope.launch {
             player.load(playlistConfig)
@@ -261,7 +264,11 @@ class AttachingScenariosTest {
         Thread.sleep(500)
     }
 
-    private fun attachOnPlaylistTransitionFastSeek(player: Player, collector: IBitmovinPlayerCollector, playlistConfig: PlaylistConfig) {
+    private fun attachOnPlaylistTransitionFastSeek(
+        player: Player,
+        collector: IBitmovinPlayerCollector,
+        playlistConfig: PlaylistConfig,
+    ) {
         // act
         mainScope.launch {
             player.load(playlistConfig)
@@ -293,7 +300,11 @@ class AttachingScenariosTest {
         Thread.sleep(500)
     }
 
-    private fun attachImmediatelyAfterFastSeek(player: Player, collector: IBitmovinPlayerCollector, playlistConfig: PlaylistConfig) {
+    private fun attachImmediatelyAfterFastSeek(
+        player: Player,
+        collector: IBitmovinPlayerCollector,
+        playlistConfig: PlaylistConfig,
+    ) {
         mainScope.launch {
             player.load(playlistConfig)
             player.play()
@@ -318,7 +329,11 @@ class AttachingScenariosTest {
         Thread.sleep(500)
     }
 
-    private fun attachOnPlaylistTransitionSlowSeek(player: Player, collector: IBitmovinPlayerCollector, playlistConfig: PlaylistConfig) {
+    private fun attachOnPlaylistTransitionSlowSeek(
+        player: Player,
+        collector: IBitmovinPlayerCollector,
+        playlistConfig: PlaylistConfig,
+    ) {
         // act
         mainScope.launch {
             player.load(playlistConfig)
@@ -354,7 +369,7 @@ class AttachingScenariosTest {
     }
 
     private fun verifyExactlyOneSessionWithStartupSample() {
-        val impressionList = MockedIngress.extractImpressions()
+        val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
         Assertions.assertThat(impressionList.size).isEqualTo(1)
 
         val impression = impressionList.first()

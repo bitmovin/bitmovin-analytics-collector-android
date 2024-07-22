@@ -108,7 +108,7 @@ class SsaiScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -178,7 +178,7 @@ class SsaiScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -220,7 +220,7 @@ class SsaiScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -263,7 +263,7 @@ class SsaiScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -330,7 +330,7 @@ class SsaiScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -419,7 +419,7 @@ class SsaiScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -500,7 +500,7 @@ class SsaiScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -566,7 +566,7 @@ class SsaiScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -630,7 +630,7 @@ class SsaiScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()

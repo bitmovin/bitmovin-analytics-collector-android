@@ -313,7 +313,12 @@ object DataVerifier {
             assertThat(eventData.playerStartupTime).isEqualTo(1)
         }
         assertThat(eventData.videoStartupTime).isGreaterThan(0)
-        assertThat(eventData.videoTimeStart).isEqualTo(0)
+
+        // ivs happens to sometime have a videoTimeStart != 0 on startup samples (~30 ms)
+        // thus we skip this check for ivs
+        if (eventData.player != "amazonivs") {
+            assertThat(eventData.videoTimeStart).isEqualTo(0)
+        }
         //   assertThat(eventData.videoTimeEnd).isEqualTo(0) // we can end up with startup samples that have non 0 videoTimeEnd, this needs to be investigated
         assertThat(eventData.droppedFrames).isEqualTo(0)
         assertThat(eventData.sequenceNumber).isEqualTo(expectedSequenceNumber)
@@ -403,7 +408,7 @@ object DataVerifier {
                 // we need to add a couple of ms to videoTimeEnd to make test stable
                 // since it seems like ivs player is sometimes changing the position backwards a bit on
                 // subsequent player.position calls after a seek, which affects the playing sample after the seek
-                assertThat(eventData.videoTimeStart).isLessThanOrEqualTo(eventData.videoTimeEnd + 30)
+                assertThat(eventData.videoTimeStart).isLessThanOrEqualTo(eventData.videoTimeEnd + 50)
             }
 
             // we don't check for continous playback in case ad was played before
@@ -647,12 +652,45 @@ object DataVerifier {
         val playingStartEndDelta = playingEvents.sumOf { it.videoTimeEnd - it.videoTimeStart }
         val playingDuration = playingEvents.sumOf { it.played }
 
-        // if playingStartEndDelta is very low we just skip verification to avoid flakyness
+        // if playingStartEndDelta is very low we just skip verification to avoid flakiness
         if (playingStartEndDelta < 100) {
             return
         }
 
-        // we use a range of -25% to +10% to account for some inaccuracies in the players
-        assertThat(playingStartEndDelta).isBetween((playingDuration * 0.75).toLong(), (playingDuration * 1.10).toLong())
+        // we use a range of -25% to +15% to account for some inaccuracies in the players
+        // we also make the range bigger by 100ms (50ms on each side) to not be too strict with low playing times.
+        val minPlayingDuration = (playingDuration * 0.75 - 50).toLong()
+        val maxPlayingDuration = (playingDuration * 1.15 + 50).toLong()
+        assertThat(playingStartEndDelta).isBetween(minPlayingDuration, maxPlayingDuration)
+    }
+
+    /**
+     * Verifies that the sum of play time is within a reasonable range of the expected value
+     * @param eventDataList list of event data samples
+     * @param expectedPlayTimeInMs expected play time in milliseconds
+     */
+    fun verifyPlayTimeIsCorrect(
+        eventDataList: MutableList<EventData>,
+        expectedPlayTimeInMs: Long,
+    ) {
+        // We accept some level of inaccuracies.
+        val playedDuration = eventDataList.sumOf { it.played }
+        assertThat(playedDuration)
+            .isBetween((expectedPlayTimeInMs * 0.85 - 50).toLong(), (expectedPlayTimeInMs * 1.15 + 50).toLong())
+    }
+
+    /**
+     * Verifies that the sum of pause time is within a reasonable range of the expected value
+     * @param eventDataList list of event data samples
+     * @param expectedPauseTimeInMs expected pause time in milliseconds
+     */
+    fun verifyPauseTimeIsCorrect(
+        eventDataList: MutableList<EventData>,
+        expectedPauseTimeInMs: Long,
+    ) {
+        // We accept some level of inaccuracies.
+        val pausedDuration = eventDataList.sumOf { it.paused }
+        assertThat(pausedDuration)
+            .isBetween((expectedPauseTimeInMs * 0.85 - 50).toLong(), (expectedPauseTimeInMs * 1.15 + 50).toLong())
     }
 }

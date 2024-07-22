@@ -73,7 +73,7 @@ class TVBasicScenariosTest {
         player.release()
 
         // assert
-        val impressionsList = MockedIngress.extractImpressions()
+        val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
 
         assertThat(impressionsList.size).isEqualTo(1)
 

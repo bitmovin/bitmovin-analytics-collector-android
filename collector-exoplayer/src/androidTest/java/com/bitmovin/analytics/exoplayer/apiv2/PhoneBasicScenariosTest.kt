@@ -94,7 +94,7 @@ class PhoneBasicScenariosTest {
                 player.release()
             }
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             Assertions.assertThat(impressions.size).isEqualTo(1)
 
             val impression = impressions.first()
@@ -157,7 +157,7 @@ class PhoneBasicScenariosTest {
                 player.release()
             }
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             Assertions.assertThat(impressions.size).isEqualTo(2)
 
             val impression = impressions.first()
@@ -232,7 +232,7 @@ class PhoneBasicScenariosTest {
             }
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             Assertions.assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -278,7 +278,7 @@ class PhoneBasicScenariosTest {
             Thread.sleep(300)
 
             // assert that no samples are sent
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             Assertions.assertThat(impressions.size).isEqualTo(0)
         }
 }

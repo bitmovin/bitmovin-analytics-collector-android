@@ -97,7 +97,7 @@ class AdScenariosTest {
             Thread.sleep(200)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             Assertions.assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()

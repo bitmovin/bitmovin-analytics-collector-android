@@ -52,12 +52,18 @@ class BundledAnalyticsTest {
 
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()
+
+    // Source metadata title depends on the test, so it has to be generated dynamically
     private var defaultSourceMetadata: SourceMetadata
         get() = metadataGenerator.generate(cdnProvider = "cdn_provider")
-        set(value) {}
+
+        // Unused setter
+        set(_) {}
+
+    // Source depends on defaultSourceMetaData which depends on the Test, so it has to be generated dynamically
     private var defaultSource: Source
         get() = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), defaultSourceMetadata)
-        set(value) {}
+        set(_) {}
     private val defaultPlayerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
 
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
@@ -120,7 +126,7 @@ class BundledAnalyticsTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -136,11 +142,8 @@ class BundledAnalyticsTest {
             DataVerifier.verifyInvariants(eventDataList)
 
             // verify durations of each state are within a reasonable range
-            val playedDuration = eventDataList.sumOf { it.played }
-            assertThat(playedDuration).isBetween((playedToMs * 0.95).toLong(), (playedToMs * 1.1).toLong())
-
-            val pausedDuration = eventDataList.sumOf { it.paused }
-            assertThat(pausedDuration).isBetween((pauseTimeMs * 0.9).toLong(), (pauseTimeMs * 1.1).toLong())
+            DataVerifier.verifyPlayTimeIsCorrect(eventDataList, playedToMs)
+            DataVerifier.verifyPauseTimeIsCorrect(eventDataList, pauseTimeMs)
         }
 
     @Test
@@ -176,7 +179,7 @@ class BundledAnalyticsTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -210,7 +213,7 @@ class BundledAnalyticsTest {
             BitmovinPlaybackUtils.waitUntilPlaybackFinished(defaultPlayer)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -255,7 +258,7 @@ class BundledAnalyticsTest {
             }
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -303,7 +306,7 @@ class BundledAnalyticsTest {
             }
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -354,14 +357,10 @@ class BundledAnalyticsTest {
 
             withContext(mainScope.coroutineContext) {
                 localPlayer.pause()
-                localPlayer.destroy()
             }
 
-            // wait a bit to make sure last play sample is sent
-            Thread.sleep(500)
-
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -427,7 +426,7 @@ class BundledAnalyticsTest {
             // wait a bit for player to be cleaned up
             Thread.sleep(500)
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions.size).isEqualTo(2)
 
             val impression1 = impressions[0]
@@ -535,7 +534,7 @@ class BundledAnalyticsTest {
             Thread.sleep(500)
 
             // assert
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions.size).isEqualTo(3)
 
             val impression1 = impressions[0]
@@ -648,7 +647,7 @@ class BundledAnalyticsTest {
             Thread.sleep(500)
 
             // assert
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions.size).isEqualTo(2)
 
             val impression1 = impressions[0]
@@ -736,7 +735,7 @@ class BundledAnalyticsTest {
             Thread.sleep(500)
 
             // assert
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions.size).isEqualTo(2)
 
             val impression1 = impressions[0]
@@ -788,7 +787,7 @@ class BundledAnalyticsTest {
             Thread.sleep(10000)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -895,7 +894,7 @@ class BundledAnalyticsTest {
                 localPlayer.destroy()
             }
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions.size).isEqualTo(2)
 
             val impression1 = impressions[0]
@@ -959,7 +958,7 @@ class BundledAnalyticsTest {
             Thread.sleep(300)
 
             // assert that no samples are sent
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions.size).isEqualTo(0)
         }
 
@@ -1029,7 +1028,7 @@ class BundledAnalyticsTest {
 
             Thread.sleep(300)
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
 
             val normalizedImpressions = impressions.combineByImpressionId()
             assertThat(normalizedImpressions.size).isEqualTo(2)
@@ -1080,7 +1079,7 @@ class BundledAnalyticsTest {
 
             Thread.sleep(500)
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
 
             // sending customData5 is with player unloaded and thus, should be in a separate impression
             assertThat(impressions.size).isEqualTo(2)
@@ -1142,7 +1141,7 @@ class BundledAnalyticsTest {
             Thread.sleep(300)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList).hasSize(1)
 
             val impression = impressionList.first()
@@ -1197,7 +1196,7 @@ class BundledAnalyticsTest {
             Thread.sleep(200) // wait a bit for player being destroyed
 
             // assert
-            val impressionsList = MockedIngress.extractImpressions()
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionsList).hasSize(1)
 
             val impression = impressionsList.first()
@@ -1253,7 +1252,7 @@ class BundledAnalyticsTest {
             }
 
             Thread.sleep(300)
-            val impressionsList = MockedIngress.extractImpressions()
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionsList).hasSize(1)
 
             val impression = impressionsList.first()

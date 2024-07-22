@@ -112,7 +112,7 @@ class LongtermRetryOnFailureTest {
 
         Thread.sleep(500)
 
-        val impressionList = MockedIngress.extractImpressions().combineByImpressionId()
+        val impressionList = MockedIngress.waitForRequestsAndExtractImpressions().combineByImpressionId()
         assertThat(impressionList).hasSize(1)
         assertThat(impressionList.values.first().eventDataList)
             .hasSize(5)
@@ -155,7 +155,7 @@ class LongtermRetryOnFailureTest {
 
         Thread.sleep(500)
 
-        val impressionsBeforeOffline = MockedIngress.extractImpressions().combineByImpressionId()
+        val impressionsBeforeOffline = MockedIngress.waitForRequestsAndExtractImpressions().combineByImpressionId()
         assertThat(impressionsBeforeOffline).hasSize(1)
         assertThat(impressionsBeforeOffline.values.first().eventDataList)
             .hasSize(2)
@@ -185,7 +185,7 @@ class LongtermRetryOnFailureTest {
         }
 
         // all samples in queue are sent together with the new samples
-        val impressionsAfterOffline = MockedIngress.extractImpressions().combineByImpressionId()
+        val impressionsAfterOffline = MockedIngress.waitForRequestsAndExtractImpressions().combineByImpressionId()
         assertThat(impressionsAfterOffline).hasSize(1)
         assertThat(impressionsAfterOffline.values.first().eventDataList)
             .hasSize(4)
@@ -213,7 +213,7 @@ class LongtermRetryOnFailureTest {
         }
         Thread.sleep(500)
 
-        val impressions = MockedIngress.extractImpressions().combineByImpressionId()
+        val impressions = MockedIngress.waitForRequestsAndExtractImpressions().combineByImpressionId()
         assertThat(impressions).hasSize(1)
         assertThat(impressions.values.first().adEventDataList)
             .hasSize(5)
@@ -254,7 +254,7 @@ class LongtermRetryOnFailureTest {
         bitmovinAnalytics.sendEventData(TestFactory.createEventData(impressionId = sessionId))
         Thread.sleep(5000)
 
-        val impressions = MockedIngress.extractImpressions().combineByImpressionId()
+        val impressions = MockedIngress.waitForRequestsAndExtractImpressions().combineByImpressionId()
         assertThat(impressions).hasSize(2)
         assertThat(impressions[cachedSessionId]!!.eventDataList)
             .hasSize(5)
@@ -308,7 +308,7 @@ class LongtermRetryOnFailureTest {
         secondInstance.sendEventData(TestFactory.createEventData(impressionId = sessionId))
         Thread.sleep(5000)
 
-        val impressions = MockedIngress.extractImpressions().combineByImpressionId()
+        val impressions = MockedIngress.waitForRequestsAndExtractImpressions().combineByImpressionId()
         assertThat(impressions).hasSize(2)
         val cachedImpression = impressions[cachedSessionId]
         val triggerImpression = impressions[sessionId]
@@ -398,7 +398,7 @@ class LongtermRetryOnFailureTest {
 
         Thread.sleep(40000)
 
-        val impressions = MockedIngress.extractImpressions().combineByImpressionId()
+        val impressions = MockedIngress.waitForRequestsAndExtractImpressions().combineByImpressionId()
 
         impressions.values.forEach {
             assertThat(it.eventDataList).hasSize(101)
@@ -466,7 +466,7 @@ class LongtermRetryOnFailureTest {
 
         Thread.sleep(1000)
 
-        val impressions = MockedIngress.extractImpressions().combineByImpressionId()
+        val impressions = MockedIngress.waitForRequestsAndExtractImpressions().combineByImpressionId()
         assertThat(impressions.values).hasSize(1)
         assertThat(impressions.values.first().eventDataList).hasSize(1)
     }

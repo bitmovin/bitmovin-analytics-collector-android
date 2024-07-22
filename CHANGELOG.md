@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] The tests metadata are now named according to the test name.
 - [Internal] Tests that involve blocking actions are now awaited for the result to be available before continuing to increase consistency ().
 - [Internal] The runBlockingTest function hides it's presence in the stack trace to enhance readability.
+- [Internal] The impression id now appears in the error message when a blocking test (which use `runBlockingTest`) fails.
+- [Internal] Adding a waiting for all requests mechanism to the tests to ensure that all requests are sent before the test extract the impressions.
+
 ## v3.5.1
 
 ### Fixed

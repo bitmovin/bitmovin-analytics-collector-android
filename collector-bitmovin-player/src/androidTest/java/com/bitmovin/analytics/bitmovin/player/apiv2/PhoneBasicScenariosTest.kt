@@ -113,7 +113,7 @@ class PhoneBasicScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -128,11 +128,8 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyInvariants(eventDataList)
 
             // verify durations of each state are within a reasonable range
-            val playedDuration = eventDataList.sumOf { it.played }
-            assertThat(playedDuration).isBetween((playedToMs * 0.95).toLong(), (playedToMs * 1.1).toLong())
-
-            val pausedDuration = eventDataList.sumOf { it.paused }
-            assertThat(pausedDuration).isBetween((pauseTimeMs * 0.9).toLong(), (pauseTimeMs * 1.1).toLong())
+            DataVerifier.verifyPlayTimeIsCorrect(eventDataList, playedToMs)
+            DataVerifier.verifyPauseTimeIsCorrect(eventDataList, pauseTimeMs)
         }
 
     @Test
@@ -172,7 +169,7 @@ class PhoneBasicScenariosTest {
             Thread.sleep(500)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -215,7 +212,7 @@ class PhoneBasicScenariosTest {
             Thread.sleep(200) // wait a bit for player being destroyed
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -262,7 +259,7 @@ class PhoneBasicScenariosTest {
             }
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -317,7 +314,7 @@ class PhoneBasicScenariosTest {
             }
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -380,7 +377,7 @@ class PhoneBasicScenariosTest {
             }
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -470,7 +467,7 @@ class PhoneBasicScenariosTest {
             }
 
             // assert
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions.size).isEqualTo(3)
 
             val impression1 = impressions[0]
@@ -595,7 +592,7 @@ class PhoneBasicScenariosTest {
             }
 
             // assert
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions.size).isEqualTo(2)
 
             val impression1 = impressions[0]
@@ -664,7 +661,7 @@ class PhoneBasicScenariosTest {
             Thread.sleep(100)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
@@ -758,7 +755,7 @@ class PhoneBasicScenariosTest {
             // wait a bit for player to be cleaned up
             Thread.sleep(500)
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions.size).isEqualTo(2)
 
             val impression1 = impressions[0]

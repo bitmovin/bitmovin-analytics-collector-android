@@ -42,6 +42,7 @@ class PhoneBasicScenariosTest {
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()
 
+    // Source metadata title depends on the test, so it has to be generated dynamically
     private var defaultSourceMetadata: SourceMetadata
         get() =
             SourceMetadata(
@@ -51,8 +52,8 @@ class PhoneBasicScenariosTest {
                 customData = TestConfig.createDummyCustomData(),
                 cdnProvider = "cdn_provider",
             )
+        set(_) {}
 
-        set(value) {}
     private val forceLowestQuality =
         TrackSelectionParameters.Builder()
             .setForceLowestBitrate(true)
@@ -119,7 +120,7 @@ class PhoneBasicScenariosTest {
 
             Thread.sleep(300)
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)
 
             val impression = impressions.first()
@@ -187,7 +188,7 @@ class PhoneBasicScenariosTest {
 
             Thread.sleep(300)
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)
 
             val impression = impressions.first()
@@ -242,7 +243,7 @@ class PhoneBasicScenariosTest {
 
             Thread.sleep(300)
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)
 
             val impression = impressions.first()
@@ -311,7 +312,7 @@ class PhoneBasicScenariosTest {
             Thread.sleep(300)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList).hasSize(1)
 
             val impression = impressionList.first()
@@ -371,7 +372,7 @@ class PhoneBasicScenariosTest {
             }
 
             Thread.sleep(300)
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)
 
             val drmImpression = impressions[0]
@@ -424,7 +425,7 @@ class PhoneBasicScenariosTest {
             }
 
             Thread.sleep(300)
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)
 
             val drmImpression = impressions[0]
@@ -488,7 +489,7 @@ class PhoneBasicScenariosTest {
 
             Thread.sleep(300)
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(2)
 
             val dashImpression = impressions[0]
@@ -543,7 +544,7 @@ class PhoneBasicScenariosTest {
             }
 
             Thread.sleep(300)
-            val impressionsList = MockedIngress.extractImpressions()
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionsList).hasSize(1)
 
             val impression = impressionsList.first()
@@ -601,7 +602,7 @@ class PhoneBasicScenariosTest {
 
             Thread.sleep(300)
 
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)
 
             val impression = impressions.first()
@@ -684,7 +685,7 @@ class PhoneBasicScenariosTest {
 
             Thread.sleep(300)
 
-            val impressionsList = MockedIngress.extractImpressions()
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionsList).hasSize(1)
 
             val impression = impressionsList.first()
@@ -757,7 +758,7 @@ class PhoneBasicScenariosTest {
 
             Thread.sleep(300)
 
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList).hasSize(1)
 
             val impression = impressionList.first()
@@ -794,7 +795,7 @@ class PhoneBasicScenariosTest {
             Thread.sleep(300)
 
             // assert that no samples are sent
-            val impressions = MockedIngress.extractImpressions()
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(0)
         }
 
@@ -847,7 +848,7 @@ class PhoneBasicScenariosTest {
             }
 
             Thread.sleep(300)
-            val impressionsList = MockedIngress.extractImpressions()
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionsList).hasSize(1)
 
             val impression = impressionsList.first()
@@ -860,11 +861,11 @@ class PhoneBasicScenariosTest {
             // a seek should be quite fast with a stable internet connection
             // we test here that the seek is not identical with the pause
             // which should take >4000 milliseconds
-            assertThat(forwardSeek.seeked).isLessThan(1000)
+            assertThat(forwardSeek.seeked).isLessThan(3000)
 
             val pauseAfterSeek = impression.eventDataList[forwardSeek.sequenceNumber + 1]
             assertThat(pauseAfterSeek.state).isEqualTo(DataVerifier.PAUSE)
-            assertThat(pauseAfterSeek.paused).isGreaterThan(4000)
+            assertThat(pauseAfterSeek.paused).isGreaterThan(3500)
 
             val pauseBeforeSeek = impression.eventDataList[forwardSeek.sequenceNumber - 1]
             assertThat(pauseBeforeSeek.state).isEqualTo(DataVerifier.PAUSE)

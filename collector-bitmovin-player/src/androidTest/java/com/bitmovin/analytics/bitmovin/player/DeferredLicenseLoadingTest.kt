@@ -100,7 +100,7 @@ class DeferredLicenseLoadingTest {
             }
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             val eventDataList = impressionList.single().eventDataList
             assertThat(eventDataList.map { it.key }.distinct()).isEqualTo(listOf(deferredLicenseKey))
         }
@@ -135,7 +135,7 @@ class DeferredLicenseLoadingTest {
             Thread.sleep(100)
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             val errorDetailList = impressionList.single().errorDetailList
             assertThat(errorDetailList.map { it.licenseKey }.distinct())
                 .isEqualTo(listOf(deferredLicenseKey))
@@ -177,7 +177,7 @@ class DeferredLicenseLoadingTest {
             }
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             val adEventDataList = impressionList.single().adEventDataList
             assertThat(adEventDataList.map { it.key }.distinct()).isEqualTo(listOf(deferredLicenseKey))
         }
@@ -208,7 +208,7 @@ class DeferredLicenseLoadingTest {
             withContext(mainScope.coroutineContext) { collector.detachPlayer() }
 
             // assert
-            val impressionList = MockedIngress.extractImpressions()
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             val eventDataList = impressionList.single().eventDataList
             assertThat(eventDataList.map { it.key }.distinct()).isEqualTo(listOf(ANALYTICS_LICENSE_KEY))
             assertThat(deferredLicenseKey).isNotNull
@@ -244,7 +244,7 @@ class DeferredLicenseLoadingTest {
             }
 
             // assert
-            assertThat(MockedIngress.extractImpressions()).isEmpty()
+            assertThat(MockedIngress.waitForRequestsAndExtractImpressions()).isEmpty()
         }
 
     private fun initializePlayer(

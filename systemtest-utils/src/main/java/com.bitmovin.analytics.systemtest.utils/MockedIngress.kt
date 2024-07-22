@@ -5,6 +5,9 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import com.bitmovin.analytics.utils.DataSerializer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -22,6 +25,12 @@ object MockedIngress {
 
     val JSON_CONTENT_TYPE = "application/json; charset=utf-8".toMediaType()
 
+    val currentImpressionsIds = mutableSetOf<String>()
+
+    // This is a volatile variable to ensure that the value is always read from the main memory and not optimized by the compiler
+    @Volatile
+    private var lastRequestReceivedTimestamp = 0L
+
     val httpClient = OkHttpClient()
 
     const val SERVER_FORWARDING: Boolean = true
@@ -30,6 +39,7 @@ object MockedIngress {
         if (::server.isInitialized) {
             server.shutdown()
         }
+        lastRequestReceivedTimestamp = System.currentTimeMillis()
         server = MockWebServer()
         server.dispatcher = dispatcher
         server.start(port)
@@ -39,11 +49,13 @@ object MockedIngress {
 
     fun stopServer() {
         server.shutdown()
+        currentImpressionsIds.clear()
     }
 
     fun setServerOffline() {
         server.shutdown()
-        Thread.sleep(1000)
+        // wait for the server to shutdown
+        Thread.sleep(2000)
     }
 
     fun hasNoSamplesReceived(): Boolean {
@@ -58,9 +70,28 @@ object MockedIngress {
         if (::server.isInitialized) {
             server.shutdown()
         }
+        lastRequestReceivedTimestamp = System.currentTimeMillis()
         server = MockWebServer()
         server.dispatcher = dispatcher
         server.start(currentPort)
+    }
+
+    /**
+     * This method is used to track the impressions ids that are sent to the server.
+     *
+     * @param request The request has to be event data request.
+     */
+    private fun trackImpressionsIds(request: RecordedRequest) {
+        val body = request.body.copy().readUtf8()
+        val eventData =
+            DataSerializer.deserialize(
+                body,
+                EventData::class.java,
+            )
+
+        if (eventData != null) {
+            currentImpressionsIds.add(eventData.impressionId)
+        }
     }
 
     private val dispatcher: Dispatcher =
@@ -70,6 +101,7 @@ object MockedIngress {
                 if (SERVER_FORWARDING) {
                     sendToRealServer(request)
                 }
+                lastRequestReceivedTimestamp = System.currentTimeMillis()
                 when (request.path) {
                     "/licensing" ->
                         return if (request.body.readUtf8().contains("nonExistingKey")) {
@@ -96,6 +128,7 @@ object MockedIngress {
                                     """.trimIndent(),
                                 )
                         }
+                    "/analytics" -> trackImpressionsIds(request)
                 }
                 return MockResponse().setResponseCode(200)
             }
@@ -110,10 +143,37 @@ object MockedIngress {
                 .post(body.toRequestBody(JSON_CONTENT_TYPE))
                 .build()
 
-        val res = httpClient.newCall(request).execute()
-        if (res.code !in 200..299) {
-            Log.e("MockedIngress", "Error while forwarding requests to the real server: ${res.code}")
+        // Avoid blocking the test thread
+        CoroutineScope(Dispatchers.IO).launch {
+            val res = httpClient.newCall(request).execute()
+            if (res.code !in 200..299) {
+                Log.e("MockedIngress", "Error while forwarding requests to the real server: ${res.code}")
+            }
         }
+    }
+
+    private const val MAX_TIME_BETWEEN_REQUESTS = 1000
+
+    /**
+     * This method waits for all requests to arrive at the server.
+     * This avoid flakiness in the tests, as the server might not have received all requests yet.
+     */
+    fun waitForAllRequestsToArrive() {
+        Thread.sleep(500)
+        while (System.currentTimeMillis() - lastRequestReceivedTimestamp < MAX_TIME_BETWEEN_REQUESTS) {
+            Thread.sleep(100)
+        }
+    }
+
+    /**
+     * This method waits for all requests to arrive at the server and extracts the impressions from the requests.
+     * This avoid flakiness in the tests, as the server might not have received all requests yet.
+     *
+     * @return List of impressions extracted from the requests
+     */
+    fun waitForRequestsAndExtractImpressions(): List<Impression> {
+        waitForAllRequestsToArrive()
+        return extractImpressions()
     }
 
     fun extractImpressions(): List<Impression> {
