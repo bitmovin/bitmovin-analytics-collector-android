@@ -6,11 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
-### Added
+## v3.6.0
 
-- [internal] Added the token for the Google SDK indexing to each of the non-test modules.
+### Added
 - Adding auto play detection for the Bitmovin Player
-- [Internal] Setting up a first working version for GitHub Actions.
+- [internal] Added the token for the Google SDK indexing to each of the non-test modules.
+- [Internal] Run SystemTests through GitHub Actions on every PR
 
 ### Changed
 - Upgraded `gson` from `2.10.1` to `2.11.0`
@@ -21,7 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Fixed IVS SystemTest setup to be able to run it in CI
 - [Internal] The tests samples are now forwarded to the real server.
 - [Internal] The tests metadata are now named according to the test name.
-- [Internal] Tests that involve blocking actions are now awaited for the result to be available before continuing to increase consistency ().
+- [Internal] Tests that involve blocking actions are now awaited for the result to be available before continuing to increase consistency.
 - [Internal] The runBlockingTest function hides it's presence in the stack trace to enhance readability.
 - [Internal] The impression id now appears in the error message when a blocking test (which use `runBlockingTest`) fails.
 - [Internal] Adding a waiting for all requests mechanism to the tests to ensure that all requests are sent before the test extract the impressions.
