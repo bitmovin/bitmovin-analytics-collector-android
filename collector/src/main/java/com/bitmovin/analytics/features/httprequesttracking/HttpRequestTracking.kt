@@ -2,7 +2,6 @@ package com.bitmovin.analytics.features.httprequesttracking
 
 import android.util.Log
 import com.bitmovin.analytics.Observable
-import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.QueueExtensions.Companion.limit
 import java.util.LinkedList
 import java.util.Queue
@@ -10,14 +9,15 @@ import java.util.Queue
 class HttpRequestTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) :
     OnDownloadFinishedEventListener {
     companion object {
-        const val defaultMaxRequests = 10
+        const val DEFAULT_MAX_REQUESTS = 10
         private const val TAG = "HttpRequestTracking"
     }
+
     private val httpRequestQueue: Queue<HttpRequest> = LinkedList()
 
     private val lock = Object()
 
-    var maxRequests = defaultMaxRequests
+    var maxRequests = DEFAULT_MAX_REQUESTS
         private set
 
     val httpRequests: Collection<HttpRequest>
@@ -58,7 +58,6 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
     }
 
     override fun onDownloadFinished(event: OnDownloadFinishedEventObject) {
-        Log.d(TAG, "onDownloadFinished: ${DataSerializer.serialize(event.httpRequest)}")
         addRequest(event.httpRequest)
     }
 
