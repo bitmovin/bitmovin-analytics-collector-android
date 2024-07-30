@@ -36,7 +36,15 @@ class PlaybackEventDataManipulatorTest {
         mockDrmInfoProvider = mockk(relaxed = true)
         mockPlayerStatisticsProvider = mockk(relaxed = true)
         mockDownloadSpeedMeter = mockk(relaxed = true)
-        playbackEventDataManipulator = PlaybackEventDataManipulator(mockExoPlayer, mockPlaybackInfoProvider, mockMetadataProvider, mockDrmInfoProvider, mockPlayerStatisticsProvider, mockDownloadSpeedMeter)
+        playbackEventDataManipulator =
+            PlaybackEventDataManipulator(
+                mockExoPlayer,
+                mockPlaybackInfoProvider,
+                mockMetadataProvider,
+                mockDrmInfoProvider,
+                mockPlayerStatisticsProvider,
+                mockDownloadSpeedMeter,
+            )
     }
 
     @Test
@@ -100,9 +108,11 @@ class PlaybackEventDataManipulatorTest {
         // arrange
         val eventData = TestUtils.createMinimalEventData()
 
-        val speedInfo = DownloadSpeedInfo()
-        speedInfo.avgDownloadSpeed = 1.0f
-        every { mockDownloadSpeedMeter.getInfo() } returns speedInfo
+        val speedInfo =
+            DownloadSpeedInfo(
+                avgDownloadSpeed = 1.0f,
+            )
+        every { mockDownloadSpeedMeter.getInfoAndReset() } returns speedInfo
         every { mockPlayerStatisticsProvider.getAndResetDroppedFrames() } returns 456
 
         // act

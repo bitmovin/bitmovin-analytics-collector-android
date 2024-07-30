@@ -651,9 +651,6 @@ private class DummyPlayerAdapter(
     override fun resetSourceRelatedState() {
     }
 
-    override fun clearValuesAfterSendingOfSample() {
-    }
-
     override fun createEventData(): EventData {
         return TestFactory.createEventData(createTestImpressionId(1001))
     }

@@ -29,6 +29,8 @@ import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
+import com.bitmovin.analytics.utils.DownloadSpeedMeasurement
+import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.deficiency.ErrorEvent
@@ -38,8 +40,10 @@ import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.event.SourceEvent
 import com.bitmovin.player.api.event.on
 import com.bitmovin.player.api.media.subtitle.SubtitleTrack
+import com.bitmovin.player.api.network.HttpRequestType
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceType
+import java.util.Date
 
 internal class BitmovinSdkAdapter(
     private val player: Player,
@@ -61,6 +65,7 @@ internal class BitmovinSdkAdapter(
         metadataProvider,
     ),
     EventDataManipulator {
+    private val downloadSpeedMeter = DownloadSpeedMeter()
     private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
     private var totalDroppedVideoFrames = 0
     private var isVideoAttemptedPlay = false
@@ -234,6 +239,8 @@ internal class BitmovinSdkAdapter(
             data.audioLanguage = audioTrack.language
         }
 
+        data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
+
         data.playerKey = playerLicenseProvider.getBitmovinPlayerLicenseKey(player.config)
 
         data.isMuted = player.isMuted
@@ -249,6 +256,7 @@ internal class BitmovinSdkAdapter(
 
     override fun release() {
         removePlayerListener()
+
         stateMachine.resetStateMachine()
         player.detachCollector()
     }
@@ -263,8 +271,6 @@ internal class BitmovinSdkAdapter(
 
     override val position: Long
         get() = BitmovinUtil.getCurrentTimeInMs(player)
-
-    override fun clearValuesAfterSendingOfSample() {}
 
     override fun createAdAdapter(): AdAdapter {
         return BitmovinSdkAdAdapter(player)
@@ -556,9 +562,28 @@ internal class BitmovinSdkAdapter(
             if (event.downloadType.toString().contains("drm/license")) {
                 drmDownloadTime = Util.secondsToMillis(event.downloadTime)
             }
+
+            // We only track videos segments to be consistent with the other implementations.
+            // A manifest download or audio download should NOT count as a segment.
+            if (event.downloadType == HttpRequestType.MediaVideo || event.downloadType == HttpRequestType.MediaProgressive) {
+                addSpeedMeasurement(event)
+            }
         } catch (e: Exception) {
             Log.d(TAG, e.message, e)
         }
+    }
+
+    private fun addSpeedMeasurement(event: SourceEvent.DownloadFinished) {
+        val measurement =
+            DownloadSpeedMeasurement(
+                downloadSizeInBytes = event.size,
+                durationInMs = Util.secondsToMillis(event.downloadTime),
+                // We don't have this information with the Bitmovin Player Collector.
+                timeToFirstByteInMs = null,
+                timestamp = Date(event.timestamp),
+                httpStatusCode = event.httpStatus,
+            )
+        downloadSpeedMeter.addMeasurement(measurement)
     }
 
     private fun onPlayerErrorEvent(event: PlayerEvent.Error) {

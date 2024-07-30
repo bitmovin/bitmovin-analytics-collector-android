@@ -80,10 +80,6 @@ internal class AmazonIvsPlayerAdapter(
         ssaiService.resetSourceRelatedState()
     }
 
-    override fun clearValuesAfterSendingOfSample() {
-        // this method should clear values after sample is sent, no action needed
-    }
-
     companion object {
         private const val PLAYER_TECH = "Android:AmazonIVS"
         private const val TAG = "AmazonIvsPlayerAdapter"

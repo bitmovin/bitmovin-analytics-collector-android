@@ -9,7 +9,6 @@ import androidx.media3.exoplayer.DecoderReuseEvaluation
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.source.LoadEventInfo
 import androidx.media3.exoplayer.source.MediaLoadData
-import com.bitmovin.analytics.data.SpeedMeasurement
 import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerUtil
 import com.bitmovin.analytics.media3.exoplayer.manipulators.QualityEventDataManipulator
 import com.bitmovin.analytics.media3.exoplayer.player.DrmInfoProvider
@@ -18,8 +17,8 @@ import com.bitmovin.analytics.media3.exoplayer.player.PlaybackInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
+import com.bitmovin.analytics.utils.DownloadSpeedMeasurement
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
-import java.util.Date
 
 @androidx.annotation.OptIn(UnstableApi::class)
 internal class AnalyticsEventListener(
@@ -239,10 +238,12 @@ internal class AnalyticsEventListener(
     }
 
     private fun addSpeedMeasurement(loadEventInfo: LoadEventInfo) {
-        val measurement = SpeedMeasurement()
-        measurement.timestamp = Date()
-        measurement.duration = loadEventInfo.loadDurationMs
-        measurement.size = loadEventInfo.bytesLoaded
+        val measurement =
+            DownloadSpeedMeasurement(
+                durationInMs = loadEventInfo.loadDurationMs,
+                downloadSizeInBytes = loadEventInfo.bytesLoaded,
+                timeToFirstByteInMs = loadEventInfo.elapsedRealtimeMs - loadEventInfo.loadDurationMs,
+            )
         downloadSpeedMeter.addMeasurement(measurement)
     }
 

@@ -11,12 +11,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 
 object DataVerifier {
-    val QUALITYCHANGE = "qualitychange"
-    val BUFFERING = "buffering"
-    val STARTUP = "startup"
-    val SEEKING = "seeking"
-    val PLAYING = "playing"
-    val PAUSE = "pause"
+    const val QUALITYCHANGE = "qualitychange"
+    const val BUFFERING = "buffering"
+    const val STARTUP = "startup"
+    const val SEEKING = "seeking"
+    const val PLAYING = "playing"
+    const val PAUSE = "pause"
 
     // verifies properties that are not specific to playback order
     fun verifyStaticData(
@@ -34,6 +34,53 @@ object DataVerifier {
 
         for (eventData in eventDataList) {
             verifyAnalyticsConfig(eventData, analyticsConfig)
+        }
+    }
+
+    private const val MIN_AVG_BANDWIDTH = 1024f // ~1 Mbps
+    private const val MAX_AVG_BANDWIDTH = 600 * 1024f // ~600 Mbps
+
+    /**
+     * Verify that the metrics for the bandwidth make sense.
+     *
+     * @param eventDataList The list of eventData samples to verify
+     */
+    fun verifyBandwidthMetrics(
+        eventDataList: MutableList<EventData>,
+        allowNullValues: Boolean = false,
+    ) {
+        for (eventData in eventDataList) {
+            val downloadSpeedInfo = eventData.downloadSpeedInfo
+            if (!allowNullValues) {
+                assertThat(downloadSpeedInfo).isNotNull()
+                assertThat(downloadSpeedInfo?.maxDownloadSpeed).isNotNull()
+                assertThat(downloadSpeedInfo?.avgDownloadSpeed).isNotNull()
+                assertThat(downloadSpeedInfo?.minDownloadSpeed).isNotNull()
+            }
+
+            downloadSpeedInfo?.let {
+                // When the startup sample is received there should already be some segments since otherwise the startup could not happen.
+                // Warning : Possibly not true when there is an ad right at the beginning : Need to investigate.
+                assertThat(it.segmentsDownloadCount).isGreaterThan(0)
+                assertThat(it.segmentsDownloadSize).isGreaterThan(0)
+                assertThat(it.segmentsDownloadTime).isGreaterThan(0)
+
+                it.minDownloadSpeed?.let { value -> assertThat(value).isGreaterThan(0f) }
+                it.maxDownloadSpeed?.let { value -> assertThat(value).isGreaterThan(0f) }
+                it.avgTimeToFirstByte?.let { value -> assertThat(value).isGreaterThan(0f) }
+
+                it.avgDownloadSpeed?.let {
+                        value ->
+                    assertThat(value).isGreaterThan(0f)
+                    // Would not make any sense to check for the average on too few segments.
+                    if (value >= 4) {
+                        // This value is re-calculated on the server, but we check it it will make sense.
+                        assertThat(it.avgDownloadSpeed)
+                            .isGreaterThan(MIN_AVG_BANDWIDTH)
+                            .isLessThan(MAX_AVG_BANDWIDTH)
+                    }
+                }
+            }
         }
     }
 

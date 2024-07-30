@@ -57,7 +57,7 @@ internal class PlaybackEventDataManipulator(
         // DroppedVideoFrames
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
 
-        data.downloadSpeedInfo = downloadSpeedMeter.getInfo()
+        data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
 
         // DRM Information
         data.drmType = drmInfoProvider.drmType

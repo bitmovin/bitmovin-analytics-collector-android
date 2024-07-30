@@ -1,80 +1,88 @@
 package com.bitmovin.analytics.utils
 
 import com.bitmovin.analytics.data.DownloadSpeedInfo
-import com.bitmovin.analytics.data.SpeedMeasurement
+
+const val THRESHOLD_BYTES_PER_MS = 1_500_000_000 / 8 / 1000; // 1.5 Gigabit per second in bytes per millisecond (1.5^9 / 8 / 1000)
 
 class DownloadSpeedMeter {
+    private var measurements = ArrayList<DownloadSpeedMeasurement>()
 
-    private var measures = ArrayList<Measure>()
-    private val thresholdBytes = 37500; // 300 Megabit per second in bytes per millisecond
-
+    @Synchronized
     fun reset() {
-        measures.clear()
+        measurements.clear()
     }
 
-    fun addMeasurement(measurement: SpeedMeasurement) {
-        if (measurement.httpStatus >= 400) {
+    /**
+     * Add a new speed measurement to the meter.
+     */
+    @Synchronized
+    fun addMeasurement(measurement: DownloadSpeedMeasurement) {
+        if (measurement.httpStatusCode != null && measurement.httpStatusCode >= 300) {
             return
         }
 
-        val measure = Measure(measurement)
-
-        if (measure.speed >= thresholdBytes) {
+        if (measurement.durationInMs <= 0L || measurement.downloadSizeInBytes <= 0) {
             return
         }
 
-        measures.add(measure)
-    }
-
-    fun getInfo(): DownloadSpeedInfo {
-        val info = DownloadSpeedInfo()
-        info.segmentsDownloadCount = measures.size
-        info.segmentsDownloadSize = measures.sumOf { it.downloadSize }
-        info.segmentsDownloadTime = totalTime()
-        info.avgDownloadSpeed = avgSpeed()
-        info.minDownloadSpeed = minSpeed()
-        info.maxDownloadSpeed = maxSpeed()
-        info.avgTimeToFirstByte = avgTimeToFirstByte()
-        return info
-    }
-
-    private fun avgSpeed(): Float {
-        if (measures.isEmpty()) {
-            return 0.0f
+        if (measurement.speedInBytesPerMs >= THRESHOLD_BYTES_PER_MS || measurement.speedInBytesPerMs <= 0) {
+            return
         }
-        val totalSpeed = measures.map { it.speed }.sum()
 
-        return totalSpeed.div(measures.size).times(8); // bytes per millisecond to kbps
+        measurements.add(measurement)
     }
 
-    private fun minSpeed(): Float? {
-        if (measures.isEmpty()) {
-            return 0.0f
+    /**
+     * Get the download speed information and resets it afterwards.
+     *
+     * Should only included in the event data if the player supports it.
+     */
+    @Synchronized
+    fun getInfoAndReset(): DownloadSpeedInfo {
+        val downloadInfos =
+            DownloadSpeedInfo(
+                segmentsDownloadCount = measurements.size,
+                segmentsDownloadSize = measurements.sumOf { it.downloadSizeInBytes },
+                segmentsDownloadTime = totalTimeInMs(),
+                avgDownloadSpeed = avgSpeedInKbps(),
+                minDownloadSpeed = minSpeedInKbps(),
+                maxDownloadSpeed = maxSpeedInKbps(),
+                avgTimeToFirstByte = avgTimeToFirstByteInMs(),
+            )
+        reset()
+        return downloadInfos
+    }
+
+    private fun avgSpeedInKbps(): Float? {
+        if (measurements.isEmpty()) {
+            return null
         }
+        return measurements.map { it.speedInBytesPerMs }.average().times(8).toFloat(); // bytes per millisecond to kbps
+    }
+
+    private fun minSpeedInKbps(): Float? {
         // the slowest one to download
-        return measures.maxOfOrNull { it.speed }?.times(8) // bytes per millisecond to kbps
+        return measurements.minOfOrNull { it.speedInBytesPerMs }?.times(8) // bytes per millisecond to kbps
     }
 
-    private fun maxSpeed(): Float? {
-        if (measures.isEmpty()) {
-            return 0.0f
-        }
+    private fun maxSpeedInKbps(): Float? {
         // the fastest one to download
-        return measures.minOfOrNull { it.speed }?.times(8); // bytes per millisecond to kbps
+        return measurements.maxOfOrNull { it.speedInBytesPerMs }?.times(8); // bytes per millisecond to kbps
     }
 
-    private fun totalTime(): Long {
-        if (this.measures.isEmpty()) {
+    private fun totalTimeInMs(): Long {
+        if (this.measurements.isEmpty()) {
             return 0
         }
-        return this.measures.sumOf { it.duration }
+        return this.measurements.sumOf { it.durationInMs }
     }
 
-    private fun avgTimeToFirstByte(): Float {
-        if (measures.isEmpty()) {
-            return 0.0f
+    private fun avgTimeToFirstByteInMs(): Float? {
+        val nonNullTimeToFirstByte = measurements.filter { it.timeToFirstByteInMs != null }.map { it.timeToFirstByteInMs!! }
+        if (nonNullTimeToFirstByte.isEmpty()) {
+            return null
         }
 
-        return measures.map { it.timeToFirstByte }.sum().div(measures.size)
+        return nonNullTimeToFirstByte.average().toFloat()
     }
 }

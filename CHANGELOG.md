@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- Adding download speed metrics tracking to the Bitmovin Player Collector.
+
 ### Fixed
 - Removed unnecessary logging of every downloaded file
 

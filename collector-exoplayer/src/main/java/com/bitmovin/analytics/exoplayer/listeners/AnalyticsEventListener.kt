@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.exoplayer.listeners
 
 import android.util.Log
-import com.bitmovin.analytics.data.SpeedMeasurement
 import com.bitmovin.analytics.exoplayer.ExoUtil
 import com.bitmovin.analytics.exoplayer.manipulators.QualityEventDataManipulator
 import com.bitmovin.analytics.exoplayer.player.DrmInfoProvider
@@ -10,6 +9,7 @@ import com.bitmovin.analytics.exoplayer.player.PlaybackInfoProvider
 import com.bitmovin.analytics.exoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
+import com.bitmovin.analytics.utils.DownloadSpeedMeasurement
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Format
@@ -18,7 +18,6 @@ import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.decoder.DecoderReuseEvaluation
 import com.google.android.exoplayer2.source.LoadEventInfo
 import com.google.android.exoplayer2.source.MediaLoadData
-import java.util.Date
 
 internal class AnalyticsEventListener(
     private val stateMachine: PlayerStateMachine,
@@ -236,10 +235,12 @@ internal class AnalyticsEventListener(
     }
 
     private fun addSpeedMeasurement(loadEventInfo: LoadEventInfo) {
-        val measurement = SpeedMeasurement()
-        measurement.timestamp = Date()
-        measurement.duration = loadEventInfo.loadDurationMs
-        measurement.size = loadEventInfo.bytesLoaded
+        val measurement =
+            DownloadSpeedMeasurement(
+                durationInMs = loadEventInfo.loadDurationMs,
+                downloadSizeInBytes = loadEventInfo.bytesLoaded,
+                timeToFirstByteInMs = loadEventInfo.elapsedRealtimeMs - loadEventInfo.loadDurationMs,
+            )
         downloadSpeedMeter.addMeasurement(measurement)
     }
 

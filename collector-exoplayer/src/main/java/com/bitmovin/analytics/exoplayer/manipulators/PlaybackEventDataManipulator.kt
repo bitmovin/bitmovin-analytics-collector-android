@@ -68,7 +68,7 @@ internal class PlaybackEventDataManipulator(
             data.m3u8Url = masterPlaylist.baseUri
         }
 
-        data.downloadSpeedInfo = downloadSpeedMeter.getInfo()
+        data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
 
         // DRM Information
         data.drmType = drmInfoProvider.drmType

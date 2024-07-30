@@ -35,10 +35,11 @@ import com.bitmovin.analytics.utils.ScopeProvider
 class BitmovinAnalytics(
     val config: AnalyticsConfig,
     val context: Context,
-    val eventQueue: AnalyticsEventQueue = EventQueueFactory.createPersistentEventQueue(
-        EventQueueConfig(),
-        EventDatabase.getInstance(context),
-    ),
+    val eventQueue: AnalyticsEventQueue =
+        EventQueueFactory.createPersistentEventQueue(
+            EventQueueConfig(),
+            EventDatabase.getInstance(context),
+        ),
     licenseKeyProvider: LicenseKeyProvider = InstantLicenseKeyProvider(config.licenseKey),
 ) : LicenseCallback {
     private val licenseCall = DefaultLicenseCall(config, licenseKeyProvider, context)
@@ -46,44 +47,46 @@ class BitmovinAnalytics(
     private val backendFactory = BackendFactory(eventQueue)
     private val eventBus = EventBus()
 
-    private val debugCallback: DebugCallback = object : DebugCallback {
-        override fun dispatchEventData(data: EventData) {
-            eventBus.notify(DebugListener::class) { it.onDispatchEventData(data) }
-        }
+    private val debugCallback: DebugCallback =
+        object : DebugCallback {
+            override fun dispatchEventData(data: EventData) {
+                eventBus.notify(DebugListener::class) { it.onDispatchEventData(data) }
+            }
 
-        override fun dispatchAdEventData(data: AdEventData) {
-            eventBus.notify(DebugListener::class) { it.onDispatchAdEventData(data) }
-        }
+            override fun dispatchAdEventData(data: AdEventData) {
+                eventBus.notify(DebugListener::class) { it.onDispatchAdEventData(data) }
+            }
 
-        override fun message(message: String) {
-            eventBus.notify(DebugListener::class) { it.onMessage(message) }
+            override fun message(message: String) {
+                eventBus.notify(DebugListener::class) { it.onMessage(message) }
+            }
         }
-    }
     private val featureManager = FeatureManager<FeatureConfigContainer>()
 
-    private val eventDataDispatcher = DebuggingEventDataDispatcher(
-        if (config.retryPolicy == RetryPolicy.LONG_TERM) {
-            PersistingAuthenticatedDispatcher(
-                context = context,
-                config = config,
-                callback = this,
-                backendFactory = backendFactory,
-                licenseCall = licenseCall,
-                eventQueue = eventQueue,
-                scopeProvider = scopeProvider,
-            )
-        } else {
-            SimpleEventDataDispatcher(
-                context = context,
-                config = config,
-                callback = this,
-                backendFactory = backendFactory,
-                licenseCall = licenseCall,
-                scopeProvider = scopeProvider,
-            )
-        },
-        debugCallback,
-    )
+    private val eventDataDispatcher =
+        DebuggingEventDataDispatcher(
+            if (config.retryPolicy == RetryPolicy.LONG_TERM) {
+                PersistingAuthenticatedDispatcher(
+                    context = context,
+                    config = config,
+                    callback = this,
+                    backendFactory = backendFactory,
+                    licenseCall = licenseCall,
+                    eventQueue = eventQueue,
+                    scopeProvider = scopeProvider,
+                )
+            } else {
+                SimpleEventDataDispatcher(
+                    context = context,
+                    config = config,
+                    callback = this,
+                    backendFactory = backendFactory,
+                    licenseCall = licenseCall,
+                    scopeProvider = scopeProvider,
+                )
+            },
+            debugCallback,
+        )
 
     private var playerAdapter: PlayerAdapter? = null
     private var stateMachineListener: StateMachineListener? = null
@@ -175,7 +178,6 @@ class BitmovinAnalytics(
 
     fun sendEventData(data: EventData) {
         eventDataDispatcher.add(data)
-        playerAdapter?.clearValuesAfterSendingOfSample()
     }
 
     fun sendAdEventData(data: AdEventData) {
@@ -213,7 +215,9 @@ class BitmovinAnalytics(
 
     interface DebugListener {
         fun onDispatchEventData(data: EventData)
+
         fun onDispatchAdEventData(data: AdEventData)
+
         fun onMessage(message: String)
     }
 

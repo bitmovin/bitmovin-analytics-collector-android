@@ -126,10 +126,6 @@ internal class Media3ExoPlayerAdapter(
             return exoplayerContext.position
         }
 
-    override fun clearValuesAfterSendingOfSample() {
-        meter.reset()
-    }
-
     private fun startup(position: Long) {
         qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
         stateMachine.transitionState(PlayerStates.STARTUP, position)

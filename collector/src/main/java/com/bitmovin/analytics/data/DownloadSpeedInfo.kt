@@ -3,26 +3,19 @@ package com.bitmovin.analytics.data
 import androidx.annotation.Keep
 
 @Keep // Protect from obfuscation in case customers are using proguard
-class DownloadSpeedInfo {
-
+class DownloadSpeedInfo(
     // Number of completed segment downloads
-    var segmentsDownloadCount: Int = 0
-
+    val segmentsDownloadCount: Int = 0,
     // Total download size in bytes
-    var segmentsDownloadSize: Long = 0
-
+    val segmentsDownloadSize: Long = 0,
     // Total time spent downloading segments in milliseconds
-    var segmentsDownloadTime: Long = 0
-
-    // Average download speed in kbps
-    var avgDownloadSpeed: Float? = 0.0f
-
-    // Maximum download speed in kbps
-    var maxDownloadSpeed: Float? = 0.0f
-
-    // Minimum download speed in kbps
-    var minDownloadSpeed: Float? = 0.0f
-
-    // Average time to first byte in milliseconds
-    var avgTimeToFirstByte: Float? = 0.0f
-}
+    val segmentsDownloadTime: Long = 0,
+    // Average download speed in kbps / null when there is no segment downloaded or not supported by the player
+    val avgDownloadSpeed: Float? = null,
+    // Maximum download speed in kbps / null when there is no segment downloaded or not supported by the player
+    val maxDownloadSpeed: Float? = null,
+    // Minimum download speed in kbps / null when there is no segment downloaded or not supported by the player
+    val minDownloadSpeed: Float? = null,
+    // Average time to first byte in milliseconds / null when there is no segment downloaded or not supported by the player
+    val avgTimeToFirstByte: Float? = null,
+)

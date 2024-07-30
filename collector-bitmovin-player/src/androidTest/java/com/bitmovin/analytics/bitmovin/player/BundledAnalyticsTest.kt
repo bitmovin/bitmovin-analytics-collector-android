@@ -30,6 +30,7 @@ import com.bitmovin.player.api.playlist.PlaylistOptions
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
@@ -452,6 +453,39 @@ class BundledAnalyticsTest {
 
             // make sure that data is not carried over from impression before
             assertThat(lastSampleImpression1.videoBitrate).isNotEqualTo(startupSampleImpression2.videoBitrate)
+        }
+
+    @Test
+    fun test_vod_download_speed_metrics_make_sense() =
+        runBlockingTest {
+            val hlsSample = TestSources.HLS_REDBULL
+            val sourceMetadata = metadataGenerator.generate()
+            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), sourceMetadata)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.load(hlsSource)
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 6000)
+
+            // generate some event data
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                defaultPlayer.play()
+                delay(500)
+                defaultPlayer.pause()
+            }
+
+            // assert
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            // Verify that the bandwidth values make sense.
+            DataVerifier.verifyBandwidthMetrics(impression.eventDataList)
         }
 
     @Test
