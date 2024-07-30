@@ -36,8 +36,9 @@ object MockedIngress {
     const val SERVER_FORWARDING: Boolean = true
 
     fun startServer(port: Int = 0): String {
+        // Stop it in case it is already running and the test @After forget to stop it
         if (::server.isInitialized) {
-            server.shutdown()
+            stopServer()
         }
         lastRequestReceivedTimestamp = System.currentTimeMillis()
         server = MockWebServer()

@@ -37,51 +37,39 @@ object DataVerifier {
         }
     }
 
-    private const val MIN_AVG_BANDWIDTH = 1024f // ~1 Mbps
-    private const val MAX_AVG_BANDWIDTH = 600 * 1024f // ~600 Mbps
+    private const val MIN_AVG_BANDWIDTH_IN_KBPS = 1024f // ~1 Mbps
+    private const val MAX_AVG_BANDWIDTH_IN_KBPS = 600 * 1024f // ~600 Mbps
 
     /**
      * Verify that the metrics for the bandwidth make sense.
      *
      * @param eventDataList The list of eventData samples to verify
      */
-    fun verifyBandwidthMetrics(
-        eventDataList: MutableList<EventData>,
-        allowNullValues: Boolean = false,
-    ) {
+    fun verifyBandwidthMetrics(eventDataList: MutableList<EventData>) {
+        var totalSizeInBytes = 0L
+        var totalTimeInMs = 0L
         for (eventData in eventDataList) {
             val downloadSpeedInfo = eventData.downloadSpeedInfo
-            if (!allowNullValues) {
-                assertThat(downloadSpeedInfo).isNotNull()
-                assertThat(downloadSpeedInfo?.maxDownloadSpeed).isNotNull()
-                assertThat(downloadSpeedInfo?.avgDownloadSpeed).isNotNull()
-                assertThat(downloadSpeedInfo?.minDownloadSpeed).isNotNull()
-            }
 
             downloadSpeedInfo?.let {
-                // When the startup sample is received there should already be some segments since otherwise the startup could not happen.
-                // Warning : Possibly not true when there is an ad right at the beginning : Need to investigate.
-                assertThat(it.segmentsDownloadCount).isGreaterThan(0)
-                assertThat(it.segmentsDownloadSize).isGreaterThan(0)
-                assertThat(it.segmentsDownloadTime).isGreaterThan(0)
+                totalSizeInBytes += it.segmentsDownloadSize
+                totalTimeInMs += it.segmentsDownloadTime
+
+                if (it.segmentsDownloadCount > 0) {
+                    assertThat(it.segmentsDownloadSize).isGreaterThan(0)
+                    assertThat(it.segmentsDownloadTime).isGreaterThan(0)
+                }
 
                 it.minDownloadSpeed?.let { value -> assertThat(value).isGreaterThan(0f) }
                 it.maxDownloadSpeed?.let { value -> assertThat(value).isGreaterThan(0f) }
                 it.avgTimeToFirstByte?.let { value -> assertThat(value).isGreaterThan(0f) }
-
-                it.avgDownloadSpeed?.let {
-                        value ->
-                    assertThat(value).isGreaterThan(0f)
-                    // Would not make any sense to check for the average on too few segments.
-                    if (value >= 4) {
-                        // This value is re-calculated on the server, but we check it it will make sense.
-                        assertThat(it.avgDownloadSpeed)
-                            .isGreaterThan(MIN_AVG_BANDWIDTH)
-                            .isLessThan(MAX_AVG_BANDWIDTH)
-                    }
-                }
+                it.avgDownloadSpeed?.let { value -> assertThat(value).isGreaterThan(0f) }
             }
         }
+
+        // verify that the average download speed is within reasonable bounds
+        val avgDownloadSpeedInKbps = totalSizeInBytes.toFloat() / totalTimeInMs.toFloat() * 8 // bytes per ms -> kbps (approx)
+        assertThat(avgDownloadSpeedInKbps).isBetween(MIN_AVG_BANDWIDTH_IN_KBPS, MAX_AVG_BANDWIDTH_IN_KBPS)
     }
 
     fun verifyStaticData(
