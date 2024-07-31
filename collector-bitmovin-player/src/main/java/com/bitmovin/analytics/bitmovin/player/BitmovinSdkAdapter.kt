@@ -565,7 +565,10 @@ internal class BitmovinSdkAdapter(
 
             // We only track videos segments to be consistent with the other implementations.
             // A manifest download or audio download should NOT count as a segment.
-            if (event.downloadType == HttpRequestType.MediaVideo || event.downloadType == HttpRequestType.MediaProgressive) {
+            // Progressive sources are not tracked, since partial downloads are not
+            // well supported in terms of download time on exoplayer and bitmovin player
+            // this is consistent with other platforms
+            if (event.downloadType == HttpRequestType.MediaVideo) {
                 addSpeedMeasurement(event)
             }
         } catch (e: Exception) {
