@@ -15,7 +15,6 @@ buildscript {
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.33.1"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
-        classpath 'org.jacoco:org.jacoco.core:0.8.11'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -178,21 +177,42 @@ tasks.register('createPrePushHook') {
     "chmod +x .git/hooks/pre-push".execute()
 }
 
-sonarqube {
+test {
+    useJUnitPlatform()
+}
+
+// SonarQube configuration
+
+sonar {
     properties {
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.organization", "bitmovin-engineering"
         property "sonar.projectName", "Analytics Collector Android"
         property "sonar.projectKey", "bitmovin-engineering_bitmovin-analytics-collector-android-internal"
-        property "sonar.tests", ["src/test/java"]
-        property "sonar.test.inclusions", "**/*Test*/**"
+        property "sonar.tests", ["src/test"]
         property "sonar.sourceEncoding", "UTF-8"
-        property "sonar.sources", "src/main/java"
-        property "sonar.exclusions", '**/*Test*/**,' +
-                '*.json,' +
-                '**/*test*/**,' +
-                '**/.gradle/**,' +
-                '**/R.class'
+        property "sonar.sources", "src/main"
+        property "sonar.exclusions", "**/R.class,**/*Generated.java,**/*Test*/**"
+        property "sonar.junit.reportPaths", "build/test-results/testDebugUnitTest"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReportBitmovinTesting/jacocoTestReportBitmovinTesting.xml"
+        property "sonar.verbose", "true"
+        property "sonar.java.coveragePlugin", "jacoco" // Please refer to the jacoco.gradle file to understand how the jacoco report is generated.
+    }
+}
+
+def nonSonarProjects = ["collector-bitmovin-player-example",
+                        "collector-bitmovin-player-tv-example",
+                        "collector-exoplayer-example",
+                        "collector-amazon-ivs-example",
+                        "collector-media3-exoplayer-example",
+                        "example-shared",
+                        "systemtest-utils"
+]
+nonSonarProjects.forEach {
+    project(":$it") {
+        sonar {
+            skipProject = true
+        }
     }
 }
 
@@ -213,33 +233,6 @@ apiValidation {
                         "collector",    // excluded until we have a better structure with internal package
                         "example-shared",
                         "systemtest-utils"]
-}
-
-project(":collector-exoplayer-example") {
-    sonarqube {
-        sonar.skipProject = true
-    }
-}
-project(":collector-bitmovin-player-example") {
-    sonarqube {
-        sonar.skipProject = true
-    }
-}
-project(":collector-bitmovin-player-tv-example") {
-    sonarqube {
-        sonar.skipProject = true
-    }
-}
-project(":collector-amazon-ivs-example") {
-    sonarqube {
-        sonar.skipProject = true
-    }
-}
-
-project(":systemtest-utils") {
-    sonarqube {
-        sonar.skipProject = true
-    }
 }
 
 java {

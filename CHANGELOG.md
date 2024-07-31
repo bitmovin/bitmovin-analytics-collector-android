@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Removed unnecessary logging of every downloaded file
+- [Internal] Fixed the SonarQube test coverage report.
 
 ## v3.6.0
 
