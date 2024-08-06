@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.media3.exoplayer.api.IMedia3ExoPlayerCollector
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
@@ -20,6 +21,7 @@ import com.bitmovin.analytics.systemtest.utils.TestSources.DASH_SINTEL_WITH_SUBT
 import com.bitmovin.analytics.systemtest.utils.TestSources.HLS_MULTIPLE_AUDIO_LANGUAGES
 import com.bitmovin.analytics.systemtest.utils.runBlockingTest
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
@@ -139,6 +141,72 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
             DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
         }
+
+    @Test
+    fun test_sourceUrlAndTypeTracking() =
+        runBlockingTest {
+            val medias = listOf(
+                StreamFormat.PROGRESSIVE to MediaItem.fromUri(TestSources.PROGRESSIVE.progUrl!!),
+                StreamFormat.DASH to MediaItem.fromUri(TestSources.DASH.mpdUrl!!),
+                StreamFormat.HLS to MediaItem.fromUri(TestSources.HLS_REDBULL.m3u8Url!!),
+            )
+            for (media in medias) {
+                // arrange
+                val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+                collector.sourceMetadata = metadataGenerator.generate(
+                    title = metadataGenerator.getTestTitle(),
+                    addition = media.first.toString(),
+                )
+                val player = ExoPlayer.Builder(appContext).build()
+                // act
+                withContext(mainScope.coroutineContext) {
+                    player.volume = 0.0f
+                    collector.attachPlayer(player)
+                    player.setMediaItem(media.second)
+                    player.prepare()
+                }
+
+                withContext(mainScope.coroutineContext) {
+                    player.play()
+                }
+
+                Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 500)
+
+                withContext(mainScope.coroutineContext) {
+                    player.pause()
+                    delay(500)
+                    collector.detachPlayer()
+                    player.release()
+                }
+            }
+
+            Thread.sleep(500)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(3)
+
+            val progEvents = impressions[0]
+            val dashEvents = impressions[1]
+            val hlsEvents = impressions[2]
+
+            DataVerifier.verifyHasNoErrorSamples(progEvents)
+            DataVerifier.verifyHasNoErrorSamples(dashEvents)
+            DataVerifier.verifyHasNoErrorSamples(hlsEvents)
+
+            val progStartup = EventDataUtils.getStartupEvent(progEvents.eventDataList)
+            val dashStartup = EventDataUtils.getStartupEvent(dashEvents.eventDataList)
+            val hlsStartup = EventDataUtils.getStartupEvent(hlsEvents.eventDataList)
+
+            assertThat(progStartup.streamFormat).isEqualTo(StreamFormat.PROGRESSIVE.toString().lowercase())
+            assertThat(progStartup.progUrl).isEqualTo(TestSources.PROGRESSIVE.progUrl!!.substringBefore("?"))
+
+            assertThat(dashStartup.streamFormat).isEqualTo(StreamFormat.DASH.toString().lowercase())
+            assertThat(dashStartup.mpdUrl).isEqualTo(TestSources.DASH.mpdUrl!!.substringBefore("?"))
+
+            assertThat(hlsStartup.streamFormat).isEqualTo(StreamFormat.HLS.toString().lowercase())
+            assertThat(hlsStartup.m3u8Url).isEqualTo(TestSources.HLS_REDBULL.m3u8Url!!.substringBefore("?"))
+        }
+
 
     @Test
     fun test_vodDash_playPauseWithPlayWhenReady() =
