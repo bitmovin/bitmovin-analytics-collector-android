@@ -58,15 +58,7 @@ internal class PlaybackEventDataManipulator(
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
 
         // streamFormat, mpdUrl, and m3u8Url
-        val manifest = exoPlayer.currentManifest
-        if (ExoUtil.isDashManifestClassLoaded && manifest is DashManifest) {
-            data.streamFormat = StreamFormat.DASH.value
-            data.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
-        } else if (ExoUtil.isHlsManifestClassLoaded && manifest is HlsManifest) {
-            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
-            data.streamFormat = StreamFormat.HLS.value
-            data.m3u8Url = masterPlaylist.baseUri
-        }
+        setSourceData(data)
 
         data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
 
@@ -76,6 +68,50 @@ internal class PlaybackEventDataManipulator(
         data.isMuted = isMuted(exoPlayer)
 
         setSubtitleInfo(data)
+    }
+
+    /**
+     * Is responsible for setting the streamFormat, mpdUrl, progUrl, and m3u8Url in the EventData object
+     */
+    private fun setSourceData(data: EventData) {
+        // In https://www.example-video.mp4?token=1234, the path is https://www.example-video.mp4
+        val sourcePath = exoPlayer.currentMediaItem?.localConfiguration?.uri?.toString()?.substringBefore("?")
+        val manifest = exoPlayer.currentManifest
+
+        // Best world scenario, we have a manifest and a uri
+        if (ExoUtil.isDashManifestClassLoaded && manifest is DashManifest) {
+            data.streamFormat = StreamFormat.DASH.value
+            data.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
+        } else if (ExoUtil.isHlsManifestClassLoaded && manifest is HlsManifest) {
+            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
+            data.streamFormat = StreamFormat.HLS.value
+            data.m3u8Url = masterPlaylist.baseUri
+        } else {
+            // If we don't have a manifest, we can extract the information from the uri in a best effort
+            val fileExt = sourcePath?.substringAfterLast(".")?.lowercase()
+            when (fileExt) {
+                "m3u8" ->  {
+                    data.streamFormat = StreamFormat.HLS.value
+                    data.m3u8Url = sourcePath
+                }
+                "mpd" -> {
+                    data.streamFormat = StreamFormat.DASH.value
+                    data.mpdUrl = sourcePath
+                }
+                "ism", "isml" -> {
+                    data.streamFormat = StreamFormat.SMOOTH.value
+                    data.progUrl = sourcePath
+                }
+                "mp4", "m4a", "m4s", "webm", "mkv", "ts", "mpg", "mpeg", "flv", "ogg", "wav", "mp3", "aac", "flac", "amr" -> {
+                    data.streamFormat = StreamFormat.PROGRESSIVE.value
+                    data.progUrl = sourcePath
+                }
+                else -> {
+                    /* We don't know the format of the stream, so we don't set the streamFormat */
+                    /* We will also arrive there if the sourcePath is null */
+                }
+            }
+        }
     }
 
     // it is enough to have volume OR deviceVolume set to muted
