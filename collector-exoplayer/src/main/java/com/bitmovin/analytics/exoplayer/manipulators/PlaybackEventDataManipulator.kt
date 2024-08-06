@@ -90,7 +90,7 @@ internal class PlaybackEventDataManipulator(
             // If we don't have a manifest, we can extract the information from the uri in a best effort
             val fileExt = sourcePath?.substringAfterLast(".")?.lowercase()
             when (fileExt) {
-                "m3u8" ->  {
+                "m3u8" -> {
                     data.streamFormat = StreamFormat.HLS.value
                     data.m3u8Url = sourcePath
                 }
@@ -107,8 +107,10 @@ internal class PlaybackEventDataManipulator(
                     data.progUrl = sourcePath
                 }
                 else -> {
-                    /* We don't know the format of the stream, so we don't set the streamFormat */
-                    /* We will also arrive there if the sourcePath is null */
+                    /*
+                        We don't know the format of the stream, so we don't set the streamFormat
+                        We will also arrive there if the sourcePath is null
+                     */
                 }
             }
         }

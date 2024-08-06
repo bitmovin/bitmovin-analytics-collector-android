@@ -114,8 +114,10 @@ internal class PlaybackEventDataManipulator(
                 }
 
                 else -> {
-                    /* We don't know the format of the stream, so we don't set the streamFormat */
-                    /* We will also arrive there if the sourcePath is null */
+                    /*
+                        We don't know the format of the stream, so we don't set the streamFormat
+                        We will also arrive there if the sourcePath is null
+                     */
                 }
             }
         }

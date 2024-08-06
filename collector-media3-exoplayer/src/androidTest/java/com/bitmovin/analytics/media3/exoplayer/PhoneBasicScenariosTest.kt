@@ -145,18 +145,20 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_sourceUrlAndTypeTracking() =
         runBlockingTest {
-            val medias = listOf(
-                StreamFormat.PROGRESSIVE to MediaItem.fromUri(TestSources.PROGRESSIVE.progUrl!!),
-                StreamFormat.DASH to MediaItem.fromUri(TestSources.DASH.mpdUrl!!),
-                StreamFormat.HLS to MediaItem.fromUri(TestSources.HLS_REDBULL.m3u8Url!!),
-            )
+            val medias =
+                listOf(
+                    StreamFormat.PROGRESSIVE to MediaItem.fromUri(TestSources.PROGRESSIVE.progUrl!!),
+                    StreamFormat.DASH to MediaItem.fromUri(TestSources.DASH.mpdUrl!!),
+                    StreamFormat.HLS to MediaItem.fromUri(TestSources.HLS_REDBULL.m3u8Url!!),
+                )
             for (media in medias) {
                 // arrange
                 val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
-                collector.sourceMetadata = metadataGenerator.generate(
-                    title = metadataGenerator.getTestTitle(),
-                    addition = media.first.toString(),
-                )
+                collector.sourceMetadata =
+                    metadataGenerator.generate(
+                        title = metadataGenerator.getTestTitle(),
+                        addition = media.first.toString(),
+                    )
                 val player = ExoPlayer.Builder(appContext).build()
                 // act
                 withContext(mainScope.coroutineContext) {
@@ -206,7 +208,6 @@ class PhoneBasicScenariosTest {
             assertThat(hlsStartup.streamFormat).isEqualTo(StreamFormat.HLS.toString().lowercase())
             assertThat(hlsStartup.m3u8Url).isEqualTo(TestSources.HLS_REDBULL.m3u8Url!!.substringBefore("?"))
         }
-
 
     @Test
     fun test_vodDash_playPauseWithPlayWhenReady() =
