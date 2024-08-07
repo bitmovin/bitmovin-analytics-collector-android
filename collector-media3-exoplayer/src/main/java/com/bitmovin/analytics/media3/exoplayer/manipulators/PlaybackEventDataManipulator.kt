@@ -58,7 +58,7 @@ internal class PlaybackEventDataManipulator(
         // DroppedVideoFrames
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
 
-        // streamFormat, mpdUrl, and m3u8Url
+        // streamFormat, mpdUrl, and m3u8Url, progUrl
         setSourceData(data)
 
         data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
@@ -77,7 +77,7 @@ internal class PlaybackEventDataManipulator(
      */
     @OptIn(UnstableApi::class)
     private fun setSourceData(data: EventData) {
-        // In https://www.example-video.mp4?token=1234, the path is https://www.example-video.mp4
+        // In https://www.example-video.mp4?token=1234, the sourcePath is https://www.example-video.mp4
         val sourcePath = player.currentMediaItem?.localConfiguration?.uri?.toString()?.substringBefore("?")
         val manifest = player.currentManifest
 
@@ -115,9 +115,12 @@ internal class PlaybackEventDataManipulator(
 
                 else -> {
                     /*
-                        We don't know the format of the stream, so we don't set the streamFormat
-                        We will also arrive there if the sourcePath is null
+                        We don't know the format of the stream, so we don't set the streamFormat.
+                        We will also arrive there if the sourcePath is null.
+                        In a last effort, we give the sourcePath as progressive url while not knowing the format.
+
                      */
+                    data.progUrl = sourcePath
                 }
             }
         }
