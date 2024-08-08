@@ -59,7 +59,7 @@ internal class PlaybackEventDataManipulator(
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
 
         // streamFormat, mpdUrl, and m3u8Url, progUrl
-        setSourceData(data)
+        setStreamFormatAndUrl(data)
 
         data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
 
@@ -69,16 +69,15 @@ internal class PlaybackEventDataManipulator(
         data.isMuted = isMuted(player)
 
         setSubtitleInfo(data)
-        setStreamFormatAndUrl(data)
     }
 
     /**
      * Is responsible for setting the streamFormat, mpdUrl, progUrl, and m3u8Url in the EventData object
      */
     @OptIn(UnstableApi::class)
-    private fun setSourceData(data: EventData) {
+    private fun setStreamFormatAndUrl(data: EventData) {
         // In https://www.example-video.mp4?token=1234, the sourcePath is https://www.example-video.mp4
-        val sourcePath = player.currentMediaItem?.localConfiguration?.uri?.toString()?.substringBefore("?")
+        val sourcePath = player.currentMediaItem?.localConfiguration?.uri?.toString()
         val manifest = player.currentManifest
 
         // Best world scenario, we have a manifest and a uri
@@ -91,7 +90,8 @@ internal class PlaybackEventDataManipulator(
             data.m3u8Url = masterPlaylist.baseUri
         } else {
             // If we don't have a manifest, we can extract the information from the uri in a best effort
-            val fileExt = sourcePath?.substringAfterLast(".")?.lowercase()
+            val fileExt = sourcePath?.substringBefore("?")?.substringAfterLast(".")?.lowercase()
+            //TODO: Common code & Unit testing
             when (fileExt) {
                 "m3u8" -> {
                     data.streamFormat = StreamFormat.HLS.value
@@ -105,6 +105,7 @@ internal class PlaybackEventDataManipulator(
 
                 "ism", "isml" -> {
                     data.streamFormat = StreamFormat.SMOOTH.value
+                    // TODO: explain
                     data.progUrl = sourcePath
                 }
 
@@ -118,7 +119,6 @@ internal class PlaybackEventDataManipulator(
                         We don't know the format of the stream, so we don't set the streamFormat.
                         We will also arrive there if the sourcePath is null.
                         In a last effort, we give the sourcePath as progressive url while not knowing the format.
-
                      */
                     data.progUrl = sourcePath
                 }
@@ -148,22 +148,5 @@ internal class PlaybackEventDataManipulator(
         val textTrack = Media3ExoPlayerUtil.getActiveSubtitles(player)
         eventData.subtitleEnabled = textTrack != null
         eventData.subtitleLanguage = textTrack?.language
-    }
-
-    @androidx.annotation.OptIn(UnstableApi::class)
-    private fun setStreamFormatAndUrl(eventData: EventData) {
-        val manifest = player.currentManifest
-
-        // we check if the corresponding class is loaded, since
-        // media3 exoplayer is modular and the dash or hls modules
-        // might not be included in the dependencies
-        if (Media3ExoPlayerUtil.isDashManifestClassLoaded && manifest is DashManifest) {
-            eventData.streamFormat = StreamFormat.DASH.value
-            eventData.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
-        } else if (Media3ExoPlayerUtil.isHlsManifestClassLoaded && manifest is HlsManifest) {
-            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
-            eventData.streamFormat = StreamFormat.HLS.value
-            eventData.m3u8Url = masterPlaylist.baseUri
-        }
     }
 }
