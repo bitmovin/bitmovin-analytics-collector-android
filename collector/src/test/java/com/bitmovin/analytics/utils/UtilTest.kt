@@ -1,6 +1,9 @@
 package com.bitmovin.analytics.utils
 
+import android.net.Uri
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
+import com.bitmovin.analytics.TestFactory
+import com.bitmovin.analytics.enums.StreamFormat
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert
 import org.junit.Test
@@ -13,6 +16,108 @@ import org.robolectric.annotation.Config
     RobolectricTestRunner::class,
 )
 class UtilTest {
+    @Test
+    fun eventDataFormatAndUrlDetectionBasedOnExtension() {
+        val progressiveMedias =
+            listOf(
+                Uri.parse("http://www.example.com/video.mp4"),
+                Uri.parse("http://www.example.com/video.mp4?token=1234"),
+                Uri.parse("http://www.example.com/video.mp4?token=1234&other=56.78"),
+                Uri.parse("http://www.example.com/video.mp3"),
+                Uri.parse("http://www.example.com/video.mkv"),
+                Uri.parse("http://www.example.com/video.webm"),
+                Uri.parse("http://www.example.com/video.m4a"),
+            )
+        val hlsMedias =
+            listOf(
+                Uri.parse("http://www.example.com/video.m3u8"),
+                Uri.parse("http://www.example.com/video.m3u8?token=1234"),
+                Uri.parse("http://www.example.com/video.m3u8?token=1234&other=5678"),
+            )
+        val smoothMedias =
+            listOf(
+                Uri.parse("http://www.example.com/video.ism"),
+                Uri.parse("http://www.example.com/video.isml"),
+            )
+        val dashMedias =
+            listOf(
+                Uri.parse("http://www.example.com/video.mpd"),
+                Uri.parse("http://www.example.com/video.mpd?token=1234"),
+                Uri.parse("http://www.example.com/video.mpd?token=1234&other=5678"),
+            )
+
+        val undefinedMedias =
+            listOf(
+                Uri.parse("http://www.example.com/video"),
+                Uri.parse("http://www.example.com/video?token=1234"),
+                Uri.parse("http://www.example.com/video.idontexist"),
+            )
+
+        progressiveMedias.forEach { uri ->
+            val data = TestFactory.createEventData()
+            Util.setEventDataFormatTypeAndUrlBasedOnExtension(data, uri)
+
+            assertThat(data.progUrl)
+                .withFailMessage("Failed on URI: $uri. Expected progUrl to be $uri but was ${data.progUrl}")
+                .isEqualTo(uri.toString())
+
+            assertThat(data.streamFormat)
+                .withFailMessage("Failed on URI: $uri. Expected streamFormat to be 'progressive' but was ${data.streamFormat}")
+                .isEqualTo(StreamFormat.PROGRESSIVE.toString().lowercase())
+        }
+
+        hlsMedias.forEach { uri ->
+            val data = TestFactory.createEventData()
+            Util.setEventDataFormatTypeAndUrlBasedOnExtension(data, uri)
+
+            assertThat(data.m3u8Url)
+                .withFailMessage("Failed on URI: $uri. Expected m3u8Url to be $uri but was ${data.m3u8Url}")
+                .isEqualTo(uri.toString())
+
+            assertThat(data.streamFormat)
+                .withFailMessage("Failed on URI: $uri. Expected streamFormat to be 'hls' but was ${data.streamFormat}")
+                .isEqualTo(StreamFormat.HLS.toString().lowercase())
+        }
+
+        smoothMedias.forEach { uri ->
+            val data = TestFactory.createEventData()
+            Util.setEventDataFormatTypeAndUrlBasedOnExtension(data, uri)
+
+            assertThat(data.progUrl)
+                .withFailMessage("Failed on URI: $uri. Expected progUrl to be $uri but was ${data.progUrl}")
+                .isEqualTo(uri.toString())
+
+            assertThat(data.streamFormat)
+                .withFailMessage("Failed on URI: $uri. Expected streamFormat to be 'smooth' but was ${data.streamFormat}")
+                .isEqualTo(StreamFormat.SMOOTH.toString().lowercase())
+        }
+
+        dashMedias.forEach { uri ->
+            val data = TestFactory.createEventData()
+            Util.setEventDataFormatTypeAndUrlBasedOnExtension(data, uri)
+
+            assertThat(data.mpdUrl)
+                .withFailMessage("Failed on URI: $uri. Expected mpdUrl to be $uri but was ${data.mpdUrl}")
+                .isEqualTo(uri.toString())
+
+            assertThat(data.streamFormat)
+                .withFailMessage("Failed on URI: $uri. Expected streamFormat to be 'dash' but was ${data.streamFormat}")
+                .isEqualTo(StreamFormat.DASH.toString().lowercase())
+        }
+
+        undefinedMedias.forEach { uri ->
+            val data = TestFactory.createEventData()
+            Util.setEventDataFormatTypeAndUrlBasedOnExtension(data, uri)
+
+            assertThat(data.progUrl)
+                .withFailMessage("Failed on URI: $uri. Expected progUrl to be $uri but was ${data.progUrl}")
+                .isEqualTo(uri.toString())
+
+            assertThat(data.streamFormat)
+                .withFailMessage("Failed on URI: $uri. Expected streamFormat to be null but was ${data.streamFormat}")
+                .isEqualTo(null)
+        }
+    }
 
     @Test
     fun testTopOfStacktrace() {

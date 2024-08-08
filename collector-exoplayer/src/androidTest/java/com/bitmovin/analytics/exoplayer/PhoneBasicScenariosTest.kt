@@ -184,8 +184,6 @@ class PhoneBasicScenariosTest {
                 }
             }
 
-            Thread.sleep(500)
-
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(3)
 
