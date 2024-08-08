@@ -8,13 +8,16 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.media.MediaCodecList
+import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
 import android.util.Log
 import android.util.Pair
 import com.bitmovin.analytics.BuildConfig
+import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.enums.StreamFormat
 import java.net.URI
-import java.util.*
+import java.util.UUID
 import kotlin.math.roundToInt
 
 object Util {
@@ -78,7 +81,11 @@ object Util {
         return false
     }
 
-    fun calculatePercentage(numerator: Long?, denominator: Long?, clamp: Boolean): Int? {
+    fun calculatePercentage(
+        numerator: Long?,
+        denominator: Long?,
+        clamp: Boolean,
+    ): Int? {
         if (denominator == null || denominator == 0L || numerator == null) {
             return null
         }
@@ -107,7 +114,10 @@ object Util {
         }
     }
 
-    fun isClassLoaded(className: String, loader: ClassLoader?): Boolean {
+    fun isClassLoaded(
+        className: String,
+        loader: ClassLoader?,
+    ): Boolean {
         return try {
             Class.forName(className, false, loader)
             true
@@ -120,7 +130,10 @@ object Util {
         return value?.toLong() ?: 0
     }
 
-    fun multiply(value: Double?, multiplicand: Int?): Double? {
+    fun multiply(
+        value: Double?,
+        multiplicand: Int?,
+    ): Double? {
         return if (value == null || multiplicand == null) null else value * multiplicand
     }
 
@@ -128,7 +141,10 @@ object Util {
         return toPrimitiveLong(multiply(seconds, MILLISECONDS_IN_SECONDS))
     }
 
-    fun joinUrl(baseUrl: String, relativeUrl: String): String {
+    fun joinUrl(
+        baseUrl: String,
+        relativeUrl: String,
+    ): String {
         val result = StringBuilder(baseUrl)
         if (!baseUrl.endsWith("/")) {
             result.append('/')
@@ -165,17 +181,18 @@ object Util {
     fun getApplicationInfoOrNull(context: Context): ApplicationInfo? {
         var applicationInfo: ApplicationInfo? = null
         try {
-            applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getApplicationInfo(
-                    context.packageName,
-                    PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()),
-                )
-            } else {
-                context.packageManager.getApplicationInfo(
-                    context.packageName,
-                    PackageManager.GET_META_DATA,
-                )
-            }
+            applicationInfo =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    context.packageManager.getApplicationInfo(
+                        context.packageName,
+                        PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()),
+                    )
+                } else {
+                    context.packageManager.getApplicationInfo(
+                        context.packageName,
+                        PackageManager.GET_META_DATA,
+                    )
+                }
         } catch (e: PackageManager.NameNotFoundException) {
             Log.d("Util", "Something went wrong while getting application info, e:", e)
         }
@@ -185,20 +202,72 @@ object Util {
     fun getPackageInfoOrNull(context: Context): PackageInfo? {
         var packageInfo: PackageInfo? = null
         try {
-            packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(
-                    context.applicationContext.packageName,
-                    PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong()),
-                )
-            } else {
-                context.packageManager.getPackageInfo(
-                    context.applicationContext.packageName,
-                    0,
-                )
-            }
+            packageInfo =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    context.packageManager.getPackageInfo(
+                        context.applicationContext.packageName,
+                        PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong()),
+                    )
+                } else {
+                    context.packageManager.getPackageInfo(
+                        context.applicationContext.packageName,
+                        0,
+                    )
+                }
         } catch (e: PackageManager.NameNotFoundException) {
             Log.d("Util", "Something went wrong while getting package info, e:", e)
         }
         return packageInfo
+    }
+
+    /**
+     * This function set the streamFormat, mpdUrl, m3u8Url, and progUrl in the EventData object based on the file extension of the uri.
+     *
+     * Note: If the format is unknown or smooth, we will still sent the Url as a progressive url.
+     * This is a necessary trick as there is no predefined place for the smooth urls in the DataEvent object and we don't want to loose the information.
+     */
+    fun setEventDataFormatTypeAndUrlBasedOnExtension(
+        data: EventData,
+        uri: Uri,
+    ) {
+        // https://www.example-video.mp4?token=1234 -> https://www.example-video.mp4 -> mp4
+        val fileExt = uri.toString().substringBefore("?").substringAfterLast(".").lowercase()
+        Log.d("Util", "File extension: $fileExt")
+        // TODO: Common code & Unit testing
+        when (fileExt) {
+            "m3u8" -> {
+                data.streamFormat = StreamFormat.HLS.value
+                data.m3u8Url = uri.toString()
+            }
+
+            "mpd" -> {
+                data.streamFormat = StreamFormat.DASH.value
+                data.mpdUrl = uri.toString()
+            }
+
+            "ism", "isml" -> {
+                data.streamFormat = StreamFormat.SMOOTH.value
+                // TODO: explain
+                // This is a trick as there no predefined place for the smooth urls in the DataEvent object, but we don't want to loose the information.
+                data.progUrl = uri.toString()
+            }
+            /**
+             * The following formats are considered progressive streams.
+             * Based on: https://developer.android.com/media/media3/exoplayer/progressive
+             */
+            "mp4", "m4a", "m4s", "webm", "mkv", "ts", "mpg", "mpeg", "flv", "ogg", "wav", "mp3", "aac", "flac", "amr" -> {
+                data.streamFormat = StreamFormat.PROGRESSIVE.value
+                data.progUrl = uri.toString()
+            }
+
+            else -> {
+                /*
+                    We don't know the format of the stream, so we don't set the streamFormat.
+                    In a last effort, we give the sourcePath as progressive url while not knowing the format.
+                    This is a trick as there no predefined place for the raw urls in the DataEvent object, but we don't want to loose the information.
+                 */
+                data.progUrl = uri.toString()
+            }
+        }
     }
 }

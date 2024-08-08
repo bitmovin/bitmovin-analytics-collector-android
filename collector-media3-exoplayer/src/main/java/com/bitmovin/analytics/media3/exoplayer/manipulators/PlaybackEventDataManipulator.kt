@@ -76,8 +76,6 @@ internal class PlaybackEventDataManipulator(
      */
     @OptIn(UnstableApi::class)
     private fun setStreamFormatAndUrl(data: EventData) {
-        // In https://www.example-video.mp4?token=1234, the sourcePath is https://www.example-video.mp4
-        val sourcePath = player.currentMediaItem?.localConfiguration?.uri?.toString()
         val manifest = player.currentManifest
 
         // Best world scenario, we have a manifest and a uri
@@ -89,39 +87,10 @@ internal class PlaybackEventDataManipulator(
             data.streamFormat = StreamFormat.HLS.value
             data.m3u8Url = masterPlaylist.baseUri
         } else {
+            val uri = player.currentMediaItem?.localConfiguration?.uri
             // If we don't have a manifest, we can extract the information from the uri in a best effort
-            val fileExt = sourcePath?.substringBefore("?")?.substringAfterLast(".")?.lowercase()
-            //TODO: Common code & Unit testing
-            when (fileExt) {
-                "m3u8" -> {
-                    data.streamFormat = StreamFormat.HLS.value
-                    data.m3u8Url = sourcePath
-                }
-
-                "mpd" -> {
-                    data.streamFormat = StreamFormat.DASH.value
-                    data.mpdUrl = sourcePath
-                }
-
-                "ism", "isml" -> {
-                    data.streamFormat = StreamFormat.SMOOTH.value
-                    // TODO: explain
-                    data.progUrl = sourcePath
-                }
-
-                "mp4", "m4a", "m4s", "webm", "mkv", "ts", "mpg", "mpeg", "flv", "ogg", "wav", "mp3", "aac", "flac", "amr" -> {
-                    data.streamFormat = StreamFormat.PROGRESSIVE.value
-                    data.progUrl = sourcePath
-                }
-
-                else -> {
-                    /*
-                        We don't know the format of the stream, so we don't set the streamFormat.
-                        We will also arrive there if the sourcePath is null.
-                        In a last effort, we give the sourcePath as progressive url while not knowing the format.
-                     */
-                    data.progUrl = sourcePath
-                }
+            uri?.let {
+                Util.setEventDataFormatTypeAndUrlBasedOnExtension(data, it)
             }
         }
     }
