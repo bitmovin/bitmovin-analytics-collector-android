@@ -232,8 +232,6 @@ object Util {
     ) {
         // https://www.example-video.mp4?token=1234 -> https://www.example-video.mp4 -> mp4
         val fileExt = uri.toString().substringBefore("?").substringAfterLast(".").lowercase()
-        Log.d("Util", "File extension: $fileExt")
-        // TODO: Common code & Unit testing
         when (fileExt) {
             "m3u8" -> {
                 data.streamFormat = StreamFormat.HLS.value
@@ -247,7 +245,6 @@ object Util {
 
             "ism", "isml" -> {
                 data.streamFormat = StreamFormat.SMOOTH.value
-                // TODO: explain
                 // This is a trick as there no predefined place for the smooth urls in the DataEvent object, but we don't want to loose the information.
                 data.progUrl = uri.toString()
             }
