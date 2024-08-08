@@ -23,7 +23,7 @@ object MockedIngress {
     private var backendUrl =
         "https://analytics-ingress-global.bitmovin.com"
 
-    val JSON_CONTENT_TYPE = "application/json; charset=utf-8".toMediaType()
+    private val JSON_CONTENT_TYPE = "application/json; charset=utf-8".toMediaType()
 
     val currentImpressionsIds = mutableSetOf<String>()
 
@@ -31,9 +31,12 @@ object MockedIngress {
     @Volatile
     private var lastRequestReceivedTimestamp = 0L
 
-    val httpClient = OkHttpClient()
+    private val httpClient = OkHttpClient()
 
-    const val SERVER_FORWARDING: Boolean = true
+    /**
+     * This flag is used to forward the requests to the real server.
+     */
+    var liveServerForwarding: Boolean = true
 
     fun startServer(port: Int = 0): String {
         // Stop it in case it is already running and the test @After forget to stop it
@@ -99,7 +102,7 @@ object MockedIngress {
         object : Dispatcher() {
             @Throws(InterruptedException::class)
             override fun dispatch(request: RecordedRequest): MockResponse {
-                if (SERVER_FORWARDING) {
+                if (liveServerForwarding) {
                     sendToRealServer(request)
                 }
                 lastRequestReceivedTimestamp = System.currentTimeMillis()

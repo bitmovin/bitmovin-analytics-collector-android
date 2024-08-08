@@ -56,6 +56,8 @@ class RepeatRule : TestRule {
     }
 }
 
+private const val LICENSE_ANDROID_IOS_KEY = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0"
+
 /**
  * Should be used to run async operations in a test.
  *
@@ -89,16 +91,18 @@ fun <T> runBlockingTest(block: suspend CoroutineScope.() -> T) {
         // If server forwarding is enabled, it is useful to keep track of the impressions id when a test fail.
         // Thus, we add the current impressions ids to the error message.
         var modifiedMessage = originalException.message ?: "Test Error"
-        if (MockedIngress.SERVER_FORWARDING) {
+        if (MockedIngress.liveServerForwarding) {
             if (MockedIngress.currentImpressionsIds.isEmpty()) {
                 modifiedMessage += "\nNo test related impressions Ids."
             } else {
                 modifiedMessage += "\nTest related impressions Ids:"
                 MockedIngress.currentImpressionsIds.forEach { value ->
                     modifiedMessage += "\n- $value : https://dashboard.bitmovin.com/analytics/sessions/" +
-                        "$value?licenseKey=17e6ea02-cb5a-407f-9d6b-9400358fbcc0"
+                        "$value?licenseKey=$LICENSE_ANDROID_IOS_KEY"
                 }
             }
+        } else {
+            modifiedMessage += "\nServer forwarding was disabled during this test."
         }
 
         // Throwable does not allow to change the message, so we need to create a new exception and copy it's content to

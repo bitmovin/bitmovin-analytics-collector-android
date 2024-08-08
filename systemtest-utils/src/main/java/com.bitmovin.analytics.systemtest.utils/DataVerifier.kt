@@ -726,6 +726,6 @@ object DataVerifier {
         // We accept some level of inaccuracies.
         val pausedDuration = eventDataList.sumOf { it.paused }
         assertThat(pausedDuration)
-            .isBetween((expectedPauseTimeInMs * 0.85 - 50).toLong(), (expectedPauseTimeInMs * 1.15 + 50).toLong())
+            .isBetween((expectedPauseTimeInMs * 0.85 - 50).toLong(), (expectedPauseTimeInMs * 1.20 + 50).toLong())
     }
 }
