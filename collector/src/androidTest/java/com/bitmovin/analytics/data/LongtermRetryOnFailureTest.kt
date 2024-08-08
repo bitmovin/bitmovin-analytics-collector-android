@@ -30,7 +30,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
+import org.junit.AfterClass
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,6 +52,21 @@ class LongtermRetryOnFailureTest {
 
     @Rule @JvmField
     val repeatRule = RepeatRule()
+
+    // Class setup and teardown
+    companion object {
+        @JvmStatic @BeforeClass
+        fun classSetup() {
+            // Disable it for the collector tests.
+            MockedIngress.liveServerForwarding = false
+        }
+
+        @JvmStatic @AfterClass
+        fun classTearDown() {
+            // Reset it to the default value to avoid having to set in other classes.
+            MockedIngress.liveServerForwarding = false
+        }
+    }
 
     @Before
     fun setup() {
