@@ -7,6 +7,10 @@ jacoco {
 tasks.withType(Test).configureEach {
     jacoco {
         enabled = true
+        // Needed for the Robolectric runners to be covered
+        includeNoLocationClasses = true
+        // Needed for the includeNoLocationClasses to not cause the tests to fail.
+        excludes = ['jdk.internal.*']
     }
     // Launches the tests with coverage enabled
     finalizedBy jacocoTestReportBitmovinTesting

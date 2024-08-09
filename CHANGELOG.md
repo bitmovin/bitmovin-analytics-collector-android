@@ -6,8 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
-### Added
-- Enhanced source Type and URL detection for Exoplayer and Media3 ExoPlayer.
+### Fixed
+- Enhanced source format and source URL detection for Exoplayer and Media3 ExoPlayer.
+- [Internal] Jacoco Coverage do not ignore Robolectric powered tests anymore.
 
 ## v3.7.0
 
