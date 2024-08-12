@@ -230,8 +230,9 @@ object Util {
         data: EventData,
         uri: Uri,
     ) {
-        // https://www.example-video.mp4?token=1234 -> https://www.example-video.mp4 -> mp4
-        val fileExt = uri.toString().substringBefore("?").substringAfterLast(".").lowercase()
+        // https://www.example/video.mp4?token=1234 -> /video.mp4 -> mp4
+        val fileExt = uri.path?.substringAfterLast(".")?.lowercase()
+
         when (fileExt) {
             "m3u8" -> {
                 data.streamFormat = StreamFormat.HLS.value
