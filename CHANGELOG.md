@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- [Internal] Added an hardcoded sequence number limit (1000).
+
 ### Fixed
 - [Internal] Jacoco Coverage do not ignore Robolectric powered tests anymore.
 

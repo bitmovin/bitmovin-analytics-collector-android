@@ -77,7 +77,13 @@ internal class SimpleEventDataDispatcher(
     }
 
     override fun add(eventData: EventData) {
+        // Do not send events with sequence number greater than the limit
+        if (sampleSequenceNumber > SEQUENCE_NUMBER_LIMIT) {
+            return
+        }
+
         eventData.sequenceNumber = sampleSequenceNumber++
+
         if (enabled) {
             backend.send(eventData)
         } else {

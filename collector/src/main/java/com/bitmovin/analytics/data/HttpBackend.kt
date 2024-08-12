@@ -18,16 +18,18 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
     private val adsAnalyticsBackendUrl: String
 
     init {
-        analyticsBackendUrl = Uri.parse(config.backendUrl)
-            .buildUpon()
-            .appendEncodedPath("analytics")
-            .build()
-            .toString()
-        adsAnalyticsBackendUrl = Uri.parse(config.backendUrl)
-            .buildUpon()
-            .appendEncodedPath("analytics/a")
-            .build()
-            .toString()
+        analyticsBackendUrl =
+            Uri.parse(config.backendUrl)
+                .buildUpon()
+                .appendEncodedPath("analytics")
+                .build()
+                .toString()
+        adsAnalyticsBackendUrl =
+            Uri.parse(config.backendUrl)
+                .buildUpon()
+                .appendEncodedPath("analytics/a")
+                .build()
+                .toString()
         Log.d(
             TAG,
             String.format("Initialized Analytics HTTP Backend with %s", analyticsBackendUrl),
@@ -39,7 +41,11 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
 
     override fun sendAd(eventData: AdEventData) = sendAd(eventData, null, null)
 
-    override fun send(eventData: EventData, success: OnSuccessCallback?, failure: OnFailureCallback?) {
+    override fun send(
+        eventData: EventData,
+        success: OnSuccessCallback?,
+        failure: OnFailureCallback?,
+    ) {
         Log.d(
             TAG,
             String.format(
@@ -57,18 +63,28 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
             analyticsBackendUrl,
             serialize(eventData),
             object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
+                override fun onFailure(
+                    call: Call,
+                    e: IOException,
+                ) {
                     failure?.onFailure(e) { call.cancel() }
                 }
 
-                override fun onResponse(call: Call, response: Response) {
+                override fun onResponse(
+                    call: Call,
+                    response: Response,
+                ) {
                     success?.onSuccess()
                 }
             },
         )
     }
 
-    override fun sendAd(eventData: AdEventData, success: OnSuccessCallback?, failure: OnFailureCallback?) {
+    override fun sendAd(
+        eventData: AdEventData,
+        success: OnSuccessCallback?,
+        failure: OnFailureCallback?,
+    ) {
         Log.d(
             TAG,
             String.format(
@@ -82,11 +98,17 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
             adsAnalyticsBackendUrl,
             serialize(eventData),
             object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
+                override fun onFailure(
+                    call: Call,
+                    e: IOException,
+                ) {
                     failure?.onFailure(e) { call.cancel() }
                 }
 
-                override fun onResponse(call: Call, response: Response) {
+                override fun onResponse(
+                    call: Call,
+                    response: Response,
+                ) {
                     success?.onSuccess()
                 }
             },
