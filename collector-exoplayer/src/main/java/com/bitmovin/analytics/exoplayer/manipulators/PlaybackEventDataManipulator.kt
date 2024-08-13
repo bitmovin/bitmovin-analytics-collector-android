@@ -58,7 +58,7 @@ internal class PlaybackEventDataManipulator(
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
 
         // streamFormat, mpdUrl, and m3u8Url, progUrl
-        setSourceData(data)
+        setStreamFormatAndUrl(data)
 
         data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
 
@@ -73,7 +73,7 @@ internal class PlaybackEventDataManipulator(
     /**
      * Is responsible for setting the streamFormat, mpdUrl, progUrl, and m3u8Url in the EventData object
      */
-    private fun setSourceData(data: EventData) {
+    private fun setStreamFormatAndUrl(data: EventData) {
         val manifest = exoPlayer.currentManifest
 
         // Best world scenario, we have a manifest and a uri

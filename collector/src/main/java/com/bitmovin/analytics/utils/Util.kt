@@ -223,8 +223,8 @@ object Util {
     /**
      * This function set the streamFormat, mpdUrl, m3u8Url, and progUrl in the EventData object based on the file extension of the uri.
      *
-     * Note: If the format is unknown or smooth, we will still sent the Url as a progressive url.
-     * This is a necessary trick as there is no predefined place for the smooth urls in the DataEvent object and we don't want to loose the information.
+     * Note: If the format is unknown or smooth, we will still send the Url as a progressive url.
+     * This is a necessary trick as there is no predefined place for the smooth urls in the DataEvent object and we don't want to lose the information.
      */
     fun setEventDataFormatTypeAndUrlBasedOnExtension(
         data: EventData,
