@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.media3.exoplayer.manipulators
 
+import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -57,6 +58,9 @@ internal class PlaybackEventDataManipulator(
         // DroppedVideoFrames
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
 
+        // streamFormat, mpdUrl, and m3u8Url, progUrl
+        setStreamFormatAndUrl(data)
+
         data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
 
         // DRM Information
@@ -65,7 +69,30 @@ internal class PlaybackEventDataManipulator(
         data.isMuted = isMuted(player)
 
         setSubtitleInfo(data)
-        setStreamFormatAndUrl(data)
+    }
+
+    /**
+     * Is responsible for setting the streamFormat, mpdUrl, progUrl, and m3u8Url in the EventData object
+     */
+    @OptIn(UnstableApi::class)
+    private fun setStreamFormatAndUrl(data: EventData) {
+        val manifest = player.currentManifest
+
+        // Best world scenario, we have a manifest and a uri
+        if (Media3ExoPlayerUtil.isDashManifestClassLoaded && manifest is DashManifest) {
+            data.streamFormat = StreamFormat.DASH.value
+            data.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
+        } else if (Media3ExoPlayerUtil.isHlsManifestClassLoaded && manifest is HlsManifest) {
+            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
+            data.streamFormat = StreamFormat.HLS.value
+            data.m3u8Url = masterPlaylist.baseUri
+        } else {
+            val uri = player.currentMediaItem?.localConfiguration?.uri
+            // If we don't have a manifest, we can extract the information from the uri in a best effort
+            uri?.let {
+                Util.setEventDataFormatTypeAndUrlBasedOnExtension(data, it)
+            }
+        }
     }
 
     // it is enough to have volume OR deviceVolume set to muted
@@ -90,22 +117,5 @@ internal class PlaybackEventDataManipulator(
         val textTrack = Media3ExoPlayerUtil.getActiveSubtitles(player)
         eventData.subtitleEnabled = textTrack != null
         eventData.subtitleLanguage = textTrack?.language
-    }
-
-    @androidx.annotation.OptIn(UnstableApi::class)
-    private fun setStreamFormatAndUrl(eventData: EventData) {
-        val manifest = player.currentManifest
-
-        // we check if the corresponding class is loaded, since
-        // media3 exoplayer is modular and the dash or hls modules
-        // might not be included in the dependencies
-        if (Media3ExoPlayerUtil.isDashManifestClassLoaded && manifest is DashManifest) {
-            eventData.streamFormat = StreamFormat.DASH.value
-            eventData.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
-        } else if (Media3ExoPlayerUtil.isHlsManifestClassLoaded && manifest is HlsManifest) {
-            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
-            eventData.streamFormat = StreamFormat.HLS.value
-            eventData.m3u8Url = masterPlaylist.baseUri
-        }
     }
 }

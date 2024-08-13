@@ -57,16 +57,8 @@ internal class PlaybackEventDataManipulator(
         // DroppedVideoFrames
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
 
-        // streamFormat, mpdUrl, and m3u8Url
-        val manifest = exoPlayer.currentManifest
-        if (ExoUtil.isDashManifestClassLoaded && manifest is DashManifest) {
-            data.streamFormat = StreamFormat.DASH.value
-            data.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
-        } else if (ExoUtil.isHlsManifestClassLoaded && manifest is HlsManifest) {
-            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
-            data.streamFormat = StreamFormat.HLS.value
-            data.m3u8Url = masterPlaylist.baseUri
-        }
+        // streamFormat, mpdUrl, and m3u8Url, progUrl
+        setStreamFormatAndUrl(data)
 
         data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
 
@@ -76,6 +68,29 @@ internal class PlaybackEventDataManipulator(
         data.isMuted = isMuted(exoPlayer)
 
         setSubtitleInfo(data)
+    }
+
+    /**
+     * Is responsible for setting the streamFormat, mpdUrl, progUrl, and m3u8Url in the EventData object
+     */
+    private fun setStreamFormatAndUrl(data: EventData) {
+        val manifest = exoPlayer.currentManifest
+
+        // Best world scenario, we have a manifest and a uri
+        if (ExoUtil.isDashManifestClassLoaded && manifest is DashManifest) {
+            data.streamFormat = StreamFormat.DASH.value
+            data.mpdUrl = manifest.location?.toString() ?: playbackInfoProvider.manifestUrl
+        } else if (ExoUtil.isHlsManifestClassLoaded && manifest is HlsManifest) {
+            val masterPlaylist: HlsMultivariantPlaylist = manifest.multivariantPlaylist
+            data.streamFormat = StreamFormat.HLS.value
+            data.m3u8Url = masterPlaylist.baseUri
+        } else {
+            val uri = exoPlayer.currentMediaItem?.localConfiguration?.uri
+            // If we don't have a manifest, we can extract the information from the uri in a best effort
+            uri?.let {
+                Util.setEventDataFormatTypeAndUrlBasedOnExtension(data, it)
+            }
+        }
     }
 
     // it is enough to have volume OR deviceVolume set to muted

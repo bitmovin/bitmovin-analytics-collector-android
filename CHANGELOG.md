@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Added an hardcoded sequence number limit (1000).
 
 ### Fixed
+- Enhanced source format and source URL detection for Exoplayer and Media3 ExoPlayer.
 - [Internal] Jacoco Coverage do not ignore Robolectric powered tests anymore.
 
 ### Changed

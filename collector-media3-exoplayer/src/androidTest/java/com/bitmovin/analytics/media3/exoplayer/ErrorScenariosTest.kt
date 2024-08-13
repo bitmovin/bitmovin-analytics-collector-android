@@ -33,7 +33,7 @@ class ErrorScenariosTest {
     val metadataGenerator = MetadataUtils.MetadataGenerator()
 
     // Source metadata title depends on the test, so it has to be generated dynamically
-    private var defaultSourceMetadata: SourceMetadata
+    private val defaultSourceMetadata: SourceMetadata
         get() =
             SourceMetadata(
                 title = metadataGenerator.getTestTitle(),
@@ -42,7 +42,6 @@ class ErrorScenariosTest {
                 customData = TestConfig.createDummyCustomData(),
                 cdnProvider = "cdn_provider",
             )
-        set(_) {}
 
     @Before
     fun setup() {
@@ -90,6 +89,7 @@ class ErrorScenariosTest {
             val impressionId = eventData.impressionId
             Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_IO_BAD_HTTP_STATUS")
             Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
+            DataVerifier.verifyStreamFormatAndUrlTracking(eventData)
 
             DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
             DataVerifier.verifySourceMetadata(eventData, sourceMetadata = defaultSourceMetadata)
@@ -148,6 +148,7 @@ class ErrorScenariosTest {
             DataVerifier.verifyMpdSourceUrl(impression.eventDataList, corruptedStream.uri.toString())
             DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
             DataVerifier.verifySourceMetadata(eventData, sourceMetadata = sourceMetadata)
+            DataVerifier.verifyStreamFormatAndUrlTracking(eventData)
 
             Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)
             val errorDetail = impression.errorDetailList.first()
@@ -202,6 +203,7 @@ class ErrorScenariosTest {
             Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
             DataVerifier.verifyMpdSourceUrl(impression.eventDataList, missingSegmentStream.uri.toString())
             DataVerifier.verifySourceMetadata(eventData, sourceMetadata = sourceMetadata)
+            DataVerifier.verifyStreamFormatAndUrlTracking(eventData)
 
             Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)
             val errorDetail = impression.errorDetailList.first()
