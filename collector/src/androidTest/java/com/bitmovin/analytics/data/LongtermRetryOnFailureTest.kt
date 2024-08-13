@@ -1,33 +1,25 @@
 package com.bitmovin.analytics.data
 
-import android.os.Handler
-import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
-import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.api.AnalyticsConfig
-import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.RetryPolicy
-import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.persistence.EventDatabase
 import com.bitmovin.analytics.data.persistence.PersistentAnalyticsEventQueue
 import com.bitmovin.analytics.data.testutils.TestFactory
-import com.bitmovin.analytics.enums.PlayerType
-import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.license.FeatureConfigContainer
+import com.bitmovin.analytics.data.testutils.createDummyPlayerAdapter
+import com.bitmovin.analytics.data.testutils.createTestImpressionId
 import com.bitmovin.analytics.persistence.EventQueueConfig
 import com.bitmovin.analytics.persistence.EventQueueFactory
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
-import com.bitmovin.analytics.stateMachines.PlayerStateMachine
-import com.bitmovin.analytics.systemtest.utils.Impression
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.RepeatRule
+import com.bitmovin.analytics.systemtest.utils.combineByImpressionId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.AfterClass
@@ -89,19 +81,8 @@ class LongtermRetryOnFailureTest {
                 context = appContext,
                 eventQueue = eventQueue,
             )
-        dummyPlayerAdapter = createDummyPlayerAdapter()
+        dummyPlayerAdapter = createDummyPlayerAdapter(bitmovinAnalytics)
     }
-
-    private fun createDummyPlayerAdapter(): DummyPlayerAdapter =
-        runBlocking {
-            withContext(mainScope.coroutineContext) {
-                // Can not be created on the test thread
-                DummyPlayerAdapter(
-                    bitmovinAnalytics,
-                    DummyPlayerContext(),
-                )
-            }
-        }
 
     @After
     fun tearDown() {
@@ -137,6 +118,31 @@ class LongtermRetryOnFailureTest {
     }
 
     @Test
+    fun test_send_more_than_sequence_number_limit() {
+        bitmovinAnalytics.attach(dummyPlayerAdapter)
+        val sessionId = createTestImpressionId()
+
+        // Create more than the sequence number limit
+        // Note: we can't write our own sequence number since it's written on the data sending
+        val eventData =
+            MutableList(SEQUENCE_NUMBER_LIMIT + 10) {
+                TestFactory.createEventData(impressionId = sessionId)
+            }
+
+        // Send all events
+        eventData.forEach {
+            bitmovinAnalytics.sendEventData(it)
+        }
+
+        val impressionList = MockedIngress.waitForRequestsAndExtractImpressions().combineByImpressionId()
+        assertThat(impressionList).hasSize(1)
+        val impression = impressionList.values.first()
+        assertThat(impression.eventDataList)
+            .hasSize(SEQUENCE_NUMBER_LIMIT + 1) // as the sequence number starts at 0
+            .isEqualTo(eventData.subList(0, SEQUENCE_NUMBER_LIMIT + 1))
+    }
+
+    @Test
     fun test_online_offline_online_sends_all_eventdata() {
         // this test uses a hardcoded port, since we cannot go online/offline/online due to
         // the fact that the server socket cannot be reused if port 0 is used (if there is traffic as it seems)
@@ -154,8 +160,7 @@ class LongtermRetryOnFailureTest {
                 context = appContext,
                 eventQueue = eventQueue,
             )
-        dummyPlayerAdapter = createDummyPlayerAdapter()
-        bitmovinAnalytics.attach(dummyPlayerAdapter)
+        dummyPlayerAdapter = createDummyPlayerAdapter(bitmovinAnalytics)
         val sessionId = createTestImpressionId()
         val eventData =
             MutableList(2) {
@@ -318,8 +323,7 @@ class LongtermRetryOnFailureTest {
                 context = appContext,
                 eventQueue = eventQueue,
             )
-        dummyPlayerAdapter = createDummyPlayerAdapter()
-        secondInstance.attach(dummyPlayerAdapter)
+        dummyPlayerAdapter = createDummyPlayerAdapter(secondInstance)
 
         // Trigger sending of cached data
         secondInstance.sendEventData(TestFactory.createEventData(impressionId = sessionId))
@@ -358,11 +362,9 @@ class LongtermRetryOnFailureTest {
                 context = appContext,
                 eventQueue = eventQueue,
             )
-        val firstDummyPlayerAdapter = createDummyPlayerAdapter()
-        firstBitmovinAnalytics.attach(firstDummyPlayerAdapter)
+        val firstDummyPlayerAdapter = createDummyPlayerAdapter(firstBitmovinAnalytics)
 
-        val secondDummyPlayerAdapter = createDummyPlayerAdapter()
-        secondBitmovinAnalytics.attach(secondDummyPlayerAdapter)
+        val secondDummyPlayerAdapter = createDummyPlayerAdapter(secondBitmovinAnalytics)
 
         val eventDataFirstCollector =
             MutableList(100) {
@@ -530,7 +532,7 @@ class LongtermRetryOnFailureTest {
                 context = appContext,
                 eventQueue = eventQueue,
             )
-        dummyPlayerAdapter = createDummyPlayerAdapter()
+        dummyPlayerAdapter = createDummyPlayerAdapter(bitmovinAnalytics)
 
         val persistentQueue =
             PersistentAnalyticsEventQueue(
@@ -583,20 +585,6 @@ class LongtermRetryOnFailureTest {
     }
 }
 
-private fun List<Impression>.combineByImpressionId(): Map<String, Impression> {
-    val events = flatMap { it.eventDataList }.groupBy { it.impressionId }
-    val adEvents = flatMap { it.adEventDataList }.groupBy { it.videoImpressionId }
-
-    return (events.keys + adEvents.keys).associateWith {
-        Impression(
-            events[it]?.toMutableList() ?: mutableListOf(),
-            adEvents[it]?.toMutableList() ?: mutableListOf(),
-        )
-    }
-}
-
-private fun createTestImpressionId(numberOfImpression: Int = 1) = UUID(0xB177E57, numberOfImpression.toLong()).toString()
-
 private fun PersistentAnalyticsEventQueue.almostFillDatabaseToCountLimit(): List<String> {
     val startTime = (System.currentTimeMillis().milliseconds - 10.hours).inWholeMilliseconds
     val sessionIds = MutableList(10) { createTestImpressionId(it + 1) }
@@ -632,56 +620,4 @@ private fun PersistentAnalyticsEventQueue.almostFillDatabaseToCountLimit(): List
         )
     }
     return sessionIds
-}
-
-private class DummyPlayerAdapter(
-    analytics: BitmovinAnalytics,
-    playerContext: PlayerContext,
-) : PlayerAdapter {
-    override val stateMachine: PlayerStateMachine =
-        PlayerStateMachine.Factory.create(
-            analytics,
-            playerContext,
-            Handler(Looper.getMainLooper()),
-        )
-    override val isAutoplayEnabled: Boolean?
-        get() = null
-    override val position: Long
-        get() = 0
-    override val drmDownloadTime: Long
-        get() = 0
-
-    override var defaultMetadata: DefaultMetadata = DefaultMetadata()
-
-    override val playerInfo: PlayerInfo
-        get() = PlayerInfo("Android:Testing", PlayerType.EXOPLAYER)
-
-    override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
-        return emptyList()
-    }
-
-    override fun getCurrentSourceMetadata(): SourceMetadata = SourceMetadata()
-
-    override fun release() {
-    }
-
-    override fun resetSourceRelatedState() {
-    }
-
-    override fun createEventData(): EventData {
-        return TestFactory.createEventData(createTestImpressionId(1001))
-    }
-
-    override fun createEventDataForCustomDataEvent(sourceMetadata: SourceMetadata): EventData {
-        return TestFactory.createEventData(createTestImpressionId(1))
-    }
-}
-
-private class DummyPlayerContext : PlayerContext {
-    override fun isPlaying(): Boolean {
-        return false
-    }
-
-    override val position: Long
-        get() = 0
 }

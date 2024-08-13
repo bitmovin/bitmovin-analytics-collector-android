@@ -16,6 +16,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.assertj.core.api.Assertions
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
@@ -35,14 +36,17 @@ class SimpleEventDataDispatcherTest {
         config = AnalyticsConfig("blub")
         every { backendFactory.createBackend(config, context, any()) } returns backend
         scopeProvider = TestScopeProvider()
-        dispatcher = SimpleEventDataDispatcher(
-            context,
-            config,
-            null,
-            backendFactory,
-            licenseCall,
-            scopeProvider,
-        )
+        dispatcher =
+            SimpleEventDataDispatcher(
+                context,
+                config,
+                null,
+                backendFactory,
+                licenseCall,
+                scopeProvider,
+            )
+
+        every { backend.send(any()) }.returns(Unit)
     }
 
     @After
@@ -60,6 +64,36 @@ class SimpleEventDataDispatcherTest {
     fun `enabling the dispatcher creates a new backend`() {
         dispatcher.enable()
         verify { backendFactory.createBackend(config, context, any()) }
+    }
+
+    @Test
+    fun `sequence numbers auto-increments on add`() {
+        dispatcher.enable()
+        val eventData1 = createTestEventData()
+        dispatcher.add(eventData1)
+        val eventData2 = createTestEventData()
+        dispatcher.add(eventData2)
+        Assertions.assertThat(eventData1.sequenceNumber).isEqualTo(eventData2.sequenceNumber - 1)
+    }
+
+    @Test
+    fun `sequence number is limited to max-limit`() {
+        dispatcher.enable()
+
+        // enable the backend to forward the data
+        dispatcher.authenticationCompleted(
+            AuthenticationResponse.Granted("authenticated-key", null),
+        )
+
+        val eventData = createTestEventData()
+        for (i in 0..1005) {
+            dispatcher.add(eventData)
+        }
+        Assertions.assertThat(eventData.sequenceNumber).isEqualTo(1000)
+
+        // this line might cause issues when there are too many calls (verification would throw an error)
+        // test is stalling then. in case of the correct amount of calls, test passes
+        verify(exactly = 1001) { backend.send(any()) }
     }
 
     @Test
@@ -111,32 +145,34 @@ class SimpleEventDataDispatcherTest {
     }
 }
 
-private fun createTestAdEventData(key: String? = null) = AdEventData.fromEventData(
-    createTestEventData(key),
-)
+private fun createTestAdEventData(key: String? = null) =
+    AdEventData.fromEventData(
+        createTestEventData(key),
+    )
 
-private fun createTestEventData(key: String? = null) = EventData(
-    DeviceInformation(
-        manufacturer = "manufacturer",
-        model = "model",
-        isTV = true,
-        locale = "locale",
-        domain = "domain",
-        screenHeight = 1,
-        screenWidth = 1,
-        operatingSystem = "operatingSystem",
-        operatingSystemMajor = "operatingSystemMajor",
-        operatingSystemMinor = "operatingSystemMinor",
-    ),
-    PlayerInfo(playerTech = "test", playerType = PlayerType.BITMOVIN),
-    CustomData(),
-    impressionId = "impressionId",
-    userId = "userId",
-    key = key,
-    videoId = "videoId",
-    videoTitle = "videoTitle",
-    customUserId = "customUserId",
-    path = "path",
-    cdnProvider = "cdnProvider",
-    userAgent = "userAgent",
-)
+private fun createTestEventData(key: String? = null) =
+    EventData(
+        DeviceInformation(
+            manufacturer = "manufacturer",
+            model = "model",
+            isTV = true,
+            locale = "locale",
+            domain = "domain",
+            screenHeight = 1,
+            screenWidth = 1,
+            operatingSystem = "operatingSystem",
+            operatingSystemMajor = "operatingSystemMajor",
+            operatingSystemMinor = "operatingSystemMinor",
+        ),
+        PlayerInfo(playerTech = "test", playerType = PlayerType.BITMOVIN),
+        CustomData(),
+        impressionId = "impressionId",
+        userId = "userId",
+        key = key,
+        videoId = "videoId",
+        videoTitle = "videoTitle",
+        customUserId = "customUserId",
+        path = "path",
+        cdnProvider = "cdnProvider",
+        userAgent = "userAgent",
+    )

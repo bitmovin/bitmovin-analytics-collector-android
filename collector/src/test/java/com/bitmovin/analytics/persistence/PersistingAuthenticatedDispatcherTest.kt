@@ -38,9 +38,10 @@ private const val TEST_LICENSE_KEY: String = "test_key"
 class PersistingAuthenticatedDispatcherTest {
     private val outerLicenseCallback: LicenseCallback = mockk(relaxed = true)
     private val backendFactory: BackendFactory = mockk()
-    private val backend: Backend = mockk(
-        moreInterfaces = arrayOf(CacheConsumingBackend::class),
-    )
+    private val backend: Backend =
+        mockk(
+            moreInterfaces = arrayOf(CacheConsumingBackend::class),
+        )
     private val licenseCall: LicenseCall = mockk()
     private val analyticsEventQueue: AnalyticsEventQueue = mockk()
     private lateinit var scopeProvider: TestScopeProvider
@@ -51,15 +52,16 @@ class PersistingAuthenticatedDispatcherTest {
         scopeProvider = TestScopeProvider()
         every { backendFactory.createBackend(any(), any(), any()) } returns backend
 
-        persistingAuthenticatedDispatcher = PersistingAuthenticatedDispatcher(
-            mockk(),
-            AnalyticsConfig(TEST_LICENSE_KEY),
-            outerLicenseCallback,
-            backendFactory,
-            licenseCall,
-            analyticsEventQueue,
-            scopeProvider,
-        )
+        persistingAuthenticatedDispatcher =
+            PersistingAuthenticatedDispatcher(
+                mockk(),
+                AnalyticsConfig(TEST_LICENSE_KEY),
+                outerLicenseCallback,
+                backendFactory,
+                licenseCall,
+                analyticsEventQueue,
+                scopeProvider,
+            )
     }
 
     @After
@@ -95,6 +97,38 @@ class PersistingAuthenticatedDispatcherTest {
         persistingAuthenticatedDispatcher.add(eventData)
 
         coVerify { licenseCall.authenticate(any()) }
+    }
+
+    @Test
+    fun `sequence numbers auto-increments on add`() {
+        persistingAuthenticatedDispatcher.enable()
+        val eventData1 = createEventData()
+        persistingAuthenticatedDispatcher.add(eventData1)
+        val eventData2 = createEventData()
+        persistingAuthenticatedDispatcher.add(eventData2)
+        assertThat(eventData1.sequenceNumber).isEqualTo(eventData2.sequenceNumber - 1)
+    }
+
+    @Test
+    fun `sequence number is limited to the limit`() {
+        persistingAuthenticatedDispatcher.enable()
+
+        // enable the backend to forward the data
+        triggerAuthenticationCallback(
+            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
+        )
+
+        val eventData = createEventData()
+        for (i in 0..1005) {
+            persistingAuthenticatedDispatcher.add(eventData)
+        }
+        assertThat(eventData.sequenceNumber).isEqualTo(1000)
+
+        // this line might cause issues when there are too many calls (verification would throw an error)
+        // test is stalling then. in case of the correct amount of calls, test passes
+        // we only have 1000 calls (instead of 1001) because the initial call
+        // is unauthenticated and triggers the authentication, and thus not counted
+        verify(exactly = 1000) { backend.send(any()) }
     }
 
     @Test
@@ -135,12 +169,13 @@ class PersistingAuthenticatedDispatcherTest {
             AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
         )
         persistingAuthenticatedDispatcher.resetSourceRelatedState()
-        val eventData = listOf(
-            createEventData(),
-            createEventData(),
-            createEventData(),
-            createEventData(),
-        )
+        val eventData =
+            listOf(
+                createEventData(),
+                createEventData(),
+                createEventData(),
+                createEventData(),
+            )
 
         eventData.forEach { persistingAuthenticatedDispatcher.add(it) }
 
@@ -157,18 +192,20 @@ class PersistingAuthenticatedDispatcherTest {
             AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
         )
         persistingAuthenticatedDispatcher.resetSourceRelatedState()
-        val eventDataOfFirstSource = listOf(
-            createEventData(),
-            createEventData(),
-            createEventData(),
-            createEventData(),
-        )
-        val eventDataOfSecondSource = listOf(
-            createEventData(),
-            createEventData(),
-            createEventData(),
-            createEventData(),
-        )
+        val eventDataOfFirstSource =
+            listOf(
+                createEventData(),
+                createEventData(),
+                createEventData(),
+                createEventData(),
+            )
+        val eventDataOfSecondSource =
+            listOf(
+                createEventData(),
+                createEventData(),
+                createEventData(),
+                createEventData(),
+            )
 
         eventDataOfFirstSource.forEach { persistingAuthenticatedDispatcher.add(it) }
         persistingAuthenticatedDispatcher.resetSourceRelatedState()
@@ -185,12 +222,13 @@ class PersistingAuthenticatedDispatcherTest {
 
     @Test
     fun `adding EventData after the dispatcher is disabled does nothing`() {
-        val eventDataOfFirstSource = listOf(
-            createEventData(),
-            createEventData(),
-            createEventData(),
-            createEventData(),
-        )
+        val eventDataOfFirstSource =
+            listOf(
+                createEventData(),
+                createEventData(),
+                createEventData(),
+                createEventData(),
+            )
         persistingAuthenticatedDispatcher.disable()
         eventDataOfFirstSource.forEach { persistingAuthenticatedDispatcher.add(it) }
 
@@ -201,12 +239,13 @@ class PersistingAuthenticatedDispatcherTest {
 
     @Test
     fun `adding AdEventData after the dispatcher is disabled does nothing`() {
-        val adEventDataOfFirstSource = listOf(
-            createAdEventData(),
-            createAdEventData(),
-            createAdEventData(),
-            createAdEventData(),
-        )
+        val adEventDataOfFirstSource =
+            listOf(
+                createAdEventData(),
+                createAdEventData(),
+                createAdEventData(),
+                createAdEventData(),
+            )
         persistingAuthenticatedDispatcher.disable()
         adEventDataOfFirstSource.forEach { persistingAuthenticatedDispatcher.addAd(it) }
 
@@ -221,18 +260,20 @@ class PersistingAuthenticatedDispatcherTest {
             AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
         )
         persistingAuthenticatedDispatcher.resetSourceRelatedState()
-        val eventDataOfFirstSource = listOf(
-            createEventData(),
-            createEventData(),
-            createEventData(),
-            createEventData(),
-        )
-        val eventDataOfSecondSource = listOf(
-            createEventData(),
-            createEventData(),
-            createEventData(),
-            createEventData(),
-        )
+        val eventDataOfFirstSource =
+            listOf(
+                createEventData(),
+                createEventData(),
+                createEventData(),
+                createEventData(),
+            )
+        val eventDataOfSecondSource =
+            listOf(
+                createEventData(),
+                createEventData(),
+                createEventData(),
+                createEventData(),
+            )
 
         eventDataOfFirstSource.forEach { persistingAuthenticatedDispatcher.add(it) }
         persistingAuthenticatedDispatcher.disable()
@@ -322,18 +363,20 @@ class PersistingAuthenticatedDispatcherTest {
         triggerAuthenticationCallback(
             AuthenticationResponse.Denied(licenseMessage),
         )
-        val eventDataOfFirstSource = listOf(
-            createEventData(),
-            createEventData(),
-            createEventData(),
-            createEventData(),
-        )
-        val adEventDataOfFirstSource = listOf(
-            createAdEventData(),
-            createAdEventData(),
-            createAdEventData(),
-            createAdEventData(),
-        )
+        val eventDataOfFirstSource =
+            listOf(
+                createEventData(),
+                createEventData(),
+                createEventData(),
+                createEventData(),
+            )
+        val adEventDataOfFirstSource =
+            listOf(
+                createAdEventData(),
+                createAdEventData(),
+                createAdEventData(),
+                createAdEventData(),
+            )
         eventDataOfFirstSource.forEach { persistingAuthenticatedDispatcher.add(it) }
         adEventDataOfFirstSource.forEach { persistingAuthenticatedDispatcher.addAd(it) }
 
