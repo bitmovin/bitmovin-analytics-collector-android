@@ -18,6 +18,7 @@ import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.ApiV3Utils
@@ -39,7 +40,7 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
     DefaultCollector<Player>(analyticsConfig, context.applicationContext),
     IBitmovinPlayerCollector {
     private val deferredLicenseManager = DeferredLicenseRelay(analyticsConfig.licenseKey)
-    private lateinit var ssaiService: SsaiService
+    private val ssaiApiProxy = SsaiApiProxy()
 
     override val analytics: BitmovinAnalytics by lazy {
         BitmovinAnalytics(
@@ -102,7 +103,8 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
         val playerContext = BitmovinPlayerContext(player)
         val handler = Handler(analytics.context.mainLooper)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
-        this.ssaiService = SsaiService(stateMachine)
+        val ssaiService = SsaiService(stateMachine)
+        ssaiApiProxy.attach(ssaiService)
         val eventDataFactory =
             EventDataFactory(
                 config,
@@ -123,7 +125,7 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
             playerLicenseProvider,
             playbackQualityProvider,
             metadataProvider,
-            this.ssaiService,
+            ssaiService,
         )
     }
 
@@ -186,5 +188,5 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
     }
 
     override val ssai: SsaiApi
-        get() = ssaiService
+        get() = ssaiApiProxy
 }

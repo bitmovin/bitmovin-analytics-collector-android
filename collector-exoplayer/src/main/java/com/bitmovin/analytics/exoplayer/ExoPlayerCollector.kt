@@ -15,6 +15,7 @@ import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import com.bitmovin.analytics.exoplayer.features.ExoPlayerFeatureFactory
 import com.bitmovin.analytics.exoplayer.player.ExoPlayerContext
 import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.ApiV3Utils
@@ -32,7 +33,7 @@ import com.google.android.exoplayer2.ExoPlayer
 )
 class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
     DefaultCollector<ExoPlayer>(analyticsConfig, context.applicationContext), IExoPlayerCollector {
-    private lateinit var ssaiService: SsaiService
+    private val ssaiApiProxy = SsaiApiProxy()
 
     override var sourceMetadata: SourceMetadata
         get() = metadataProvider.getSourceMetadata() ?: SourceMetadata()
@@ -41,7 +42,7 @@ class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
         }
 
     override val ssai: SsaiApi
-        get() = ssaiService
+        get() = ssaiApiProxy
 
     @Deprecated(
         "Use IExoPlayerCollector.Factory.create(context, analyticsConfig) instead",
@@ -70,7 +71,9 @@ class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
         val playerContext = ExoPlayerContext(player)
         val handler = Handler(player.applicationLooper)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
-        this.ssaiService = SsaiService(stateMachine)
+        val ssaiService = SsaiService(stateMachine)
+        ssaiApiProxy.attach(ssaiService)
+
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider, ssaiService = ssaiService)
         eventDataFactory.registerEventDataManipulator(ssaiService)
 
@@ -82,7 +85,7 @@ class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
             eventDataFactory,
             deviceInformationProvider,
             metadataProvider,
-            this.ssaiService,
+            ssaiService,
         )
     }
 }

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Enhanced source format and source URL detection for Exoplayer and Media3 ExoPlayer.
+- Race condition that leads to a crash in case the ssai API is called before attaching the collector to the player.
 - [Internal] Jacoco Coverage do not ignore Robolectric powered tests anymore.
 
 ### Changed

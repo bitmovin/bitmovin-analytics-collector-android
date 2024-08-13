@@ -23,6 +23,7 @@ import com.bitmovin.analytics.api.ssai.SsaiApi
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.SystemInformationProvider
@@ -32,7 +33,7 @@ import com.bitmovin.analytics.utils.Util
 internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
     DefaultCollector<Player>(analyticsConfig, context.applicationContext),
     IAmazonIvsPlayerCollector {
-    private lateinit var ssaiService: SsaiService
+    private val ssaiApiProxy = SsaiApiProxy()
 
     override var sourceMetadata: SourceMetadata
         get() = metadataProvider.getSourceMetadata() ?: SourceMetadata()
@@ -41,7 +42,7 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
         }
 
     override val ssai: SsaiApi
-        get() = ssaiService
+        get() = ssaiApiProxy
 
     override fun createAdapter(
         player: Player,
@@ -51,7 +52,8 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
         val playerContext = IvsPlayerContext(player)
         val handler = Handler(analytics.context.mainLooper)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
-        this.ssaiService = SsaiService(stateMachine)
+        val ssaiService = SsaiService(stateMachine)
+        ssaiApiProxy.attach(ssaiService)
 
         val playbackService = PlaybackService(stateMachine)
         val playbackManipulator = PlaybackEventDataManipulator(player)
