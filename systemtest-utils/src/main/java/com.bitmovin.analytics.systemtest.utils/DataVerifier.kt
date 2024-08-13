@@ -144,8 +144,15 @@ object DataVerifier {
 
         if (eventData.mpdUrl != null) {
             assertThat(eventData.streamFormat).isEqualTo(StreamFormat.DASH.value)
-        } else if (eventData.m3u8Url != null) {
+        }
+
+        if (eventData.m3u8Url != null) {
             assertThat(eventData.streamFormat).isEqualTo(StreamFormat.HLS.value)
+        }
+
+        // progUrl is used to track progressives, smooth, and unknown formats. Thus, it's less reliable to fully cover
+        if (eventData.progUrl != null) {
+            assertThat(eventData.streamFormat).isIn(StreamFormat.PROGRESSIVE.value, StreamFormat.SMOOTH.value, null)
         }
     }
 
