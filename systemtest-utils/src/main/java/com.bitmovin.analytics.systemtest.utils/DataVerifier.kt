@@ -6,6 +6,7 @@ import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
@@ -130,8 +131,21 @@ object DataVerifier {
                 assertThat(eventData.audioLanguage).isNotEmpty
             }
 
+            verifyStreamFormatAndUrlTracking(eventData)
+
             // make sure that sequenceNumber is continuous increasing
             assertThat(eventData.sequenceNumber).isEqualTo(expectedSequenceNumber)
+        }
+    }
+
+    fun verifyStreamFormatAndUrlTracking(eventData: EventData) {
+        // Either mpdUrl, m3u8Url or progUrl should be set
+        assertThat(eventData.mpdUrl != null || eventData.m3u8Url != null || eventData.progUrl != null).isTrue()
+
+        if (eventData.mpdUrl != null) {
+            assertThat(eventData.streamFormat).isEqualTo(StreamFormat.DASH.value)
+        } else if (eventData.m3u8Url != null) {
+            assertThat(eventData.streamFormat).isEqualTo(StreamFormat.HLS.value)
         }
     }
 
