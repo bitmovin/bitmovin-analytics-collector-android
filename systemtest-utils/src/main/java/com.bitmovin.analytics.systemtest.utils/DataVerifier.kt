@@ -139,6 +139,9 @@ object DataVerifier {
     }
 
     fun verifyStreamFormatAndUrlTracking(eventData: EventData) {
+        // Stream Format should not be unknown in our tests
+        assertThat(eventData.streamFormat).isNotNull()
+
         // Either mpdUrl, m3u8Url or progUrl should be set
         assertThat(eventData.mpdUrl != null || eventData.m3u8Url != null || eventData.progUrl != null).isTrue()
 
@@ -150,9 +153,9 @@ object DataVerifier {
             assertThat(eventData.streamFormat).isEqualTo(StreamFormat.HLS.value)
         }
 
-        // progUrl is used to track progressives, smooth, and unknown formats. Thus, it's less reliable to fully cover
+        // progUrl is used to track progressives, smooth, and unknown formats. However, we don't want null formats to occurs, it's just a best effort.
         if (eventData.progUrl != null) {
-            assertThat(eventData.streamFormat).isIn(StreamFormat.PROGRESSIVE.value, StreamFormat.SMOOTH.value, null)
+            assertThat(eventData.streamFormat).isIn(StreamFormat.PROGRESSIVE.value, StreamFormat.SMOOTH.value)
         }
     }
 
