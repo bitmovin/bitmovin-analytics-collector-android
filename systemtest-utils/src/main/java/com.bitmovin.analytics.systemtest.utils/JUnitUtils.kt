@@ -120,38 +120,44 @@ class TestFailedException(message: String, stackTrace: Array<StackTraceElement>)
 private const val RUNNING_BLOCKING_TEST_FUN_NAME = "runBlockingTest"
 
 private fun stackTraceCleaner(stackTrace: Array<StackTraceElement>): Array<StackTraceElement> {
-    // The line that entered the runBlockingTest scope
-    val indexOfRunBlockingTestScopeEntering =
-        stackTrace.indexOfLast { it.methodName == RUNNING_BLOCKING_TEST_FUN_NAME } + 1
+    try {
+        // The line that entered the runBlockingTest scope
+        val indexOfRunBlockingTestScopeEntering =
+            stackTrace.indexOfLast { it.methodName == RUNNING_BLOCKING_TEST_FUN_NAME } + 1
 
-    // The line that invoked the failing test
-    // Should look like this : com.example.TestClass.test(TestClass.kt:<Line where runBlockingTest is called>)
-    val testEnteringRunBlocking = stackTrace[indexOfRunBlockingTestScopeEntering]
+        // The line that invoked the failing test
+        // Should look like this : com.example.TestClass.test(TestClass.kt:<Line where runBlockingTest is called>)
+        val testEnteringRunBlocking = stackTrace[indexOfRunBlockingTestScopeEntering]
 
-    val indexOfFailingLine =
-        stackTrace.indexOfFirst { it.methodName == "invokeSuspend" && it.fileName == testEnteringRunBlocking.fileName }
+        val indexOfFailingLine =
+            stackTrace.indexOfFirst { it.methodName == "invokeSuspend" && it.fileName == testEnteringRunBlocking.fileName }
 
-    // The line that failed within the runBlockingTest scope
-    // Should look like this : com.example.TestClass$test$1.invokeSuspend(TestClass.kt:<Line where the real fail test happen>)
-    val valueOfErrorLine = stackTrace[indexOfFailingLine]
+        // The line that failed within the runBlockingTest scope
+        // Should look like this : com.example.TestClass$test$1.invokeSuspend(TestClass.kt:<Line where the real fail test happen>)
+        val valueOfErrorLine = stackTrace[indexOfFailingLine]
 
-    // Everything in the middle should be removed and replaced by wrapping up the right line error number with the test's other details
-    // Like that, the runBlockingTest scope is not visible in the stack trace.
-    // We want this : com.example.TestClass.test(TestClass.kt:<Line where the real fail test happen>)
-    val reworkedFailedTest =
-        StackTraceElement(
-            testEnteringRunBlocking.className,
-            testEnteringRunBlocking.methodName,
-            testEnteringRunBlocking.fileName,
-            valueOfErrorLine.lineNumber,
-        )
+        // Everything in the middle should be removed and replaced by wrapping up the right line error number with the test's other details
+        // Like that, the runBlockingTest scope is not visible in the stack trace.
+        // We want this : com.example.TestClass.test(TestClass.kt:<Line where the real fail test happen>)
+        val reworkedFailedTest =
+            StackTraceElement(
+                testEnteringRunBlocking.className,
+                testEnteringRunBlocking.methodName,
+                testEnteringRunBlocking.fileName,
+                valueOfErrorLine.lineNumber,
+            )
 
-    // Rebuilding the stack trace without the useless runBlockingTest scope content.
-    val filteredStackTrace =
-        stackTrace
-            .sliceArray(0 until indexOfFailingLine)
-            .plus(reworkedFailedTest)
-            .plus(stackTrace.sliceArray(indexOfRunBlockingTestScopeEntering + 1 until stackTrace.size))
+        // Rebuilding the stack trace without the useless runBlockingTest scope content.
+        val filteredStackTrace =
+            stackTrace
+                .sliceArray(0 until indexOfFailingLine)
+                .plus(reworkedFailedTest)
+                .plus(stackTrace.sliceArray(indexOfRunBlockingTestScopeEntering + 1 until stackTrace.size))
 
-    return filteredStackTrace
+        return filteredStackTrace
+    } catch (_: ArrayIndexOutOfBoundsException) {
+        // If the stack trace is not as expected, we return the original stack trace.
+        // Typically happens when the exception comes from the code and not from a failing test.
+        return stackTrace
+    }
 }
