@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.7.1
+
 ### Fixed
 - Enhanced source format and source URL detection for Exoplayer and Media3 ExoPlayer.
 - Race condition that could cause a crash in case the ssai API is called before attaching the collector to the player.
