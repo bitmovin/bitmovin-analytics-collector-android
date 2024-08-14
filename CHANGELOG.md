@@ -6,15 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
-### Changed
-- [Internal] Added an hardcoded sequence number limit (1000).
-
 ### Fixed
 - Enhanced source format and source URL detection for Exoplayer and Media3 ExoPlayer.
-- Race condition that leads to a crash in case the ssai API is called before attaching the collector to the player.
+- Race condition that could cause a crash in case the ssai API is called before attaching the collector to the player.
 - [Internal] Jacoco Coverage do not ignore Robolectric powered tests anymore.
 
 ### Changed
+- [Internal] Added an hardcoded sequence number limit (1000).
 - [Internal] Upgraded `bitmovin player` from `3.75.0` to `3.78.0`
 - [Internal] Upgraded `media3 exoplayer` from `1.3.1` to `1.4.0`
 
