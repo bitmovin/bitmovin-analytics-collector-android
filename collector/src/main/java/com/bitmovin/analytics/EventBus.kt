@@ -1,17 +1,25 @@
 package com.bitmovin.analytics
 
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import kotlin.reflect.KClass
 
-class EventBus {
+@InternalBitmovinApi
+internal class EventBus {
     private val observableMap = hashMapOf<KClass<*>, ObservableSupport<*>>()
 
-    fun <TEventListener : Any> notify(type: KClass<TEventListener>, action: (listener: TEventListener) -> Unit) {
+    fun <TEventListener : Any> notify(
+        type: KClass<TEventListener>,
+        action: (listener: TEventListener) -> Unit,
+    ) {
         observableMap[type]?.notify {
             action(it as TEventListener)
         }
     }
 
-    fun <TEventListener : Any> notify(type: Class<TEventListener>, action: ObservableSupport.EventListenerNotifier<TEventListener>) {
+    fun <TEventListener : Any> notify(
+        type: Class<TEventListener>,
+        action: ObservableSupport.EventListenerNotifier<TEventListener>,
+    ) {
         notify(type.kotlin) {
             action.notify(it)
         }

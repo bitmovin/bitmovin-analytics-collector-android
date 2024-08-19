@@ -13,13 +13,12 @@ import com.bitmovin.analytics.utils.Util
 /**
  * Analytics Collector for the Media3-ExoPlayer
  */
-interface IMedia3ExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
-
+public interface IMedia3ExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
     /**
      * The [sourceMetadata] which is used to enrich the analytics data with source specific
      * metadata.
      */
-    var sourceMetadata: SourceMetadata
+    public var sourceMetadata: SourceMetadata
 
     /**
      * CustomData accessor to the current configured [sourceMetadata]
@@ -32,17 +31,16 @@ interface IMedia3ExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
      * More information can be found here:
      * https://developer.bitmovin.com/playback/docs/how-can-values-of-customdata-and-other-metadata-fields-be-changed
      */
-    var customData: CustomData
+    public var customData: CustomData
 
-    companion object Factory {
-
+    public companion object Factory {
         /**
          * The version of the analytics collector
          *
          * For example "3.0.0"
          */
         @JvmStatic
-        val sdkVersion = Util.analyticsVersion
+        public val sdkVersion: String = Util.analyticsVersion
 
         /**
          * Creates a collector instance configured via the provided [analyticsConfig], and the
@@ -50,7 +48,11 @@ interface IMedia3ExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
          */
         @JvmStatic
         @JvmOverloads
-        fun create(context: Context, analyticsConfig: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IMedia3ExoPlayerCollector {
+        public fun create(
+            context: Context,
+            analyticsConfig: AnalyticsConfig,
+            defaultMetadata: DefaultMetadata = DefaultMetadata(),
+        ): IMedia3ExoPlayerCollector {
             val collector = Media3ExoPlayerCollector(analyticsConfig, context)
             collector.defaultMetadata = defaultMetadata
             return collector

@@ -9,8 +9,10 @@ import com.bitmovin.analytics.ads.AdQuartile
 import com.bitmovin.analytics.ads.AdTagType
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.AdSample
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.Util
 
+@InternalBitmovinApi
 class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalyticsEventListener {
     private var activeAdBreak: AdBreak? = null
     private var activeAdSample: AdSample? = null
@@ -23,17 +25,21 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
     private var adAdapter: AdAdapter? = null
 
     private var currentTime: Long? = null
-        get() = if (this.isPlaying) {
-            if (field == null || this.elapsedTimeBeginPlaying == null) {
-                null
+        get() =
+            if (this.isPlaying) {
+                if (field == null || this.elapsedTimeBeginPlaying == null) {
+                    null
+                } else {
+                    field!! + Util.elapsedTime - this.elapsedTimeBeginPlaying!!
+                }
             } else {
-                field!! + Util.elapsedTime - this.elapsedTimeBeginPlaying!!
+                field
             }
-        } else {
-            field
-        }
 
-    fun attachAdapter(playerAdapter: PlayerAdapter, adAdapter: AdAdapter) {
+    fun attachAdapter(
+        playerAdapter: PlayerAdapter,
+        adAdapter: AdAdapter,
+    ) {
         this.playerAdapter = playerAdapter
         this.adAdapter = adAdapter
         this.adAdapter?.subscribe(this)
@@ -91,7 +97,11 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         activeAdSample.clickPercentage = Util.calculatePercentage(activeAdSample.clickPosition, activeAdSample.ad.duration, true)
     }
 
-    override fun onAdError(adBreak: AdBreak, code: Int?, message: String?) {
+    override fun onAdError(
+        adBreak: AdBreak,
+        code: Int?,
+        message: String?,
+    ) {
         val adSample = this.activeAdSample ?: AdSample()
 
         if (adSample.ad.id != null && adBreak.ads.any { ad -> ad.id == adSample.ad.id }) {
@@ -104,7 +114,10 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         this.completeAd(adBreak, adSample, adSample.errorPosition ?: 0)
     }
 
-    override fun onAdManifestLoaded(adBreak: AdBreak, downloadTime: Long) {
+    override fun onAdManifestLoaded(
+        adBreak: AdBreak,
+        downloadTime: Long,
+    ) {
         this.adManifestDownloadTimes[adBreak.id] = downloadTime
         if (adBreak.tagType == AdTagType.VMAP) {
             this.sendAnalyticsRequest(adBreak)
@@ -160,7 +173,11 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         this.adPodPosition++
     }
 
-    private fun completeAd(adBreak: AdBreak, adSample: AdSample, exitPosition: Long? = 0) {
+    private fun completeAd(
+        adBreak: AdBreak,
+        adSample: AdSample,
+        exitPosition: Long? = 0,
+    ) {
         adSample.exitPosition = exitPosition
         adSample.timePlayed = exitPosition
         adSample.playPercentage = Util.calculatePercentage(adSample.timePlayed, adSample.ad.duration, true)
@@ -183,7 +200,10 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         return adManifestDownloadTimes[adBreak.id]
     }
 
-    private fun sendAnalyticsRequest(adBreak: AdBreak, adSample: AdSample? = null) {
+    private fun sendAnalyticsRequest(
+        adBreak: AdBreak,
+        adSample: AdSample? = null,
+    ) {
         val eventData = playerAdapter?.createEventData() ?: return
         val adEventData = AdEventData.fromEventData(eventData)
 

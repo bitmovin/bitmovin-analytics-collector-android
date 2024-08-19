@@ -1,0 +1,466 @@
+public final class com/bitmovin/analytics/BitmovinAnalytics$Companion {
+}
+
+public final class com/bitmovin/analytics/BitmovinAnalyticsConfig : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
+	public static final field Companion Lcom/bitmovin/analytics/BitmovinAnalyticsConfig$Companion;
+	public fun <init> ()V
+	public synthetic fun <init> (Landroid/os/Parcel;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun describeContents ()I
+	public final fun getAds ()Z
+	public final fun getCdnProvider ()Ljava/lang/String;
+	public final fun getConfig ()Lcom/bitmovin/analytics/CollectorConfig;
+	public final fun getCustomData1 ()Ljava/lang/String;
+	public final fun getCustomData10 ()Ljava/lang/String;
+	public final fun getCustomData11 ()Ljava/lang/String;
+	public final fun getCustomData12 ()Ljava/lang/String;
+	public final fun getCustomData13 ()Ljava/lang/String;
+	public final fun getCustomData14 ()Ljava/lang/String;
+	public final fun getCustomData15 ()Ljava/lang/String;
+	public final fun getCustomData16 ()Ljava/lang/String;
+	public final fun getCustomData17 ()Ljava/lang/String;
+	public final fun getCustomData18 ()Ljava/lang/String;
+	public final fun getCustomData19 ()Ljava/lang/String;
+	public final fun getCustomData2 ()Ljava/lang/String;
+	public final fun getCustomData20 ()Ljava/lang/String;
+	public final fun getCustomData21 ()Ljava/lang/String;
+	public final fun getCustomData22 ()Ljava/lang/String;
+	public final fun getCustomData23 ()Ljava/lang/String;
+	public final fun getCustomData24 ()Ljava/lang/String;
+	public final fun getCustomData25 ()Ljava/lang/String;
+	public final fun getCustomData26 ()Ljava/lang/String;
+	public final fun getCustomData27 ()Ljava/lang/String;
+	public final fun getCustomData28 ()Ljava/lang/String;
+	public final fun getCustomData29 ()Ljava/lang/String;
+	public final fun getCustomData3 ()Ljava/lang/String;
+	public final fun getCustomData30 ()Ljava/lang/String;
+	public final fun getCustomData4 ()Ljava/lang/String;
+	public final fun getCustomData5 ()Ljava/lang/String;
+	public final fun getCustomData6 ()Ljava/lang/String;
+	public final fun getCustomData7 ()Ljava/lang/String;
+	public final fun getCustomData8 ()Ljava/lang/String;
+	public final fun getCustomData9 ()Ljava/lang/String;
+	public final fun getCustomUserId ()Ljava/lang/String;
+	public final fun getExperimentName ()Ljava/lang/String;
+	public final fun getHeartbeatInterval ()I
+	public final fun getIsLive ()Ljava/lang/Boolean;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getM3u8Url ()Ljava/lang/String;
+	public final fun getMpdUrl ()Ljava/lang/String;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getPlayerKey ()Ljava/lang/String;
+	public final fun getPlayerType ()Lcom/bitmovin/analytics/enums/PlayerType;
+	public final fun getProgUrl ()Ljava/lang/String;
+	public final fun getRandomizeUserId ()Z
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getVideoId ()Ljava/lang/String;
+	public final fun setAds (Z)V
+	public final fun setCdnProvider (Ljava/lang/String;)V
+	public final fun setCustomData1 (Ljava/lang/String;)V
+	public final fun setCustomData10 (Ljava/lang/String;)V
+	public final fun setCustomData11 (Ljava/lang/String;)V
+	public final fun setCustomData12 (Ljava/lang/String;)V
+	public final fun setCustomData13 (Ljava/lang/String;)V
+	public final fun setCustomData14 (Ljava/lang/String;)V
+	public final fun setCustomData15 (Ljava/lang/String;)V
+	public final fun setCustomData16 (Ljava/lang/String;)V
+	public final fun setCustomData17 (Ljava/lang/String;)V
+	public final fun setCustomData18 (Ljava/lang/String;)V
+	public final fun setCustomData19 (Ljava/lang/String;)V
+	public final fun setCustomData2 (Ljava/lang/String;)V
+	public final fun setCustomData20 (Ljava/lang/String;)V
+	public final fun setCustomData21 (Ljava/lang/String;)V
+	public final fun setCustomData22 (Ljava/lang/String;)V
+	public final fun setCustomData23 (Ljava/lang/String;)V
+	public final fun setCustomData24 (Ljava/lang/String;)V
+	public final fun setCustomData25 (Ljava/lang/String;)V
+	public final fun setCustomData26 (Ljava/lang/String;)V
+	public final fun setCustomData27 (Ljava/lang/String;)V
+	public final fun setCustomData28 (Ljava/lang/String;)V
+	public final fun setCustomData29 (Ljava/lang/String;)V
+	public final fun setCustomData3 (Ljava/lang/String;)V
+	public final fun setCustomData30 (Ljava/lang/String;)V
+	public final fun setCustomData4 (Ljava/lang/String;)V
+	public final fun setCustomData5 (Ljava/lang/String;)V
+	public final fun setCustomData6 (Ljava/lang/String;)V
+	public final fun setCustomData7 (Ljava/lang/String;)V
+	public final fun setCustomData8 (Ljava/lang/String;)V
+	public final fun setCustomData9 (Ljava/lang/String;)V
+	public final fun setCustomUserId (Ljava/lang/String;)V
+	public final fun setExperimentName (Ljava/lang/String;)V
+	public final fun setHeartbeatInterval (I)V
+	public final fun setIsLive (Ljava/lang/Boolean;)V
+	public final fun setM3u8Url (Ljava/lang/String;)V
+	public final fun setMpdUrl (Ljava/lang/String;)V
+	public final fun setPath (Ljava/lang/String;)V
+	public final fun setPlayerType (Lcom/bitmovin/analytics/enums/PlayerType;)V
+	public final fun setProgUrl (Ljava/lang/String;)V
+	public final fun setRandomizeUserId (Z)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setVideoId (Ljava/lang/String;)V
+	public fun writeToParcel (Landroid/os/Parcel;I)V
+}
+
+public final class com/bitmovin/analytics/BitmovinAnalyticsConfig$Companion {
+}
+
+public final class com/bitmovin/analytics/BuildConfig {
+	public static final field BUILD_TYPE Ljava/lang/String;
+	public static final field COLLECTOR_CORE_VERSION Ljava/lang/String;
+	public static final field DEBUG Z
+	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
+	public fun <init> ()V
+}
+
+public final class com/bitmovin/analytics/CollectorConfig : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
+	public static final field Companion Lcom/bitmovin/analytics/CollectorConfig$Companion;
+	public fun <init> ()V
+	public synthetic fun <init> (Landroid/os/Parcel;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun describeContents ()I
+	public final fun getBackendUrl ()Ljava/lang/String;
+	public final fun getLongTermRetryEnabled ()Z
+	public final fun getTryResendDataOnFailedConnection ()Z
+	public final fun setBackendUrl (Ljava/lang/String;)V
+	public final fun setLongTermRetryEnabled (Z)V
+	public final fun setTryResendDataOnFailedConnection (Z)V
+	public fun writeToParcel (Landroid/os/Parcel;I)V
+}
+
+public final class com/bitmovin/analytics/CollectorConfig$Companion {
+}
+
+public abstract interface class com/bitmovin/analytics/api/AnalyticsCollector {
+	public abstract fun attachPlayer (Ljava/lang/Object;)V
+	public abstract fun detachPlayer ()V
+	public abstract fun getDefaultMetadata ()Lcom/bitmovin/analytics/api/DefaultMetadata;
+	public abstract fun getImpressionId ()Ljava/lang/String;
+	public abstract fun getSsai ()Lcom/bitmovin/analytics/api/ssai/SsaiApi;
+	public abstract fun getUserId ()Ljava/lang/String;
+	public abstract fun sendCustomDataEvent (Lcom/bitmovin/analytics/api/CustomData;)V
+	public abstract fun setCustomDataOnce (Lcom/bitmovin/analytics/api/CustomData;)V
+	public abstract fun setDefaultMetadata (Lcom/bitmovin/analytics/api/DefaultMetadata;)V
+}
+
+public final class com/bitmovin/analytics/api/AnalyticsConfig : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
+	public static final field Companion Lcom/bitmovin/analytics/api/AnalyticsConfig$Companion;
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Z)V
+	public fun <init> (Ljava/lang/String;ZZ)V
+	public fun <init> (Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;)V
+	public fun <init> (Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Z
+	public final fun component3 ()Z
+	public final fun component4 ()Lcom/bitmovin/analytics/api/RetryPolicy;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;Ljava/lang/String;)Lcom/bitmovin/analytics/api/AnalyticsConfig;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/AnalyticsConfig;Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;Ljava/lang/String;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/AnalyticsConfig;
+	public fun describeContents ()I
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdTrackingDisabled ()Z
+	public final fun getBackendUrl ()Ljava/lang/String;
+	public final fun getLicenseKey ()Ljava/lang/String;
+	public final fun getRandomizeUserId ()Z
+	public final fun getRetryPolicy ()Lcom/bitmovin/analytics/api/RetryPolicy;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public fun writeToParcel (Landroid/os/Parcel;I)V
+}
+
+public final class com/bitmovin/analytics/api/AnalyticsConfig$Builder {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun build ()Lcom/bitmovin/analytics/api/AnalyticsConfig;
+	public final fun getLicenseKey ()Ljava/lang/String;
+	public final fun setAdTrackingDisabled (Z)Lcom/bitmovin/analytics/api/AnalyticsConfig$Builder;
+	public final fun setBackendUrl (Ljava/lang/String;)Lcom/bitmovin/analytics/api/AnalyticsConfig$Builder;
+	public final fun setRandomizeUserId (Z)Lcom/bitmovin/analytics/api/AnalyticsConfig$Builder;
+	public final fun setRetryPolicy (Lcom/bitmovin/analytics/api/RetryPolicy;)Lcom/bitmovin/analytics/api/AnalyticsConfig$Builder;
+}
+
+public final class com/bitmovin/analytics/api/AnalyticsConfig$Companion {
+}
+
+public final class com/bitmovin/analytics/api/AnalyticsConfig$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public final fun createFromParcel (Landroid/os/Parcel;)Lcom/bitmovin/analytics/api/AnalyticsConfig;
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun newArray (I)[Lcom/bitmovin/analytics/api/AnalyticsConfig;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class com/bitmovin/analytics/api/CustomData : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun buildUpon ()Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/lang/String;
+	public final fun component11 ()Ljava/lang/String;
+	public final fun component12 ()Ljava/lang/String;
+	public final fun component13 ()Ljava/lang/String;
+	public final fun component14 ()Ljava/lang/String;
+	public final fun component15 ()Ljava/lang/String;
+	public final fun component16 ()Ljava/lang/String;
+	public final fun component17 ()Ljava/lang/String;
+	public final fun component18 ()Ljava/lang/String;
+	public final fun component19 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component20 ()Ljava/lang/String;
+	public final fun component21 ()Ljava/lang/String;
+	public final fun component22 ()Ljava/lang/String;
+	public final fun component23 ()Ljava/lang/String;
+	public final fun component24 ()Ljava/lang/String;
+	public final fun component25 ()Ljava/lang/String;
+	public final fun component26 ()Ljava/lang/String;
+	public final fun component27 ()Ljava/lang/String;
+	public final fun component28 ()Ljava/lang/String;
+	public final fun component29 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component30 ()Ljava/lang/String;
+	public final fun component31 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()Ljava/lang/String;
+	public final fun component8 ()Ljava/lang/String;
+	public final fun component9 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/CustomData;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/CustomData;
+	public fun describeContents ()I
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCustomData1 ()Ljava/lang/String;
+	public final fun getCustomData10 ()Ljava/lang/String;
+	public final fun getCustomData11 ()Ljava/lang/String;
+	public final fun getCustomData12 ()Ljava/lang/String;
+	public final fun getCustomData13 ()Ljava/lang/String;
+	public final fun getCustomData14 ()Ljava/lang/String;
+	public final fun getCustomData15 ()Ljava/lang/String;
+	public final fun getCustomData16 ()Ljava/lang/String;
+	public final fun getCustomData17 ()Ljava/lang/String;
+	public final fun getCustomData18 ()Ljava/lang/String;
+	public final fun getCustomData19 ()Ljava/lang/String;
+	public final fun getCustomData2 ()Ljava/lang/String;
+	public final fun getCustomData20 ()Ljava/lang/String;
+	public final fun getCustomData21 ()Ljava/lang/String;
+	public final fun getCustomData22 ()Ljava/lang/String;
+	public final fun getCustomData23 ()Ljava/lang/String;
+	public final fun getCustomData24 ()Ljava/lang/String;
+	public final fun getCustomData25 ()Ljava/lang/String;
+	public final fun getCustomData26 ()Ljava/lang/String;
+	public final fun getCustomData27 ()Ljava/lang/String;
+	public final fun getCustomData28 ()Ljava/lang/String;
+	public final fun getCustomData29 ()Ljava/lang/String;
+	public final fun getCustomData3 ()Ljava/lang/String;
+	public final fun getCustomData30 ()Ljava/lang/String;
+	public final fun getCustomData4 ()Ljava/lang/String;
+	public final fun getCustomData5 ()Ljava/lang/String;
+	public final fun getCustomData6 ()Ljava/lang/String;
+	public final fun getCustomData7 ()Ljava/lang/String;
+	public final fun getCustomData8 ()Ljava/lang/String;
+	public final fun getCustomData9 ()Ljava/lang/String;
+	public final fun getExperimentName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public fun writeToParcel (Landroid/os/Parcel;I)V
+}
+
+public final class com/bitmovin/analytics/api/CustomData$Builder {
+	public fun <init> ()V
+	public fun <init> (Lcom/bitmovin/analytics/api/CustomData;)V
+	public final fun build ()Lcom/bitmovin/analytics/api/CustomData;
+	public final fun setCustomData1 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData10 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData11 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData12 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData13 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData14 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData15 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData16 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData17 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData18 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData19 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData2 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData20 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData21 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData22 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData23 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData24 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData25 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData26 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData27 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData28 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData29 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData3 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData30 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData4 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData5 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData6 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData7 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData8 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData9 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setExperimentName (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+}
+
+public final class com/bitmovin/analytics/api/CustomData$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public final fun createFromParcel (Landroid/os/Parcel;)Lcom/bitmovin/analytics/api/CustomData;
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun newArray (I)[Lcom/bitmovin/analytics/api/CustomData;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class com/bitmovin/analytics/api/DefaultMetadata : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lcom/bitmovin/analytics/api/CustomData;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/DefaultMetadata;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/DefaultMetadata;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/DefaultMetadata;
+	public fun describeContents ()I
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCdnProvider ()Ljava/lang/String;
+	public final fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
+	public final fun getCustomUserId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public fun writeToParcel (Landroid/os/Parcel;I)V
+}
+
+public final class com/bitmovin/analytics/api/DefaultMetadata$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/bitmovin/analytics/api/DefaultMetadata;
+	public final fun setCdnProvider (Ljava/lang/String;)Lcom/bitmovin/analytics/api/DefaultMetadata$Builder;
+	public final fun setCustomData (Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/DefaultMetadata$Builder;
+	public final fun setCustomUserId (Ljava/lang/String;)Lcom/bitmovin/analytics/api/DefaultMetadata$Builder;
+}
+
+public final class com/bitmovin/analytics/api/DefaultMetadata$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public final fun createFromParcel (Landroid/os/Parcel;)Lcom/bitmovin/analytics/api/DefaultMetadata;
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun newArray (I)[Lcom/bitmovin/analytics/api/DefaultMetadata;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class com/bitmovin/analytics/api/RetryPolicy : java/lang/Enum {
+	public static final field LONG_TERM Lcom/bitmovin/analytics/api/RetryPolicy;
+	public static final field NO_RETRY Lcom/bitmovin/analytics/api/RetryPolicy;
+	public static final field SHORT_TERM Lcom/bitmovin/analytics/api/RetryPolicy;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/api/RetryPolicy;
+	public static fun values ()[Lcom/bitmovin/analytics/api/RetryPolicy;
+}
+
+public final class com/bitmovin/analytics/api/SourceMetadata : android/os/Parcelable {
+	public static final field CREATOR Landroid/os/Parcelable$Creator;
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Lcom/bitmovin/analytics/api/CustomData;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Lcom/bitmovin/analytics/api/CustomData;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/Boolean;
+	public final fun component6 ()Lcom/bitmovin/analytics/api/CustomData;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/SourceMetadata;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/SourceMetadata;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Lcom/bitmovin/analytics/api/CustomData;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/SourceMetadata;
+	public fun describeContents ()I
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCdnProvider ()Ljava/lang/String;
+	public final fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getVideoId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun isLive ()Ljava/lang/Boolean;
+	public fun toString ()Ljava/lang/String;
+	public fun writeToParcel (Landroid/os/Parcel;I)V
+}
+
+public final class com/bitmovin/analytics/api/SourceMetadata$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/bitmovin/analytics/api/SourceMetadata;
+	public final fun setCdnProvider (Ljava/lang/String;)Lcom/bitmovin/analytics/api/SourceMetadata$Builder;
+	public final fun setCustomData (Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/SourceMetadata$Builder;
+	public final fun setIsLive (Ljava/lang/Boolean;)Lcom/bitmovin/analytics/api/SourceMetadata$Builder;
+	public final fun setPath (Ljava/lang/String;)Lcom/bitmovin/analytics/api/SourceMetadata$Builder;
+	public final fun setTitle (Ljava/lang/String;)Lcom/bitmovin/analytics/api/SourceMetadata$Builder;
+	public final fun setVideoId (Ljava/lang/String;)Lcom/bitmovin/analytics/api/SourceMetadata$Builder;
+}
+
+public final class com/bitmovin/analytics/api/SourceMetadata$Creator : android/os/Parcelable$Creator {
+	public fun <init> ()V
+	public final fun createFromParcel (Landroid/os/Parcel;)Lcom/bitmovin/analytics/api/SourceMetadata;
+	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
+	public final fun newArray (I)[Lcom/bitmovin/analytics/api/SourceMetadata;
+	public synthetic fun newArray (I)[Ljava/lang/Object;
+}
+
+public final class com/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata {
+	public fun <init> ()V
+	public fun <init> (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;)V
+	public synthetic fun <init> (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
+	public final fun copy (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;)Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdPosition ()Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/api/ssai/SsaiAdMetadata {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lcom/bitmovin/analytics/api/CustomData;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdId ()Ljava/lang/String;
+	public final fun getAdSystem ()Ljava/lang/String;
+	public final fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/api/ssai/SsaiAdPosition : java/lang/Enum {
+	public static final field MIDROLL Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
+	public static final field POSTROLL Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
+	public static final field PREROLL Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getPosition ()Ljava/lang/String;
+	public fun toString ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
+	public static fun values ()[Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
+}
+
+public abstract interface class com/bitmovin/analytics/api/ssai/SsaiApi {
+	public abstract fun adBreakEnd ()V
+	public abstract fun adBreakStart (Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;)V
+	public abstract fun adStart (Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;)V
+}
+
+public final class com/bitmovin/analytics/api/ssai/SsaiApi$DefaultImpls {
+	public static synthetic fun adBreakStart$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;ILjava/lang/Object;)V
+	public static synthetic fun adStart$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;ILjava/lang/Object;)V
+}
+

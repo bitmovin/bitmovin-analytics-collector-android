@@ -11,14 +11,15 @@ import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.RandomizedUserIdIdProvider
 import com.bitmovin.analytics.data.SecureSettingsAndroidIdUserIdProvider
 import com.bitmovin.analytics.data.UserIdProvider
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.ApiV3Utils
 
+@InternalBitmovinApi
 abstract class DefaultCollector<TPlayer> protected constructor(
     val config: AnalyticsConfig,
     context: Context,
     protected val metadataProvider: MetadataProvider = MetadataProvider(),
 ) : AnalyticsCollector<TPlayer> {
-
     // TODO[AN-3692]: why is this lazy and not part of the constructor for easier testing?
     protected open val analytics by lazy {
         BitmovinAnalytics(config, context)

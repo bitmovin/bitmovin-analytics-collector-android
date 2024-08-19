@@ -36,7 +36,7 @@ import com.bitmovin.player.api.source.Source
             imports = ["com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector"],
         ),
 )
-class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
+public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
     DefaultCollector<Player>(analyticsConfig, context.applicationContext),
     IBitmovinPlayerCollector {
     private val deferredLicenseManager = DeferredLicenseRelay(analyticsConfig.licenseKey)
@@ -74,7 +74,7 @@ class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context
                 imports = ["com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector"],
             ),
     )
-    constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : this(
+    public constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : this(
         ApiV3Utils.extractAnalyticsConfig(bitmovinAnalyticsConfig),
         context,
     ) {

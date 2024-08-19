@@ -10,7 +10,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.0'
+        classpath 'com.android.tools.build:gradle:8.2.2'
         classpath "com.diffplug.spotless:spotless-plugin-gradle:6.23.3"
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.33.1"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -25,7 +25,7 @@ plugins {
     id 'java'
     id 'jacoco'
     id "org.sonarqube" version "3.5.0.2730"
-    id 'org.jetbrains.kotlinx.binary-compatibility-validator' version '0.13.2'
+    id 'org.jetbrains.kotlinx.binary-compatibility-validator' version '0.16.3'
 }
 
 apply from: './bitmovinpropertiesloader.gradle'
@@ -216,23 +216,51 @@ nonSonarProjects.forEach {
     }
 }
 
-// config for org.jetbrains.kotlinx.binary-compatibility-validator
-// this plugin is used to ensure binary compatibility on our public APIs between versions
-// it needs to be run manually for now since collector has too many public methods
-// ./gradlew apiCheck #runs the check against the current dump (stored in /api/ for each module)
-// ./gradlew apiDump #creates a new dump which we can run against in the future
+/**
+ * Config for org.jetbrains.kotlinx.binary-compatibility-validator.
+ * Documentation : https://kotlin.github.io/binary-compatibility-validator/index.html
+ *
+ * This plugin is used to ensure binary compatibility on our public APIs between versions.
+ * It needs to be run manually for now since collector has too many public methods
+ * ./gradlew apiCheck #runs the check against the current dump (stored in /api/ for each module)
+ * ./gradlew apiDump #creates a new dump which we can run against in the future
+ */
 apiValidation {
-    /**
-     * Sub-projects that are excluded from API validation
-     */
+    /*
+    Sub-projects that are excluded from API validation
+    */
     ignoredProjects += ["collector-bitmovin-player-example",
                         "collector-bitmovin-player-tv-example",
                         "collector-exoplayer-example",
                         "collector-amazon-ivs-example",
                         "collector-media3-exoplayer-example",
-                        "collector",    // excluded until we have a better structure with internal package
                         "example-shared",
                         "systemtest-utils"]
+
+    /*
+    We can't use the publicPackages property because it doesn't work for some reason.
+    We also can't make most of the package private/internal because for technical reasons.
+    To check for backwards compatibility, we exclude everything that should not be used by customers.
+    */
+    ignoredPackages += [
+            "com.bitmovin.analytics.adapters",
+            "com.bitmovin.analytics.ads",
+            "com.bitmovin.analytics.data",
+            "com.bitmovin.analytics.enums",
+            "com.bitmovin.analytics.error",
+            "com.bitmovin.analytics.features",
+            "com.bitmovin.analytics.internal",
+            "com.bitmovin.analytics.license",
+            "com.bitmovin.analytics.persistence",
+            "com.bitmovin.analytics.retryBackend",
+            "com.bitmovin.analytics.ssai",
+            "com.bitmovin.analytics.stateMachines",
+            "com.bitmovin.analytics.utils",
+    ]
+
+    nonPublicMarkers += [
+            "com.bitmovin.analytics.internal.InternalBitmovinApi"
+    ]
 }
 
 java {

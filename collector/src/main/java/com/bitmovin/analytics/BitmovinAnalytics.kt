@@ -213,6 +213,7 @@ class BitmovinAnalytics(
     val impressionId: String?
         get() = playerAdapter?.stateMachine?.impressionId
 
+    @InternalBitmovinApi
     interface DebugListener {
         fun onDispatchEventData(data: EventData)
 

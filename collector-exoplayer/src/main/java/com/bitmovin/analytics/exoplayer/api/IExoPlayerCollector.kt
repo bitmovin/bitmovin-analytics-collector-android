@@ -15,13 +15,12 @@ import com.google.android.exoplayer2.ExoPlayer
 /**
  * Analytics Collector for the ExoPlayer
  */
-interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
-
+public interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
     /**
      * The [sourceMetadata] which is used to enrich the analytics data with source specific
      * metadata.
      */
-    var sourceMetadata: SourceMetadata
+    public var sourceMetadata: SourceMetadata
 
     /**
      * CustomData accessor to the current configured [sourceMetadata]
@@ -34,17 +33,16 @@ interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
      * More information can be found here:
      * https://developer.bitmovin.com/playback/docs/how-can-values-of-customdata-and-other-metadata-fields-be-changed
      */
-    var customData: CustomData
+    public var customData: CustomData
 
-    companion object Factory {
-
+    public companion object Factory {
         /**
          * The version of the analytics collector
          *
          * For example "3.0.0"
          */
         @JvmStatic
-        val sdkVersion = Util.analyticsVersion
+        public val sdkVersion: String = Util.analyticsVersion
 
         /**
          * Creates a collector instance configured via the provided [config].
@@ -57,7 +55,10 @@ interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
             ),
         )
         @JvmStatic
-        fun create(config: BitmovinAnalyticsConfig, context: Context): IExoPlayerCollector {
+        public fun create(
+            config: BitmovinAnalyticsConfig,
+            context: Context,
+        ): IExoPlayerCollector {
             val collector = ExoPlayerCollector(ApiV3Utils.extractAnalyticsConfig(config), context)
             collector.setDeprecatedBitmovinAnalyticsConfig(config)
             return collector
@@ -69,7 +70,11 @@ interface IExoPlayerCollector : AnalyticsCollector<ExoPlayer> {
          */
         @JvmStatic
         @JvmOverloads
-        fun create(context: Context, analyticsConfig: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IExoPlayerCollector {
+        public fun create(
+            context: Context,
+            analyticsConfig: AnalyticsConfig,
+            defaultMetadata: DefaultMetadata = DefaultMetadata(),
+        ): IExoPlayerCollector {
             val collector = ExoPlayerCollector(analyticsConfig, context)
             collector.defaultMetadata = defaultMetadata
             return collector

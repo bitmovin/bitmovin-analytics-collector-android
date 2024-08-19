@@ -5,6 +5,11 @@ apply plugin: 'maven-publish'
 apply from: '../jacoco.gradle'
 apply from: '../bitmovinpropertiesloader.gradle'
 
+kotlin {
+    explicitApi()
+    explicitApi 'strict'
+}
+
 android {
     namespace 'com.bitmovin.analytics.amazon.ivs'
     compileSdk rootProject.ext.compileSdk

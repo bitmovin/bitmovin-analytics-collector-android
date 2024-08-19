@@ -31,7 +31,7 @@ import com.google.android.exoplayer2.ExoPlayer
         "com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector",
     ),
 )
-class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
+public class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
     DefaultCollector<ExoPlayer>(analyticsConfig, context.applicationContext), IExoPlayerCollector {
     private val ssaiApiProxy = SsaiApiProxy()
 
@@ -51,7 +51,7 @@ class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
             "com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector",
         ),
     )
-    constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : this(
+    public constructor(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig, context: Context) : this(
         ApiV3Utils.extractAnalyticsConfig(bitmovinAnalyticsConfig),
         context,
     )

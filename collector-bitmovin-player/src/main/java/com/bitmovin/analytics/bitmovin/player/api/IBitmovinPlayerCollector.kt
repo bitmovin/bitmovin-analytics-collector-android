@@ -15,8 +15,7 @@ import com.bitmovin.player.api.source.Source
 /**
  * Analytics Collector for the Bitmovin Player
  */
-interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
-
+public interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
     /**
      * Setter for source specific [sourceMetadata] that is used to enrich the analytics data
      * when the player plays the specified source.
@@ -25,18 +24,24 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
         "Use setSourceMetadata instead",
         ReplaceWith("setSourceMetadata(playerSource, sourceMetadata)"),
     )
-    fun addSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
+    public fun addSourceMetadata(
+        playerSource: Source,
+        sourceMetadata: SourceMetadata,
+    )
 
     /**
      * Setter for source specific [sourceMetadata] that is used to enrich the analytics data
      * when the player plays the specified source.
      */
-    fun setSourceMetadata(playerSource: Source, sourceMetadata: SourceMetadata)
+    public fun setSourceMetadata(
+        playerSource: Source,
+        sourceMetadata: SourceMetadata,
+    )
 
     /**
      * Gets the configured [SourceMetadata] for the specified source.
      */
-    fun getSourceMetadata(playerSource: Source): SourceMetadata
+    public fun getSourceMetadata(playerSource: Source): SourceMetadata
 
     /**
      * Sets [customData] of the [SourceMetadata] for the specified source.
@@ -49,22 +54,24 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
      * More information can be found here:
      * https://developer.bitmovin.com/playback/docs/how-can-values-of-customdata-and-other-metadata-fields-be-changed
      */
-    fun setCustomData(playerSource: Source, customData: CustomData)
+    public fun setCustomData(
+        playerSource: Source,
+        customData: CustomData,
+    )
 
     /**
      * Gets the configured custom data for the specified source.
      */
-    fun getCustomData(playerSource: Source): CustomData
+    public fun getCustomData(playerSource: Source): CustomData
 
-    companion object Factory {
-
+    public companion object Factory {
         /**
          * The version of the analytics collector
          *
          * For example "3.0.0"
          */
         @JvmStatic
-        val sdkVersion = Util.analyticsVersion
+        public val sdkVersion: String = Util.analyticsVersion
 
         /**
          * Creates a collector instance configured via the provided [config].
@@ -77,7 +84,10 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
                 "com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector",
             ),
         )
-        fun create(config: BitmovinAnalyticsConfig, context: Context): IBitmovinPlayerCollector {
+        public fun create(
+            config: BitmovinAnalyticsConfig,
+            context: Context,
+        ): IBitmovinPlayerCollector {
             return BitmovinPlayerCollector(config, context)
         }
 
@@ -87,7 +97,11 @@ interface IBitmovinPlayerCollector : AnalyticsCollector<Player> {
          */
         @JvmStatic
         @JvmOverloads
-        fun create(context: Context, analyticsConfig: AnalyticsConfig, defaultMetadata: DefaultMetadata = DefaultMetadata()): IBitmovinPlayerCollector {
+        public fun create(
+            context: Context,
+            analyticsConfig: AnalyticsConfig,
+            defaultMetadata: DefaultMetadata = DefaultMetadata(),
+        ): IBitmovinPlayerCollector {
             val collector = BitmovinPlayerCollector(analyticsConfig, context)
             collector.defaultMetadata = defaultMetadata
             return collector

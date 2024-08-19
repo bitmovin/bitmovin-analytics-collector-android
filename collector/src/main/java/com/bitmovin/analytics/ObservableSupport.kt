@@ -1,7 +1,13 @@
 package com.bitmovin.analytics
 
+import com.bitmovin.analytics.internal.InternalBitmovinApi
+
+@InternalBitmovinApi
 class ObservableSupport<TListener> : Observable<TListener> {
-    interface EventListenerNotifier<T> { fun notify(listener: T) }
+    @InternalBitmovinApi
+    interface EventListenerNotifier<T> {
+        fun notify(listener: T)
+    }
 
     private val listeners = mutableListOf<TListener>()
 

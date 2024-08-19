@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- [Internal] API checks for the `collector` module.
+
 ## v3.7.1
 
 ### Fixed
