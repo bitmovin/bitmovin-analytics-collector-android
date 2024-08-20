@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - [Internal] API checks for the `collector` module.
+- [Internal] Github Action's System tests sends a Slack message whenever it fails on the main branch.
 
 ## v3.7.1
 

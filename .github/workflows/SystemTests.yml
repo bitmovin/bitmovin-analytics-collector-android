@@ -76,6 +76,19 @@ jobs:
         run: |
           ./gradlew :collector-amazon-ivs:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.notClass=com.bitmovin.analytics.amazon.ivs.TVBasicScenariosTest
 
+      # If it fails on the main branch, send a slack message (merged PR or nightly tests)
+      - name: Send a Slack message whenever the tests fails on the main branch
+        if: failure() && github.ref == 'refs/heads/main'
+        uses: slackapi/slack-github-action@v1
+        with:
+          # The Slack Webhook URL only takes one parameter which is the link to the failed action.
+          payload: |
+            {
+              "failedActionUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
 # Report
       - name: Copying Reports
         if: always()
