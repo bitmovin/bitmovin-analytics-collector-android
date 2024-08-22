@@ -7,8 +7,10 @@ import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.enums.AdType
+import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.utils.DataSerializer.serialize
 import com.bitmovin.analytics.utils.Util
 
@@ -16,6 +18,7 @@ class DefaultStateMachineListener(
     private val analytics: BitmovinAnalytics,
     private val playerAdapter: PlayerAdapter,
     private val errorDetailObservable: ObservableSupport<OnErrorDetailEventListener>,
+    private val ssaiService: SsaiService,
 ) : StateMachineListener {
     companion object {
         private val TAG = DefaultStateMachineListener::class.java.name
@@ -136,9 +139,15 @@ class DefaultStateMachineListener(
             data.errorCode = errorCode.errorCode
             data.errorMessage = errorCode.description
             data.errorData = serialize(errorCode.legacyErrorData)
+
+            // send ad Error Sample to report errors also in ad metrics in case ssai ad is currently running
+            if (errorCode.errorCode != AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode.errorCode) {
+                ssaiService.sendAdErrorSample(errorCode.errorCode, errorCode.description)
+            }
         }
 
         analytics.sendEventData(data)
+
         errorDetailObservable.notify {
             it.onError(
                 stateMachine.impressionId,
@@ -244,6 +253,12 @@ class DefaultStateMachineListener(
             data.errorCode = errorCode.errorCode
             data.errorMessage = errorCode.description
             data.errorData = serialize(errorCode.legacyErrorData)
+
+            // send ad Error Sample to report errors also in ad metrics in case ssai ad is currently running
+            if (errorCode.errorCode != AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode.errorCode) {
+                ssaiService.sendAdErrorSample(errorCode.errorCode, errorCode.description)
+            }
+
             errorDetailObservable.notify {
                 it.onError(
                     stateMachine.impressionId,

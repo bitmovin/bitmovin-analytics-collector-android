@@ -9,10 +9,9 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.UserIdProvider
+import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.enums.PlayerType
-import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.utils.UserAgentProvider
-import io.mockk.every
 import io.mockk.mockk
 
 object TestFactory {
@@ -32,13 +31,10 @@ object TestFactory {
         userIdProvider: UserIdProvider? = null,
         userAgentProvider: UserAgentProvider? = null,
     ): EventDataFactory {
-        val ssaiService = mockk<SsaiService>()
-        every { ssaiService.adMetadata?.customData } returns null
         return EventDataFactory(
             config,
             userIdProvider ?: mockk(relaxed = true),
             userAgentProvider ?: mockk(relaxed = true),
-            ssaiService = ssaiService,
         )
     }
 
@@ -56,6 +52,7 @@ object TestFactory {
             defaultMetadata,
             deviceInformation,
             playerInfo,
+            null,
         )
 
     fun createAdEventData(adId: String = "testAdId") =
@@ -73,5 +70,6 @@ object TestFactory {
             videoWindowHeight = 9,
             videoWindowWidth = 16,
             userId = "testUser",
+            adType = AdType.CLIENT_SIDE.value,
         )
 }

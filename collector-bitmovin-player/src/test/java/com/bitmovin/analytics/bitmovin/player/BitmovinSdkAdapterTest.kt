@@ -63,6 +63,7 @@ class BitmovinSdkAdapterTest {
                 playbackQualityProvider,
                 mockk(relaxed = true),
                 mockk(relaxed = true),
+                mockk(relaxed = true),
             )
     }
 

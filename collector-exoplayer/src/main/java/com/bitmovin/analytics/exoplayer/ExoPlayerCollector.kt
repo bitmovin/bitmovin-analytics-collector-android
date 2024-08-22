@@ -16,7 +16,6 @@ import com.bitmovin.analytics.exoplayer.features.ExoPlayerFeatureFactory
 import com.bitmovin.analytics.exoplayer.player.ExoPlayerContext
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.ssai.SsaiApiProxy
-import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.SystemInformationProvider
@@ -71,11 +70,7 @@ public class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Conte
         val playerContext = ExoPlayerContext(player)
         val handler = Handler(player.applicationLooper)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
-        val ssaiService = SsaiService(stateMachine)
-        ssaiApiProxy.attach(ssaiService)
-
-        val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider, ssaiService = ssaiService)
-        eventDataFactory.registerEventDataManipulator(ssaiService)
+        val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
 
         return ExoPlayerAdapter(
             player,
@@ -85,7 +80,8 @@ public class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Conte
             eventDataFactory,
             deviceInformationProvider,
             metadataProvider,
-            ssaiService,
+            analytics,
+            ssaiApiProxy,
         )
     }
 }

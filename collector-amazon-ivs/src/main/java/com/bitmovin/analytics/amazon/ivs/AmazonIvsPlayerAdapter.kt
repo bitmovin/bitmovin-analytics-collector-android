@@ -2,6 +2,7 @@ package com.bitmovin.analytics.amazon.ivs
 
 import android.util.Log
 import com.amazonaws.ivs.player.Player
+import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.amazon.ivs.playback.VideoStartupService
@@ -17,7 +18,7 @@ import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
-import com.bitmovin.analytics.ssai.SsaiService
+import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 
 internal class AmazonIvsPlayerAdapter(
@@ -33,7 +34,8 @@ internal class AmazonIvsPlayerAdapter(
     private val playerStatisticsProvider: PlayerStatisticsProvider,
     private val playerContext: PlayerContext,
     metadataProvider: MetadataProvider,
-    private val ssaiService: SsaiService,
+    bitmovinAnalytics: BitmovinAnalytics,
+    ssaiApiProxy: SsaiApiProxy,
 ) : DefaultPlayerAdapter(
         config,
         eventDataFactory,
@@ -41,6 +43,8 @@ internal class AmazonIvsPlayerAdapter(
         featureFactory,
         deviceInformationProvider,
         metadataProvider,
+        bitmovinAnalytics,
+        ssaiApiProxy,
     ) {
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         try {

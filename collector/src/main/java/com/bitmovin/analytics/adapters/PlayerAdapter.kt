@@ -6,6 +6,7 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.license.FeatureConfigContainer
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 
 interface PlayerAdapter {
@@ -15,6 +16,7 @@ interface PlayerAdapter {
     var defaultMetadata: DefaultMetadata
     val playerInfo: PlayerInfo
     val isAutoplayEnabled: Boolean?
+    val ssaiService: SsaiService
 
     fun init(): Collection<Feature<FeatureConfigContainer, *>>
 
@@ -23,6 +25,8 @@ interface PlayerAdapter {
     fun resetSourceRelatedState()
 
     fun createEventData(): EventData
+
+    fun createEventDataForAdSample(): EventData
 
     fun createEventDataForCustomDataEvent(sourceMetadata: SourceMetadata): EventData
 

@@ -22,19 +22,22 @@ class RetryQueueTest {
         DeviceInformation("manufacturer", "model", false, "locale", "packageName", 0, 0)
 
     private val firstDate = Date()
-    private val secondDate = Calendar.getInstance().run {
-        add(Calendar.HOUR, 2)
-        time
-    }
+    private val secondDate =
+        Calendar.getInstance().run {
+            add(Calendar.HOUR, 2)
+            time
+        }
 
     private fun setupEventData(sequenceNumber: Int): EventData {
-        var eventData = TestFactory.createEventDataFactory(config).create(
-            "testImpressionId",
-            SourceMetadata(),
-            DefaultMetadata(),
-            deviceInformation,
-            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-        )
+        var eventData =
+            TestFactory.createEventDataFactory(config).create(
+                "testImpressionId",
+                SourceMetadata(),
+                DefaultMetadata(),
+                deviceInformation,
+                PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                null,
+            )
         eventData.sequenceNumber = sequenceNumber
         return eventData
     }

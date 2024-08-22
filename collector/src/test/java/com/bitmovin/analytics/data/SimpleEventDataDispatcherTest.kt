@@ -5,6 +5,7 @@ package com.bitmovin.analytics.data
 import android.content.Context
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.LicenseCall
@@ -45,8 +46,6 @@ class SimpleEventDataDispatcherTest {
                 licenseCall,
                 scopeProvider,
             )
-
-        every { backend.send(any()) }.returns(Unit)
     }
 
     @After
@@ -148,6 +147,7 @@ class SimpleEventDataDispatcherTest {
 private fun createTestAdEventData(key: String? = null) =
     AdEventData.fromEventData(
         createTestEventData(key),
+        AdType.CLIENT_SIDE,
     )
 
 private fun createTestEventData(key: String? = null) =

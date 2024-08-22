@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Added
+- New API to report ssai ad quartiles
 - [Internal] API checks for the `collector` module.
 - [Internal] Github Action's System tests sends a Slack message whenever it fails on the main branch.
 

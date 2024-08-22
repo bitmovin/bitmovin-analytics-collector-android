@@ -7,6 +7,7 @@ import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import io.mockk.every
@@ -22,7 +23,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class BitmovinAnalyticsTest {
-
     private lateinit var analyticsConfig: AnalyticsConfig
     private lateinit var context: Context
 
@@ -31,9 +31,10 @@ class BitmovinAnalyticsTest {
         mockkStatic(Uri::class)
         every { Uri.parse(any()) } returns mockk()
         MockitoAnnotations.openMocks(this)
-        context = mockk {
-            every { applicationContext } returns mockk()
-        }
+        context =
+            mockk {
+                every { applicationContext } returns mockk()
+            }
         analyticsConfig = AnalyticsConfig("<ANALYTICS_KEY>")
         mockkConstructor(BackendFactory::class)
         every { anyConstructed<BackendFactory>().createBackend(any(), any(), any()) } returns mockk(relaxed = true)
@@ -56,13 +57,21 @@ class BitmovinAnalyticsTest {
         val eventQueue = mockk<AnalyticsEventQueue>(relaxed = true)
         val analytics = BitmovinAnalytics(analyticsConfig, context, eventQueue)
         val observable = ObservableSupport<OnErrorDetailEventListener>()
-        val defaultStateMachineListener = DefaultStateMachineListener(analytics, mockk(relaxed = true), observable)
+        val ssaiService = mockk<SsaiService>(relaxed = true)
+        val defaultStateMachineListener = DefaultStateMachineListener(analytics, mockk(relaxed = true), observable, ssaiService)
         val stateMachine = mockk<PlayerStateMachine>()
         val impressionId = "randomImpressionId"
         every { stateMachine.videoStartFailedReason } returns VideoStartFailedReason.TIMEOUT
         every { stateMachine.impressionId } returns impressionId
         observable.subscribe(listener)
         defaultStateMachineListener.onVideoStartFailed(stateMachine)
-        verify(exactly = 1) { listener.onError(impressionId, VideoStartFailedReason.TIMEOUT.errorCode?.errorCode, VideoStartFailedReason.TIMEOUT.errorCode?.description, any()) }
+        verify(exactly = 1) {
+            listener.onError(
+                impressionId,
+                VideoStartFailedReason.TIMEOUT.errorCode?.errorCode,
+                VideoStartFailedReason.TIMEOUT.errorCode?.description,
+                any(),
+            )
+        }
     }
 }

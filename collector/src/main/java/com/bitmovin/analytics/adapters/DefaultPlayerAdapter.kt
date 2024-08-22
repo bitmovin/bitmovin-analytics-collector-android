@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.adapters
 
+import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
@@ -10,19 +11,33 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
+import com.bitmovin.analytics.ssai.SsaiApiProxy
+import com.bitmovin.analytics.ssai.SsaiEngagementMetricsService
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 
 abstract class DefaultPlayerAdapter(
     protected val config: AnalyticsConfig,
     protected val eventDataFactory: EventDataFactory,
-    override val stateMachine: PlayerStateMachine,
+    final override val stateMachine: PlayerStateMachine,
     private val featureFactory: FeatureFactory,
     private val deviceInformationProvider: DeviceInformationProvider,
     protected val metadataProvider: MetadataProvider,
+    bitmovinAnalytics: BitmovinAnalytics,
+    ssaiApiProxy: SsaiApiProxy,
 ) : PlayerAdapter {
     protected abstract val eventDataManipulators: Collection<EventDataManipulator>
 
+    private val ssaiEngagementMetricsService: SsaiEngagementMetricsService =
+        SsaiEngagementMetricsService(analytics = bitmovinAnalytics, playerAdapter = this)
+    final override val ssaiService = SsaiService(stateMachine, ssaiEngagementMetricsService)
+
     override val isAutoplayEnabled: Boolean? = null
+
+    init {
+        eventDataFactory.registerEventDataManipulator(ssaiService)
+        ssaiApiProxy.attach(ssaiService)
+    }
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         eventDataManipulators.forEach { eventDataFactory.registerEventDataManipulator(it) }
@@ -36,6 +51,21 @@ abstract class DefaultPlayerAdapter(
             defaultMetadata,
             deviceInformationProvider.getDeviceInformation(),
             playerInfo,
+            ssaiService.adMetadata,
+        )
+
+    // this method is used to create eventData samples which are used within
+    // ad samples, this offers a way to have slightly different logic
+    // for eventData that is used within ad samples
+    // (mainly used for ssai to have a custom manipulator)
+    override fun createEventDataForAdSample() =
+        eventDataFactory.createForAdSamples(
+            stateMachine.impressionId,
+            getCurrentSourceMetadata(),
+            defaultMetadata,
+            deviceInformationProvider.getDeviceInformation(),
+            playerInfo,
+            ssaiService.adMetadata,
         )
 
     override fun createEventDataForCustomDataEvent(sourceMetadata: SourceMetadata) =
@@ -45,6 +75,7 @@ abstract class DefaultPlayerAdapter(
             defaultMetadata,
             deviceInformationProvider.getDeviceInformation(),
             playerInfo,
+            ssaiService.adMetadata,
         )
 
     override fun release() {

@@ -22,4 +22,13 @@ interface SsaiApi {
      * No-op if no ad break is currently active. Implicitly closes tracking of the last ad.
      */
     fun adBreakEnd()
+
+    /**
+     * Marks an AdQuartile as finished
+     * No-op if no ad is currently running
+     */
+    fun adQuartileFinished(
+        adQuartile: SsaiAdQuartile,
+        adQuartileMetadata: SsaiAdQuartileMetadata? = null,
+    )
 }

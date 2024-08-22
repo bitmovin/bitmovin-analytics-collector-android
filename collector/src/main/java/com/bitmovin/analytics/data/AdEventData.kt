@@ -2,6 +2,8 @@ package com.bitmovin.analytics.data
 
 import androidx.annotation.Keep
 import com.bitmovin.analytics.ads.AdBreak
+import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.utils.Util
 
 @Keep // Protect from obfuscation in case customers are using proguard
@@ -132,64 +134,110 @@ data class AdEventData(
     var audioCodec: String? = null,
     var videoCodec: String? = null,
     var retryCount: Int = 0,
+    var adIndex: Int? = null,
+    var adType: Int,
+    var quartile1FailedBeaconUrl: String? = null,
+    var midpointFailedBeaconUrl: String? = null,
+    var quartile3FailedBeaconUrl: String? = null,
+    var completedFailedBeaconUrl: String? = null,
 ) {
-
     companion object {
-        fun fromEventData(eventData: EventData): AdEventData = AdEventData(
-            videoImpressionId = eventData.impressionId,
-            userAgent = eventData.userAgent,
-            language = eventData.language,
-            cdnProvider = eventData.cdnProvider,
-            customData1 = eventData.customData1,
-            customData2 = eventData.customData2,
-            customData3 = eventData.customData3,
-            customData4 = eventData.customData4,
-            customData5 = eventData.customData5,
-            customData6 = eventData.customData6,
-            customData7 = eventData.customData7,
-            customData8 = eventData.customData8,
-            customData9 = eventData.customData9,
-            customData10 = eventData.customData10,
-            customData11 = eventData.customData11,
-            customData12 = eventData.customData12,
-            customData13 = eventData.customData13,
-            customData14 = eventData.customData14,
-            customData15 = eventData.customData15,
-            customData16 = eventData.customData16,
-            customData17 = eventData.customData17,
-            customData18 = eventData.customData18,
-            customData19 = eventData.customData19,
-            customData20 = eventData.customData20,
-            customData21 = eventData.customData21,
-            customData22 = eventData.customData22,
-            customData23 = eventData.customData23,
-            customData24 = eventData.customData24,
-            customData25 = eventData.customData25,
-            customData26 = eventData.customData26,
-            customData27 = eventData.customData27,
-            customData28 = eventData.customData28,
-            customData29 = eventData.customData29,
-            customData30 = eventData.customData30,
-            customUserId = eventData.customUserId,
-            domain = eventData.domain,
-            experimentName = eventData.experimentName,
-            key = eventData.key,
-            path = eventData.path,
-            player = eventData.player,
-            playerKey = eventData.playerKey,
-            playerTech = eventData.playerTech,
-            screenHeight = eventData.screenHeight,
-            screenWidth = eventData.screenWidth,
-            version = eventData.version,
-            userId = eventData.userId,
-            videoId = eventData.videoId,
-            videoTitle = eventData.videoTitle,
-            videoWindowHeight = eventData.videoWindowHeight,
-            videoWindowWidth = eventData.videoWindowWidth,
-            platform = eventData.platform,
-            audioCodec = eventData.audioCodec,
-            videoCodec = eventData.videoCodec,
-        )
+        fun fromEventData(
+            eventData: EventData,
+            adType: AdType,
+        ): AdEventData =
+            AdEventData(
+                analyticsVersion = eventData.analyticsVersion,
+                videoImpressionId = eventData.impressionId,
+                userAgent = eventData.userAgent,
+                language = eventData.language,
+                cdnProvider = eventData.cdnProvider,
+                customData1 = eventData.customData1,
+                customData2 = eventData.customData2,
+                customData3 = eventData.customData3,
+                customData4 = eventData.customData4,
+                customData5 = eventData.customData5,
+                customData6 = eventData.customData6,
+                customData7 = eventData.customData7,
+                customData8 = eventData.customData8,
+                customData9 = eventData.customData9,
+                customData10 = eventData.customData10,
+                customData11 = eventData.customData11,
+                customData12 = eventData.customData12,
+                customData13 = eventData.customData13,
+                customData14 = eventData.customData14,
+                customData15 = eventData.customData15,
+                customData16 = eventData.customData16,
+                customData17 = eventData.customData17,
+                customData18 = eventData.customData18,
+                customData19 = eventData.customData19,
+                customData20 = eventData.customData20,
+                customData21 = eventData.customData21,
+                customData22 = eventData.customData22,
+                customData23 = eventData.customData23,
+                customData24 = eventData.customData24,
+                customData25 = eventData.customData25,
+                customData26 = eventData.customData26,
+                customData27 = eventData.customData27,
+                customData28 = eventData.customData28,
+                customData29 = eventData.customData29,
+                customData30 = eventData.customData30,
+                customUserId = eventData.customUserId,
+                domain = eventData.domain,
+                experimentName = eventData.experimentName,
+                key = eventData.key,
+                path = eventData.path,
+                player = eventData.player,
+                playerKey = eventData.playerKey,
+                playerTech = eventData.playerTech,
+                screenHeight = eventData.screenHeight,
+                screenWidth = eventData.screenWidth,
+                version = eventData.version,
+                userId = eventData.userId,
+                videoId = eventData.videoId,
+                videoTitle = eventData.videoTitle,
+                videoWindowHeight = eventData.videoWindowHeight,
+                videoWindowWidth = eventData.videoWindowWidth,
+                platform = eventData.platform,
+                audioCodec = eventData.audioCodec,
+                videoCodec = eventData.videoCodec,
+                adType = adType.value,
+                streamFormat = eventData.streamFormat,
+            )
+    }
+
+    fun setCustomData(customData: CustomData) {
+        customData1 = customData.customData1
+        customData2 = customData.customData2
+        customData3 = customData.customData3
+        customData4 = customData.customData4
+        customData5 = customData.customData5
+        customData6 = customData.customData6
+        customData7 = customData.customData7
+        customData8 = customData.customData8
+        customData9 = customData.customData9
+        customData10 = customData.customData10
+        customData11 = customData.customData11
+        customData12 = customData.customData12
+        customData13 = customData.customData13
+        customData14 = customData.customData14
+        customData15 = customData.customData15
+        customData16 = customData.customData16
+        customData17 = customData.customData17
+        customData18 = customData.customData18
+        customData19 = customData.customData19
+        customData20 = customData.customData20
+        customData21 = customData.customData21
+        customData22 = customData.customData22
+        customData23 = customData.customData23
+        customData24 = customData.customData24
+        customData25 = customData.customData25
+        customData26 = customData.customData26
+        customData27 = customData.customData27
+        customData28 = customData.customData28
+        customData29 = customData.customData29
+        customData30 = customData.customData30
+        experimentName = customData.experimentName
     }
 
     fun setAdBreak(adBreak: AdBreak) {

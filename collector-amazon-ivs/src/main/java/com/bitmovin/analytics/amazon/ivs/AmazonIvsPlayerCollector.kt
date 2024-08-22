@@ -24,7 +24,6 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.ssai.SsaiApiProxy
-import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.SystemInformationProvider
 import com.bitmovin.analytics.utils.UserAgentProvider
@@ -52,9 +51,6 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
         val playerContext = IvsPlayerContext(player)
         val handler = Handler(analytics.context.mainLooper)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
-        val ssaiService = SsaiService(stateMachine)
-        ssaiApiProxy.attach(ssaiService)
-
         val playbackService = PlaybackService(stateMachine)
         val playbackManipulator = PlaybackEventDataManipulator(player)
         val playbackQualityProvider = PlaybackQualityProvider()
@@ -78,9 +74,10 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
                 SystemInformationProvider.getProperty("http.agent"),
             )
 
-        val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider, ssaiService = ssaiService)
-        val manipulators = listOf(playbackManipulator, playerInfoManipulator, qualityManipulator, ssaiService)
+        val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
+        val manipulators = listOf(playbackManipulator, playerInfoManipulator, qualityManipulator)
         val deviceInformationProvider = DeviceInformationProvider(analytics.context)
+
         return AmazonIvsPlayerAdapter(
             player,
             config,
@@ -94,7 +91,8 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
             playerStatisticsProvider,
             playerContext,
             metadataProvider,
-            ssaiService,
+            analytics,
+            ssaiApiProxy,
         )
     }
 }

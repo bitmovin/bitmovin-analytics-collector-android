@@ -32,29 +32,33 @@ class DataSerializerTest {
         val userIdProvider = mockk<SecureSettingsAndroidIdUserIdProvider>()
         every { userIdProvider.userId() } returns userId
 
-        val errorCode = ErrorCode(
-            1000,
-            "Error Description",
-            ErrorData(),
-            LegacyErrorData(
-                "Error Data Message",
-                arrayOf("first line of details", "second line of details"),
-            ),
-        )
+        val errorCode =
+            ErrorCode(
+                1000,
+                "Error Description",
+                ErrorData(),
+                LegacyErrorData(
+                    "Error Data Message",
+                    arrayOf("first line of details", "second line of details"),
+                ),
+            )
         val bitmovinAnalyticsConfig = AnalyticsConfig(analyticsLicenseKey)
-        val eventDataFactory = TestFactory.createEventDataFactory(
-            bitmovinAnalyticsConfig,
-            userIdProvider,
-        )
+        val eventDataFactory =
+            TestFactory.createEventDataFactory(
+                bitmovinAnalyticsConfig,
+                userIdProvider,
+            )
 
         // act
-        val eventData = eventDataFactory.create(
-            impressionId,
-            SourceMetadata(),
-            DefaultMetadata(),
-            deviceInformation,
-            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-        )
+        val eventData =
+            eventDataFactory.create(
+                impressionId,
+                SourceMetadata(),
+                DefaultMetadata(),
+                deviceInformation,
+                PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                null,
+            )
 
         // assert
         eventData.m3u8Url = "https://www.mydomain.com/playlist.m3u8"
@@ -63,6 +67,7 @@ class DataSerializerTest {
         eventData.errorData = DataSerializer.serialize(errorCode.legacyErrorData)
         eventData.time = 1607598943236
 
+        @Suppress("ktlint:standard:max-line-length")
         assertThat(DataSerializer.serialize(eventData)).isEqualTo(
             "{\"impressionId\":\"79b531da-5abb-4fb2-8dbc-9a6c60b6526f\",\"userId\":\"c54d11c8-dba2-4475-a867-764befdb5ad2\",\"key\":\"82dc5cdc-d425-4329-a043-b5fc540f9a74\",\"userAgent\":\"\",\"deviceInformation\":{\"manufacturer\":\"Google\",\"model\":\"Pixel 5\",\"isTV\":false},\"language\":\"en_US\",\"analyticsVersion\":\"${BuildConfig.COLLECTOR_CORE_VERSION}\",\"playerTech\":\"Android:Exoplayer\",\"domain\":\"package.bitmovin.com\",\"screenHeight\":640,\"screenWidth\":280,\"isLive\":false,\"isCasting\":false,\"videoDuration\":0,\"time\":1607598943236,\"videoWindowWidth\":0,\"videoWindowHeight\":0,\"droppedFrames\":0,\"played\":0,\"buffered\":0,\"paused\":0,\"ad\":0,\"seeked\":0,\"videoPlaybackWidth\":0,\"videoPlaybackHeight\":0,\"videoBitrate\":0,\"audioBitrate\":0,\"videoTimeStart\":0,\"videoTimeEnd\":0,\"videoStartupTime\":0,\"duration\":0,\"startupTime\":0,\"errorCode\":1000,\"errorData\":\"{\\\"msg\\\":\\\"Error Data Message\\\",\\\"details\\\":[\\\"first line of details\\\",\\\"second line of details\\\"]}\",\"playerStartupTime\":0,\"pageLoadType\":1,\"pageLoadTime\":0,\"m3u8Url\":\"https://www.mydomain.com/playlist.m3u8\",\"isMuted\":false,\"sequenceNumber\":0,\"platform\":\"android\",\"subtitleEnabled\":false,\"videoStartFailed\":false,\"retryCount\":0,\"player\":\"exoplayer\"}",
         )
@@ -90,19 +95,22 @@ class DataSerializerTest {
 
         val errorCode = ErrorCode(1000, "Error Description", ErrorData(), null)
         val analyticsConfig = AnalyticsConfig(analyticsLicenseKey)
-        val eventDataFactory = TestFactory.createEventDataFactory(
-            analyticsConfig,
-            userIdProvider,
-        )
+        val eventDataFactory =
+            TestFactory.createEventDataFactory(
+                analyticsConfig,
+                userIdProvider,
+            )
 
         // act
-        val eventData = eventDataFactory.create(
-            impressionId,
-            SourceMetadata(),
-            DefaultMetadata(),
-            deviceInformation,
-            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-        )
+        val eventData =
+            eventDataFactory.create(
+                impressionId,
+                SourceMetadata(),
+                DefaultMetadata(),
+                deviceInformation,
+                PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                null,
+            )
 
         // assert
         eventData.m3u8Url = "https://www.mydomain.com/playlist.m3u8"
@@ -110,6 +118,8 @@ class DataSerializerTest {
         eventData.errorCode = errorCode.errorCode
         eventData.errorData = DataSerializer.serialize(null)
         eventData.time = 1607598943236
+
+        @Suppress("ktlint:standard:max-line-length")
         assertThat(DataSerializer.serialize(eventData)).isEqualTo(
             "{\"impressionId\":\"79b531da-5abb-4fb2-8dbc-9a6c60b6526f\",\"userId\":\"c54d11c8-dba2-4475-a867-764befdb5ad2\",\"key\":\"82dc5cdc-d425-4329-a043-b5fc540f9a74\",\"userAgent\":\"\",\"deviceInformation\":{\"manufacturer\":\"Google\",\"model\":\"Pixel 5\",\"isTV\":false},\"language\":\"en_US\",\"analyticsVersion\":\"${BuildConfig.COLLECTOR_CORE_VERSION}\",\"playerTech\":\"Android:Exoplayer\",\"domain\":\"package.bitmovin.com\",\"screenHeight\":640,\"screenWidth\":280,\"isLive\":false,\"isCasting\":false,\"videoDuration\":0,\"time\":1607598943236,\"videoWindowWidth\":0,\"videoWindowHeight\":0,\"droppedFrames\":0,\"played\":0,\"buffered\":0,\"paused\":0,\"ad\":0,\"seeked\":0,\"videoPlaybackWidth\":0,\"videoPlaybackHeight\":0,\"videoBitrate\":0,\"audioBitrate\":0,\"videoTimeStart\":0,\"videoTimeEnd\":0,\"videoStartupTime\":0,\"duration\":0,\"startupTime\":0,\"errorCode\":1000,\"playerStartupTime\":0,\"pageLoadType\":1,\"pageLoadTime\":0,\"m3u8Url\":\"https://www.mydomain.com/playlist.m3u8\",\"isMuted\":false,\"sequenceNumber\":0,\"platform\":\"android\",\"subtitleEnabled\":false,\"videoStartFailed\":false,\"retryCount\":0,\"player\":\"exoplayer\"}",
         )

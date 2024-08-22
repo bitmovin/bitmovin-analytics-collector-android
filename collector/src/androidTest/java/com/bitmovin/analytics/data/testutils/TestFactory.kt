@@ -7,6 +7,7 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.PlayerInfo
+import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.utils.ApiV3Utils
@@ -14,15 +15,16 @@ import com.bitmovin.analytics.utils.Util
 import java.util.UUID
 
 object TestFactory {
-    private val testDeviceInformation = DeviceInformation(
-        manufacturer = "manufacturer",
-        model = "model",
-        isTV = false,
-        locale = "locale",
-        domain = "packageName",
-        screenHeight = 2400,
-        screenWidth = 1080,
-    )
+    private val testDeviceInformation =
+        DeviceInformation(
+            manufacturer = "manufacturer",
+            model = "model",
+            isTV = false,
+            locale = "locale",
+            domain = "packageName",
+            screenHeight = 2400,
+            screenWidth = 1080,
+        )
 
     fun createAdEventData(
         adId: String = "testAdId",
@@ -50,6 +52,7 @@ object TestFactory {
         time = time ?: Util.timestamp,
         adClickthroughUrl = "test+easy",
         key = analyticsConfig.licenseKey,
+        adType = AdType.CLIENT_SIDE.value,
     )
 
     fun createEventData(

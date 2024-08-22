@@ -151,7 +151,6 @@ object TestSources {
             drmLicenseUrl = "https://cwip-shaka-proxy.appspot.com/no_auth",
         )
 
-    // TODO: what does encrypted here mean?? vs DRM only?
     val DRM_HLS_WIDEVINE_ENCRYPTED =
         StreamData(
             "avc1.",

@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import android.util.Log
+import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
@@ -26,7 +27,7 @@ import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
-import com.bitmovin.analytics.ssai.SsaiService
+import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.utils.DownloadSpeedMeasurement
@@ -55,7 +56,8 @@ internal class BitmovinSdkAdapter(
     private val playerLicenseProvider: PlayerLicenseProvider,
     private val playbackQualityProvider: PlaybackQualityProvider,
     metadataProvider: MetadataProvider,
-    private val ssaiService: SsaiService,
+    bitmovinAnalytics: BitmovinAnalytics,
+    ssaiApiProxy: SsaiApiProxy,
 ) : DefaultPlayerAdapter(
         config,
         eventDataFactory,
@@ -63,6 +65,8 @@ internal class BitmovinSdkAdapter(
         featureFactory,
         deviceInformationProvider,
         metadataProvider,
+        bitmovinAnalytics,
+        ssaiApiProxy,
     ),
     EventDataManipulator {
     private val downloadSpeedMeter = DownloadSpeedMeter()

@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.exoplayer
 
 import android.util.Log
+import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
@@ -20,7 +21,7 @@ import com.bitmovin.analytics.exoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
-import com.bitmovin.analytics.ssai.SsaiService
+import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
@@ -35,7 +36,8 @@ internal class ExoPlayerAdapter(
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
     metadataProvider: MetadataProvider,
-    private val ssaiService: SsaiService,
+    bitmovinAnalytics: BitmovinAnalytics,
+    ssaiApiProxy: SsaiApiProxy,
 ) : DefaultPlayerAdapter(
         config,
         eventDataFactory,
@@ -43,6 +45,8 @@ internal class ExoPlayerAdapter(
         featureFactory,
         deviceInformationProvider,
         metadataProvider,
+        bitmovinAnalytics,
+        ssaiApiProxy,
     ) {
     private val meter = DownloadSpeedMeter()
     private val exoplayerContext = ExoPlayerContext(exoplayer)

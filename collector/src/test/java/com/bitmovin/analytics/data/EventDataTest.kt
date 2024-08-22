@@ -30,13 +30,15 @@ class EventDataTest {
     fun testEventDataContainsDeviceInformation() {
         val deviceInformation =
             DeviceInformation("myManufacturer", "myModel", false, "de", "package-name", 100, 200)
-        val eventData = TestFactory.createEventDataFactory(analyticsConfig).create(
-            impressionId,
-            SourceMetadata(),
-            DefaultMetadata(),
-            deviceInformation,
-            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-        )
+        val eventData =
+            TestFactory.createEventDataFactory(analyticsConfig).create(
+                impressionId,
+                SourceMetadata(),
+                DefaultMetadata(),
+                deviceInformation,
+                PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                null,
+            )
 
         assertThat(eventData.deviceInformation.manufacturer).isEqualTo("myManufacturer")
         assertThat(eventData.deviceInformation.model).isEqualTo("myModel")
@@ -52,13 +54,15 @@ class EventDataTest {
     fun testEventDataSetsPlatformToAndroidTVIfDeviceInformationIsTVIsTrue() {
         val deviceInformation =
             DeviceInformation("myManufacturer", "myModel", true, "de", "package-name", 100, 200)
-        val eventData = TestFactory.createEventDataFactory(analyticsConfig).create(
-            impressionId,
-            SourceMetadata(),
-            DefaultMetadata(),
-            deviceInformation,
-            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-        )
+        val eventData =
+            TestFactory.createEventDataFactory(analyticsConfig).create(
+                impressionId,
+                SourceMetadata(),
+                DefaultMetadata(),
+                deviceInformation,
+                PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                null,
+            )
 
         assertThat(eventData.platform).isEqualTo("androidTV")
     }
@@ -69,36 +73,42 @@ class EventDataTest {
             DeviceInformation("myManufacturer", "myModel", true, "de", "package-name", 100, 200)
         var randomizedUserIdProvider = RandomizedUserIdIdProvider()
         var randomizedUserIdProvider1 = RandomizedUserIdIdProvider()
-        var eventData = TestFactory.createEventDataFactory(
-            analyticsConfig,
-            randomizedUserIdProvider,
-        ).create(
-            impressionId,
-            SourceMetadata(),
-            DefaultMetadata(),
-            deviceInformation,
-            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-        )
-        var eventData1 = TestFactory.createEventDataFactory(
-            analyticsConfig,
-            randomizedUserIdProvider,
-        ).create(
-            impressionId,
-            SourceMetadata(),
-            DefaultMetadata(),
-            deviceInformation,
-            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-        )
-        var eventData2 = TestFactory.createEventDataFactory(
-            analyticsConfig,
-            randomizedUserIdProvider1,
-        ).create(
-            impressionId,
-            SourceMetadata(),
-            DefaultMetadata(),
-            deviceInformation,
-            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-        )
+        var eventData =
+            TestFactory.createEventDataFactory(
+                analyticsConfig,
+                randomizedUserIdProvider,
+            ).create(
+                impressionId,
+                SourceMetadata(),
+                DefaultMetadata(),
+                deviceInformation,
+                PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                null,
+            )
+        var eventData1 =
+            TestFactory.createEventDataFactory(
+                analyticsConfig,
+                randomizedUserIdProvider,
+            ).create(
+                impressionId,
+                SourceMetadata(),
+                DefaultMetadata(),
+                deviceInformation,
+                PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                null,
+            )
+        var eventData2 =
+            TestFactory.createEventDataFactory(
+                analyticsConfig,
+                randomizedUserIdProvider1,
+            ).create(
+                impressionId,
+                SourceMetadata(),
+                DefaultMetadata(),
+                deviceInformation,
+                PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                null,
+            )
 
         assertThat(eventData.userId).isEqualTo(eventData1.userId)
         assertThat(eventData.userId).isEqualTo(randomizedUserIdProvider.userId())
@@ -110,9 +120,10 @@ class EventDataTest {
     fun testEventDataStringIsDeserialized() {
         // this test ensures that we are backward compatible in case EventData class is changing
         // arrange
-        val eventData1Json = """
+        val eventData1Json =
+            """
             {"ad":0,"analyticsVersion":"0.0.0-local","audioBitrate":-1,"audioCodec":"mp4a.40.2","audioLanguage":"en","buffered":0,"cdnProvider":"testCdnProvider","customData1":"systemtest","customData10":"customData10","customData11":"customData11","customData12":"customData12","customData13":"customData13","customData14":"customData14","customData15":"customData15","customData16":"customData16","customData17":"customData17","customData18":"customData18","customData19":"customData19","customData2":"customData2","customData20":"customData20","customData21":"customData21","customData22":"customData22","customData23":"customData23","customData24":"customData24","customData25":"customData25","customData26":"customData26","customData27":"customData27","customData28":"customData28","customData29":"customData29","customData3":"customData3","customData30":"customData30","customData4":"customData4","customData5":"customData5","customData6":"customData6","customData7":"customData7","customData8":"systemtest8","customData9":"customData9","customUserId":"customBitmovinUserId1","deviceInformation":{"isTV":false,"manufacturer":"Google","model":"sdk_gphone64_arm64"},"domain":"com.bitmovin.analytics.bitmovin.player.test","droppedFrames":0,"duration":3929,"experimentName":"experiment-1","impressionId":"c6e0e073-c777-49f2-a7e1-e47bc8a839cb","isCasting":false,"isLive":false,"isMuted":false,"key":"17e6ea02-cb5a-407f-9d6b-9400358fbcc0","language":"en_US","m3u8Url":"https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8","mpdUrl":"https://test.com/mpd","pageLoadTime":0,"pageLoadType":1,"path":"/customPath/new/","paused":0,"platform":"android","played":0,"player":"bitmovin","playerKey":"dummyplayerKey","playerStartupTime":1,"playerTech":"Android:Exoplayer","progUrl":"https://test.com/prog","retryCount":0,"screenHeight":2209,"screenWidth":1080,"seeked":0,"sequenceNumber":0,"startupTime":3929,"state":"startup","streamFormat":"hls","subtitleEnabled":false,"supportedVideoCodecs":["hevc","vp9","avc"],"time":1689091210921,"userAgent":"Dalvik/2.1.0 (Linux; U; Android 13; sdk_gphone64_arm64 Build/TE1A.220922.029)","userId":"25f572b30123c015","version":"bitmovin-3.38.0","videoBitrate":628000,"videoCodec":"avc1.4D400D","videoDuration":210000,"videoId":"dummy-videoId","videoPlaybackHeight":180,"videoPlaybackWidth":320,"videoStartFailed":false,"videoStartupTime":3928,"videoTimeEnd":0,"videoTimeStart":0,"videoTitle":"offlineSession","videoWindowHeight":123,"videoWindowWidth":123}
-        """.trimIndent()
+            """.trimIndent()
 
         // act
         val eventData1 = DataSerializer.deserialize(eventData1Json, EventData::class.java)
@@ -176,7 +187,9 @@ class EventDataTest {
         assertThat(eventData1.isMuted).isFalse
         assertThat(eventData1.key).isEqualTo("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
         assertThat(eventData1.language).isEqualTo("en_US")
-        assertThat(eventData1.m3u8Url).isEqualTo("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8")
+        assertThat(
+            eventData1.m3u8Url,
+        ).isEqualTo("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8")
         assertThat(eventData1.mpdUrl).isEqualTo("https://test.com/mpd")
         assertThat(eventData1.pageLoadTime).isEqualTo(0)
         assertThat(eventData1.pageLoadType).isEqualTo(1)
@@ -220,107 +233,110 @@ class EventDataTest {
 
     @Test
     fun testEventDataIsCorrectlySerialized() {
-        val eventData = EventData(
-            deviceInfo = DeviceInformation(
-                manufacturer = "manufacturer",
-                model = "model",
-                isTV = false,
-                locale = "locale",
-                domain = "packageName",
-                screenHeight = 2400,
-                screenWidth = 1080,
-            ),
-            playerInfo = PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-            customData = CustomData(
-                customData1 = "customData1",
-                customData2 = "customData2",
-                customData3 = "customData3",
-                customData4 = "customData4",
-                customData5 = "customData5",
-                customData6 = "customData6",
-                customData7 = "customData7",
-                customData8 = "customData8",
-                customData9 = "customData9",
-                customData10 = "customData10",
-                customData11 = "customData11",
-                customData12 = "customData12",
-                customData13 = "customData13",
-                customData14 = "customData14",
-                customData15 = "customData15",
-                customData16 = "customData16",
-                customData17 = "customData17",
-                customData18 = "customData18",
-                customData19 = "customData19",
-                customData20 = "customData20",
-                customData21 = "customData21",
-                customData22 = "customData22",
-                customData23 = "customData23",
-                customData24 = "customData24",
-                customData25 = "customData25",
-                customData26 = "customData26",
-                customData27 = "customData27",
-                customData28 = "customData28",
-                customData29 = "customData29",
-                customData30 = "customData30",
-                experimentName = "experimentName",
-            ),
-            impressionId = "impressionId",
-            userId = "userId",
-            key = "licenseKey",
-            videoId = "videoId",
-            customUserId = "customUserId",
-            path = "path",
-            cdnProvider = "cdnProvider",
-            userAgent = "userAgent",
-            videoTitle = "videoTitle",
-        ).apply {
-            time = 1234567890
-            drmLoadTime = 1234
-            videoDuration = 2
-            videoWindowWidth = 3
-            videoWindowHeight = 4
-            droppedFrames = 5
-            played = 6
-            buffered = 7
-            paused = 8
-            ad = 9
-            seeked = 10
-            videoPlaybackWidth = 11
-            videoPlaybackHeight = 12
-            videoBitrate = 13
-            audioBitrate = 14
-            videoTimeStart = 15
-            videoTimeEnd = 16
-            videoStartupTime = 17
-            duration = 18
-            startupTime = 19
-            playerStartupTime = 20
-            pageLoadType = 1
-            pageLoadTime = 21
-            isMuted = false
-            sequenceNumber = 22
-            state = "state"
-            errorCode = 23
-            errorMessage = "errorMessage"
-            errorData = "errorData"
-            streamFormat = "streamFormat"
-            mpdUrl = "mpdUrl"
-            m3u8Url = "m3u8Url"
-            progUrl = "progUrl"
-            videoCodec = "videoCodec"
-            audioCodec = "audioCodec"
-            supportedVideoCodecs = listOf("supportedVideoCodecs")
-            subtitleEnabled = false
-            subtitleLanguage = "subtitleLanguage"
-            audioLanguage = "audioLanguage"
-            drmType = "drmType"
-            isLive = false
-            isCasting = false
-            castTech = "castTech"
-            videoStartFailed = false
-            retryCount = 24
-            playerKey = "playerKey"
-        }
+        val eventData =
+            EventData(
+                deviceInfo =
+                    DeviceInformation(
+                        manufacturer = "manufacturer",
+                        model = "model",
+                        isTV = false,
+                        locale = "locale",
+                        domain = "packageName",
+                        screenHeight = 2400,
+                        screenWidth = 1080,
+                    ),
+                playerInfo = PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                customData =
+                    CustomData(
+                        customData1 = "customData1",
+                        customData2 = "customData2",
+                        customData3 = "customData3",
+                        customData4 = "customData4",
+                        customData5 = "customData5",
+                        customData6 = "customData6",
+                        customData7 = "customData7",
+                        customData8 = "customData8",
+                        customData9 = "customData9",
+                        customData10 = "customData10",
+                        customData11 = "customData11",
+                        customData12 = "customData12",
+                        customData13 = "customData13",
+                        customData14 = "customData14",
+                        customData15 = "customData15",
+                        customData16 = "customData16",
+                        customData17 = "customData17",
+                        customData18 = "customData18",
+                        customData19 = "customData19",
+                        customData20 = "customData20",
+                        customData21 = "customData21",
+                        customData22 = "customData22",
+                        customData23 = "customData23",
+                        customData24 = "customData24",
+                        customData25 = "customData25",
+                        customData26 = "customData26",
+                        customData27 = "customData27",
+                        customData28 = "customData28",
+                        customData29 = "customData29",
+                        customData30 = "customData30",
+                        experimentName = "experimentName",
+                    ),
+                impressionId = "impressionId",
+                userId = "userId",
+                key = "licenseKey",
+                videoId = "videoId",
+                customUserId = "customUserId",
+                path = "path",
+                cdnProvider = "cdnProvider",
+                userAgent = "userAgent",
+                videoTitle = "videoTitle",
+            ).apply {
+                time = 1234567890
+                drmLoadTime = 1234
+                videoDuration = 2
+                videoWindowWidth = 3
+                videoWindowHeight = 4
+                droppedFrames = 5
+                played = 6
+                buffered = 7
+                paused = 8
+                ad = 9
+                seeked = 10
+                videoPlaybackWidth = 11
+                videoPlaybackHeight = 12
+                videoBitrate = 13
+                audioBitrate = 14
+                videoTimeStart = 15
+                videoTimeEnd = 16
+                videoStartupTime = 17
+                duration = 18
+                startupTime = 19
+                playerStartupTime = 20
+                pageLoadType = 1
+                pageLoadTime = 21
+                isMuted = false
+                sequenceNumber = 22
+                state = "state"
+                errorCode = 23
+                errorMessage = "errorMessage"
+                errorData = "errorData"
+                streamFormat = "streamFormat"
+                mpdUrl = "mpdUrl"
+                m3u8Url = "m3u8Url"
+                progUrl = "progUrl"
+                videoCodec = "videoCodec"
+                audioCodec = "audioCodec"
+                supportedVideoCodecs = listOf("supportedVideoCodecs")
+                subtitleEnabled = false
+                subtitleLanguage = "subtitleLanguage"
+                audioLanguage = "audioLanguage"
+                drmType = "drmType"
+                isLive = false
+                isCasting = false
+                castTech = "castTech"
+                videoStartFailed = false
+                retryCount = 24
+                playerKey = "playerKey"
+            }
 
         val serializedEventData = DataSerializer.serialize(eventData)
         assertThat(serializedEventData)

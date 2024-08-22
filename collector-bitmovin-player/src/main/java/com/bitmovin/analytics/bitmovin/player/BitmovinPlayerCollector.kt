@@ -19,7 +19,6 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.ssai.SsaiApiProxy
-import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.SystemInformationProvider
@@ -103,17 +102,13 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
         val playerContext = BitmovinPlayerContext(player)
         val handler = Handler(analytics.context.mainLooper)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
-        val ssaiService = SsaiService(stateMachine)
-        ssaiApiProxy.attach(ssaiService)
         val eventDataFactory =
             EventDataFactory(
                 config,
                 userIdProvider,
                 userAgentProvider,
                 licenseKeyProvider,
-                ssaiService,
             )
-        eventDataFactory.registerEventDataManipulator(ssaiService)
         val playbackQualityProvider = PlaybackQualityProvider(player)
         return BitmovinSdkAdapter(
             player,
@@ -125,7 +120,8 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
             playerLicenseProvider,
             playbackQualityProvider,
             metadataProvider,
-            ssaiService,
+            analytics,
+            ssaiApiProxy,
         )
     }
 

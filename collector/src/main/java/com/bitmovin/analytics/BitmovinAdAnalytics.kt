@@ -9,6 +9,7 @@ import com.bitmovin.analytics.ads.AdQuartile
 import com.bitmovin.analytics.ads.AdTagType
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.AdSample
+import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.Util
 
@@ -204,8 +205,8 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         adBreak: AdBreak,
         adSample: AdSample? = null,
     ) {
-        val eventData = playerAdapter?.createEventData() ?: return
-        val adEventData = AdEventData.fromEventData(eventData)
+        val eventData = playerAdapter?.createEventDataForAdSample() ?: return
+        val adEventData = AdEventData.fromEventData(eventData, AdType.CLIENT_SIDE)
 
         adEventData.analyticsVersion = Util.analyticsVersion
         val moduleInfo = adAdapter?.moduleInformation

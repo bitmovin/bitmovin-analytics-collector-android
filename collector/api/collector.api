@@ -453,14 +453,33 @@ public final class com/bitmovin/analytics/api/ssai/SsaiAdPosition : java/lang/En
 	public static fun values ()[Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
 }
 
+public final class com/bitmovin/analytics/api/ssai/SsaiAdQuartile : java/lang/Enum {
+	public static final field COMPLETED Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
+	public static final field FIRST_QUARTILE Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
+	public static final field MIDPOINT Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
+	public static final field THIRD_QUARTILE Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
+	public static fun values ()[Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
+}
+
+public final class com/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getFailedBeaconUrl ()Ljava/lang/String;
+}
+
 public abstract interface class com/bitmovin/analytics/api/ssai/SsaiApi {
 	public abstract fun adBreakEnd ()V
 	public abstract fun adBreakStart (Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;)V
+	public abstract fun adQuartileFinished (Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata;)V
 	public abstract fun adStart (Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;)V
 }
 
 public final class com/bitmovin/analytics/api/ssai/SsaiApi$DefaultImpls {
 	public static synthetic fun adBreakStart$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;ILjava/lang/Object;)V
+	public static synthetic fun adQuartileFinished$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata;ILjava/lang/Object;)V
 	public static synthetic fun adStart$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;ILjava/lang/Object;)V
 }
 

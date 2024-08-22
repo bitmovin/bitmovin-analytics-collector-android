@@ -9,14 +9,24 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import io.mockk.mockk
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
 import org.junit.Test
 
 class SsaiServiceTests {
+    lateinit var stateMachineMock: PlayerStateMachine
+    lateinit var ssaiEngagementMetricsServiceMock: SsaiEngagementMetricsService
+    lateinit var ssaiService: SsaiService
+
+    @Before
+    fun setup() {
+        stateMachineMock = mockk(relaxed = true)
+        ssaiEngagementMetricsServiceMock = mockk(relaxed = true)
+        ssaiService = SsaiService(stateMachineMock, ssaiEngagementMetricsServiceMock)
+    }
+
     @Test
     fun `adBreakStart and adStart triggers heartbeat and set correct state and metadata`() {
         // arrange
-        val stateMachineMock = mockk<PlayerStateMachine>(relaxed = true)
-        val ssaiService = SsaiService(stateMachineMock)
         val sample = createDefaultEventData()
 
         // act
@@ -44,8 +54,6 @@ class SsaiServiceTests {
     @Test
     fun `adBreakStart and adStarts with no metadata provided triggers heartbeat and set correct data`() {
         // arrange
-        val stateMachineMock = mockk<PlayerStateMachine>(relaxed = true)
-        val ssaiService = SsaiService(stateMachineMock)
         val sample = createDefaultEventData()
 
         // act
@@ -65,11 +73,7 @@ class SsaiServiceTests {
 
     @Test
     fun `adBreakEnd does not trigger heartbeat if adBreakStart was not called`() {
-        // arrange
-        val stateMachineMock = mockk<PlayerStateMachine>(relaxed = true)
-        val ssaiService = SsaiService(stateMachineMock)
-
-        // act
+        // arrange and act
         ssaiService.adBreakEnd()
 
         // assert
@@ -78,11 +82,7 @@ class SsaiServiceTests {
 
     @Test
     fun `adBreakEnd does not trigger heartbeat if adBreakStart was called but no adStart was called`() {
-        // arrange
-        val stateMachineMock = mockk<PlayerStateMachine>(relaxed = true)
-        val ssaiService = SsaiService(stateMachineMock)
-
-        // act
+        // arrange and act
         ssaiService.adBreakStart()
         ssaiService.adBreakEnd()
 
@@ -92,11 +92,7 @@ class SsaiServiceTests {
 
     @Test
     fun `adStart without adBreakStart does not trigger heartbeat`() {
-        // arrange
-        val stateMachineMock = mockk<PlayerStateMachine>(relaxed = true)
-        val ssaiService = SsaiService(stateMachineMock)
-
-        // act
+        // arrange and act
         ssaiService.adStart()
 
         // assert
@@ -106,8 +102,6 @@ class SsaiServiceTests {
     @Test
     fun `adIndex is increased and set only on first manipulate call after an adStart call`() {
         // arrange
-        val stateMachineMock = mockk<PlayerStateMachine>(relaxed = true)
-        val ssaiService = SsaiService(stateMachineMock)
         val sample1 = createDefaultEventData()
         val sample2 = createDefaultEventData()
         val sample3 = createDefaultEventData()
@@ -132,8 +126,6 @@ class SsaiServiceTests {
     @Test
     fun `adEndBreak resets metadata correctly but does not reset adIndex`() {
         // arrange
-        val stateMachineMock = mockk<PlayerStateMachine>(relaxed = true)
-        val ssaiService = SsaiService(stateMachineMock)
         val sample1 = createDefaultEventData()
         val sample2 = createDefaultEventData()
         val sample3 = createDefaultEventData()
@@ -173,8 +165,6 @@ class SsaiServiceTests {
     @Test
     fun `resetSourceRelatedState resets adIndex`() {
         // arrange
-        val stateMachineMock = mockk<PlayerStateMachine>(relaxed = true)
-        val ssaiService = SsaiService(stateMachineMock)
         val sample1 = createDefaultEventData()
         val sample2 = createDefaultEventData()
 

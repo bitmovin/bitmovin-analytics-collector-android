@@ -2,6 +2,8 @@ package com.bitmovin.analytics.ssai
 
 import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
+import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
+import com.bitmovin.analytics.api.ssai.SsaiAdQuartileMetadata
 import com.bitmovin.analytics.api.ssai.SsaiApi
 
 /**
@@ -26,5 +28,12 @@ class SsaiApiProxy : SsaiApi {
 
     override fun adBreakEnd() {
         ssaiService?.adBreakEnd()
+    }
+
+    override fun adQuartileFinished(
+        adQuartile: SsaiAdQuartile,
+        adQuartileMetadata: SsaiAdQuartileMetadata?,
+    ) {
+        ssaiService?.adQuartileFinished(adQuartile, adQuartileMetadata)
     }
 }

@@ -12,6 +12,8 @@ import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.license.FeatureConfigContainer
+import com.bitmovin.analytics.ssai.SsaiEngagementMetricsService
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +40,10 @@ internal class DummyPlayerAdapter(
     override val drmDownloadTime: Long
         get() = 0
 
+    private val ssaiEngagementMetricsService: SsaiEngagementMetricsService = SsaiEngagementMetricsService(analytics, this)
+
+    override val ssaiService: SsaiService = SsaiService(stateMachine, ssaiEngagementMetricsService)
+
     override var defaultMetadata: DefaultMetadata = DefaultMetadata()
 
     override val playerInfo: PlayerInfo
@@ -57,6 +63,10 @@ internal class DummyPlayerAdapter(
 
     override fun createEventData(): EventData {
         return TestFactory.createEventData(createTestImpressionId(1001))
+    }
+
+    override fun createEventDataForAdSample(): EventData {
+        return TestFactory.createEventData(createTestImpressionId(1))
     }
 
     override fun createEventDataForCustomDataEvent(sourceMetadata: SourceMetadata): EventData {

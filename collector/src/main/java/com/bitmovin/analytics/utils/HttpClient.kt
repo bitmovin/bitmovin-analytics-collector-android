@@ -13,25 +13,36 @@ import okhttp3.Response
 import java.io.IOException
 
 class HttpClient(private val context: Context, private val client: OkHttpClient) {
-    fun post(url: String, postBody: String?, callback: Callback?) {
+    fun post(
+        url: String,
+        postBody: String?,
+        callback: Callback?,
+    ) {
         Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody))
 
-        val request: Request = Request.Builder()
-            .url(url)
-            .header("Origin", String.format("http://%s", context.packageName))
-            .post(postBody.orEmpty().toRequestBody(JSON_CONTENT_TYPE))
-            .build()
+        val request =
+            Request.Builder()
+                .url(url)
+                .header("Origin", String.format("http://%s", context.packageName))
+                .post(postBody.orEmpty().toRequestBody(JSON_CONTENT_TYPE))
+                .build()
 
         client.newCall(request)
             .enqueue(
                 object : Callback {
-                    override fun onFailure(call: Call, e: IOException) {
+                    override fun onFailure(
+                        call: Call,
+                        e: IOException,
+                    ) {
                         Log.e(TAG, "HTTP Error: ", e)
                         callback?.onFailure(call, e)
                     }
 
                     @Throws(IOException::class)
-                    override fun onResponse(call: Call, response: Response) {
+                    override fun onResponse(
+                        call: Call,
+                        response: Response,
+                    ) {
                         callback?.onResponse(call, response)
                         response.close()
                     }

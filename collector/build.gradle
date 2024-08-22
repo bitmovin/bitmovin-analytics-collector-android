@@ -85,7 +85,6 @@ dependencies {
     // required for @Keep annotation to avoid pro guard issues with obfuscated dtos
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
 
-
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoInlineVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"

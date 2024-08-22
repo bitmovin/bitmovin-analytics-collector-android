@@ -7,7 +7,6 @@ import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.license.DeferredLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseKeyState
-import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.utils.UserAgentProvider
 import io.mockk.every
 import io.mockk.mockk
@@ -37,10 +36,8 @@ class EventDataFactoryTest {
         // mocks
         val defaultMetadataMock = mockk<DefaultMetadata>(relaxed = true)
         val sourceMetadataMock = mockk<SourceMetadata>(relaxed = true)
-        val ssaiServiceMock = mockk<SsaiService>(relaxed = true)
         val licenseKeyProvider = DeferredLicenseKeyProvider(MutableStateFlow<LicenseKeyState>(LicenseKeyState.Deferred))
 
-        every { ssaiServiceMock.adMetadata } returns ssaiMetadata
         every { defaultMetadataMock.customData } returns defaultCustomData
         every { sourceMetadataMock.customData } returns sourceCustomData
 
@@ -50,7 +47,6 @@ class EventDataFactoryTest {
                 mockk<UserIdProvider>(relaxed = true),
                 mockk<UserAgentProvider>(relaxed = true),
                 licenseKeyProvider,
-                ssaiServiceMock,
             )
         // act
         val customData =
@@ -60,6 +56,7 @@ class EventDataFactoryTest {
                 defaultMetadataMock,
                 mockk<DeviceInformation>(relaxed = true),
                 mockk<PlayerInfo>(relaxed = true),
+                ssaiMetadata,
             )
 
         // assert

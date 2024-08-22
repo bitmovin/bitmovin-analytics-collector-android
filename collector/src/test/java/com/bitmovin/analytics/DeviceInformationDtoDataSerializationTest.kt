@@ -14,21 +14,24 @@ class DeviceInformationDtoDataSerializationTest {
     @Test
     fun testSerializesEventDataDeviceInformationCorrectly() {
         // #region Mocking
-        val config = AnalyticsConfig(
-            "9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac",
-        )
+        val config =
+            AnalyticsConfig(
+                "9ae0b480-f2ee-4c10-bc3c-cb88e982e0ac",
+            )
 
         val deviceInformation =
             DeviceInformation("myManufacturer", "myModel", false, "de", "package-name", 100, 200)
         // #endregion
 
-        val data = TestFactory.createEventDataFactory(config).create(
-            "null",
-            SourceMetadata(),
-            DefaultMetadata(),
-            deviceInformation,
-            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-        )
+        val data =
+            TestFactory.createEventDataFactory(config).create(
+                "null",
+                SourceMetadata(),
+                DefaultMetadata(),
+                deviceInformation,
+                PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                null,
+            )
         val serialized = DataSerializer.serialize(data)
 
         assertThat(serialized).contains("\"deviceInformation\":{")

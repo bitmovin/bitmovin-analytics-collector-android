@@ -1,5 +1,6 @@
 package com.bitmovin.analytics
 
+import android.app.Application
 import android.content.Context
 import android.util.Log
 import com.bitmovin.analytics.adapters.PlayerAdapter
@@ -25,6 +26,7 @@ import com.bitmovin.analytics.persistence.EventQueueConfig
 import com.bitmovin.analytics.persistence.EventQueueFactory
 import com.bitmovin.analytics.persistence.PersistingAuthenticatedDispatcher
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
+import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
@@ -46,6 +48,7 @@ class BitmovinAnalytics(
     private val scopeProvider = ScopeProvider.create()
     private val backendFactory = BackendFactory(eventQueue)
     private val eventBus = EventBus()
+    private var lifecycleCallbacks: ActivityLifecycleCallbacks? = null
 
     private val debugCallback: DebugCallback =
         object : DebugCallback {
@@ -113,13 +116,14 @@ class BitmovinAnalytics(
     fun attach(adapter: PlayerAdapter) {
         detachPlayer()
         val stateMachineListener =
-            DefaultStateMachineListener(this, adapter, eventBus[OnErrorDetailEventListener::class])
+            DefaultStateMachineListener(this, adapter, eventBus[OnErrorDetailEventListener::class], adapter.ssaiService)
         adapter.stateMachine.subscribe(stateMachineListener)
         this.stateMachineListener = stateMachineListener
         eventDataDispatcher.enable()
         playerAdapter = adapter
         val features = adapter.init()
         featureManager.registerFeatures(features)
+        registerActivityPauseListener(adapter.ssaiService)
         tryAttachAd(adapter)
     }
 
@@ -136,6 +140,7 @@ class BitmovinAnalytics(
         eventBus.notify(OnAnalyticsReleasingEventListener::class) { it.onReleasing() }
         playerAdapter?.release()
         eventDataDispatcher.disable()
+        unregisterActivityPauseListener()
     }
 
     private fun detachAd() {
@@ -224,5 +229,29 @@ class BitmovinAnalytics(
 
     companion object {
         private const val TAG = "BitmovinAnalytics"
+    }
+
+    private fun registerActivityPauseListener(ssaiService: SsaiService) {
+        val lifecycleCallbacks = ActivityLifecycleCallbacks(ssaiService)
+        try {
+            val application = this.context.applicationContext as Application
+            application.registerActivityLifecycleCallbacks(lifecycleCallbacks)
+            this.lifecycleCallbacks = lifecycleCallbacks
+        } catch (e: Exception) {
+            Log.e(TAG, "Something went wrong while registering lifecycle callbacks", e)
+        }
+    }
+
+    private fun unregisterActivityPauseListener() {
+        val lifecycleCallbacks = this.lifecycleCallbacks
+        try {
+            if (lifecycleCallbacks != null) {
+                val application = this.context.applicationContext as Application
+                application.unregisterActivityLifecycleCallbacks(lifecycleCallbacks)
+                this.lifecycleCallbacks = null
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Something went wrong while unregistering lifecycle callbacks", e)
+        }
     }
 }

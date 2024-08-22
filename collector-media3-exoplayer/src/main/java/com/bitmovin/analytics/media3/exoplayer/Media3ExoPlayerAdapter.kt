@@ -3,6 +3,7 @@ package com.bitmovin.analytics.media3.exoplayer
 import android.util.Log
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
@@ -22,7 +23,7 @@ import com.bitmovin.analytics.media3.exoplayer.player.DrmInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.Media3ExoPlayerContext
 import com.bitmovin.analytics.media3.exoplayer.player.PlaybackInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.PlayerStatisticsProvider
-import com.bitmovin.analytics.ssai.SsaiService
+import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
@@ -35,7 +36,8 @@ internal class Media3ExoPlayerAdapter(
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
     metadataProvider: MetadataProvider,
-    private val ssaiService: SsaiService,
+    bitmovinAnalytics: BitmovinAnalytics,
+    ssaiApiProxy: SsaiApiProxy,
 ) : DefaultPlayerAdapter(
         config,
         eventDataFactory,
@@ -43,6 +45,8 @@ internal class Media3ExoPlayerAdapter(
         featureFactory,
         deviceInformationProvider,
         metadataProvider,
+        bitmovinAnalytics,
+        ssaiApiProxy,
     ) {
     private val meter = DownloadSpeedMeter()
     private val exoplayerContext = Media3ExoPlayerContext(player)
@@ -64,6 +68,7 @@ internal class Media3ExoPlayerAdapter(
             playbackInfoProvider,
             drmInfoProvider,
         )
+
     private val defaultPlayerEventListener = PlayerEventListener(stateMachine, exoplayerContext)
 
     override val drmDownloadTime: Long?

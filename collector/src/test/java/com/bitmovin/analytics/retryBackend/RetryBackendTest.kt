@@ -21,7 +21,6 @@ import java.util.Calendar
 import java.util.Date
 
 class RetryBackendTest {
-
     private val config = AnalyticsConfig("123")
     private val backendMock = mockk<CallbackBackend>(relaxed = true)
     private val handlerMock = mockk<Handler>(relaxed = true)
@@ -30,10 +29,11 @@ class RetryBackendTest {
 
     private val firstDate = Date()
 
-    private val secondDate = Calendar.getInstance().run {
-        add(Calendar.HOUR, 2)
-        time
-    }
+    private val secondDate =
+        Calendar.getInstance().run {
+            add(Calendar.HOUR, 2)
+            time
+        }
 
     @Test
     fun sampleShouldBeProcessedAfterHttpRequestTimeout() {
@@ -65,13 +65,15 @@ class RetryBackendTest {
     }
 
     private fun setupEventData(sequenceNumber: Int): EventData {
-        val eventData = TestFactory.createEventDataFactory(config).create(
-            "testImpressionId",
-            SourceMetadata(),
-            DefaultMetadata(),
-            deviceInformation,
-            PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
-        )
+        val eventData =
+            TestFactory.createEventDataFactory(config).create(
+                "testImpressionId",
+                SourceMetadata(),
+                DefaultMetadata(),
+                deviceInformation,
+                PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
+                null,
+            )
         eventData.sequenceNumber = sequenceNumber
         return eventData
     }

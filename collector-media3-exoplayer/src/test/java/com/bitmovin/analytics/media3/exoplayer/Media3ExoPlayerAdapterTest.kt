@@ -53,6 +53,7 @@ class Media3ExoPlayerAdapterTest {
                     mockk(relaxed = true),
                     mockk(relaxed = true),
                     mockk(relaxed = true),
+                    mockk(relaxed = true),
                 ),
             )
     }

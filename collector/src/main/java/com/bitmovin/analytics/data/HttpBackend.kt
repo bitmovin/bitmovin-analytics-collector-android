@@ -59,6 +59,7 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
                 eventData.audioLanguage,
             ),
         )
+
         httpClient.post(
             analyticsBackendUrl,
             serialize(eventData),
@@ -94,6 +95,7 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
                 eventData.adImpressionId,
             ),
         )
+
         httpClient.post(
             adsAnalyticsBackendUrl,
             serialize(eventData),
