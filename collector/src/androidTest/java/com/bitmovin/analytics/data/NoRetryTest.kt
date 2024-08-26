@@ -38,6 +38,7 @@ class NoRetryTest {
     @Before
     fun setup() {
         val mockedIngressUrl = MockedIngress.startServer()
+        MockedIngress.liveServerForwarding = false
         config =
             AnalyticsConfig(
                 licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0",
@@ -64,6 +65,7 @@ class NoRetryTest {
         MockedIngress.stopServer()
         bitmovinAnalytics.detachPlayer()
         EventDatabase.getInstance(appContext).purge()
+        MockedIngress.liveServerForwarding = true
     }
 
     @Test

@@ -237,7 +237,13 @@ class LongtermRetryOnFailureTest {
 
         val impressions = MockedIngress.waitForRequestsAndExtractImpressions().combineByImpressionId()
         assertThat(impressions).hasSize(1)
-        assertThat(impressions.values.first().adEventDataList)
+
+        val adEventDataList =
+            impressions.values.first().adEventDataList.map {
+                it.getAdEventData()
+            }
+
+        assertThat(adEventDataList)
             .hasSize(5)
             .isEqualTo(eventData)
     }

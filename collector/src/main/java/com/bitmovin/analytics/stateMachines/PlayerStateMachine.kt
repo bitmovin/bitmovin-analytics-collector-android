@@ -99,10 +99,10 @@ class PlayerStateMachine(
         }
     }
 
-    private fun triggerHeartbeat() {
+    private fun triggerHeartbeat(ssaiRelated: Boolean = false) {
         val elapsedTime = Util.elapsedTime
         videoTimeEnd = playerContext.position
-        listeners.notify { it.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter) }
+        listeners.notify { it.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter, ssaiRelated) }
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
     }
@@ -279,12 +279,12 @@ class PlayerStateMachine(
         qualityChanged(videoTime, didQualityChange, setQualityFunction)
     }
 
-    fun onPlayingHeartbeat() {
+    fun onPlayingHeartbeat(ssaiRelated: Boolean = false) {
         if (currentState != PlayerStates.PLAYING) {
             return
         }
 
-        triggerHeartbeat()
+        triggerHeartbeat(ssaiRelated)
     }
 
     private fun qualityChanged(

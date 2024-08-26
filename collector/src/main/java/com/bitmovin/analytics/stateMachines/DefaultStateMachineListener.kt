@@ -79,6 +79,7 @@ class DefaultStateMachineListener(
     override fun onHeartbeat(
         stateMachine: PlayerStateMachine,
         duration: Long,
+        ssaiRelated: Boolean,
     ) {
         Log.d(
             TAG,
@@ -102,6 +103,11 @@ class DefaultStateMachineListener(
 
         data.videoTimeStart = stateMachine.videoTimeStart
         data.videoTimeEnd = stateMachine.videoTimeEnd
+
+        if (ssaiRelated || data.ad == AdType.SERVER_SIDE.value) {
+            data.ssaiRelatedSample = true
+        }
+
         analytics.sendEventData(data)
     }
 

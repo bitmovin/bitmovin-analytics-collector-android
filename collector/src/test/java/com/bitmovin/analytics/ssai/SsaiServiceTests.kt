@@ -41,7 +41,7 @@ class SsaiServiceTests {
         ssaiService.manipulate(sample)
 
         // assert
-        verify(exactly = 1) { stateMachineMock.onPlayingHeartbeat() }
+        verify(exactly = 1) { stateMachineMock.onPlayingHeartbeat(eq(true)) }
         assertThat(sample.ad).isEqualTo(2)
         assertThat(sample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
         assertThat(sample.adIndex).isEqualTo(0)
@@ -62,7 +62,7 @@ class SsaiServiceTests {
         ssaiService.manipulate(sample)
 
         // assert
-        verify(exactly = 1) { stateMachineMock.onPlayingHeartbeat() }
+        verify(exactly = 1) { stateMachineMock.onPlayingHeartbeat(eq(true)) }
         assertThat(sample.ad).isEqualTo(2)
         assertThat(sample.adPosition).isNull()
         assertThat(sample.adIndex).isEqualTo(0)
@@ -77,7 +77,7 @@ class SsaiServiceTests {
         ssaiService.adBreakEnd()
 
         // assert
-        verify(exactly = 0) { stateMachineMock.onPlayingHeartbeat() }
+        verify(exactly = 0) { stateMachineMock.onPlayingHeartbeat(any()) }
     }
 
     @Test
@@ -87,7 +87,7 @@ class SsaiServiceTests {
         ssaiService.adBreakEnd()
 
         // assert
-        verify(exactly = 0) { stateMachineMock.onPlayingHeartbeat() }
+        verify(exactly = 0) { stateMachineMock.onPlayingHeartbeat(any()) }
     }
 
     @Test
@@ -96,7 +96,7 @@ class SsaiServiceTests {
         ssaiService.adStart()
 
         // assert
-        verify(exactly = 0) { stateMachineMock.onPlayingHeartbeat() }
+        verify(exactly = 0) { stateMachineMock.onPlayingHeartbeat(any()) }
     }
 
     @Test
@@ -120,7 +120,7 @@ class SsaiServiceTests {
         assertThat(sample1.adIndex).isEqualTo(0)
         assertThat(sample2.adIndex).isNull()
         assertThat(sample3.adIndex).isEqualTo(1)
-        verify(exactly = 2) { stateMachineMock.onPlayingHeartbeat() }
+        verify(exactly = 2) { stateMachineMock.onPlayingHeartbeat(eq(true)) }
     }
 
     @Test
@@ -142,7 +142,7 @@ class SsaiServiceTests {
         ssaiService.manipulate(sample3)
 
         // assert
-        verify(exactly = 3) { stateMachineMock.onPlayingHeartbeat() }
+        verify(exactly = 3) { stateMachineMock.onPlayingHeartbeat(eq(true)) }
         assertThat(sample1.ad).isEqualTo(2)
         assertThat(sample1.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
         assertThat(sample1.adIndex).isEqualTo(0)
@@ -180,7 +180,7 @@ class SsaiServiceTests {
         ssaiService.manipulate(sample2)
 
         // assert
-        verify(exactly = 3) { stateMachineMock.onPlayingHeartbeat() }
+        verify(exactly = 3) { stateMachineMock.onPlayingHeartbeat(eq(true)) }
         assertThat(sample1.adIndex).isEqualTo(0)
         assertThat(sample2.adIndex).isEqualTo(0)
     }

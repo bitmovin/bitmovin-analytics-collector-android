@@ -47,7 +47,7 @@ class SsaiService(
         }
         this.ssaiEngagementMetricsService.flushCurrentAdSample()
 
-        stateMachine.onPlayingHeartbeat()
+        stateMachine.onPlayingHeartbeat(ssaiRelated = true)
 
         this.state = SsaiState.AD_RUNNING
         // to include the adIndex in the next sample which will be the first sample of this started ad
@@ -65,7 +65,7 @@ class SsaiService(
         this.ssaiEngagementMetricsService.flushCurrentAdSample()
 
         if (this.state == SsaiState.AD_RUNNING) {
-            stateMachine.onPlayingHeartbeat()
+            stateMachine.onPlayingHeartbeat(ssaiRelated = true)
         }
         this.resetAdBreakRelatedState()
     }
@@ -151,5 +151,6 @@ class SsaiService(
         data.adId = this.adMetadata?.adId
         data.adSystem = this.adMetadata?.adSystem
         data.adPosition = this.adBreakMetadata?.adPosition?.toString()
+        data.ssaiRelatedSample = true
     }
 }

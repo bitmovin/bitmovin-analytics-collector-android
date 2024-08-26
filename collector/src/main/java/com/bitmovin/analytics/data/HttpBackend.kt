@@ -4,11 +4,13 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.utils.ClientFactory
 import com.bitmovin.analytics.utils.DataSerializer.serialize
 import com.bitmovin.analytics.utils.HttpClient
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.Headers
 import okhttp3.Response
 import java.io.IOException
 
@@ -60,6 +62,8 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
             ),
         )
 
+        val additionalHeaders = if (eventData.ssaiRelatedSample) SSAI_ROUTING_HEADER else null
+
         httpClient.post(
             analyticsBackendUrl,
             serialize(eventData),
@@ -78,6 +82,7 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
                     success?.onSuccess()
                 }
             },
+            additionalHeaders,
         )
     }
 
@@ -95,6 +100,8 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
                 eventData.adImpressionId,
             ),
         )
+
+        val additionalHeader = if (eventData.adType == AdType.SERVER_SIDE.value) SSAI_ROUTING_HEADER else null
 
         httpClient.post(
             adsAnalyticsBackendUrl,
@@ -114,10 +121,15 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
                     success?.onSuccess()
                 }
             },
+            additionalHeader,
         )
     }
 
     companion object {
         private const val TAG = "BitmovinBackend"
+
+        // Routing Key that allows to route ssai samples to
+        // a different ingress (in order to handle ssai spikes different then normal samples)
+        private val SSAI_ROUTING_HEADER = Headers.headersOf("X-Bitmovin-Routingkey", "ssai")
     }
 }

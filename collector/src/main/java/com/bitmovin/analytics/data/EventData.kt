@@ -109,6 +109,15 @@ data class EventData(
     val customData29: String? = null,
     val customData30: String? = null,
     val experimentName: String? = null,
+    // Field used to mark a sample that is ssai related as such
+    // this is needed since ssai samples on live events
+    // are globally synchronized in terms of when they are happening
+    // and thus very spikey, this field is used to mark such samples
+    // with a specific header when sending, which allows header
+    // specific routing on load balancer side
+    // we mark it as transient since we don't want to serialize this field
+    @Transient
+    var ssaiRelatedSample: Boolean = false,
 ) {
     constructor(
         deviceInfo: DeviceInformation,

@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.systemtest.utils
 
 import android.util.Log
-import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import com.bitmovin.analytics.utils.DataSerializer
@@ -183,7 +182,7 @@ object MockedIngress {
     fun extractImpressions(): List<Impression> {
         val requestCount = server.requestCount
         val eventDataMap = mutableMapOf<String, List<EventData>>()
-        val adEventDataMap = mutableMapOf<String, List<AdEventData>>()
+        val adEventDataMap = mutableMapOf<String, List<AdEventDataForTest>>()
         val errorDetailMap = mutableMapOf<String, List<ErrorDetail>>()
 
         for (i in 0 until requestCount) {
@@ -198,6 +197,10 @@ object MockedIngress {
                             EventData::class.java,
                         )
 
+                    if (request.headers.get("X-Bitmovin-Routingkey") == "ssai") {
+                        eventData?.ssaiRelatedSample = true
+                    }
+
                     if (eventData != null) {
                         eventDataMap[eventData.impressionId]?.let {
                             eventDataMap.put(eventData.impressionId, it.plus(eventData))
@@ -208,8 +211,10 @@ object MockedIngress {
                     val adEventData =
                         DataSerializer.deserialize(
                             body,
-                            AdEventData::class.java,
+                            AdEventDataForTest::class.java,
                         )
+
+                    adEventData?.headers = request.headers
 
                     if (adEventData != null) {
                         adEventDataMap[adEventData.videoImpressionId]?.let {

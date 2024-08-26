@@ -129,6 +129,8 @@ class SsaiScenariosTest {
             val eventDataList = impression.eventDataList
             assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
 
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(eventDataList)
+
             val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
             assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
 
@@ -212,6 +214,8 @@ class SsaiScenariosTest {
 
             val impression = impressionList.first()
             DataVerifier.verifyHasNoErrorSamples(impression)
+
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
 
             val adEventDataList = impression.adEventDataList
             assertThat(adEventDataList).hasSize(1)
@@ -311,6 +315,8 @@ class SsaiScenariosTest {
             val impression = impressionList.first()
             DataVerifier.verifyHasNoErrorSamples(impression)
 
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
+
             val adEventDataList = impression.adEventDataList
             assertThat(adEventDataList).hasSize(2)
 
@@ -381,6 +387,8 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
+
             val adEventDataList = impression.adEventDataList
             assertThat(adEventDataList).hasSize(1)
 
@@ -508,6 +516,7 @@ class SsaiScenariosTest {
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val adEventDataList = impression.adEventDataList
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
             assertThat(adEventDataList).hasSize(1)
 
             val adSample = adEventDataList[0]

@@ -1,13 +1,13 @@
 package com.bitmovin.analytics.systemtest.utils
 
-import com.bitmovin.analytics.data.AdEventData
+import com.bitmovin.analytics.data.EventData
 import org.assertj.core.api.Assertions.assertThat
 
 object SsaiDataVerifier {
     private const val SSAI_AD_TYPE = 2
 
     fun verifySamplesHaveSameAdIndex(
-        adEventDataList: List<AdEventData>,
+        adEventDataList: List<AdEventDataForTest>,
         adIndex: Int,
     ) {
         adEventDataList.forEach {
@@ -18,7 +18,7 @@ object SsaiDataVerifier {
     }
 
     fun verifySamplesHaveSameAdSystem(
-        adEventDataList: List<AdEventData>,
+        adEventDataList: List<AdEventDataForTest>,
         adSystem: String,
     ) {
         adEventDataList.forEach {
@@ -29,7 +29,7 @@ object SsaiDataVerifier {
     }
 
     fun verifySamplesHaveSameAdId(
-        adEventDataList: List<AdEventData>,
+        adEventDataList: List<AdEventDataForTest>,
         adId: String,
     ) {
         adEventDataList.forEach {
@@ -39,7 +39,7 @@ object SsaiDataVerifier {
         }
     }
 
-    fun verifySamplesHaveBasicAdInfoSet(adEventDataList: List<AdEventData>) {
+    fun verifySamplesHaveBasicAdInfoSet(adEventDataList: List<AdEventDataForTest>) {
         // TODO: we might also check that these fields are the same for all samples
         adEventDataList.forEach {
             assertThat(it.adImpressionId).isNotEmpty()
@@ -61,7 +61,36 @@ object SsaiDataVerifier {
             assertThat(it.time).isGreaterThan(0)
             assertThat(it.language).isNotEmpty()
             assertThat(it.streamFormat).isNotEmpty()
-            //  assertThat(it.path).isNotEmpty()
+            assertThat(it.hasSsaiRoutingKeyHeaderSet).isTrue()
+        }
+    }
+
+    fun verifySsaiRelatedSamplesHaveHeaderSet(eventDataList: List<EventData>) {
+        // all ssai samples should have the routing key set
+        // and the last sample before the ad block
+        eventDataList.forEachIndexed { index, eventData ->
+            if (eventData.ad == SSAI_AD_TYPE) {
+                assertThat(eventData.ssaiRelatedSample).isTrue()
+
+                val sampleBefore = index - 1
+
+                // verify that sample before ad block has ssai header set
+                // if sample is not startup sample
+                if (sampleBefore >= 0 && eventDataList[sampleBefore].ad != SSAI_AD_TYPE &&
+                    eventDataList[sampleBefore].videoStartupTime == 0L
+                ) {
+                    assertThat(eventDataList[sampleBefore].ssaiRelatedSample).isTrue()
+                }
+            }
+        }
+
+        for (eventData in eventDataList) {
+            if (eventData.ad == SSAI_AD_TYPE) {
+                // ssaiRelatedSample is a transitive property, but the
+                // mocked ingress sets it according to header info
+                // thus we can validate it here
+                assertThat(eventData.ssaiRelatedSample).isTrue()
+            }
         }
     }
 }

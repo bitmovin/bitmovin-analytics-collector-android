@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -17,15 +18,21 @@ class HttpClient(private val context: Context, private val client: OkHttpClient)
         url: String,
         postBody: String?,
         callback: Callback?,
+        additionalHeaders: Headers? = null,
     ) {
         Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody))
 
-        val request =
+        val requestBuilder =
             Request.Builder()
                 .url(url)
                 .header("Origin", String.format("http://%s", context.packageName))
                 .post(postBody.orEmpty().toRequestBody(JSON_CONTENT_TYPE))
-                .build()
+
+        additionalHeaders?.forEach { (key, value) ->
+            requestBuilder.addHeader(key, value)
+        }
+
+        val request = requestBuilder.build()
 
         client.newCall(request)
             .enqueue(
