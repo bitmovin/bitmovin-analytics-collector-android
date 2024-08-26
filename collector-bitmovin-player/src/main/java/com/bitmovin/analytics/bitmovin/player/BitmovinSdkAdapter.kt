@@ -335,6 +335,7 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: SourceEvent.Unloaded,
     ) {
         try {
+            ssaiService.flushCurrentAdSample()
             Log.d(TAG, "On Source Unloaded")
             stateMachine.resetStateMachine()
         } catch (e: Exception) {
@@ -346,6 +347,7 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Destroy,
     ) {
         try {
+            ssaiService.flushCurrentAdSample()
             Log.d(TAG, "On Destroy")
             if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
                 stateMachine.videoStartFailedReason = VideoStartFailedReason.PAGE_CLOSED

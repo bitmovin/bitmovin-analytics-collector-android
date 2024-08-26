@@ -135,6 +135,7 @@ class BitmovinAnalytics(
 
     /** Detach the current player that is being used with Bitmovin Analytics.  */
     fun detachPlayer() {
+        playerAdapter?.ssaiService?.flushCurrentAdSample()
         detachAd()
         featureManager.unregisterFeatures()
         eventBus.notify(OnAnalyticsReleasingEventListener::class) { it.onReleasing() }
