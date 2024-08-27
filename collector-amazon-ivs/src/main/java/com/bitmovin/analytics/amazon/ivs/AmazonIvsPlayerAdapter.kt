@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.amazon.ivs
 
+import android.os.Looper
 import android.util.Log
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalytics
@@ -36,6 +37,7 @@ internal class AmazonIvsPlayerAdapter(
     metadataProvider: MetadataProvider,
     bitmovinAnalytics: BitmovinAnalytics,
     ssaiApiProxy: SsaiApiProxy,
+    looper: Looper,
 ) : DefaultPlayerAdapter(
         config,
         eventDataFactory,
@@ -45,6 +47,7 @@ internal class AmazonIvsPlayerAdapter(
         metadataProvider,
         bitmovinAnalytics,
         ssaiApiProxy,
+        looper,
     ) {
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         try {

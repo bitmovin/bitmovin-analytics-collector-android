@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.exoplayer
 
 import android.content.Context
-import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
@@ -68,8 +67,8 @@ public class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Conte
             )
         val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         val playerContext = ExoPlayerContext(player)
-        val handler = Handler(player.applicationLooper)
-        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
+        val applicationLooper = player.applicationLooper
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, applicationLooper)
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
 
         return ExoPlayerAdapter(
@@ -82,6 +81,7 @@ public class ExoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Conte
             metadataProvider,
             analytics,
             ssaiApiProxy,
+            applicationLooper,
         )
     }
 }

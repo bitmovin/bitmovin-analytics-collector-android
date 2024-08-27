@@ -31,7 +31,7 @@ internal class DummyPlayerAdapter(
         PlayerStateMachine.Factory.create(
             analytics,
             playerContext,
-            Handler(Looper.getMainLooper()),
+            Looper.getMainLooper(),
         )
     override val isAutoplayEnabled: Boolean?
         get() = null
@@ -40,7 +40,8 @@ internal class DummyPlayerAdapter(
     override val drmDownloadTime: Long
         get() = 0
 
-    private val ssaiEngagementMetricsService: SsaiEngagementMetricsService = SsaiEngagementMetricsService(analytics, this)
+    private val ssaiEngagementMetricsService: SsaiEngagementMetricsService =
+        SsaiEngagementMetricsService(analytics, this, Handler(Looper.getMainLooper()))
 
     override val ssaiService: SsaiService = SsaiService(stateMachine, ssaiEngagementMetricsService)
 

@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.ssai
 
+import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
@@ -8,6 +9,7 @@ import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartileMetadata
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.enums.AdType
+import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -19,10 +21,11 @@ class SsaiEngagementMetricsServiceTest {
     private lateinit var ssaiEngagementMetricsService: SsaiEngagementMetricsService
     private val analytics: BitmovinAnalytics = mockk()
     private val playerAdapter: PlayerAdapter = mockk()
+    private val handlerMock = mockk<Handler>()
 
     @Before
     fun setUp() {
-        ssaiEngagementMetricsService = SsaiEngagementMetricsService(analytics, playerAdapter)
+        ssaiEngagementMetricsService = SsaiEngagementMetricsService(analytics, playerAdapter, handlerMock)
     }
 
     @Test
@@ -237,5 +240,65 @@ class SsaiEngagementMetricsServiceTest {
         ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 1)
         ssaiEngagementMetricsService.sendAdErrorSample(SsaiAdPosition.MIDROLL, adMetadata, 0, 1234, "testMessage")
         verify(exactly = 2) { analytics.sendAdEventData(any()) }
+    }
+
+    @Test
+    fun `timeout for flushing is reset on ad started`() {
+        val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+
+        verify(exactly = 2) { handlerMock.removeCallbacksAndMessages(any()) }
+        verify(exactly = 1) { handlerMock.postDelayed(any(), any()) }
+    }
+
+    @Test
+    fun `timeout for flushing is postponed on quartile call`() {
+        val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+
+        // we clear the mock to only test that calls happen due to the quartile call, and not the started call
+        clearMocks(handlerMock)
+
+        ssaiEngagementMetricsService.markQuartileFinished(SsaiAdPosition.MIDROLL, SsaiAdQuartile.FIRST, adMetadata, null, 0)
+
+        verify(exactly = 1) { handlerMock.removeCallbacksAndMessages(any()) }
+        verify(exactly = 1) { handlerMock.postDelayed(any(), any()) }
+    }
+
+    @Test
+    fun `timeout for flushing is cleared on error`() {
+        val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+
+        // we clear the mock to only test that calls happen due to the error, and not the started call
+        clearMocks(handlerMock)
+
+        ssaiEngagementMetricsService.sendAdErrorSample(SsaiAdPosition.MIDROLL, adMetadata, 0, 123, "testError")
+        verify(exactly = 1) { handlerMock.removeCallbacksAndMessages(any()) }
+        verify(exactly = 0) { handlerMock.postDelayed(any(), any()) }
+    }
+
+    @Test
+    fun `timeout for flushing is cleared on completed`() {
+        val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+
+        // we clear the mock to only test that calls happen due to the completed call, and not the started call
+        clearMocks(handlerMock)
+        ssaiEngagementMetricsService.markQuartileFinished(SsaiAdPosition.MIDROLL, SsaiAdQuartile.COMPLETED, adMetadata, null, 0)
+        verify(exactly = 1) { handlerMock.removeCallbacksAndMessages(any()) }
+        verify(exactly = 0) { handlerMock.postDelayed(any(), any()) }
+    }
+
+    @Test
+    fun `timeout for flushing is cleared on flushOfCurrentSamples`() {
+        val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+
+        // we clear the mock to only test that calls happen due to the adBreakEnd call, and not the started call
+        clearMocks(handlerMock)
+        ssaiEngagementMetricsService.flushCurrentAdSample()
+        verify(exactly = 1) { handlerMock.removeCallbacksAndMessages(any()) }
+        verify(exactly = 0) { handlerMock.postDelayed(any(), any()) }
     }
 }

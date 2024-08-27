@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.media3.exoplayer
 
+import android.os.Looper
 import android.util.Log
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -38,6 +39,7 @@ internal class Media3ExoPlayerAdapter(
     metadataProvider: MetadataProvider,
     bitmovinAnalytics: BitmovinAnalytics,
     ssaiApiProxy: SsaiApiProxy,
+    looper: Looper,
 ) : DefaultPlayerAdapter(
         config,
         eventDataFactory,
@@ -47,6 +49,7 @@ internal class Media3ExoPlayerAdapter(
         metadataProvider,
         bitmovinAnalytics,
         ssaiApiProxy,
+        looper,
     ) {
     private val meter = DownloadSpeedMeter()
     private val exoplayerContext = Media3ExoPlayerContext(player)

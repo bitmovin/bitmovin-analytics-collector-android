@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.stateMachines
 
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.ObservableSupport
@@ -18,7 +19,8 @@ class PlayerStateMachine(
     internal val qualityChangeEventLimiter: QualityChangeEventLimiter,
     internal val videoStartTimeoutTimer: ObservableTimer,
     private val playerContext: PlayerContext,
-    private val heartbeatHandler: Handler,
+    looper: Looper,
+    private val heartbeatHandler: Handler = Handler(looper),
 ) {
     internal val listeners = ObservableSupport<StateMachineListener>()
 
@@ -337,7 +339,7 @@ class PlayerStateMachine(
         fun create(
             analytics: BitmovinAnalytics,
             playerContext: PlayerContext,
-            handler: Handler,
+            looper: Looper,
         ): PlayerStateMachine {
             val bufferingTimeoutTimer = ObservableTimer(Util.REBUFFERING_TIMEOUT.toLong(), 1000)
             val qualityChangeCountResetTimer =
@@ -350,7 +352,7 @@ class PlayerStateMachine(
                 qualityChangeEventLimiter,
                 videoStartTimeoutTimer,
                 playerContext,
-                handler,
+                looper,
             )
         }
     }

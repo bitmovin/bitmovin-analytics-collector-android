@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
+import android.os.Looper
 import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.AdAdapter
@@ -58,6 +59,7 @@ internal class BitmovinSdkAdapter(
     metadataProvider: MetadataProvider,
     bitmovinAnalytics: BitmovinAnalytics,
     ssaiApiProxy: SsaiApiProxy,
+    looper: Looper,
 ) : DefaultPlayerAdapter(
         config,
         eventDataFactory,
@@ -67,6 +69,7 @@ internal class BitmovinSdkAdapter(
         metadataProvider,
         bitmovinAnalytics,
         ssaiApiProxy,
+        looper,
     ),
     EventDataManipulator {
     private val downloadSpeedMeter = DownloadSpeedMeter()

@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.ssai
 
+import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
@@ -10,7 +11,11 @@ import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.utils.Util
 
-class SsaiEngagementMetricsService(val analytics: BitmovinAnalytics, val playerAdapter: PlayerAdapter) {
+class SsaiEngagementMetricsService(
+    private val analytics: BitmovinAnalytics,
+    private val playerAdapter: PlayerAdapter,
+    private val ssaiTimeoutHandler: Handler,
+) {
     private var adImpressionId: String? = null
     private var quartilesFinishedWithCurrentAd = mutableSetOf<SsaiAdQuartile>()
     private var errorSentForCurrentAd = false
@@ -22,12 +27,13 @@ class SsaiEngagementMetricsService(val analytics: BitmovinAnalytics, val playerA
         adMetadata: SsaiAdMetadata?,
         adIndex: Int,
     ) {
-        sendAndClearAdSample()
+        flushCurrentAdSample()
         resetStateOnNewAd()
         adImpressionId = Util.uUID
         val adEventData = createBasicSsaiAdEventData(adPosition, adMetadata, adIndex)
         adEventData.started = 1
         activeAdSample = adEventData
+        enableOrPostponeFlushTimeout()
     }
 
     @Synchronized
@@ -44,8 +50,12 @@ class SsaiEngagementMetricsService(val analytics: BitmovinAnalytics, val playerA
             createAndUpsertQuartileSample(adPosition, quartile, adMetadata, adQuartileMetadata, adIndex)
 
             // we only send the sample out if the ad is completed
+            // partially watched ads are sent through
+            // pausing of the app, starting a new ad, or ad break end
             if (quartile == SsaiAdQuartile.COMPLETED) {
-                sendAndClearAdSample()
+                flushCurrentAdSample()
+            } else {
+                enableOrPostponeFlushTimeout()
             }
         }
     }
@@ -67,7 +77,7 @@ class SsaiEngagementMetricsService(val analytics: BitmovinAnalytics, val playerA
         adEventData.errorMessage = errorMessage
         adEventData.errorCode = errorCode
         upsertAdSample(adEventData)
-        sendAndClearAdSample()
+        flushCurrentAdSample()
     }
 
     @Synchronized
@@ -80,6 +90,7 @@ class SsaiEngagementMetricsService(val analytics: BitmovinAnalytics, val playerA
             analytics.sendAdEventData(it)
         }
         activeAdSample = null
+        disableFlushTimeout()
     }
 
     private fun createAndUpsertQuartileSample(
@@ -203,5 +214,24 @@ class SsaiEngagementMetricsService(val analytics: BitmovinAnalytics, val playerA
     private fun resetStateOnNewAd() {
         errorSentForCurrentAd = false
         quartilesFinishedWithCurrentAd.clear()
+    }
+
+    private fun enableOrPostponeFlushTimeout() {
+        disableFlushTimeout()
+        enableFlushTimeout()
+    }
+
+    private fun enableFlushTimeout() {
+        ssaiTimeoutHandler.postDelayed({
+            flushCurrentAdSample()
+        }, FLUSH_TIMEOUT_MS)
+    }
+
+    private fun disableFlushTimeout() {
+        ssaiTimeoutHandler.removeCallbacksAndMessages(null)
+    }
+
+    companion object {
+        private const val FLUSH_TIMEOUT_MS = 60000L
     }
 }

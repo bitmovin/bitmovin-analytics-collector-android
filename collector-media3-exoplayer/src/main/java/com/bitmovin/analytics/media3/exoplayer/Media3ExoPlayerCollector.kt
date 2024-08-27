@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.media3.exoplayer
 
 import android.content.Context
-import android.os.Handler
 import androidx.media3.exoplayer.ExoPlayer
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.DefaultCollector
@@ -48,8 +47,8 @@ internal class Media3ExoPlayerCollector(analyticsConfig: AnalyticsConfig, contex
             )
         val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         val playerContext = Media3ExoPlayerContext(player)
-        val handler = Handler(player.applicationLooper)
-        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
+        val applicationLooper = player.applicationLooper
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, applicationLooper)
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         return Media3ExoPlayerAdapter(
             player,
@@ -61,6 +60,7 @@ internal class Media3ExoPlayerCollector(analyticsConfig: AnalyticsConfig, contex
             metadataProvider,
             analytics,
             ssaiApiProxy,
+            applicationLooper,
         )
     }
 }

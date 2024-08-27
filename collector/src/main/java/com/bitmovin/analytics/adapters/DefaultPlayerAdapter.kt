@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.adapters
 
+import android.os.Handler
+import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
@@ -25,11 +27,13 @@ abstract class DefaultPlayerAdapter(
     protected val metadataProvider: MetadataProvider,
     bitmovinAnalytics: BitmovinAnalytics,
     ssaiApiProxy: SsaiApiProxy,
+    looper: Looper,
 ) : PlayerAdapter {
     protected abstract val eventDataManipulators: Collection<EventDataManipulator>
 
+    // TODO [AN-4317]: this wiring is not good, we should aim for getting rid of the PlayerAdapter dependency
     private val ssaiEngagementMetricsService: SsaiEngagementMetricsService =
-        SsaiEngagementMetricsService(analytics = bitmovinAnalytics, playerAdapter = this)
+        SsaiEngagementMetricsService(analytics = bitmovinAnalytics, playerAdapter = this, Handler(looper))
     final override val ssaiService = SsaiService(stateMachine, ssaiEngagementMetricsService)
 
     override val isAutoplayEnabled: Boolean? = null

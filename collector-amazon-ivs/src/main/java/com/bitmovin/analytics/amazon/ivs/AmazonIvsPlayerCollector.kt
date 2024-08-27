@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.amazon.ivs
 
 import android.content.Context
-import android.os.Handler
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.DefaultCollector
@@ -49,8 +48,8 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
     ): PlayerAdapter {
         val featureFactory: FeatureFactory = AmazonIvsPlayerFeatureFactory(analytics)
         val playerContext = IvsPlayerContext(player)
-        val handler = Handler(analytics.context.mainLooper)
-        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
+        val mainLooper = analytics.context.mainLooper
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, mainLooper)
         val playbackService = PlaybackService(stateMachine)
         val playbackManipulator = PlaybackEventDataManipulator(player)
         val playbackQualityProvider = PlaybackQualityProvider()
@@ -93,6 +92,7 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
             metadataProvider,
             analytics,
             ssaiApiProxy,
+            mainLooper,
         )
     }
 }

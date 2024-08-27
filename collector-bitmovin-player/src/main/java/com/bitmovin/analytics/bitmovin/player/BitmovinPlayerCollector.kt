@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import android.content.Context
-import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.DefaultCollector
@@ -100,8 +99,8 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
         val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         val playerLicenseProvider = PlayerLicenseProvider(analytics.context)
         val playerContext = BitmovinPlayerContext(player)
-        val handler = Handler(analytics.context.mainLooper)
-        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, handler)
+        val mainLooper = analytics.context.mainLooper
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, mainLooper)
         val eventDataFactory =
             EventDataFactory(
                 config,
@@ -122,6 +121,7 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
             metadataProvider,
             analytics,
             ssaiApiProxy,
+            mainLooper,
         )
     }
 
