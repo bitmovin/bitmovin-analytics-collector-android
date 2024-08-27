@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] API checks for the `collector` module.
 - [Internal] Github Action's System tests sends a Slack message whenever it fails on the main branch.
 
+### Removed
+- [Internal] Removed DebugListener related classes from core collector
+
 ## v3.7.1
 
 ### Fixed

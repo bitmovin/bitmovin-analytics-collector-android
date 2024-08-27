@@ -9,7 +9,6 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.RetryPolicy
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.BackendFactory
-import com.bitmovin.analytics.data.DebuggingEventDataDispatcher
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.SimpleEventDataDispatcher
 import com.bitmovin.analytics.data.persistence.EventDatabase
@@ -50,46 +49,29 @@ class BitmovinAnalytics(
     private val eventBus = EventBus()
     private var lifecycleCallbacks: ActivityLifecycleCallbacks? = null
 
-    private val debugCallback: DebugCallback =
-        object : DebugCallback {
-            override fun dispatchEventData(data: EventData) {
-                eventBus.notify(DebugListener::class) { it.onDispatchEventData(data) }
-            }
-
-            override fun dispatchAdEventData(data: AdEventData) {
-                eventBus.notify(DebugListener::class) { it.onDispatchAdEventData(data) }
-            }
-
-            override fun message(message: String) {
-                eventBus.notify(DebugListener::class) { it.onMessage(message) }
-            }
-        }
     private val featureManager = FeatureManager<FeatureConfigContainer>()
 
     private val eventDataDispatcher =
-        DebuggingEventDataDispatcher(
-            if (config.retryPolicy == RetryPolicy.LONG_TERM) {
-                PersistingAuthenticatedDispatcher(
-                    context = context,
-                    config = config,
-                    callback = this,
-                    backendFactory = backendFactory,
-                    licenseCall = licenseCall,
-                    eventQueue = eventQueue,
-                    scopeProvider = scopeProvider,
-                )
-            } else {
-                SimpleEventDataDispatcher(
-                    context = context,
-                    config = config,
-                    callback = this,
-                    backendFactory = backendFactory,
-                    licenseCall = licenseCall,
-                    scopeProvider = scopeProvider,
-                )
-            },
-            debugCallback,
-        )
+        if (config.retryPolicy == RetryPolicy.LONG_TERM) {
+            PersistingAuthenticatedDispatcher(
+                context = context,
+                config = config,
+                callback = this,
+                backendFactory = backendFactory,
+                licenseCall = licenseCall,
+                eventQueue = eventQueue,
+                scopeProvider = scopeProvider,
+            )
+        } else {
+            SimpleEventDataDispatcher(
+                context = context,
+                config = config,
+                callback = this,
+                backendFactory = backendFactory,
+                licenseCall = licenseCall,
+                scopeProvider = scopeProvider,
+            )
+        }
 
     private var playerAdapter: PlayerAdapter? = null
     private var stateMachineListener: StateMachineListener? = null
@@ -208,25 +190,8 @@ class BitmovinAnalytics(
         }
     }
 
-    fun addDebugListener(listener: DebugListener) {
-        eventBus[DebugListener::class].subscribe(listener)
-    }
-
-    fun removeDebugListener(listener: DebugListener) {
-        eventBus[DebugListener::class].unsubscribe(listener)
-    }
-
     val impressionId: String?
         get() = playerAdapter?.stateMachine?.impressionId
-
-    @InternalBitmovinApi
-    interface DebugListener {
-        fun onDispatchEventData(data: EventData)
-
-        fun onDispatchAdEventData(data: AdEventData)
-
-        fun onMessage(message: String)
-    }
 
     companion object {
         private const val TAG = "BitmovinAnalytics"
