@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Jacoco Coverage do not ignore Robolectric powered tests anymore.
 
 ### Changed
+- Changed `appcompat` version from `1.7.0` to `1.6.1`
 - [Internal] Added an hardcoded sequence number limit (1000).
 - [Internal] Upgraded `bitmovin player` from `3.75.0` to `3.78.0`
 - [Internal] Upgraded `media3 exoplayer` from `1.3.1` to `1.4.0`
