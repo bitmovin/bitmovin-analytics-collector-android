@@ -26,6 +26,9 @@ interface SsaiApi {
     /**
      * Marks an AdQuartile as finished
      * No-op if no ad is currently running
+     *
+     * Tracking Ads on Quartile level is an opt-in feature.
+     * Please contact Bitmovin Support to enable it.
      */
     fun adQuartileFinished(
         adQuartile: SsaiAdQuartile,

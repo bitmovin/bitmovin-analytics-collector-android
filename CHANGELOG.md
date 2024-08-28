@@ -6,10 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.8.0
+
 ### Added
 - New API to report ssai ad quartiles
 - [Internal] API checks for the `collector` module.
 - [Internal] Github Action's System tests sends a Slack message whenever it fails on the main branch.
+
+### Changed
+- Changed `appcompat` version from `1.7.0` to `1.6.1` to have same version as bitmovin player
 
 ### Removed
 - [Internal] Removed DebugListener related classes from core collector
@@ -22,7 +27,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Jacoco Coverage do not ignore Robolectric powered tests anymore.
 
 ### Changed
-- Changed `appcompat` version from `1.7.0` to `1.6.1`
 - [Internal] Added an hardcoded sequence number limit (1000).
 - [Internal] Upgraded `bitmovin player` from `3.75.0` to `3.78.0`
 - [Internal] Upgraded `media3 exoplayer` from `1.3.1` to `1.4.0`
