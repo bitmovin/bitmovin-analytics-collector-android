@@ -48,7 +48,7 @@ object SsaiDataVerifier {
             assertThat(it.domain).isNotEmpty()
             assertThat(it.key).isNotEmpty()
             assertThat(it.language).isNotEmpty()
-            assertThat(it.hasSsaiRoutingKeyHeaderSet).isTrue()
+            assertThat(it.hasSsaiRoutingParamSet).isTrue()
             assertThat(it.path).isNotEmpty()
             assertThat(it.platform).isNotEmpty()
             assertThat(it.player).isNotEmpty()

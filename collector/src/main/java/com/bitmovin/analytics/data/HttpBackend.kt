@@ -62,8 +62,6 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
             ),
         )
 
-        val additionalHeaders = if (eventData.ssaiRelatedSample) SSAI_ROUTING_HEADER else null
-
         httpClient.post(
             analyticsBackendUrl,
             serialize(eventData),
@@ -82,7 +80,7 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
                     success?.onSuccess()
                 }
             },
-            additionalHeaders,
+            eventData.ssaiRelatedSample,
         )
     }
 
@@ -101,7 +99,7 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
             ),
         )
 
-        val additionalHeader = if (eventData.adType == AdType.SERVER_SIDE.value) SSAI_ROUTING_HEADER else null
+        val useSsaiRouting = eventData.adType == AdType.SERVER_SIDE.value
 
         httpClient.post(
             adsAnalyticsBackendUrl,
@@ -121,7 +119,7 @@ class HttpBackend(config: AnalyticsConfig, context: Context) : Backend, Callback
                     success?.onSuccess()
                 }
             },
-            additionalHeader,
+            useSsaiRouting,
         )
     }
 

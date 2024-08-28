@@ -2,7 +2,6 @@ package com.bitmovin.analytics.systemtest.utils
 
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.utils.Util
-import okhttp3.Headers
 
 // AdEventData that has an additional field to also store the hasSsaiRoutingKeyHeaderSet header
 // this is used to be able to verify the header that was set
@@ -141,11 +140,8 @@ data class AdEventDataForTest(
     var quartile3FailedBeaconUrl: String? = null,
     var completedFailedBeaconUrl: String? = null,
     var timeSinceAdStartedInMs: Long? = null,
-    var headers: Headers? = null,
+    var hasSsaiRoutingParamSet: Boolean = false,
 ) {
-    val hasSsaiRoutingKeyHeaderSet: Boolean
-        get() = headers?.get("X-Bitmovin-Routingkey") == "ssai"
-
     // get the AdEventData object to able to compare sent AdEventData with received AdEventDataForTest
     fun getAdEventData(): AdEventData {
         return AdEventData(

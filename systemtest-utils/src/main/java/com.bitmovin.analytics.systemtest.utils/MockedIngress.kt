@@ -189,7 +189,7 @@ object MockedIngress {
             val request = server.takeRequest()
             val body = request.body.readUtf8()
 
-            when (request.path) {
+            when (request.requestUrl?.encodedPath) {
                 "/analytics" -> {
                     val eventData =
                         DataSerializer.deserialize(
@@ -197,7 +197,7 @@ object MockedIngress {
                             EventData::class.java,
                         )
 
-                    if (request.headers.get("X-Bitmovin-Routingkey") == "ssai") {
+                    if (request.requestUrl?.encodedQuery == "routingParam=ssai") {
                         eventData?.ssaiRelatedSample = true
                     }
 
@@ -214,7 +214,9 @@ object MockedIngress {
                             AdEventDataForTest::class.java,
                         )
 
-                    adEventData?.headers = request.headers
+                    if (request.requestUrl?.encodedQuery == "routingParam=ssai") {
+                        adEventData?.hasSsaiRoutingParamSet = true
+                    }
 
                     if (adEventData != null) {
                         adEventDataMap[adEventData.videoImpressionId]?.let {

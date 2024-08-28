@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.Headers
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -18,21 +18,25 @@ class HttpClient(private val context: Context, private val client: OkHttpClient)
         url: String,
         postBody: String?,
         callback: Callback?,
-        additionalHeaders: Headers? = null,
+        useSsaiRouting: Boolean = false,
     ) {
         Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody))
 
-        val requestBuilder =
+        val urlWithRouting =
+            if (useSsaiRouting) {
+                val urlBuilder = url.toHttpUrl().newBuilder()
+                urlBuilder.addQueryParameter("routingParam", "ssai")
+                urlBuilder.build().toString()
+            } else {
+                url
+            }
+
+        val request =
             Request.Builder()
-                .url(url)
+                .url(urlWithRouting)
                 .header("Origin", String.format("http://%s", context.packageName))
                 .post(postBody.orEmpty().toRequestBody(JSON_CONTENT_TYPE))
-
-        additionalHeaders?.forEach { (key, value) ->
-            requestBuilder.addHeader(key, value)
-        }
-
-        val request = requestBuilder.build()
+                .build()
 
         client.newCall(request)
             .enqueue(
