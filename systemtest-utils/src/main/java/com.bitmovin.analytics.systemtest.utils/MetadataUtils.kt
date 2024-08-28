@@ -87,8 +87,8 @@ object MetadataUtils {
             addition: String? = null,
             title: String? = currentTestName,
             videoId: String? = currentTestName + (addition?.let { "_$it" } ?: ""),
-            path: String? = null,
-            cdnProvider: String? = null,
+            path: String? = "testPath",
+            cdnProvider: String? = "testCdnProvider",
             customData: CustomData = TestConfig.createDummyCustomData(),
             isLive: Boolean = false,
         ): SourceMetadata {

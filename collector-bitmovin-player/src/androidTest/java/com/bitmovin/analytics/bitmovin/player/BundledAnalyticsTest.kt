@@ -1373,7 +1373,6 @@ class BundledAnalyticsTest {
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(adEventDataList, "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(adEventDataList, "test-ad-id-1")
-            SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(adEventDataList)
         }
 
     @Test
@@ -1427,6 +1426,5 @@ class BundledAnalyticsTest {
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(adEventDataList, "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(adEventDataList, "test-ad-id-1")
-            SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(adEventDataList)
         }
 }

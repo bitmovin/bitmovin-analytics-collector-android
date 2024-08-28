@@ -3,6 +3,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
@@ -53,6 +54,7 @@ class SsaiScenariosTest {
         inline get() = metadataGenerator.generate(customData = CustomData(customData1 = "custom-data-1"))
 
     private val defaultSource = Source(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
+    private val defaultMetadata = DefaultMetadata(customUserId = "test-user-id")
 
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
     private lateinit var mockedIngressUrl: String
@@ -87,7 +89,7 @@ class SsaiScenariosTest {
     fun test_adBreakStart_adStart_adStart_adBreakEnd_sets_right_values() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -98,7 +100,11 @@ class SsaiScenariosTest {
                     SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
                 )
                 collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                    SsaiAdMetadata(
+                        "test-ad-id-1",
+                        "test-ad-system-1",
+                        CustomData(customData1 = "ad-test-custom-data-1", customData30 = "ad-test-custom-data-30"),
+                    ),
                 )
                 defaultPlayer.play()
             }
@@ -140,7 +146,7 @@ class SsaiScenariosTest {
                 firstAdSamples,
                 SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
                 SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-                CustomData(customData1 = "ad-test-custom-data-1"),
+                CustomData(customData1 = "ad-test-custom-data-1", customData30 = "ad-test-custom-data-30"),
                 0,
             )
 
@@ -164,7 +170,7 @@ class SsaiScenariosTest {
     fun test_adEngagementMetrics_track_all_quartiles() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -237,7 +243,7 @@ class SsaiScenariosTest {
     fun test_adEngagementMetrics_track_all_quartiles_for_2_ads() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -354,7 +360,7 @@ class SsaiScenariosTest {
             val corruptedStream = Samples.CORRUPT_DASH
             val corruptedStreamSource = Source(SourceConfig.fromUrl(corruptedStream.uri.toString()))
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -402,7 +408,7 @@ class SsaiScenariosTest {
     fun test_adEngagementMetrics_multiple_quartile_calls_are_debounced() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -476,7 +482,7 @@ class SsaiScenariosTest {
     fun test_adEngagementMetrics_failedBeaconUrlIsReported() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -535,7 +541,7 @@ class SsaiScenariosTest {
     fun test_ignore_adStart_call_if_adBreakStart_has_not_been_called() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -574,7 +580,7 @@ class SsaiScenariosTest {
     fun test_ignore_adBreakEnd_call_if_adBreakStart_has_not_been_called() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -613,7 +619,7 @@ class SsaiScenariosTest {
     fun test_no_sample_sent_when_adBreak_was_closed_without_adStart_call_during_adBreak() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -653,7 +659,7 @@ class SsaiScenariosTest {
     fun test_increase_and_set_adIndex_only_on_every_first_ad_sample() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -739,7 +745,7 @@ class SsaiScenariosTest {
     fun test_do_not_reset_adIndex_between_adBreaks() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -830,7 +836,7 @@ class SsaiScenariosTest {
     fun test_does_not_ignore_adBreakStart_when_player_is_paused() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -894,7 +900,7 @@ class SsaiScenariosTest {
     fun test_does_not_send_sample_but_sets_metadata_when_adStart_called_with_player_paused() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -954,7 +960,7 @@ class SsaiScenariosTest {
     fun test_does_not_send_sample_but_resets_ssai_related_data_when_adBreakEnd_called_with_player_paused() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -1019,7 +1025,7 @@ class SsaiScenariosTest {
     fun test_reset_with_playlist_transition() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
             val secondSource = Source(SourceConfig.fromUrl(TestSources.DASH_SINTEL_WITH_SUBTITLES.mpdUrl!!))
             val playlistConfig = PlaylistConfig(listOf(defaultSource, secondSource))
 
@@ -1102,7 +1108,7 @@ class SsaiScenariosTest {
     fun test_adEngagementMetrics_send_adEngagementData_on_detach() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -1161,7 +1167,7 @@ class SsaiScenariosTest {
     fun test_adEngagementMetrics_send_adEngagementData_on_player_destroy() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -1220,7 +1226,7 @@ class SsaiScenariosTest {
     fun test_adEngagementMetrics_send_adEngagementData_on_source_unload() =
         runBlockingTest {
             // arrange
-            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {

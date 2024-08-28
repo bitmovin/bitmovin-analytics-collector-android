@@ -131,6 +131,7 @@ data class AdEventDataForTest(
     var autoplay: Boolean? = null,
     var platform: String,
     var audioCodec: String? = null,
+    var audioBitrate: Int? = null,
     var videoCodec: String? = null,
     var retryCount: Int = 0,
     var adIndex: Int? = null,
@@ -272,6 +273,7 @@ data class AdEventDataForTest(
             videoCodec = videoCodec,
             analyticsVersion = analyticsVersion,
             autoplay = autoplay,
+            audioBitrate = audioBitrate,
         )
     }
 }
