@@ -455,9 +455,9 @@ public final class com/bitmovin/analytics/api/ssai/SsaiAdPosition : java/lang/En
 
 public final class com/bitmovin/analytics/api/ssai/SsaiAdQuartile : java/lang/Enum {
 	public static final field COMPLETED Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
-	public static final field FIRST_QUARTILE Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
+	public static final field FIRST Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
 	public static final field MIDPOINT Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
-	public static final field THIRD_QUARTILE Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
+	public static final field THIRD Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
 	public static fun values ()[Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;
