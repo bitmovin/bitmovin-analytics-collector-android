@@ -141,6 +141,7 @@ data class AdEventData(
     var midpointFailedBeaconUrl: String? = null,
     var quartile3FailedBeaconUrl: String? = null,
     var completedFailedBeaconUrl: String? = null,
+    var timeSinceAdStartedInMs: Long? = null,
 ) {
     companion object {
         fun fromEventData(

@@ -9,7 +9,9 @@ import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartileMetadata
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.enums.AdType
+import com.bitmovin.analytics.utils.SystemTimeService
 import io.mockk.clearMocks
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -22,10 +24,13 @@ class SsaiEngagementMetricsServiceTest {
     private val analytics: BitmovinAnalytics = mockk()
     private val playerAdapter: PlayerAdapter = mockk()
     private val handlerMock = mockk<Handler>()
+    private val systemTimeServiceMock = mockk<SystemTimeService>()
 
     @Before
     fun setUp() {
-        ssaiEngagementMetricsService = SsaiEngagementMetricsService(analytics, playerAdapter, handlerMock)
+        // dummy default mock setup to run tests
+        every { systemTimeServiceMock.elapsedRealtime() }.returns(12L)
+        ssaiEngagementMetricsService = SsaiEngagementMetricsService(analytics, playerAdapter, handlerMock, systemTimeServiceMock)
     }
 
     @Test

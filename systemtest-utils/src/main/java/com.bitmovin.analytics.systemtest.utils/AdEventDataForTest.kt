@@ -140,6 +140,7 @@ data class AdEventDataForTest(
     var midpointFailedBeaconUrl: String? = null,
     var quartile3FailedBeaconUrl: String? = null,
     var completedFailedBeaconUrl: String? = null,
+    var timeSinceAdStartedInMs: Long? = null,
     var headers: Headers? = null,
 ) {
     val hasSsaiRoutingKeyHeaderSet: Boolean
@@ -274,6 +275,7 @@ data class AdEventDataForTest(
             analyticsVersion = analyticsVersion,
             autoplay = autoplay,
             audioBitrate = audioBitrate,
+            timeSinceAdStartedInMs = timeSinceAdStartedInMs,
         )
     }
 }

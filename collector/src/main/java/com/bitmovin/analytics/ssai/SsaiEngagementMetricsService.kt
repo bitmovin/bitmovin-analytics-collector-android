@@ -9,17 +9,22 @@ import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartileMetadata
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.enums.AdType
+import com.bitmovin.analytics.internal.InternalBitmovinApi
+import com.bitmovin.analytics.utils.SystemTimeService
 import com.bitmovin.analytics.utils.Util
 
+@InternalBitmovinApi
 class SsaiEngagementMetricsService(
     private val analytics: BitmovinAnalytics,
     private val playerAdapter: PlayerAdapter,
     private val ssaiTimeoutHandler: Handler,
+    private val systemTimeService: SystemTimeService = SystemTimeService(),
 ) {
     private var adImpressionId: String? = null
     private var quartilesFinishedWithCurrentAd = mutableSetOf<SsaiAdQuartile>()
     private var errorSentForCurrentAd = false
     private var activeAdSample: AdEventData? = null
+    private var adStartedAtInMs: Long = 0
 
     @Synchronized
     fun markAdStart(
@@ -32,6 +37,7 @@ class SsaiEngagementMetricsService(
         adImpressionId = Util.uUID
         val adEventData = createBasicSsaiAdEventData(adPosition, adMetadata, adIndex)
         adEventData.started = 1
+        adStartedAtInMs = systemTimeService.elapsedRealtime()
         activeAdSample = adEventData
         enableOrPostponeFlushTimeout()
     }
@@ -87,6 +93,7 @@ class SsaiEngagementMetricsService(
 
     private fun sendAndClearAdSample() {
         activeAdSample?.let {
+            it.timeSinceAdStartedInMs = systemTimeService.elapsedRealtime() - adStartedAtInMs
             analytics.sendAdEventData(it)
         }
         activeAdSample = null

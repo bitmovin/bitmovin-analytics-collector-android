@@ -287,25 +287,25 @@ class SsaiScenariosTest {
                 )
             }
 
-            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 5000)
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4500)
 
             withContext(mainScope.coroutineContext) {
                 collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
             }
 
-            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 6000)
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 5000)
 
             withContext(mainScope.coroutineContext) {
                 collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
             }
 
-            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 7000)
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 5500)
 
             withContext(mainScope.coroutineContext) {
                 collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
             }
 
-            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 8000)
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 6000)
 
             withContext(mainScope.coroutineContext) {
                 collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
@@ -333,6 +333,9 @@ class SsaiScenariosTest {
             assertThat(firstAdSample.quartile3).isEqualTo(1)
             assertThat(firstAdSample.completed).isEqualTo(1)
 
+            // verify that delta is set close to the time
+            assertThat(firstAdSample.timeSinceAdStartedInMs).isBetween(3500, 5500)
+
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(listOf(firstAdSample), 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(listOf(firstAdSample), "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(listOf(firstAdSample), "test-ad-id-1")
@@ -344,6 +347,8 @@ class SsaiScenariosTest {
             assertThat(secondAdSample.midpoint).isEqualTo(1)
             assertThat(secondAdSample.quartile3).isEqualTo(1)
             assertThat(secondAdSample.completed).isEqualTo(1)
+
+            assertThat(secondAdSample.timeSinceAdStartedInMs).isBetween(1500, 3000)
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(listOf(secondAdSample), 1)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(listOf(secondAdSample), "test-ad-system-2")

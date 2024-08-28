@@ -14,7 +14,7 @@ import com.bitmovin.analytics.api.ssai.SsaiApi
 class SsaiApiProxy : SsaiApi {
     private var ssaiService: SsaiService? = null
 
-    fun attach(ssaiService: SsaiService) {
+    internal fun attach(ssaiService: SsaiService) {
         this.ssaiService = ssaiService
     }
 
