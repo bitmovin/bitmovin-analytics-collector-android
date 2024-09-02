@@ -106,17 +106,17 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyInvariants(eventDataList)
             DataVerifier.verifyM3u8SourceUrl(eventDataList, liveStreamSample.m3u8Url!!)
 
-            EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            val filteredList = EventDataUtils.filterNonDeterministicEvents(eventDataList)
 
             // there need to be at least 4 events
             // startup, playing, pause, playing
-            assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(4)
+            assertThat(filteredList).hasSizeGreaterThanOrEqualTo(4)
 
             DataVerifier.verifyStartupSample(eventDataList[0])
-            assertThat(eventDataList[1].state).isEqualTo("playing")
+            assertThat(filteredList[1].state).isEqualTo("playing")
 
             // verify that there is exactly one pause sample
-            val pauseSamples = eventDataList.filter { x -> x.state?.lowercase() == "pause" }
+            val pauseSamples = filteredList.filter { x -> x.state?.lowercase() == "pause" }
             assertThat(pauseSamples.size).isEqualTo(1)
             assertThat(pauseSamples[0].paused).isGreaterThan(firstPauseMs - 100) // reducing minimal expected pause time to make test stable
         }
@@ -196,24 +196,23 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyM3u8SourceUrl(firstImpressionSamples, liveStreamSample1.m3u8Url!!)
             DataVerifier.verifyM3u8SourceUrl(secondImpressionSamples, liveStreamSample2.m3u8Url!!)
 
-            EventDataUtils.filterNonDeterministicEvents(firstImpressionSamples)
-            EventDataUtils.filterNonDeterministicEvents(secondImpressionSamples)
+            val filteredFirst = EventDataUtils.filterNonDeterministicEvents(firstImpressionSamples)
+            val filteredSecond = EventDataUtils.filterNonDeterministicEvents(secondImpressionSamples)
 
             // there need to be at least 2 events per session
             // startup, playing
-            assertThat(firstImpressionSamples).hasSizeGreaterThanOrEqualTo(2)
-            assertThat(secondImpressionSamples).hasSizeGreaterThanOrEqualTo(2)
+            assertThat(filteredFirst).hasSizeGreaterThanOrEqualTo(2)
+            assertThat(filteredSecond).hasSizeGreaterThanOrEqualTo(2)
 
-            DataVerifier.verifyStartupSample(firstImpressionSamples.first())
-            DataVerifier.verifyStartupSample(secondImpressionSamples.first(), false)
+            DataVerifier.verifyStartupSample(filteredFirst.first())
+            DataVerifier.verifyStartupSample(filteredSecond.first(), false)
 
-            assertThat(firstImpressionSamples[1].state).isEqualTo("playing")
-            assertThat(secondImpressionSamples[1].state).isEqualTo("playing")
+            assertThat(filteredFirst[1].state).isEqualTo("playing")
+            assertThat(filteredSecond[1].state).isEqualTo("playing")
 
             // verify durations of playing samples state are within a reasonable range
-            DataVerifier.verifyPlayTimeIsCorrect(firstImpressionSamples, firstPlayMs)
-
-            DataVerifier.verifyPlayTimeIsCorrect(secondImpressionSamples, secondPlayMs)
+            DataVerifier.verifyPlayTimeIsCorrect(filteredFirst, firstPlayMs)
+            DataVerifier.verifyPlayTimeIsCorrect(filteredSecond, secondPlayMs)
         }
 
     @Test
@@ -259,14 +258,14 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
             DataVerifier.verifyM3u8SourceUrl(eventDataList, vodStreamSample.m3u8Url!!)
 
-            EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            val filteredList = EventDataUtils.filterNonDeterministicEvents(eventDataList)
 
             // there need to be at least 3 events
             // startup, playing, seeking
-            assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(3)
+            assertThat(filteredList).hasSizeGreaterThanOrEqualTo(3)
 
-            DataVerifier.verifyStartupSample(eventDataList[0])
-            DataVerifier.verifyThereWasExactlyOneSeekingSample(eventDataList)
+            DataVerifier.verifyStartupSample(filteredList[0])
+            DataVerifier.verifyThereWasExactlyOneSeekingSample(filteredList)
         }
 
     @Test
@@ -314,14 +313,14 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
             DataVerifier.verifyInvariants(eventDataList)
 
-            EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            val filteredList = EventDataUtils.filterNonDeterministicEvents(eventDataList)
 
             // there need to be at least 2 events
             // startup, playing
-            assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(2)
-            DataVerifier.verifyStartupSample(eventDataList[0])
+            assertThat(filteredList).hasSizeGreaterThanOrEqualTo(2)
+            DataVerifier.verifyStartupSample(filteredList[0])
 
-            DataVerifier.verifyPlayTimeIsCorrect(eventDataList, playedBeforePause)
+            DataVerifier.verifyPlayTimeIsCorrect(filteredList, playedBeforePause)
         }
 
     @Test

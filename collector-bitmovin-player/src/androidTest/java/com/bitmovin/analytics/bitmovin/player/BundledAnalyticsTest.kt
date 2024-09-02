@@ -278,10 +278,10 @@ class BundledAnalyticsTest {
             DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true, true))
             DataVerifier.verifyInvariants(eventDataList)
 
-            EventDataUtils.filterNonDeterministicEvents(eventDataList)
-            DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+            val filteredList = EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            DataVerifier.verifyThereWasAtLeastOnePlayingSample(filteredList)
             // verify that no other states than startup and playing were reached
-            assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
+            assertThat(filteredList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
         }
 
     @Test
@@ -326,10 +326,10 @@ class BundledAnalyticsTest {
             DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(false, false))
             DataVerifier.verifyInvariants(eventDataList)
 
-            EventDataUtils.filterNonDeterministicEvents(eventDataList)
-            DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+            val filteredList = EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            DataVerifier.verifyThereWasAtLeastOnePlayingSample(filteredList)
             // verify that no other states than startup and playing were reached
-            assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
+            assertThat(filteredList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
         }
 
     @Test
@@ -381,10 +381,10 @@ class BundledAnalyticsTest {
             DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true, true))
             DataVerifier.verifyInvariants(eventDataList)
 
-            EventDataUtils.filterNonDeterministicEvents(eventDataList)
-            DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+            val filteredList = EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            DataVerifier.verifyThereWasAtLeastOnePlayingSample(filteredList)
             // verify that no other states than startup and playing were reached
-            assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
+            assertThat(filteredList.filter { x -> x.state != "startup" && x.state != "playing" }.size).isEqualTo(0)
         }
 
     @Test
@@ -1449,11 +1449,10 @@ class BundledAnalyticsTest {
             val impression = impressionsList.first()
             DataVerifier.verifyHasNoErrorSamples(impression)
 
-            val eventDataList = impression.eventDataList.toMutableList()
-            EventDataUtils.filterNonDeterministicEvents(eventDataList)
-            assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(2)
+            val filteredList = EventDataUtils.filterNonDeterministicEvents(impression.eventDataList)
+            assertThat(filteredList).hasSizeGreaterThanOrEqualTo(2)
 
-            val playingTime = eventDataList.map { it.played }.reduce(Long::plus)
+            val playingTime = filteredList.map { it.played }.reduce(Long::plus)
             assertThat(playingTime).isGreaterThan(1700)
         }
 }

@@ -196,7 +196,6 @@ object DataVerifier {
         assertThat(eventData.streamFormat).isEqualTo(expectedData.streamFormat)
 
         if (expectedData.progUrl != null) {
-            // TODO
             // We don't do any checks on videoBitrate when progressive source is used
             // since it seems to be a bit flaky,
             // bitrate is set to -1 mostly but sometimes to 4800000
@@ -219,15 +218,6 @@ object DataVerifier {
             if (eventData.player != "exoplayer") {
                 assertThat(eventData.progUrl).isEqualTo(expectedData.progUrl)
             }
-        }
-    }
-
-    fun verifyAnalyticsConfig(
-        eventData: List<EventData>,
-        analyticsConfig: BitmovinAnalyticsConfig,
-    ) {
-        for (event in eventData) {
-            verifyAnalyticsConfig(event, analyticsConfig)
         }
     }
 

@@ -118,7 +118,7 @@ class AdScenariosTest {
             // DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
             DataVerifier.verifyInvariants(eventDataList)
 
-            EventDataUtils.filterNonDeterministicEvents(eventDataList)
-            DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+            val filteredList = EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            DataVerifier.verifyThereWasAtLeastOnePlayingSample(filteredList)
         }
 }

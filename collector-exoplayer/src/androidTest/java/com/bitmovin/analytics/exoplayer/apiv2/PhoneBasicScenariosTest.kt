@@ -245,10 +245,10 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(false))
             DataVerifier.verifyInvariants(eventDataList)
 
-            EventDataUtils.filterNonDeterministicEvents(eventDataList)
-            DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+            val filteredList = EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            DataVerifier.verifyThereWasAtLeastOnePlayingSample(filteredList)
             // verify that no other states than startup and playing were reached
-            Assertions.assertThat(eventDataList.filter { x -> x.state != "startup" && x.state != "playing" }.size)
+            Assertions.assertThat(filteredList.filter { x -> x.state != "startup" && x.state != "playing" }.size)
                 .isEqualTo(0)
         }
 
