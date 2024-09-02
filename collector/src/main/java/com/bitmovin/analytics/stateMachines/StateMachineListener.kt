@@ -20,7 +20,7 @@ interface StateMachineListener {
         duration: Long,
     )
 
-    fun onHeartbeat(
+    fun onTriggerSample(
         stateMachine: PlayerStateMachine,
         duration: Long,
         ssaiRelated: Boolean,

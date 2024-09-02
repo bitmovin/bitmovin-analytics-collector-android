@@ -47,7 +47,7 @@ class PlayerStateMachine(
         heartbeatHandler.postDelayed(
             object : Runnable {
                 override fun run() {
-                    val continueHeartbeat = checkAndTriggerPlayingHeartbeat()
+                    val continueHeartbeat = checkAndTriggerPlayingSample()
                     if (continueHeartbeat) {
                         heartbeatHandler.postDelayed(this, heartbeatDelay)
                     }
@@ -65,7 +65,7 @@ class PlayerStateMachine(
         heartbeatHandler.postDelayed(
             object : Runnable {
                 override fun run() {
-                    triggerHeartbeat()
+                    triggerSample()
                     currentRebufferingIntervalIndex =
                         Math.min(
                             currentRebufferingIntervalIndex + 1,
@@ -86,13 +86,28 @@ class PlayerStateMachine(
         heartbeatHandler.removeCallbacksAndMessages(null)
     }
 
+    // last sample of session when collector is detached
+    // player destroyed, or source unloaded
+    fun triggerLastSampleOfSession() {
+        // we don't want to trigger on Pause since this is pause samples are not affecting our metrics
+        // same for Ready state. We also ignore error, since every error triggers a sample immediately
+        // anyway, and we want to make sure we don't send it out twice
+        if (currentState === PlayerStates.PAUSE || currentState === PlayerStates.READY ||
+            currentState === PlayerStates.ERROR
+        ) {
+            return
+        }
+
+        triggerSample()
+    }
+
     // Exoplayer and IVsPlayer do not have a 'playerWasReleased' event, so we can not detect when
     // the player was released. This is problematic when a customer releases player but does not
     // detach our collectors, as we do not transition into pause state and will continue sending
     // samples. The below check prevents this from happening.
-    private fun checkAndTriggerPlayingHeartbeat(): Boolean {
+    private fun checkAndTriggerPlayingSample(): Boolean {
         if (playerContext.isPlaying()) {
-            triggerHeartbeat()
+            triggerSample()
             return true
         } else {
             // transition into pause state when player is in PLAYING state but not actually playing
@@ -101,10 +116,11 @@ class PlayerStateMachine(
         }
     }
 
-    private fun triggerHeartbeat(ssaiRelated: Boolean = false) {
+    // Trigger sample that is not caused by a player event directly (heartbeat, ssai ad block, detaching,...
+    private fun triggerSample(ssaiRelated: Boolean = false) {
         val elapsedTime = Util.elapsedTime
         videoTimeEnd = playerContext.position
-        listeners.notify { it.onHeartbeat(this, elapsedTime - elapsedTimeOnEnter, ssaiRelated) }
+        listeners.notify { it.onTriggerSample(this, elapsedTime - elapsedTimeOnEnter, ssaiRelated) }
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
     }
@@ -281,12 +297,12 @@ class PlayerStateMachine(
         qualityChanged(videoTime, didQualityChange, setQualityFunction)
     }
 
-    fun onPlayingHeartbeat(ssaiRelated: Boolean = false) {
+    fun triggerSampleIfPlaying(ssaiRelated: Boolean = false) {
         if (currentState != PlayerStates.PLAYING) {
             return
         }
 
-        triggerHeartbeat(ssaiRelated)
+        triggerSample(ssaiRelated)
     }
 
     private fun qualityChanged(

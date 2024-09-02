@@ -116,8 +116,11 @@ class BitmovinAnalytics(
     }
 
     /** Detach the current player that is being used with Bitmovin Analytics.  */
-    fun detachPlayer() {
-        playerAdapter?.ssaiService?.flushCurrentAdSample()
+    fun detachPlayer(shouldSendOutSamples: Boolean = true) {
+        if (shouldSendOutSamples) {
+            playerAdapter?.ssaiService?.flushCurrentAdSample()
+            playerAdapter?.stateMachine?.triggerLastSampleOfSession()
+        }
         detachAd()
         featureManager.unregisterFeatures()
         eventBus.notify(OnAnalyticsReleasingEventListener::class) { it.onReleasing() }
@@ -186,7 +189,7 @@ class BitmovinAnalytics(
 
     override fun authenticationCompleted(success: Boolean) {
         if (!success) {
-            detachPlayer()
+            detachPlayer(shouldSendOutSamples = false)
         }
     }
 

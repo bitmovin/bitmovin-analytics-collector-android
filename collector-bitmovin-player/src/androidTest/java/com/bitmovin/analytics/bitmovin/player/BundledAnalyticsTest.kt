@@ -362,7 +362,7 @@ class BundledAnalyticsTest {
             Thread.sleep(10000)
 
             withContext(mainScope.coroutineContext) {
-                localPlayer.pause()
+                localPlayer.destroy()
             }
 
             // assert
@@ -1426,5 +1426,34 @@ class BundledAnalyticsTest {
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(adEventDataList, "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(adEventDataList, "test-ad-id-1")
+        }
+
+    @Test
+    fun test_send_sample_on_detach() =
+        runBlockingTest {
+            // act
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.load(defaultSource)
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.destroy()
+            }
+
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionsList).hasSize(1)
+
+            val impression = impressionsList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList.toMutableList()
+            EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(2)
+
+            val playingTime = eventDataList.map { it.played }.reduce(Long::plus)
+            assertThat(playingTime).isGreaterThan(1700)
         }
 }

@@ -675,9 +675,10 @@ class PhoneBasicScenariosTest {
             val impression = impressions.first()
             DataVerifier.verifyHasNoErrorSamples(impression)
 
-            // since use lowest quality, we expect only 1 startup and 1 playing sample
+            // since use lowest quality, we expect only 1 startup and 2 playing sample
+            // (one for the hearbeat itself and one for detaching)
             // (using lowest quality doesn't trigger qualitychange events)
-            assertThat(impression.eventDataList).hasSize(2)
+            assertThat(impression.eventDataList).hasSize(3)
             DataVerifier.verifyStartupSample(impression.eventDataList[0])
 
             // second sample is playing sample triggered through playing heartbeat
@@ -939,5 +940,41 @@ class PhoneBasicScenariosTest {
 
             val playAfterPause = impression.eventDataList[pauseAfterSeek.sequenceNumber + 1]
             assertThat(playAfterPause.state).isEqualTo(DataVerifier.PLAYING)
+        }
+
+    @Test
+    fun test_send_sample_on_detach() =
+        runBlockingTest {
+            // arrange
+            val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.sourceMetadata = defaultSourceMetadata
+                collector.attachPlayer(player)
+                player.setMediaItem(defaultMediaItem)
+                player.trackSelectionParameters = forceLowestQuality
+                player.prepare()
+                player.play()
+            }
+
+            ExoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+            }
+
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionsList).hasSize(1)
+
+            val impression = impressionsList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList.toMutableList()
+            EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(2)
+
+            val playingTime = eventDataList.map { it.played }.reduce(Long::plus)
+            assertThat(playingTime).isGreaterThan(1700)
         }
 }

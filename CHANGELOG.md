@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
+- All players: Send out sample on detaching of collector to improve data quality
 - [Internal] Upgraded `bitmovin player` from `3.78.0` to `3.81.0`
 - [Internal] Upgraded `media3 exoplayer` from `1.4.0` to `1.4.1`
 

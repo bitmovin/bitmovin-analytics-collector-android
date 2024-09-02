@@ -76,7 +76,7 @@ class DefaultStateMachineListener(
         analytics.sendEventData(data)
     }
 
-    override fun onHeartbeat(
+    override fun onTriggerSample(
         stateMachine: PlayerStateMachine,
         duration: Long,
         ssaiRelated: Boolean,
@@ -84,7 +84,7 @@ class DefaultStateMachineListener(
         Log.d(
             TAG,
             String.format(
-                "onHeartbeat %s %s",
+                "onTriggerSample %s %s",
                 stateMachine.currentState.name,
                 stateMachine.impressionId,
             ),
@@ -99,6 +99,8 @@ class DefaultStateMachineListener(
             data.paused = duration
         } else if (stateMachine.currentState === PlayerStates.BUFFERING) {
             data.buffered = duration
+        } else if (stateMachine.currentState === PlayerStates.SEEKING) {
+            data.seeked = duration
         }
 
         data.videoTimeStart = stateMachine.videoTimeStart

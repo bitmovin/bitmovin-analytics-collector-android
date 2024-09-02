@@ -1280,4 +1280,38 @@ class PhoneBasicScenariosTest {
             val playingAfterSecondSeek = impression.eventDataList[backwardSeek.sequenceNumber + 1]
             DataVerifier.verifyIsPlayingEvent(playingAfterSecondSeek)
         }
+
+    @Test
+    fun test_send_sample_on_detach() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+            }
+
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionsList).hasSize(1)
+
+            val impression = impressionsList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList.toMutableList()
+            EventDataUtils.filterNonDeterministicEvents(eventDataList)
+            assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(2)
+
+            val playingTime = eventDataList.map { it.played }.reduce(Long::plus)
+            assertThat(playingTime).isGreaterThan(1700)
+        }
 }
