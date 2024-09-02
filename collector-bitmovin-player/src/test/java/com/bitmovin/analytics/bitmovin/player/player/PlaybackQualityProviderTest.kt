@@ -10,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 
 class PlaybackQualityProviderTest {
-
     private lateinit var playerMock: Player
     private lateinit var qualityProvider: PlaybackQualityProvider
 
@@ -23,7 +22,7 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentVideoQuality_Should_returnQualityFromPlayerInitially() {
         // arrange
-        val quality = VideoQuality("id", "label", 123, "dummy", 30.0f, 1, 1)
+        val quality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
         every { playerMock.playbackVideoData }.returns(quality)
 
         // act and assert
@@ -33,7 +32,7 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentVideoQuality_Should_returnQualityStored() {
         // arrange
-        val quality = VideoQuality("id", "label", 123, "dummy", 30.0f, 1, 1)
+        val quality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
         qualityProvider.currentVideoQuality = quality
 
         // act and assert
@@ -43,7 +42,7 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentAudioQuality_Should_returnQualityStored() {
         // arrange
-        val quality = AudioQuality("id", "label", 123, "dummy")
+        val quality = AudioQuality("id", "label", 123, 123, 123, "dummy")
         qualityProvider.currentAudioQuality = quality
 
         // act and assert
@@ -53,7 +52,7 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentAudioQuality_Should_returnQualityFromPlayerInitially() {
         // arrange
-        val quality = AudioQuality("id", "label", 123, "dummy")
+        val quality = AudioQuality("id", "label", 123, 123, 123, "dummy")
         every { playerMock.playbackAudioData }.returns(quality)
 
         // act and assert
@@ -63,8 +62,8 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_didVideoQualityChange_Should_returnFalseWithSameQuality() {
         // arrage
-        val oldVideoQuality = VideoQuality("id", "label", 123, "dummy", 30.0f, 1, 1)
-        val newVideoQuality = VideoQuality("id", "label", 123, "dummy", 30.0f, 1, 1)
+        val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
+        val newVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
 
         qualityProvider.currentVideoQuality = oldVideoQuality
 
@@ -78,8 +77,8 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_didVideoQualityChange_Should_returnTrueWithDifferentQuality() {
         // arrage
-        val oldVideoQuality = VideoQuality("id", "label", 123, "dummy", 30.0f, 1, 1)
-        val newVideoQuality = VideoQuality("id", "label", 456, "dummy", 30.0f, 1, 1)
+        val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
+        val newVideoQuality = VideoQuality("id", "label", 456, 123, 123, "dummy", 30.0f, 1, 1)
 
         qualityProvider.currentVideoQuality = oldVideoQuality
 
@@ -93,8 +92,8 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_didAudioQualityChange_Should_returnFalseWithSameQuality() {
         // arrage
-        val oldAudioQuality = AudioQuality("id", "label", 123, "dummy")
-        val newAudioQuality = AudioQuality("id", "label", 123, "dummy")
+        val oldAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy")
+        val newAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy")
 
         qualityProvider.currentAudioQuality = oldAudioQuality
 
@@ -108,8 +107,8 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_didAudioQualityChange_Should_returnTrueWithDifferentQuality() {
         // arrage
-        val oldAudioQuality = AudioQuality("id", "label", 123, "dummy")
-        val newAudioQuality = AudioQuality("id2", "label2", 456, "dummy")
+        val oldAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy")
+        val newAudioQuality = AudioQuality("id2", "label2", 456, 123, 123, "dummy")
 
         qualityProvider.currentAudioQuality = oldAudioQuality
 
@@ -123,11 +122,11 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_resetPlaybackQualities_Should_setQualitiesToNull() {
         // arrage
-        val oldVideoQuality = VideoQuality("id", "label", 123, "dummy", 30.0f, 1, 1)
-        val oldAudioQuality = AudioQuality("id", "label", 123, "dummy")
+        val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
+        val oldAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy")
 
-        val newVideoQuality = VideoQuality("id2", "label2", 456, "dummy", 30.0f, 1, 1)
-        val newAudioQuality = AudioQuality("id2", "label2", 456, "dummy")
+        val newVideoQuality = VideoQuality("id2", "label2", 456, 123, 123, "dummy", 30.0f, 1, 1)
+        val newAudioQuality = AudioQuality("id2", "label2", 456, 123, 123, "dummy")
 
         // since qualities are null after reset, player will be called for current qualities
         every { playerMock.playbackAudioData }.returns(newAudioQuality)
