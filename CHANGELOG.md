@@ -6,8 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
-### Changed
+## v3.8.1
+
+## Fixed
 - All players: Send out sample on detaching of collector to improve data quality
+
+### Changed
 - [Internal] Upgraded `bitmovin player` from `3.78.0` to `3.81.0`
 - [Internal] Upgraded `media3 exoplayer` from `1.4.0` to `1.4.1`
 
