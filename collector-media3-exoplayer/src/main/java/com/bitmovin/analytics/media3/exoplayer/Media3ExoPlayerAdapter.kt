@@ -100,6 +100,12 @@ internal class Media3ExoPlayerAdapter(
         )
     }
 
+    override fun triggerLastSampleOfSession() {
+        Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
+            stateMachine.triggerLastSampleOfSession()
+        }
+    }
+
     override fun release() {
         // we need to run this on the application thread to prevent exoplayer from crashing
         // when calling the api from a non application thread

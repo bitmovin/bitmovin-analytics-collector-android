@@ -138,6 +138,15 @@ internal class ExoPlayerAdapter(
         stateMachine.transitionState(PlayerStates.STARTUP, position)
     }
 
+    override fun triggerLastSampleOfSession() {
+        // this method ensure that we are accessing the exoplayer on the correct looper
+        // on detaching, to send out the last sample.
+        // player could crash otherwise
+        ExoUtil.executeSyncOrAsyncOnLooperThread(exoplayer.applicationLooper) {
+            stateMachine.triggerLastSampleOfSession()
+        }
+    }
+
     /*
      * Because of the late initialization of the Adapter we do not get the first
      * couple of events so in case the player starts a video due to autoplay=true we

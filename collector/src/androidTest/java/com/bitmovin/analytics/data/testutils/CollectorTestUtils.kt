@@ -73,6 +73,8 @@ internal class DummyPlayerAdapter(
     override fun createEventDataForCustomDataEvent(sourceMetadata: SourceMetadata): EventData {
         return TestFactory.createEventData(createTestImpressionId(1))
     }
+
+    override fun triggerLastSampleOfSession() {}
 }
 
 internal class DummyPlayerContext : PlayerContext {

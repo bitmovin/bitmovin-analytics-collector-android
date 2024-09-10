@@ -72,6 +72,10 @@ abstract class DefaultPlayerAdapter(
             ssaiService.adMetadata,
         )
 
+    override fun triggerLastSampleOfSession() {
+        stateMachine.triggerLastSampleOfSession()
+    }
+
     override fun createEventDataForCustomDataEvent(sourceMetadata: SourceMetadata) =
         eventDataFactory.create(
             stateMachine.impressionId,

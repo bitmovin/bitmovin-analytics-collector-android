@@ -119,7 +119,7 @@ class BitmovinAnalytics(
     fun detachPlayer(shouldSendOutSamples: Boolean = true) {
         if (shouldSendOutSamples) {
             playerAdapter?.ssaiService?.flushCurrentAdSample()
-            playerAdapter?.stateMachine?.triggerLastSampleOfSession()
+            playerAdapter?.triggerLastSampleOfSession()
         }
         detachAd()
         featureManager.unregisterFeatures()
