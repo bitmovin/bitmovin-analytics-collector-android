@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
 import android.os.Looper
-import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
@@ -31,6 +30,7 @@ import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.DownloadSpeedMeasurement
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.bitmovin.analytics.utils.Util
@@ -100,7 +100,7 @@ internal class BitmovinSdkAdapter(
     }
 
     private fun addPlayerListeners() {
-        Log.d(TAG, "Adding Player Listeners")
+        BitmovinLog.d(TAG, "Adding Player Listeners")
         player.on(::onSourceEventSourceLoaded)
         player.on(::onSourceEventSourceUnloaded)
         player.on(::onPlayerEventPlay)
@@ -127,7 +127,7 @@ internal class BitmovinSdkAdapter(
     }
 
     private fun removePlayerListener() {
-        Log.d(TAG, "Removing Player Listeners")
+        BitmovinLog.d(TAG, "Removing Player Listeners")
         player.off(::onSourceEventSourceLoaded)
         player.off(::onSourceEventSourceUnloaded)
         player.off(::onPlayerEventPlay)
@@ -201,7 +201,7 @@ internal class BitmovinSdkAdapter(
                 drmConfig is WidevineConfig -> data.drmType = DRMType.WIDEVINE.value
                 drmConfig is ClearKeyConfig -> data.drmType = DRMType.CLEARKEY.value
                 drmConfig != null -> {
-                    Log.d(TAG, "Warning: unknown DRM Type " + drmConfig.javaClass.simpleName)
+                    BitmovinLog.d(TAG, "Warning: unknown DRM Type " + drmConfig.javaClass.simpleName)
                 }
             }
         } else {
@@ -310,7 +310,7 @@ internal class BitmovinSdkAdapter(
         val source = player.source
 
         if (source != null && playbackConfig.isAutoplayEnabled) {
-            Log.d(TAG, "Detected Autoplay going to startup")
+            BitmovinLog.d(TAG, "Detected Autoplay going to startup")
             startup()
         }
     }
@@ -330,7 +330,7 @@ internal class BitmovinSdkAdapter(
     private fun onSourceEventSourceLoaded(
         @Suppress("UNUSED_PARAMETER") event: SourceEvent.Loaded,
     ) {
-        Log.d(TAG, "On Source Loaded")
+        BitmovinLog.d(TAG, "On Source Loaded")
         isVideoAttemptedPlay = false
     }
 
@@ -339,10 +339,10 @@ internal class BitmovinSdkAdapter(
     ) {
         try {
             ssaiService.flushCurrentAdSample()
-            Log.d(TAG, "On Source Unloaded")
+            BitmovinLog.d(TAG, "On Source Unloaded")
             stateMachine.resetStateMachine()
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -351,13 +351,13 @@ internal class BitmovinSdkAdapter(
     ) {
         try {
             ssaiService.flushCurrentAdSample()
-            Log.d(TAG, "On Destroy")
+            BitmovinLog.d(TAG, "On Destroy")
             if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
                 stateMachine.videoStartFailedReason = VideoStartFailedReason.PAGE_CLOSED
                 stateMachine.transitionState(PlayerStates.EXITBEFOREVIDEOSTART, position)
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -365,7 +365,7 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.PlaybackFinished,
     ) {
         try {
-            Log.d(TAG, "On Playback Finished Listener")
+            BitmovinLog.d(TAG, "On Playback Finished Listener")
 
             // if it's live stream we are using currentPosition of playback as videoTime
             val videoTime =
@@ -373,13 +373,13 @@ internal class BitmovinSdkAdapter(
             stateMachine.transitionState(PlayerStates.PAUSE, videoTime)
             stateMachine.resetStateMachine()
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
     private fun onPlayerEventPaused(event: PlayerEvent.Paused) {
         try {
-            Log.d(TAG, "On Pause Listener")
+            BitmovinLog.d(TAG, "On Pause Listener")
             // used value from event instead of player.currentTime because in case player is transitioning to ads
             // player.currentTime will be 0 and mess videoTimeEnd measurement
             val videoPosition = Util.secondsToMillis(event.time)
@@ -389,7 +389,7 @@ internal class BitmovinSdkAdapter(
                 stateMachine.pause(videoPosition)
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -397,12 +397,12 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Play,
     ) {
         try {
-            Log.d(TAG, "On Play Listener")
+            BitmovinLog.d(TAG, "On Play Listener")
             if (!stateMachine.isStartupFinished) {
                 startup()
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -410,10 +410,10 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Playing,
     ) {
         try {
-            Log.d(TAG, "On Playing Listener " + stateMachine.currentState.name)
+            BitmovinLog.d(TAG, "On Playing Listener " + stateMachine.currentState.name)
             stateMachine.transitionState(PlayerStates.PLAYING, position)
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -425,14 +425,14 @@ internal class BitmovinSdkAdapter(
                 stateMachine.transitionState(PlayerStates.PLAYING, position)
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
     private fun onPlayerEventSeeked(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Seeked,
     ) {
-        Log.d(TAG, "On Seeked Listener")
+        BitmovinLog.d(TAG, "On Seeked Listener")
 
         if (player.isPaused) {
             stateMachine.transitionState(PlayerStates.PAUSE, position)
@@ -443,13 +443,14 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Seek,
     ) {
         try {
-            Log.d(TAG, "On Seek Listener")
+            BitmovinLog.d(TAG, "On Seek Listener")
+
             if (!stateMachine.isStartupFinished) {
                 return
             }
             stateMachine.transitionState(PlayerStates.SEEKING, position)
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -457,7 +458,8 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.StallEnded,
     ) {
         try {
-            Log.d(TAG, "On Stall Ended: " + player.isPlaying)
+            BitmovinLog.d(TAG, "On Stall Ended: " + player.isPlaying)
+
             if (!stateMachine.isStartupFinished) {
                 return
             }
@@ -471,7 +473,7 @@ internal class BitmovinSdkAdapter(
                 stateMachine.transitionState(PlayerStates.PAUSE, position)
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -479,7 +481,8 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: SourceEvent.AudioChanged,
     ) {
         try {
-            Log.d(TAG, "On AudioChanged")
+            BitmovinLog.d(TAG, "On AudioChanged")
+
             // TODO AN-3298 add a audio track changed to the statemachine that will check if
             // transition is allowed and make sure the old sample is send with the old audio track value
             if (!stateMachine.isStartupFinished) {
@@ -494,20 +497,21 @@ internal class BitmovinSdkAdapter(
             stateMachine.transitionState(PlayerStates.AUDIOTRACKCHANGE, position)
             stateMachine.transitionState(originalState, position)
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
     private fun onSourceEventSubtitleChanged(event: SourceEvent.SubtitleChanged) {
         try {
-            Log.d(TAG, "On SubtitleChanged")
+            BitmovinLog.d(TAG, "On SubtitleChanged")
+
             stateMachine.subtitleChanged(
                 position,
                 getSubtitleDto(event.oldSubtitleTrack),
                 getSubtitleDto(event.newSubtitleTrack),
             )
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -515,7 +519,7 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.StallStarted,
     ) {
         try {
-            Log.d(TAG, "On Stall Started Listener isPlaying:" + player.isPlaying)
+            BitmovinLog.d(TAG, "On Stall Started Listener isPlaying:" + player.isPlaying)
             if (!stateMachine.isStartupFinished) {
                 return
             }
@@ -526,13 +530,13 @@ internal class BitmovinSdkAdapter(
                 stateMachine.transitionState(PlayerStates.BUFFERING, position)
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
     private fun onPlayerEventVideoPlaybackQualityChanged(event: PlayerEvent.VideoPlaybackQualityChanged) {
         try {
-            Log.d(TAG, "On Video Quality Changed")
+            BitmovinLog.d(TAG, "On Video Quality Changed")
             stateMachine.videoQualityChanged(
                 position,
                 playbackQualityProvider.didVideoQualityChange(event.newVideoQuality),
@@ -540,7 +544,7 @@ internal class BitmovinSdkAdapter(
                 playbackQualityProvider.currentVideoQuality = event.newVideoQuality
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -548,13 +552,14 @@ internal class BitmovinSdkAdapter(
         try {
             totalDroppedVideoFrames += event.droppedFrames
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
     private fun onPlayerEventAudioPlaybackQualityChanged(event: PlayerEvent.AudioPlaybackQualityChanged) {
         try {
-            Log.d(TAG, "On Audio Quality Changed")
+            BitmovinLog.d(TAG, "On Audio Quality Changed")
+
             stateMachine.audioQualityChanged(
                 position,
                 playbackQualityProvider.didAudioQualityChange(event.newAudioQuality),
@@ -562,7 +567,7 @@ internal class BitmovinSdkAdapter(
                 playbackQualityProvider.currentAudioQuality = event.newAudioQuality
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -581,7 +586,7 @@ internal class BitmovinSdkAdapter(
                 addSpeedMeasurement(event)
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -599,12 +604,12 @@ internal class BitmovinSdkAdapter(
     }
 
     private fun onPlayerErrorEvent(event: PlayerEvent.Error) {
-        Log.d(TAG, "onPlayerError")
+        BitmovinLog.d(TAG, "onPlayerError")
         handleErrorEvent(event, exceptionMapper.map(event))
     }
 
     private fun onSourceErrorEvent(event: SourceEvent.Error) {
-        Log.d(TAG, "onSourceError")
+        BitmovinLog.d(TAG, "onSourceError")
         handleErrorEvent(event, exceptionMapper.map(event))
     }
 
@@ -619,7 +624,7 @@ internal class BitmovinSdkAdapter(
             }
             stateMachine.error(videoTime, errorCode)
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -629,7 +634,7 @@ internal class BitmovinSdkAdapter(
         try {
             stateMachine.startAd(position)
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -639,13 +644,13 @@ internal class BitmovinSdkAdapter(
         try {
             stateMachine.endAd()
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
     private fun onPlayerEventPlaylistTransition(event: PlayerEvent.PlaylistTransition) {
         try {
-            Log.d(
+            BitmovinLog.d(
                 TAG,
                 "Event PlaylistTransition" +
                     " from: " +
@@ -669,7 +674,7 @@ internal class BitmovinSdkAdapter(
             val shouldStartup = player.isPlaying
             stateMachine.sourceChange(videoEndTimeOfPreviousSource, position, shouldStartup)
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 

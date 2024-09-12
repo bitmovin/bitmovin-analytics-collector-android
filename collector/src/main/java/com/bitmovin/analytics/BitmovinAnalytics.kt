@@ -2,7 +2,6 @@ package com.bitmovin.analytics
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
@@ -30,6 +29,7 @@ import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
 import com.bitmovin.analytics.utils.ApiV3Utils
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.ScopeProvider
 
 @InternalBitmovinApi
@@ -153,7 +153,7 @@ class BitmovinAnalytics(
     fun sendCustomDataEvent(customData: CustomData) {
         val playerAdapter = this.playerAdapter
         if (playerAdapter == null) {
-            Log.d(TAG, "Custom data event could not be sent because player is not attached")
+            BitmovinLog.d(TAG, "Custom data event could not be sent because player is not attached")
             return
         }
 
@@ -207,7 +207,7 @@ class BitmovinAnalytics(
             application.registerActivityLifecycleCallbacks(lifecycleCallbacks)
             this.lifecycleCallbacks = lifecycleCallbacks
         } catch (e: Exception) {
-            Log.e(TAG, "Something went wrong while registering lifecycle callbacks", e)
+            BitmovinLog.e(TAG, "Something went wrong while registering lifecycle callbacks", e)
         }
     }
 
@@ -220,7 +220,7 @@ class BitmovinAnalytics(
                 this.lifecycleCallbacks = null
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Something went wrong while unregistering lifecycle callbacks", e)
+            BitmovinLog.e(TAG, "Something went wrong while unregistering lifecycle callbacks", e)
         }
     }
 }

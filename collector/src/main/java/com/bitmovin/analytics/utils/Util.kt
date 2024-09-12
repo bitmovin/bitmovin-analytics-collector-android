@@ -11,7 +11,6 @@ import android.media.MediaCodecList
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
-import android.util.Log
 import android.util.Pair
 import com.bitmovin.analytics.BuildConfig
 import com.bitmovin.analytics.data.EventData
@@ -194,7 +193,7 @@ object Util {
                     )
                 }
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.d("Util", "Something went wrong while getting application info, e:", e)
+            BitmovinLog.e("Util", "Something went wrong while getting application info, e:", e)
         }
         return applicationInfo
     }
@@ -215,7 +214,7 @@ object Util {
                     )
                 }
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.d("Util", "Something went wrong while getting package info, e:", e)
+            BitmovinLog.e("Util", "Something went wrong while getting package info, e:", e)
         }
         return packageInfo
     }

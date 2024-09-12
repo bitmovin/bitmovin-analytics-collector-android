@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.exoplayer.features
 
 import android.net.Uri
-import android.util.Log
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
@@ -10,6 +9,7 @@ import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestType
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -21,48 +21,57 @@ import com.google.android.exoplayer2.source.hls.HlsManifest
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import java.io.IOException
 
-internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
+internal class ExoPlayerHttpRequestTrackingAdapter(
+    private val player: ExoPlayer,
+    private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>,
+) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
-    private val analyticsListener = object : AnalyticsListener {
+    private val analyticsListener =
+        object : AnalyticsListener {
+            override fun onLoadCompleted(
+                eventTime: AnalyticsListener.EventTime,
+                loadEventInfo: LoadEventInfo,
+                mediaLoadData: MediaLoadData,
+            ) {
+                catchAndLogException("Exception occurred in onLoadCompleted") {
+                    val statusCode = loadEventInfo.extractStatusCode ?: 0
+                    notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, statusCode)
+                }
+            }
 
-        override fun onLoadCompleted(
-            eventTime: AnalyticsListener.EventTime,
-            loadEventInfo: LoadEventInfo,
-            mediaLoadData: MediaLoadData,
-        ) {
-            catchAndLogException("Exception occurred in onLoadCompleted") {
-                val statusCode = loadEventInfo.extractStatusCode ?: 0
-                notifyObservable(eventTime, loadEventInfo, mediaLoadData, true, statusCode)
+            override fun onLoadError(
+                eventTime: AnalyticsListener.EventTime,
+                loadEventInfo: LoadEventInfo,
+                mediaLoadData: MediaLoadData,
+                error: IOException,
+                wasCanceled: Boolean,
+            ) {
+                catchAndLogException("Exception occurred in onLoadError") {
+                    val loadEventInfoStatusCode = loadEventInfo.extractStatusCode ?: 0
+                    val errorResponseCode =
+                        (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode
+                    notifyObservable(
+                        eventTime,
+                        loadEventInfo,
+                        mediaLoadData,
+                        false,
+                        errorResponseCode ?: loadEventInfoStatusCode,
+                    )
+                }
             }
         }
-
-        override fun onLoadError(
-            eventTime: AnalyticsListener.EventTime,
-            loadEventInfo: LoadEventInfo,
-            mediaLoadData: MediaLoadData,
-            error: IOException,
-            wasCanceled: Boolean,
-        ) {
-            catchAndLogException("Exception occurred in onLoadError") {
-                val loadEventInfoStatusCode = loadEventInfo.extractStatusCode ?: 0
-                val errorResponseCode =
-                    (error as? HttpDataSource.InvalidResponseCodeException)?.responseCode
-                notifyObservable(
-                    eventTime,
-                    loadEventInfo,
-                    mediaLoadData,
-                    false,
-                    errorResponseCode ?: loadEventInfoStatusCode,
-                )
-            }
-        }
-    }
 
     init {
         wireEvents()
     }
 
-    private fun notifyObservable(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, success: Boolean, statusCode: Int) {
+    private fun notifyObservable(
+        eventTime: AnalyticsListener.EventTime,
+        loadEventInfo: LoadEventInfo,
+        mediaLoadData: MediaLoadData,
+        success: Boolean,
+        statusCode: Int,
+    ) {
         val httpRequest = mapLoadCompletedArgsToHttpRequest(eventTime, loadEventInfo, mediaLoadData, statusCode, success)
         observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(httpRequest)) }
     }
@@ -82,7 +91,7 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
             try {
                 player.removeAnalyticsListener(analyticsListener)
             } catch (e: Exception) {
-                Log.e(TAG, e.toString())
+                BitmovinLog.e(TAG, e.toString())
             }
         }
     }
@@ -102,12 +111,16 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
     companion object {
         private val TAG = ExoPlayerHttpRequestTrackingAdapter::class.java.name
 
-        private fun catchAndLogException(msg: String, block: () -> Unit) {
-            // As ExoPlayer sometimes has breaking changes, we want to make sure that an optional feature isn't breaking our collector
+        private fun catchAndLogException(
+            msg: String,
+            block: () -> Unit,
+        ) {
+            // As ExoPlayer sometimes has breaking changes,
+            // we want to make sure that an optional feature isn't breaking our collector
             try {
                 block()
             } catch (e: Exception) {
-                Log.e(TAG, msg, e)
+                BitmovinLog.e(TAG, msg, e)
             }
         }
 
@@ -127,16 +140,24 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
         internal val LoadEventInfo.extractStatusCode: Int?
             get() {
                 // the null key contains the status code information
-                // this solution is bit hacky since I couldn't find a way to extract the null key from the java hashmap directly
-                // using toString and parsing the string works (might be an issue with kotlin/java interoperability)
+                // this solution is bit hacky since I couldn't
+                // find a way to extract the null key from the java hashmap directly
+                // using toString and parsing the string works
+                // (might be an issue with kotlin/java interoperability)
                 // toString returns a string in the following format:
-                // {null=[HTTP/1.1 200 OK], Accept-Ranges=[bytes], Access-Control-Allow-Credentials=[false], Access-Control-Allow-Headers=[*], Access-Control-Allow-Methods=[GET,POST,HEAD], ....
+                // {null=[HTTP/1.1 200 OK], Accept-Ranges=[bytes],
+                // Access-Control-Allow-Credentials=[false],
+                // Access-Control-Allow-Headers=[*],
+                // Access-Control-Allow-Methods=[GET,POST,HEAD], ....
                 val matchResult = regex.find(this.responseHeaders.toString())
                 val statusCodeString = matchResult?.value
                 return statusCodeString?.extractStatusCode
             }
 
-        private fun mapManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): HttpRequestType {
+        private fun mapManifestType(
+            uri: Uri,
+            eventTime: AnalyticsListener.EventTime,
+        ): HttpRequestType {
             return when (com.google.android.exoplayer2.util.Util.inferContentType(uri)) {
                 C.CONTENT_TYPE_DASH -> HttpRequestType.MANIFEST_DASH
                 C.CONTENT_TYPE_HLS -> mapHlsManifestType(uri, eventTime)
@@ -145,7 +166,10 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
             }
         }
 
-        private fun mapHlsManifestType(uri: Uri, eventTime: AnalyticsListener.EventTime): HttpRequestType {
+        private fun mapHlsManifestType(
+            uri: Uri,
+            eventTime: AnalyticsListener.EventTime,
+        ): HttpRequestType {
             try {
                 val window = Timeline.Window()
                 // we want the window corresponding to the eventTime that was part of the triggered event
@@ -157,18 +181,20 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
                 if (initialPlaylistUri != null) {
                     return if (initialPlaylistUri == uri) HttpRequestType.MANIFEST_HLS_MASTER else HttpRequestType.MANIFEST_HLS_VARIANT
                 }
-            } catch (ignored: Exception) {}
+            } catch (ignored: Exception) {
+            }
             return HttpRequestType.MANIFEST_HLS
         }
 
-        private fun mapTrackType(trackType: Int): HttpRequestType = when (trackType) {
-            C.TRACK_TYPE_AUDIO -> HttpRequestType.MEDIA_AUDIO
-            C.TRACK_TYPE_VIDEO,
-            C.TRACK_TYPE_DEFAULT,
-            -> HttpRequestType.MEDIA_VIDEO
-            C.TRACK_TYPE_TEXT -> HttpRequestType.MEDIA_SUBTITLES
-            else -> HttpRequestType.UNKNOWN
-        }
+        private fun mapTrackType(trackType: Int): HttpRequestType =
+            when (trackType) {
+                C.TRACK_TYPE_AUDIO -> HttpRequestType.MEDIA_AUDIO
+                C.TRACK_TYPE_VIDEO,
+                C.TRACK_TYPE_DEFAULT,
+                -> HttpRequestType.MEDIA_VIDEO
+                C.TRACK_TYPE_TEXT -> HttpRequestType.MEDIA_SUBTITLES
+                else -> HttpRequestType.UNKNOWN
+            }
 
         private fun mapDrmType(eventTime: AnalyticsListener.EventTime): HttpRequestType {
             if (ExoUtil.isHlsManifestClassLoaded) {
@@ -190,7 +216,12 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
             return HttpRequestType.DRM_OTHER
         }
 
-        private fun mapDataType(eventTime: AnalyticsListener.EventTime, uri: Uri, dataType: Int, trackType: Int): HttpRequestType {
+        private fun mapDataType(
+            eventTime: AnalyticsListener.EventTime,
+            uri: Uri,
+            dataType: Int,
+            trackType: Int,
+        ): HttpRequestType {
             when (dataType) {
                 C.DATA_TYPE_DRM -> return mapDrmType(eventTime)
                 C.DATA_TYPE_MEDIA_PROGRESSIVE_LIVE -> return HttpRequestType.MEDIA_PROGRESSIVE
@@ -202,9 +233,31 @@ internal class ExoPlayerHttpRequestTrackingAdapter(private val player: ExoPlayer
             return HttpRequestType.UNKNOWN
         }
 
-        private fun mapLoadCompletedArgsToHttpRequest(eventTime: AnalyticsListener.EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData, statusCode: Int, success: Boolean): HttpRequest {
-            val requestType = mapDataType(eventTime, loadEventInfo.uri, mediaLoadData.dataType, mediaLoadData.trackType)
-            return HttpRequest(Util.timestamp, requestType, loadEventInfo.dataSpec.uri.toString(), loadEventInfo.uri.toString(), statusCode, loadEventInfo.loadDurationMs, null, loadEventInfo.bytesLoaded, success)
+        private fun mapLoadCompletedArgsToHttpRequest(
+            eventTime: AnalyticsListener.EventTime,
+            loadEventInfo: LoadEventInfo,
+            mediaLoadData: MediaLoadData,
+            statusCode: Int,
+            success: Boolean,
+        ): HttpRequest {
+            val requestType =
+                mapDataType(
+                    eventTime,
+                    loadEventInfo.uri,
+                    mediaLoadData.dataType,
+                    mediaLoadData.trackType,
+                )
+            return HttpRequest(
+                Util.timestamp,
+                requestType,
+                loadEventInfo.dataSpec.uri.toString(),
+                loadEventInfo.uri.toString(),
+                statusCode,
+                loadEventInfo.loadDurationMs,
+                null,
+                loadEventInfo.bytesLoaded,
+                success,
+            )
         }
     }
 }

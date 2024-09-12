@@ -2,13 +2,13 @@ package com.bitmovin.analytics.license
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.LicenseCallData
 import com.bitmovin.analytics.data.LicenseResponse
 import com.bitmovin.analytics.license.AuthenticationResponse.Denied
 import com.bitmovin.analytics.license.AuthenticationResponse.Error
 import com.bitmovin.analytics.license.AuthenticationResponse.Granted
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.ClientFactory
 import com.bitmovin.analytics.utils.DataSerializer.deserialize
 import com.bitmovin.analytics.utils.DataSerializer.serialize
@@ -23,18 +23,20 @@ internal class DefaultLicenseCall(
     config: AnalyticsConfig,
     private val licenseKeyProvider: LicenseKeyProvider,
     private val context: Context,
-    private val httpClient: HttpClient = HttpClient(
-        context,
-        ClientFactory().createClient(config),
-    ),
-    private val backendUrl: String = Uri.parse(config.backendUrl)
-        .buildUpon()
-        .appendEncodedPath("licensing")
-        .build()
-        .toString(),
+    private val httpClient: HttpClient =
+        HttpClient(
+            context,
+            ClientFactory().createClient(config),
+        ),
+    private val backendUrl: String =
+        Uri.parse(config.backendUrl)
+            .buildUpon()
+            .appendEncodedPath("licensing")
+            .build()
+            .toString(),
 ) : LicenseCall {
     init {
-        Log.d(TAG, String.format("Initialized license call with backendUrl: %s", backendUrl))
+        BitmovinLog.d(TAG, String.format("Initialized license call with backendUrl: %s", backendUrl))
     }
 
     override suspend fun authenticate(callback: AuthenticationCallback) {
@@ -44,18 +46,21 @@ internal class DefaultLicenseCall(
             }
 
             is LicenseKeyState.Timeout -> {
-                Log.d(TAG, "License call failed due to license key not being provided in time")
+                BitmovinLog.d(TAG, "License call failed due to license key not being provided in time")
                 callback.authenticationCompleted(Error)
             }
 
             is LicenseKeyState.NotProvided -> {
-                Log.d(TAG, "License call failed due to license key not being provided")
+                BitmovinLog.d(TAG, "License call failed due to license key not being provided")
                 callback.authenticationCompleted(Error)
             }
         }
     }
 
-    private fun callLicenseBackend(licenseKey: String, callback: AuthenticationCallback) {
+    private fun callLicenseBackend(
+        licenseKey: String,
+        callback: AuthenticationCallback,
+    ) {
         val data = LicenseCallData(licenseKey, Util.analyticsVersion, Util.getDomain(context))
         httpClient.post(
             backendUrl,
@@ -69,38 +74,44 @@ private class LicenseRequestCallback(
     private val licenseKey: String,
     private val callback: AuthenticationCallback,
 ) : Callback {
-    override fun onFailure(call: Call, e: IOException) {
-        Log.d(TAG, "License call failed due to connectivity issues", e)
+    override fun onFailure(
+        call: Call,
+        e: IOException,
+    ) {
+        BitmovinLog.e(TAG, "License call failed due to connectivity issues", e)
         callback.authenticationCompleted(Error)
     }
 
     @Throws(IOException::class)
-    override fun onResponse(call: Call, response: Response) {
+    override fun onResponse(
+        call: Call,
+        response: Response,
+    ) {
         val body = response.body
 
         if (body == null) {
-            Log.d(TAG, "License call was denied without providing a response body")
+            BitmovinLog.d(TAG, "License call was denied without providing a response body")
             callback.authenticationCompleted(Error)
             return
         }
 
         val licenseResponse = deserialize(body.string(), LicenseResponse::class.java)
         if (licenseResponse == null) {
-            Log.d(TAG, "License call was denied without providing a valid response body")
+            BitmovinLog.d(TAG, "License call was denied without providing a valid response body")
             callback.authenticationCompleted(Error)
             return
         }
         if (licenseResponse.status == null) {
-            Log.d(TAG, "License response was denied without status")
+            BitmovinLog.d(TAG, "License response was denied without status")
             callback.authenticationCompleted(Error)
             return
         }
         if (licenseResponse.status != "granted") {
-            Log.d(TAG, "License response was denied: ${licenseResponse.message}")
+            BitmovinLog.d(TAG, "License response was denied: ${licenseResponse.message}")
             callback.authenticationCompleted(Denied(licenseResponse.message))
             return
         }
-        Log.d(TAG, "License response was granted")
+        BitmovinLog.d(TAG, "License response was granted")
         callback.authenticationCompleted(Granted(licenseKey, licenseResponse.features))
     }
 }

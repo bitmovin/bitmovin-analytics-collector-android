@@ -2,7 +2,6 @@ package com.bitmovin.analytics.stateMachines
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.PlayerContext
@@ -10,6 +9,7 @@ import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 import com.bitmovin.analytics.enums.VideoStartFailedReason
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
 
@@ -165,7 +165,7 @@ class PlayerStateMachine(
         }
         val elapsedTime = Util.elapsedTime
         videoTimeEnd = videoTime
-        Log.d(TAG, "Transitioning from $currentState to $destinationPlayerState")
+        BitmovinLog.d(TAG, "Transitioning from $currentState to $destinationPlayerState")
         currentState.onExitState(this, elapsedTime, elapsedTime - elapsedTimeOnEnter, destinationPlayerState)
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
@@ -328,13 +328,14 @@ class PlayerStateMachine(
         get() = currentState === PlayerStates.PLAYING || currentState === PlayerStates.PAUSE
 
     private fun onVideoStartTimeoutTimerFinished() {
-        Log.d(TAG, "VideoStartTimeout finish")
+        BitmovinLog.d(TAG, "VideoStartTimeout finish")
         videoStartFailedReason = VideoStartFailedReason.TIMEOUT
         transitionState(PlayerStates.EXITBEFOREVIDEOSTART, 0, null)
     }
 
     private fun onRebufferingTimerFinished() {
-        Log.d(TAG, "rebufferingTimeout finish")
+        BitmovinLog.d(TAG, "rebufferingTimeout finish")
+
         error(
             playerContext.position,
             AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.errorCode,

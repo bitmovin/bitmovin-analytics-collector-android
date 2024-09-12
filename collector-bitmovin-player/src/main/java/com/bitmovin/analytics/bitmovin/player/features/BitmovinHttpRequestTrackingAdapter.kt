@@ -1,25 +1,36 @@
 package com.bitmovin.analytics.bitmovin.player.features
 
-import android.util.Log
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.SourceEvent
 import com.bitmovin.player.api.network.HttpRequestType
 
-internal class BitmovinHttpRequestTrackingAdapter(private val player: Player, private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
+internal class BitmovinHttpRequestTrackingAdapter(
+    private val player: Player,
+    private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>,
+) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
 
     private val sourceEventDownloadFinishedListener: (SourceEvent.DownloadFinished) -> Unit = { event ->
         catchAndLogException("Exception occurred in SourceEvent.DownloadFinished") {
             val requestType = mapHttpRequestType(event.downloadType)
             val httpRequest =
-                HttpRequest(Util.timestamp, requestType, event.url, event.lastRedirectLocation, event.httpStatus, Util.secondsToMillis(event.downloadTime), null, event.size, event.isSuccess)
+                HttpRequest(
+                    Util.timestamp, requestType, event.url, event.lastRedirectLocation, event.httpStatus,
+                    Util.secondsToMillis(
+                        event.downloadTime,
+                    ),
+                    null,
+                    event.size,
+                    event.isSuccess,
+                )
             observableSupport.notify { listener -> listener.onDownloadFinished(OnDownloadFinishedEventObject(httpRequest)) }
         }
     }
@@ -70,11 +81,14 @@ internal class BitmovinHttpRequestTrackingAdapter(private val player: Player, pr
     companion object {
         private val TAG = BitmovinHttpRequestTrackingAdapter::class.java.name
 
-        private fun catchAndLogException(msg: String, block: () -> Unit) {
+        private fun catchAndLogException(
+            msg: String,
+            block: () -> Unit,
+        ) {
             try {
                 block()
             } catch (e: Exception) {
-                Log.e(TAG, msg, e)
+                BitmovinLog.e(TAG, msg, e)
             }
         }
     }

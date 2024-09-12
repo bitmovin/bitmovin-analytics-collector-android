@@ -27,9 +27,9 @@ import android.hardware.display.DisplayManager
 import android.os.Build
 import android.text.TextUtils
 import android.text.TextUtils.split
-import android.util.Log
 import android.view.Display
 import com.bitmovin.analytics.features.FeatureManager.Companion.TAG
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 
 open class DeviceInformationProvider(
@@ -232,7 +232,7 @@ open class DeviceInformationProvider(
             val property = getMethod.invoke(systemProperties::class.java, name) as String
             property
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to read system property " + name, e)
+            BitmovinLog.e(TAG, "Failed to read system property $name", e)
             ""
         }
     }

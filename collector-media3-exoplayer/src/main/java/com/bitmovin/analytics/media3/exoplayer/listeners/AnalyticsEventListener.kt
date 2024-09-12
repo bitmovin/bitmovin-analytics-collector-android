@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.media3.exoplayer.listeners
 
-import android.util.Log
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.Player
@@ -17,8 +16,10 @@ import com.bitmovin.analytics.media3.exoplayer.player.PlaybackInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.DownloadSpeedMeasurement
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
+import java.util.Locale
 
 @androidx.annotation.OptIn(UnstableApi::class)
 internal class AnalyticsEventListener(
@@ -37,7 +38,16 @@ internal class AnalyticsEventListener(
         playWhenReady: Boolean,
         reason: Int,
     ) {
-        Log.d(TAG, String.format("onPlayWhenReadyChanged: %b, %d", playWhenReady, reason))
+        BitmovinLog.d(
+            TAG,
+            String.format(
+                Locale.US,
+                "onPlayWhenReadyChanged: %b, %d",
+                playWhenReady,
+                reason,
+            ),
+        )
+
         // if player preload is setup without autoplay being enabled
         // this gets triggered after user clicks play
         if (playbackInfoProvider.isInInitialBufferState &&
@@ -53,7 +63,7 @@ internal class AnalyticsEventListener(
         isPlaying: Boolean,
     ) {
         try {
-            Log.d(TAG, "onIsPlayingChanged $isPlaying")
+            BitmovinLog.d(TAG, "onIsPlayingChanged $isPlaying")
             this.playbackInfoProvider.isPlaying = isPlaying
             if (isPlaying) {
                 stateMachine.transitionState(PlayerStates.PLAYING, position)
@@ -63,7 +73,7 @@ internal class AnalyticsEventListener(
                 stateMachine.pause(position)
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -73,7 +83,8 @@ internal class AnalyticsEventListener(
     ) {
         try {
             val videoTime = position
-            Log.d(
+
+            BitmovinLog.d(
                 TAG,
                 String.format(
                     "onPlaybackStateChanged: %s playWhenready: %b isPlaying: %b",
@@ -82,6 +93,7 @@ internal class AnalyticsEventListener(
                     exoPlayerContext.isPlaying(),
                 ),
             )
+
             when (state) {
                 Player.STATE_READY -> // if autoplay is enabled startup state is not yet finished
                     // if collector is attached late or ConcatenatingMediaSource is used we miss other events
@@ -120,20 +132,22 @@ internal class AnalyticsEventListener(
                 }
                 Player.STATE_ENDED -> {
                 }
-                else -> Log.d(TAG, "Unknown Player PlayerState encountered")
+                else -> {
+                    BitmovinLog.d(TAG, "Unknown Player PlayerState encountered")
+                }
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
     override fun onSeekStarted(eventTime: AnalyticsListener.EventTime) {
         try {
             val videoTime = eventTime.currentPlaybackPositionMs
-            Log.d(TAG, "onSeekStarted on position: $videoTime")
+            BitmovinLog.d(TAG, "onSeekStarted on position: $videoTime")
             stateMachine.seekStarted(videoTime)
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -155,7 +169,7 @@ internal class AnalyticsEventListener(
                 addSpeedMeasurement(loadEventInfo)
             }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -164,14 +178,15 @@ internal class AnalyticsEventListener(
         format: Format,
         decoderReuseEvaluation: DecoderReuseEvaluation?,
     ) {
-        Log.d(TAG, String.format("onAudioInputFormatChanged: Bitrate: %d", format.bitrate))
+        BitmovinLog.d(TAG, String.format(Locale.US, "onAudioInputFormatChanged: Bitrate: %d", format.bitrate))
+
         try {
             stateMachine.videoQualityChanged(
                 position,
                 qualityEventDataManipulator.hasAudioFormatChanged(format),
             ) { qualityEventDataManipulator.currentAudioFormat = format }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -180,14 +195,15 @@ internal class AnalyticsEventListener(
         format: Format,
         decoderReuseEvaluation: DecoderReuseEvaluation?,
     ) {
-        Log.d(TAG, String.format("onVideoInputFormatChanged: Bitrate: %d", format.bitrate))
+        BitmovinLog.d(TAG, String.format(Locale.US, "onVideoInputFormatChanged: Bitrate: %d", format.bitrate))
+
         try {
             stateMachine.videoQualityChanged(
                 position,
                 qualityEventDataManipulator.hasVideoFormatChanged(format),
             ) { qualityEventDataManipulator.currentVideoFormat = format }
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -199,7 +215,7 @@ internal class AnalyticsEventListener(
         try {
             playerStatisticsProvider.addDroppedFrames(droppedFrames)
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
@@ -217,18 +233,18 @@ internal class AnalyticsEventListener(
     ) {
         try {
             drmInfoProvider.drmLoadStartedAt(eventTime.realtimeMs)
-            Log.d(TAG, String.format("DRM Session aquired %d", eventTime.realtimeMs))
+            BitmovinLog.d(TAG, String.format("DRM Session aquired %d", eventTime.realtimeMs))
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 
     override fun onDrmKeysLoaded(eventTime: AnalyticsListener.EventTime) {
         try {
             drmInfoProvider.drmLoadFinishedAt(eventTime.realtimeMs)
-            Log.d(TAG, String.format("DRM Keys loaded %d", eventTime.realtimeMs))
+            BitmovinLog.d(TAG, String.format(Locale.US, "DRM Keys loaded %d", eventTime.realtimeMs))
         } catch (e: Exception) {
-            Log.d(TAG, e.message, e)
+            BitmovinLog.e(TAG, e.message, e)
         }
     }
 

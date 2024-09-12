@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.persistence
 
-import android.util.Log
 import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.CallbackBackend
@@ -8,12 +7,12 @@ import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.OnSuccessCallback
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
+import com.bitmovin.analytics.utils.BitmovinLog
 
 internal class PersistentCacheBackend(
     private val backend: CallbackBackend,
     private val eventQueue: AnalyticsEventQueue,
 ) : Backend, CallbackBackend {
-
     override fun send(eventData: EventData) = send(eventData, null, null)
 
     override fun sendAd(eventData: AdEventData) = sendAd(eventData, null, null)
@@ -29,7 +28,7 @@ internal class PersistentCacheBackend(
                 success?.onSuccess()
             },
             failure = { e, cancel ->
-                Log.d(TAG, "Failed to send ${eventData.sequenceNumber}")
+                BitmovinLog.d(TAG, "Failed to send ${eventData.sequenceNumber}")
                 eventQueue.push(eventData)
                 failure?.onFailure(e, cancel)
             },
@@ -47,7 +46,7 @@ internal class PersistentCacheBackend(
                 success?.onSuccess()
             },
             failure = { e, cancel ->
-                Log.d(TAG, "Failed to send ${eventData.adId}")
+                BitmovinLog.e(TAG, "Failed to send ${eventData.adId}")
                 eventQueue.push(eventData)
                 failure?.onFailure(e, cancel)
             },

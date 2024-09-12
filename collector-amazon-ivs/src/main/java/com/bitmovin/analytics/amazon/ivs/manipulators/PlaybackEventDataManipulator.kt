@@ -1,11 +1,11 @@
 package com.bitmovin.analytics.amazon.ivs.manipulators
 
-import android.util.Log
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.amazon.ivs.Utils
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.StreamFormat
+import com.bitmovin.analytics.utils.BitmovinLog
 
 internal class PlaybackEventDataManipulator(
     private val player: Player,
@@ -29,7 +29,7 @@ internal class PlaybackEventDataManipulator(
                 data.videoDuration = player.duration
             }
         } catch (e: Exception) {
-            Log.e("PlaybackDataManipulator", "Something went wrong while setting playback event data, e: ${e.message}", e)
+            BitmovinLog.e(TAG, "Something went wrong while setting playback event data, e: ${e.message}", e)
         }
     }
 
@@ -45,5 +45,9 @@ internal class PlaybackEventDataManipulator(
             }
             return null
         }.getOrNull() ?: return null
+    }
+
+    companion object {
+        private const val TAG = "PlaybackEventDataManipulator"
     }
 }

@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.utils
 
 import android.content.Context
-import android.util.Log
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -20,7 +19,7 @@ class HttpClient(private val context: Context, private val client: OkHttpClient)
         callback: Callback?,
         useSsaiRouting: Boolean = false,
     ) {
-        Log.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody))
+        BitmovinLog.d(TAG, String.format("Posting Analytics JSON: \n%s\n", postBody))
 
         val urlWithRouting =
             if (useSsaiRouting) {
@@ -45,7 +44,7 @@ class HttpClient(private val context: Context, private val client: OkHttpClient)
                         call: Call,
                         e: IOException,
                     ) {
-                        Log.e(TAG, "HTTP Error: ", e)
+                        BitmovinLog.e(TAG, "HTTP Error: ", e)
                         callback?.onFailure(call, e)
                     }
 

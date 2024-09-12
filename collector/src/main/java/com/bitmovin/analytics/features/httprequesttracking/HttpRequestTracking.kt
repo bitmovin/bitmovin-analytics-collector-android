@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.features.httprequesttracking
 
-import android.util.Log
 import com.bitmovin.analytics.Observable
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.QueueExtensions.Companion.limit
 import java.util.LinkedList
 import java.util.Queue
@@ -40,7 +40,7 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
                 httpRequestQueue.limit(maxRequests)
             }
         } catch (e: Exception) {
-            Log.d(TAG, "Exception happened while configuring http request tracking: ${e.message}")
+            BitmovinLog.e(TAG, "Exception happened while configuring http request tracking: ${e.message}")
         }
     }
 
@@ -70,7 +70,7 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
                 httpRequestQueue.limit(maxRequests)
             }
         } catch (e: Exception) {
-            Log.d(TAG, "Exception happened while adding http request: ${e.message}")
+            BitmovinLog.e(TAG, "Exception happened while adding http request: ${e.message}")
         }
     }
 }

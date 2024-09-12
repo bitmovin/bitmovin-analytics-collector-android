@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.exoplayer
 
 import android.os.Looper
-import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
@@ -25,6 +24,7 @@ import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
@@ -115,7 +115,7 @@ internal class ExoPlayerAdapter(
                 qualityEventDataManipulator.reset()
                 stateMachine.resetStateMachine()
             } catch (e: Exception) {
-                Log.e(TAG, e.toString())
+                BitmovinLog.e(TAG, e.toString())
             }
         }
     }
@@ -164,13 +164,15 @@ internal class ExoPlayerAdapter(
         if (isBufferingAndWillAutoPlay || isAlreadyPlaying) {
             playbackInfoProvider.isPlaying = true
             val position = position
-            Log.d(
+
+            BitmovinLog.d(
                 TAG,
                 "Collector was attached while media source was already loading, transitioning to startup state.",
             )
+
             startup(position)
             if (playbackState == Player.STATE_READY) {
-                Log.d(
+                BitmovinLog.d(
                     TAG,
                     "Collector was attached while media source was already playing, transitioning to playing state",
                 )

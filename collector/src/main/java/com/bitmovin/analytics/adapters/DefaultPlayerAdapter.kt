@@ -17,6 +17,7 @@ import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.ssai.SsaiEngagementMetricsService
 import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.utils.LogLevelConfig
 
 abstract class DefaultPlayerAdapter(
     protected val config: AnalyticsConfig,
@@ -39,6 +40,8 @@ abstract class DefaultPlayerAdapter(
     override val isAutoplayEnabled: Boolean? = null
 
     init {
+        // store log config settings in a static field to make it accessible for the whole SDK
+        LogLevelConfig.logLevel = config.logLevel
         eventDataFactory.registerEventDataManipulator(ssaiService)
         ssaiApiProxy.attach(ssaiService)
     }

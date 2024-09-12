@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.retryBackend
 
-import android.util.Log
+import com.bitmovin.analytics.utils.BitmovinLog
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.locks.ReentrantLock
@@ -8,23 +8,21 @@ import kotlin.Comparator
 import kotlin.math.pow
 
 class RetryQueue {
-    private val TAG = "RetryQueue"
     private val lock = ReentrantLock()
-    private val MAX_RETRY_TIME = 300 // in seconds
-    private val MAX_RETRY_SAMPLES = 100
-    private val MAX_BACKOFF_INTERVAL = 64
 
     fun getMaxSampleNumber() = MAX_RETRY_SAMPLES
+
     fun now() = Date()
 
     private var retrySamplesList = mutableListOf<RetrySample<Any>>()
-    private val sampleComparator = Comparator<RetrySample<Any>> { a, b ->
-        when {
-            (a.scheduledTime == b.scheduledTime) -> 0
-            (a.scheduledTime.before(b.scheduledTime)) -> -1
-            else -> 1
+    private val sampleComparator =
+        Comparator<RetrySample<Any>> { a, b ->
+            when {
+                (a.scheduledTime == b.scheduledTime) -> 0
+                (a.scheduledTime.before(b.scheduledTime)) -> -1
+                else -> 1
+            }
         }
-    }
 
     fun addSample(retrySample: RetrySample<Any>) {
         try {
@@ -39,19 +37,24 @@ class RetryQueue {
                 return
             }
 
-            retrySample.scheduledTime = Calendar.getInstance().run {
-                add(Calendar.SECOND, backOffTime)
-                time
-            }
+            retrySample.scheduledTime =
+                Calendar.getInstance().run {
+                    add(Calendar.SECOND, backOffTime)
+                    time
+                }
             if (retrySamplesList.size >= getMaxSampleNumber()) {
                 val removeSample = retrySamplesList.last()
                 retrySamplesList.remove(removeSample)
-                Log.d(TAG, "removed sample with highest scheduled time ${removeSample.scheduledTime} due to queue being over capacity of ${getMaxSampleNumber()}")
+                BitmovinLog.d(
+                    TAG,
+                    "removed sample with highest scheduled time ${removeSample.scheduledTime} " +
+                        "due to queue being over capacity of ${getMaxSampleNumber()}",
+                )
             }
             retrySamplesList.add(retrySample)
             retrySamplesList.sortWith(sampleComparator)
         } catch (e: Exception) {
-            Log.e(TAG, "addSample threw an unexpected exception: ${e.message}", e)
+            BitmovinLog.e(TAG, "addSample threw an unexpected exception: ${e.message}", e)
         } finally {
             lock.unlock()
         }
@@ -64,7 +67,7 @@ class RetryQueue {
             retrySamplesList.remove(retrySample)
             return retrySample
         } catch (e: Exception) {
-            Log.e(TAG, "getSample threw an unexpected exception: ${e.message}", e)
+            BitmovinLog.e(TAG, "getSample threw an unexpected exception: ${e.message}", e)
         } finally {
             lock.unlock()
         }
@@ -78,10 +81,17 @@ class RetryQueue {
                 return retrySamplesList.first().scheduledTime
             }
         } catch (e: Exception) {
-            Log.e(TAG, "getNextScheduleTime threw an unexpected exception ${e.message}", e)
+            BitmovinLog.e(TAG, "getNextScheduleTime threw an unexpected exception ${e.message}", e)
         } finally {
             lock.unlock()
         }
         return null
+    }
+
+    companion object {
+        private const val MAX_RETRY_TIME = 300 // in seconds
+        private const val MAX_RETRY_SAMPLES = 100
+        private const val MAX_BACKOFF_INTERVAL = 64
+        private const val TAG = "RetryQueue"
     }
 }

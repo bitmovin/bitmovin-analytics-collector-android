@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.stateMachines
 
-import android.util.Log
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 
 class QualityChangeEventLimiter(private val resetTimer: ObservableTimer) {
@@ -30,7 +30,7 @@ class QualityChangeEventLimiter(private val resetTimer: ObservableTimer) {
     }
 
     private fun onResetTimerFinished() {
-        Log.d(TAG, "qualityChangeResetTimeout finish")
+        BitmovinLog.d(TAG, "qualityChangeResetTimeout finish")
         resetQualityChangeCount()
     }
 

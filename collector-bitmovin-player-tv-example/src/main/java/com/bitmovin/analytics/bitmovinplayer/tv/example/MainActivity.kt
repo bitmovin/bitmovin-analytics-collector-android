@@ -45,46 +45,53 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializePlayer() {
         val analyticsConfig = AnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
-        val defaultMetadata = DefaultMetadata(
-            customUserId = "customBitmovinUserId1",
-            cdnProvider = CDNProvider.BITMOVIN,
-            customData = CustomData(
-                experimentName = "experiment-1",
-                customData1 = "customData1",
-                customData2 = "customData2",
-                customData3 = "customData3",
-                customData4 = "customData4",
-                customData5 = "customData5",
-                customData6 = "customData6",
-                customData7 = "customData7",
-            ),
-        )
+        val defaultMetadata =
+            DefaultMetadata(
+                customUserId = "customBitmovinUserId1",
+                cdnProvider = CDNProvider.BITMOVIN,
+                customData =
+                    CustomData(
+                        experimentName = "experiment-1",
+                        customData1 = "customData1",
+                        customData2 = "customData2",
+                        customData3 = "customData3",
+                        customData4 = "customData4",
+                        customData5 = "customData5",
+                        customData6 = "customData6",
+                        customData7 = "customData7",
+                    ),
+            )
 
         // Initialize PlayerView from layout and attach a new Player instance
-        player = Player.create(this, createPlayerConfig(), analyticsConfig, defaultMetadata).also {
-            binding.playerView.player = it
-        }
+        player =
+            Player.create(this, createPlayerConfig(), analyticsConfig, defaultMetadata).also {
+                binding.playerView.player = it
+            }
 
-        val redbullMetadata = SourceMetadata(
-            videoId = "source-video-id",
-            title = "redbull",
-            customData = CustomData(customData1 = "customData_source_redbull"),
-        )
-        val sintelMetadata = SourceMetadata(
-            videoId = "source-video-id-2",
-            title = "sintel",
-            customData = CustomData(customData1 = "customData_source_sintel"),
-        )
-        val liveSimMetadata = SourceMetadata(
-            videoId = "source-video-id",
-            title = "livesims",
-            customData = CustomData(customData1 = "customData_source_livesims"),
-        )
-        val drmMetadata = SourceMetadata(
-            videoId = "drm-source-video-id",
-            title = "widevine",
-            customData = CustomData(customData1 = "customData_source_widevine"),
-        )
+        val redbullMetadata =
+            SourceMetadata(
+                videoId = "source-video-id",
+                title = "redbull",
+                customData = CustomData(customData1 = "customData_source_redbull"),
+            )
+        val sintelMetadata =
+            SourceMetadata(
+                videoId = "source-video-id-2",
+                title = "sintel",
+                customData = CustomData(customData1 = "customData_source_sintel"),
+            )
+        val liveSimMetadata =
+            SourceMetadata(
+                videoId = "source-video-id",
+                title = "livesims",
+                customData = CustomData(customData1 = "customData_source_livesims"),
+            )
+        val drmMetadata =
+            SourceMetadata(
+                videoId = "drm-source-video-id",
+                title = "widevine",
+                customData = CustomData(customData1 = "customData_source_widevine"),
+            )
 
         val liveSimSource = Source.create(SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()), liveSimMetadata)
         val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()), redbullMetadata)
@@ -215,14 +222,15 @@ class MainActivity : AppCompatActivity() {
         seek(0.0)
     }
 
-    private fun createPlayerConfig() = PlayerConfig(
-        // Here a custom bitmovinplayer-ui.js is loaded which utilizes the Cast-UI as this
-        // matches our needs here perfectly.
-        // I.e. UI controls get shown / hidden whenever the Player API is called.
-        // This is needed due to the fact that on Android TV no touch events are received
-        styleConfig = StyleConfig(playerUiJs = "file:///android_asset/bitmovinplayer-ui.js"),
-        playbackConfig = PlaybackConfig(isAutoplayEnabled = true),
-    )
+    private fun createPlayerConfig() =
+        PlayerConfig(
+            // Here a custom bitmovinplayer-ui.js is loaded which utilizes the Cast-UI as this
+            // matches our needs here perfectly.
+            // I.e. UI controls get shown / hidden whenever the Player API is called.
+            // This is needed due to the fact that on Android TV no touch events are received
+            styleConfig = StyleConfig(playerUiJs = "file:///android_asset/bitmovinplayer-ui.js"),
+            playbackConfig = PlaybackConfig(isAutoplayEnabled = true),
+        )
 
     companion object {
         private val corruptedSource = Source.create(SourceConfig.fromUrl(Samples.CORRUPT_DASH.uri.toString()))

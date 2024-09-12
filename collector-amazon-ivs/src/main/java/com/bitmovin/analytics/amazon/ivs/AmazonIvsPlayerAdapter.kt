@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.amazon.ivs
 
 import android.os.Looper
-import android.util.Log
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
@@ -21,6 +20,7 @@ import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.utils.BitmovinLog
 
 internal class AmazonIvsPlayerAdapter(
     private val player: Player,
@@ -56,7 +56,7 @@ internal class AmazonIvsPlayerAdapter(
             videoStartupService.finishStartupOnPlaying(player.state, player.position)
             return features
         } catch (e: Exception) {
-            Log.e(TAG, "Something went wrong while initializing IVS adapter, e: ${e.message}", e)
+            BitmovinLog.e(TAG, "Something went wrong while initializing IVS adapter, e: ${e.message}", e)
             return emptyList()
         }
     }
@@ -69,7 +69,7 @@ internal class AmazonIvsPlayerAdapter(
             player.removeListener(playerListener)
             super.release()
         } catch (e: Exception) {
-            Log.e(TAG, "Something went wrong while releasing IVS adapter, e: ${e.message}", e)
+            BitmovinLog.e(TAG, "Something went wrong while releasing IVS adapter, e: ${e.message}", e)
         }
     }
 

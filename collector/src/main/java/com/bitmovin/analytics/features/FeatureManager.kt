@@ -1,12 +1,13 @@
 package com.bitmovin.analytics.features
 
-import android.util.Log
 import com.bitmovin.analytics.license.LicensingState
+import com.bitmovin.analytics.utils.BitmovinLog
 
 class FeatureManager<TConfigContainer> {
     companion object {
         val TAG = FeatureManager::class.java.name
     }
+
     private val features: MutableList<Feature<TConfigContainer, *>> = mutableListOf()
 
     @Synchronized fun registerFeature(feature: Feature<TConfigContainer, *>) {
@@ -36,7 +37,10 @@ class FeatureManager<TConfigContainer> {
                 val it = iterator.next()
                 val config = it.configure(true, featureConfigs)
                 if (config?.enabled != true) {
-                    Log.d(TAG, "Disabling feature ${it.javaClass.simpleName} as it isn't enabled according to license callback.")
+                    BitmovinLog.d(
+                        TAG,
+                        "Disabling feature ${it.javaClass.simpleName} as it isn't enabled according to license callback.",
+                    )
                     it.disable()
                     iterator.remove()
                 }
@@ -50,7 +54,10 @@ class FeatureManager<TConfigContainer> {
         LicensingState.Unauthenticated -> {
             features.forEach {
                 it.configure(false, featureConfigs)
-                Log.d(TAG, "Disabling feature ${it.javaClass.simpleName} as it isn't enabled according to license callback.")
+                BitmovinLog.d(
+                    TAG,
+                    "Disabling feature ${it.javaClass.simpleName} as it isn't enabled according to license callback.",
+                )
                 it.disable()
             }
         }

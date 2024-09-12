@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.bitmovin.player
 
-import android.util.Log
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
@@ -8,6 +7,7 @@ import com.bitmovin.analytics.bitmovin.player.utils.AdBreakMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdQuartileFactory
 import com.bitmovin.analytics.data.AdModuleInformation
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.PlayerEvent
 
@@ -25,7 +25,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
             val ad = event.ad ?: return@method
             observableSupport.notify { it.onAdStarted(adMapper.fromPlayerAd(ad)) }
         } catch (e: Exception) {
-            Log.d(TAG, "On Ad Started", e)
+            BitmovinLog.e(TAG, "On Ad Started", e)
         }
     }
 
@@ -33,7 +33,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
         try {
             observableSupport.notify { it.onAdFinished() }
         } catch (e: Exception) {
-            Log.d(TAG, "On Ad Finished", e)
+            BitmovinLog.e(TAG, "On Ad Finished", e)
         }
     }
 
@@ -42,7 +42,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
             val adBreak = event.adBreak ?: return@method
             observableSupport.notify { it.onAdBreakStarted(adBreakMapper.fromPlayerAdConfiguration(adBreak)) }
         } catch (e: Exception) {
-            Log.d(TAG, "On Ad Break Started", e)
+            BitmovinLog.e(TAG, "On Ad Break Started", e)
         }
     }
 
@@ -50,7 +50,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
         try {
             observableSupport.notify { it.onAdBreakFinished() }
         } catch (e: Exception) {
-            Log.d(TAG, "On Ad Break Finished", e)
+            BitmovinLog.e(TAG, "On Ad Break Finished", e)
         }
     }
 
@@ -58,7 +58,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
         try {
             observableSupport.notify { it.onAdClicked(event.clickThroughUrl) }
         } catch (e: Exception) {
-            Log.d(TAG, "On Ad Clicked", e)
+            BitmovinLog.e(TAG, "On Ad Clicked", e)
         }
     }
 
@@ -73,7 +73,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
                 )
             }
         } catch (e: Exception) {
-            Log.d(TAG, "On Ad Error", e)
+            BitmovinLog.e(TAG, "On Ad Error", e)
         }
     }
 
@@ -81,7 +81,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
         try {
             observableSupport.notify { it.onAdSkipped() }
         } catch (e: Exception) {
-            Log.d(TAG, "On Ad Skipped", e)
+            BitmovinLog.e(TAG, "On Ad Skipped", e)
         }
     }
 
@@ -90,7 +90,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
             val adBreak = event.adBreak ?: return@method
             observableSupport.notify { it.onAdManifestLoaded(adBreakMapper.fromPlayerAdConfiguration(adBreak), event.downloadTime) }
         } catch (e: Exception) {
-            Log.d(TAG, "On Ad Manifest Loaded", e)
+            BitmovinLog.e(TAG, "On Ad Manifest Loaded", e)
         }
     }
 
@@ -98,7 +98,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
         try {
             observableSupport.notify { it.onAdQuartile(adQuartileFactory.FromPlayerAdQuartile(event.quartile)) }
         } catch (e: Exception) {
-            Log.d(TAG, "On Ad Quartile Listener ", e)
+            BitmovinLog.e(TAG, "On Ad Quartile Listener ", e)
         }
     }
 

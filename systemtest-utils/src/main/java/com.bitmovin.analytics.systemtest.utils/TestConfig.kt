@@ -45,6 +45,7 @@ object TestConfig {
         return AnalyticsConfig(
             licenseKey = analyticsKey,
             backendUrl = backendUrl,
+            logLevel = com.bitmovin.analytics.api.LogLevel.DEBUG,
         )
     }
 

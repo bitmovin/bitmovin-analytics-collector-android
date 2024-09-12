@@ -1,10 +1,10 @@
 package com.bitmovin.analytics.amazon.ivs.manipulators
 
-import android.util.Log
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.enums.PlayerType
+import com.bitmovin.analytics.utils.BitmovinLog
 
 /**
  * Manipulator for static player info
@@ -16,7 +16,11 @@ internal class PlayerInfoEventDataManipulator(private val player: Player) : Even
         try {
             data.version = PlayerType.AMAZON_IVS.toString() + "-" + player.version
         } catch (e: Exception) {
-            Log.e("PlayerInfoManipulator", "Something went wrong while setting player info event data, e: ${e.message}", e)
+            BitmovinLog.e(TAG, "Something went wrong while setting player info event data, e: ${e.message}", e)
         }
+    }
+
+    companion object {
+        private const val TAG = "PlayerInfoEventDataManipulator"
     }
 }
