@@ -4,5 +4,9 @@ import android.content.Context
 import android.provider.Settings
 
 class SecureSettingsAndroidIdUserIdProvider(val context: Context) : UserIdProvider {
-    override fun userId(): String = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+    private val userId = lazy { Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) }
+
+    override fun userId(): String {
+        return userId.value
+    }
 }
