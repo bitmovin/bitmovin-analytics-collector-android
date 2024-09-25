@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.9.1
+
 ### Fixed
 - Cache UserId since retrieval is not so cheap can cause the app to hang (as seen in android sdk console logs)
 - Make handling of listeners in observable thread safe (seen crashes in android sdk console logs)
