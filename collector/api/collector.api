@@ -152,6 +152,7 @@ public final class com/bitmovin/analytics/api/AnalyticsConfig : android/os/Parce
 	public fun <init> (Ljava/lang/String;ZZ)V
 	public fun <init> (Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;)V
 	public fun <init> (Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun <init> (Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;Ljava/lang/String;Lcom/bitmovin/analytics/api/LogLevel;)V
 	public synthetic fun <init> (Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;Ljava/lang/String;Lcom/bitmovin/analytics/api/LogLevel;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;

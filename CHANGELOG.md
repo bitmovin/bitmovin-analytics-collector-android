@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.9.2
+
+### Fixed
+- Binary compatibility issues with Bitmovin player bundling that was introduced with `3.9.0` (`AnaltyicsConfig` data class change)
+
 ## v3.9.1
 
 ### Fixed
