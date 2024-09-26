@@ -75,7 +75,7 @@ allprojects {
 }
 
 ext {
-    developLocal = System.getProperty("developLocal", "true").toBoolean()
+    developLocal = System.getProperty("developLocal", "false").toBoolean()
     packageGroupId = 'com.bitmovin.analytics'
 
     /**
@@ -84,7 +84,7 @@ ext {
      */
     versionCode = 122003
 
-    version = System.getProperty("version", "0.0.0") + (developLocal ? '-local' : '')
+    version = System.getProperty("version", "3.9.1") + (developLocal ? '-local' : '')
 
     compileSdk = 34
 
