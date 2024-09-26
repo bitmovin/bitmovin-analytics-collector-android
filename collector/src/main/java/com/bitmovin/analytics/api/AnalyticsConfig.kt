@@ -34,7 +34,6 @@ data class AnalyticsConfig(
      * Default is the bitmovin backend URL
      */
     val backendUrl: String = DEFAULT_BACKEND_URL,
-
     /**
      * Config to define the log level of the SDK.
      *
@@ -42,7 +41,6 @@ data class AnalyticsConfig(
      */
     val logLevel: LogLevel = LogLevel.ERROR,
 ) : Parcelable {
-
     @JvmOverloads
     constructor(
         /**
@@ -82,39 +80,40 @@ data class AnalyticsConfig(
         backendUrl = backendUrl,
         logLevel = LogLevel.ERROR,
     )
-        companion object {
-            internal const val DEFAULT_BACKEND_URL = "https://analytics-ingress-global.bitmovin.com/"
-        }
 
-        class Builder(val licenseKey: String) {
-            private var adTrackingDisabled: Boolean = false
-            private var randomizeUserId: Boolean = false
-            private var retryPolicy: RetryPolicy = RetryPolicy.NO_RETRY
-            private var backendUrl: String = DEFAULT_BACKEND_URL
-            private var logLevel: LogLevel = LogLevel.ERROR
+    companion object {
+        internal const val DEFAULT_BACKEND_URL = "https://analytics-ingress-global.bitmovin.com/"
+    }
 
-            fun setAdTrackingDisabled(adTrackingDisabled: Boolean) = apply { this.adTrackingDisabled = adTrackingDisabled }
+    class Builder(val licenseKey: String) {
+        private var adTrackingDisabled: Boolean = false
+        private var randomizeUserId: Boolean = false
+        private var retryPolicy: RetryPolicy = RetryPolicy.NO_RETRY
+        private var backendUrl: String = DEFAULT_BACKEND_URL
+        private var logLevel: LogLevel = LogLevel.ERROR
 
-            fun setRandomizeUserId(randomizeUserId: Boolean) = apply { this.randomizeUserId = randomizeUserId }
+        fun setAdTrackingDisabled(adTrackingDisabled: Boolean) = apply { this.adTrackingDisabled = adTrackingDisabled }
 
-            fun setRetryPolicy(retryPolicy: RetryPolicy) = apply { this.retryPolicy = retryPolicy }
+        fun setRandomizeUserId(randomizeUserId: Boolean) = apply { this.randomizeUserId = randomizeUserId }
 
-            fun setBackendUrl(backendUrl: String) = apply { this.backendUrl = backendUrl }
+        fun setRetryPolicy(retryPolicy: RetryPolicy) = apply { this.retryPolicy = retryPolicy }
 
-            fun setLogLevel(logLevel: LogLevel) = apply { this.logLevel = logLevel }
+        fun setBackendUrl(backendUrl: String) = apply { this.backendUrl = backendUrl }
 
-            fun build(): AnalyticsConfig {
-                return AnalyticsConfig(
-                    licenseKey = licenseKey,
-                    adTrackingDisabled = adTrackingDisabled,
-                    randomizeUserId = randomizeUserId,
-                    retryPolicy = retryPolicy,
-                    backendUrl = backendUrl,
-                    logLevel = logLevel,
-                )
-            }
+        fun setLogLevel(logLevel: LogLevel) = apply { this.logLevel = logLevel }
+
+        fun build(): AnalyticsConfig {
+            return AnalyticsConfig(
+                licenseKey = licenseKey,
+                adTrackingDisabled = adTrackingDisabled,
+                randomizeUserId = randomizeUserId,
+                retryPolicy = retryPolicy,
+                backendUrl = backendUrl,
+                logLevel = logLevel,
+            )
         }
     }
+}
 
 enum class RetryPolicy {
     /**
