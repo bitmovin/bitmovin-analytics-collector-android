@@ -119,6 +119,7 @@ data class AdEventDataForTest(
     var playerTech: String,
     var screenHeight: Int,
     var screenWidth: Int,
+    // this is playerVersion NOT analyticsVersion
     var version: String? = null,
     var userId: String,
     var videoId: String? = null,
@@ -140,6 +141,7 @@ data class AdEventDataForTest(
     var quartile3FailedBeaconUrl: String? = null,
     var completedFailedBeaconUrl: String? = null,
     var timeSinceAdStartedInMs: Long? = null,
+    var pageLoadType: Int,
     var hasSsaiRoutingParamSet: Boolean = false,
 ) {
     // get the AdEventData object to able to compare sent AdEventData with received AdEventDataForTest
@@ -272,6 +274,7 @@ data class AdEventDataForTest(
             autoplay = autoplay,
             audioBitrate = audioBitrate,
             timeSinceAdStartedInMs = timeSinceAdStartedInMs,
+            pageLoadType = pageLoadType,
         )
     }
 }

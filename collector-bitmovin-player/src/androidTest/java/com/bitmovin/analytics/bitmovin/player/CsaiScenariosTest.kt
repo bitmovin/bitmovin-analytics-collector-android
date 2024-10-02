@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
+import com.bitmovin.analytics.systemtest.utils.CsaiDataVerifier
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
@@ -23,14 +24,14 @@ import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.withContext
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AdScenariosTest {
+class CsaiScenariosTest {
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var defaultSample = TestSources.HLS_REDBULL
@@ -58,8 +59,9 @@ class AdScenariosTest {
             // play midroll after 6 seconds
             val midRoll = AdItem("6", adSource)
             val advertisingConfig = AdvertisingConfig(preRoll, midRoll)
+            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
 
-            val collector = IBitmovinPlayerCollector.create(appContext, TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl))
+            val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
             val playbackConfig = PlaybackConfig(isMuted = true)
             val playerConfig =
                 PlayerConfig(
@@ -98,20 +100,38 @@ class AdScenariosTest {
 
             // assert
             val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            Assertions.assertThat(impressionList.size).isEqualTo(1)
+            assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
             DataVerifier.verifyHasNoErrorSamples(impression)
 
-            // we expect 2 adEventData to be sent
-            Assertions.assertThat(impression.adEventDataList.size).isEqualTo(2)
+            // verify adSamples
+            // we expect 2 adEventData to be sent since there are 2 ads played
+            assertThat(impression.adEventDataList.size).isEqualTo(2)
+            val firstAd = impression.adEventDataList[0]
+            assertThat(firstAd.adStartupTime).isGreaterThan(0)
+            CsaiDataVerifier.verifyStaticAdData(firstAd, analyticsConfig)
+            CsaiDataVerifier.verifyFullyPlayedAd(firstAd)
+
+            val secondAd = impression.adEventDataList[1]
+            // TODO (AN-4378): what is expected behavior for startupTime? should it be always > 0?
+            // This assertions is flaky
+            // assertThat(secondAd.adStartupTime).isEqualTo(0)
+
+            CsaiDataVerifier.verifyStaticAdData(secondAd, analyticsConfig)
+            CsaiDataVerifier.verifyFullyPlayedAd(secondAd)
+
+            assertThat(firstAd.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+            assertThat(secondAd.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+
+            // verify samples
             val eventDataWithAdState = impression.eventDataList.filter { x -> x.ad == 1 }
-            Assertions.assertThat(eventDataWithAdState.size).isEqualTo(2)
+            assertThat(eventDataWithAdState.size).isEqualTo(2)
 
             val eventDataList = impression.eventDataList
             DataVerifier.verifyStaticData(eventDataList, sourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
 
-            // startup sample is second sample (since order of events in player changed in 3.40.0
+            // startup sample is second sample (since order of events in player changed in 3.40.0)
             DataVerifier.verifyStartupSample(eventData = eventDataList[1], expectedSequenceNumber = 1)
 
             // TODO: we are not collecting videoStart and videoEnd times correctly when ads are played

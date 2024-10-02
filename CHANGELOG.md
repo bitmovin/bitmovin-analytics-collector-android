@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- CSAI: Added missing pageLoadType = 1 to request (also fixed on server side)
+
 ## v3.9.2
 
 ### Fixed

@@ -142,6 +142,9 @@ data class AdEventData(
     var quartile3FailedBeaconUrl: String? = null,
     var completedFailedBeaconUrl: String? = null,
     var timeSinceAdStartedInMs: Long? = null,
+    // This is hardcoded to 1 (FOREGROUND), since we need to mimic the behavior of web
+    // and there is no background mode in android that we specifically track
+    val pageLoadType: Int = 1,
 ) {
     companion object {
         fun fromEventData(
