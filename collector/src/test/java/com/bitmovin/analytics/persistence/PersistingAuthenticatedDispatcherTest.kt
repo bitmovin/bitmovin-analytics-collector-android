@@ -100,38 +100,6 @@ class PersistingAuthenticatedDispatcherTest {
     }
 
     @Test
-    fun `sequence numbers auto-increments on add`() {
-        persistingAuthenticatedDispatcher.enable()
-        val eventData1 = createEventData()
-        persistingAuthenticatedDispatcher.add(eventData1)
-        val eventData2 = createEventData()
-        persistingAuthenticatedDispatcher.add(eventData2)
-        assertThat(eventData1.sequenceNumber).isEqualTo(eventData2.sequenceNumber - 1)
-    }
-
-    @Test
-    fun `sequence number is limited to the limit`() {
-        persistingAuthenticatedDispatcher.enable()
-
-        // enable the backend to forward the data
-        triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
-        )
-
-        val eventData = createEventData()
-        for (i in 0..1005) {
-            persistingAuthenticatedDispatcher.add(eventData)
-        }
-        assertThat(eventData.sequenceNumber).isEqualTo(1000)
-
-        // this line might cause issues when there are too many calls (verification would throw an error)
-        // test is stalling then. in case of the correct amount of calls, test passes
-        // we only have 1000 calls (instead of 1001) because the initial call
-        // is unauthenticated and triggers the authentication, and thus not counted
-        verify(exactly = 1000) { backend.send(any()) }
-    }
-
-    @Test
     fun `adding an AdEventData when the dispatcher is unauthenticated it requests authentication`() {
         val adEventData = createAdEventData()
         persistingAuthenticatedDispatcher.addAd(adEventData)
@@ -161,63 +129,6 @@ class PersistingAuthenticatedDispatcherTest {
         persistingAuthenticatedDispatcher.addAd(adEventData)
 
         verify { backend.sendAd(adEventData) }
-    }
-
-    @Test
-    fun `adding multiple EventData when the dispatcher is authenticated it increments the sequence number`() {
-        triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
-        )
-        persistingAuthenticatedDispatcher.resetSourceRelatedState()
-        val eventData =
-            listOf(
-                createEventData(),
-                createEventData(),
-                createEventData(),
-                createEventData(),
-            )
-
-        eventData.forEach { persistingAuthenticatedDispatcher.add(it) }
-
-        val eventSlots = mutableListOf<EventData>()
-        verify(exactly = eventData.size) { backend.send(capture(eventSlots)) }
-        eventSlots.forEachIndexed { index, event ->
-            assertThat(event.sequenceNumber).isEqualTo(index)
-        }
-    }
-
-    @Test
-    fun `resetting source related state resets the sequence number for events`() {
-        triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
-        )
-        persistingAuthenticatedDispatcher.resetSourceRelatedState()
-        val eventDataOfFirstSource =
-            listOf(
-                createEventData(),
-                createEventData(),
-                createEventData(),
-                createEventData(),
-            )
-        val eventDataOfSecondSource =
-            listOf(
-                createEventData(),
-                createEventData(),
-                createEventData(),
-                createEventData(),
-            )
-
-        eventDataOfFirstSource.forEach { persistingAuthenticatedDispatcher.add(it) }
-        persistingAuthenticatedDispatcher.resetSourceRelatedState()
-        eventDataOfSecondSource.forEach { persistingAuthenticatedDispatcher.add(it) }
-
-        val eventSlots = mutableListOf<EventData>()
-        verify(exactly = eventDataOfFirstSource.size + eventDataOfSecondSource.size) {
-            backend.send(capture(eventSlots))
-        }
-        eventSlots.forEachIndexed { index, event ->
-            assertThat(event.sequenceNumber).isEqualTo(index % 4)
-        }
     }
 
     @Test
@@ -252,46 +163,6 @@ class PersistingAuthenticatedDispatcherTest {
         verify { backend wasNot called }
         verify { analyticsEventQueue wasNot called }
         verify { licenseCall wasNot called }
-    }
-
-    @Test
-    fun `disabling the dispatcher resets the sequence number for events`() {
-        triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
-        )
-        persistingAuthenticatedDispatcher.resetSourceRelatedState()
-        val eventDataOfFirstSource =
-            listOf(
-                createEventData(),
-                createEventData(),
-                createEventData(),
-                createEventData(),
-            )
-        val eventDataOfSecondSource =
-            listOf(
-                createEventData(),
-                createEventData(),
-                createEventData(),
-                createEventData(),
-            )
-
-        eventDataOfFirstSource.forEach { persistingAuthenticatedDispatcher.add(it) }
-        persistingAuthenticatedDispatcher.disable()
-        triggerAuthenticationCallback(
-            AuthenticationResponse.Granted(TEST_LICENSE_KEY, null),
-        )
-        eventDataOfSecondSource.forEach { persistingAuthenticatedDispatcher.add(it) }
-
-        val eventSlots = mutableListOf<EventData>()
-        verify(exactly = eventDataOfFirstSource.size + eventDataOfSecondSource.size) {
-            backend.send(capture(eventSlots))
-        }
-        eventSlots.drop(eventDataOfFirstSource.size).forEachIndexed { index, event ->
-            // Because of the triggerAuthenticationCallback, the sequence number is offset
-            // by 1
-            val expectedSequenceNumber = index + 1
-            assertThat(event.sequenceNumber).isEqualTo(expectedSequenceNumber)
-        }
     }
 
     @Test

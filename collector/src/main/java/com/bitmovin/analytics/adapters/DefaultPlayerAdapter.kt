@@ -26,7 +26,7 @@ abstract class DefaultPlayerAdapter(
     private val featureFactory: FeatureFactory,
     private val deviceInformationProvider: DeviceInformationProvider,
     protected val metadataProvider: MetadataProvider,
-    bitmovinAnalytics: BitmovinAnalytics,
+    private val bitmovinAnalytics: BitmovinAnalytics,
     ssaiApiProxy: SsaiApiProxy,
     looper: Looper,
 ) : PlayerAdapter {
@@ -53,7 +53,7 @@ abstract class DefaultPlayerAdapter(
 
     override fun createEventData() =
         eventDataFactory.create(
-            stateMachine.impressionId,
+            bitmovinAnalytics.impressionId,
             getCurrentSourceMetadata(),
             defaultMetadata,
             deviceInformationProvider.getDeviceInformation(),
@@ -67,7 +67,7 @@ abstract class DefaultPlayerAdapter(
     // (mainly used for ssai to have a custom manipulator)
     override fun createEventDataForAdSample() =
         eventDataFactory.createForAdSamples(
-            stateMachine.impressionId,
+            bitmovinAnalytics.impressionId,
             getCurrentSourceMetadata(),
             defaultMetadata,
             deviceInformationProvider.getDeviceInformation(),
@@ -81,7 +81,7 @@ abstract class DefaultPlayerAdapter(
 
     override fun createEventDataForCustomDataEvent(sourceMetadata: SourceMetadata) =
         eventDataFactory.create(
-            stateMachine.impressionId,
+            bitmovinAnalytics.impressionId,
             sourceMetadata,
             defaultMetadata,
             deviceInformationProvider.getDeviceInformation(),

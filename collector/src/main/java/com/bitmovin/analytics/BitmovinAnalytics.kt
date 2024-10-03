@@ -5,75 +5,38 @@ import android.content.Context
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
-import com.bitmovin.analytics.api.RetryPolicy
 import com.bitmovin.analytics.data.AdEventData
-import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.data.SimpleEventDataDispatcher
-import com.bitmovin.analytics.data.persistence.EventDatabase
+import com.bitmovin.analytics.data.EventDataDispatcherFactory
+import com.bitmovin.analytics.data.SEQUENCE_NUMBER_LIMIT
+import com.bitmovin.analytics.data.SequenceNumberAndImpressionIdProvider
 import com.bitmovin.analytics.features.FeatureManager
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.internal.InternalBitmovinApi
-import com.bitmovin.analytics.license.DefaultLicenseCall
 import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.InstantLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.license.LicenseKeyProvider
 import com.bitmovin.analytics.license.LicensingState
-import com.bitmovin.analytics.persistence.EventQueueConfig
-import com.bitmovin.analytics.persistence.EventQueueFactory
-import com.bitmovin.analytics.persistence.PersistingAuthenticatedDispatcher
-import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.DefaultStateMachineListener
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.StateMachineListener
 import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.BitmovinLog
-import com.bitmovin.analytics.utils.ScopeProvider
 
 @InternalBitmovinApi
 class BitmovinAnalytics(
     val config: AnalyticsConfig,
     val context: Context,
-    val eventQueue: AnalyticsEventQueue =
-        EventQueueFactory.createPersistentEventQueue(
-            EventQueueConfig(),
-            EventDatabase.getInstance(context),
-        ),
     licenseKeyProvider: LicenseKeyProvider = InstantLicenseKeyProvider(config.licenseKey),
+    eventDataDispatcherFactory: EventDataDispatcherFactory = EventDataDispatcherFactory(context, config, licenseKeyProvider),
+    private val sequenceNumberAndImpressionIdProvider: SequenceNumberAndImpressionIdProvider = SequenceNumberAndImpressionIdProvider(),
 ) : LicenseCallback {
-    private val licenseCall = DefaultLicenseCall(config, licenseKeyProvider, context)
-    private val scopeProvider = ScopeProvider.create()
-    private val backendFactory = BackendFactory(eventQueue)
     private val eventBus = EventBus()
     private var lifecycleCallbacks: ActivityLifecycleCallbacks? = null
-
     private val featureManager = FeatureManager<FeatureConfigContainer>()
-
-    private val eventDataDispatcher =
-        if (config.retryPolicy == RetryPolicy.LONG_TERM) {
-            PersistingAuthenticatedDispatcher(
-                context = context,
-                config = config,
-                callback = this,
-                backendFactory = backendFactory,
-                licenseCall = licenseCall,
-                eventQueue = eventQueue,
-                scopeProvider = scopeProvider,
-            )
-        } else {
-            SimpleEventDataDispatcher(
-                context = context,
-                config = config,
-                callback = this,
-                backendFactory = backendFactory,
-                licenseCall = licenseCall,
-                scopeProvider = scopeProvider,
-            )
-        }
-
-    private var playerAdapter: PlayerAdapter? = null
+    private val eventDataDispatcher = eventDataDispatcherFactory.create(this)
     private var stateMachineListener: StateMachineListener? = null
     private val adAnalytics: BitmovinAdAnalytics? =
         if (!config.adTrackingDisabled) BitmovinAdAnalytics(this) else null
@@ -81,6 +44,8 @@ class BitmovinAnalytics(
     // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
     // first startup sample, in case the collector supports multiple sources)
     private var playerStartupTime = 1L
+
+    public var playerAdapter: PlayerAdapter? = null
 
     fun getAndResetPlayerStartupTime(): Long {
         val playerStartupTime = playerStartupTime
@@ -121,7 +86,7 @@ class BitmovinAnalytics(
             playerAdapter?.ssaiService?.flushCurrentAdSample()
             playerAdapter?.triggerLastSampleOfSession()
         }
-        detachAd()
+        adAnalytics?.detachAdapter()
         featureManager.unregisterFeatures()
         eventBus.notify(OnAnalyticsReleasingEventListener::class) { it.onReleasing() }
         playerAdapter?.release()
@@ -129,14 +94,10 @@ class BitmovinAnalytics(
         unregisterActivityPauseListener()
     }
 
-    private fun detachAd() {
-        adAnalytics?.detachAdapter()
-    }
-
     fun resetSourceRelatedState() {
-        eventDataDispatcher.resetSourceRelatedState()
         featureManager.resetFeatures()
         playerAdapter?.resetSourceRelatedState()
+        sequenceNumberAndImpressionIdProvider.reset()
     }
 
     val activeCustomData: CustomData
@@ -168,6 +129,14 @@ class BitmovinAnalytics(
     }
 
     fun sendEventData(data: EventData) {
+        data.sequenceNumber = sequenceNumberAndImpressionIdProvider.getAndIncrementSequenceNumber()
+
+        // Do not send events with sequence number greater than the limit, the limit is in sync with the limit on ingress side
+        if (data.sequenceNumber > SEQUENCE_NUMBER_LIMIT) {
+            BitmovinLog.d("BitmovinAnalytics", "Event with sequence number ${data.sequenceNumber} is not sent.")
+            return
+        }
+
         eventDataDispatcher.add(data)
     }
 
@@ -193,8 +162,8 @@ class BitmovinAnalytics(
         }
     }
 
-    val impressionId: String?
-        get() = playerAdapter?.stateMachine?.impressionId
+    val impressionId: String
+        get() = sequenceNumberAndImpressionIdProvider.getImpressionId()
 
     companion object {
         private const val TAG = "BitmovinAnalytics"

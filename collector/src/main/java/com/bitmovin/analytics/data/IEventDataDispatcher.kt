@@ -13,6 +13,4 @@ interface IEventDataDispatcher {
     fun add(data: EventData)
 
     fun addAd(data: AdEventData)
-
-    fun resetSourceRelatedState()
 }

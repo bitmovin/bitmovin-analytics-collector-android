@@ -8,7 +8,6 @@ import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.data.CacheConsumingBackend
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.IEventDataDispatcher
-import com.bitmovin.analytics.data.SEQUENCE_NUMBER_LIMIT
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.LicenseCall
@@ -35,7 +34,6 @@ internal class PersistingAuthenticatedDispatcher(
     private lateinit var ioScope: CoroutineScope
     private lateinit var backend: Backend
     private var operationMode = Unauthenticated
-    private var sampleSequenceNumber = 0
 
     init {
         createBackend()
@@ -87,17 +85,9 @@ internal class PersistingAuthenticatedDispatcher(
     override fun disable() {
         ioScope.cancel()
         operationMode = Disabled
-        sampleSequenceNumber = 0
     }
 
     override fun add(data: EventData) {
-        // Do not send events with sequence number greater than the limit
-        if (sampleSequenceNumber > SEQUENCE_NUMBER_LIMIT) {
-            return
-        }
-
-        data.sequenceNumber = sampleSequenceNumber++
-
         when (operationMode) {
             Disabled -> return
             Authenticated -> backend.send(data)
@@ -117,10 +107,6 @@ internal class PersistingAuthenticatedDispatcher(
                 ioScope.launch { licenseCall.authenticate(authenticationCallback) }
             }
         }
-    }
-
-    override fun resetSourceRelatedState() {
-        sampleSequenceNumber = 0
     }
 }
 

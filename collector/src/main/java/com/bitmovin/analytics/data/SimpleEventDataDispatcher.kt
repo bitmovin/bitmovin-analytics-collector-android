@@ -24,15 +24,11 @@ internal class SimpleEventDataDispatcher(
 ) : IEventDataDispatcher, AuthenticationCallback {
     private lateinit var backend: Backend
     private lateinit var ioScope: CoroutineScope
-    private val data: Queue<EventData>
-    private val adData: Queue<AdEventData>
+    private val data: Queue<EventData> = ConcurrentLinkedQueue()
+    private val adData: Queue<AdEventData> = ConcurrentLinkedQueue()
     private var enabled = false
 
-    private var sampleSequenceNumber = 0
-
     init {
-        data = ConcurrentLinkedQueue()
-        adData = ConcurrentLinkedQueue()
         createBackend()
     }
 
@@ -73,17 +69,9 @@ internal class SimpleEventDataDispatcher(
         adData.clear()
         ioScope.cancel()
         enabled = false
-        sampleSequenceNumber = 0
     }
 
     override fun add(eventData: EventData) {
-        // Do not send events with sequence number greater than the limit
-        if (sampleSequenceNumber > SEQUENCE_NUMBER_LIMIT) {
-            return
-        }
-
-        eventData.sequenceNumber = sampleSequenceNumber++
-
         if (enabled) {
             backend.send(eventData)
         } else {
@@ -97,10 +85,6 @@ internal class SimpleEventDataDispatcher(
         } else {
             adData.add(eventData)
         }
-    }
-
-    override fun resetSourceRelatedState() {
-        sampleSequenceNumber = 0
     }
 
     private fun forwardQueuedEvents(licenseKey: String) {

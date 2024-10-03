@@ -36,12 +36,16 @@ class PlayerStateMachine(
         private set
     var videoTimeEnd: Long = 0
         private set
-    lateinit var impressionId: String
-        private set
 
     private var currentRebufferingIntervalIndex = 0
     private val heartbeatDelay = HEARTBEAT_INTERVAL.toLong() // 60 seconds
     var videoStartFailedReason: VideoStartFailedReason? = null
+
+    init {
+        bufferingTimeoutTimer.subscribe(::onRebufferingTimerFinished)
+        videoStartTimeoutTimer.subscribe(::onVideoStartTimeoutTimerFinished)
+        resetStateMachine()
+    }
 
     fun enableHeartbeat() {
         heartbeatHandler.postDelayed(
@@ -128,17 +132,14 @@ class PlayerStateMachine(
     private fun resetSourceRelatedState() {
         disableHeartbeat()
         disableRebufferHeartbeat()
-        impressionId = Util.uUID
-        videoStartFailedReason = null
-        isStartupFinished = false
-
-        startupTime = 0
-
         videoStartTimeoutTimer.cancel()
         bufferingTimeoutTimer.cancel()
         qualityChangeEventLimiter.reset()
-
         analytics.resetSourceRelatedState()
+
+        videoStartFailedReason = null
+        isStartupFinished = false
+        startupTime = 0
     }
 
     fun resetStateMachine() {
@@ -341,14 +342,6 @@ class PlayerStateMachine(
             AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.errorCode,
         )
         disableRebufferHeartbeat()
-        resetStateMachine()
-    }
-
-    // This should be defined at the bottom, so we make sure
-    // that all fields are assigned already
-    init {
-        bufferingTimeoutTimer.subscribe(::onRebufferingTimerFinished)
-        videoStartTimeoutTimer.subscribe(::onVideoStartTimeoutTimerFinished)
         resetStateMachine()
     }
 

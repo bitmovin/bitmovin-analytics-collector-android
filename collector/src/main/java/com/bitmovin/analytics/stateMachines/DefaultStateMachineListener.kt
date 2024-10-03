@@ -29,7 +29,7 @@ class DefaultStateMachineListener(
         videoStartupTime: Long,
         playerStartupTime: Long,
     ) {
-        BitmovinLog.d(TAG, String.format("onStartup %s", stateMachine.impressionId))
+        BitmovinLog.d(TAG, String.format("onStartup %s", analytics.impressionId))
         val data = playerAdapter.createEventData()
         data.supportedVideoCodecs = Util.supportedVideoFormats
         data.state = "startup"
@@ -52,7 +52,7 @@ class DefaultStateMachineListener(
         stateMachine: PlayerStateMachine,
         duration: Long,
     ) {
-        BitmovinLog.d(TAG, String.format("onPauseExit %s", stateMachine.impressionId))
+        BitmovinLog.d(TAG, String.format("onPauseExit %s", analytics.impressionId))
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = duration
@@ -66,7 +66,7 @@ class DefaultStateMachineListener(
         stateMachine: PlayerStateMachine,
         duration: Long,
     ) {
-        BitmovinLog.d(TAG, String.format("onPlayExit %s", stateMachine.impressionId))
+        BitmovinLog.d(TAG, String.format("onPlayExit %s", analytics.impressionId))
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = duration
@@ -86,7 +86,7 @@ class DefaultStateMachineListener(
             String.format(
                 "onTriggerSample %s %s",
                 stateMachine.currentState.name,
-                stateMachine.impressionId,
+                analytics.impressionId,
             ),
         )
         val data = playerAdapter.createEventData()
@@ -117,7 +117,7 @@ class DefaultStateMachineListener(
         stateMachine: PlayerStateMachine,
         duration: Long,
     ) {
-        BitmovinLog.d(TAG, String.format("onRebuffering %s", stateMachine.impressionId))
+        BitmovinLog.d(TAG, String.format("onRebuffering %s", analytics.impressionId))
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = duration
@@ -131,7 +131,7 @@ class DefaultStateMachineListener(
         stateMachine: PlayerStateMachine,
         errorCode: ErrorCode?,
     ) {
-        BitmovinLog.d(TAG, String.format("onError %s", stateMachine.impressionId))
+        BitmovinLog.d(TAG, String.format("onError %s", analytics.impressionId))
 
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
@@ -159,7 +159,7 @@ class DefaultStateMachineListener(
 
         errorDetailObservable.notify {
             it.onError(
-                stateMachine.impressionId,
+                analytics.impressionId,
                 errorCode?.errorCode,
                 errorCode?.description,
                 errorCode?.errorData,
@@ -171,7 +171,7 @@ class DefaultStateMachineListener(
         stateMachine: PlayerStateMachine,
         duration: Long,
     ) {
-        BitmovinLog.d(TAG, String.format("onSeekComplete %s", stateMachine.impressionId))
+        BitmovinLog.d(TAG, String.format("onSeekComplete %s", analytics.impressionId))
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.seeked = duration
@@ -208,7 +208,7 @@ class DefaultStateMachineListener(
     }
 
     override fun onQualityChange(stateMachine: PlayerStateMachine) {
-        BitmovinLog.d(TAG, String.format("onQualityChange %s", stateMachine.impressionId))
+        BitmovinLog.d(TAG, String.format("onQualityChange %s", analytics.impressionId))
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = 0
@@ -225,7 +225,7 @@ class DefaultStateMachineListener(
         stateMachine: PlayerStateMachine,
         oldValue: SubtitleDto?,
     ) {
-        BitmovinLog.d(TAG, String.format("onSubtitleChange %s", stateMachine.impressionId))
+        BitmovinLog.d(TAG, String.format("onSubtitleChange %s", analytics.impressionId))
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = 0
@@ -239,7 +239,7 @@ class DefaultStateMachineListener(
     }
 
     override fun onAudioTrackChange(stateMachine: PlayerStateMachine) {
-        BitmovinLog.d(TAG, String.format("onAudioTrackChange %s", stateMachine.impressionId))
+        BitmovinLog.d(TAG, String.format("onAudioTrackChange %s", analytics.impressionId))
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name
         data.duration = 0
@@ -270,7 +270,7 @@ class DefaultStateMachineListener(
 
             errorDetailObservable.notify {
                 it.onError(
-                    stateMachine.impressionId,
+                    analytics.impressionId,
                     errorCode.errorCode,
                     errorCode.description,
                     errorCode.errorData,

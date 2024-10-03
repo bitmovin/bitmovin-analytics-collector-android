@@ -10,9 +10,6 @@ import com.bitmovin.analytics.data.persistence.EventDatabase
 import com.bitmovin.analytics.data.testutils.TestFactory
 import com.bitmovin.analytics.data.testutils.createDummyPlayerAdapter
 import com.bitmovin.analytics.data.testutils.createTestImpressionId
-import com.bitmovin.analytics.persistence.EventQueueConfig
-import com.bitmovin.analytics.persistence.EventQueueFactory
-import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.RepeatRule
 import com.bitmovin.analytics.systemtest.utils.combineByImpressionId
@@ -29,7 +26,6 @@ class NoRetryTest {
     private lateinit var dummyPlayerAdapter: PlayerAdapter
     private lateinit var config: AnalyticsConfig
     private lateinit var bitmovinAnalytics: BitmovinAnalytics
-    private lateinit var eventQueue: AnalyticsEventQueue
 
     @Rule
     @JvmField
@@ -45,17 +41,11 @@ class NoRetryTest {
                 retryPolicy = RetryPolicy.NO_RETRY,
                 backendUrl = mockedIngressUrl,
             )
-        eventQueue =
-            EventQueueFactory.createPersistentEventQueue(
-                EventQueueConfig(),
-                EventDatabase.getInstance(appContext),
-            )
 
         bitmovinAnalytics =
             BitmovinAnalytics(
                 config = config,
                 context = appContext,
-                eventQueue = eventQueue,
             )
         dummyPlayerAdapter = createDummyPlayerAdapter(bitmovinAnalytics)
     }

@@ -35,7 +35,17 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         }
 
     override val impressionId: String?
-        get() = analytics.impressionId
+        get() {
+            // we are only returning a valid impressionId if the player is already attached
+            // this is needed to mimic the existing behaviour and since we are
+            // resetting the impressionId on attaching of the collector, which would mean that
+            // the user gets a different impressionId before attaching
+            return if (analytics.playerAdapter != null) {
+                analytics.impressionId
+            } else {
+                null
+            }
+        }
 
     override val userId: String
         get() = userIdProvider.userId()

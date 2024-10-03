@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Fixed
+- Made sequenceNumber and impressionId resetting atomic + refactoring
 - CSAI: Added missing pageLoadType = 1 to request (also fixed on server side)
 
 ## v3.9.2
