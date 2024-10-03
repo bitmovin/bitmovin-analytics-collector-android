@@ -6,8 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.9.3
+
 ### Fixed
-- Made sequenceNumber and impressionId resetting atomic + refactoring
+- [AN-4201] Made sequenceNumber and impressionId resetting atomic + refactoring
 - CSAI: Added missing pageLoadType = 1 to request (also fixed on server side)
 
 ## v3.9.2
