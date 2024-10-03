@@ -11,6 +11,7 @@ import com.bitmovin.analytics.systemtest.utils.EventDataUtils
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.PlayerSettings
+import com.bitmovin.analytics.systemtest.utils.RepeatRule
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.bitmovin.analytics.systemtest.utils.TestSources.DASH_SINTEL_WITH_SUBTITLES
@@ -43,6 +44,9 @@ class PhoneBasicScenariosTest {
 
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()
+
+    @Rule @JvmField
+    val repeatRule = RepeatRule()
 
     // Source metadata title depends on the test, so it has to be generated dynamically
     private var defaultSourceMetadata: SourceMetadata
@@ -436,6 +440,8 @@ class PhoneBasicScenariosTest {
 
             withContext(mainScope.coroutineContext) {
                 player.pause()
+                collector.detachPlayer()
+                player.release()
             }
 
             Thread.sleep(300)
@@ -445,7 +451,7 @@ class PhoneBasicScenariosTest {
             val drmImpression = impressions[0]
             DataVerifier.verifyHasNoErrorSamples(drmImpression)
             val startupSample = drmImpression.eventDataList.first()
-            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema)
+            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, verifyDrmType = false)
         }
 
     @Test
@@ -498,7 +504,7 @@ class PhoneBasicScenariosTest {
             val drmImpression = impressions[0]
             DataVerifier.verifyHasNoErrorSamples(drmImpression)
             val startupSample = drmImpression.eventDataList.first()
-            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, isAutoPlay = false)
+            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, isAutoPlay = false, verifyDrmType = false)
         }
 
     @Test

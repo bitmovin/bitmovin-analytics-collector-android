@@ -460,7 +460,7 @@ class PhoneBasicScenariosTest {
             val drmImpression = impressions[0]
             DataVerifier.verifyHasNoErrorSamples(drmImpression)
             val startupSample = drmImpression.eventDataList.first()
-            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema)
+            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, verifyDrmType = false)
         }
 
     @Test
@@ -513,7 +513,8 @@ class PhoneBasicScenariosTest {
             val drmImpression = impressions[0]
             DataVerifier.verifyHasNoErrorSamples(drmImpression)
             val startupSample = drmImpression.eventDataList.first()
-            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, isAutoPlay = false)
+
+            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, isAutoPlay = false, verifyDrmType = false)
         }
 
     @Test

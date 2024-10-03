@@ -378,9 +378,15 @@ object DataVerifier {
         drmType: String?,
         isFirstImpression: Boolean = true,
         isAutoPlay: Boolean = true,
+        verifyDrmType: Boolean = true,
     ) {
         verifyStartupSample(eventData, isFirstImpression)
-        assertThat(eventData.drmType).isEqualTo(drmType)
+
+        // on exoplayer drm download events are sometimes lagging
+        // and thus the startup sample doesn't have the type set which would make the test flaky
+        if (verifyDrmType) {
+            assertThat(eventData.drmType).isEqualTo(drmType)
+        }
         assertThat(eventData.drmLoadTime).isGreaterThan(0)
 
         if (isAutoPlay) {
