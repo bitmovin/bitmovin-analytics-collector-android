@@ -240,6 +240,72 @@ class SsaiScenariosTest {
         }
 
     @Test
+    fun test_adEngagementMetricsDisabled_DO_NOT_track_all_quartiles() =
+        runBlockingTest {
+            // arrange
+            val configWithSsaiEngagementTrackingDisabled =
+                AnalyticsConfig(
+                    licenseKey = defaultAnalyticsConfig.licenseKey,
+                    backendUrl = mockedIngressUrl,
+                )
+            val collector = IBitmovinPlayerCollector.create(appContext, configWithSsaiEngagementTrackingDisabled, defaultMetadata)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                )
+
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                )
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 3000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
+                collector.ssai.adBreakEnd()
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
+
+            val adEventDataList = impression.adEventDataList
+            assertThat(adEventDataList).hasSize(0)
+        }
+
+    @Test
     fun test_adEngagementMetrics_track_all_quartiles_for_2_ads() =
         runBlockingTest {
             // arrange
@@ -407,6 +473,56 @@ class SsaiScenariosTest {
             assertThat(adSampleWithError.started).isEqualTo(1)
             assertThat(adSampleWithError.errorCode).isNotNull()
             assertThat(adSampleWithError.errorMessage).isNotNull()
+        }
+
+    @Test
+    fun test_adEngagementMetricsDisabled_do_NOT_track_error() =
+        runBlockingTest {
+            val corruptedStream = Samples.CORRUPT_DASH
+            val corruptedStreamSource = Source(SourceConfig.fromUrl(corruptedStream.uri.toString()))
+            // arrange
+            val configWithSsaiEngagementTrackingDisabled =
+                AnalyticsConfig(
+                    licenseKey = defaultAnalyticsConfig.licenseKey,
+                    backendUrl = mockedIngressUrl,
+                )
+            val collector = IBitmovinPlayerCollector.create(appContext, configWithSsaiEngagementTrackingDisabled, defaultMetadata)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(corruptedStreamSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(corruptedStreamSource)
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                )
+
+                collector.ssai.adStart(
+                    SsaiAdMetadata(
+                        "test-ad-id-1",
+                        "test-ad-system-1",
+                        CustomData(customData1 = "ad-test-custom-data-1"),
+                    ),
+                )
+                defaultPlayer.play()
+            }
+
+            // wait a bit to make sure we catch the error
+            Thread.sleep(3000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+            }
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
+
+            val adEventDataList = impression.adEventDataList
+            assertThat(adEventDataList).hasSize(0)
         }
 
     @Test

@@ -3,6 +3,7 @@ package com.bitmovin.analytics.ssai
 import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
@@ -21,16 +22,33 @@ import org.junit.Test
 
 class SsaiEngagementMetricsServiceTest {
     private lateinit var ssaiEngagementMetricsService: SsaiEngagementMetricsService
+
+    private lateinit var ssaiEngagementMetricsServiceDisabled: SsaiEngagementMetricsService
     private val analytics: BitmovinAnalytics = mockk()
     private val playerAdapter: PlayerAdapter = mockk()
     private val handlerMock = mockk<Handler>()
     private val systemTimeServiceMock = mockk<SystemTimeService>()
+    private val analyticsConfig =
+        AnalyticsConfig(
+            "dummyLicenseKey",
+            ssaiEngagementTrackingEnabled = true,
+        )
 
     @Before
     fun setUp() {
         // dummy default mock setup to run tests
         every { systemTimeServiceMock.elapsedRealtime() }.returns(12L)
-        ssaiEngagementMetricsService = SsaiEngagementMetricsService(analytics, playerAdapter, handlerMock, systemTimeServiceMock)
+        ssaiEngagementMetricsService =
+            SsaiEngagementMetricsService(
+                analytics,
+                analyticsConfig, playerAdapter, handlerMock, systemTimeServiceMock,
+            )
+
+        ssaiEngagementMetricsServiceDisabled =
+            SsaiEngagementMetricsService(
+                analytics,
+                AnalyticsConfig("dummyLicense"), playerAdapter, handlerMock, systemTimeServiceMock,
+            )
     }
 
     @Test
@@ -62,6 +80,13 @@ class SsaiEngagementMetricsServiceTest {
         ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 1)
 
         verify(exactly = 1) { analytics.sendAdEventData(any()) }
+    }
+
+    @Test
+    fun `markAdStart should be noop if adEngagementTracking is disabled`() {
+        val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
+        ssaiEngagementMetricsServiceDisabled.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        verify(exactly = 0) { analytics.sendAdEventData(any()) }
     }
 
     @Test
@@ -114,6 +139,23 @@ class SsaiEngagementMetricsServiceTest {
         assertThat(adEventData.adSystem).isEqualTo("testAdSystem")
         assertThat(adEventData.adIndex).isEqualTo(1)
         assertThat(adEventData.adPosition).isEqualTo("midroll")
+    }
+
+    @Test
+    fun `markQuartileFinished should NOT create sample if adEngagementTracking is disabled`() {
+        val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
+        val adQuartileMetadata = SsaiAdQuartileMetadata(failedBeaconUrl = "dummyUrl")
+
+        ssaiEngagementMetricsServiceDisabled.markQuartileFinished(
+            SsaiAdPosition.MIDROLL,
+            SsaiAdQuartile.FIRST,
+            adMetadata,
+            adQuartileMetadata,
+            1,
+        )
+        ssaiEngagementMetricsServiceDisabled.flushCurrentAdSample()
+
+        verify(exactly = 0) { analytics.sendAdEventData(any()) }
     }
 
     @Test
@@ -225,6 +267,15 @@ class SsaiEngagementMetricsServiceTest {
         assertThat(adEventData.adPosition).isEqualTo("midroll")
         assertThat(adEventData.errorCode).isEqualTo(1234)
         assertThat(adEventData.errorMessage).isEqualTo("testMessage")
+    }
+
+    @Test
+    fun `sendAdErrorSample should NOT sendout sample if ssaiEngagement is disabled`() {
+        val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
+        ssaiEngagementMetricsServiceDisabled.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsServiceDisabled.sendAdErrorSample(SsaiAdPosition.MIDROLL, adMetadata, 0, 1234, "testMessage")
+
+        verify(exactly = 0) { analytics.sendAdEventData(any()) }
     }
 
     @Test

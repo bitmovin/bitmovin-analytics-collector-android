@@ -5,6 +5,7 @@ import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.adapters.PlayerContext
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.EventData
@@ -41,7 +42,12 @@ internal class DummyPlayerAdapter(
         get() = 0
 
     private val ssaiEngagementMetricsService: SsaiEngagementMetricsService =
-        SsaiEngagementMetricsService(analytics, this, Handler(Looper.getMainLooper()))
+        SsaiEngagementMetricsService(
+            analytics,
+            AnalyticsConfig("dummy", ssaiEngagementTrackingEnabled = true),
+            this,
+            Handler(Looper.getMainLooper()),
+        )
 
     override val ssaiService: SsaiService = SsaiService(stateMachine, ssaiEngagementMetricsService)
 

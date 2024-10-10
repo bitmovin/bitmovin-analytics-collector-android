@@ -3,6 +3,7 @@ package com.bitmovin.analytics.ssai
 import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
@@ -16,6 +17,7 @@ import com.bitmovin.analytics.utils.Util
 @InternalBitmovinApi
 class SsaiEngagementMetricsService(
     private val analytics: BitmovinAnalytics,
+    private val analyticsConfig: AnalyticsConfig,
     private val playerAdapter: PlayerAdapter,
     private val ssaiTimeoutHandler: Handler,
     private val systemTimeService: SystemTimeService = SystemTimeService(),
@@ -32,6 +34,10 @@ class SsaiEngagementMetricsService(
         adMetadata: SsaiAdMetadata?,
         adIndex: Int,
     ) {
+        if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
+            return
+        }
+
         flushCurrentAdSample()
         resetStateOnNewAd()
         adImpressionId = Util.uUID
@@ -50,6 +56,10 @@ class SsaiEngagementMetricsService(
         adQuartileMetadata: SsaiAdQuartileMetadata?,
         adIndex: Int,
     ) {
+        if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
+            return
+        }
+
         // we make sure that each quartile is sent at most once per ad id,
         // to avoid duplicates in the metrics
         if (quartilesFinishedWithCurrentAd.add(quartile)) {
@@ -74,6 +84,10 @@ class SsaiEngagementMetricsService(
         errorCode: Int,
         errorMessage: String,
     ) {
+        if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
+            return
+        }
+
         // we need to make sure that we only send one error sample per active ad, to not inflate metrics
         if (errorSentForCurrentAd) {
             return
@@ -88,6 +102,10 @@ class SsaiEngagementMetricsService(
 
     @Synchronized
     fun flushCurrentAdSample() {
+        if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
+            return
+        }
+
         sendAndClearAdSample()
     }
 

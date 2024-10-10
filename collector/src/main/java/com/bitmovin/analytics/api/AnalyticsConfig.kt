@@ -10,7 +10,8 @@ data class AnalyticsConfig(
      */
     val licenseKey: String,
     /**
-     * Value indicating if ad tracking is disabled.
+     * Value indicating if CSAI ad tracking is disabled.
+     * This is not affecting SSAI ad tracking.
      *
      * Default is `false`
      */
@@ -40,6 +41,14 @@ data class AnalyticsConfig(
      * Default is ERROR, which means only error logs are printed.
      */
     val logLevel: LogLevel = LogLevel.ERROR,
+    /**
+     * Config to enable tracking of SSAI engagement metrics (quartile level)
+     * This is an opt in feature and off by default.
+     *
+     * It also needs to be enabled on account level,
+     * please contact Bitmovin Support to enable it for your account.
+     */
+    val ssaiEngagementTrackingEnabled: Boolean = false,
 ) : Parcelable {
     @JvmOverloads
     constructor(
@@ -79,6 +88,53 @@ data class AnalyticsConfig(
         retryPolicy = retryPolicy,
         backendUrl = backendUrl,
         logLevel = LogLevel.ERROR,
+        ssaiEngagementTrackingEnabled = false,
+    )
+
+    constructor(
+        /**
+         * The analytics license key
+         */
+        licenseKey: String,
+        /**
+         * Value indicating if ad tracking is disabled.
+         *
+         * Default is `false`
+         */
+        adTrackingDisabled: Boolean = false,
+        /**
+         * Generate a random UserId for the session
+         *
+         * Default is `false`
+         */
+        randomizeUserId: Boolean = false,
+        /**
+         * Specifies the retry behavior in case an analytics request cannot be sent to the analytics backend.
+         * See [RetryPolicy] for the available settings.
+         *
+         * Default is [RetryPolicy.NO_RETRY]
+         */
+        retryPolicy: RetryPolicy = RetryPolicy.NO_RETRY,
+        /**
+         * The URL of the Bitmovin Analytics backend.
+         *
+         * Default is the bitmovin backend URL
+         */
+        backendUrl: String = DEFAULT_BACKEND_URL,
+        /**
+         * Config to define the log level of the SDK.
+         *
+         * Default is ERROR, which means only error logs are printed.
+         */
+        logLevel: LogLevel = LogLevel.ERROR,
+    ) : this(
+        licenseKey = licenseKey,
+        adTrackingDisabled = adTrackingDisabled,
+        randomizeUserId = randomizeUserId,
+        retryPolicy = retryPolicy,
+        backendUrl = backendUrl,
+        logLevel = logLevel,
+        ssaiEngagementTrackingEnabled = false,
     )
 
     companion object {
@@ -91,6 +147,7 @@ data class AnalyticsConfig(
         private var retryPolicy: RetryPolicy = RetryPolicy.NO_RETRY
         private var backendUrl: String = DEFAULT_BACKEND_URL
         private var logLevel: LogLevel = LogLevel.ERROR
+        private var ssaiEngagementTrackingEnabled: Boolean = false
 
         fun setAdTrackingDisabled(adTrackingDisabled: Boolean) = apply { this.adTrackingDisabled = adTrackingDisabled }
 
@@ -102,6 +159,11 @@ data class AnalyticsConfig(
 
         fun setLogLevel(logLevel: LogLevel) = apply { this.logLevel = logLevel }
 
+        fun setSsaiEngagementTrackingEnabled(ssaiEngagementTrackingEnabled: Boolean) =
+            apply {
+                this.ssaiEngagementTrackingEnabled = ssaiEngagementTrackingEnabled
+            }
+
         fun build(): AnalyticsConfig {
             return AnalyticsConfig(
                 licenseKey = licenseKey,
@@ -110,6 +172,7 @@ data class AnalyticsConfig(
                 retryPolicy = retryPolicy,
                 backendUrl = backendUrl,
                 logLevel = logLevel,
+                ssaiEngagementTrackingEnabled = ssaiEngagementTrackingEnabled,
             )
         }
     }

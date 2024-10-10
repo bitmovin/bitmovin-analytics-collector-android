@@ -35,10 +35,13 @@ object TestConfig {
     fun createAnalyticsConfig(
         analyticsKey: String = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0",
         backendUrl: String? = null,
+        ssaiEngagementTrackingEnabled: Boolean = true,
     ): AnalyticsConfig {
         if (backendUrl == null) {
             return AnalyticsConfig(
                 licenseKey = analyticsKey,
+                logLevel = com.bitmovin.analytics.api.LogLevel.DEBUG,
+                ssaiEngagementTrackingEnabled = ssaiEngagementTrackingEnabled,
             )
         }
 
@@ -46,6 +49,7 @@ object TestConfig {
             licenseKey = analyticsKey,
             backendUrl = backendUrl,
             logLevel = com.bitmovin.analytics.api.LogLevel.DEBUG,
+            ssaiEngagementTrackingEnabled = ssaiEngagementTrackingEnabled,
         )
     }
 

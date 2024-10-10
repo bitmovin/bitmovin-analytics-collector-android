@@ -34,7 +34,7 @@ abstract class DefaultPlayerAdapter(
 
     // TODO [AN-4317]: this wiring is not good, we should aim for getting rid of the PlayerAdapter dependency
     private val ssaiEngagementMetricsService: SsaiEngagementMetricsService =
-        SsaiEngagementMetricsService(analytics = bitmovinAnalytics, playerAdapter = this, Handler(looper))
+        SsaiEngagementMetricsService(analytics = bitmovinAnalytics, analyticsConfig = config, playerAdapter = this, Handler(looper))
     final override val ssaiService = SsaiService(stateMachine, ssaiEngagementMetricsService)
 
     override val isAutoplayEnabled: Boolean? = null
