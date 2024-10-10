@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.10.0
+
 ### Changed
 - Tracking of SSAI ad quartiles is off by default and can be enabled via the `ssaiEngagementTrackingEnabled` config in AnalyticsConfig
 
