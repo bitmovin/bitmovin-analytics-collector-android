@@ -189,6 +189,7 @@ public final class com/bitmovin/analytics/api/AnalyticsConfig$Builder {
 	public final fun setLogLevel (Lcom/bitmovin/analytics/api/LogLevel;)Lcom/bitmovin/analytics/api/AnalyticsConfig$Builder;
 	public final fun setRandomizeUserId (Z)Lcom/bitmovin/analytics/api/AnalyticsConfig$Builder;
 	public final fun setRetryPolicy (Lcom/bitmovin/analytics/api/RetryPolicy;)Lcom/bitmovin/analytics/api/AnalyticsConfig$Builder;
+	public final fun setSsaiEngagementTrackingEnabled (Z)Lcom/bitmovin/analytics/api/AnalyticsConfig$Builder;
 }
 
 public final class com/bitmovin/analytics/api/AnalyticsConfig$Companion {
