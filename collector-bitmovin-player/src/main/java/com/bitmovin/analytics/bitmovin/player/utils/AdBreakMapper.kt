@@ -8,7 +8,6 @@ import com.bitmovin.player.api.advertising.ima.ImaAdBreak
 import java.util.ArrayList
 
 internal class AdBreakMapper {
-
     fun fromPlayerAdConfiguration(adConfig: AdConfig): AdBreak {
         val collectorAdBreak = AdBreak("notset", ArrayList<Ad>() as List<Ad>)
 
@@ -17,7 +16,10 @@ internal class AdBreakMapper {
         return collectorAdBreak
     }
 
-    private fun fromPlayerAdConfiguration(collectorAdBreak: AdBreak, adConfig: AdConfig): AdBreak {
+    private fun fromPlayerAdConfiguration(
+        collectorAdBreak: AdBreak,
+        adConfig: AdConfig,
+    ): AdBreak {
         collectorAdBreak.replaceContentDuration = adConfig.replaceContentDuration?.toLong()?.times(1000)
 
         if (adConfig is com.bitmovin.player.api.advertising.AdBreak) {
@@ -27,7 +29,10 @@ internal class AdBreakMapper {
         return collectorAdBreak
     }
 
-    private fun fromPlayerAdBreak(collectorAdBreak: AdBreak, playerAdBreak: com.bitmovin.player.api.advertising.AdBreak) {
+    private fun fromPlayerAdBreak(
+        collectorAdBreak: AdBreak,
+        playerAdBreak: com.bitmovin.player.api.advertising.AdBreak,
+    ) {
         val ads = ArrayList<Ad>(playerAdBreak.ads.size)
         if (playerAdBreak.ads.isNotEmpty()) {
             playerAdBreak.ads.forEach { ad -> ads.add(AdMapper().fromPlayerAd(Ad(), ad)) }
@@ -43,7 +48,10 @@ internal class AdBreakMapper {
         }
     }
 
-    private fun fromImaAdBreak(collectorAdBreak: AdBreak, imaAdBreak: ImaAdBreak) {
+    private fun fromImaAdBreak(
+        collectorAdBreak: AdBreak,
+        imaAdBreak: ImaAdBreak,
+    ) {
         collectorAdBreak.position = getPositionFromPlayerPosition(imaAdBreak.position)
         collectorAdBreak.fallbackIndex = imaAdBreak.currentFallbackIndex?.toLong() ?: 0
         collectorAdBreak.tagType = AdTagFactory().FromPlayerAdTag(imaAdBreak.tag)
@@ -54,8 +62,12 @@ internal class AdBreakMapper {
         return when {
             playerPosition == AdPosition.PRE.position -> AdPosition.PRE
             playerPosition == AdPosition.POST.position -> AdPosition.POST
-            "([0-9]+.*)".toRegex().matches(playerPosition) -> AdPosition.MID
+            playerPositionRegex.matches(playerPosition) -> AdPosition.MID
             else -> null
         }
+    }
+
+    companion object {
+        private val playerPositionRegex by lazy { "([0-9]+.*)".toRegex() }
     }
 }
