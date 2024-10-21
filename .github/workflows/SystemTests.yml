@@ -70,7 +70,7 @@ jobs:
         run: |
           ./gradlew :collector-media3-exoplayer:pixel6api34DebugAndroidTest
 
-# Collector Amazon IVS Test
+## Collector Amazon IVS Test
       - name: Tests Collector Amazon IVS
         if: always()
         run: |
@@ -89,21 +89,27 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-# Report
+# Create Report which can be analyzed in the github ui directly
+      - name: Publish SystemTest Report
+        uses: mikepenz/action-junit-report@v4
+        if: success() || failure() # always run even if the previous step fails
+        with:
+          report_paths: '**/build/outputs/androidTest-results/managedDevice/debug/pixel6api34/TEST-*.xml'
+
       - name: Copying Reports
         if: always()
         id: copy-reports
         run: |
             mkdir reports
-            
+
             cp -r collector/build/reports/androidTests/managedDevice/debug/pixel6api34/ reports/collector
             cp -r collector-bitmovin-player/build/reports/androidTests/managedDevice/debug/pixel6api34/ reports/collector-bitmovin-player
             cp -r collector-exoplayer/build/reports/androidTests/managedDevice/debug/pixel6api34/ reports/collector-exoplayer
             cp -r collector-media3-exoplayer/build/reports/androidTests/managedDevice/debug/pixel6api34/ reports/collector-media3-exoplayer
             cp -r collector-amazon-ivs/build/reports/androidTests/managedDevice/debug/pixel6api34/ reports/collector-amazon-ivs
-          
+
             cp .github/tests-report/INDEX_TEST_REPORTS.html reports/index.html
-          
+
             ./.github/tests-report/report_enhancer.sh reports
 
       - name: Upload Reports
@@ -112,5 +118,3 @@ jobs:
         with:
           name: tests-report
           path: reports
-
-# Displaying the Results... Might be feasible : https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/

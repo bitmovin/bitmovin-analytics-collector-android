@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- [Internal] Enable testreports directly in github ui
+
 ## v3.10.0
 
 ### Changed
