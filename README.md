@@ -329,7 +329,7 @@ For more information about the Analytics Product and the collectors check out ou
 
 ## Threading Model
 
-The collector API is not thread safe. 
+The collector API is not thread safe.
 All calls need to come from the same thread as the player is executed on (usually the MainThread).
 While the collector might not crash when called from different threads, it can lead to inconsistent data.
 
