@@ -326,6 +326,13 @@ A [full example app](https://github.com/bitmovin/bitmovin-analytics-collector-an
 
 For more information about the Analytics Product and the collectors check out our [documentation](https://developer.bitmovin.com/playback/docs/setup-analytics).
 
+
+## Threading Model
+
+The collector API is not thread safe. 
+All calls need to come from the same thread as the player is executed on (usually the MainThread).
+While the collector might not crash when called from different threads, it can lead to inconsistent data.
+
 ## Support
 
 If you have any questions or issues with this Analytics Collector or its examples, or you require other technical support for our services, please login to your Bitmovin Dashboard at [https://bitmovin.com/dashboard](https://bitmovin.com/dashboard) and create a new support case. Our team will get back to you as soon as possible 👍
