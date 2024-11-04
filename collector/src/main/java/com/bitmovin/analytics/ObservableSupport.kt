@@ -1,7 +1,6 @@
 package com.bitmovin.analytics
 
 import com.bitmovin.analytics.internal.InternalBitmovinApi
-import java.util.Collections
 
 @InternalBitmovinApi
 class ObservableSupport<TListener> : Observable<TListener> {
@@ -10,28 +9,37 @@ class ObservableSupport<TListener> : Observable<TListener> {
         fun notify(listener: T)
     }
 
-    // we need a thread safe list here, since removal can happen concurrently
+    private val listeners = mutableListOf<TListener>()
+
+    // we need to synchronize access to all listeners here
+    // since these methods can be called from different threads
     // (seen real crashes in the google sdk console)
-    private val listeners = Collections.synchronizedList(mutableListOf<TListener>())
+    private val lock = Any()
 
     override fun subscribe(listener: TListener) {
-        listeners.add(listener)
+        synchronized(lock) {
+            listeners.add(listener)
+        }
     }
 
     override fun unsubscribe(listener: TListener) {
-        listeners.remove(listener)
+        synchronized(lock) {
+            listeners.remove(listener)
+        }
     }
 
     fun clear() {
-        listeners.clear()
-    }
-
-    // Helper method for inline Java calls
-    fun notify(action: EventListenerNotifier<TListener>) {
-        notify { action.notify(it) }
+        synchronized(lock) {
+            listeners.clear()
+        }
     }
 
     fun notify(action: (listener: TListener) -> Unit) {
-        listeners.toList().forEach(action)
+        val tempList =
+            synchronized(lock) {
+                listeners.toList()
+            }
+
+        tempList.forEach(action)
     }
 }
