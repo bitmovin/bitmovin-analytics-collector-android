@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.10.1
+
 ### Fixed
 - Synchronized all methods of ObservableSupport due to crashes seen in android sdk index
 
