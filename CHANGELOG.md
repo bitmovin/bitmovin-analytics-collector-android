@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
+- [Internal] Upgraded agp to 8.7 and gradle to 8.9
 - Upgraded bitmovin player to 3.94.0 and amazon ivs player to 1.34.0
 
 ## v3.10.1
