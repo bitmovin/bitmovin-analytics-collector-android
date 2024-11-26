@@ -86,8 +86,6 @@ ext {
 
     version = System.getProperty("version", "0.0.0") + (developLocal ? '-local' : '')
 
-    compileSdk = 34
-
     // minSdkVersion we officially support is 21
     // Emulators need to have at least API level 25, since lower don't emulate
     // the media stack correctly
@@ -100,15 +98,15 @@ ext {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
     exampleAppJvmTarget = jvmTarget
 
-    compileSdkVersion = 34
+    compileSdk = 35
     amazonIvsMinSdkVersion = 21
-    targetSdkVersion = 34
+    targetSdkVersion = 35
 
     // player versions
     bitmovinPlayerVersion = '3.94.0'
     exoplayerVersion = '2.19.1'
     amazonIvsPlayerVersion = '1.34.0'
-    media3PlayerVersion = '1.4.1'
+    media3PlayerVersion = '1.5.0'
 
     // collector dependencies
     gsonVersion = '2.11.0'
@@ -132,7 +130,7 @@ ext {
     // not using latest (1.13.8) due to https://github.com/mockk/mockk/issues/1168
     mockkVersion = '1.13.7'
     assertjCoreVersion = '3.24.2'
-    robolectricVersion = '4.11.1'
+    robolectricVersion = '4.14.1'
     testCoreXVersion = '1.5.0'
 }
 
