@@ -26,7 +26,14 @@ class ErrorDetailBackend(
     }
 
     fun send(errorDetail: ErrorDetail) {
-        val errorDetailCopy = errorDetail.copyTruncateStringsAndUrls(MAX_STRING_LENGTH, MAX_URL_LENGTH)
+        val errorDetailCopy =
+            if (isBitmovinPlayerDecodingError(errorDetail)) {
+                // we handle decoding errors differently, as they can contain a lot of additional data
+                errorDetail.copyTruncateStringsAndUrls(MAX_ADDITIONAL_DATA_LENGTH_FOR_DECODING_ERRORS)
+            } else {
+                errorDetail.copyTruncateStringsAndUrls(MAX_ADDITIONAL_DATA_LENGTH)
+            }
+
         if (enabled) {
             httpClient.post(backendUrl, DataSerializer.serialize(errorDetailCopy), null)
         } else {
@@ -51,26 +58,37 @@ class ErrorDetailBackend(
 
     companion object {
         const val MAX_URL_LENGTH = 200
-        const val MAX_STRING_LENGTH = 400
+        const val MAX_ERROR_MESSAGE_LENGTH = 400
+        const val MAX_ADDITIONAL_DATA_LENGTH = 2000
+        const val MAX_ADDITIONAL_DATA_LENGTH_FOR_DECODING_ERRORS = 4500
 
-        fun ErrorDetail.copyTruncateStringsAndUrls(maxStringLength: Int, maxUrlLength: Int): ErrorDetail = this.copy(
-            message = message?.take(maxStringLength),
-            data = data.copyTruncateStrings(maxStringLength),
-            httpRequests = httpRequests?.mapNotNull {
-                it.copyTruncateUrls(maxUrlLength)
-            },
-        )
+        fun ErrorDetail.copyTruncateStringsAndUrls(maxAdditionalDataLength: Int): ErrorDetail {
+            return this.copy(
+                message = message?.take(MAX_ERROR_MESSAGE_LENGTH),
+                data = data.copyTruncateStrings(maxAdditionalDataLength),
+                httpRequests =
+                    httpRequests?.mapNotNull {
+                        it.copyTruncateUrls()
+                    },
+            )
+        }
 
-        private fun HttpRequest?.copyTruncateUrls(maxLength: Int) = this?.copy(
-            url = url?.take(maxLength),
-            lastRedirectLocation = lastRedirectLocation?.take(maxLength),
-        )
+        private fun HttpRequest?.copyTruncateUrls() =
+            this?.copy(
+                url = url?.take(MAX_URL_LENGTH),
+                lastRedirectLocation = lastRedirectLocation?.take(MAX_URL_LENGTH),
+            )
 
-        private fun ErrorData.copyTruncateStrings(maxStringLength: Int) = this.copy(
-            exceptionMessage = exceptionMessage?.take(maxStringLength),
-            additionalData = additionalData?.take(maxStringLength),
-        )
+        private fun ErrorData.copyTruncateStrings(maxAdditionalDataLength: Int) =
+            this.copy(
+                exceptionMessage = exceptionMessage?.take(MAX_ERROR_MESSAGE_LENGTH),
+                additionalData = additionalData?.take(maxAdditionalDataLength),
+            )
 
         fun ErrorDetail.copyTruncateHttpRequests(maxRequests: Int) = this.copy(httpRequests = httpRequests?.take(maxRequests))
+
+        fun isBitmovinPlayerDecodingError(errorDetail: ErrorDetail): Boolean {
+            return errorDetail.code != null && errorDetail.code >= 2100 && errorDetail.code <= 2105
+        }
     }
 }

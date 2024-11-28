@@ -13,7 +13,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ErrorDetailBackendTests {
-
     lateinit var httpClientMock: HttpClient
 
     @Before
@@ -37,6 +36,56 @@ class ErrorDetailBackendTests {
     }
 
     @Test
+    fun testDecodingErrorsAreCutOffAfter4500Characters() {
+        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk(), httpClientMock)
+        val d1 =
+            ErrorDetail(
+                platform = "platform",
+                licenseKey = "test",
+                domain = "domain",
+                impressionId = "impressionId",
+                errorId = 0,
+                timestamp = 0,
+                // decoding error
+                code = 2100,
+                message = null,
+                data = ErrorData(additionalData = "a".repeat(5000)),
+                httpRequests = null,
+            )
+
+        // act
+        backend.send(d1)
+
+        // assert
+        assertThat(backend.queue[0].data.additionalData?.length).isEqualTo(4500)
+    }
+
+    @Test
+    fun testNonDecodingErrorsAreCutOffAfter2000Characters() {
+        val backend = ErrorDetailBackend(mockk(relaxed = true), mockk(), httpClientMock)
+        val d1 =
+            ErrorDetail(
+                platform = "platform",
+                licenseKey = "test",
+                domain = "domain",
+                impressionId = "impressionId",
+                errorId = 0,
+                timestamp = 0,
+                // NOT decoding error
+                code = 100,
+                message = null,
+                data = ErrorData(additionalData = "a".repeat(5000)),
+                httpRequests = null,
+            )
+
+        // act
+        backend.send(d1)
+
+        // assert
+        assertThat(backend.queue[0].data.additionalData?.length).isEqualTo(2000)
+    }
+
+    @Test
     fun testErrorDetailLimitHttpRequestsShouldntFailIfHttpRequestsAreNull() {
         val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), null)
         errorDetail.copyTruncateHttpRequests(1)
@@ -54,36 +103,48 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testErrorDetailCopyTruncateStringsAndUrlsShouldCorrectlyTruncateStringsAndUrls() {
-        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, "0123456789", "0123456789", 0, 0L, null, 0, true)
+        val longString = "a".repeat(4600)
+
+        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, longString, longString, 0, 0L, null, 0, true)
         val httpRequest2 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, "0123", 0, 0L, null, 0, true)
-        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, "0123456789", ErrorData(), mutableListOf(httpRequest1, httpRequest2))
-        val copy = errorDetail.copyTruncateStringsAndUrls(5, 5)
+        val errorDetail =
+            ErrorDetail(
+                "", "", "", "", 0, 0, null, longString,
+                ErrorData(
+                    additionalData = longString,
+                ),
+                mutableListOf(httpRequest1, httpRequest2),
+            )
+        val copy = errorDetail.copyTruncateStringsAndUrls(4000)
         assertThat(copy.analyticsVersion).isEqualTo(errorDetail.analyticsVersion)
         assertThat(copy.code).isEqualTo(errorDetail.code)
         assertThat(copy.domain).isEqualTo(errorDetail.domain)
         assertThat(copy.errorId).isEqualTo(errorDetail.errorId)
         assertThat(copy.impressionId).isEqualTo(errorDetail.impressionId)
         assertThat(copy.licenseKey).isEqualTo(errorDetail.licenseKey)
-        assertThat(copy.message).isEqualTo("01234")
+        assertThat(copy.message).isEqualTo(longString.substring(0, 400))
         assertThat(copy.platform).isEqualTo(errorDetail.platform)
         assertThat(copy.httpRequests?.size).isEqualTo(errorDetail.httpRequests?.size)
-        assertThat(copy.httpRequests?.get(0)?.url).isEqualTo("01234")
-        assertThat(copy.httpRequests?.get(0)?.lastRedirectLocation).isEqualTo("01234")
+        assertThat(copy.httpRequests?.get(0)?.url).isEqualTo("a".repeat(200))
+        assertThat(copy.httpRequests?.get(0)?.lastRedirectLocation).isEqualTo("a".repeat(200))
         assertThat(copy.httpRequests?.get(1)?.url).isEqualTo(null)
         assertThat(copy.httpRequests?.get(1)?.lastRedirectLocation).isEqualTo("0123")
+        assertThat(copy.data.additionalData).isEqualTo(longString.substring(0, 4000))
     }
 
     @Test
     fun testErrorDetailCopyTruncateStringsAndUrlsShouldCorrectlyTruncateStringsAndUrlsWithNullHttpRequests() {
-        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, "0123456789", ErrorData(), null)
-        val copy = errorDetail.copyTruncateStringsAndUrls(5, 5)
+        val tooLongMessage = "s".repeat(1000)
+
+        val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, tooLongMessage, ErrorData(), null)
+        val copy = errorDetail.copyTruncateStringsAndUrls(2000)
         assertThat(copy.analyticsVersion).isEqualTo(errorDetail.analyticsVersion)
         assertThat(copy.code).isEqualTo(errorDetail.code)
         assertThat(copy.domain).isEqualTo(errorDetail.domain)
         assertThat(copy.errorId).isEqualTo(errorDetail.errorId)
         assertThat(copy.impressionId).isEqualTo(errorDetail.impressionId)
         assertThat(copy.licenseKey).isEqualTo(errorDetail.licenseKey)
-        assertThat(copy.message).isEqualTo("01234")
+        assertThat(copy.message).isEqualTo("s".repeat(400))
         assertThat(copy.platform).isEqualTo(errorDetail.platform)
         assertThat(copy.httpRequests?.size).isEqualTo(errorDetail.httpRequests?.size)
     }
@@ -125,11 +186,12 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testWillFlushToHttpClientIfEnabledAndKeyWasNotProvidedBefore() {
-        val backend = ErrorDetailBackend(
-            AnalyticsConfig("test", backendUrl = "http://localhost"),
-            mockk(relaxed = true),
-            httpClientMock,
-        )
+        val backend =
+            ErrorDetailBackend(
+                AnalyticsConfig("test", backendUrl = "http://localhost"),
+                mockk(relaxed = true),
+                httpClientMock,
+            )
         backend.send(getErrorDetail(0, key = null))
         backend.enabled = true
         verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
@@ -149,7 +211,11 @@ class ErrorDetailBackendTests {
         verify(exactly = 0) { httpClientMock.post(any(), any(), any()) }
     }
 
-    private fun getErrorDetail(httpRequestCount: Int?, key: String? = "key") = ErrorDetail(
+    private fun getErrorDetail(
+        httpRequestCount: Int?,
+        key: String? = "key",
+        additionalData: String = "",
+    ) = ErrorDetail(
         platform = "platform",
         licenseKey = key,
         domain = "domain",
@@ -158,15 +224,15 @@ class ErrorDetailBackendTests {
         timestamp = 0,
         code = null,
         message = null,
-        data = ErrorData(),
-        httpRequests = if (httpRequestCount == null) {
-            null
-        } else {
-            (0..httpRequestCount).map { getHttpRequest() }
-                .toMutableList()
-        },
+        data = ErrorData(additionalData = additionalData),
+        httpRequests =
+            if (httpRequestCount == null) {
+                null
+            } else {
+                (0..httpRequestCount).map { getHttpRequest() }
+                    .toMutableList()
+            },
     )
 
-    private fun getHttpRequest() =
-        HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
+    private fun getHttpRequest() = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
 }

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Increased targetSdkVersion and compileSdkVersion to 35 (Android 15)
 - [Internal] Upgraded agp to 8.7 and gradle to 8.9
 - Upgraded bitmovin player to 3.94.0, amazon ivs player to 1.34.0 and media3-exoplayer to 1.5.0
+- Handle Bitmovin Decoding ErrorDetails correctly to not cut them off anymore in most cases
 
 ## v3.10.1
 

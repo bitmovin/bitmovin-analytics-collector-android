@@ -1,12 +1,16 @@
 package com.bitmovin.analytics.systemtest.utils
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import com.bitmovin.analytics.utils.DataSerializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.time.withTimeout
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -15,6 +19,8 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 object MockedIngress {
     private lateinit var server: MockWebServer
@@ -25,6 +31,8 @@ object MockedIngress {
     private val JSON_CONTENT_TYPE = "application/json; charset=utf-8".toMediaType()
 
     val currentImpressionsIds = mutableSetOf<String>()
+
+    val alreadyTakenRequests = mutableListOf<RecordedRequest>()
 
     // This is a volatile variable to ensure that the value is always read from the main memory and not optimized by the compiler
     @Volatile
@@ -179,6 +187,31 @@ object MockedIngress {
         return extractImpressions()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun waitForErrorDetailSample(
+        timeout: Long = 10,
+        unit: TimeUnit = TimeUnit.SECONDS,
+    ) {
+        runBlocking {
+            withTimeout(Duration.ofMillis(unit.toMillis(timeout))) {
+                while (true) {
+                    val request = server.takeRequest(timeout, unit)
+                    if (request == null) {
+                        throw RuntimeException("No request received within the timeout")
+                    }
+
+                    alreadyTakenRequests.add(request)
+
+                    when (request.requestUrl?.encodedPath) {
+                        "/analytics/error" -> {
+                            break
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fun extractImpressions(): List<Impression> {
         val requestCount = server.requestCount
         val eventDataMap = mutableMapOf<String, List<EventData>>()
@@ -186,7 +219,14 @@ object MockedIngress {
         val errorDetailMap = mutableMapOf<String, List<ErrorDetail>>()
 
         for (i in 0 until requestCount) {
-            val request = server.takeRequest()
+            // we might have already looked into requests to have a waiting condition, thus taking
+            // these first (there is no peek function in the MockWebServer)
+            val request =
+                if (alreadyTakenRequests.size > 0) {
+                    alreadyTakenRequests.removeAt(0)
+                } else {
+                    server.takeRequest()
+                }
             val body = request.body.readUtf8()
 
             when (request.requestUrl?.encodedPath) {
@@ -240,6 +280,14 @@ object MockedIngress {
             }
         }
 
+        return extractImpressionsFromRequests(eventDataMap, adEventDataMap, errorDetailMap)
+    }
+
+    private fun extractImpressionsFromRequests(
+        eventDataMap: MutableMap<String, List<EventData>>,
+        adEventDataMap: MutableMap<String, List<AdEventDataForTest>>,
+        errorDetailMap: MutableMap<String, List<ErrorDetail>>,
+    ): List<Impression> {
         val impressionList = mutableListOf<Impression>()
 
         if (eventDataMap.isEmpty()) {

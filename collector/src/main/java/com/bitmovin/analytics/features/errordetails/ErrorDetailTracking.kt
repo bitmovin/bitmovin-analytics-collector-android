@@ -20,15 +20,19 @@ class ErrorDetailTracking(
     private val licenseKeyProvider: LicenseKeyProvider = InstantLicenseKeyProvider(analyticsConfig.licenseKey),
 ) :
     Feature<FeatureConfigContainer, ErrorDetailTrackingConfig>(),
-    OnErrorDetailEventListener {
+        OnErrorDetailEventListener {
     private var errorIndex: Long = 0
+
     init {
         observables.forEach { it.subscribe(this) }
     }
 
     override fun extractConfig(featureConfigs: FeatureConfigContainer) = featureConfigs.errorDetails
 
-    override fun configured(authenticated: Boolean, config: ErrorDetailTrackingConfig?) {
+    override fun configured(
+        authenticated: Boolean,
+        config: ErrorDetailTrackingConfig?,
+    ) {
         val maxRequests = config?.numberOfHttpRequests ?: 0
         httpRequestTracking?.configure(maxRequests)
         backend.limitHttpRequestsInQueue(maxRequests)
@@ -50,28 +54,34 @@ class ErrorDetailTracking(
         errorIndex = 0
     }
 
-    override fun onError(impressionId: String, code: Int?, message: String?, errorData: ErrorData?) {
+    override fun onError(
+        impressionId: String,
+        code: Int?,
+        message: String?,
+        errorData: ErrorData?,
+    ) {
         if (!isEnabled) {
             return
         }
         val httpRequests = httpRequestTracking?.httpRequests?.toMutableList()
-        val errorIndex = errorIndex
+        val errorIndexLocal = errorIndex
         this.errorIndex++
-        val platform = Util.getPlatform(Util.isTVDevice(context))
         val timestamp = Util.timestamp
+        val platform = Util.getPlatform(Util.isTVDevice(context))
 
-        val errorDetails = ErrorDetail(
-            platform,
-            licenseKeyProvider.licenseKeyOrNull,
-            Util.getDomain(context),
-            impressionId,
-            errorIndex,
-            timestamp,
-            code,
-            message,
-            errorData ?: ErrorData(),
-            httpRequests,
-        )
+        val errorDetails =
+            ErrorDetail(
+                platform,
+                licenseKeyProvider.licenseKeyOrNull,
+                Util.getDomain(context),
+                impressionId,
+                errorIndexLocal,
+                timestamp,
+                code,
+                message,
+                errorData ?: ErrorData(),
+                httpRequests,
+            )
         backend.send(errorDetails)
     }
 }

@@ -12,7 +12,6 @@ import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
-import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.EventDataUtils
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
@@ -45,7 +44,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-// System test for basic playing and error scenario using bitmovin player
+// System test for basic playing scenarios using bitmovin player
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
 // Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
@@ -804,50 +803,6 @@ class BundledAnalyticsTest {
 
             DataVerifier.verifyMpdSourceUrl(impression2.eventDataList, dashSample.mpdUrl!!)
             DataVerifier.verifyCustomData(impression2.eventDataList, CustomData())
-        }
-
-    @Test
-    fun test_nonExistingStream_Should_sendErrorSample() =
-        runBlockingTest {
-            val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-            val sourceMetadata =
-                SourceMetadata(
-                    title = metadataGenerator.getTestTitle(),
-                    customData = CustomData(customData1 = "nonExistingStream"),
-                )
-            val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()), sourceMetadata)
-            // act
-            withContext(mainScope.coroutineContext) {
-                defaultPlayer.load(nonExistingSource)
-                defaultPlayer.play()
-            }
-
-            // it seems to take a while until the error is consistently reported
-            Thread.sleep(10000)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            assertThat(impression.eventDataList.size).isEqualTo(1)
-            assertThat(impression.errorDetailList.size).isEqualTo(1)
-
-            val eventData = impression.eventDataList.first()
-            val errorDetail = impression.errorDetailList.first()
-
-            val impressionId = eventData.impressionId
-            assertThat(eventData.errorMessage).isEqualTo("An unexpected HTTP status code was received: Response code: 404")
-            assertThat(eventData.errorCode).isEqualTo(2203)
-            assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
-            DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
-
-            DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
-            assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
-            assertThat(errorDetail.data.exceptionMessage).isEqualTo("Response code: 404")
-            assertThat(errorDetail.httpRequests?.size).isGreaterThan(0)
-
-            DataVerifier.verifySourceMetadata(eventData, sourceMetadata)
         }
 
     @Test
