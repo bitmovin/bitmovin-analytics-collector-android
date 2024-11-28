@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.11.0
+
 ### Changed
 - Increased targetSdkVersion and compileSdkVersion to 35 (Android 15)
 - [Internal] Upgraded agp to 8.7 and gradle to 8.9
