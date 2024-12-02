@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.12.0
+
 ### Fixed
 - The StackTrace used for errorDetails didn't include the Exception that was thrown.
 
