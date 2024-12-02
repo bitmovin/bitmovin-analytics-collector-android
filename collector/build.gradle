@@ -87,7 +87,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
 
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoInlineVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
     testImplementation "org.robolectric:robolectric:${rootProject.ext.robolectricVersion}"

@@ -88,7 +88,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 
     testImplementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
-    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoInlineVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"

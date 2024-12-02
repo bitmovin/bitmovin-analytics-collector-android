@@ -39,7 +39,7 @@ class DataSerializerTest {
                 ErrorData(),
                 LegacyErrorData(
                     "Error Data Message",
-                    arrayOf("first line of details", "second line of details"),
+                    listOf("first line of details", "second line of details"),
                 ),
             )
         val bitmovinAnalyticsConfig = AnalyticsConfig(analyticsLicenseKey)

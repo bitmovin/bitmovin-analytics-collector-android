@@ -11,15 +11,15 @@ import com.bitmovin.analytics.features.errordetails.ErrorData
 import com.bitmovin.analytics.utils.topOfStacktrace
 
 internal object Media3ExoPlayerExceptionMapper {
-
-    private val errorTypeMap = mapOf(
-        -1 to "Unknown Error Type",
-        0 to "Source Error",
-        1 to "Render Error",
-        2 to "Unexpected Error",
-        3 to "Remote Error",
-        4 to "Out of memory Error",
-    )
+    private val errorTypeMap =
+        mapOf(
+            -1 to "Unknown Error Type",
+            0 to "Source Error",
+            1 to "Render Error",
+            2 to "Unexpected Error",
+            3 to "Remote Error",
+            4 to "Out of memory Error",
+        )
 
     @androidx.annotation.OptIn(UnstableApi::class)
     fun map(playbackException: PlaybackException): ErrorCode {
@@ -51,7 +51,7 @@ internal object Media3ExoPlayerExceptionMapper {
 
         val topOfStackTrace = playbackException.topOfStacktrace
         val legacyErrorData = LegacyErrorData(errorMessage, topOfStackTrace)
-        val errorData = ErrorData(errorMessage, topOfStackTrace.toList())
+        val errorData = ErrorData(errorMessage, topOfStackTrace)
         val errorCodeDescription = errorTypeMap[getExceptionType(playbackException)] + ": " + playbackException.errorCodeName
         return ErrorCode(playbackException.errorCode, errorCodeDescription, errorData, legacyErrorData)
     }

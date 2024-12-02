@@ -95,7 +95,7 @@ dependencies {
     testImplementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
-    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoInlineVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 
     androidTestImplementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"

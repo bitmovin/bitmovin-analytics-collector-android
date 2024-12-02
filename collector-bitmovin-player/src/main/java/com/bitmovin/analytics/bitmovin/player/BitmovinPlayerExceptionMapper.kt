@@ -21,7 +21,7 @@ internal class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
                 additionalData = DataSerializer.trySerialize(ErrorData.fromThrowable(cause))
             }
             errorData = ErrorData.fromThrowable(throwable, additionalData)
-            legacyErrorData = LegacyErrorData(throwable.message ?: "", throwable.topOfStacktrace)
+            legacyErrorData = LegacyErrorData(throwable.message ?: throwable.toString(), throwable.topOfStacktrace)
         } else {
             additionalData = DataSerializer.trySerialize(event.data)
             errorData = ErrorData(additionalData = additionalData)

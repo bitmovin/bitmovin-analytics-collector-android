@@ -8,7 +8,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 class AmazonIvsPlayerExceptionMapperTest {
-
     @Test
     fun testMap_ShouldMapExceptionFieldsCorrectly() {
         // arrange
@@ -17,9 +16,7 @@ class AmazonIvsPlayerExceptionMapperTest {
         every { pe.source }.returns("testSource")
         every { pe.errorType }.returns(ErrorType.ERROR_INVALID_DATA)
         every { pe.message }.returns("testMessage")
-
-        val stackTraceElement = StackTraceElement("testClass", "testMethod", "testFileName", 123)
-        every { pe.stackTrace }.returns(arrayOf(stackTraceElement))
+        every { pe.errorMessage }.returns("errorMessage")
 
         val mapper = AmazonIvsPlayerExceptionMapper()
 
@@ -31,6 +28,5 @@ class AmazonIvsPlayerExceptionMapperTest {
         assertThat(errorCode.description).isEqualTo(ErrorType.ERROR_INVALID_DATA.name)
         assertThat(errorCode.legacyErrorData).isNull()
         assertThat(errorCode.errorData.exceptionMessage).isEqualTo("testMessage")
-        assertThat(errorCode.errorData.exceptionStacktrace).isEqualTo(listOf("testClass.testMethod(testFileName:123)"))
     }
 }

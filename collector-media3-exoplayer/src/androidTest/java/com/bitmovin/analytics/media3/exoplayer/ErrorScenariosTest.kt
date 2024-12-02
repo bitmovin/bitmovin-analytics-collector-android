@@ -129,7 +129,7 @@ class ErrorScenariosTest {
             Media3PlayerPlaybackUtils.waitUntilPlayerHasError(player)
 
             // wait a bit for samples being sent out
-            Thread.sleep(300)
+            Thread.sleep(500)
 
             withContext(mainScope.coroutineContext) {
                 collector.detachPlayer()
@@ -185,7 +185,7 @@ class ErrorScenariosTest {
             Media3PlayerPlaybackUtils.waitUntilPlayerHasError(player)
 
             // wait a bit for samples being sent out
-            Thread.sleep(1000)
+            Thread.sleep(500)
 
             withContext(mainScope.coroutineContext) {
                 collector.detachPlayer()
@@ -208,7 +208,8 @@ class ErrorScenariosTest {
             Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)
             val errorDetail = impression.errorDetailList.first()
             DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
-            Assertions.assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
+            Assertions.assertThat(errorDetail.data.exceptionStacktrace).hasSizeGreaterThan(4)
+            Assertions.assertThat(errorDetail.data.exceptionStacktrace?.first()).contains("ExoPlaybackException")
             Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Data Source request failed with HTTP status: 403")
         }
 
@@ -263,5 +264,7 @@ class ErrorScenariosTest {
             val errorDetail = impression.errorDetailList.first()
             Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Source error ")
             Assertions.assertThat(errorDetail.data.exceptionStacktrace).isNotEmpty
+            Assertions.assertThat(errorDetail.data.exceptionStacktrace).hasSizeGreaterThan(4)
+            Assertions.assertThat(errorDetail.data.exceptionStacktrace?.first()).contains("ExoPlaybackException")
         }
 }

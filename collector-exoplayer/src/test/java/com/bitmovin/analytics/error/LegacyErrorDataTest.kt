@@ -8,14 +8,14 @@ import org.junit.Test
 class LegacyErrorDataTest {
     @Test
     fun serializeErrorData() {
-        val errorData = LegacyErrorData("Our message", arrayOf("stack1", "stack2"))
+        val errorData = LegacyErrorData("Our message", listOf("stack1", "stack2"))
         val serialized = DataSerializer.serialize(errorData)
         assertThat(serialized).isEqualTo("{\"msg\":\"Our message\",\"details\":[\"stack1\",\"stack2\"]}")
     }
 
     @Test
     fun serializeErrorDataNoStack() {
-        val errorData = LegacyErrorData("Our message", emptyArray())
+        val errorData = LegacyErrorData("Our message", emptyList())
         val serialized = DataSerializer.serialize(errorData)
         assertThat(serialized).isEqualTo("{\"msg\":\"Our message\",\"details\":[]}")
     }

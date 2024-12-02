@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- The StackTrace used for errorDetails didn't include the Exception that was thrown.
+
+### Changed
+- Use Throwable.toString() as fallback for the errorMessage in case there is no error message provided
+- [Internal] Updated test dependencies
+
 ## v3.11.0
 
 ### Changed

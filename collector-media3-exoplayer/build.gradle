@@ -100,7 +100,7 @@ dependencies {
     testImplementation "androidx.media3:media3-exoplayer-dash:${testVersion}"
     testImplementation "androidx.media3:media3-exoplayer-hls:${testVersion}"
 
-    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoInlineVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"

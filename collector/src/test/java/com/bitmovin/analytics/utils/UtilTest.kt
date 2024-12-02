@@ -120,12 +120,14 @@ class UtilTest {
     }
 
     @Test
-    fun testTopOfStacktrace() {
+    fun testTopOfStacktrace_Should_includeExceptionName() {
         try {
             throw RuntimeException("RUNTIMEEXCEPTION")
         } catch (e: Exception) {
             val top = e.topOfStacktrace
+            assertThat(top.size).isGreaterThan(4)
             assertThat(top.size).isLessThanOrEqualTo(50)
+            assertThat(top[0]).contains("java.lang.RuntimeException: RUNTIMEEXCEPTION")
             assertThat(top).anySatisfy { element -> assertThat(element).contains("testTopOfStacktrace") }
         }
     }
