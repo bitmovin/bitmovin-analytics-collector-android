@@ -31,12 +31,13 @@ android {
 
     buildTypes {
         debug {
-            // pro guard obfuscation can be tested on emulator with setting minifyEnabled to true and using gradle 7.1.3
-            minifyEnabled false
+            // pro guard obfuscation can be tested on emulator with setting minifyEnabled and shrink resources to true
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

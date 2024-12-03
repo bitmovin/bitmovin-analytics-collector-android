@@ -333,6 +333,18 @@ The collector API is not thread safe.
 All calls need to come from the same thread as the player is executed on (usually the MainThread).
 While the collector might not crash when called from different threads, it can lead to inconsistent data.
 
+## Minification / Obfuscation
+
+The collector uses the @Keep annotation to prevent minification/obfuscation of request and response classes.
+There could be issues with certain obfuscation/minification tools though (seen with DexGuard for example), and the following rules should be applied in these cases:
+
+```
+#### Bitmovin Analytics
+-keep class com.bitmovin.analytics.data.** { *; }
+-keep class com.bitmovin.analytics.features.** { *; }
+-keep class com.bitmovin.analytics.license.** { *; }
+```
+
 ## Support
 
 If you have any questions or issues with this Analytics Collector or its examples, or you require other technical support for our services, please login to your Bitmovin Dashboard at [https://bitmovin.com/dashboard](https://bitmovin.com/dashboard) and create a new support case. Our team will get back to you as soon as possible 👍
