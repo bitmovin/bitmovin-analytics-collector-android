@@ -31,12 +31,15 @@ android {
 
     buildTypes {
         debug {
-            // pro guard obfuscation can be tested on emulator with setting minifyEnabled to true and using gradle 7.1.3
-            minifyEnabled false
+            // testing proguard rules requires to create a release of the core collector
+            // (in order to apply the consumer pro guard rules)
+            // and then reference the core collector in the player specific library
+            // and setting minifyEnable to true here
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

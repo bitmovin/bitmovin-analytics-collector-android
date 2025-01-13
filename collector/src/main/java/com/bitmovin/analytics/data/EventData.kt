@@ -1,10 +1,9 @@
 package com.bitmovin.analytics.data
 
-import androidx.annotation.Keep
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.utils.Util
 
-@Keep // Protect from obfuscation in case customers are using proguard
+// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
 data class EventData(
     val impressionId: String,
     val userId: String,

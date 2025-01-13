@@ -1,8 +1,6 @@
 package com.bitmovin.analytics.data
 
-import androidx.annotation.Keep
-
-@Keep // Protect from obfuscation in case customers are using proguard
+// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
 data class SubtitleDto(
     val subtitleEnabled: Boolean = false,
     val subtitleLanguage: String? = null,

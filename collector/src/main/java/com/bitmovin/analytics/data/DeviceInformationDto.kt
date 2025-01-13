@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.data
 
-import androidx.annotation.Keep
-@Keep // Protect from proguard obfuscation
+// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
 data class DeviceInformationDto(
     val manufacturer: String,
     val model: String,

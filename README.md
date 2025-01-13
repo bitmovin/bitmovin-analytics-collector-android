@@ -335,15 +335,8 @@ While the collector might not crash when called from different threads, it can l
 
 ## Minification / Obfuscation
 
-The collector uses the @Keep annotation to prevent minification/obfuscation of request and response classes.
-There could be issues with certain obfuscation/minification tools though (seen with DexGuard for example), and the following rules should be applied in these cases:
-
-```
-#### Bitmovin Analytics
--keep class com.bitmovin.analytics.data.** { *; }
--keep class com.bitmovin.analytics.features.** { *; }
--keep class com.bitmovin.analytics.license.** { *; }
-```
+The collector uses consumer proguard rules that are shipped with the aar to prevent minification/obfuscation of request and response classes.
+The released library is not obfuscated by default. In case there are issues with a certain config or obfuscation tool, please let us know.
 
 ## Support
 

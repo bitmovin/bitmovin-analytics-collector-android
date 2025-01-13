@@ -1,9 +1,8 @@
 package com.bitmovin.analytics.features.errordetails
 
-import androidx.annotation.Keep
 import com.bitmovin.analytics.utils.topOfStacktrace
 
-@Keep // Protect from obfuscation in case customers are using proguard
+// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
 data class ErrorData(
     val exceptionMessage: String? = null,
     val exceptionStacktrace: Collection<String>? = null,

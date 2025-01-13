@@ -1,10 +1,9 @@
 package com.bitmovin.analytics.features.errordetails
 
-import androidx.annotation.Keep
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.utils.Util
 
-@Keep // Protect from obfuscation in case customers are using proguard
+// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
 data class ErrorDetail(
     val platform: String,
     val licenseKey: String?,

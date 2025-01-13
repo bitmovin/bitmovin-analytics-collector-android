@@ -106,7 +106,7 @@ publishing {
                     configurations[configurationName].allDependencies.each {
 
                         if (it.group == null || it.name == null) {
-                            return
+                            throw new GradleException("Group or name is null for dependency: $it")
                         }
 
                         def dependencyNode = dependenciesNode.appendNode('dependency')

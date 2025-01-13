@@ -1,12 +1,11 @@
 package com.bitmovin.analytics.data
 
-import androidx.annotation.Keep
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.utils.Util
 
-@Keep // Protect from obfuscation in case customers are using proguard
+// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
 data class AdEventData(
     var wrapperAdsCount: Int? = null,
     var adSkippable: Boolean? = null,

@@ -36,7 +36,7 @@ android {
         // https://developer.android.com/studio/test/gradle-managed-devices
         managedDevices {
             devices {
-                pixel6api34 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                pixel6api34 (ManagedVirtualDevice) {
                     // Use device profiles you typically see in Android Studio.
                     device = "Pixel 6"
                     // Use only API levels 27 and higher.
@@ -44,7 +44,7 @@ android {
                     // google is used since atd and aosp don't support widevine anymore
                     systemImageSource = "google"
                 }
-                pixel6api30 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                pixel6api30 (ManagedVirtualDevice) {
                     // Use device profiles you typically see in Android Studio.
                     device = "Pixel 6"
                     // Use only API levels 27 and higher.
@@ -64,7 +64,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-consumer-rules.pro'
         }
         debug {
             enableUnitTestCoverage true
@@ -82,9 +82,13 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttp3Version}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
-
-    // required for @Keep annotation to avoid pro guard issues with obfuscated dtos
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
+
+    // we add the parcelize-runtime dependency explicit here (instead on relying on the kotlin-parcelize plugin)
+    // in order to make sure it is added to the pom.xml with runtime scope
+    // this is needed to avoid the following errors on minification with r8:
+    // "Missing class kotlinx.parcelize.Parcelize (referenced from: com.bitmovin.analytics.api.AnalyticsConfig and 3 other contexts)"
+    runtimeOnly "org.jetbrains.kotlin:kotlin-parcelize-runtime:${rootProject.ext.kotlin_version}"
 
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
@@ -113,21 +117,27 @@ publishing {
             pom.withXml {
                 def dependenciesNode = asNode().appendNode('dependencies')
 
-                //Defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
-                def configurationNames = ['implementation']
-
-                configurationNames.each { configurationName ->
-                    configurations[configurationName].allDependencies.each {
-
-                        if (it.group == null || it.name == null) {
-                            return
-                        }
-
-                        def dependencyNode = dependenciesNode.appendNode('dependency')
-                        dependencyNode.appendNode('groupId', it.group)
-                        dependencyNode.appendNode('artifactId', it.name)
-                        dependencyNode.appendNode('version', it.version)
+                configurations['implementation'].allDependencies.each {
+                    if (it.group == null || it.name == null) {
+                        throw new GradleException("Group or name is null for dependency: $it")
                     }
+
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                }
+
+                configurations['runtimeOnly'].allDependencies.each {
+                    if (it.group == null || it.name == null) {
+                        throw new GradleException("Group or name is null for dependency: $it")
+                    }
+
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                    dependencyNode.appendNode('scope', 'runtime')
                 }
             }
         }

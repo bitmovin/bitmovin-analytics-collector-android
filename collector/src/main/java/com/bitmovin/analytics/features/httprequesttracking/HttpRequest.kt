@@ -1,8 +1,6 @@
 package com.bitmovin.analytics.features.httprequesttracking
 
-import androidx.annotation.Keep
-
-@Keep // Protect from obfuscation in case customers are using proguard
+// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
 data class HttpRequest(
     val timestamp: Long,
     val type: HttpRequestType,
