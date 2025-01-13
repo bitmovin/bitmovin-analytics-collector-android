@@ -77,7 +77,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttp3Version}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
