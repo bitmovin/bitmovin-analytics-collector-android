@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.13.0
+
 ### Changed
 - Use consumer pro guard rules defined in proguard-consumer-rules.pro instead of @Keep to prevent obfuscation of DTOs
 - Added explicit runtime dependency to kotlin-parcelize-runtime to fix R8 issues, and changed publish script to also add runtime deps to pom.xml
