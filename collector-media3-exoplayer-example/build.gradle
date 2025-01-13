@@ -50,8 +50,6 @@ android {
 
 dependencies {
     def testVersion = rootProject.ext.media3PlayerVersion
-
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
