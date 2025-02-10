@@ -36,8 +36,28 @@ public final class com/bitmovin/analytics/BitmovinAnalyticsConfig : android/os/P
 	public final fun getCustomData29 ()Ljava/lang/String;
 	public final fun getCustomData3 ()Ljava/lang/String;
 	public final fun getCustomData30 ()Ljava/lang/String;
+	public final fun getCustomData31 ()Ljava/lang/String;
+	public final fun getCustomData32 ()Ljava/lang/String;
+	public final fun getCustomData33 ()Ljava/lang/String;
+	public final fun getCustomData34 ()Ljava/lang/String;
+	public final fun getCustomData35 ()Ljava/lang/String;
+	public final fun getCustomData36 ()Ljava/lang/String;
+	public final fun getCustomData37 ()Ljava/lang/String;
+	public final fun getCustomData38 ()Ljava/lang/String;
+	public final fun getCustomData39 ()Ljava/lang/String;
 	public final fun getCustomData4 ()Ljava/lang/String;
+	public final fun getCustomData40 ()Ljava/lang/String;
+	public final fun getCustomData41 ()Ljava/lang/String;
+	public final fun getCustomData42 ()Ljava/lang/String;
+	public final fun getCustomData43 ()Ljava/lang/String;
+	public final fun getCustomData44 ()Ljava/lang/String;
+	public final fun getCustomData45 ()Ljava/lang/String;
+	public final fun getCustomData46 ()Ljava/lang/String;
+	public final fun getCustomData47 ()Ljava/lang/String;
+	public final fun getCustomData48 ()Ljava/lang/String;
+	public final fun getCustomData49 ()Ljava/lang/String;
 	public final fun getCustomData5 ()Ljava/lang/String;
+	public final fun getCustomData50 ()Ljava/lang/String;
 	public final fun getCustomData6 ()Ljava/lang/String;
 	public final fun getCustomData7 ()Ljava/lang/String;
 	public final fun getCustomData8 ()Ljava/lang/String;
@@ -82,8 +102,28 @@ public final class com/bitmovin/analytics/BitmovinAnalyticsConfig : android/os/P
 	public final fun setCustomData29 (Ljava/lang/String;)V
 	public final fun setCustomData3 (Ljava/lang/String;)V
 	public final fun setCustomData30 (Ljava/lang/String;)V
+	public final fun setCustomData31 (Ljava/lang/String;)V
+	public final fun setCustomData32 (Ljava/lang/String;)V
+	public final fun setCustomData33 (Ljava/lang/String;)V
+	public final fun setCustomData34 (Ljava/lang/String;)V
+	public final fun setCustomData35 (Ljava/lang/String;)V
+	public final fun setCustomData36 (Ljava/lang/String;)V
+	public final fun setCustomData37 (Ljava/lang/String;)V
+	public final fun setCustomData38 (Ljava/lang/String;)V
+	public final fun setCustomData39 (Ljava/lang/String;)V
 	public final fun setCustomData4 (Ljava/lang/String;)V
+	public final fun setCustomData40 (Ljava/lang/String;)V
+	public final fun setCustomData41 (Ljava/lang/String;)V
+	public final fun setCustomData42 (Ljava/lang/String;)V
+	public final fun setCustomData43 (Ljava/lang/String;)V
+	public final fun setCustomData44 (Ljava/lang/String;)V
+	public final fun setCustomData45 (Ljava/lang/String;)V
+	public final fun setCustomData46 (Ljava/lang/String;)V
+	public final fun setCustomData47 (Ljava/lang/String;)V
+	public final fun setCustomData48 (Ljava/lang/String;)V
+	public final fun setCustomData49 (Ljava/lang/String;)V
 	public final fun setCustomData5 (Ljava/lang/String;)V
+	public final fun setCustomData50 (Ljava/lang/String;)V
 	public final fun setCustomData6 (Ljava/lang/String;)V
 	public final fun setCustomData7 (Ljava/lang/String;)V
 	public final fun setCustomData8 (Ljava/lang/String;)V
