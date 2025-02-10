@@ -1041,11 +1041,11 @@ class BundledAnalyticsTest {
                 )
 
             val source = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), sourceMetadata)
-            val customData1 = TestConfig.createDummyCustomData("customData1")
-            val customData2 = TestConfig.createDummyCustomData("customData2")
-            val customData3 = TestConfig.createDummyCustomData("customData3")
-            val customData4 = TestConfig.createDummyCustomData("customData4")
-            val customData5 = TestConfig.createDummyCustomData("customData5")
+            val customData1 = TestConfig.createDummyCustomData("test1_customData")
+            val customData2 = TestConfig.createDummyCustomData("test2_customData")
+            val customData3 = TestConfig.createDummyCustomData("test3_customData")
+            val customData4 = TestConfig.createDummyCustomData("test4_customData")
+            val customData5 = TestConfig.createDummyCustomData("test5_customData")
 
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.analytics?.sendCustomDataEvent(customData1)
@@ -1328,6 +1328,8 @@ class BundledAnalyticsTest {
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(adEventDataList, "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(adEventDataList, "test-ad-id-1")
+            val expectedCustomData = TestConfig.createDummyCustomData().copy(customData1 = "ad-test-custom-data-1")
+            SsaiDataVerifier.verifyCustomData(adEventDataList, expectedCustomData)
         }
 
     @Test
@@ -1341,7 +1343,11 @@ class BundledAnalyticsTest {
                 )
 
                 defaultPlayer.analytics?.ssai?.adStart(
-                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                    SsaiAdMetadata(
+                        "test-ad-id-1",
+                        "test-ad-system-1",
+                        CustomData(customData1 = "ad-test-custom-data-1", customData50 = "ad-test-custom-data-50"),
+                    ),
                 )
                 defaultPlayer.play()
             }
@@ -1380,7 +1386,14 @@ class BundledAnalyticsTest {
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(adEventDataList, "test-ad-system-1")
-            SsaiDataVerifier.verifySamplesHaveSameAdId(adEventDataList, "test-ad-id-1")
+
+            // customData of the ssai ad sample is a merge of sourceCustomData and ssai specific customData
+            val expectedSsaiCustomData =
+                TestConfig.createDummyCustomData().copy(
+                    customData1 = "ad-test-custom-data-1",
+                    customData50 = "ad-test-custom-data-50",
+                )
+            SsaiDataVerifier.verifyCustomData(adEventDataList, expectedSsaiCustomData)
         }
 
     @Test

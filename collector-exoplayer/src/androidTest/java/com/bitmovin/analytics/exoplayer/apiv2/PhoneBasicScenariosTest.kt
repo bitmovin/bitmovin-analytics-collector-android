@@ -167,7 +167,7 @@ class PhoneBasicScenariosTest {
             val beforeCustomDataChange = eventDataList.filter { it.customData1 != "source1" }
             val afterCustomDataChange = eventDataList.filter { it.customData1 == "source1" }
 
-            val customDataBeforeChange =
+            val expectedCustomDataBeforeChange =
                 CustomData(
                     experimentName = "experiment-1",
                     customData1 = "systemtest",
@@ -177,23 +177,24 @@ class PhoneBasicScenariosTest {
                     customData5 = "customData5",
                     customData6 = "customData6",
                     customData7 = "customData7",
+                    customData50 = "customData50",
                 )
 
-            DataVerifier.verifyCustomData(beforeCustomDataChange, customDataBeforeChange)
+            DataVerifier.verifyCustomData(beforeCustomDataChange, expectedCustomDataBeforeChange)
 
-            val customDataAfterChange =
+            val expectedCustomDataAfterChange =
                 CustomData(
                     customData1 = "source1",
                     customData2 = "source1",
                 )
-            DataVerifier.verifyCustomData(afterCustomDataChange, customDataAfterChange)
+            DataVerifier.verifyCustomData(afterCustomDataChange, expectedCustomDataAfterChange)
 
-            val customDataOnSecondImpression =
+            val expectedCustomDataOnSecondImpression =
                 CustomData(
                     customData1 = "source2",
                     customData2 = "source2",
                 )
-            DataVerifier.verifyCustomData(impressions[1].eventDataList, customDataOnSecondImpression)
+            DataVerifier.verifyCustomData(impressions[1].eventDataList, expectedCustomDataOnSecondImpression)
         }
 
     @Test

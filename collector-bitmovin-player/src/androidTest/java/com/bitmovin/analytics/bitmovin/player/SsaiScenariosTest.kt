@@ -91,6 +91,13 @@ class SsaiScenariosTest {
             // arrange
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
+            val exepctedCustomDataOnFirstSample =
+                CustomData(
+                    customData1 = "ad-test-custom-data-1",
+                    customData30 = "ad-test-custom-data-30",
+                    customData50 = "ad-test-custom-data-50",
+                )
+
             // act
             withContext(mainScope.coroutineContext) {
                 collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
@@ -103,7 +110,7 @@ class SsaiScenariosTest {
                     SsaiAdMetadata(
                         "test-ad-id-1",
                         "test-ad-system-1",
-                        CustomData(customData1 = "ad-test-custom-data-1", customData30 = "ad-test-custom-data-30"),
+                        exepctedCustomDataOnFirstSample,
                     ),
                 )
                 defaultPlayer.play()
@@ -140,17 +147,20 @@ class SsaiScenariosTest {
             val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
             assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
 
-            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
             assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
             DataVerifier.verifyDataForSsaiAdSamples(
                 firstAdSamples,
                 SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
                 SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-                CustomData(customData1 = "ad-test-custom-data-1", customData30 = "ad-test-custom-data-30"),
+                exepctedCustomDataOnFirstSample,
                 0,
             )
 
-            val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
+            val firstSsaiAdSample = SsaiDataVerifier.getSsaiAdEventSampleByAdIndex(impression.adEventDataList, 0)
+            SsaiDataVerifier.verifyCustomData(firstSsaiAdSample, exepctedCustomDataOnFirstSample)
+
+            val secondAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 1)
             assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
             DataVerifier.verifyDataForSsaiAdSamples(
                 secondAdSamples,
@@ -836,7 +846,7 @@ class SsaiScenariosTest {
             val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
             assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
 
-            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
             assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
             DataVerifier.verifyDataForSsaiAdSamples(
                 firstAdSamples,
@@ -846,7 +856,7 @@ class SsaiScenariosTest {
                 0,
             )
 
-            val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
+            val secondAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 1)
             assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
             DataVerifier.verifyDataForSsaiAdSamples(
                 secondAdSamples,
@@ -927,7 +937,7 @@ class SsaiScenariosTest {
             val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
             assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
 
-            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
             assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
             DataVerifier.verifyDataForSsaiAdSamples(
                 firstAdSamples,
@@ -942,7 +952,7 @@ class SsaiScenariosTest {
             DataVerifier.verifyHasNoSsaiAdSamples(samplesBetweenAds)
             DataVerifier.verifyCustomData(samplesBetweenAds, defaultSourceMetadata.customData)
 
-            val secondAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 1)
+            val secondAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 1)
             assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
             DataVerifier.verifyDataForSsaiAdSamples(
                 secondAdSamples,
@@ -1006,7 +1016,7 @@ class SsaiScenariosTest {
             assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(4)
             DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
 
-            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
             assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
             DataVerifier.verifyDataForSsaiAdSamples(
                 firstAdSamples,
@@ -1066,7 +1076,7 @@ class SsaiScenariosTest {
             DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
             DataVerifier.verifyCustomData(samplesBeforeFirstAd, defaultSourceMetadata.customData)
 
-            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
             assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(2)
             DataVerifier.verifyDataForSsaiAdSamples(
                 firstAdSamples,
@@ -1126,7 +1136,7 @@ class SsaiScenariosTest {
             assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
             DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
 
-            val firstAdSample = DataVerifier.getSsaiAdSamplesByIndex(eventDataList, 0)
+            val firstAdSample = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
             assertThat(firstAdSample.size).isGreaterThanOrEqualTo(1)
             DataVerifier.verifyDataForSsaiAdSamples(
                 firstAdSample,
@@ -1214,7 +1224,7 @@ class SsaiScenariosTest {
             DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
             DataVerifier.verifyCustomData(samplesBeforeFirstAd, CustomData())
 
-            val firstAdSamples = DataVerifier.getSsaiAdSamplesByIndex(eventDataList2, 0)
+            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList2, 0)
             assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
             DataVerifier.verifyDataForSsaiAdSamples(
                 firstAdSamples,
@@ -1400,5 +1410,11 @@ class SsaiScenariosTest {
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(adEventDataList, "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(adEventDataList, "test-ad-id-1")
             SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(adEventDataList)
+
+            val expectedSsaiCustomData =
+                CustomData(
+                    customData1 = "ad-test-custom-data-1",
+                )
+            SsaiDataVerifier.verifyCustomData(adEventDataList, expectedSsaiCustomData)
         }
 }

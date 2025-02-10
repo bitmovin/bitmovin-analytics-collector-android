@@ -11,6 +11,7 @@ public class DefaultMetadataBuilderJavaTest {
         CustomData customData = new CustomData.Builder()
                 .setCustomData1("customData1")
                 .setCustomData30("customData30")
+                .setCustomData50("customData50")
                 .setExperimentName("experimentName")
                 .build();
 

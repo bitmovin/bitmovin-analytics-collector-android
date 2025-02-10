@@ -26,12 +26,24 @@ class EventDataFactoryTest {
                         customData1 = "ssai-custom-data-1",
                         customData2 = "ssai-custom-data-2",
                         customData3 = "ssai-custom-data-3",
+                        customData48 = "ssai-custom-data-48",
                     ),
             )
         val defaultCustomData =
-            CustomData(customData1 = "default-custom-data-1", customData4 = "default-custom-data-4", customData5 = "default-custom-data-5")
+            CustomData(
+                customData1 = "default-custom-data-1",
+                customData4 = "default-custom-data-4",
+                customData5 = "default-custom-data-5",
+                customData49 = "default-custom-data-49",
+                customData50 = "default-custom-data-50",
+            )
         val sourceCustomData =
-            CustomData(customData2 = "source-custom-data-2", customData4 = "source-custom-data-4", customData6 = "source-custom-data-6")
+            CustomData(
+                customData2 = "source-custom-data-2",
+                customData4 = "source-custom-data-4",
+                customData6 = "source-custom-data-6",
+                customData50 = "source-custom-data-50",
+            )
 
         // mocks
         val defaultMetadataMock = mockk<DefaultMetadata>(relaxed = true)
@@ -66,5 +78,8 @@ class EventDataFactoryTest {
         assertThat(customData.customData4).isEqualTo("source-custom-data-4")
         assertThat(customData.customData5).isEqualTo("default-custom-data-5")
         assertThat(customData.customData6).isEqualTo("source-custom-data-6")
+        assertThat(customData.customData48).isEqualTo("ssai-custom-data-48")
+        assertThat(customData.customData49).isEqualTo("default-custom-data-49")
+        assertThat(customData.customData50).isEqualTo("source-custom-data-50")
     }
 }

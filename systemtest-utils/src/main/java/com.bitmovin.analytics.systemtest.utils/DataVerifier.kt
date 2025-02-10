@@ -264,6 +264,26 @@ object DataVerifier {
         assertThat(eventData.customData28).isEqualTo(analyticsConfig.customData28)
         assertThat(eventData.customData29).isEqualTo(analyticsConfig.customData29)
         assertThat(eventData.customData30).isEqualTo(analyticsConfig.customData30)
+        assertThat(eventData.customData31).isEqualTo(analyticsConfig.customData31)
+        assertThat(eventData.customData32).isEqualTo(analyticsConfig.customData32)
+        assertThat(eventData.customData33).isEqualTo(analyticsConfig.customData33)
+        assertThat(eventData.customData34).isEqualTo(analyticsConfig.customData34)
+        assertThat(eventData.customData35).isEqualTo(analyticsConfig.customData35)
+        assertThat(eventData.customData36).isEqualTo(analyticsConfig.customData36)
+        assertThat(eventData.customData37).isEqualTo(analyticsConfig.customData37)
+        assertThat(eventData.customData38).isEqualTo(analyticsConfig.customData38)
+        assertThat(eventData.customData39).isEqualTo(analyticsConfig.customData39)
+        assertThat(eventData.customData40).isEqualTo(analyticsConfig.customData40)
+        assertThat(eventData.customData41).isEqualTo(analyticsConfig.customData41)
+        assertThat(eventData.customData42).isEqualTo(analyticsConfig.customData42)
+        assertThat(eventData.customData43).isEqualTo(analyticsConfig.customData43)
+        assertThat(eventData.customData44).isEqualTo(analyticsConfig.customData44)
+        assertThat(eventData.customData45).isEqualTo(analyticsConfig.customData45)
+        assertThat(eventData.customData46).isEqualTo(analyticsConfig.customData46)
+        assertThat(eventData.customData47).isEqualTo(analyticsConfig.customData47)
+        assertThat(eventData.customData48).isEqualTo(analyticsConfig.customData48)
+        assertThat(eventData.customData49).isEqualTo(analyticsConfig.customData49)
+        assertThat(eventData.customData50).isEqualTo(analyticsConfig.customData50)
     }
 
     fun verifyCustomData(
@@ -309,6 +329,26 @@ object DataVerifier {
         assertThat(eventData.customData28).isEqualTo(expectedCustomData.customData28)
         assertThat(eventData.customData29).isEqualTo(expectedCustomData.customData29)
         assertThat(eventData.customData30).isEqualTo(expectedCustomData.customData30)
+        assertThat(eventData.customData31).isEqualTo(expectedCustomData.customData31)
+        assertThat(eventData.customData32).isEqualTo(expectedCustomData.customData32)
+        assertThat(eventData.customData33).isEqualTo(expectedCustomData.customData33)
+        assertThat(eventData.customData34).isEqualTo(expectedCustomData.customData34)
+        assertThat(eventData.customData35).isEqualTo(expectedCustomData.customData35)
+        assertThat(eventData.customData36).isEqualTo(expectedCustomData.customData36)
+        assertThat(eventData.customData37).isEqualTo(expectedCustomData.customData37)
+        assertThat(eventData.customData38).isEqualTo(expectedCustomData.customData38)
+        assertThat(eventData.customData39).isEqualTo(expectedCustomData.customData39)
+        assertThat(eventData.customData40).isEqualTo(expectedCustomData.customData40)
+        assertThat(eventData.customData41).isEqualTo(expectedCustomData.customData41)
+        assertThat(eventData.customData42).isEqualTo(expectedCustomData.customData42)
+        assertThat(eventData.customData43).isEqualTo(expectedCustomData.customData43)
+        assertThat(eventData.customData44).isEqualTo(expectedCustomData.customData44)
+        assertThat(eventData.customData45).isEqualTo(expectedCustomData.customData45)
+        assertThat(eventData.customData46).isEqualTo(expectedCustomData.customData46)
+        assertThat(eventData.customData47).isEqualTo(expectedCustomData.customData47)
+        assertThat(eventData.customData48).isEqualTo(expectedCustomData.customData48)
+        assertThat(eventData.customData49).isEqualTo(expectedCustomData.customData49)
+        assertThat(eventData.customData50).isEqualTo(expectedCustomData.customData50)
         assertThat(eventData.experimentName).isEqualTo(expectedCustomData.experimentName)
     }
 
@@ -563,7 +603,7 @@ object DataVerifier {
         }
     }
 
-    fun getSsaiAdSamplesByIndex(
+    fun getSsaiSamplesByIndex(
         eventDataList: MutableList<EventData>,
         adIndex: Int,
     ): MutableList<EventData> {

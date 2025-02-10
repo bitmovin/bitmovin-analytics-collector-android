@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- Support for additional customData fields 31-50
+
 ## v3.13.0
 
 ### Changed

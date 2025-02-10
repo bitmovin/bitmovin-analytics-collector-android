@@ -24,6 +24,7 @@ object TestConfig {
         bitmovinAnalyticsConfig.customData5 = "customData5"
         bitmovinAnalyticsConfig.customData6 = "customData6"
         bitmovinAnalyticsConfig.customData7 = "customData7"
+        bitmovinAnalyticsConfig.customData50 = "customData50"
         bitmovinAnalyticsConfig.path = "/customPath/new/"
         bitmovinAnalyticsConfig.cdnProvider = "testCdnProvider"
         if (backendUrl != null) {
@@ -66,6 +67,13 @@ object TestConfig {
             customData22 = prefix + "22", customData23 = prefix + "23", customData24 = prefix + "24",
             customData25 = prefix + "25", customData26 = prefix + "26", customData27 = prefix + "27",
             customData28 = prefix + "28", customData29 = prefix + "29", customData30 = prefix + "30",
+            customData31 = prefix + "31", customData32 = prefix + "32", customData33 = prefix + "33",
+            customData34 = prefix + "34", customData35 = prefix + "35", customData36 = prefix + "36",
+            customData37 = prefix + "37", customData38 = prefix + "38", customData39 = prefix + "39",
+            customData40 = prefix + "40", customData41 = prefix + "41", customData42 = prefix + "42",
+            customData43 = prefix + "43", customData44 = prefix + "44", customData45 = prefix + "45",
+            customData46 = prefix + "46", customData47 = prefix + "47", customData48 = prefix + "48",
+            customData49 = prefix + "49", customData50 = prefix + "50",
         )
     }
 }

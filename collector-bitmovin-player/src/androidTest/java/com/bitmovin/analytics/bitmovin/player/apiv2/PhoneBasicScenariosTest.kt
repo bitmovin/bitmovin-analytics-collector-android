@@ -296,7 +296,11 @@ class PhoneBasicScenariosTest {
             BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
 
             val customDataSentOnce =
-                CustomData(customData1 = "setCustomDataThroughApiCalls1", customData30 = "setCustomDataThroughApiCalls30")
+                CustomData(
+                    customData1 = "setCustomDataThroughApiCalls1",
+                    customData30 = "setCustomDataThroughApiCalls30",
+                    customData50 = "setCustomDataThroughApiCalls50",
+                )
             collector.setCustomDataOnce(customDataSentOnce)
 
             BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 4000)

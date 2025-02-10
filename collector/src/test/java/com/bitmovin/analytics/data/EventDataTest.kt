@@ -17,7 +17,6 @@ import java.util.UUID
 class EventDataTest {
     private val licenseKey = UUID.randomUUID().toString()
     private val impressionId = UUID.randomUUID().toString()
-    private val userId = UUID.randomUUID().toString()
 
     private lateinit var analyticsConfig: AnalyticsConfig
 
@@ -279,6 +278,26 @@ class EventDataTest {
                         customData29 = "customData29",
                         customData30 = "customData30",
                         experimentName = "experimentName",
+                        customData31 = "customData31",
+                        customData32 = "customData32",
+                        customData33 = "customData33",
+                        customData34 = "customData34",
+                        customData35 = "customData35",
+                        customData36 = "customData36",
+                        customData37 = "customData37",
+                        customData38 = "customData38",
+                        customData39 = "customData39",
+                        customData40 = "customData40",
+                        customData41 = "customData41",
+                        customData42 = "customData42",
+                        customData43 = "customData43",
+                        customData44 = "customData44",
+                        customData45 = "customData45",
+                        customData46 = "customData46",
+                        customData47 = "customData47",
+                        customData48 = "customData48",
+                        customData49 = "customData49",
+                        customData50 = "customData50",
                     ),
                 impressionId = "impressionId",
                 userId = "userId",
@@ -383,6 +402,16 @@ class EventDataTest {
                     "\"customData25\":\"customData25\",\"customData26\":\"customData26\"," +
                     "\"customData27\":\"customData27\",\"customData28\":\"customData28\"," +
                     "\"customData29\":\"customData29\",\"customData30\":\"customData30\"," +
+                    "\"customData31\":\"customData31\",\"customData32\":\"customData32\"," +
+                    "\"customData33\":\"customData33\",\"customData34\":\"customData34\"," +
+                    "\"customData35\":\"customData35\",\"customData36\":\"customData36\"," +
+                    "\"customData37\":\"customData37\",\"customData38\":\"customData38\"," +
+                    "\"customData39\":\"customData39\",\"customData40\":\"customData40\"," +
+                    "\"customData41\":\"customData41\",\"customData42\":\"customData42\"," +
+                    "\"customData43\":\"customData43\",\"customData44\":\"customData44\"," +
+                    "\"customData45\":\"customData45\",\"customData46\":\"customData46\"," +
+                    "\"customData47\":\"customData47\",\"customData48\":\"customData48\"," +
+                    "\"customData49\":\"customData49\",\"customData50\":\"customData50\"," +
                     "\"experimentName\":\"experimentName\"}",
             )
     }

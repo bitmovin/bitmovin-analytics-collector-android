@@ -208,6 +208,8 @@ public final class com/bitmovin/analytics/api/CustomData : android/os/Parcelable
 	public fun <init> ()V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun buildUpon ()Lcom/bitmovin/analytics/api/CustomData$Builder;
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component10 ()Ljava/lang/String;
@@ -234,14 +236,34 @@ public final class com/bitmovin/analytics/api/CustomData : android/os/Parcelable
 	public final fun component3 ()Ljava/lang/String;
 	public final fun component30 ()Ljava/lang/String;
 	public final fun component31 ()Ljava/lang/String;
+	public final fun component32 ()Ljava/lang/String;
+	public final fun component33 ()Ljava/lang/String;
+	public final fun component34 ()Ljava/lang/String;
+	public final fun component35 ()Ljava/lang/String;
+	public final fun component36 ()Ljava/lang/String;
+	public final fun component37 ()Ljava/lang/String;
+	public final fun component38 ()Ljava/lang/String;
+	public final fun component39 ()Ljava/lang/String;
 	public final fun component4 ()Ljava/lang/String;
+	public final fun component40 ()Ljava/lang/String;
+	public final fun component41 ()Ljava/lang/String;
+	public final fun component42 ()Ljava/lang/String;
+	public final fun component43 ()Ljava/lang/String;
+	public final fun component44 ()Ljava/lang/String;
+	public final fun component45 ()Ljava/lang/String;
+	public final fun component46 ()Ljava/lang/String;
+	public final fun component47 ()Ljava/lang/String;
+	public final fun component48 ()Ljava/lang/String;
+	public final fun component49 ()Ljava/lang/String;
 	public final fun component5 ()Ljava/lang/String;
+	public final fun component50 ()Ljava/lang/String;
+	public final fun component51 ()Ljava/lang/String;
 	public final fun component6 ()Ljava/lang/String;
 	public final fun component7 ()Ljava/lang/String;
 	public final fun component8 ()Ljava/lang/String;
 	public final fun component9 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData;
-	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/CustomData;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/CustomData;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/CustomData;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILjava/lang/Object;)Lcom/bitmovin/analytics/api/CustomData;
 	public fun describeContents ()I
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCustomData1 ()Ljava/lang/String;
@@ -268,8 +290,28 @@ public final class com/bitmovin/analytics/api/CustomData : android/os/Parcelable
 	public final fun getCustomData29 ()Ljava/lang/String;
 	public final fun getCustomData3 ()Ljava/lang/String;
 	public final fun getCustomData30 ()Ljava/lang/String;
+	public final fun getCustomData31 ()Ljava/lang/String;
+	public final fun getCustomData32 ()Ljava/lang/String;
+	public final fun getCustomData33 ()Ljava/lang/String;
+	public final fun getCustomData34 ()Ljava/lang/String;
+	public final fun getCustomData35 ()Ljava/lang/String;
+	public final fun getCustomData36 ()Ljava/lang/String;
+	public final fun getCustomData37 ()Ljava/lang/String;
+	public final fun getCustomData38 ()Ljava/lang/String;
+	public final fun getCustomData39 ()Ljava/lang/String;
 	public final fun getCustomData4 ()Ljava/lang/String;
+	public final fun getCustomData40 ()Ljava/lang/String;
+	public final fun getCustomData41 ()Ljava/lang/String;
+	public final fun getCustomData42 ()Ljava/lang/String;
+	public final fun getCustomData43 ()Ljava/lang/String;
+	public final fun getCustomData44 ()Ljava/lang/String;
+	public final fun getCustomData45 ()Ljava/lang/String;
+	public final fun getCustomData46 ()Ljava/lang/String;
+	public final fun getCustomData47 ()Ljava/lang/String;
+	public final fun getCustomData48 ()Ljava/lang/String;
+	public final fun getCustomData49 ()Ljava/lang/String;
 	public final fun getCustomData5 ()Ljava/lang/String;
+	public final fun getCustomData50 ()Ljava/lang/String;
 	public final fun getCustomData6 ()Ljava/lang/String;
 	public final fun getCustomData7 ()Ljava/lang/String;
 	public final fun getCustomData8 ()Ljava/lang/String;
@@ -308,8 +350,28 @@ public final class com/bitmovin/analytics/api/CustomData$Builder {
 	public final fun setCustomData29 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
 	public final fun setCustomData3 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
 	public final fun setCustomData30 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData31 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData32 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData33 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData34 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData35 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData36 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData37 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData38 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData39 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
 	public final fun setCustomData4 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData40 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData41 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData42 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData43 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData44 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData45 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData46 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData47 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData48 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData49 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
 	public final fun setCustomData5 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
+	public final fun setCustomData50 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
 	public final fun setCustomData6 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
 	public final fun setCustomData7 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
 	public final fun setCustomData8 (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;

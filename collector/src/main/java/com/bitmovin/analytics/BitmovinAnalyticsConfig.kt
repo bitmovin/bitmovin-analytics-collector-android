@@ -185,6 +185,106 @@ class BitmovinAnalyticsConfig() : Parcelable {
     var customData30: String? = null
 
     /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData31: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData32: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData33: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData34: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData35: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData36: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData37: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData38: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData39: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData40: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData41: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData42: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData43: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData44: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData45: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData46: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData47: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData48: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData49: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData50: String? = null
+
+    /**
      * User-ID in the Customer System
      */
     var customUserId: String? = null
@@ -294,6 +394,26 @@ class BitmovinAnalyticsConfig() : Parcelable {
         customData28 = parcel.readString()
         customData29 = parcel.readString()
         customData30 = parcel.readString()
+        customData31 = parcel.readString()
+        customData32 = parcel.readString()
+        customData33 = parcel.readString()
+        customData34 = parcel.readString()
+        customData35 = parcel.readString()
+        customData36 = parcel.readString()
+        customData37 = parcel.readString()
+        customData38 = parcel.readString()
+        customData39 = parcel.readString()
+        customData40 = parcel.readString()
+        customData41 = parcel.readString()
+        customData42 = parcel.readString()
+        customData43 = parcel.readString()
+        customData44 = parcel.readString()
+        customData45 = parcel.readString()
+        customData46 = parcel.readString()
+        customData47 = parcel.readString()
+        customData48 = parcel.readString()
+        customData49 = parcel.readString()
+        customData50 = parcel.readString()
         customUserId = parcel.readString()
         experimentName = parcel.readString()
         mpdUrl = parcel.readString()
@@ -312,7 +432,10 @@ class BitmovinAnalyticsConfig() : Parcelable {
         progUrl = parcel.readString()
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
+    override fun writeToParcel(
+        dest: Parcel,
+        flags: Int,
+    ) {
         dest.writeString(cdnProvider)
         dest.writeString(customData1)
         dest.writeString(customData2)
@@ -344,6 +467,26 @@ class BitmovinAnalyticsConfig() : Parcelable {
         dest.writeString(customData28)
         dest.writeString(customData29)
         dest.writeString(customData30)
+        dest.writeString(customData31)
+        dest.writeString(customData32)
+        dest.writeString(customData33)
+        dest.writeString(customData34)
+        dest.writeString(customData35)
+        dest.writeString(customData36)
+        dest.writeString(customData37)
+        dest.writeString(customData38)
+        dest.writeString(customData39)
+        dest.writeString(customData40)
+        dest.writeString(customData41)
+        dest.writeString(customData42)
+        dest.writeString(customData43)
+        dest.writeString(customData44)
+        dest.writeString(customData45)
+        dest.writeString(customData46)
+        dest.writeString(customData47)
+        dest.writeString(customData48)
+        dest.writeString(customData49)
+        dest.writeString(customData50)
         dest.writeString(customUserId)
         dest.writeString(experimentName)
         dest.writeString(mpdUrl)
@@ -368,9 +511,11 @@ class BitmovinAnalyticsConfig() : Parcelable {
 
     companion object {
         @JvmField
-        val CREATOR = object : Parcelable.Creator<BitmovinAnalyticsConfig> {
-            override fun createFromParcel(parcel: Parcel) = BitmovinAnalyticsConfig(parcel)
-            override fun newArray(size: Int) = arrayOfNulls<BitmovinAnalyticsConfig>(size)
-        }
+        val CREATOR =
+            object : Parcelable.Creator<BitmovinAnalyticsConfig> {
+                override fun createFromParcel(parcel: Parcel) = BitmovinAnalyticsConfig(parcel)
+
+                override fun newArray(size: Int) = arrayOfNulls<BitmovinAnalyticsConfig>(size)
+            }
     }
 }

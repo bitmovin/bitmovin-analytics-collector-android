@@ -144,5 +144,25 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         deprecatedBitmovinAnalyticsConfig?.customData29 = customData.customData29
         deprecatedBitmovinAnalyticsConfig?.customData30 = customData.customData30
         deprecatedBitmovinAnalyticsConfig?.experimentName = customData.experimentName
+        deprecatedBitmovinAnalyticsConfig?.customData31 = customData.customData31
+        deprecatedBitmovinAnalyticsConfig?.customData32 = customData.customData32
+        deprecatedBitmovinAnalyticsConfig?.customData33 = customData.customData33
+        deprecatedBitmovinAnalyticsConfig?.customData34 = customData.customData34
+        deprecatedBitmovinAnalyticsConfig?.customData35 = customData.customData35
+        deprecatedBitmovinAnalyticsConfig?.customData36 = customData.customData36
+        deprecatedBitmovinAnalyticsConfig?.customData37 = customData.customData37
+        deprecatedBitmovinAnalyticsConfig?.customData38 = customData.customData38
+        deprecatedBitmovinAnalyticsConfig?.customData39 = customData.customData39
+        deprecatedBitmovinAnalyticsConfig?.customData40 = customData.customData40
+        deprecatedBitmovinAnalyticsConfig?.customData41 = customData.customData41
+        deprecatedBitmovinAnalyticsConfig?.customData42 = customData.customData42
+        deprecatedBitmovinAnalyticsConfig?.customData43 = customData.customData43
+        deprecatedBitmovinAnalyticsConfig?.customData44 = customData.customData44
+        deprecatedBitmovinAnalyticsConfig?.customData45 = customData.customData45
+        deprecatedBitmovinAnalyticsConfig?.customData46 = customData.customData46
+        deprecatedBitmovinAnalyticsConfig?.customData47 = customData.customData47
+        deprecatedBitmovinAnalyticsConfig?.customData48 = customData.customData48
+        deprecatedBitmovinAnalyticsConfig?.customData49 = customData.customData49
+        deprecatedBitmovinAnalyticsConfig?.customData50 = customData.customData50
     }
 }

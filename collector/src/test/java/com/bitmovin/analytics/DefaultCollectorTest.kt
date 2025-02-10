@@ -27,11 +27,15 @@ class DefaultCollectorTest {
                 mockedBitmovinAnalytics,
                 mockedSsaiApi,
             )
-        every { mockedMetadataProvider.defaultMetadata.customData }.returns(CustomData(customData2 = "test2", customData29 = "test29"))
-        every { mockedBitmovinAnalytics.activeCustomData }.returns(CustomData(customData2 = "test2", customData29 = "test29"))
+        every {
+            mockedMetadataProvider.defaultMetadata.customData
+        }.returns(CustomData(customData2 = "test2", customData29 = "test29", customData49 = "test49"))
+        every {
+            mockedBitmovinAnalytics.activeCustomData
+        }.returns(CustomData(customData2 = "test2", customData29 = "test29", customData49 = "test49"))
 
         // act
-        defaultCollector.customData = CustomData(customData1 = "test1", customData30 = "test30")
+        defaultCollector.customData = CustomData(customData1 = "test1", customData30 = "test30", customData50 = "test50")
 
         // assert
         verify(exactly = 1) { mockedBitmovinAnalytics.closeCurrentSampleForCustomDataChangeIfNeeded() }

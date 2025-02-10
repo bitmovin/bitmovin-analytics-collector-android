@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.systemtest.utils
 
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.data.EventData
 import org.assertj.core.api.Assertions.assertThat
 
@@ -15,6 +16,72 @@ object SsaiDataVerifier {
                 throw AssertionError("AdIndex is not correct. Expected: $adIndex, but was: ${it.adIndex}")
             }
         }
+    }
+
+    fun verifyCustomData(
+        adEventData: List<AdEventDataForTest>,
+        expectedCustomData: CustomData,
+    ) {
+        adEventData.forEach {
+            verifyCustomData(it, expectedCustomData)
+        }
+    }
+
+    fun verifyCustomData(
+        adEventData: AdEventDataForTest,
+        expectedCustomData: CustomData,
+    ) {
+        assertThat(adEventData.customData1).isEqualTo(expectedCustomData.customData1)
+        assertThat(adEventData.customData2).isEqualTo(expectedCustomData.customData2)
+        assertThat(adEventData.customData3).isEqualTo(expectedCustomData.customData3)
+        assertThat(adEventData.customData4).isEqualTo(expectedCustomData.customData4)
+        assertThat(adEventData.customData5).isEqualTo(expectedCustomData.customData5)
+        assertThat(adEventData.customData6).isEqualTo(expectedCustomData.customData6)
+        assertThat(adEventData.customData7).isEqualTo(expectedCustomData.customData7)
+        assertThat(adEventData.customData8).isEqualTo(expectedCustomData.customData8)
+        assertThat(adEventData.customData9).isEqualTo(expectedCustomData.customData9)
+        assertThat(adEventData.customData10).isEqualTo(expectedCustomData.customData10)
+        assertThat(adEventData.customData11).isEqualTo(expectedCustomData.customData11)
+        assertThat(adEventData.customData12).isEqualTo(expectedCustomData.customData12)
+        assertThat(adEventData.customData13).isEqualTo(expectedCustomData.customData13)
+        assertThat(adEventData.customData14).isEqualTo(expectedCustomData.customData14)
+        assertThat(adEventData.customData15).isEqualTo(expectedCustomData.customData15)
+        assertThat(adEventData.customData16).isEqualTo(expectedCustomData.customData16)
+        assertThat(adEventData.customData17).isEqualTo(expectedCustomData.customData17)
+        assertThat(adEventData.customData18).isEqualTo(expectedCustomData.customData18)
+        assertThat(adEventData.customData19).isEqualTo(expectedCustomData.customData19)
+        assertThat(adEventData.customData20).isEqualTo(expectedCustomData.customData20)
+        assertThat(adEventData.customData21).isEqualTo(expectedCustomData.customData21)
+        assertThat(adEventData.customData22).isEqualTo(expectedCustomData.customData22)
+        assertThat(adEventData.customData23).isEqualTo(expectedCustomData.customData23)
+        assertThat(adEventData.customData24).isEqualTo(expectedCustomData.customData24)
+        assertThat(adEventData.customData25).isEqualTo(expectedCustomData.customData25)
+        assertThat(adEventData.customData26).isEqualTo(expectedCustomData.customData26)
+        assertThat(adEventData.customData27).isEqualTo(expectedCustomData.customData27)
+        assertThat(adEventData.customData28).isEqualTo(expectedCustomData.customData28)
+        assertThat(adEventData.customData29).isEqualTo(expectedCustomData.customData29)
+        assertThat(adEventData.customData30).isEqualTo(expectedCustomData.customData30)
+        assertThat(adEventData.customData31).isEqualTo(expectedCustomData.customData31)
+        assertThat(adEventData.customData32).isEqualTo(expectedCustomData.customData32)
+        assertThat(adEventData.customData33).isEqualTo(expectedCustomData.customData33)
+        assertThat(adEventData.customData34).isEqualTo(expectedCustomData.customData34)
+        assertThat(adEventData.customData35).isEqualTo(expectedCustomData.customData35)
+        assertThat(adEventData.customData36).isEqualTo(expectedCustomData.customData36)
+        assertThat(adEventData.customData37).isEqualTo(expectedCustomData.customData37)
+        assertThat(adEventData.customData38).isEqualTo(expectedCustomData.customData38)
+        assertThat(adEventData.customData39).isEqualTo(expectedCustomData.customData39)
+        assertThat(adEventData.customData40).isEqualTo(expectedCustomData.customData40)
+        assertThat(adEventData.customData41).isEqualTo(expectedCustomData.customData41)
+        assertThat(adEventData.customData42).isEqualTo(expectedCustomData.customData42)
+        assertThat(adEventData.customData43).isEqualTo(expectedCustomData.customData43)
+        assertThat(adEventData.customData44).isEqualTo(expectedCustomData.customData44)
+        assertThat(adEventData.customData45).isEqualTo(expectedCustomData.customData45)
+        assertThat(adEventData.customData46).isEqualTo(expectedCustomData.customData46)
+        assertThat(adEventData.customData47).isEqualTo(expectedCustomData.customData47)
+        assertThat(adEventData.customData48).isEqualTo(expectedCustomData.customData48)
+        assertThat(adEventData.customData49).isEqualTo(expectedCustomData.customData49)
+        assertThat(adEventData.customData50).isEqualTo(expectedCustomData.customData50)
+        assertThat(adEventData.experimentName).isEqualTo(expectedCustomData.experimentName)
     }
 
     fun verifySamplesHaveSameAdSystem(
@@ -149,5 +216,18 @@ object SsaiDataVerifier {
                 assertThat(eventData.ssaiRelatedSample).isTrue()
             }
         }
+    }
+
+    fun getSsaiAdEventSampleByAdIndex(
+        adEventDataList: List<AdEventDataForTest>,
+        adIndex: Int,
+    ): AdEventDataForTest {
+        adEventDataList.forEach {
+            if (it.adIndex == adIndex) {
+                return it
+            }
+        }
+
+        throw RuntimeException("SSAI AdEvent with index = $adIndex not found")
     }
 }
