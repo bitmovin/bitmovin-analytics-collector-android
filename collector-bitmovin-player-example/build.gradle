@@ -45,14 +45,14 @@ android {
     }
 }
 
-// we need to exclude the bitmovin player analytics module since we work with a local development version
-// otherwise we would run into dex errors due to duplicate classes
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute module('com.bitmovin.analytics:collector') using project(':collector') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
-        substitute module('com.bitmovin.analytics:collector-bitmovin-player') using project(':collector-bitmovin-player') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
-    }
-}
+//// we need to exclude the bitmovin player analytics module since we work with a local development version
+//// otherwise we would run into dex errors due to duplicate classes
+//configurations.all {
+//    resolutionStrategy.dependencySubstitution {
+//        substitute module('com.bitmovin.analytics:collector') using project(':collector') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
+//        substitute module('com.bitmovin.analytics:collector-bitmovin-player') using project(':collector-bitmovin-player') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
+//    }
+//}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -75,10 +75,10 @@ dependencies {
     // dependencies for ads and Chromecast
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-    if (rootProject.ext.developLocal) {
-        implementation project(':collector-bitmovin-player')
-    } else {
-        implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
-    }
+//    if (rootProject.ext.developLocal) {
+//        implementation project(':collector-bitmovin-player')
+//    } else {
+        implementation "com.bitmovin.analytics:collector-bitmovin-player:3.14.0-rc.1"
+//    }
     implementation project(':example-shared')
 }
