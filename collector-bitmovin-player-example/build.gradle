@@ -78,7 +78,7 @@ dependencies {
     if (rootProject.ext.developLocal) {
         implementation project(':collector-bitmovin-player')
     } else {
-        implementation "com.bitmovin.analytics:collector-bitmovin-player:3.14.0-rc.1"
+        implementation "com.bitmovin.analytics:collector-bitmovin-player:${rootProject.ext.version}"
     }
     implementation project(':example-shared')
 }
