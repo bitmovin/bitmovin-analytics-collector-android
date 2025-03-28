@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Upgraded to latest ivs player, bitmovin player and media3-exoplayer
+
 ### v3.14.0
 
 ### Added

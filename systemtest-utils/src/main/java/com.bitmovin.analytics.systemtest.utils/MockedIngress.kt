@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.time.withTimeout
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -19,7 +18,6 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 object MockedIngress {
@@ -193,20 +191,24 @@ object MockedIngress {
         unit: TimeUnit = TimeUnit.SECONDS,
     ) {
         runBlocking {
-            withTimeout(Duration.ofMillis(unit.toMillis(timeout))) {
-                while (true) {
-                    val request = server.takeRequest(timeout, unit)
-                    if (request == null) {
-                        throw RuntimeException("No request received within the timeout")
-                    }
+            val start = System.currentTimeMillis()
 
-                    alreadyTakenRequests.add(request)
+            while (true) {
+                val request = server.takeRequest(timeout, unit)
+                if (request == null) {
+                    throw RuntimeException("No request received within the timeout")
+                }
 
-                    when (request.requestUrl?.encodedPath) {
-                        "/analytics/error" -> {
-                            break
-                        }
+                alreadyTakenRequests.add(request)
+
+                when (request.requestUrl?.encodedPath) {
+                    "/analytics/error" -> {
+                        break
                     }
+                }
+
+                if (start.plus(unit.toMillis(timeout)) <= System.currentTimeMillis()) {
+                    throw RuntimeException("No error detail sample received within the timeout")
                 }
             }
         }

@@ -50,31 +50,31 @@ jobs:
       - name: Tests Collector
         if: always()
         run: |
-          ./gradlew :collector:pixel6api34DebugAndroidTest
+          ./gradlew :collector:pixel6api35DebugAndroidTest
 
 # Collector Bitmovin Player Test
       - name: Tests Collector Bitmovin Player
         if: always()
         run: |
-          ./gradlew :collector-bitmovin-player:pixel6api34DebugAndroidTest
+          ./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest
 
 # Collector Exo Player Test
       - name: Tests Collector Exoplayer
         if: always()
         run: |
-          ./gradlew :collector-exoplayer:pixel6api34DebugAndroidTest
+          ./gradlew :collector-exoplayer:pixel6api35DebugAndroidTest
 
 # Collector Media3 Exo Player Test
       - name: Tests Collector Media3 Exoplayer
         if: always()
         run: |
-          ./gradlew :collector-media3-exoplayer:pixel6api34DebugAndroidTest
+          ./gradlew :collector-media3-exoplayer:pixel6api35DebugAndroidTest
 
 ## Collector Amazon IVS Test
       - name: Tests Collector Amazon IVS
         if: always()
         run: |
-          ./gradlew :collector-amazon-ivs:pixel6api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.notClass=com.bitmovin.analytics.amazon.ivs.TVBasicScenariosTest
+          ./gradlew :collector-amazon-ivs:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.notClass=com.bitmovin.analytics.amazon.ivs.TVBasicScenariosTest
 
       # If it fails on the main branch, send a slack message (merged PR or nightly tests)
       - name: Send a Slack message whenever the tests fails on the main branch
@@ -94,7 +94,7 @@ jobs:
         uses: mikepenz/action-junit-report@v4
         if: success() || failure() # always run even if the previous step fails
         with:
-          report_paths: '**/build/outputs/androidTest-results/managedDevice/debug/pixel6api34/TEST-*.xml'
+          report_paths: '**/build/outputs/androidTest-results/managedDevice/debug/pixel6api35/TEST-*.xml'
 
       - name: Copying Reports
         if: always()
@@ -102,11 +102,11 @@ jobs:
         run: |
             mkdir reports
 
-            cp -r collector/build/reports/androidTests/managedDevice/debug/pixel6api34/ reports/collector
-            cp -r collector-bitmovin-player/build/reports/androidTests/managedDevice/debug/pixel6api34/ reports/collector-bitmovin-player
-            cp -r collector-exoplayer/build/reports/androidTests/managedDevice/debug/pixel6api34/ reports/collector-exoplayer
-            cp -r collector-media3-exoplayer/build/reports/androidTests/managedDevice/debug/pixel6api34/ reports/collector-media3-exoplayer
-            cp -r collector-amazon-ivs/build/reports/androidTests/managedDevice/debug/pixel6api34/ reports/collector-amazon-ivs
+            cp -r collector/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector
+            cp -r collector-bitmovin-player/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-bitmovin-player
+            cp -r collector-exoplayer/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-exoplayer
+            cp -r collector-media3-exoplayer/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-media3-exoplayer
+            cp -r collector-amazon-ivs/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-amazon-ivs
 
             cp .github/tests-report/INDEX_TEST_REPORTS.html reports/index.html
 
