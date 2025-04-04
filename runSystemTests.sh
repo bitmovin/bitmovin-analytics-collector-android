@@ -48,11 +48,11 @@ yes | sdkmanager --licenses
 #./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.BundledAnalyticsTest || exit
 #./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.bitmovin.analytics.bitmovin.player.BundledAnalyticsTest || exit
 
-## command to run specific test (with regex) in a loop (can be used to verify flaky test is stable)
+# command to run specific test (with regex) in a loop (can be used to verify flaky test is stable)
 #for i in {1..50}; do
 #   echo "RUN $i/50"
 #  ./gradlew :collector-bitmovin-player:cleanPixel6api35DebugAndroidTest
-#  ./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.bitmovin.player.PhoneBasicScenariosTest.test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer || exit
+#  ./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.bitmovin.player.SsaiScenariosTest
 #done
 
 #  ./gradlew :collector-exoplayer:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.exoplayer.ErrorScenariosTest.test_vodWithDrm_wrongConfig || exit

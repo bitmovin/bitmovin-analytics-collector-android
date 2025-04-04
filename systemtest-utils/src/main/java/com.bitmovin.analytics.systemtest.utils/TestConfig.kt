@@ -34,7 +34,7 @@ object TestConfig {
     }
 
     fun createAnalyticsConfig(
-        analyticsKey: String = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0",
+        analyticsKey: String = "45adcf9b-8f7c-4e28-91c5-50ba3d442cd4",
         backendUrl: String? = null,
         ssaiEngagementTrackingEnabled: Boolean = true,
     ): AnalyticsConfig {
