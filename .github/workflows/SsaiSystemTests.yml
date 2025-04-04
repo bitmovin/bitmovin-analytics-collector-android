@@ -5,8 +5,8 @@ on:
     branches:
       - main
   schedule:
-    # Trigger on start of the day every working day (stolen from player nightly)
-    - cron: '0 0 * * MON-FRI'
+    # Trigger run every 30 minutes
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 jobs:
