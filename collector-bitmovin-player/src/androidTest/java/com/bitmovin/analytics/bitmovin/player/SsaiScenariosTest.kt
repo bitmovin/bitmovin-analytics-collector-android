@@ -65,7 +65,11 @@ class SsaiScenariosTest {
         EventDatabaseTestHelper.purge(appContext)
 
         mockedIngressUrl = MockedIngress.startServer()
-        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
+        defaultAnalyticsConfig =
+            TestConfig.createAnalyticsConfig(
+                backendUrl = mockedIngressUrl,
+                analyticsKey = "ab0544de-d8b7-4a34-8f66-11ad5cb11945",
+            )
         val playerConfig =
             PlayerConfig(
                 key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
