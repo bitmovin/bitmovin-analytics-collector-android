@@ -44,7 +44,7 @@ jobs:
           cache-read-only: false
 
 # Collector Bitmovin Player SSAI Tests
-      - name: Ssasi Tests Collector Bitmovin Player
+      - name: Ssai Tests Collector Bitmovin Player
         if: always()
         run: |
           ./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.bitmovin.player.SsaiScenariosTest

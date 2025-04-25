@@ -103,10 +103,10 @@ ext {
     targetSdkVersion = 35
 
     // player versions
-    bitmovinPlayerVersion = '3.104.2'
+    bitmovinPlayerVersion = '3.107.0'
     exoplayerVersion = '2.19.1'
     amazonIvsPlayerVersion = '1.38.0'
-    media3PlayerVersion = '1.5.1'
+    media3PlayerVersion = '1.6.1'
 
     // collector dependencies
     gsonVersion = '2.11.0'

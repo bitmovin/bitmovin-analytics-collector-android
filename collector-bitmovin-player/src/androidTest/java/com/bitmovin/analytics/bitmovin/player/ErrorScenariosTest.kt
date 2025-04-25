@@ -19,8 +19,11 @@ import com.bitmovin.analytics.systemtest.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
-import com.bitmovin.player.api.TweaksConfig
 import com.bitmovin.player.api.analytics.create
+import com.bitmovin.player.api.decoder.DecoderConfig
+import com.bitmovin.player.api.decoder.DecoderPriorityProvider
+import com.bitmovin.player.api.decoder.MediaCodecInfo
+import com.bitmovin.player.api.media.MediaType
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
@@ -123,6 +126,7 @@ class ErrorScenariosTest {
                 )
 
             // we simulate a decoding error by occupying all available decoders
+            // and disable software decoders
             noAvailableDecoder(MediaFormat.createVideoFormat(MimeTypes.VIDEO_H264, 1920, 1080)) {
                 val source = Source.create(SourceConfig.fromUrl(stream.uri.toString()), sourceMetadata)
                 // act
@@ -130,8 +134,27 @@ class ErrorScenariosTest {
                     val playerConfig =
                         PlayerConfig(
                             key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
-                            playbackConfig = PlaybackConfig(),
-                            tweaksConfig = TweaksConfig(enableMainContentVideoCodecInitializationFallback = false),
+                            playbackConfig =
+                                PlaybackConfig(
+                                    decoderConfig =
+                                        DecoderConfig(
+                                            decoderPriorityProvider =
+                                                object : DecoderPriorityProvider {
+                                                    // avoid using software decoders
+                                                    override fun overrideDecodersPriority(
+                                                        context: DecoderPriorityProvider.DecoderContext,
+                                                        preferredDecoders: List<MediaCodecInfo>,
+                                                    ): List<MediaCodecInfo> {
+                                                        return if (!context.isAd && context.mediaType == MediaType.Video) {
+                                                            // Do not use software decoders
+                                                            preferredDecoders.filter { !it.isSoftware }
+                                                        } else {
+                                                            preferredDecoders
+                                                        }
+                                                    }
+                                                },
+                                        ),
+                                ),
                         )
                     val player = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
                     player.load(source)
@@ -153,7 +176,7 @@ class ErrorScenariosTest {
             val impressionId = eventData.impressionId
             assertThat(
                 eventData.errorMessage,
-            ).isEqualTo("Decoder initialization failed: video decoder c2.goldfish.h264.decoder, attempted to use 1 fallback decoders")
+            ).isEqualTo("Decoder initialization failed: video decoder c2.goldfish.h264.decoder")
             assertThat(eventData.errorCode).isEqualTo(2102)
             DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
             assertThat(errorDetail.data.exceptionStacktrace).isNull()
