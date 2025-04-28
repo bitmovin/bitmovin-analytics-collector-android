@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Upgraded to latest ivs player, bitmovin player and media3-exoplayer
 
+### Added
+- [Internal] Systemtest for bitmovin collector to cover ebvs when player is closed while startup
+
 ### v3.14.0
 
 ### Added

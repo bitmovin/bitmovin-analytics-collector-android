@@ -72,6 +72,35 @@ class ErrorScenariosTest {
         }
 
     @Test
+    fun test_exitBeforeVideoStart_Should_setPageClosedAsReason() =
+        runBlockingTest {
+            val sample = Samples.DASH
+            val sourceMetadata =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                    customData = CustomData(customData1 = "exitBeforeVideoStart"),
+                )
+            val nonExistingSource = Source.create(SourceConfig.fromUrl(sample.uri.toString()), sourceMetadata)
+            // act
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.load(nonExistingSource)
+                defaultPlayer.play()
+                defaultPlayer.destroy()
+            }
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+            val impression = impressionList.first()
+
+            val eventData = impression.eventDataList.first()
+            assertThat(eventData.videoStartFailed).isTrue()
+            assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
+            DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
+        }
+
+    @Test
     fun test_nonExistingStream_Should_sendErrorSample() =
         runBlockingTest {
             val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
@@ -104,6 +133,7 @@ class ErrorScenariosTest {
             val impressionId = eventData.impressionId
             assertThat(eventData.errorMessage).isEqualTo("An unexpected HTTP status code was received: Response code: 404")
             assertThat(eventData.errorCode).isEqualTo(2203)
+            assertThat(eventData.videoStartFailed).isTrue()
             assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
             DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
 
@@ -178,6 +208,10 @@ class ErrorScenariosTest {
                 eventData.errorMessage,
             ).isEqualTo("Decoder initialization failed: video decoder c2.goldfish.h264.decoder")
             assertThat(eventData.errorCode).isEqualTo(2102)
+
+            // TODO: Discuss why this is not counted as startup error, since player was failing during load
+            // assertThat(eventData.videoStartFailed).isTrue()
+            //  assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
             DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
             assertThat(errorDetail.data.exceptionStacktrace).isNull()
             assertThat(errorDetail.data.exceptionMessage).isNullOrEmpty()
