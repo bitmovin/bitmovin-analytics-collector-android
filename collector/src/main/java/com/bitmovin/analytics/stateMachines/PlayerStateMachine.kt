@@ -96,8 +96,10 @@ class PlayerStateMachine(
         // we don't want to trigger on Pause since this is pause samples are not affecting our metrics
         // same for Ready state. We also ignore error, since every error triggers a sample immediately
         // anyway, and we want to make sure we don't send it out twice
+        // If a startup is still in progress we also don't want to send out an extra sample
+        // since this is covered with ebvs anyway
         if (currentState === PlayerStates.PAUSE || currentState === PlayerStates.READY ||
-            currentState === PlayerStates.ERROR
+            currentState === PlayerStates.ERROR || currentState === PlayerStates.STARTUP
         ) {
             return
         }

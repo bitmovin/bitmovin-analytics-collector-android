@@ -279,6 +279,7 @@ class DefaultStateMachineListener(
         }
         data.videoStartFailedReason = videoStartFailedReason.reason
         analytics.sendEventData(data)
-        analytics.detachPlayer()
+        // we implicitly detach and don't want to send the last sample out
+        analytics.detachPlayer(shouldSendOutSamples = false)
     }
 }

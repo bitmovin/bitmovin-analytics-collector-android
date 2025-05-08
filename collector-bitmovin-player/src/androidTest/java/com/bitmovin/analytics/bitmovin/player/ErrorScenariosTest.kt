@@ -13,6 +13,7 @@ import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.MockedIngress.waitForErrorDetailSample
+import com.bitmovin.analytics.systemtest.utils.RepeatRule
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.noAvailableDecoder
 import com.bitmovin.analytics.systemtest.utils.runBlockingTest
@@ -43,6 +44,9 @@ class ErrorScenariosTest {
 
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()
+
+    @Rule @JvmField
+    val repeatRule = RepeatRule()
 
     private val defaultPlayerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
 
@@ -87,12 +91,14 @@ class ErrorScenariosTest {
                 defaultPlayer.play()
                 defaultPlayer.destroy()
             }
-            Thread.sleep(500)
+            Thread.sleep(1000)
 
             // assert
             val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressionList.size).isEqualTo(1)
             val impression = impressionList.first()
+
+            assertThat(impression.eventDataList).hasSize(1)
 
             val eventData = impression.eventDataList.first()
             assertThat(eventData.videoStartFailed).isTrue()
