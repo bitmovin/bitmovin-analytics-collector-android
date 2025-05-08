@@ -7,6 +7,7 @@ import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
+import com.bitmovin.analytics.systemtest.utils.MockedIngress.waitForErrorDetailSample
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.bitmovin.analytics.systemtest.utils.runBlockingTest
@@ -75,6 +76,7 @@ class ErrorScenariosTest {
 
             // wait a bit for samples being sent out
             Thread.sleep(300)
+            waitForErrorDetailSample()
 
             withContext(mainScope.coroutineContext) {
                 collector.detachPlayer()
@@ -130,6 +132,7 @@ class ErrorScenariosTest {
 
             // wait a bit for samples being sent out
             Thread.sleep(300)
+            waitForErrorDetailSample()
 
             withContext(mainScope.coroutineContext) {
                 collector.detachPlayer()
@@ -184,7 +187,8 @@ class ErrorScenariosTest {
             ExoPlayerPlaybackUtils.waitUntilPlayerHasError(player)
 
             // wait a bit for samples being sent out
-            Thread.sleep(1000)
+            Thread.sleep(300)
+            waitForErrorDetailSample()
 
             withContext(mainScope.coroutineContext) {
                 collector.detachPlayer()
@@ -247,8 +251,8 @@ class ErrorScenariosTest {
             ExoPlayerPlaybackUtils.waitUntilPlayerHasError(player)
 
             // wait a bit to make sure the error samples are sent
-            // test was flaky with 300ms, 500ms should stabilize it.
-            Thread.sleep(500)
+            Thread.sleep(300)
+            waitForErrorDetailSample()
 
             val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
             val impression = impressionsList.first()
