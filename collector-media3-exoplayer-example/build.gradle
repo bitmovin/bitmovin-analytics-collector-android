@@ -35,11 +35,13 @@ android {
             // (in order to apply the consumer pro guard rules)
             // and then reference the core collector in the player specific library
             // and setting minifyEnable to true here
-            minifyEnabled true
+            // if the local version is used the pro guard rules are not applied
+            // and the app crashes on startup if minifyEnabled is set to true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
