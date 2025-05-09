@@ -61,7 +61,6 @@ class BitmovinAnalytics(
      * To attach a different player instance, simply call this method again.
      */
     fun attach(adapter: PlayerAdapter) {
-        detachPlayer()
         val stateMachineListener =
             DefaultStateMachineListener(this, adapter, eventBus[OnErrorDetailEventListener::class], adapter.ssaiService)
         adapter.stateMachine.subscribe(stateMachineListener)

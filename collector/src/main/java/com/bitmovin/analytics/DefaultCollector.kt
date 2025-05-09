@@ -84,6 +84,7 @@ abstract class DefaultCollector<TPlayer> protected constructor(
     ): PlayerAdapter
 
     override fun attachPlayer(player: TPlayer) {
+        analytics.detachPlayer()
         val adapter = createAdapter(player, analytics)
         analytics.attach(adapter)
     }

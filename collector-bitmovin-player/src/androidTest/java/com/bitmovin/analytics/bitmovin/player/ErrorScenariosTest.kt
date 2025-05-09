@@ -84,10 +84,10 @@ class ErrorScenariosTest {
                     title = metadataGenerator.getTestTitle(),
                     customData = CustomData(customData1 = "exitBeforeVideoStart"),
                 )
-            val nonExistingSource = Source.create(SourceConfig.fromUrl(sample.uri.toString()), sourceMetadata)
+            val source = Source.create(SourceConfig.fromUrl(sample.uri.toString()), sourceMetadata)
             // act
             withContext(mainScope.coroutineContext) {
-                defaultPlayer.load(nonExistingSource)
+                defaultPlayer.load(source)
                 defaultPlayer.play()
                 defaultPlayer.destroy()
             }

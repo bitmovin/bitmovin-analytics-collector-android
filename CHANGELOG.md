@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Fixed
-- Only send one sample in case a startup is interrupted by closing the player
+- Only send one sample in case a startup is interrupted by closing the player (ebvs)
+- Implicit detaching of collector when player is attached could create new sessions in rare events
 
 ### Changed
 - Upgraded to latest ivs player, bitmovin player and media3-exoplayer
