@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### v3.14.1
+
 ### Fixed
 - Only send one sample in case a startup is interrupted by closing the player (ebvs)
 - Implicit detaching of collector when player is attached could create new sessions in rare events
