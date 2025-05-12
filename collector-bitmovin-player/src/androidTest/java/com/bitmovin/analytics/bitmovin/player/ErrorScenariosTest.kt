@@ -89,6 +89,8 @@ class ErrorScenariosTest {
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.load(source)
                 defaultPlayer.play()
+                // we wait 15ms to make sure that player is in startup state
+                Thread.sleep(15)
                 defaultPlayer.destroy()
             }
             Thread.sleep(1000)
