@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### v3.14.2
+
 ### Fixed
 - [AN-4679] Stop sending playing samples when TV is turned off on FireOS 8 devices
 
