@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
+import com.bitmovin.analytics.api.LogLevel
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
@@ -16,6 +17,7 @@ import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Samples
+import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerBuilder
 import com.bitmovin.player.api.PlayerConfig
@@ -161,11 +163,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeBitmovinPlayerWithAnalytics(withAds: Boolean = false) {
-        val playerConfig = PlayerConfig()
+        val playerConfig = PlayerConfig(playbackConfig = PlaybackConfig(isAutoplayEnabled = true))
         if (withAds) {
             playerConfig.advertisingConfig = createAdvertisingConfig()
         }
-        val analyticsConfig = AnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0")
+        val analyticsConfig = AnalyticsConfig("17e6ea02-cb5a-407f-9d6b-9400358fbcc0", logLevel = LogLevel.DEBUG)
         val defaultMetadata =
             DefaultMetadata(
                 customUserId = "customBitmovinUserId1",

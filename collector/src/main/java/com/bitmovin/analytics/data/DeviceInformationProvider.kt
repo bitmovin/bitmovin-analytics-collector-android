@@ -37,6 +37,10 @@ open class DeviceInformationProvider(
 ) {
     val isTV: Boolean = Util.isTVDevice(context)
 
+    // https://developer.amazon.com/docs/fire-tablets/fire-os-8.html#target-your-app-for-fire-os-8-devices
+    val isFireOs8OrHigher: Boolean
+        get() = Build.VERSION.SDK_INT >= 30 && isFireOS(context.packageManager)
+
     fun getDeviceInformation(): DeviceInformation {
         var width = 0
         var height = 0

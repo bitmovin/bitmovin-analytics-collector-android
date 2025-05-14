@@ -24,7 +24,7 @@ object BitmovinPlaybackUtils {
 
         // we need to wait a bit for the player to report position of new source
         // this is a workaround, since this is due to the asynchronous nature of the player
-        Thread.sleep(300)
+        Thread.sleep(500)
         Assertions.assertThat(player.currentTime).isLessThan(4.0)
 
         PlaybackUtils.waitUntil("waitUntilNewSourceIsPlaying") { player.isPlaying }

@@ -5,6 +5,7 @@ import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.PlayerContext
+import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.ErrorCode
 import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
@@ -20,6 +21,7 @@ class PlayerStateMachine(
     internal val videoStartTimeoutTimer: ObservableTimer,
     private val playerContext: PlayerContext,
     looper: Looper,
+    private val deviceInformationProvider: DeviceInformationProvider,
     private val heartbeatHandler: Handler = Handler(looper),
 ) {
     internal val listeners = ObservableSupport<StateMachineListener>()
@@ -111,14 +113,44 @@ class PlayerStateMachine(
     // the player was released. This is problematic when a customer releases player but does not
     // detach our collectors, as we do not transition into pause state and will continue sending
     // samples. The below check prevents this from happening.
+    // Further, on FireOS 8 we have seen that the player is in playing state but not actually
+    // playing, which also leads to heartbeat samples for long periods of time, which mingles with our data.
+    // This is true for media3 and bitmovin player (as of 2025-05-14)
+    // -> https://bitmovin.atlassian.net/browse/AN-4679
     private fun checkAndTriggerPlayingSample(): Boolean {
         if (playerContext.isPlaying()) {
-            triggerSample()
-            return true
+            // workaround for fireos 8 since the playing state
+            // is not reliable when the display is turned off
+            // https://bitmovin.atlassian.net/browse/AN-4679
+            if (deviceInformationProvider.isFireOs8OrHigher) {
+                if (playerIsMakingProgressBetweenHeartbeats()) {
+                    triggerSample()
+                    return true
+                } else {
+                    pause(playerContext.position)
+                    return false
+                }
+            } else {
+                triggerSample()
+                return true
+            }
         } else {
-            // transition into pause state when player is in PLAYING state but not actually playing
+            // transition into pause state when statemachine is in PLAYING state but player not actually playing
             pause(playerContext.position)
             return false
+        }
+    }
+
+    private var lastPlayerPosition: Long = 0
+
+    // we verify if the player is changing the position since the last heartbeat
+    private fun playerIsMakingProgressBetweenHeartbeats(): Boolean {
+        val currentPosition = playerContext.position
+
+        try {
+            return currentPosition != lastPlayerPosition
+        } finally {
+            lastPlayerPosition = currentPosition
         }
     }
 
@@ -352,6 +384,7 @@ class PlayerStateMachine(
             analytics: BitmovinAnalytics,
             playerContext: PlayerContext,
             looper: Looper,
+            deviceInformationProvider: DeviceInformationProvider,
         ): PlayerStateMachine {
             val bufferingTimeoutTimer = ObservableTimer(Util.REBUFFERING_TIMEOUT.toLong(), 1000)
             val qualityChangeCountResetTimer =
@@ -365,6 +398,7 @@ class PlayerStateMachine(
                 videoStartTimeoutTimer,
                 playerContext,
                 looper,
+                deviceInformationProvider,
             )
         }
     }

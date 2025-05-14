@@ -100,7 +100,7 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
         val playerLicenseProvider = PlayerLicenseProvider(analytics.context)
         val playerContext = BitmovinPlayerContext(player)
         val mainLooper = analytics.context.mainLooper
-        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, mainLooper)
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, mainLooper, deviceInformationProvider)
         val eventDataFactory =
             EventDataFactory(
                 config,

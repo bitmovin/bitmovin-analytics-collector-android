@@ -48,7 +48,7 @@ internal class Media3ExoPlayerCollector(analyticsConfig: AnalyticsConfig, contex
         val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         val playerContext = Media3ExoPlayerContext(player)
         val applicationLooper = player.applicationLooper
-        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, applicationLooper)
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, applicationLooper, deviceInformationProvider)
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         return Media3ExoPlayerAdapter(
             player,

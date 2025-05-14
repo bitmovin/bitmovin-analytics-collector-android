@@ -49,7 +49,8 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
         val featureFactory: FeatureFactory = AmazonIvsPlayerFeatureFactory(analytics)
         val playerContext = IvsPlayerContext(player)
         val mainLooper = analytics.context.mainLooper
-        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, mainLooper)
+        val deviceInformationProvider = DeviceInformationProvider(analytics.context)
+        val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, mainLooper, deviceInformationProvider)
         val playbackService = PlaybackService(stateMachine)
         val playbackManipulator = PlaybackEventDataManipulator(player)
         val playbackQualityProvider = PlaybackQualityProvider()
@@ -75,7 +76,6 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
 
         val eventDataFactory = EventDataFactory(config, userIdProvider, userAgentProvider)
         val manipulators = listOf(playbackManipulator, playerInfoManipulator, qualityManipulator)
-        val deviceInformationProvider = DeviceInformationProvider(analytics.context)
 
         return AmazonIvsPlayerAdapter(
             player,
