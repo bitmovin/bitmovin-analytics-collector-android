@@ -242,6 +242,7 @@ apiValidation {
             "com.bitmovin.analytics.adapters",
             "com.bitmovin.analytics.ads",
             "com.bitmovin.analytics.data",
+            "com.bitmovin.analytics.dtos",
             "com.bitmovin.analytics.enums",
             "com.bitmovin.analytics.error",
             "com.bitmovin.analytics.features",
