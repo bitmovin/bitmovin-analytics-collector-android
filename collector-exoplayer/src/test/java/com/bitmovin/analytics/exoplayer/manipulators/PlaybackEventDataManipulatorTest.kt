@@ -2,8 +2,8 @@ package com.bitmovin.analytics.exoplayer.manipulators
 
 import android.net.Uri
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.data.DownloadSpeedInfo
 import com.bitmovin.analytics.data.MetadataProvider
+import com.bitmovin.analytics.dtos.DownloadSpeedInfo
 import com.bitmovin.analytics.exoplayer.TestUtils
 import com.bitmovin.analytics.exoplayer.player.DrmInfoProvider
 import com.bitmovin.analytics.exoplayer.player.PlaybackInfoProvider

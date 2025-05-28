@@ -3,8 +3,8 @@ package com.bitmovin.analytics.media3.exoplayer.manipulators
 import androidx.media3.common.Format
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.dtos.EventData
 
 internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : EventDataManipulator {
     var currentAudioFormat: Format? = null
@@ -38,7 +38,10 @@ internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : E
     }
 
     @androidx.annotation.OptIn(UnstableApi::class)
-    private fun applyVideoFormat(data: EventData, videoFormat: Format?) {
+    private fun applyVideoFormat(
+        data: EventData,
+        videoFormat: Format?,
+    ) {
         if (videoFormat == null) {
             return
         }
@@ -50,7 +53,10 @@ internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : E
     }
 
     @androidx.annotation.OptIn(UnstableApi::class)
-    private fun applyAudioFormat(data: EventData, audioFormat: Format?) {
+    private fun applyAudioFormat(
+        data: EventData,
+        audioFormat: Format?,
+    ) {
         if (audioFormat == null) {
             return
         }

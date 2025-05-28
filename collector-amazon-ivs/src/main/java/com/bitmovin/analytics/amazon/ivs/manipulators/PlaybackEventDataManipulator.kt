@@ -2,8 +2,8 @@ package com.bitmovin.analytics.amazon.ivs.manipulators
 
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.amazon.ivs.Utils
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.utils.BitmovinLog
 

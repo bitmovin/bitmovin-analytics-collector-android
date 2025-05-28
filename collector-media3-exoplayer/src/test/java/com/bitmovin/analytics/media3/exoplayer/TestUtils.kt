@@ -3,26 +3,27 @@ package com.bitmovin.analytics.media3.exoplayer
 import android.content.Context
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.data.DeviceInformation
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.PlayerInfo
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.PlayerType
 import io.mockk.mockk
 
 object TestUtils {
     fun createMinimalEventData(): EventData {
-        val deviceInfo = DeviceInformation(
-            "manufactorer",
-            "model",
-            false,
-            "locale",
-            "domain",
-            0,
-            0,
-            null,
-            null,
-            null,
-            null,
-        )
+        val deviceInfo =
+            DeviceInformation(
+                "manufactorer",
+                "model",
+                false,
+                "locale",
+                "domain",
+                0,
+                0,
+                null,
+                null,
+                null,
+                null,
+            )
         val playerInfo = PlayerInfo("playerTech", PlayerType.AMAZON_IVS)
 
         return EventData(

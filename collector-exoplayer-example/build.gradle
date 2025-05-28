@@ -32,12 +32,12 @@ android {
     buildTypes {
         debug {
             // pro guard obfuscation can be tested on emulator with setting minifyEnabled and shrink resources to true
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

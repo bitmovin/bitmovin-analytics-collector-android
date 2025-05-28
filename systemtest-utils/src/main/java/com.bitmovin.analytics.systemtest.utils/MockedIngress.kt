@@ -3,8 +3,8 @@ package com.bitmovin.analytics.systemtest.utils
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.features.errordetails.ErrorDetail
+import com.bitmovin.analytics.dtos.ErrorDetail
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.utils.DataSerializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

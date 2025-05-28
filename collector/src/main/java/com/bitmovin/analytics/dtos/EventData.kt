@@ -1,6 +1,8 @@
-package com.bitmovin.analytics.data
+package com.bitmovin.analytics.dtos
 
 import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.data.DeviceInformation
+import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.utils.Util
 
 // DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro

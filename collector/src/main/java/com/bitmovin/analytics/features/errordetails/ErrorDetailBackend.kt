@@ -2,7 +2,9 @@ package com.bitmovin.analytics.features.errordetails
 
 import android.content.Context
 import com.bitmovin.analytics.api.AnalyticsConfig
-import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
+import com.bitmovin.analytics.dtos.ErrorData
+import com.bitmovin.analytics.dtos.ErrorDetail
+import com.bitmovin.analytics.dtos.HttpRequest
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.HttpClient
 import com.bitmovin.analytics.utils.Util

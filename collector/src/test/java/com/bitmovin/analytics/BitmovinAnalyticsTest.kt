@@ -4,10 +4,10 @@ import android.content.Context
 import android.net.Uri
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.BackendFactory
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataDispatcherFactory
 import com.bitmovin.analytics.data.IEventDataDispatcher
 import com.bitmovin.analytics.data.SequenceNumberAndImpressionIdProvider
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.ssai.SsaiService

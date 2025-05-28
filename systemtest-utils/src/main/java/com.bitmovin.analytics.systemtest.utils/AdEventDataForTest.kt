@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.systemtest.utils
 
-import com.bitmovin.analytics.data.AdEventData
+import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.utils.Util
 
 // AdEventData that has an additional field to also store the hasSsaiRoutingKeyHeaderSet header

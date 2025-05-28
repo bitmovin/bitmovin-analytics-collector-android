@@ -3,8 +3,8 @@ package com.bitmovin.analytics.license
 import android.content.Context
 import android.net.Uri
 import com.bitmovin.analytics.api.AnalyticsConfig
-import com.bitmovin.analytics.data.LicenseCallData
-import com.bitmovin.analytics.data.LicenseResponse
+import com.bitmovin.analytics.dtos.LicenseCallData
+import com.bitmovin.analytics.dtos.LicenseResponse
 import com.bitmovin.analytics.license.AuthenticationResponse.Denied
 import com.bitmovin.analytics.license.AuthenticationResponse.Error
 import com.bitmovin.analytics.license.AuthenticationResponse.Granted

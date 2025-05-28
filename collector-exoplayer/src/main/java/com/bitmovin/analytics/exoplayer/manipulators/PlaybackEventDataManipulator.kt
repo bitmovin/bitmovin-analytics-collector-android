@@ -1,8 +1,8 @@
 package com.bitmovin.analytics.exoplayer.manipulators
 
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat

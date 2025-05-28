@@ -6,6 +6,7 @@ import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.license.InstantLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseKeyProvider
 import com.bitmovin.analytics.license.licenseKeyOrNull

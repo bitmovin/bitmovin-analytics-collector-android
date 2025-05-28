@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.systemtest.utils
 
 import com.bitmovin.analytics.api.CustomData
-import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.dtos.EventData
 import org.assertj.core.api.Assertions.assertThat
 
 object SsaiDataVerifier {

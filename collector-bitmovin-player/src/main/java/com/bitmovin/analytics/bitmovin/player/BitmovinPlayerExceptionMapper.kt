@@ -1,9 +1,9 @@
 package com.bitmovin.analytics.bitmovin.player
 
-import com.bitmovin.analytics.data.ErrorCode
-import com.bitmovin.analytics.data.LegacyErrorData
+import com.bitmovin.analytics.dtos.ErrorCode
+import com.bitmovin.analytics.dtos.ErrorData
+import com.bitmovin.analytics.dtos.LegacyErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
-import com.bitmovin.analytics.features.errordetails.ErrorData
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.topOfStacktrace
 import com.bitmovin.player.api.deficiency.ErrorEvent

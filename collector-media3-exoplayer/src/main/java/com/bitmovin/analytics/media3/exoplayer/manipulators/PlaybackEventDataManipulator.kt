@@ -7,9 +7,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.dash.manifest.DashManifest
 import androidx.media3.exoplayer.hls.HlsManifest
 import androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat

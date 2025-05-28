@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.features.httprequesttracking
+package com.bitmovin.analytics.dtos
 
 // DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
 enum class HttpRequestType {

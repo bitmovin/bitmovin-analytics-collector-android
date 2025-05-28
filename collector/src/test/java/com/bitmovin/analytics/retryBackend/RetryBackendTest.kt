@@ -7,9 +7,9 @@ import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.CallbackBackend
 import com.bitmovin.analytics.data.DeviceInformation
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.PlayerInfo
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.PlayerType
 import io.mockk.every
 import io.mockk.mockk

@@ -1,11 +1,11 @@
 package com.bitmovin.analytics.persistence
 
-import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.CallbackBackend
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.OnSuccessCallback
+import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.utils.BitmovinLog
 

@@ -2,11 +2,11 @@ package com.bitmovin.analytics.retryBackend
 
 import android.os.Handler
 import android.os.SystemClock
-import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.CallbackBackend
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
+import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.utils.BitmovinLog
 import okhttp3.internal.http2.StreamResetException
 import java.net.ConnectException

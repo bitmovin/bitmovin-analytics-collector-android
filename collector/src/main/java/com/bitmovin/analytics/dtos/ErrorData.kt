@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.features.errordetails
+package com.bitmovin.analytics.dtos
 
 import com.bitmovin.analytics.utils.topOfStacktrace
 

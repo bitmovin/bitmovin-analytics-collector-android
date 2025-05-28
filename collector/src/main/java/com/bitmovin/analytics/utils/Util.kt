@@ -13,7 +13,7 @@ import android.os.Build
 import android.os.SystemClock
 import android.util.Pair
 import com.bitmovin.analytics.BuildConfig
-import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.StreamFormat
 import java.net.URI
 import java.util.UUID

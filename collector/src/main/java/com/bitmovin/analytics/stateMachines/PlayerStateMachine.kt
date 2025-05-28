@@ -6,8 +6,8 @@ import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.data.DeviceInformationProvider
-import com.bitmovin.analytics.data.ErrorCode
-import com.bitmovin.analytics.data.SubtitleDto
+import com.bitmovin.analytics.dtos.ErrorCode
+import com.bitmovin.analytics.dtos.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.utils.BitmovinLog

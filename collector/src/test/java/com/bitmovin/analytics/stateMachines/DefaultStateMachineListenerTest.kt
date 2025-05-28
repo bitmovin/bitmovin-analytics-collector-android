@@ -3,7 +3,7 @@ package com.bitmovin.analytics.stateMachines
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.CustomData
-import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.ssai.SsaiService
 import io.mockk.every
 import io.mockk.mockk

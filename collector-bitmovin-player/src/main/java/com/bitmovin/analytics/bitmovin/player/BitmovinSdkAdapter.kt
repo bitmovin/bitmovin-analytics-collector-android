@@ -11,13 +11,14 @@ import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.bitmovin.player.player.attachCollector
 import com.bitmovin.analytics.bitmovin.player.player.detachCollector
 import com.bitmovin.analytics.data.DeviceInformationProvider
-import com.bitmovin.analytics.data.ErrorCode
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.PlayerInfo
-import com.bitmovin.analytics.data.SubtitleDto
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.dtos.ErrorCode
+import com.bitmovin.analytics.dtos.EventData
+import com.bitmovin.analytics.dtos.FeatureConfigContainer
+import com.bitmovin.analytics.dtos.SubtitleDto
 import com.bitmovin.analytics.enums.CastTech
 import com.bitmovin.analytics.enums.DRMType
 import com.bitmovin.analytics.enums.PlayerType
@@ -26,7 +27,6 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
-import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates

@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.stateMachines
 
-import com.bitmovin.analytics.data.ErrorCode
-import com.bitmovin.analytics.data.SubtitleDto
+import com.bitmovin.analytics.dtos.ErrorCode
+import com.bitmovin.analytics.dtos.SubtitleDto
 
 interface StateMachineListener {
     fun onStartup(

@@ -1,11 +1,11 @@
 package com.bitmovin.analytics.persistence
 
 import com.bitmovin.analytics.TestFactory
-import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.CallbackBackend
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.OnFailureCallback
 import com.bitmovin.analytics.data.OnSuccessCallback
+import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.persistence.queue.ConsumeOnlyAnalyticsEventQueue
 import com.bitmovin.analytics.testutils.TestEventQueue
 import io.mockk.Call
@@ -31,11 +31,12 @@ class ConsumeOnlyPersistentCacheBackendTests {
 
     @Before
     fun setup() {
-        backend = ConsumeOnlyPersistentCacheBackend(
-            testScope,
-            callbackBackend,
-            eventQueue,
-        )
+        backend =
+            ConsumeOnlyPersistentCacheBackend(
+                testScope,
+                callbackBackend,
+                eventQueue,
+            )
     }
 
     @After
@@ -212,11 +213,12 @@ class ConsumeOnlyPersistentCacheBackendTests {
         repeat(enqueuedAdEventCount) {
             testQueue.push(enqueuedAdEvent)
         }
-        val backend = ConsumeOnlyPersistentCacheBackend(
-            testScope,
-            callbackBackend,
-            testQueue,
-        )
+        val backend =
+            ConsumeOnlyPersistentCacheBackend(
+                testScope,
+                callbackBackend,
+                testQueue,
+            )
         every { callbackBackend.send(any(), any(), any()) } answers {
             secondArg<OnSuccessCallback>().onSuccess()
         }
@@ -258,11 +260,12 @@ class ConsumeOnlyPersistentCacheBackendTests {
         repeat(enqueuedAdEventCount) {
             testQueue.push(enqueuedAdEvent)
         }
-        val backend = ConsumeOnlyPersistentCacheBackend(
-            testScope,
-            callbackBackend,
-            testQueue,
-        )
+        val backend =
+            ConsumeOnlyPersistentCacheBackend(
+                testScope,
+                callbackBackend,
+                testQueue,
+            )
         // New event sending fails, the opposite event type sending could still succeed.
         every { callbackBackend.send(any(), any(), any()) } answers {
             when (newEvent) {
@@ -298,7 +301,10 @@ class ConsumeOnlyPersistentCacheBackendTests {
         }
     }
 
-    private fun testCallbackBackendCallbacks(event: Any, success: Boolean) {
+    private fun testCallbackBackendCallbacks(
+        event: Any,
+        success: Boolean,
+    ) {
         requireEventDataOrAdEventData(event)
 
         var onSuccessCalled = false

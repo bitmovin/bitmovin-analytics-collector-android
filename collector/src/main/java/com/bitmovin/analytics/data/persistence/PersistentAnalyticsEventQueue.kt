@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.data.persistence
 
-import com.bitmovin.analytics.data.AdEventData
-import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.persistence.EventQueueConfig
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
 import com.bitmovin.analytics.utils.DataSerializer
@@ -11,10 +11,11 @@ internal class PersistentAnalyticsEventQueue(
     private val eventDatabase: EventDatabase,
 ) : AnalyticsEventQueue {
     init {
-        eventDatabase.retentionConfig = RetentionConfig(
-            ageLimit = eventQueueConfig.maximumSessionStartAge,
-            maximumEntriesPerType = eventQueueConfig.maximumOverallEntriesPerEventType,
-        )
+        eventDatabase.retentionConfig =
+            RetentionConfig(
+                ageLimit = eventQueueConfig.maximumSessionStartAge,
+                maximumEntriesPerType = eventQueueConfig.maximumOverallEntriesPerEventType,
+            )
     }
 
     override fun push(event: EventData) {
@@ -29,13 +30,15 @@ internal class PersistentAnalyticsEventQueue(
         eventDatabase.purge()
     }
 
-    override fun popEvent() = eventDatabase.popUntilTransformationIsSuccessful(
-        EventDatabase::pop,
-    ) { toEventData() }
+    override fun popEvent() =
+        eventDatabase.popUntilTransformationIsSuccessful(
+            EventDatabase::pop,
+        ) { toEventData() }
 
-    override fun popAdEvent() = eventDatabase.popUntilTransformationIsSuccessful(
-        EventDatabase::popAd,
-    ) { toAdEventData() }
+    override fun popAdEvent() =
+        eventDatabase.popUntilTransformationIsSuccessful(
+            EventDatabase::popAd,
+        ) { toAdEventData() }
 }
 
 private fun <T> EventDatabase.popUntilTransformationIsSuccessful(
@@ -50,24 +53,28 @@ private fun <T> EventDatabase.popUntilTransformationIsSuccessful(
     return event
 }
 
-private fun EventData.toEventDatabaseEntry() = EventDatabaseEntry(
-    sessionId = impressionId,
-    eventTimestamp = time,
-    data = DataSerializer.serialize(this)!!,
-)
+private fun EventData.toEventDatabaseEntry() =
+    EventDatabaseEntry(
+        sessionId = impressionId,
+        eventTimestamp = time,
+        data = DataSerializer.serialize(this)!!,
+    )
 
-private fun EventDatabaseEntry.toEventData() = DataSerializer.deserialize(
-    data,
-    EventData::class.java,
-)
+private fun EventDatabaseEntry.toEventData() =
+    DataSerializer.deserialize(
+        data,
+        EventData::class.java,
+    )
 
-private fun AdEventData.toEventDatabaseEntry() = EventDatabaseEntry(
-    sessionId = videoImpressionId,
-    eventTimestamp = time,
-    data = DataSerializer.serialize(this)!!,
-)
+private fun AdEventData.toEventDatabaseEntry() =
+    EventDatabaseEntry(
+        sessionId = videoImpressionId,
+        eventTimestamp = time,
+        data = DataSerializer.serialize(this)!!,
+    )
 
-private fun EventDatabaseEntry.toAdEventData() = DataSerializer.deserialize(
-    data,
-    AdEventData::class.java,
-)
+private fun EventDatabaseEntry.toAdEventData() =
+    DataSerializer.deserialize(
+        data,
+        AdEventData::class.java,
+    )

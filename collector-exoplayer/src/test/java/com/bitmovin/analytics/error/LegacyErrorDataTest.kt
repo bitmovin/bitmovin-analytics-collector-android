@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.error
 
-import com.bitmovin.analytics.data.LegacyErrorData
+import com.bitmovin.analytics.dtos.LegacyErrorData
 import com.bitmovin.analytics.utils.DataSerializer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test

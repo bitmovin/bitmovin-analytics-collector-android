@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.enums
 
-import com.bitmovin.analytics.data.ErrorCode
+import com.bitmovin.analytics.dtos.ErrorCode
 
 enum class VideoStartFailedReason(val reason: String, val errorCode: ErrorCode?) {
     PAGE_CLOSED("PAGE_CLOSED", null),

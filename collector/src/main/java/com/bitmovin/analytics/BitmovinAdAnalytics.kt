@@ -7,8 +7,8 @@ import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdQuartile
 import com.bitmovin.analytics.ads.AdTagType
-import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.AdSample
+import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.Util

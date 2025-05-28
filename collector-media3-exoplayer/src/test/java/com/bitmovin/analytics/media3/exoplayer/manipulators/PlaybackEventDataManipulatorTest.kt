@@ -5,8 +5,8 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.manifest.DashManifest
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.data.DownloadSpeedInfo
 import com.bitmovin.analytics.data.MetadataProvider
+import com.bitmovin.analytics.dtos.DownloadSpeedInfo
 import com.bitmovin.analytics.media3.exoplayer.TestUtils
 import com.bitmovin.analytics.media3.exoplayer.player.DrmInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.PlaybackInfoProvider

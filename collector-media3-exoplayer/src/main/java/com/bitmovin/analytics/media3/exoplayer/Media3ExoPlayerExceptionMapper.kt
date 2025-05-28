@@ -5,9 +5,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.ExoPlaybackException
 import androidx.media3.exoplayer.source.BehindLiveWindowException
-import com.bitmovin.analytics.data.ErrorCode
-import com.bitmovin.analytics.data.LegacyErrorData
-import com.bitmovin.analytics.features.errordetails.ErrorData
+import com.bitmovin.analytics.dtos.ErrorCode
+import com.bitmovin.analytics.dtos.ErrorData
+import com.bitmovin.analytics.dtos.LegacyErrorData
 import com.bitmovin.analytics.utils.topOfStacktrace
 
 internal object Media3ExoPlayerExceptionMapper {

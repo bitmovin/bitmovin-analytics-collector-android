@@ -2,12 +2,12 @@ package com.bitmovin.analytics.persistence
 
 import android.content.Context
 import com.bitmovin.analytics.api.AnalyticsConfig
-import com.bitmovin.analytics.data.AdEventData
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.data.CacheConsumingBackend
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.IEventDataDispatcher
+import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.LicenseCall

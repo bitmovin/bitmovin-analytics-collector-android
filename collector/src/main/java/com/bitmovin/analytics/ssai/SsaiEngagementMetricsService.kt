@@ -8,7 +8,7 @@ import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartileMetadata
-import com.bitmovin.analytics.data.AdEventData
+import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.SystemTimeService

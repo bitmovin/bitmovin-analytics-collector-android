@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.testutils
 
-import com.bitmovin.analytics.data.AdEventData
-import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.EventData
 import java.util.LinkedList
 import java.util.Queue
 

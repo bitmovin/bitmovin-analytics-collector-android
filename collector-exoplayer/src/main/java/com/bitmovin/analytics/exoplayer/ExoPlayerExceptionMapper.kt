@@ -1,8 +1,8 @@
 package com.bitmovin.analytics.exoplayer
 
-import com.bitmovin.analytics.data.ErrorCode
-import com.bitmovin.analytics.data.LegacyErrorData
-import com.bitmovin.analytics.features.errordetails.ErrorData
+import com.bitmovin.analytics.dtos.ErrorCode
+import com.bitmovin.analytics.dtos.ErrorData
+import com.bitmovin.analytics.dtos.LegacyErrorData
 import com.bitmovin.analytics.utils.topOfStacktrace
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.PlaybackException
@@ -10,15 +10,15 @@ import com.google.android.exoplayer2.source.BehindLiveWindowException
 import com.google.android.exoplayer2.upstream.HttpDataSource
 
 internal object ExoPlayerExceptionMapper {
-
-    private val errorTypeMap = mapOf(
-        -1 to "Unknown Error Type",
-        0 to "Source Error",
-        1 to "Render Error",
-        2 to "Unexpected Error",
-        3 to "Remote Error",
-        4 to "Out of memory Error",
-    )
+    private val errorTypeMap =
+        mapOf(
+            -1 to "Unknown Error Type",
+            0 to "Source Error",
+            1 to "Render Error",
+            2 to "Unexpected Error",
+            3 to "Remote Error",
+            4 to "Out of memory Error",
+        )
 
     fun map(playbackException: PlaybackException): ErrorCode {
         val errorMessage: String

@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.utils
 
-import com.bitmovin.analytics.data.DownloadSpeedInfo
+import com.bitmovin.analytics.dtos.DownloadSpeedInfo
 
 const val THRESHOLD_BYTES_PER_MS = 1_500_000_000 / 8 / 1000; // 1.5 Gigabit per second in bytes per millisecond (1.5^9 / 8 / 1000)
 

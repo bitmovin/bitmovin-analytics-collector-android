@@ -1,6 +1,4 @@
-package com.bitmovin.analytics.data
-
-import com.bitmovin.analytics.features.errordetails.ErrorData
+package com.bitmovin.analytics.dtos
 
 // DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
 data class ErrorCode(val errorCode: Int, val description: String, val errorData: ErrorData, val legacyErrorData: LegacyErrorData? = null) {

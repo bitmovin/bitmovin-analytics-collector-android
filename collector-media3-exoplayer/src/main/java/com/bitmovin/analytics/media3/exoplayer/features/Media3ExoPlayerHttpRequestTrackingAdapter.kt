@@ -14,8 +14,8 @@ import androidx.media3.exoplayer.source.MediaLoadData
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
-import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
-import com.bitmovin.analytics.features.httprequesttracking.HttpRequestType
+import com.bitmovin.analytics.dtos.HttpRequest
+import com.bitmovin.analytics.dtos.HttpRequestType
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
 import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerUtil

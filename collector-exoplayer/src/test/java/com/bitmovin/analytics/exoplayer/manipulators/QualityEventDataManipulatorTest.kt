@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.exoplayer.manipulators
 
-import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.dtos.EventData
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 import io.mockk.every
@@ -120,11 +120,12 @@ class QualityEventDataManipulatorTest {
     @Test
     fun `manipulate will apply videoBitrate Information`() {
         // arrange
-        val videoFormatFromExo = Format.Builder()
-            .setAverageBitrate(123)
-            .setWidth(234)
-            .setHeight(345)
-            .build()
+        val videoFormatFromExo =
+            Format.Builder()
+                .setAverageBitrate(123)
+                .setWidth(234)
+                .setHeight(345)
+                .build()
         qualityEventDataManipulator.currentVideoFormat = videoFormatFromExo
         val data = mockk<EventData>(relaxed = true)
 
@@ -140,9 +141,10 @@ class QualityEventDataManipulatorTest {
     @Test
     fun `manipulate will apply audioBitrate Information`() {
         // arrange
-        val audioFormatFromExo = Format.Builder()
-            .setAverageBitrate(123)
-            .build()
+        val audioFormatFromExo =
+            Format.Builder()
+                .setAverageBitrate(123)
+                .build()
         qualityEventDataManipulator.currentAudioFormat = audioFormatFromExo
         val data = mockk<EventData>(relaxed = true)
 

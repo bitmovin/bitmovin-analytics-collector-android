@@ -9,6 +9,7 @@ import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.dtos.FeatureConfigContainer
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.exoplayer.listeners.AnalyticsEventListener
 import com.bitmovin.analytics.exoplayer.listeners.PlayerEventListener
@@ -20,7 +21,6 @@ import com.bitmovin.analytics.exoplayer.player.PlaybackInfoProvider
 import com.bitmovin.analytics.exoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
-import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates

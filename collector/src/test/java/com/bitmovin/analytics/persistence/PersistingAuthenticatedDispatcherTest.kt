@@ -8,10 +8,10 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.Backend
 import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.data.CacheConsumingBackend
-import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.dtos.EventData
+import com.bitmovin.analytics.dtos.FeatureConfigContainer
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
-import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.LicenseCall
 import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.license.LicensingState

@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.data
 
+import com.bitmovin.analytics.dtos.DeviceClass
+
 data class DeviceInformation(
     val manufacturer: String,
     val model: String,

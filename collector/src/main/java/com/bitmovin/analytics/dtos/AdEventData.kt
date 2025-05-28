@@ -1,7 +1,8 @@
-package com.bitmovin.analytics.data
+package com.bitmovin.analytics.dtos
 
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.data.AdSample
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.utils.Util
 

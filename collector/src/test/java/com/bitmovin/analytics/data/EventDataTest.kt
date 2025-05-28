@@ -5,6 +5,7 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.utils.DataSerializer
 import com.bitmovin.analytics.utils.Util

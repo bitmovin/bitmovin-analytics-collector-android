@@ -2,6 +2,8 @@ package com.bitmovin.analytics.data
 
 import android.content.Context
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.license.AuthenticationCallback
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.LicenseCall

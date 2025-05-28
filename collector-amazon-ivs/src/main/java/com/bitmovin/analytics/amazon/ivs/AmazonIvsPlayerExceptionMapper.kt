@@ -1,9 +1,9 @@
 package com.bitmovin.analytics.amazon.ivs
 
 import com.amazonaws.ivs.player.PlayerException
-import com.bitmovin.analytics.data.ErrorCode
+import com.bitmovin.analytics.dtos.ErrorCode
+import com.bitmovin.analytics.dtos.ErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
-import com.bitmovin.analytics.features.errordetails.ErrorData
 
 internal class AmazonIvsPlayerExceptionMapper : ExceptionMapper<PlayerException> {
     override fun map(pe: PlayerException): ErrorCode {

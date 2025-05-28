@@ -4,6 +4,7 @@ import android.app.UiModeManager
 import android.content.Context
 import android.content.res.Configuration
 import androidx.test.core.app.ApplicationProvider
+import com.bitmovin.analytics.dtos.DeviceClass
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

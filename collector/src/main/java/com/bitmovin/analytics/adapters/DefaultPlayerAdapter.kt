@@ -10,9 +10,9 @@ import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.dtos.FeatureConfigContainer
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
-import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.ssai.SsaiEngagementMetricsService
 import com.bitmovin.analytics.ssai.SsaiService

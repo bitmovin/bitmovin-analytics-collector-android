@@ -1,5 +1,7 @@
 package com.bitmovin.analytics.license
 
+import com.bitmovin.analytics.dtos.FeatureConfigContainer
+
 fun interface AuthenticationCallback {
     fun authenticationCompleted(response: AuthenticationResponse)
 }

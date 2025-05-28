@@ -3,6 +3,8 @@ package com.bitmovin.analytics.data
 import android.content.Context
 import android.net.Uri
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.ClientFactory

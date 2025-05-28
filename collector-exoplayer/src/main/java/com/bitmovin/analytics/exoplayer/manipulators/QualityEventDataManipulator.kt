@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.exoplayer.manipulators
 
-import com.bitmovin.analytics.data.EventData
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.dtos.EventData
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 
@@ -34,7 +34,10 @@ internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : E
         currentVideoFormat = null
     }
 
-    private fun applyVideoFormat(data: EventData, videoFormat: Format?) {
+    private fun applyVideoFormat(
+        data: EventData,
+        videoFormat: Format?,
+    ) {
         if (videoFormat == null) {
             return
         }
@@ -45,7 +48,10 @@ internal class QualityEventDataManipulator(private val exoplayer: ExoPlayer) : E
         data.videoCodec = videoFormat.codecs
     }
 
-    private fun applyAudioFormat(data: EventData, audioFormat: Format?) {
+    private fun applyAudioFormat(
+        data: EventData,
+        audioFormat: Format?,
+    ) {
         if (audioFormat == null) {
             return
         }

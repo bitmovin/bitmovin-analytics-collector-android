@@ -5,9 +5,9 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
-import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.dtos.ErrorDetail
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.StreamFormat
-import com.bitmovin.analytics.features.errordetails.ErrorDetail
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 

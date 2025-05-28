@@ -1,9 +1,9 @@
 package com.bitmovin.analytics.media3.exoplayer.listeners
 
 import androidx.media3.common.PlaybackException
-import com.bitmovin.analytics.data.ErrorCode
+import com.bitmovin.analytics.dtos.ErrorCode
+import com.bitmovin.analytics.dtos.ErrorData
 import com.bitmovin.analytics.enums.VideoStartFailedReason
-import com.bitmovin.analytics.features.errordetails.ErrorData
 import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerExceptionMapper
 import com.bitmovin.analytics.media3.exoplayer.player.Media3ExoPlayerContext
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
@@ -15,7 +15,6 @@ import org.junit.Before
 import org.junit.Test
 
 class PlayerEventListenerTest {
-
     private lateinit var stateMachine: PlayerStateMachine
     private lateinit var exoPlayerContext: Media3ExoPlayerContext
     private lateinit var playbackException: PlaybackException

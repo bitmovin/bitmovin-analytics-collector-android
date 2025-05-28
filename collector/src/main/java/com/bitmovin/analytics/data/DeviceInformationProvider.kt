@@ -28,6 +28,7 @@ import android.os.Build
 import android.text.TextUtils
 import android.text.TextUtils.split
 import android.view.Display
+import com.bitmovin.analytics.dtos.DeviceClass
 import com.bitmovin.analytics.features.FeatureManager.Companion.TAG
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util

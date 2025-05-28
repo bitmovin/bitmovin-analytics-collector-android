@@ -1,6 +1,5 @@
-package com.bitmovin.analytics.features.errordetails
+package com.bitmovin.analytics.dtos
 
-import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
 import com.bitmovin.analytics.utils.Util
 
 // DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro

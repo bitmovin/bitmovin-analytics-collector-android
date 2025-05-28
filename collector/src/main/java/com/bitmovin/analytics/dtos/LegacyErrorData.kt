@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.data
+package com.bitmovin.analytics.dtos
 
 // LegacyErrorData is stored unindexed as error_data in crate
 // DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro

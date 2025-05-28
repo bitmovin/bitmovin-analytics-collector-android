@@ -11,6 +11,7 @@ import com.bitmovin.analytics.data.persistence.PersistentAnalyticsEventQueue
 import com.bitmovin.analytics.data.testutils.TestFactory
 import com.bitmovin.analytics.data.testutils.createDummyPlayerAdapter
 import com.bitmovin.analytics.data.testutils.createTestImpressionId
+import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.persistence.EventQueueConfig
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.RepeatRule

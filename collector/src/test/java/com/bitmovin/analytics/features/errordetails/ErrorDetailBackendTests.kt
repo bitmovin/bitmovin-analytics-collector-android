@@ -1,10 +1,12 @@
 package com.bitmovin.analytics.features.errordetails
 
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.dtos.ErrorData
+import com.bitmovin.analytics.dtos.ErrorDetail
+import com.bitmovin.analytics.dtos.HttpRequest
+import com.bitmovin.analytics.dtos.HttpRequestType
 import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend.Companion.copyTruncateHttpRequests
 import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend.Companion.copyTruncateStringsAndUrls
-import com.bitmovin.analytics.features.httprequesttracking.HttpRequest
-import com.bitmovin.analytics.features.httprequesttracking.HttpRequestType
 import com.bitmovin.analytics.utils.HttpClient
 import io.mockk.mockk
 import io.mockk.verify

@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.systemtest.utils
 
-import com.bitmovin.analytics.data.EventData
-import com.bitmovin.analytics.features.errordetails.ErrorDetail
+import com.bitmovin.analytics.dtos.ErrorDetail
+import com.bitmovin.analytics.dtos.EventData
 
 data class Impression(
     val eventDataList: MutableList<EventData> = mutableListOf(),

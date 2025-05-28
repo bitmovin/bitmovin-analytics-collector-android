@@ -4,7 +4,7 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
-import com.bitmovin.analytics.data.EventData
+import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import io.mockk.mockk
 import io.mockk.verify

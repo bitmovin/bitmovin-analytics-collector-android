@@ -3,9 +3,12 @@ package com.bitmovin.analytics.features.errordetails
 import android.content.Context
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.dtos.ErrorData
+import com.bitmovin.analytics.dtos.ErrorDetail
+import com.bitmovin.analytics.dtos.ErrorDetailTrackingConfig
+import com.bitmovin.analytics.dtos.FeatureConfigContainer
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
-import com.bitmovin.analytics.license.FeatureConfigContainer
 import com.bitmovin.analytics.license.InstantLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseKeyProvider
 import com.bitmovin.analytics.license.licenseKeyOrNull
