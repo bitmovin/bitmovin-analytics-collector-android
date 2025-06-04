@@ -97,7 +97,7 @@ open class DeviceInformationProvider(
             screenHeight = height,
             operatingSystem = operatingSystem,
             operatingSystemMajor = operatingSystemMajor,
-            deviceClass = deviceClass,
+            deviceClass = deviceClass?.value,
         )
     }
 

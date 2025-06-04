@@ -2,9 +2,11 @@ package com.bitmovin.analytics.systemtest.utils
 
 import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.utils.Util
+import kotlinx.serialization.Serializable
 
 // AdEventData that has an additional field to also store the hasSsaiRoutingKeyHeaderSet header
 // this is used to be able to verify the header that was set
+@Serializable
 data class AdEventDataForTest(
     var wrapperAdsCount: Int? = null,
     var adSkippable: Boolean? = null,

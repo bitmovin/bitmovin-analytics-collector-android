@@ -5,7 +5,7 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.dtos.ErrorData
 import com.bitmovin.analytics.dtos.ErrorDetail
 import com.bitmovin.analytics.dtos.HttpRequest
-import com.bitmovin.analytics.utils.DataSerializer
+import com.bitmovin.analytics.utils.DataSerializerKotlinX
 import com.bitmovin.analytics.utils.HttpClient
 import com.bitmovin.analytics.utils.Util
 import okhttp3.OkHttpClient
@@ -37,7 +37,7 @@ class ErrorDetailBackend(
             }
 
         if (enabled) {
-            httpClient.post(backendUrl, DataSerializer.serialize(errorDetailCopy), null)
+            httpClient.post(backendUrl, DataSerializerKotlinX.serialize(errorDetailCopy), null)
         } else {
             _queue.add(errorDetailCopy)
         }

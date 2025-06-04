@@ -7,7 +7,7 @@ import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.PlayerType
-import com.bitmovin.analytics.utils.DataSerializer
+import com.bitmovin.analytics.utils.DataSerializerKotlinX
 import com.bitmovin.analytics.utils.Util
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
@@ -126,7 +126,7 @@ class EventDataTest {
             """.trimIndent()
 
         // act
-        val eventData1 = DataSerializer.deserialize(eventData1Json, EventData::class.java)
+        val eventData1 = DataSerializerKotlinX.deserialize(eventData1Json, EventData::class.java)
 
         // assert
         if (eventData1 == null) {
@@ -358,7 +358,7 @@ class EventDataTest {
                 playerKey = "playerKey"
             }
 
-        val serializedEventData = DataSerializer.serialize(eventData)
+        val serializedEventData = DataSerializerKotlinX.serialize(eventData)
         assertThat(serializedEventData)
             .isEqualTo(
                 "{\"impressionId\":\"impressionId\",\"userId\":\"userId\",\"key\":\"licenseKey\"," +

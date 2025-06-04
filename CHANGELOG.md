@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Move from gson to kotlinx.serialization for serialization of DTOs
+  (gson is still used for error details in Bitmovin player collector)
+
 ### v3.14.2
 
 ### Fixed

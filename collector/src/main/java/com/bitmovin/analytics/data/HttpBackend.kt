@@ -8,7 +8,7 @@ import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.ClientFactory
-import com.bitmovin.analytics.utils.DataSerializer.serialize
+import com.bitmovin.analytics.utils.DataSerializerKotlinX.serialize
 import com.bitmovin.analytics.utils.HttpClient
 import okhttp3.Call
 import okhttp3.Callback

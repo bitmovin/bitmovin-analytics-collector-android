@@ -10,8 +10,8 @@ import com.bitmovin.analytics.license.AuthenticationResponse.Error
 import com.bitmovin.analytics.license.AuthenticationResponse.Granted
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.ClientFactory
-import com.bitmovin.analytics.utils.DataSerializer.deserialize
-import com.bitmovin.analytics.utils.DataSerializer.serialize
+import com.bitmovin.analytics.utils.DataSerializerKotlinX.deserialize
+import com.bitmovin.analytics.utils.DataSerializerKotlinX.serialize
 import com.bitmovin.analytics.utils.HttpClient
 import com.bitmovin.analytics.utils.Util
 import okhttp3.Call

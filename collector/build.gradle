@@ -6,6 +6,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
+apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 apply from: '../jacoco.gradle'
 apply from: '../bitmovinpropertiesloader.gradle'
 
@@ -79,9 +80,9 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.okhttp3Version}"
-    implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${rootProject.ext.kotlinxSerialization}"
 
     // we add the parcelize-runtime dependency explicit here (instead on relying on the kotlin-parcelize plugin)
     // in order to make sure it is added to the pom.xml with runtime scope

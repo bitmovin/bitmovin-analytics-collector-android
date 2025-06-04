@@ -23,7 +23,7 @@ internal class BitmovinHttpRequestTrackingAdapter(
             val requestType = mapHttpRequestType(event.downloadType)
             val httpRequest =
                 HttpRequest(
-                    Util.timestamp, requestType, event.url, event.lastRedirectLocation, event.httpStatus,
+                    Util.timestamp, requestType.value, event.url, event.lastRedirectLocation, event.httpStatus,
                     Util.secondsToMillis(
                         event.downloadTime,
                     ),

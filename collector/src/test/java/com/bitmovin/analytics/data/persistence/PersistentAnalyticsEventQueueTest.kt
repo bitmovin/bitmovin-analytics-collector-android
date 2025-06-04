@@ -2,7 +2,7 @@ package com.bitmovin.analytics.data.persistence
 
 import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.persistence.EventQueueConfig
-import com.bitmovin.analytics.utils.DataSerializer
+import com.bitmovin.analytics.utils.DataSerializerKotlinX
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -43,14 +43,16 @@ class PersistentAnalyticsEventQueueTest {
     @Test
     fun `pushing an EventData pushes an EventDatabaseEntry to the event database`() {
         val event = TestFactory.createEventData(impressionId = "id")
-        val expectedEvent = TestFactory.createEventData(impressionId = "id").apply {
-            time = event.time
-        }
-        val eventDatabaseEntry = EventDatabaseEntry(
-            sessionId = expectedEvent.impressionId,
-            eventTimestamp = expectedEvent.time,
-            data = DataSerializer.serialize(expectedEvent)!!,
-        )
+        val expectedEvent =
+            TestFactory.createEventData(impressionId = "id").apply {
+                time = event.time
+            }
+        val eventDatabaseEntry =
+            EventDatabaseEntry(
+                sessionId = expectedEvent.impressionId,
+                eventTimestamp = expectedEvent.time,
+                data = DataSerializerKotlinX.serialize(expectedEvent)!!,
+            )
 
         eventQueue.push(event)
 
@@ -63,11 +65,12 @@ class PersistentAnalyticsEventQueueTest {
     fun `pushing an AdEventData pushes an AdEventDatabaseEntry to the event database`() {
         val event = TestFactory.createAdEventData(adId = "id")
         val expectedEvent = TestFactory.createAdEventData(adId = "id")
-        val eventDatabaseEntry = EventDatabaseEntry(
-            sessionId = expectedEvent.videoImpressionId,
-            eventTimestamp = expectedEvent.time,
-            data = DataSerializer.serialize(expectedEvent)!!,
-        )
+        val eventDatabaseEntry =
+            EventDatabaseEntry(
+                sessionId = expectedEvent.videoImpressionId,
+                eventTimestamp = expectedEvent.time,
+                data = DataSerializerKotlinX.serialize(expectedEvent)!!,
+            )
 
         eventQueue.push(event)
 
@@ -88,11 +91,12 @@ class PersistentAnalyticsEventQueueTest {
     @Test
     fun `popping an EventData pops from the event database`() {
         val event = TestFactory.createEventData()
-        val eventDatabaseEntry = EventDatabaseEntry(
-            sessionId = event.impressionId,
-            eventTimestamp = event.time,
-            data = DataSerializer.serialize(event)!!,
-        )
+        val eventDatabaseEntry =
+            EventDatabaseEntry(
+                sessionId = event.impressionId,
+                eventTimestamp = event.time,
+                data = DataSerializerKotlinX.serialize(event)!!,
+            )
         every { eventDatabase.pop() } returns eventDatabaseEntry
 
         val popEvent = eventQueue.popEvent()!!
@@ -103,11 +107,12 @@ class PersistentAnalyticsEventQueueTest {
     @Test
     fun `popping an AdEventData pops from the event database`() {
         val event = TestFactory.createAdEventData()
-        val eventDatabaseEntry = EventDatabaseEntry(
-            sessionId = event.videoImpressionId,
-            eventTimestamp = event.time,
-            data = DataSerializer.serialize(event)!!,
-        )
+        val eventDatabaseEntry =
+            EventDatabaseEntry(
+                sessionId = event.videoImpressionId,
+                eventTimestamp = event.time,
+                data = DataSerializerKotlinX.serialize(event)!!,
+            )
         every { eventDatabase.popAd() } returns eventDatabaseEntry
 
         val popEvent = eventQueue.popAdEvent()!!
@@ -118,12 +123,13 @@ class PersistentAnalyticsEventQueueTest {
     @Test
     fun `popping a corrupted AdEventData pops from the event database until a proper AdEventData`() {
         val expectedEvent = TestFactory.createAdEventData()
-        val entries = listOf(
-            EventDatabaseEntry("sessionId", 0, ""),
-            EventDatabaseEntry("sessionId", 1, ""),
-            EventDatabaseEntry("sessionId", 2, ""),
-            EventDatabaseEntry("sessionId", expectedEvent.time, DataSerializer.serialize(expectedEvent)!!),
-        )
+        val entries =
+            listOf(
+                EventDatabaseEntry("sessionId", 0, ""),
+                EventDatabaseEntry("sessionId", 1, ""),
+                EventDatabaseEntry("sessionId", 2, ""),
+                EventDatabaseEntry("sessionId", expectedEvent.time, DataSerializerKotlinX.serialize(expectedEvent)!!),
+            )
 
         var entryIndex = 0
         every { eventDatabase.popAd() } answers {
@@ -137,11 +143,12 @@ class PersistentAnalyticsEventQueueTest {
 
     @Test
     fun `popping an AdEventData when there are only corrupted entries pops entries until the database is empty`() {
-        val entries = listOf(
-            EventDatabaseEntry("sessionId", 0, ""),
-            EventDatabaseEntry("sessionId", 1, ""),
-            EventDatabaseEntry("sessionId", 2, ""),
-        )
+        val entries =
+            listOf(
+                EventDatabaseEntry("sessionId", 0, ""),
+                EventDatabaseEntry("sessionId", 1, ""),
+                EventDatabaseEntry("sessionId", 2, ""),
+            )
 
         var entryIndex = 0
         every { eventDatabase.popAd() } answers {
@@ -156,12 +163,13 @@ class PersistentAnalyticsEventQueueTest {
     @Test
     fun `popping a corrupted EventData pops from the event database until a proper EventData`() {
         val expectedEvent = TestFactory.createEventData()
-        val entries = listOf(
-            EventDatabaseEntry("sessionId", 0, ""),
-            EventDatabaseEntry("sessionId", 1, ""),
-            EventDatabaseEntry("sessionId", 2, ""),
-            EventDatabaseEntry("sessionId", expectedEvent.time, DataSerializer.serialize(expectedEvent)!!),
-        )
+        val entries =
+            listOf(
+                EventDatabaseEntry("sessionId", 0, ""),
+                EventDatabaseEntry("sessionId", 1, ""),
+                EventDatabaseEntry("sessionId", 2, ""),
+                EventDatabaseEntry("sessionId", expectedEvent.time, DataSerializerKotlinX.serialize(expectedEvent)!!),
+            )
 
         var entryIndex = 0
         every { eventDatabase.pop() } answers {
@@ -175,11 +183,12 @@ class PersistentAnalyticsEventQueueTest {
 
     @Test
     fun `popping an EventData when there are only corrupted entries pops entries until the database is empty`() {
-        val entries = listOf(
-            EventDatabaseEntry("sessionId", 0, ""),
-            EventDatabaseEntry("sessionId", 1, ""),
-            EventDatabaseEntry("sessionId", 2, ""),
-        )
+        val entries =
+            listOf(
+                EventDatabaseEntry("sessionId", 0, ""),
+                EventDatabaseEntry("sessionId", 1, ""),
+                EventDatabaseEntry("sessionId", 2, ""),
+            )
 
         var entryIndex = 0
         every { eventDatabase.pop() } answers {

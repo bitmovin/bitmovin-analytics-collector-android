@@ -4,8 +4,10 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.utils.Util
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
-// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
+@Serializable
 data class EventData(
     val impressionId: String,
     val userId: String,

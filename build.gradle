@@ -26,6 +26,7 @@ plugins {
     id 'jacoco'
     id "org.sonarqube" version "3.5.0.2730"
     id 'org.jetbrains.kotlinx.binary-compatibility-validator' version '0.16.3'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.0.0' // using same version as player folks (2025-06)
 }
 
 apply from: './bitmovinpropertiesloader.gradle'
@@ -113,6 +114,7 @@ ext {
     okhttp3Version = '4.12.0'
     appCompatVersion = '1.6.1' // required for bitmovin player and @Keep annotation in core collector to avoid proguard issues
     coroutinesVersion = "1.8.1"
+    kotlinxSerialization = "1.6.3" // used for serialization of events in the collector
 
     // example apps dependencies
     playServicesAdsVersion = '19.8.0'

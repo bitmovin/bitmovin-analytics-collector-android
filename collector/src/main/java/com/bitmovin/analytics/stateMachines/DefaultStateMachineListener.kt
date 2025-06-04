@@ -11,7 +11,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.utils.BitmovinLog
-import com.bitmovin.analytics.utils.DataSerializer.serialize
+import com.bitmovin.analytics.utils.DataSerializerKotlinX.serialize
 import com.bitmovin.analytics.utils.Util
 
 class DefaultStateMachineListener(

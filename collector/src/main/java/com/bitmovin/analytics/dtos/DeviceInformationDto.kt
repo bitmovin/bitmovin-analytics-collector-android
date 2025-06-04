@@ -1,6 +1,8 @@
 package com.bitmovin.analytics.dtos
 
-// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class DeviceInformationDto(
     val manufacturer: String,
     val model: String,
@@ -8,5 +10,5 @@ data class DeviceInformationDto(
     val operatingSystem: String? = null,
     val operatingSystemMajor: String? = null,
     val operatingSystemMinor: String? = null,
-    val deviceClass: DeviceClass? = null,
+    val deviceClass: String?,
 )

@@ -1,9 +1,11 @@
 package com.bitmovin.analytics.dtos
 
-// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class HttpRequest(
     val timestamp: Long,
-    val type: HttpRequestType,
+    val type: String,
     val url: String?,
     val lastRedirectLocation: String?,
     val httpStatus: Int,

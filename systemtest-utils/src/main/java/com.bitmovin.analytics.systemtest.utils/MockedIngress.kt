@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.bitmovin.analytics.dtos.ErrorDetail
 import com.bitmovin.analytics.dtos.EventData
-import com.bitmovin.analytics.utils.DataSerializer
+import com.bitmovin.analytics.utils.DataSerializerKotlinX
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -93,7 +93,7 @@ object MockedIngress {
     private fun trackImpressionsIds(request: RecordedRequest) {
         val body = request.body.copy().readUtf8()
         val eventData =
-            DataSerializer.deserialize(
+            DataSerializerKotlinX.deserialize(
                 body,
                 EventData::class.java,
             )
@@ -234,7 +234,7 @@ object MockedIngress {
             when (request.requestUrl?.encodedPath) {
                 "/analytics" -> {
                     val eventData =
-                        DataSerializer.deserialize(
+                        DataSerializerKotlinX.deserialize(
                             body,
                             EventData::class.java,
                         )
@@ -251,7 +251,7 @@ object MockedIngress {
                 }
                 "/analytics/a" -> {
                     val adEventData =
-                        DataSerializer.deserialize(
+                        DataSerializerKotlinX.deserialize(
                             body,
                             AdEventDataForTest::class.java,
                         )
@@ -268,7 +268,7 @@ object MockedIngress {
                 }
                 "/analytics/error" -> {
                     val errorDetail =
-                        DataSerializer.deserialize(
+                        DataSerializerKotlinX.deserialize(
                             body,
                             ErrorDetail::class.java,
                         )

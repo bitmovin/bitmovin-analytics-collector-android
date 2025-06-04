@@ -31,17 +31,13 @@ android {
 
     buildTypes {
         debug {
-            // testing proguard rules requires to create a release of the core collector
-            // (in order to apply the consumer pro guard rules)
-            // and then reference the core collector in the player specific library
-            // and setting minifyEnable to true here
-            // if the local version is used the pro guard rules are not applied
-            // and the app crashes on startup if minifyEnabled is set to true
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

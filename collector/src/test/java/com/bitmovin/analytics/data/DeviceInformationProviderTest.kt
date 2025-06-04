@@ -85,7 +85,7 @@ class DeviceInformationProviderTest {
 
         // assert
         Assert.assertEquals(true, deviceInfo.isTV)
-        Assert.assertEquals(DeviceClass.TV, deviceInfo.deviceClass)
+        Assert.assertEquals("TV", deviceInfo.deviceClass)
         Assert.assertEquals(2160, deviceInfo.screenWidth)
         Assert.assertEquals(3840, deviceInfo.screenHeight)
     }
@@ -103,7 +103,7 @@ class DeviceInformationProviderTest {
 
         // assert
         Assert.assertEquals(true, deviceInfo.isTV)
-        Assert.assertEquals(DeviceClass.TV, deviceInfo.deviceClass)
+        Assert.assertEquals("TV", deviceInfo.deviceClass)
         Assert.assertEquals(2160, deviceInfo.screenWidth)
         Assert.assertEquals(3840, deviceInfo.screenHeight)
     }
@@ -121,7 +121,7 @@ class DeviceInformationProviderTest {
 
         // assert
         Assert.assertEquals(true, deviceInfo.isTV)
-        Assert.assertEquals(DeviceClass.TV, deviceInfo.deviceClass)
+        Assert.assertEquals(DeviceClass.TV.value, deviceInfo.deviceClass)
         Assert.assertEquals(2160, deviceInfo.screenWidth)
         Assert.assertEquals(3840, deviceInfo.screenHeight)
     }
@@ -144,7 +144,7 @@ class DeviceInformationProviderTest {
         Assert.assertEquals("Fire OS", deviceInfo.operatingSystem)
         Assert.assertEquals(">=8", deviceInfo.operatingSystemMajor)
         Assert.assertEquals(null, deviceInfo.operatingSystemMinor)
-        Assert.assertEquals(DeviceClass.TV, deviceInfo.deviceClass)
+        Assert.assertEquals("TV", deviceInfo.deviceClass)
         Assert.assertEquals(2160, deviceInfo.screenWidth)
         Assert.assertEquals(3840, deviceInfo.screenHeight)
     }
@@ -166,7 +166,7 @@ class DeviceInformationProviderTest {
         Assert.assertEquals(true, deviceInfo.isTV)
         Assert.assertEquals("Fire OS", deviceInfo.operatingSystem)
         Assert.assertEquals("7", deviceInfo.operatingSystemMajor)
-        Assert.assertEquals(DeviceClass.TV, deviceInfo.deviceClass)
+        Assert.assertEquals("TV", deviceInfo.deviceClass)
         Assert.assertEquals(2160, deviceInfo.screenWidth)
         Assert.assertEquals(3840, deviceInfo.screenHeight)
     }

@@ -1,8 +1,9 @@
 package com.bitmovin.analytics.dtos
 
 import com.bitmovin.analytics.utils.Util
+import kotlinx.serialization.Serializable
 
-// DTO which is protected from ProGuard obfuscation through proguard-consumer-rules.pro
+@Serializable
 data class ErrorDetail(
     val platform: String,
     val licenseKey: String?,

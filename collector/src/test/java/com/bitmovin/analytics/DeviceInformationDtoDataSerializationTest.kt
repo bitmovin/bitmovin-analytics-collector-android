@@ -6,7 +6,7 @@ import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.enums.PlayerType
-import com.bitmovin.analytics.utils.DataSerializer
+import com.bitmovin.analytics.utils.DataSerializerKotlinX
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
@@ -32,7 +32,7 @@ class DeviceInformationDtoDataSerializationTest {
                 PlayerInfo("Android:Exoplayer", PlayerType.EXOPLAYER),
                 null,
             )
-        val serialized = DataSerializer.serialize(data)
+        val serialized = DataSerializerKotlinX.serialize(data)
 
         assertThat(serialized).contains("\"deviceInformation\":{")
         assertThat(serialized).contains(String.format("\"model\":\"%s\"", "myModel"))

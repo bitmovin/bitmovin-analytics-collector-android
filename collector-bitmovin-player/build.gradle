@@ -88,6 +88,8 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 
+    implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
+
     // app compat is needed for the bitmovin player in the expanded_controller.xml
     // otherwise processDebugAndroidTestResources is failing
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"

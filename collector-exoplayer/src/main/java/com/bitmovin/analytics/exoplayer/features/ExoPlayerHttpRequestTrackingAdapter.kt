@@ -249,7 +249,7 @@ internal class ExoPlayerHttpRequestTrackingAdapter(
                 )
             return HttpRequest(
                 Util.timestamp,
-                requestType,
+                requestType.value,
                 loadEventInfo.dataSpec.uri.toString(),
                 loadEventInfo.uri.toString(),
                 statusCode,

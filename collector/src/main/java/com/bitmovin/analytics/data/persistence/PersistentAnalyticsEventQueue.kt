@@ -4,7 +4,7 @@ import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.persistence.EventQueueConfig
 import com.bitmovin.analytics.persistence.queue.AnalyticsEventQueue
-import com.bitmovin.analytics.utils.DataSerializer
+import com.bitmovin.analytics.utils.DataSerializerKotlinX
 
 internal class PersistentAnalyticsEventQueue(
     eventQueueConfig: EventQueueConfig,
@@ -57,11 +57,11 @@ private fun EventData.toEventDatabaseEntry() =
     EventDatabaseEntry(
         sessionId = impressionId,
         eventTimestamp = time,
-        data = DataSerializer.serialize(this)!!,
+        data = DataSerializerKotlinX.serialize(this)!!,
     )
 
 private fun EventDatabaseEntry.toEventData() =
-    DataSerializer.deserialize(
+    DataSerializerKotlinX.deserialize(
         data,
         EventData::class.java,
     )
@@ -70,11 +70,11 @@ private fun AdEventData.toEventDatabaseEntry() =
     EventDatabaseEntry(
         sessionId = videoImpressionId,
         eventTimestamp = time,
-        data = DataSerializer.serialize(this)!!,
+        data = DataSerializerKotlinX.serialize(this)!!,
     )
 
 private fun EventDatabaseEntry.toAdEventData() =
-    DataSerializer.deserialize(
+    DataSerializerKotlinX.deserialize(
         data,
         AdEventData::class.java,
     )

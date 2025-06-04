@@ -95,8 +95,8 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testErrorDetailLimitHttpRequestsShouldLimitHttpRequests() {
-        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
-        val httpRequest2 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
+        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH.value, null, null, 0, 0L, null, 0, true)
+        val httpRequest2 = HttpRequest(0, HttpRequestType.MANIFEST_DASH.value, null, null, 0, 0L, null, 0, true)
         val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), mutableListOf(httpRequest1, httpRequest2))
         assertThat(errorDetail.httpRequests?.size).isEqualTo(2)
         val copy = errorDetail.copyTruncateHttpRequests(1)
@@ -107,8 +107,8 @@ class ErrorDetailBackendTests {
     fun testErrorDetailCopyTruncateStringsAndUrlsShouldCorrectlyTruncateStringsAndUrls() {
         val longString = "a".repeat(4600)
 
-        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, longString, longString, 0, 0L, null, 0, true)
-        val httpRequest2 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, "0123", 0, 0L, null, 0, true)
+        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH.value, longString, longString, 0, 0L, null, 0, true)
+        val httpRequest2 = HttpRequest(0, HttpRequestType.MANIFEST_DASH.value, null, "0123", 0, 0L, null, 0, true)
         val errorDetail =
             ErrorDetail(
                 "", "", "", "", 0, 0, null, longString,
@@ -153,8 +153,8 @@ class ErrorDetailBackendTests {
 
     @Test
     fun testErrorDetailLimitHttpRequestsShouldRemoveItemsFromEnd() {
-        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
-        val httpRequest2 = HttpRequest(1, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
+        val httpRequest1 = HttpRequest(0, HttpRequestType.MANIFEST_DASH.value, null, null, 0, 0L, null, 0, true)
+        val httpRequest2 = HttpRequest(1, HttpRequestType.MANIFEST_DASH.value, null, null, 0, 0L, null, 0, true)
         val errorDetail = ErrorDetail("", "", "", "", 0, 0, null, null, ErrorData(), mutableListOf(httpRequest1, httpRequest2))
         errorDetail.copyTruncateHttpRequests(1)
         assertThat(errorDetail.httpRequests?.get(0)).isEqualTo(httpRequest1)
@@ -236,5 +236,5 @@ class ErrorDetailBackendTests {
             },
     )
 
-    private fun getHttpRequest() = HttpRequest(0, HttpRequestType.MANIFEST_DASH, null, null, 0, 0L, null, 0, true)
+    private fun getHttpRequest() = HttpRequest(0, HttpRequestType.MANIFEST_DASH.value, null, null, 0, 0L, null, 0, true)
 }
