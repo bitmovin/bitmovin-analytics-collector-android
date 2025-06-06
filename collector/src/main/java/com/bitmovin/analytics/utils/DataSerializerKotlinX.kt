@@ -13,9 +13,9 @@ object DataSerializerKotlinX {
     inline fun <reified T> serialize(data: T?): String? {
         return data?.let {
             // encodeDefaults = true is needed to ensure that all properties (also the ones with defaults)
-            // are serialized, this mimics the behavior of Gson which we had before
+            //      are serialized, this mimics the behavior of Gson which we had before
             // explicitNulls = false is needed to avoid setting of default values
-            // for all nullable properties in the data classes
+            //      for all nullable properties in the data classes
             val json =
                 Json {
                     encodeDefaults = true
@@ -36,11 +36,17 @@ object DataSerializerKotlinX {
     ): T? {
         return input?.let {
             return try {
+                // encodeDefaults = true is needed to ensure that all properties (also the ones with defaults)
+                //      are serialized, this mimics the behavior of Gson which we had before
+                // explicitNulls = false is needed to avoid setting of default values
+                //      for all nullable properties in the data classes
+                // ignoreUnknownKeys = true this is needed for backward compatibility,
+                //      in case we introduce new properties in the data classes
                 val json =
                     Json {
                         encodeDefaults = true
                         explicitNulls = false
-                        ignoreUnknownKeys = true // Ignore unknown keys to avoid deserialization errors
+                        ignoreUnknownKeys = true
                     }
                 json.decodeFromString<T>(input)
             } catch (e: SerializationException) {
