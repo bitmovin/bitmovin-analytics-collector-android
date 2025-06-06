@@ -14,8 +14,7 @@ object DataSerializerKotlinX {
         return data?.let {
             // encodeDefaults = true is needed to ensure that all properties (also the ones with defaults)
             //      are serialized, this mimics the behavior of Gson which we had before
-            // explicitNulls = false is needed to avoid setting of default values
-            //      for all nullable properties in the data classes
+            // explicitNulls = false makes sure that null values are not serialized and thus reduces request size
             val json =
                 Json {
                     encodeDefaults = true
