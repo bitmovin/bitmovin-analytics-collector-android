@@ -110,9 +110,9 @@ ext {
     media3PlayerVersion = '1.6.1'
 
     // collector dependencies
-    gsonVersion = '2.11.0'
+    gsonVersion = '2.12.1'
     okhttp3Version = '4.12.0'
-    appCompatVersion = '1.6.1' // required for bitmovin player and @Keep annotation in core collector to avoid proguard issues
+    appCompatVersion = '1.7.0' // required for bitmovin player
     coroutinesVersion = "1.8.1"
     kotlinxSerialization = "1.6.3" // used for serialization of events in the collector
 

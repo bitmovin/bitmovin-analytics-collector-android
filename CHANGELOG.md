@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Move from gson to kotlinx.serialization for serialization of DTOs
   (gson is still used for error details in Bitmovin player collector)
+- Upgrade gson library to `2.12.1` and appcompat library to `1.7.0`
 - Upgraded Bitmovin player to 3.112.0
 
 ### v3.14.2
