@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- [Internal] Reuse Json Instance for serialization of DTOs for better performance
+
 ### v3.15.0
 
 ### Changed
