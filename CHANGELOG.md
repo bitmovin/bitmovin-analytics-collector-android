@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### v3.15.1
+
 ### Fixed
 - Improved download tracking for media3-exoplayer when using cronet network stack
 - [Internal] Reuse Json Instance for serialization of DTOs for better performance
