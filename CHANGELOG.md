@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Fixed
+- Improved download tracking for media3-exoplayer when using cronet network stack
 - [Internal] Reuse Json Instance for serialization of DTOs for better performance
 
 ### v3.15.0
