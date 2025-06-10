@@ -140,6 +140,7 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyInvariants(eventDataList)
             DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
             DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+            DataVerifier.verifyBandwidthMetrics(eventDataList)
         }
 
     @Test

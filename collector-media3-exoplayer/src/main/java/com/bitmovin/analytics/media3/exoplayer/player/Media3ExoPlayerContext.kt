@@ -25,7 +25,7 @@ internal class Media3ExoPlayerContext(private val player: Player) : PlayerContex
                     var position = (
                         player.currentPosition -
                             firstPeriodInWindow.positionInWindowMs
-                        )
+                    )
                     if (position < 0) {
                         position = 0
                     }
@@ -36,4 +36,6 @@ internal class Media3ExoPlayerContext(private val player: Player) : PlayerContex
         }
 
     val playWhenReady get() = player.playWhenReady
+
+    val getUriOfCurrentMedia get() = player.currentMediaItem?.localConfiguration?.uri
 }

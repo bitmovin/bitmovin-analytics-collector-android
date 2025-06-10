@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.utils
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.enums.StreamFormat
@@ -247,5 +248,52 @@ class UtilTest {
 
         // assert
         Assert.assertNotNull(packageInfo)
+    }
+
+    @Test
+    fun `isLikelyVideoMimeType should return true for mp4 containerMimeType`() {
+        assertThat(Util.isLikelyVideoMimeType("video/mp4")).isTrue()
+    }
+
+    @Test
+    fun `isLikelyVideoMimeType should return true for avc sampleMimeType`() {
+        assertThat(Util.isLikelyVideoMimeType("video/avc")).isTrue()
+    }
+
+    @Test
+    fun `isLikelyVideoMimeType should return false for audio sampleMimeType`() {
+        assertThat(Util.isLikelyVideoMimeType("audio/mp4a-latm")).isFalse()
+    }
+
+    @Test
+    fun `isLikelyVideoMimeType should return false for application mimetype`() {
+        assertThat(Util.isLikelyVideoMimeType("application/vnd.3gpp.mcvideo-user-profile+xml")).isFalse()
+    }
+
+    @Test
+    fun `isLikelyVideoMimeType should return false for audio containerMimeType`() {
+        assertThat(Util.isLikelyVideoMimeType("audio/mp4")).isFalse()
+    }
+
+    @Test
+    fun `isLikelyProgressiveStream should return false for non progressive segment`() {
+        assertThat(Util.isLikelyProgressiveStream("http://www.example.com/video.m3u8".toUri())).isFalse()
+    }
+
+    @Test
+    fun `isLikelyProgressiveStream should return true for progressive segment`() {
+        assertThat(Util.isLikelyProgressiveStream("http://www.example.com/video.mp4".toUri())).isTrue()
+    }
+
+    @Test
+    fun `isLikelyVideoSegment should return true for progressive segment`() {
+        assertThat(Util.isLikelyVideoSegment("http://www.example.com/video.mp4".toUri())).isTrue()
+    }
+
+    @Test
+    fun `isLikelyVideoSegment should return false for nonVideoSegment`() {
+        assertThat(Util.isLikelyVideoSegment("http://www.example.com/video.m3u8".toUri())).isFalse()
+        assertThat(Util.isLikelyVideoSegment("http://www.example.com/video.mp3".toUri())).isFalse()
+        assertThat(Util.isLikelyVideoSegment("http://www.example.com/video.mpd".toUri())).isFalse()
     }
 }

@@ -19,6 +19,7 @@ import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.DownloadSpeedMeasurement
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
+import com.bitmovin.analytics.utils.Util
 import java.util.Locale
 
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -165,7 +166,14 @@ internal class AnalyticsEventListener(
             ) {
                 this.drmInfoProvider.evaluateDrmType(mediaLoadData)
             }
-            if (mediaLoadData.trackFormat?.containerMimeType?.startsWith("video") == true) {
+
+            // we don't track progressive media, since partial downloads of one file are not showing up here
+            // and this would lead to wrong metrics
+            // we need to look into the current media, instead of the loadEventInfo, because the loadEventInfo
+            // shows segments for DASH and HLS which could have similar file extensions as progressive
+            val isProgressiveMedia = Util.isLikelyProgressiveStream(exoPlayerContext.getUriOfCurrentMedia)
+
+            if (!isProgressiveMedia && isTrackablePacket(mediaLoadData, loadEventInfo)) {
                 addSpeedMeasurement(loadEventInfo)
             }
         } catch (e: Exception) {
@@ -261,6 +269,44 @@ internal class AnalyticsEventListener(
                 timeToFirstByteInMs = loadEventInfo.elapsedRealtimeMs - loadEventInfo.loadDurationMs,
             )
         downloadSpeedMeter.addMeasurement(measurement)
+    }
+
+    /**
+     * This method check if we should track the download speed measurement on this packet or not.
+     *
+     * Our criteria is:
+     * - We don't track progressives medias (but we DO track segments that have a file extension similar to progressive)
+     * - We only track video (not audio track, manifest, etc).
+     *
+     */
+    private fun isTrackablePacket(
+        mediaLoadData: MediaLoadData,
+        loadEventInfo: LoadEventInfo,
+    ): Boolean {
+        val packetUri = loadEventInfo.uri
+        val dataType = mediaLoadData.dataType
+        val trackType = mediaLoadData.trackType
+        val sampleMimeType = mediaLoadData.trackFormat?.sampleMimeType
+        val containerMimeType = mediaLoadData.trackFormat?.containerMimeType
+
+        // we only track media files (no manifest, etc)
+        if (dataType != C.DATA_TYPE_MEDIA) {
+            return false
+        }
+
+        return when (trackType) {
+            // in case track type is video, we always track the packet
+            C.TRACK_TYPE_VIDEO -> true
+            // in case track type is default, we try to guess if it is a video track
+            C.TRACK_TYPE_DEFAULT -> {
+                (
+                    Util.isLikelyVideoSegment(packetUri) ||
+                        Util.isLikelyVideoMimeType(sampleMimeType) ||
+                        Util.isLikelyVideoMimeType(containerMimeType)
+                )
+            }
+            else -> false
+        }
     }
 
     companion object {

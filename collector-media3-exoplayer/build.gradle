@@ -110,6 +110,8 @@ dependencies {
     androidTestImplementation "androidx.media3:media3-exoplayer-dash:${testVersion}"
     androidTestImplementation "androidx.media3:media3-exoplayer-hls:${testVersion}"
 
+    androidTestImplementation "androidx.media3:media3-datasource-cronet:${testVersion}"
+
     androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"

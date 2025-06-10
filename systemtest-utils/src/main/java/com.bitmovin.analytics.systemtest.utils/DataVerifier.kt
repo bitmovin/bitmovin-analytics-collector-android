@@ -68,6 +68,9 @@ object DataVerifier {
             }
         }
 
+        assertThat(totalSizeInBytes).isGreaterThan(0L)
+        assertThat(totalTimeInMs).isGreaterThan(0L)
+
         // verify that the average download speed is within reasonable bounds
         val avgDownloadSpeedInKbps = totalSizeInBytes.toFloat() / totalTimeInMs.toFloat() * 8 // bytes per ms -> kbps (approx)
         assertThat(avgDownloadSpeedInKbps).isBetween(MIN_AVG_BANDWIDTH_IN_KBPS, MAX_AVG_BANDWIDTH_IN_KBPS)

@@ -149,6 +149,7 @@ class BundledAnalyticsTest {
             // verify durations of each state are within a reasonable range
             DataVerifier.verifyPlayTimeIsCorrect(eventDataList, playedToMs)
             DataVerifier.verifyPauseTimeIsCorrect(eventDataList, pauseTimeMs)
+            DataVerifier.verifyBandwidthMetrics(eventDataList)
         }
 
     @Test

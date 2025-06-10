@@ -132,6 +132,10 @@ ext {
     assertjCoreVersion = '3.26.3'
     robolectricVersion = '4.14.1'
     testCoreXVersion = '1.6.1'
+
+    // cronet network stack systemtests dependencies
+    cronetApi = '119.6045.31'
+    cronetGooglePlay = '18.1.0'
 }
 
 tasks.register('createPrePushHook') {

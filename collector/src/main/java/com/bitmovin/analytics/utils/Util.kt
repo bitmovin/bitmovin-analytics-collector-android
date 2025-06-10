@@ -219,6 +219,15 @@ object Util {
         return packageInfo
     }
 
+    private val knownHlsManifestFileExtensions = listOf("m3u8")
+    private val knownDashManifestFileExtensions = listOf("mpd")
+    private val knownSmoothFileExtensions = listOf("ism", "isml")
+    private val knownVideoContainerFileExtensions = listOf("mp4", "m4s", "webm", "mkv", "ts", "mpg", "mpeg", "flv", "ogg")
+    private val knownProgressiveFormats =
+        listOf("mp4", "m4a", "m4s", "webm", "mkv", "ts", "mpg", "mpeg", "flv", "ogg", "wav", "mp3", "aac", "flac", "amr")
+
+    private val typicalVideoExtensions = listOf("video", "mpeg")
+
     /**
      * This function set the streamFormat, mpdUrl, m3u8Url, and progUrl in the EventData object based on the file extension of the uri.
      *
@@ -233,26 +242,23 @@ object Util {
         val fileExt = uri.path?.substringAfterLast(".")?.lowercase()
 
         when (fileExt) {
-            "m3u8" -> {
+            in knownHlsManifestFileExtensions -> {
                 data.streamFormat = StreamFormat.HLS.value
                 data.m3u8Url = uri.toString()
             }
 
-            "mpd" -> {
+            in knownDashManifestFileExtensions -> {
                 data.streamFormat = StreamFormat.DASH.value
                 data.mpdUrl = uri.toString()
             }
 
-            "ism", "isml" -> {
+            in knownSmoothFileExtensions -> {
                 data.streamFormat = StreamFormat.SMOOTH.value
                 // This is a trick as there no predefined place for the smooth urls in the DataEvent object, but we don't want to loose the information.
                 data.progUrl = uri.toString()
             }
-            /**
-             * The following formats are considered progressive streams.
-             * Based on: https://developer.android.com/media/media3/exoplayer/progressive
-             */
-            "mp4", "m4a", "m4s", "webm", "mkv", "ts", "mpg", "mpeg", "flv", "ogg", "wav", "mp3", "aac", "flac", "amr" -> {
+
+            in knownProgressiveFormats -> {
                 data.streamFormat = StreamFormat.PROGRESSIVE.value
                 data.progUrl = uri.toString()
             }
@@ -267,4 +273,26 @@ object Util {
             }
         }
     }
+
+    /* Best effort.
+       We check if the mimeType contains keywords that are usually present in video files.
+       Based on:
+       https://www.iana.org/assignments/media-types/media-types.xhtml#video
+     */
+    fun isLikelyVideoMimeType(mimeType: String?): Boolean {
+        return typicalVideoExtensions
+            .any { mimeType?.startsWith(it) == true }
+    }
+
+    fun isLikelyVideoSegment(uri: Uri?): Boolean {
+        return uri?.getFileExtension() in knownVideoContainerFileExtensions
+    }
+
+    fun isLikelyProgressiveStream(uri: Uri?): Boolean {
+        return uri?.getFileExtension() in knownProgressiveFormats
+    }
+}
+
+fun Uri.getFileExtension(): String? {
+    return this.path?.substringAfterLast(".")?.lowercase()
 }
