@@ -16,6 +16,7 @@ import org.robolectric.annotation.Config
 @RunWith(
     RobolectricTestRunner::class,
 )
+@Config(sdk = [35]) // need to limit sdk to 35, since 36 is not available in Robolectric 4.14.1
 class UtilTest {
     @Test
     fun eventDataFormatAndUrlDetectionBasedOnExtension() {

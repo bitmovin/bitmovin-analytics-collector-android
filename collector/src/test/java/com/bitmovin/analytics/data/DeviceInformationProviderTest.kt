@@ -18,6 +18,7 @@ import org.robolectric.shadows.ShadowUIModeManager
 @RunWith(
     RobolectricTestRunner::class,
 )
+@Config(sdk = [35]) // we need to limit sdk to 35, since 36 is not available in Robolectric 4.14.1
 class DeviceInformationProviderTest {
     @Test
     @Config(qualifiers = "fr-rFR-w360dp-h640dp-xhdpi")

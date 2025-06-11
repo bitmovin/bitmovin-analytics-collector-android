@@ -99,9 +99,9 @@ ext {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
     exampleAppJvmTarget = jvmTarget
 
-    compileSdk = 35
+    compileSdk = 36
     amazonIvsMinSdkVersion = 21
-    targetSdkVersion = 35
+    targetSdkVersion = 36
 
     // player versions
     bitmovinPlayerVersion = '3.112.0'
