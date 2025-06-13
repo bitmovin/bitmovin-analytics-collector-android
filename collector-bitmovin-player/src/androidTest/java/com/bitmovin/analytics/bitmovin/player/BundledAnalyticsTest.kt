@@ -734,9 +734,11 @@ class BundledAnalyticsTest {
     fun test_vod_2ImpressionsWithPlaylist_Should_SetCustomDataOnlyOnFirstSource() =
         runBlockingTest {
             val hlsSample = TestSources.HLS_REDBULL
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+            val hlsSourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle("hls"))
+            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), hlsSourceMetadata)
             val dashSample = TestSources.DASH
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+            val dashSourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle("DASH"))
+            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashSourceMetadata)
             val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
 
             // act
@@ -799,10 +801,14 @@ class BundledAnalyticsTest {
             assertThat(samplesAfterCustomDataChange).hasSizeGreaterThan(0)
 
             DataVerifier.verifyM3u8SourceUrl(impression1.eventDataList, hlsSample.m3u8Url!!)
+            // verify that changing customData doesn't affect the other properties of sourceMetadata
+            assertThat(impression1.eventDataList).allMatch({ x -> x.videoTitle == hlsSourceMetadata.title })
+
             DataVerifier.verifyCustomData(samplesBeforeCustomDataChange, CustomData())
             DataVerifier.verifyCustomData(samplesAfterCustomDataChange, changedCustomData)
 
             DataVerifier.verifyMpdSourceUrl(impression2.eventDataList, dashSample.mpdUrl!!)
+            assertThat(impression2.eventDataList).allMatch({ x -> x.videoTitle == dashSourceMetadata.title })
             DataVerifier.verifyCustomData(impression2.eventDataList, CustomData())
         }
 
