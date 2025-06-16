@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
+- always use `SourceMetadata.isLive` on event data when set
 - Increased target and compileSdk to 36
 
 ### v3.15.1

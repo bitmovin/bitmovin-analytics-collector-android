@@ -52,7 +52,7 @@ internal class AmazonIvsPlayerCollector(analyticsConfig: AnalyticsConfig, contex
         val deviceInformationProvider = DeviceInformationProvider(analytics.context)
         val stateMachine = PlayerStateMachine.Factory.create(analytics, playerContext, mainLooper, deviceInformationProvider)
         val playbackService = PlaybackService(stateMachine)
-        val playbackManipulator = PlaybackEventDataManipulator(player)
+        val playbackManipulator = PlaybackEventDataManipulator(player, metadataProvider)
         val playbackQualityProvider = PlaybackQualityProvider()
         val videoStartupService = VideoStartupService(stateMachine, player, playbackQualityProvider)
         val playerStatisticsProvider = PlayerStatisticsProvider(player)

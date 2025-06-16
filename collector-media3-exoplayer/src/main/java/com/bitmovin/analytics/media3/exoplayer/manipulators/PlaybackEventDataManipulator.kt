@@ -35,12 +35,7 @@ internal class PlaybackEventDataManipulator(
         }
 
         // isLive
-        data.isLive =
-            Util.getIsLiveFromConfigOrPlayer(
-                playbackInfoProvider.playerIsReady,
-                metadataProvider.getSourceMetadata()?.isLive,
-                player.isCurrentMediaItemDynamic,
-            )
+        data.isLive = metadataProvider.getSourceMetadata()?.isLive ?: player.isCurrentMediaItemDynamic
 
         // we report 0 videoDuration for live streams to be consistent with other players/platforms
         if (data.isLive) {

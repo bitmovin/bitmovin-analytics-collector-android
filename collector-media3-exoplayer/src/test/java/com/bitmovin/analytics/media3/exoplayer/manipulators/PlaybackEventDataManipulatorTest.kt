@@ -53,7 +53,7 @@ class PlaybackEventDataManipulatorTest {
         val eventData = TestUtils.createMinimalEventData()
 
         // prepare isLive
-        every { mockPlaybackInfoProvider.playerIsReady } returns true
+        every { mockMetadataProvider.getSourceMetadata() } returns null
         every { mockExoPlayer.isCurrentMediaItemDynamic } returns true
         every { mockExoPlayer.duration } returns 1234L
 
@@ -74,7 +74,6 @@ class PlaybackEventDataManipulatorTest {
         // prepare isLive
         val sourceMetadata = SourceMetadata(isLive = true)
         every { mockMetadataProvider.getSourceMetadata() } returns sourceMetadata
-        every { mockPlaybackInfoProvider.playerIsReady } returns false
         every { mockExoPlayer.isCurrentMediaItemDynamic } returns false
         every { mockExoPlayer.duration } answers { 1234L }
 
@@ -91,7 +90,7 @@ class PlaybackEventDataManipulatorTest {
     fun `track duration when not live`() {
         // arrange
         val eventData = TestUtils.createMinimalEventData()
-        every { mockPlaybackInfoProvider.playerIsReady } returns true
+        every { mockMetadataProvider.getSourceMetadata() } returns null
         every { mockExoPlayer.isCurrentMediaItemDynamic } returns false
         every { mockExoPlayer.duration } answers { 1234L }
 

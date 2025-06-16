@@ -160,23 +160,25 @@ internal class BitmovinSdkAdapter(
     override fun manipulate(data: EventData) {
         val source = currentSource
         val sourceMetadata = this.getCurrentSourceMetadata()
-        val fallbackIsLive = sourceMetadata.isLive == true
 
-        // duration and isLive, streamFormat, mpdUrl, and m3u8Url
+        // videoDuration and isLive,
+        var playerIsLive = false
         if (source != null) {
             val duration = source.duration
-            if (duration == -1.0) {
-                // Source duration is not available yet, fallback to SourceMetadata /
-                // BitmovinAnalyticsConfig
-                data.isLive = fallbackIsLive
-            } else {
+            if (duration != -1.0) {
+                // source is loaded and duration is available
                 if (duration == Double.POSITIVE_INFINITY) {
-                    data.isLive = true
+                    playerIsLive = true
                 } else {
-                    data.isLive = false
+                    playerIsLive = false
                     data.videoDuration = Util.secondsToMillis(duration)
                 }
             }
+        }
+        data.isLive = sourceMetadata.isLive ?: playerIsLive
+
+        // streamFormat, mpdUrl, and m3u8Url
+        if (source != null) {
             val sourceConfig = source.config
             when (sourceConfig.type) {
                 SourceType.Hls -> {
@@ -204,10 +206,8 @@ internal class BitmovinSdkAdapter(
                     BitmovinLog.d(TAG, "Warning: unknown DRM Type " + drmConfig.javaClass.simpleName)
                 }
             }
-        } else {
-            // player active Source is not available
-            data.isLive = fallbackIsLive
         }
+
         // version
         data.version = PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.playerVersion
 

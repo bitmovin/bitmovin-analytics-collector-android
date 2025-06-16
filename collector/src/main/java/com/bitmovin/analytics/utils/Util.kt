@@ -101,18 +101,6 @@ object Util {
         return Pair(null, null)
     }
 
-    fun getIsLiveFromConfigOrPlayer(
-        isPlayerReady: Boolean,
-        isLiveFromConfig: Boolean?,
-        isLiveFromPlayer: Boolean,
-    ): Boolean {
-        return if (isPlayerReady) {
-            isLiveFromPlayer
-        } else {
-            isLiveFromConfig ?: false
-        }
-    }
-
     fun isClassLoaded(
         className: String,
         loader: ClassLoader?,

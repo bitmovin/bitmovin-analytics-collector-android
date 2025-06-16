@@ -2,7 +2,6 @@ package com.bitmovin.analytics.utils
 
 import android.net.Uri
 import androidx.core.net.toUri
-import com.bitmovin.analytics.BitmovinAnalyticsConfig
 import com.bitmovin.analytics.TestFactory
 import com.bitmovin.analytics.enums.StreamFormat
 import org.assertj.core.api.Assertions.assertThat
@@ -132,46 +131,6 @@ class UtilTest {
             assertThat(top[0]).contains("java.lang.RuntimeException: RUNTIMEEXCEPTION")
             assertThat(top).anySatisfy { element -> assertThat(element).contains("testTopOfStacktrace") }
         }
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun testGetIsLiveFromConfigOrPlayer_ReturnsConfigValueTrueIfPlayerNotReady() {
-        val config = BitmovinAnalyticsConfig()
-        config.isLive = true
-
-        val isLive = Util.getIsLiveFromConfigOrPlayer(false, config.isLive, false)
-        assertThat(isLive).isTrue
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun testGetIsLiveFromConfigOrPlayer_ReturnsConfigValueFalseIfPlayerNotReady() {
-        val config = BitmovinAnalyticsConfig()
-        config.isLive = false
-
-        val isLive = Util.getIsLiveFromConfigOrPlayer(false, config.isLive, false)
-        assertThat(isLive).isFalse
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun testGetIsLiveFromConfigOrPlayer_ReturnsPlayerIsLiveTrueIfPlayerReady() {
-        val config = BitmovinAnalyticsConfig()
-        config.isLive = true
-
-        val isLive = Util.getIsLiveFromConfigOrPlayer(true, config.isLive, true)
-        assertThat(isLive).isTrue
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun testGetIsLiveFromConfigOrPlayer_ReturnsPlayerIsLiveFalseIfPlayerReady() {
-        val config = BitmovinAnalyticsConfig()
-        config.isLive = true
-
-        val isLive = Util.getIsLiveFromConfigOrPlayer(true, config.isLive, false)
-        assertThat(isLive).isFalse
     }
 
     @Test

@@ -2,20 +2,23 @@ package com.bitmovin.analytics.amazon.ivs.manipulators
 
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.amazon.ivs.TestUtils
+import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.data.MetadataProvider
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 internal class PlaybackEventDataManipulatorTest {
-
     @Test
-    fun `manipulate should set is live from player`() {
+    fun `manipulate should set is live from player given sourceMetadata is null`() {
         // arrange
         val mockedPlayer = mockk<Player>(relaxed = true)
         every { mockedPlayer.duration } returns -1L
+        val mockedMetadataProvider = mockk<MetadataProvider>(relaxed = true)
+        every { mockedMetadataProvider.getSourceMetadata() } returns null
 
-        val manipulator = createPlaybackEventDataManipulator(mockedPlayer)
+        val manipulator = createPlaybackEventDataManipulator(mockedPlayer, mockedMetadataProvider)
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -26,12 +29,14 @@ internal class PlaybackEventDataManipulatorTest {
     }
 
     @Test
-    fun `manipulate should set is live from player to false`() {
+    fun `manipulate should set is live from player to false given sourceMetadata is null`() {
         // arrange
         val mockedPlayer = mockk<Player>(relaxed = true)
         every { mockedPlayer.duration } returns 1234
+        val mockedMetadataProvider = mockk<MetadataProvider>(relaxed = true)
+        every { mockedMetadataProvider.getSourceMetadata() } returns null
 
-        val manipulator = createPlaybackEventDataManipulator(mockedPlayer)
+        val manipulator = createPlaybackEventDataManipulator(mockedPlayer, mockedMetadataProvider)
         val eventData = TestUtils.createMinimalEventData()
 
         // act
@@ -39,6 +44,44 @@ internal class PlaybackEventDataManipulatorTest {
 
         // assert
         assertThat(eventData.isLive).isFalse
+    }
+
+    @Test
+    fun `manipulate should set is live from sourceMetadata to false`() {
+        // arrange
+        val mockedPlayer = mockk<Player>(relaxed = true)
+        every { mockedPlayer.duration } returns -1L // indicating live
+        val mockedMetadataProvider = mockk<MetadataProvider>(relaxed = true)
+        val sourceMetadata = SourceMetadata(isLive = false)
+        every { mockedMetadataProvider.getSourceMetadata() } returns sourceMetadata
+
+        val manipulator = createPlaybackEventDataManipulator(mockedPlayer, mockedMetadataProvider)
+        val eventData = TestUtils.createMinimalEventData()
+
+        // act
+        manipulator.manipulate(eventData)
+
+        // assert
+        assertThat(eventData.isLive).isFalse
+    }
+
+    @Test
+    fun `manipulate should set is live from sourceMetadata to true`() {
+        // arrange
+        val mockedPlayer = mockk<Player>(relaxed = true)
+        every { mockedPlayer.duration } returns 1234 // indicating VOD
+        val mockedMetadataProvider = mockk<MetadataProvider>(relaxed = true)
+        val sourceMetadata = SourceMetadata(isLive = true)
+        every { mockedMetadataProvider.getSourceMetadata() } returns sourceMetadata
+
+        val manipulator = createPlaybackEventDataManipulator(mockedPlayer, mockedMetadataProvider)
+        val eventData = TestUtils.createMinimalEventData()
+
+        // act
+        manipulator.manipulate(eventData)
+
+        // assert
+        assertThat(eventData.isLive).isTrue
     }
 
     @Test
@@ -94,7 +137,8 @@ internal class PlaybackEventDataManipulatorTest {
 
     private fun createPlaybackEventDataManipulator(
         player: Player = mockk(relaxed = true),
+        metadataProvider: MetadataProvider = mockk(relaxed = true),
     ): PlaybackEventDataManipulator {
-        return PlaybackEventDataManipulator(player)
+        return PlaybackEventDataManipulator(player, metadataProvider)
     }
 }

@@ -2,6 +2,7 @@ package com.bitmovin.analytics.amazon.ivs.manipulators
 
 import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.amazon.ivs.Utils
+import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.StreamFormat
@@ -9,6 +10,7 @@ import com.bitmovin.analytics.utils.BitmovinLog
 
 internal class PlaybackEventDataManipulator(
     private val player: Player,
+    private val metaDataProvider: MetadataProvider,
 ) : EventDataManipulator {
     override fun manipulate(data: EventData) {
         try {
@@ -18,9 +20,7 @@ internal class PlaybackEventDataManipulator(
 
             data.m3u8Url = extractM3u8Url(player)
 
-            // It cannot be distinguished between a live stream and a stream not being loaded
-            // on IVS, thus we don't use the isLive property from the SourceMetadata as fallback
-            data.isLive = Utils.isPlaybackLive(player.duration)
+            data.isLive = metaDataProvider.getSourceMetadata()?.isLive ?: Utils.isPlaybackLive(player.duration)
 
             // for live streams, we set duration to 0 to be consistent with other players and platforms
             if (Utils.isPlaybackLive(player.duration)) {
