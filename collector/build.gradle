@@ -65,7 +65,6 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            consumerProguardFiles 'proguard-consumer-rules.pro'
         }
         debug {
             enableUnitTestCoverage true
