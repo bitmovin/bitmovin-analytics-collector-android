@@ -18,7 +18,7 @@ import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.bitmovin.analytics.systemtest.utils.runBlockingTest
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.withContext
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -56,7 +56,14 @@ class ErrorScenariosTest {
 
     @After
     fun teardown() {
-        MockedIngress.stopServer()
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                if (!player.isReleased) {
+                    player.release()
+                }
+            }
+            MockedIngress.stopServer()
+        }
     }
 
     @Test
@@ -89,21 +96,21 @@ class ErrorScenariosTest {
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             val impression = impressions.first()
 
-            Assertions.assertThat(impression.eventDataList.size).isEqualTo(1)
+            assertThat(impression.eventDataList.size).isEqualTo(1)
             val eventData = impression.eventDataList.first()
             val impressionId = eventData.impressionId
-            Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_IO_BAD_HTTP_STATUS")
-            Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
+            assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_IO_BAD_HTTP_STATUS")
+            assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
             DataVerifier.verifyStreamFormatAndUrlTracking(eventData)
 
             DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
             DataVerifier.verifySourceMetadata(eventData, sourceMetadata = defaultSourceMetadata)
 
-            Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)
+            assertThat(impression.errorDetailList.size).isEqualTo(1)
             val errorDetail = impression.errorDetailList.first()
             DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
-            Assertions.assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
-            Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Data Source request failed with HTTP status: 404")
+            assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
+            assertThat(errorDetail.data.exceptionMessage).startsWith("Data Source request failed with HTTP status: 404")
         }
 
     @Test
@@ -146,21 +153,21 @@ class ErrorScenariosTest {
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             val impression = impressions.first()
 
-            Assertions.assertThat(impression.eventDataList.size).isEqualTo(1)
+            assertThat(impression.eventDataList.size).isEqualTo(1)
             val eventData = impression.eventDataList.first()
             val impressionId = eventData.impressionId
-            Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED")
-            Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED)
+            assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED")
+            assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED)
             DataVerifier.verifyMpdSourceUrl(impression.eventDataList, corruptedStream.uri.toString())
             DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
             DataVerifier.verifySourceMetadata(eventData, sourceMetadata = sourceMetadata)
             DataVerifier.verifyStreamFormatAndUrlTracking(eventData)
 
-            Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)
+            assertThat(impression.errorDetailList.size).isEqualTo(1)
             val errorDetail = impression.errorDetailList.first()
             DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
-            Assertions.assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
-            Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Source error")
+            assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
+            assertThat(errorDetail.data.exceptionMessage).startsWith("Source error")
         }
 
     @Test
@@ -203,21 +210,21 @@ class ErrorScenariosTest {
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             val impression = impressions.first()
 
-            Assertions.assertThat(impression.eventDataList.size).isGreaterThanOrEqualTo(2)
+            assertThat(impression.eventDataList.size).isGreaterThanOrEqualTo(2)
             val eventData = impression.eventDataList.last() // error sample is the last one sent
             val impressionId = eventData.impressionId
-            Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_IO_BAD_HTTP_STATUS")
-            Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
+            assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_IO_BAD_HTTP_STATUS")
+            assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
             DataVerifier.verifyMpdSourceUrl(impression.eventDataList, missingSegmentStream.uri.toString())
             DataVerifier.verifySourceMetadata(eventData, sourceMetadata = sourceMetadata)
             DataVerifier.verifyStreamFormatAndUrlTracking(eventData)
 
-            Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)
+            assertThat(impression.errorDetailList.size).isEqualTo(1)
             val errorDetail = impression.errorDetailList.first()
             DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
-            Assertions.assertThat(errorDetail.data.exceptionStacktrace).hasSizeGreaterThan(4)
-            Assertions.assertThat(errorDetail.data.exceptionStacktrace?.first()).contains("ExoPlaybackException")
-            Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Data Source request failed with HTTP status: 403")
+            assertThat(errorDetail.data.exceptionStacktrace).hasSizeGreaterThan(4)
+            assertThat(errorDetail.data.exceptionStacktrace?.first()).contains("ExoPlaybackException")
+            assertThat(errorDetail.data.exceptionMessage).startsWith("Data Source request failed with HTTP status: 403")
         }
 
     @Test
@@ -263,15 +270,75 @@ class ErrorScenariosTest {
             val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
             val impression = impressionsList.first()
             val startupSample = impression.eventDataList.first()
-            Assertions.assertThat(startupSample.videoStartFailed).isTrue
-            Assertions.assertThat(startupSample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
-            Assertions.assertThat(startupSample.errorMessage).startsWith("Source Error: ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED")
-            Assertions.assertThat(startupSample.errorCode).isEqualTo(PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED)
+            assertThat(startupSample.videoStartFailed).isTrue
+            assertThat(startupSample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            assertThat(startupSample.errorMessage).startsWith("Source Error: ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED")
+            assertThat(startupSample.errorCode).isEqualTo(PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED)
 
             val errorDetail = impression.errorDetailList.first()
-            Assertions.assertThat(errorDetail.data.exceptionMessage).startsWith("Source error ")
-            Assertions.assertThat(errorDetail.data.exceptionStacktrace).isNotEmpty
-            Assertions.assertThat(errorDetail.data.exceptionStacktrace).hasSizeGreaterThan(4)
-            Assertions.assertThat(errorDetail.data.exceptionStacktrace?.first()).contains("ExoPlaybackException")
+            assertThat(errorDetail.data.exceptionMessage).startsWith("Source error ")
+            assertThat(errorDetail.data.exceptionStacktrace).isNotEmpty
+            assertThat(errorDetail.data.exceptionStacktrace).hasSizeGreaterThan(4)
+            assertThat(errorDetail.data.exceptionStacktrace?.first()).contains("ExoPlaybackException")
+        }
+
+    @Test
+    fun test_playerReleaseDuringStartup_Should_sendEbvsSample() =
+        runBlockingTest {
+            // arrange
+            val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.attachPlayer(player)
+                collector.sourceMetadata = defaultSourceMetadata
+                player.setMediaItem(MediaItem.fromUri(Samples.DASH.uri))
+                player.prepare()
+                player.play()
+                Thread.sleep(100)
+                player.release()
+            }
+
+            // wait until first sample is sent out
+            MockedIngress.waitForAnalyticsSample()
+            Thread.sleep(500) // wait a bit longer to ensure no further samples are sent
+            val impressions = MockedIngress.extractImpressions()
+            assertThat(impressions).hasSize(1)
+            val impression = impressions.first()
+
+            val eventData = impression.eventDataList.first()
+            assertThat(eventData.videoStartFailed).isTrue()
+            assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
+            DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
+        }
+
+    @Test
+    fun test_detachCollectorDuringStartup_Should_sendEbvsSample() =
+        runBlockingTest {
+            // arrange
+            val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.attachPlayer(player)
+                collector.sourceMetadata = defaultSourceMetadata
+                player.setMediaItem(MediaItem.fromUri(Samples.DASH.uri))
+                player.prepare()
+                player.play()
+                Thread.sleep(100)
+                collector.detachPlayer()
+            }
+
+            // wait until first sample is sent out
+            MockedIngress.waitForAnalyticsSample()
+            Thread.sleep(500) // wait a bit longer to ensure no further samples are sent
+            val impressions = MockedIngress.extractImpressions()
+            assertThat(impressions).hasSize(1)
+            val impression = impressions.first()
+
+            val eventData = impression.eventDataList.first()
+            assertThat(eventData.videoStartFailed).isTrue()
+            assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
+            DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
         }
 }

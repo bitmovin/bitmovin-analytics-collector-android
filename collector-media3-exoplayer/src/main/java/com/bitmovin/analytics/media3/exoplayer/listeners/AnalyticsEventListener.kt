@@ -215,6 +215,17 @@ internal class AnalyticsEventListener(
         }
     }
 
+    override fun onPlayerReleased(eventTime: AnalyticsListener.EventTime) {
+        try {
+            BitmovinLog.d(TAG, "On Destroy")
+            if (stateMachine.isInStartupState()) {
+                stateMachine.exitBeforeVideoStart(position)
+            }
+        } catch (e: Exception) {
+            BitmovinLog.e(TAG, e.message, e)
+        }
+    }
+
     override fun onDroppedVideoFrames(
         eventTime: AnalyticsListener.EventTime,
         droppedFrames: Int,

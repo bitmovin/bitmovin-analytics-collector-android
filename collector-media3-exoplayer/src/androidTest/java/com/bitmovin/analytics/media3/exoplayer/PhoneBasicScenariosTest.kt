@@ -73,6 +73,11 @@ class PhoneBasicScenariosTest {
     @After
     fun teardown() =
         runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                if (!player.isReleased) {
+                    player.release()
+                }
+            }
             MockedIngress.stopServer()
         }
 
@@ -141,6 +146,66 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
             DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
             DataVerifier.verifyBandwidthMetrics(eventDataList)
+        }
+
+    @Test
+    fun test_playNotInitiated_ShouldNotSendAnySamples_whenReleasing() =
+        runBlockingTest {
+            // arrange
+            val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            collector.sourceMetadata = defaultSourceMetadata
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                player.volume = 0.0f
+                collector.attachPlayer(player)
+                player.setMediaItem(defaultMediaItem)
+                player.prepare()
+            }
+
+            // we wait until player is in ready state before we call play to test this specific scenario
+            Media3PlayerPlaybackUtils.waitUntilPlayerIsReady(player)
+
+            withContext(mainScope.coroutineContext) {
+                // scenario where player is released before play is called
+                player.release()
+            }
+
+            // wait a bit to make sure we would catch any samples
+            Thread.sleep(2000)
+
+            val impressions = MockedIngress.extractImpressions()
+            assertThat(impressions).hasSize(0)
+        }
+
+    @Test
+    fun test_playNotInitiated_ShouldNotSendAnySamples_whenDetaching() =
+        runBlockingTest {
+            // arrange
+            val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            collector.sourceMetadata = defaultSourceMetadata
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                player.volume = 0.0f
+                collector.attachPlayer(player)
+                player.setMediaItem(defaultMediaItem)
+                player.prepare()
+            }
+
+            // we wait until player is in ready state before we call play to test this specific scenario
+            Media3PlayerPlaybackUtils.waitUntilPlayerIsReady(player)
+
+            withContext(mainScope.coroutineContext) {
+                // scenario where collector is detached before play is called
+                collector.detachPlayer()
+            }
+
+            // wait a bit to make sure we would catch any samples
+            Thread.sleep(2000)
+
+            val impressions = MockedIngress.extractImpressions()
+            assertThat(impressions).hasSize(0)
         }
 
     @Test

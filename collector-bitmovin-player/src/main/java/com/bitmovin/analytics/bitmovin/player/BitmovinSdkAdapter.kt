@@ -353,8 +353,7 @@ internal class BitmovinSdkAdapter(
             ssaiService.flushCurrentAdSample()
             BitmovinLog.d(TAG, "On Destroy")
             if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
-                stateMachine.videoStartFailedReason = VideoStartFailedReason.PAGE_CLOSED
-                stateMachine.transitionState(PlayerStates.EXITBEFOREVIDEOSTART, position)
+                stateMachine.exitBeforeVideoStart(position)
             }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)

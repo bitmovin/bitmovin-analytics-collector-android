@@ -214,6 +214,35 @@ object MockedIngress {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun waitForAnalyticsSample(
+        timeout: Long = 10,
+        unit: TimeUnit = TimeUnit.SECONDS,
+    ) {
+        runBlocking {
+            val start = System.currentTimeMillis()
+
+            while (true) {
+                val request = server.takeRequest(timeout, unit)
+                if (request == null) {
+                    throw RuntimeException("No request received within the timeout")
+                }
+
+                alreadyTakenRequests.add(request)
+
+                when (request.requestUrl?.encodedPath) {
+                    "/analytics" -> {
+                        break
+                    }
+                }
+
+                if (start.plus(unit.toMillis(timeout)) <= System.currentTimeMillis()) {
+                    throw RuntimeException("No error detail sample received within the timeout")
+                }
+            }
+        }
+    }
+
     fun extractImpressions(): List<Impression> {
         val requestCount = server.requestCount
         val eventDataMap = mutableMapOf<String, List<EventData>>()

@@ -32,6 +32,7 @@ class PlayerStateMachine(
         private set
 
     private var elapsedTimeOnEnter: Long = 0
+
     var isStartupFinished = false
 
     var videoTimeStart: Long = 0
@@ -47,6 +48,10 @@ class PlayerStateMachine(
         bufferingTimeoutTimer.subscribe(::onRebufferingTimerFinished)
         videoStartTimeoutTimer.subscribe(::onVideoStartTimeoutTimerFinished)
         resetStateMachine()
+    }
+
+    fun isInStartupState(): Boolean {
+        return currentState === PlayerStates.STARTUP
     }
 
     fun enableHeartbeat() {
@@ -95,18 +100,14 @@ class PlayerStateMachine(
     // last sample of session when collector is detached
     // player destroyed, or source unloaded
     fun triggerLastSampleOfSession() {
-        // we don't want to trigger on Pause since this is pause samples are not affecting our metrics
-        // same for Ready state. We also ignore error, since every error triggers a sample immediately
-        // anyway, and we want to make sure we don't send it out twice
-        // If a startup is still in progress we also don't want to send out an extra sample
-        // since this is covered with ebvs anyway
-        if (currentState === PlayerStates.PAUSE || currentState === PlayerStates.READY ||
-            currentState === PlayerStates.ERROR || currentState === PlayerStates.STARTUP
+        // we only send the last sample if we are in a state that is not triggering
+        // an immediate sample by itself and ignore PAUSE, since that one is not relevant as a last sample
+        if (currentState === PlayerStates.PLAYING ||
+            currentState === PlayerStates.BUFFERING ||
+            currentState === PlayerStates.AD
         ) {
-            return
+            triggerSample()
         }
-
-        triggerSample()
     }
 
     // Exoplayer and IVsPlayer do not have a 'playerWasReleased' event, so we can not detect when
@@ -330,6 +331,11 @@ class PlayerStateMachine(
         setQualityFunction: () -> Unit,
     ) {
         qualityChanged(videoTime, didQualityChange, setQualityFunction)
+    }
+
+    fun exitBeforeVideoStart(position: Long) {
+        videoStartFailedReason = VideoStartFailedReason.PAGE_CLOSED
+        transitionState(PlayerStates.EXITBEFOREVIDEOSTART, position)
     }
 
     fun triggerSampleIfPlaying(ssaiRelated: Boolean = false) {

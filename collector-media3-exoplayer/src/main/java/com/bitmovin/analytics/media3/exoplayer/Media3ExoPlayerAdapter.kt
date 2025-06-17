@@ -102,7 +102,11 @@ internal class Media3ExoPlayerAdapter(
 
     override fun triggerLastSampleOfSession() {
         Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
-            stateMachine.triggerLastSampleOfSession()
+            if (stateMachine.isInStartupState()) {
+                stateMachine.exitBeforeVideoStart(position)
+            } else {
+                stateMachine.triggerLastSampleOfSession()
+            }
         }
     }
 

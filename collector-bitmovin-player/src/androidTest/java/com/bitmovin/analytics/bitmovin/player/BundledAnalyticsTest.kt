@@ -153,6 +153,25 @@ class BundledAnalyticsTest {
         }
 
     @Test
+    fun test_playNotInitiated_ShouldNotSendAnySamples() =
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.load(defaultSource)
+            }
+
+            Thread.sleep(1000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.destroy()
+            }
+
+            // wait a bit to make sure a sample would be sent out
+            Thread.sleep(2000)
+            val impressionList = MockedIngress.extractImpressions()
+            assertThat(impressionList.size).isEqualTo(0)
+        }
+
+    @Test
     fun test_vodDashWithDrm_playPauseWithAutoPlay() =
         runBlockingTest {
             // arrange

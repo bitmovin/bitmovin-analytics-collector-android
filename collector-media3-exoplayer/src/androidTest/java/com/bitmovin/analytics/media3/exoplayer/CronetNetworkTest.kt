@@ -60,19 +60,7 @@ class CronetNetworkTest {
         defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
 
         CronetProviderInstaller.installProvider(appContext)
-
-        val myBuilder = CronetEngine.Builder(appContext)
-        val cronetEngine: CronetEngine = myBuilder.build()
-        val executor: Executor = Executors.newSingleThreadExecutor()
-        val cronetDataSourceFactory = CronetDataSource.Factory(cronetEngine, executor)
-        val dataSourceFactory =
-            DefaultDataSource.Factory(appContext, cronetDataSourceFactory)
-        player =
-            ExoPlayer.Builder(appContext)
-                .setMediaSourceFactory(
-                    DefaultMediaSourceFactory(appContext).setDataSourceFactory(dataSourceFactory),
-                )
-                .build()
+        player = createExoPlayer()
     }
 
     @Test
@@ -108,4 +96,20 @@ class CronetNetworkTest {
             val eventDataList = impression.eventDataList
             DataVerifier.verifyBandwidthMetrics(eventDataList)
         }
+
+    private fun createExoPlayer(): ExoPlayer {
+        val myBuilder = CronetEngine.Builder(appContext)
+        val cronetEngine: CronetEngine = myBuilder.build()
+        val executor: Executor = Executors.newSingleThreadExecutor()
+        val cronetDataSourceFactory = CronetDataSource.Factory(cronetEngine, executor)
+        val dataSourceFactory =
+            DefaultDataSource.Factory(appContext, cronetDataSourceFactory)
+        player =
+            ExoPlayer.Builder(appContext)
+                .setMediaSourceFactory(
+                    DefaultMediaSourceFactory(appContext).setDataSourceFactory(dataSourceFactory),
+                )
+                .build()
+        return player
+    }
 }

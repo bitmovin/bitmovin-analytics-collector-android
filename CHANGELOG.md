@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- Media3-Exoplayer: Tracking when the player is released or the collector is detached during startup (EBVS)
+
 ### Changed
 - always use `SourceMetadata.isLive` on event data when set
 - Increased target and compileSdk to 36
