@@ -366,6 +366,15 @@ object DataVerifier {
         verifyCustomData(eventData, sourceMetadata.customData)
     }
 
+    fun verifyIsLiveIsConsistentlySet(
+        eventDataList: MutableList<EventData>,
+        expectedIsLive: Boolean,
+    ) {
+        for (eventData in eventDataList) {
+            assertThat(eventData.isLive).isEqualTo(expectedIsLive)
+        }
+    }
+
     private fun verifyPhoneDeviceInfo(eventData: EventData) {
         assertThat(eventData.deviceInformation.model).isNotEmpty
         assertThat(eventData.deviceInformation.isTV).isFalse

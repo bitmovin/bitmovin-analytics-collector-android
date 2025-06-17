@@ -407,6 +407,41 @@ class BundledAnalyticsTest {
         }
 
     @Test
+    fun test_isLive_flag_overwrites_sourcetype() =
+        runBlockingTest {
+            val hlsSample = TestSources.HLS_REDBULL
+
+            // setting isLive to true although it is VOD content, to test that the flag has priority
+            val hlsSourceMetadata =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                    videoId = "hlsVideoId",
+                    customData = TestConfig.createDummyCustomData("hls"),
+                    cdnProvider = "hlsCdnProvider",
+                    path = "hlsPath",
+                    isLive = true,
+                )
+            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), hlsSourceMetadata)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.load(hlsSource)
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.destroy()
+            }
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions.size).isEqualTo(1)
+
+            DataVerifier.verifyIsLiveIsConsistentlySet(impressions.first().eventDataList, true)
+        }
+
+    @Test
     fun test_vod_2Impressions_Should_NotCarryOverDataFromFirstImpression() =
         runBlockingTest {
             val hlsSample = TestSources.HLS_REDBULL

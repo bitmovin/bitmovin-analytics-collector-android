@@ -112,10 +112,13 @@ class ErrorScenariosTest {
     fun test_nonExistingStream_Should_sendErrorSample() =
         runBlockingTest {
             val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
+
+            // we set isLive to true to test that isLive is also set in error cases
             val sourceMetadata =
                 SourceMetadata(
                     title = metadataGenerator.getTestTitle(),
                     customData = CustomData(customData1 = "nonExistingStream"),
+                    isLive = true,
                 )
             val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()), sourceMetadata)
             // act
@@ -151,6 +154,7 @@ class ErrorScenariosTest {
             assertThat(errorDetail.httpRequests?.size).isGreaterThan(0)
 
             DataVerifier.verifySourceMetadata(eventData, sourceMetadata)
+            DataVerifier.verifyIsLiveIsConsistentlySet(impression.eventDataList, true)
         }
 
     @Test
