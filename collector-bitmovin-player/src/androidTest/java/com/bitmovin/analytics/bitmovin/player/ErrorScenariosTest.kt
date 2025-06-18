@@ -89,11 +89,11 @@ class ErrorScenariosTest {
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.load(source)
                 defaultPlayer.play()
-                // we wait 15ms to make sure that player is in startup state
-                Thread.sleep(15)
+                // we wait 100ms to make sure that player is in startup state
+                Thread.sleep(100)
                 defaultPlayer.destroy()
             }
-            Thread.sleep(1000)
+            MockedIngress.waitForAnalyticsSample()
 
             // assert
             val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
