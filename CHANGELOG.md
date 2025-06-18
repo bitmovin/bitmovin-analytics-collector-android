@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.16.0
+
 ### Added
 - Media3-Exoplayer: Tracking when the player is released or the collector is detached during startup (EBVS)
 
@@ -14,13 +16,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Increased target and compileSdk to 36
 - [Internal] Remove obsolete reference to consumer pro guard file in collector, since file is already deleted
 
-### v3.15.1
+## v3.15.1
 
 ### Fixed
 - Improved download tracking for media3-exoplayer when using cronet network stack
 - [Internal] Reuse Json Instance for serialization of DTOs for better performance
 
-### v3.15.0
+## v3.15.0
 
 ### Changed
 - Move from gson to kotlinx.serialization for serialization of DTOs
@@ -28,12 +30,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgrade gson library to `2.12.1` and appcompat library to `1.7.0`
 - Upgraded Bitmovin player to 3.112.0
 
-### v3.14.2
+## v3.14.2
 
 ### Fixed
 - [AN-4679] Stop sending playing samples when TV is turned off on FireOS 8 devices
 
-### v3.14.1
+## v3.14.1
 
 ### Fixed
 - Only send one sample in case a startup is interrupted by closing the player (ebvs)
@@ -45,7 +47,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - [Internal] Systemtest for bitmovin collector to cover ebvs when player is closed while startup
 
-### v3.14.0
+## v3.14.0
 
 ### Added
 - Support for additional customData fields 31-50
