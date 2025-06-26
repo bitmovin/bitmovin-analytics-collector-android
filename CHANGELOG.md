@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.17.0
+
 ### Fixed
 - Media3 Player: Track startups correctly when playWhenReady is turned off after attaching the collector
 
 ### Changed
-- Downgrade `kotlinx.serialization` plugin to `1.9.24` to be in line with the Kotlin version (following player here)
+- Downgraded the Kotlin metadata version from `2.0.0` to `1.9.0` to restore compatibility with apps using Kotlin `1.8.0`
 
 ## v3.16.0
 
