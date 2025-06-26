@@ -26,7 +26,7 @@ plugins {
     id 'jacoco'
     id "org.sonarqube" version "3.5.0.2730"
     id 'org.jetbrains.kotlinx.binary-compatibility-validator' version '0.16.3'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.0.0' // using same version as player folks (2025-06)
+    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" // using same version as player folks (2025-06)
 }
 
 apply from: './bitmovinpropertiesloader.gradle'

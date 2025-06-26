@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Downgrade `kotlinx.serialization` plugin to `1.9.24` to be in line with the Kotlin version (following player here)
+
 ## v3.16.0
 
 ### Added
