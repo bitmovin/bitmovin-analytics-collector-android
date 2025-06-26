@@ -60,11 +60,15 @@ class SsaiScenariosTest {
     @After
     fun teardown() =
         runBlockingTest {
-            MockedIngress.stopServer()
             withContext(mainScope.coroutineContext) {
-                player.release()
+                if (!player.isReleased) {
+                    player.release()
+                }
             }
-            // wait a bit for player to be destroyed
+            // wait a bit to make sure the player is released
+            Thread.sleep(100)
+            MockedIngress.stopServer()
+            // wait a bit to make sure the server is stopped before next test starts
             Thread.sleep(100)
         }
 

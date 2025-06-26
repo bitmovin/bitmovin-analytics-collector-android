@@ -78,7 +78,11 @@ class PhoneBasicScenariosTest {
                     player.release()
                 }
             }
+            // wait a bit to make sure the player is released
+            Thread.sleep(100)
             MockedIngress.stopServer()
+            // wait a bit to make sure the server is stopped before next test starts
+            Thread.sleep(100)
         }
 
     @Test

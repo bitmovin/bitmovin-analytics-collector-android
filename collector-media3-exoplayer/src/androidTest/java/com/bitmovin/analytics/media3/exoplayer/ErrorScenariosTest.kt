@@ -2,6 +2,7 @@ package com.bitmovin.analytics.media3.exoplayer
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -13,6 +14,7 @@ import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.MockedIngress.waitForErrorDetailSample
+import com.bitmovin.analytics.systemtest.utils.RepeatRule
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
 import com.bitmovin.analytics.systemtest.utils.runBlockingTest
@@ -35,6 +37,11 @@ class ErrorScenariosTest {
 
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()
+
+    private val forceHighestQuality =
+        TrackSelectionParameters.Builder(appContext)
+            .setForceHighestSupportedBitrate(true)
+            .build()
 
     // Source metadata title depends on the test, so it has to be generated dynamically
     private val defaultSourceMetadata: SourceMetadata
@@ -62,7 +69,11 @@ class ErrorScenariosTest {
                     player.release()
                 }
             }
+            // wait a bit to make sure the player is released
+            Thread.sleep(100)
             MockedIngress.stopServer()
+            // wait a bit to make sure the server is stopped before next test starts
+            Thread.sleep(100)
         }
     }
 
@@ -91,6 +102,9 @@ class ErrorScenariosTest {
                 collector.detachPlayer()
                 player.release()
             }
+
+            // wait a bit for samples being sent out
+            Thread.sleep(300)
 
             // assert
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
@@ -227,6 +241,9 @@ class ErrorScenariosTest {
             assertThat(errorDetail.data.exceptionMessage).startsWith("Data Source request failed with HTTP status: 403")
         }
 
+    @Rule @JvmField
+    val repeatRule = RepeatRule()
+
     @Test
     fun test_vodWithDrm_wrongConfig() =
         runBlockingTest {
@@ -280,6 +297,13 @@ class ErrorScenariosTest {
             assertThat(errorDetail.data.exceptionStacktrace).isNotEmpty
             assertThat(errorDetail.data.exceptionStacktrace).hasSizeGreaterThan(4)
             assertThat(errorDetail.data.exceptionStacktrace?.first()).contains("ExoPlaybackException")
+
+            // detach collector to clean up after test is done
+            // we do this here to make sure detaching does not interfere with the test
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+            }
+            Thread.sleep(100)
         }
 
     @Test
@@ -291,11 +315,24 @@ class ErrorScenariosTest {
             // act
             withContext(mainScope.coroutineContext) {
                 collector.attachPlayer(player)
+                // we need to wait a bit here to ensure we got a proper license callback
+                // otherwise we have seen cases where the test finished before the license callback was called
+                // and thus no samples were sent
+                Thread.sleep(1000)
+
                 collector.sourceMetadata = defaultSourceMetadata
                 player.setMediaItem(MediaItem.fromUri(Samples.DASH.uri))
+                // we are forcing the highest quality
+                // to ensure that player is longer in startup state (should reduce flakiness)
+                player.trackSelectionParameters = forceHighestQuality
                 player.prepare()
                 player.play()
-                Thread.sleep(100)
+            }
+
+            Media3PlayerPlaybackUtils.waitUntilPlayerIsInStartup(player)
+            Thread.sleep(100)
+
+            withContext(mainScope.coroutineContext) {
                 player.release()
             }
 
@@ -310,6 +347,16 @@ class ErrorScenariosTest {
             assertThat(eventData.videoStartFailed).isTrue()
             assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
             DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
+
+            // verify that collector detaching after player release does not send further samples
+            val requestsBeforeDetach = MockedIngress.requestCount()
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(1000)
+            val requestsAfterDetach = MockedIngress.requestCount()
+            assertThat(requestsAfterDetach).isEqualTo(requestsBeforeDetach)
         }
 
     @Test
@@ -321,17 +368,30 @@ class ErrorScenariosTest {
             // act
             withContext(mainScope.coroutineContext) {
                 collector.attachPlayer(player)
+                // we need to wait a bit here to ensure we got a proper license callback
+                // otherwise we have seen cases where the test finished before the license callback was called
+                // and thus no samples were sent
+                Thread.sleep(1000)
+
                 collector.sourceMetadata = defaultSourceMetadata
                 player.setMediaItem(MediaItem.fromUri(Samples.DASH.uri))
+                // we are forcing the highest quality
+                // to ensure that player is longer in startup state (should reduce flakiness)
+                player.trackSelectionParameters = forceHighestQuality
                 player.prepare()
                 player.play()
-                Thread.sleep(100)
+            }
+
+            Media3PlayerPlaybackUtils.waitUntilPlayerIsInStartup(player)
+            Thread.sleep(100)
+
+            withContext(mainScope.coroutineContext) {
                 collector.detachPlayer()
             }
 
             // wait until first sample is sent out
             MockedIngress.waitForAnalyticsSample()
-            Thread.sleep(500) // wait a bit longer to ensure no further samples are sent
+            Thread.sleep(1000) // wait a bit longer to ensure no further samples are sent
             val impressions = MockedIngress.extractImpressions()
             assertThat(impressions).hasSize(1)
             val impression = impressions.first()
@@ -340,5 +400,15 @@ class ErrorScenariosTest {
             assertThat(eventData.videoStartFailed).isTrue()
             assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
             DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
+
+            // verify that destroying of player after detaching collector does not send further samples
+            val requestsBeforeRelease = MockedIngress.requestCount()
+            withContext(mainScope.coroutineContext) {
+                player.release()
+            }
+
+            Thread.sleep(1000)
+            val requestsAfterRelease = MockedIngress.requestCount()
+            assertThat(requestsAfterRelease).isEqualTo(requestsBeforeRelease)
         }
 }

@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.media3.exoplayer
 
 import androidx.media3.common.Player
+import androidx.media3.common.Player.STATE_BUFFERING
 import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
 
 object Media3PlayerPlaybackUtils {
@@ -22,5 +23,9 @@ object Media3PlayerPlaybackUtils {
 
     fun waitUntilPlayerHasError(player: Player) {
         PlaybackUtils.waitUntil { player.playerError != null }
+    }
+
+    fun waitUntilPlayerIsInStartup(player: Player) {
+        PlaybackUtils.waitUntil { player.playbackState == STATE_BUFFERING && player.playWhenReady }
     }
 }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.withContext
 import org.assertj.core.api.Assertions.assertThat
 import org.chromium.net.CronetEngine
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -63,6 +64,22 @@ class CronetNetworkTest {
         player = createExoPlayer()
     }
 
+    @After
+    fun teardown() {
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                if (!player.isReleased) {
+                    player.release()
+                }
+            }
+            // wait a bit to make sure the player is released
+            Thread.sleep(100)
+            MockedIngress.stopServer()
+            // wait a bit to make sure the server is stopped before next test starts
+            Thread.sleep(100)
+        }
+    }
+
     @Test
     fun test_downloadTracking_withCronetNetworkStack() =
         runBlockingTest {
@@ -85,7 +102,7 @@ class CronetNetworkTest {
                 player.release()
             }
 
-            Thread.sleep(300)
+            Thread.sleep(500)
 
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)

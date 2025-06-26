@@ -38,7 +38,7 @@ object DataVerifier {
         }
     }
 
-    private const val MIN_AVG_BANDWIDTH_IN_KBPS = 1024f // ~1 Mbps
+    private const val MIN_AVG_BANDWIDTH_IN_KBPS = 512f // ~512 kbps
     private const val MAX_AVG_BANDWIDTH_IN_KBPS = 600 * 1024f // ~600 Mbps
 
     /**

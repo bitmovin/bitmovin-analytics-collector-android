@@ -58,3 +58,10 @@ yes | sdkmanager --licenses
 #  ./gradlew :collector-exoplayer:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.exoplayer.ErrorScenariosTest.test_vodWithDrm_wrongConfig || exit
 
 
+#for i in {1..50}; do
+#   echo "RUN $i/50"
+#  ./gradlew :collector-media3-exoplayer:cleanPixel6api35DebugAndroidTest
+#  ./gradlew :collector-media3-exoplayer:pixel6api35DebugAndroidTest  -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.media3.exoplayer.ErrorScenariosTest.test_playerReleaseDuringStartup_Should_sendEbvsSample || exit
+#done
+
+

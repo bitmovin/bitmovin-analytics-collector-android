@@ -56,6 +56,14 @@ internal class AnalyticsEventListener(
             !stateMachine.isStartupFinished
         ) {
             startup(position)
+        } else if (!playWhenReady && stateMachine.isInStartupState()) {
+            // in case we are in startupstate but playWhenReady is for some reason
+            // not set, it indicates that player will not start playing without
+            // user interaction, this could happen in case the source is changed
+            // and playWhenReady is disabled afterwards
+            // resetting the state machine to the initial state covers this scenario
+            stateMachine.resetStateMachine()
+            playbackInfoProvider.isInInitialBufferState = true
         }
     }
 

@@ -30,7 +30,7 @@ object MockedIngress {
 
     val currentImpressionsIds = mutableSetOf<String>()
 
-    val alreadyTakenRequests = mutableListOf<RecordedRequest>()
+    private val alreadyTakenRequests = mutableListOf<RecordedRequest>()
 
     // This is a volatile variable to ensure that the value is always read from the main memory and not optimized by the compiler
     @Volatile
@@ -58,6 +58,7 @@ object MockedIngress {
 
     fun stopServer() {
         server.shutdown()
+        alreadyTakenRequests.clear()
         currentImpressionsIds.clear()
     }
 
@@ -237,7 +238,7 @@ object MockedIngress {
                 }
 
                 if (start.plus(unit.toMillis(timeout)) <= System.currentTimeMillis()) {
-                    throw RuntimeException("No error detail sample received within the timeout")
+                    throw RuntimeException("No analytics sample received within the timeout")
                 }
             }
         }
