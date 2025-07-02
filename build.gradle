@@ -10,7 +10,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.7.0'
+        classpath 'com.android.tools.build:gradle:8.9.1'
         classpath "com.diffplug.spotless:spotless-plugin-gradle:6.23.3"
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.33.1"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -112,7 +112,7 @@ ext {
     // collector dependencies
     gsonVersion = '2.12.1'
     okhttp3Version = '4.12.0'
-    appCompatVersion = '1.7.0' // required for bitmovin player
+    appCompatVersion = '1.7.0'
     coroutinesVersion = "1.8.1"
     kotlinxSerialization = "1.6.3" // used for serialization of events in the collector
 

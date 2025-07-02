@@ -27,7 +27,7 @@ import com.bitmovin.player.api.source.SourceConfig
 import com.bitmovin.player.api.ui.StyleConfig
 
 private const val SEEKING_OFFSET = 10
-private val TAG = MainActivity::class.java.simpleName
+private val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
     private lateinit var player: Player

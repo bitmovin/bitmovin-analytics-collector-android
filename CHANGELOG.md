@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Layout of example apps is not hiding buttons underneath app label anymore
 
 ### Changed
+- [Internal] Upgraded gradle to 8.11.1 and AGP to 8.9.1 (same as player currently has)
 - [Internal] Using bundled bitmovin player instead of standalone collector for bitmovin example app
 
 ## v3.17.0
