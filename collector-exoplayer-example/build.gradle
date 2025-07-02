@@ -53,6 +53,7 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
     implementation "androidx.work:work-runtime-ktx:${rootProject.ext.workRuntimeKtxVersion}"
     implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
+    implementation "androidx.activity:activity-ktx:${rootProject.ext.ActivityKtxVersion}"
 
     implementation "com.google.android.exoplayer:exoplayer:${rootProject.ext.exoplayerVersion}"
 

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- [Internal] Layout of example apps is not hiding buttons underneath app label anymore
+
+### Changed
+- [Internal] Using bundled bitmovin player instead of standalone collector for bitmovin example app
+
 ## v3.17.0
 
 ### Fixed

@@ -122,6 +122,7 @@ ext {
     constraintlayoutVersion = '2.1.4'
     multidexVersion = '2.0.1'
     workRuntimeKtxVersion = '2.9.0'
+    ActivityKtxVersion = '1.10.1'
 
     // test dependencies
     testRunnerVersion = '1.6.2'

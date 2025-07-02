@@ -4,7 +4,11 @@ import android.os.Bundle
 import android.os.StrictMode
 import android.view.Menu
 import android.widget.Button
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
@@ -13,7 +17,6 @@ import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
-import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.example.shared.Samples
@@ -25,20 +28,23 @@ import com.bitmovin.player.api.advertising.AdItem
 import com.bitmovin.player.api.advertising.AdSource
 import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdvertisingConfig
+import com.bitmovin.player.api.analytics.AnalyticsApi.Companion.analytics
+import com.bitmovin.player.api.analytics.SourceAnalyticsApi.Companion.analytics
 import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
 import com.bitmovin.player.api.source.Source
+import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import com.google.android.gms.cast.framework.CastButtonFactory
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var player: Player
-    private lateinit var collector: IBitmovinPlayerCollector
     private var currentPlaylistItemIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         // Policy to verify that main scope is not misused
@@ -54,6 +60,13 @@ class MainActivity : AppCompatActivity() {
         )
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(insets.left, insets.top, insets.right, insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
+
         setContentView(binding.root)
 
         // it's necessary to update applicationId for casting to work
@@ -107,9 +120,12 @@ class MainActivity : AppCompatActivity() {
                     title = "DRM Video Title",
                     videoId = "drmVideoId",
                 )
-            val source = Source.create(createDRMSourceConfig())
-            collector.setSourceMetadata(source, drmSourceMetadata)
-            this.player.load(source)
+            val drmSource =
+                SourceBuilder(createDRMSourceConfig())
+                    .configureAnalytics(drmSourceMetadata)
+                    .build()
+
+            this.player.load(drmSource)
         }
 
         findViewById<Button>(R.id.seek_next_source).setOnClickListener {
@@ -120,32 +136,31 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.changeCustomData).setOnClickListener {
-            player.source?.let { source ->
-                val newCustomData =
-                    collector.getCustomData(source).copy(
-                        customData2 = "custom_data_2_changed",
-                        customData4 = "custom_data_4_changed",
-                    )
-                collector.setCustomData(source, newCustomData)
-            }
+            val oldCustomData = player.source?.analytics?.customData ?: CustomData()
+            val newCustomData =
+                oldCustomData.copy(
+                    customData2 = "custom_data_2_changed",
+                    customData4 = "custom_data_4_changed",
+                )
+            player.source?.analytics?.customData = newCustomData
         }
 
         findViewById<Button>(R.id.sendCustomDataEvent).setOnClickListener {
             val customData = CustomData(customData1 = "sendWithCustomDataEvent")
-            collector.sendCustomDataEvent(customData)
+            player.analytics?.sendCustomDataEvent(customData)
         }
 
         findViewById<Button>(R.id.ssaiStart).setOnClickListener {
-            collector.ssai.adBreakStart(SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL))
+            player.analytics?.ssai?.adBreakStart(SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL))
         }
 
         findViewById<Button>(R.id.ssaiNext).setOnClickListener {
             val metadata = SsaiAdMetadata("adId1", "adSystem1", CustomData(customData1 = "ssai1 custom data"))
-            collector.ssai.adStart(metadata)
+            player.analytics?.ssai?.adStart(metadata)
         }
 
         findViewById<Button>(R.id.ssaiEnd).setOnClickListener {
-            collector.ssai.adBreakEnd()
+            player.analytics?.ssai?.adBreakEnd()
         }
 
         initializeBitmovinPlayerWithAnalytics()
@@ -186,11 +201,8 @@ class MainActivity : AppCompatActivity() {
             )
         // create player instance with analytics config and default metadata
         val playerBuilder = PlayerBuilder(this).setPlayerConfig(playerConfig)
-        playerBuilder.disableAnalytics()
+        playerBuilder.configureAnalytics(analyticsConfig, defaultMetadata)
         player = playerBuilder.build()
-
-        collector = IBitmovinPlayerCollector.create(this, analyticsConfig, defaultMetadata)
-        collector.attachPlayer(player)
 
         binding.playerView.player = player
         val redbullMetadata =
@@ -213,12 +225,17 @@ class MainActivity : AppCompatActivity() {
             )
 
         // add metadata to sources
-        val liveSimSource = Source.create(SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()))
-        collector.setSourceMetadata(liveSimSource, liveSimMetadata)
-        val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()))
-        collector.setSourceMetadata(redbullSource, redbullMetadata)
-        val sintelSource = Source.create(SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()))
-        collector.setSourceMetadata(sintelSource, sintelMetadata)
+        val liveSimSource =
+            SourceBuilder(sourceConfig = SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()))
+                .configureAnalytics(liveSimMetadata).build()
+
+        val redbullSource =
+            SourceBuilder(sourceConfig = SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()))
+                .configureAnalytics(redbullMetadata).build()
+
+        val sintelSource =
+            SourceBuilder(sourceConfig = SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()))
+                .configureAnalytics(sintelMetadata).build()
 
         val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource, liveSimSource), PlaylistOptions())
         player.load(playlistConfig)

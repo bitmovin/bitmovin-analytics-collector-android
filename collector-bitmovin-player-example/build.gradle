@@ -61,6 +61,8 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
     implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
     implementation "androidx.work:work-runtime-ktx:${rootProject.ext.workRuntimeKtxVersion}"
+    implementation "androidx.activity:activity-ktx:${rootProject.ext.ActivityKtxVersion}"
+
 
     implementation "com.bitmovin.player:player:${rootProject.ext.bitmovinPlayerVersion}"
 

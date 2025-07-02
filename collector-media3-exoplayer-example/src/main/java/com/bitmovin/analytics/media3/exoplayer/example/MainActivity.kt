@@ -4,7 +4,11 @@ import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import android.widget.Button
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.Util
@@ -29,6 +33,15 @@ class MainActivity : AppCompatActivity(), Player.Listener {
     private var collector: IMedia3ExoPlayerCollector? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
+        ViewCompat.setOnApplyWindowInsetsListener(viewBinding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(insets.left, insets.top, insets.right, insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
+        setContentView(viewBinding.root)
+
         // Set StrictMode to catch potential issues early
         // okhttp causes android.os.strictmode.UntaggedSocketViolation
         // which is a known issue
@@ -38,9 +51,6 @@ class MainActivity : AppCompatActivity(), Player.Listener {
                 .detectAll()
                 .build(),
         )
-
-        super.onCreate(savedInstanceState)
-        setContentView(viewBinding.root)
 
         findViewById<Button>(R.id.release_button).setOnClickListener {
             if (player != null) {
