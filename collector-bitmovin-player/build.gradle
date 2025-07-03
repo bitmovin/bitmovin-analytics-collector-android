@@ -107,6 +107,8 @@ dependencies {
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
     androidTestImplementation "androidx.work:work-runtime-ktx:${rootProject.ext.workRuntimeKtxVersion}"
 
+    androidTestImplementation  "org.jetbrains.kotlinx:kotlinx-metadata-jvm:${rootProject.ext.kotlinMetadataJvmVersion}"
+
     // used to test download tracking with cronet network stack
     androidTestImplementation "org.chromium.net:cronet-api:${rootProject.ext.cronetApi}"
     androidTestImplementation "com.google.android.gms:play-services-cronet:${rootProject.ext.cronetGooglePlay}"

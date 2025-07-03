@@ -82,6 +82,8 @@ dependencies {
     androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    androidTestImplementation  "org.jetbrains.kotlinx:kotlinx-metadata-jvm:${rootProject.ext.kotlinMetadataJvmVersion}"
+
     androidTestImplementation project(':example-shared')
     androidTestImplementation project(':systemtest-utils')
 }
