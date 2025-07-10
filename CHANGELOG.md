@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Renamed exitbeforevideostart state to videostartfailed to better reflect the state
+- Only cleanup resources on detaching if player is attached
 - [Internal] Upgraded gradle to 8.11.1 and AGP to 8.9.1 (same as player currently has)
 - [Internal] Using bundled bitmovin player instead of standalone collector for bitmovin example app
 

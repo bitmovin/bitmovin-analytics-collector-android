@@ -45,7 +45,11 @@ class BitmovinAnalytics(
     // first startup sample, in case the collector supports multiple sources)
     private var playerStartupTime = 1L
 
-    public var playerAdapter: PlayerAdapter? = null
+    private var playerAdapter: PlayerAdapter? = null
+
+    fun isAttachedToPlayer(): Boolean {
+        return playerAdapter != null
+    }
 
     fun getAndResetPlayerStartupTime(): Long {
         val playerStartupTime = playerStartupTime
@@ -66,11 +70,11 @@ class BitmovinAnalytics(
         adapter.stateMachine.subscribe(stateMachineListener)
         this.stateMachineListener = stateMachineListener
         eventDataDispatcher.enable()
-        playerAdapter = adapter
         val features = adapter.init()
         featureManager.registerFeatures(features)
         registerActivityPauseListener(adapter.ssaiService)
         tryAttachAd(adapter)
+        playerAdapter = adapter
     }
 
     private fun tryAttachAd(adapter: PlayerAdapter) {
@@ -81,6 +85,10 @@ class BitmovinAnalytics(
 
     /** Detach the current player that is being used with Bitmovin Analytics.  */
     fun detachPlayer(shouldSendOutSamples: Boolean = true) {
+        if (!isAttachedToPlayer()) {
+            return
+        }
+
         if (shouldSendOutSamples) {
             playerAdapter?.ssaiService?.flushCurrentAdSample()
             playerAdapter?.triggerLastSampleOfSession()
@@ -91,6 +99,10 @@ class BitmovinAnalytics(
         playerAdapter?.release()
         eventDataDispatcher.disable()
         unregisterActivityPauseListener()
+
+        // cleanup references
+        playerAdapter = null
+        stateMachineListener = null
     }
 
     fun resetSourceRelatedState() {

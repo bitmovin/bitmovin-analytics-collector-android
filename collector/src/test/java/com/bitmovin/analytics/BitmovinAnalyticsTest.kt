@@ -2,6 +2,7 @@ package com.bitmovin.analytics
 
 import android.content.Context
 import android.net.Uri
+import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.BackendFactory
 import com.bitmovin.analytics.data.EventDataDispatcherFactory
@@ -47,7 +48,9 @@ class BitmovinAnalyticsTest {
     @Test
     fun testDetachPlayerShouldCallOnAnalyticsReleasingEventListener() {
         val listener = mockk<OnAnalyticsReleasingEventListener>(relaxed = true)
+        val mockPlayerAdapter = mockk<PlayerAdapter>(relaxed = true)
         val analytics = BitmovinAnalytics(analyticsConfig, context)
+        analytics.attach(mockPlayerAdapter)
         analytics.onAnalyticsReleasingObservable.subscribe(listener)
         analytics.detachPlayer()
         verify(exactly = 1) { listener.onReleasing() }
