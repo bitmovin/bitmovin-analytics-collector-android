@@ -215,7 +215,7 @@ class PlayerStateMachine(
     ): Boolean {
         if (destination === this.currentState) {
             return false
-        } else if (this.currentState === PlayerStates.VIDEOSTARTFAILED) {
+        } else if (this.currentState === PlayerStates.VIDEOSTART_FAILED) {
             return false
         } else if (currentState === PlayerStates.AD &&
             destination !== PlayerStates.ERROR && destination !== PlayerStates.ADFINISHED
@@ -226,7 +226,7 @@ class PlayerStateMachine(
         ) {
             return false
         } else if (currentState === PlayerStates.STARTUP && destination !== PlayerStates.READY &&
-            destination !== PlayerStates.ERROR && destination !== PlayerStates.VIDEOSTARTFAILED &&
+            destination !== PlayerStates.ERROR && destination !== PlayerStates.VIDEOSTART_FAILED &&
             destination !== PlayerStates.PLAYING && destination !== PlayerStates.AD
         ) {
             return false
@@ -335,7 +335,7 @@ class PlayerStateMachine(
 
     fun exitBeforeVideoStart(position: Long) {
         videoStartFailedReason = VideoStartFailedReason.PAGE_CLOSED
-        transitionState(PlayerStates.VIDEOSTARTFAILED, position)
+        transitionState(PlayerStates.VIDEOSTART_FAILED, position)
     }
 
     fun triggerSampleIfPlaying(ssaiRelated: Boolean = false) {
@@ -371,7 +371,7 @@ class PlayerStateMachine(
     private fun onVideoStartTimeoutTimerFinished() {
         BitmovinLog.d(TAG, "VideoStartTimeout finish")
         videoStartFailedReason = VideoStartFailedReason.TIMEOUT
-        transitionState(PlayerStates.VIDEOSTARTFAILED, 0, null)
+        transitionState(PlayerStates.VIDEOSTART_FAILED, 0, null)
     }
 
     private fun onRebufferingTimerFinished() {

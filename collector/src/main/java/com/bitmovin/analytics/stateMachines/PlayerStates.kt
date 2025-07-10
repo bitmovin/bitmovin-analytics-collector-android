@@ -102,8 +102,8 @@ class PlayerStates {
                 }
             }
 
-        @JvmField val VIDEOSTARTFAILED =
-            object : DefaultPlayerState<Void>("videostartfailed") {
+        @JvmField val VIDEOSTART_FAILED =
+            object : DefaultPlayerState<Void>("videostart_failed") {
                 override fun onEnterState(
                     machine: PlayerStateMachine,
                     data: Void?,
