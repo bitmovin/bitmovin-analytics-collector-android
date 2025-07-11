@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.17.1
+
 ### Fixed
 - [Internal] Layout of example apps is not hiding buttons underneath app label anymore
 
