@@ -68,10 +68,11 @@ class BitmovinAnalyticsTest {
         val defaultStateMachineListener = DefaultStateMachineListener(analytics, mockk(relaxed = true), observable, ssaiService)
         val stateMachine = mockk<PlayerStateMachine>()
         val impressionId = "randomImpressionId"
+        val durationInStartupStateMs = 123L
         every { stateMachine.videoStartFailedReason } returns VideoStartFailedReason.TIMEOUT
         every { mockImpressionIdProvider.getImpressionId() } returns impressionId
         observable.subscribe(listener)
-        defaultStateMachineListener.onVideoStartFailed(stateMachine)
+        defaultStateMachineListener.onVideoStartFailed(stateMachine, durationInStartupStateMs)
         verify(exactly = 1) {
             listener.onError(
                 impressionId,

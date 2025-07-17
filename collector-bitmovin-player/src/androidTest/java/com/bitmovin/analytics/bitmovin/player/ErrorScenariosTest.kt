@@ -105,6 +105,7 @@ class ErrorScenariosTest {
             val eventData = impression.eventDataList.first()
             assertThat(eventData.videoStartFailed).isTrue()
             assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
+            assertThat(eventData.duration).isGreaterThan(10)
             DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
         }
 

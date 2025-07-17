@@ -63,5 +63,8 @@ interface StateMachineListener {
 
     fun onAudioTrackChange(stateMachine: PlayerStateMachine)
 
-    fun onVideoStartFailed(stateMachine: PlayerStateMachine)
+    fun onVideoStartFailed(
+        stateMachine: PlayerStateMachine,
+        durationInStartupStateMs: Long,
+    )
 }

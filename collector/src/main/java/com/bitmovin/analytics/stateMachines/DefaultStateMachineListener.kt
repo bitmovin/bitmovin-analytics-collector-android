@@ -248,7 +248,10 @@ class DefaultStateMachineListener(
         analytics.sendEventData(data)
     }
 
-    override fun onVideoStartFailed(stateMachine: PlayerStateMachine) {
+    override fun onVideoStartFailed(
+        stateMachine: PlayerStateMachine,
+        durationInStartupStateMs: Long,
+    ) {
         var videoStartFailedReason = stateMachine.videoStartFailedReason
         if (videoStartFailedReason == null) {
             videoStartFailedReason = VideoStartFailedReason.UNKNOWN
@@ -278,6 +281,7 @@ class DefaultStateMachineListener(
             }
         }
         data.videoStartFailedReason = videoStartFailedReason.reason
+        data.duration = durationInStartupStateMs
         analytics.sendEventData(data)
         // we implicitly detach and don't want to send the last sample out
         analytics.detachPlayer(shouldSendOutSamples = false)

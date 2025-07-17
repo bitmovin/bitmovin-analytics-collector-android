@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.17.2
+
+### Changed
+- Store duration of startup until exit before video start (EBVS) happens in state duration
+
 ## v3.17.1
 
 ### Fixed

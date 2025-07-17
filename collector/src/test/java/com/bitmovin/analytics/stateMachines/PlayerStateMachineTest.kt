@@ -149,12 +149,13 @@ class PlayerStateMachineTest {
         val listener = mockk<StateMachineListener>(relaxed = true)
         playerStateMachine.listeners.subscribe(listener)
         playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.addStartupTime(123L)
 
         // Act
         playerStateMachine.exitBeforeVideoStart(0)
 
         // Assert
-        verify { listener.onVideoStartFailed(any()) }
+        verify { listener.onVideoStartFailed(any(), eq(123L)) }
         assertEquals(VideoStartFailedReason.PAGE_CLOSED, playerStateMachine.videoStartFailedReason)
     }
 }

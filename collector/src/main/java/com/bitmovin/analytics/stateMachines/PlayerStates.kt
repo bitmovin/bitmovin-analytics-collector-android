@@ -108,7 +108,7 @@ class PlayerStates {
                     machine: PlayerStateMachine,
                     data: Void?,
                 ) {
-                    machine.listeners.notify { it.onVideoStartFailed(machine) }
+                    machine.listeners.notify { it.onVideoStartFailed(machine, machine.startupTime) }
                 }
 
                 override fun onExitState(
