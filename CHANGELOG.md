@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Stop reporting of identical errors after 5 errors if there is no state change (avoiding reporting of error loops)
+
 ## v3.17.2
 
 ### Changed

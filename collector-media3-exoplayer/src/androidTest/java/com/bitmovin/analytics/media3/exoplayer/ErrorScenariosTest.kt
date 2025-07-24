@@ -411,4 +411,90 @@ class ErrorScenariosTest {
             val requestsAfterRelease = MockedIngress.requestCount()
             assertThat(requestsAfterRelease).isEqualTo(requestsBeforeRelease)
         }
+
+    @Test
+    fun test_wrongDrmConfigWithRetries_Should_onlySend5SimilarErrorSamplesPerSession() =
+        runBlockingTest {
+            // arrange
+            val sample = TestSources.DRM_DASH_WIDEVINE
+            val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            // using clearkey_uuid instead of widevine to simulate error
+            val mediaItem =
+                MediaItem.Builder()
+                    .setDrmConfiguration(
+                        MediaItem.DrmConfiguration.Builder(C.CLEARKEY_UUID)
+                            .setLicenseUri(sample.drmLicenseUrl)
+                            .build(),
+                    )
+                    .setUri(sample.mpdUrl)
+                    .build()
+            val drmSourceMetadata1 =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                    videoId = "source1",
+                    cdnProvider = "cdn_provider",
+                    customData = TestConfig.createDummyCustomData(),
+                )
+
+            val drmSourceMetadata2 =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                    videoId = "source2",
+                    cdnProvider = "cdn_provider",
+                    customData = TestConfig.createDummyCustomData(),
+                )
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                player.playWhenReady = true
+                player.setMediaItem(mediaItem)
+                collector.sourceMetadata = drmSourceMetadata1
+                collector.attachPlayer(player)
+                player.prepare()
+            }
+
+            waitForErrorDetailSample()
+
+            for (i in 1..4) {
+                // We expect that the player is only sending 5 similar errors if there is no state change
+                withContext(mainScope.coroutineContext) {
+                    player.prepare()
+                }
+                waitForErrorDetailSample()
+            }
+
+            // We expect that the player is only sending 5 similar errors if there is no state change
+            // thus all errors below should not be sent
+            withContext(mainScope.coroutineContext) {
+                player.prepare()
+            }
+
+            // we need to wait a bit, to ensure that there is no further error sample sent
+            Thread.sleep(5000)
+
+            // create another session, where we should have 1 error reported again
+            // this verifies that the counter is reset after a session ends
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+                player.playWhenReady = true
+                player.setMediaItem(mediaItem)
+                collector.sourceMetadata = drmSourceMetadata2
+                collector.attachPlayer(player)
+                player.prepare()
+            }
+
+            waitForErrorDetailSample()
+
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionsList).hasSize(2)
+            val firstImpression = impressionsList.first()
+            assertThat(firstImpression.eventDataList).hasSize(5)
+            assertThat(firstImpression.errorDetailList).hasSize(5)
+            assertThat(firstImpression.eventDataList).allMatch { e -> e.videoId == "source1" }
+            val secondImpression = impressionsList.last()
+            assertThat(secondImpression.eventDataList).hasSize(1)
+            assertThat(secondImpression.errorDetailList).hasSize(1)
+            assertThat(secondImpression.eventDataList).allMatch { e -> e.videoId == "source2" }
+        }
 }

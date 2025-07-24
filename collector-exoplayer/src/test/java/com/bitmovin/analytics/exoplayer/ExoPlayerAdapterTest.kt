@@ -40,6 +40,7 @@ class ExoPlayerAdapterTest {
                     mockk(),
                     mockk(),
                     mockk(),
+                    mockk(),
                 ),
                 recordPrivateCalls = true,
             )

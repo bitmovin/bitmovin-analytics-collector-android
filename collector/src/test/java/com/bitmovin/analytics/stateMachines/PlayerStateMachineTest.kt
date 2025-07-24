@@ -6,6 +6,7 @@ import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.enums.VideoStartFailedReason
+import com.bitmovin.analytics.error.IdenticalErrorReportingLimiter
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Assert.assertEquals
@@ -34,6 +35,7 @@ class PlayerStateMachineTest {
                 playerContext = playerContextMock,
                 looper = looperMock,
                 deviceInformationProvider = deviceInformationProviderMock,
+                identicalErrorReportingLimiter = IdenticalErrorReportingLimiter(),
                 heartbeatHandler = heartbeatHandlerMock,
             )
     }

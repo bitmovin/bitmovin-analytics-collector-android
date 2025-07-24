@@ -1,11 +1,14 @@
 package com.bitmovin.analytics.stateMachines
 
+import android.util.Log
 import com.bitmovin.analytics.dtos.ErrorCode
 import com.bitmovin.analytics.dtos.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 
 class PlayerStates {
     companion object {
+        private const val TAG = "PlayerStates"
+
         @JvmField val READY = DefaultPlayerState<Void>("ready")
 
         @JvmField val SOURCE_CHANGED = DefaultPlayerState<Void>("source_changed")
@@ -89,6 +92,11 @@ class PlayerStates {
                     data: ErrorCode?,
                 ) {
                     machine.videoStartTimeoutTimer.cancel()
+                    if (data != null && !machine.shouldReportError(data.errorCode)) {
+                        Log.i(TAG, "ErrorCode ${data.errorCode} already reported 5 times, not reporting this occurrence!")
+                        return
+                    }
+
                     machine.listeners.notify { it.onError(machine, data) }
                 }
 
@@ -127,6 +135,10 @@ class PlayerStates {
                     machine: PlayerStateMachine,
                     data: Void?,
                 ) {
+                    // we reset the error limiter here since entering playing state means
+                    // that the player is continuing playback and it is unlikely that we are in an error loop
+                    // (which is usually during startup due to retries, or within the error state itself)
+                    machine.resetIdenticalErrorReportingLimiter()
                     machine.enableHeartbeat()
                 }
 

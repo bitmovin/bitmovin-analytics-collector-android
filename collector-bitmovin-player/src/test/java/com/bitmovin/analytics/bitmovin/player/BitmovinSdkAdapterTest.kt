@@ -63,6 +63,7 @@ class BitmovinSdkAdapterTest {
                     mockk(),
                     mockk(),
                     mockk(),
+                    mockk(),
                 ),
                 recordPrivateCalls = true,
             )

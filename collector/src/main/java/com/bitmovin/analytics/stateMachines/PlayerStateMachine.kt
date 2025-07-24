@@ -10,6 +10,7 @@ import com.bitmovin.analytics.dtos.ErrorCode
 import com.bitmovin.analytics.dtos.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 import com.bitmovin.analytics.enums.VideoStartFailedReason
+import com.bitmovin.analytics.error.IdenticalErrorReportingLimiter
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
@@ -22,6 +23,7 @@ class PlayerStateMachine(
     private val playerContext: PlayerContext,
     looper: Looper,
     private val deviceInformationProvider: DeviceInformationProvider,
+    private val identicalErrorReportingLimiter: IdenticalErrorReportingLimiter,
     private val heartbeatHandler: Handler = Handler(looper),
 ) {
     internal val listeners = ObservableSupport<StateMachineListener>()
@@ -199,10 +201,12 @@ class PlayerStateMachine(
         if (!isTransitionAllowed(currentState, destinationPlayerState)) {
             return
         }
+
         val elapsedTime = Util.elapsedTime
         videoTimeEnd = videoTime
         BitmovinLog.d(TAG, "Transitioning from $currentState to $destinationPlayerState")
-        currentState.onExitState(this, elapsedTime, elapsedTime - elapsedTimeOnEnter, destinationPlayerState)
+        val durationInState = elapsedTime - elapsedTimeOnEnter
+        currentState.onExitState(this, elapsedTime, durationInState, destinationPlayerState)
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
         destinationPlayerState.onEnterState(this, data)
@@ -265,6 +269,7 @@ class PlayerStateMachine(
     ) {
         transitionState(PlayerStates.SOURCE_CHANGED, oldVideoTime, null)
         resetSourceRelatedState()
+        identicalErrorReportingLimiter.reset()
         if (shouldStartup) {
             transitionState(PlayerStates.STARTUP, newVideoTime, null)
         }
@@ -346,6 +351,14 @@ class PlayerStateMachine(
         triggerSample(ssaiRelated)
     }
 
+    fun shouldReportError(errorCode: Int): Boolean {
+        return identicalErrorReportingLimiter.shouldReportError(errorCode)
+    }
+
+    fun resetIdenticalErrorReportingLimiter() {
+        identicalErrorReportingLimiter.reset()
+    }
+
     private fun qualityChanged(
         videoTime: Long,
         didQualityChange: Boolean,
@@ -392,6 +405,7 @@ class PlayerStateMachine(
             looper: Looper,
             deviceInformationProvider: DeviceInformationProvider,
         ): PlayerStateMachine {
+            val identicalErrorReportingLimiter = IdenticalErrorReportingLimiter()
             val bufferingTimeoutTimer = ObservableTimer(Util.REBUFFERING_TIMEOUT.toLong(), 1000)
             val qualityChangeCountResetTimer =
                 ObservableTimer(Util.ANALYTICS_QUALITY_CHANGE_COUNT_RESET_INTERVAL.toLong(), 1000)
@@ -405,6 +419,7 @@ class PlayerStateMachine(
                 playerContext,
                 looper,
                 deviceInformationProvider,
+                identicalErrorReportingLimiter,
             )
         }
     }

@@ -40,6 +40,7 @@ class Media3ExoPlayerAdapterTest {
                     mockk(),
                     mockk(),
                     mockk(),
+                    mockk(),
                 ),
                 recordPrivateCalls = true,
             )
