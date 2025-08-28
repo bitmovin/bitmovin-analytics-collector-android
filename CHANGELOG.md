@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.19.0
+
 ### Added
 - New API to transform errors and mark them with severity CRITICAL (default) or INFO
 - Added transformation of errors for adsamples (for ssai engagement tracking and csai)
