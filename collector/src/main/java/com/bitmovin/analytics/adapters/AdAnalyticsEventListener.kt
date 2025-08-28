@@ -6,14 +6,31 @@ import com.bitmovin.analytics.ads.AdQuartile
 
 interface AdAnalyticsEventListener {
     fun onAdStarted(ad: Ad)
+
     fun onAdFinished()
+
     fun onAdBreakStarted(adBreak: AdBreak)
+
     fun onAdBreakFinished()
+
     fun onAdClicked(clickThroughUrl: String?)
-    fun onAdError(adBreak: AdBreak, code: Int?, message: String?)
+
+    fun onAdError(
+        adBreak: AdBreak,
+        code: Int,
+        message: String?,
+    )
+
     fun onAdSkipped()
-    fun onAdManifestLoaded(adBreak: AdBreak, downloadTime: Long)
+
+    fun onAdManifestLoaded(
+        adBreak: AdBreak,
+        downloadTime: Long,
+    )
+
     fun onAdQuartile(quartile: AdQuartile)
+
     fun onPlay()
+
     fun onPause()
 }

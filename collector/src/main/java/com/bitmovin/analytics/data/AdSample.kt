@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.data
 
 import com.bitmovin.analytics.ads.Ad
+import com.bitmovin.analytics.api.error.ErrorSeverity
 
 data class AdSample(
     var adStartupTime: Long? = null,
@@ -34,5 +35,6 @@ data class AdSample(
     var errorCode: Int? = null,
     var errorData: String? = null,
     var errorMessage: String? = null,
+    var errorSeverity: ErrorSeverity? = null,
     var ad: Ad = Ad(),
 )

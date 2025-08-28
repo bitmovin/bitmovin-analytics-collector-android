@@ -2,6 +2,7 @@ package com.bitmovin.analytics.dtos
 
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.data.AdSample
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.utils.Util
@@ -75,6 +76,7 @@ data class AdEventData(
     var errorCode: Int? = null,
     var errorData: String? = null,
     var errorMessage: String? = null,
+    var errorSeverity: ErrorSeverity? = null,
     var adFallbackIndex: Long = 0,
     var adModule: String? = null,
     var adModuleVersion: String? = null,
@@ -384,5 +386,6 @@ data class AdEventData(
         errorCode = adSample.errorCode
         errorData = adSample.errorData
         errorMessage = adSample.errorMessage
+        errorSeverity = adSample.errorSeverity
     }
 }

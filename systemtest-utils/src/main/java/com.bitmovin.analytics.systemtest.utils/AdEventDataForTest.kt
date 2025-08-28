@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.systemtest.utils
 
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.utils.Util
 import kotlinx.serialization.Serializable
@@ -74,6 +75,8 @@ data class AdEventDataForTest(
     var errorCode: Int? = null,
     var errorData: String? = null,
     var errorMessage: String? = null,
+    // using String? here to make sure serialization of enum works correctly
+    var errorSeverity: String? = null,
     var adFallbackIndex: Long = 0,
     var adModule: String? = null,
     var adModuleVersion: String? = null,
@@ -236,6 +239,7 @@ data class AdEventDataForTest(
             errorCode = errorCode,
             errorData = errorData,
             errorMessage = errorMessage,
+            errorSeverity = if (errorSeverity != null) ErrorSeverity.valueOf(errorSeverity!!) else null,
             adFallbackIndex = adFallbackIndex,
             adModule = adModule,
             adModuleVersion = adModuleVersion,

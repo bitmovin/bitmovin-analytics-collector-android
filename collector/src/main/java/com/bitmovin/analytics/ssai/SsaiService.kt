@@ -6,6 +6,7 @@ import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartileMetadata
 import com.bitmovin.analytics.api.ssai.SsaiApi
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
+import com.bitmovin.analytics.dtos.ErrorCode
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
@@ -91,10 +92,7 @@ class SsaiService(
         ssaiEngagementMetricsService.flushCurrentAdSample()
     }
 
-    fun sendAdErrorSample(
-        errorCode: Int,
-        errorMessage: String,
-    ) {
+    fun sendAdErrorSample(errorCode: ErrorCode) {
         if (this.state != SsaiState.AD_RUNNING) {
             return
         }
@@ -103,8 +101,9 @@ class SsaiService(
             this.adBreakMetadata?.adPosition,
             adMetadata,
             adIndex,
-            errorCode,
-            errorMessage,
+            errorCode.errorCode,
+            errorCode.message,
+            errorCode.errorSeverity,
         )
     }
 

@@ -4,6 +4,7 @@ import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
@@ -245,7 +246,14 @@ class SsaiEngagementMetricsServiceTest {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
         ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
         ssaiEngagementMetricsService.markQuartileFinished(SsaiAdPosition.MIDROLL, SsaiAdQuartile.FIRST, adMetadata, null, 0)
-        ssaiEngagementMetricsService.sendAdErrorSample(SsaiAdPosition.MIDROLL, adMetadata, 0, 1234, "testMessage")
+        ssaiEngagementMetricsService.sendAdErrorSample(
+            SsaiAdPosition.MIDROLL,
+            adMetadata,
+            0,
+            1234,
+            "testMessage",
+            ErrorSeverity.INFO,
+        )
 
         val adEventDataSlot = slot<AdEventData>()
         verify(exactly = 1) { analytics.sendAdEventData(capture(adEventDataSlot)) }
@@ -267,13 +275,21 @@ class SsaiEngagementMetricsServiceTest {
         assertThat(adEventData.adPosition).isEqualTo("midroll")
         assertThat(adEventData.errorCode).isEqualTo(1234)
         assertThat(adEventData.errorMessage).isEqualTo("testMessage")
+        assertThat(adEventData.errorSeverity).isEqualTo(ErrorSeverity.INFO)
     }
 
     @Test
     fun `sendAdErrorSample should NOT sendout sample if ssaiEngagement is disabled`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
         ssaiEngagementMetricsServiceDisabled.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
-        ssaiEngagementMetricsServiceDisabled.sendAdErrorSample(SsaiAdPosition.MIDROLL, adMetadata, 0, 1234, "testMessage")
+        ssaiEngagementMetricsServiceDisabled.sendAdErrorSample(
+            SsaiAdPosition.MIDROLL,
+            adMetadata,
+            0,
+            1234,
+            "testMessage",
+            ErrorSeverity.CRITICAL,
+        )
 
         verify(exactly = 0) { analytics.sendAdEventData(any()) }
     }
@@ -282,8 +298,22 @@ class SsaiEngagementMetricsServiceTest {
     fun `sendAdErrorSample is not send twice on one ad`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
         ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
-        ssaiEngagementMetricsService.sendAdErrorSample(SsaiAdPosition.MIDROLL, adMetadata, 0, 1234, "testMessage")
-        ssaiEngagementMetricsService.sendAdErrorSample(SsaiAdPosition.MIDROLL, adMetadata, 0, 1234, "testMessage")
+        ssaiEngagementMetricsService.sendAdErrorSample(
+            SsaiAdPosition.MIDROLL,
+            adMetadata,
+            0,
+            1234,
+            "testMessage",
+            ErrorSeverity.INFO,
+        )
+        ssaiEngagementMetricsService.sendAdErrorSample(
+            SsaiAdPosition.MIDROLL,
+            adMetadata,
+            0,
+            1234,
+            "testMessage",
+            ErrorSeverity.CRITICAL,
+        )
         verify(exactly = 1) { analytics.sendAdEventData(any()) }
     }
 
@@ -291,10 +321,24 @@ class SsaiEngagementMetricsServiceTest {
     fun `sendAdErrorSample is called once per ad`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
         ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
-        ssaiEngagementMetricsService.sendAdErrorSample(SsaiAdPosition.MIDROLL, adMetadata, 0, 1234, "testMessage")
+        ssaiEngagementMetricsService.sendAdErrorSample(
+            SsaiAdPosition.MIDROLL,
+            adMetadata,
+            0,
+            1234,
+            "testMessage",
+            ErrorSeverity.INFO,
+        )
 
         ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 1)
-        ssaiEngagementMetricsService.sendAdErrorSample(SsaiAdPosition.MIDROLL, adMetadata, 0, 1234, "testMessage")
+        ssaiEngagementMetricsService.sendAdErrorSample(
+            SsaiAdPosition.MIDROLL,
+            adMetadata,
+            0,
+            1234,
+            "testMessage",
+            ErrorSeverity.CRITICAL,
+        )
         verify(exactly = 2) { analytics.sendAdEventData(any()) }
     }
 
@@ -329,7 +373,14 @@ class SsaiEngagementMetricsServiceTest {
         // we clear the mock to only test that calls happen due to the error, and not the started call
         clearMocks(handlerMock)
 
-        ssaiEngagementMetricsService.sendAdErrorSample(SsaiAdPosition.MIDROLL, adMetadata, 0, 123, "testError")
+        ssaiEngagementMetricsService.sendAdErrorSample(
+            SsaiAdPosition.MIDROLL,
+            adMetadata,
+            0,
+            123,
+            "testError",
+            ErrorSeverity.CRITICAL,
+        )
         verify(exactly = 1) { handlerMock.removeCallbacksAndMessages(any()) }
         verify(exactly = 0) { handlerMock.postDelayed(any(), any()) }
     }

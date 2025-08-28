@@ -69,11 +69,7 @@ class SsaiScenariosTest {
         EventDatabaseTestHelper.purge(appContext)
 
         mockedIngressUrl = MockedIngress.startServer()
-        defaultAnalyticsConfig =
-            TestConfig.createAnalyticsConfig(
-                backendUrl = mockedIngressUrl,
-                analyticsKey = "ab0544de-d8b7-4a34-8f66-11ad5cb11945",
-            )
+        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
         val playerConfig =
             PlayerConfig(
                 key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
@@ -1481,6 +1477,7 @@ class SsaiScenariosTest {
             assertThat(adEventDataList).hasSize(1)
             val ssaiAdEventData = adEventDataList[0]
             assertThat(ssaiAdEventData.errorCode).isEqualTo(102001)
+            assertThat(ssaiAdEventData.errorSeverity).isEqualTo("INFO")
             assertThat(ssaiAdEventData.errorMessage).startsWith("Transformed message: A general error occurred:")
         }
 

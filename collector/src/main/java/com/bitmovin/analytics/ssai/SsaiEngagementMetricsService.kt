@@ -4,6 +4,7 @@ import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
@@ -83,6 +84,7 @@ class SsaiEngagementMetricsService(
         adIndex: Int,
         errorCode: Int,
         errorMessage: String,
+        errorSeverity: ErrorSeverity,
     ) {
         if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
             return
@@ -96,6 +98,7 @@ class SsaiEngagementMetricsService(
         val adEventData = createBasicSsaiAdEventData(adPosition, adMetadata, adIndex)
         adEventData.errorMessage = errorMessage
         adEventData.errorCode = errorCode
+        adEventData.errorSeverity = errorSeverity
         upsertAdSample(adEventData)
         flushCurrentAdSample()
     }
@@ -213,23 +216,37 @@ class SsaiEngagementMetricsService(
             }
     }
 
+    // we make sure that when we merge the critical error wins
+    // thus we first check if there is an critical error which is then prefered
+    // if no critical error is present first error wins
     private fun mergeErrorInfo(
         adSample1: AdEventData,
         adSample2: AdEventData,
     ) {
-        adSample1.errorCode =
-            if (adSample1.errorCode != null) {
-                adSample1.errorCode
-            } else {
-                adSample2.errorCode
-            }
+        if (adSample1.errorCode != null && adSample1.errorSeverity == ErrorSeverity.CRITICAL) {
+            // do nothing, critical error already present in adSample1
+            return
+        }
 
-        adSample1.errorMessage =
-            if (adSample1.errorMessage != null) {
-                adSample1.errorMessage
-            } else {
-                adSample2.errorMessage
-            }
+        // in case adSample1 has no critical error, but adSample2 has one, we take the error from adSample2
+        if (adSample2.errorCode != null && adSample2.errorSeverity == ErrorSeverity.CRITICAL) {
+            adSample1.errorCode = adSample2.errorCode
+            adSample1.errorMessage = adSample2.errorMessage
+            adSample1.errorSeverity = adSample2.errorSeverity
+            return
+        }
+
+        if (adSample1.errorCode != null) {
+            // do nothing, adSample1 already has an error, but INFO
+            return
+        }
+
+        if (adSample2.errorCode != null) {
+            adSample1.errorCode = adSample2.errorCode
+            adSample1.errorMessage = adSample2.errorMessage
+            adSample1.errorSeverity = adSample2.errorSeverity
+            return
+        }
     }
 
     private fun getOrCreateAdImpressionId(): String {

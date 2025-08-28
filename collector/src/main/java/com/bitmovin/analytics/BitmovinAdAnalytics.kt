@@ -9,8 +9,11 @@ import com.bitmovin.analytics.ads.AdQuartile
 import com.bitmovin.analytics.ads.AdTagType
 import com.bitmovin.analytics.data.AdSample
 import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.ErrorCode
+import com.bitmovin.analytics.dtos.ErrorData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.internal.InternalBitmovinApi
+import com.bitmovin.analytics.utils.ErrorTransformationHelper
 import com.bitmovin.analytics.utils.Util
 
 @InternalBitmovinApi
@@ -100,7 +103,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
 
     override fun onAdError(
         adBreak: AdBreak,
-        code: Int?,
+        code: Int,
         message: String?,
     ) {
         val adSample = this.activeAdSample ?: AdSample()
@@ -110,8 +113,17 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
             adSample.errorPercentage = Util.calculatePercentage(adSample.errorPosition, adSample.ad.duration, true)
         }
 
-        adSample.errorCode = code
-        adSample.errorMessage = message
+        val errorCode = ErrorCode(code, message ?: "", ErrorData())
+        val transformedError =
+            ErrorTransformationHelper.transformErrorWithUserCallback(
+                analytics.config.errorTransformerCallback,
+                errorCode,
+                null,
+            )
+
+        adSample.errorCode = transformedError.errorCode
+        adSample.errorMessage = transformedError.message
+        adSample.errorSeverity = transformedError.errorSeverity
         this.completeAd(adBreak, adSample, adSample.errorPosition ?: 0)
     }
 

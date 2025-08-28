@@ -154,7 +154,7 @@ class DefaultStateMachineListener(
 
             // send ad Error Sample to report errors also in ad metrics in case ssai ad is currently running
             if (errorCode.errorCode != AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode.errorCode) {
-                ssaiService.sendAdErrorSample(errorCode.errorCode, errorCode.message)
+                ssaiService.sendAdErrorSample(errorCode)
             }
         }
 
@@ -281,7 +281,7 @@ class DefaultStateMachineListener(
             data.errorData = serialize(errorCode.legacyErrorData)
 
             // send ad Error Sample to report errors also in ad metrics in case ssai ad is currently running
-            ssaiService.sendAdErrorSample(transformedError.errorCode, transformedError.message)
+            ssaiService.sendAdErrorSample(transformedError)
 
             errorDetailObservable.notify {
                 it.onError(

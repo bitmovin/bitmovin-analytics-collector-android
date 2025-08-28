@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - New API to transform errors and mark them with severity CRITICAL (default) or INFO
+- Added transformation of errors for adsamples (for ssai engagement tracking and csai)
 
 ## v3.18.0
 
