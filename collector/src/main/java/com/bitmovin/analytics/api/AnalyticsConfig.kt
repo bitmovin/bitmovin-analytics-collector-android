@@ -54,6 +54,7 @@ data class AnalyticsConfig(
     /**
      * Callback to transform errors before they are sent to the analytics backend.
      * This can be used to modify the error code, message or severity.
+     * This field is not persisted when parcelized.
      */
     @IgnoredOnParcel
     @Transient

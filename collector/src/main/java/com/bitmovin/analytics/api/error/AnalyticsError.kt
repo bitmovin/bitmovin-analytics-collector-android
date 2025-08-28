@@ -1,17 +1,13 @@
 package com.bitmovin.analytics.api.error
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
 /**
  * AnalyticsError represents an error that is tracked by the Bitmovin Analytics SDK.
  */
-@Parcelize
 class AnalyticsError(
     val code: Int,
     val message: String,
     val severity: ErrorSeverity,
-) : Parcelable {
+) {
     /**
      * Returns a string representation of the error.
      */
