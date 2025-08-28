@@ -3,6 +3,7 @@ package com.bitmovin.analytics.features.errordetails
 import android.content.Context
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.dtos.ErrorData
 import com.bitmovin.analytics.dtos.ErrorDetail
 import com.bitmovin.analytics.dtos.ErrorDetailTrackingConfig
@@ -62,6 +63,7 @@ class ErrorDetailTracking(
         code: Int?,
         message: String?,
         errorData: ErrorData?,
+        errorSeverity: ErrorSeverity,
     ) {
         if (!isEnabled) {
             return
@@ -84,6 +86,7 @@ class ErrorDetailTracking(
                 message,
                 errorData ?: ErrorData(),
                 httpRequests,
+                severity = errorSeverity,
             )
         backend.send(errorDetails)
     }

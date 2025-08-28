@@ -43,7 +43,7 @@ class PlayerEventListenerTest {
         playerEventListener.onPlayerError(playbackException)
 
         // assert
-        verify { stateMachine.error(0, errorCode) }
+        verify { stateMachine.error(0, errorCode, any()) }
         verify { stateMachine.videoStartFailedReason = videoStartFailedReason }
     }
 
@@ -63,6 +63,6 @@ class PlayerEventListenerTest {
         playerEventListener.onPlayerError(playbackException)
 
         // assert
-        verify { stateMachine.error(100, errorCode) }
+        verify { stateMachine.error(100, errorCode, any()) }
     }
 }

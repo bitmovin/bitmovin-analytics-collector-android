@@ -25,7 +25,7 @@ class AmazonIvsPlayerExceptionMapperTest {
 
         // assert
         assertThat(errorCode.errorCode).isEqualTo(ErrorType.ERROR_INVALID_DATA.errorCode)
-        assertThat(errorCode.description).isEqualTo(ErrorType.ERROR_INVALID_DATA.name)
+        assertThat(errorCode.message).isEqualTo(ErrorType.ERROR_INVALID_DATA.name)
         assertThat(errorCode.legacyErrorData).isNull()
         assertThat(errorCode.errorData.exceptionMessage).isEqualTo("testMessage")
     }

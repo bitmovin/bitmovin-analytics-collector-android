@@ -77,7 +77,8 @@ class BitmovinAnalyticsTest {
             listener.onError(
                 impressionId,
                 VideoStartFailedReason.TIMEOUT.errorCode?.errorCode,
-                VideoStartFailedReason.TIMEOUT.errorCode?.description,
+                VideoStartFailedReason.TIMEOUT.errorCode?.message,
+                any(),
                 any(),
             )
         }

@@ -4,9 +4,17 @@ import android.os.Handler
 import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerContext
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.error.AnalyticsError
+import com.bitmovin.analytics.api.error.ErrorContext
+import com.bitmovin.analytics.api.error.ErrorSeverity
+import com.bitmovin.analytics.api.error.ErrorTransformerCallback
 import com.bitmovin.analytics.data.DeviceInformationProvider
+import com.bitmovin.analytics.dtos.ErrorCode
+import com.bitmovin.analytics.dtos.ErrorData
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.error.IdenticalErrorReportingLimiter
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Assert.assertEquals
@@ -159,5 +167,33 @@ class PlayerStateMachineTest {
         // Assert
         verify { listener.onVideoStartFailed(any(), eq(123L)) }
         assertEquals(VideoStartFailedReason.PAGE_CLOSED, playerStateMachine.videoStartFailedReason)
+    }
+
+    @Test
+    fun `onError should call errorTransformationCallback if it is set`() {
+        // Arrange
+        val configMock = mockk<AnalyticsConfig>()
+        val errorTransformerCallbackMock = mockk<ErrorTransformerCallback>(relaxed = true)
+
+        every { bitmovinAnalyticsMock.config }.returns(configMock)
+        every { configMock.errorTransformerCallback }.returns(errorTransformerCallbackMock)
+        every {
+            errorTransformerCallbackMock.transform(
+                any(),
+                any(),
+            )
+        }.returns(AnalyticsError(567, "TransformedError1", ErrorSeverity.INFO))
+
+        // Act
+        val originalError = ErrorCode(123, "Test error", ErrorData(), null)
+        playerStateMachine.error(0, originalError, null)
+
+        // Assert
+        verify(exactly = 1) {
+            errorTransformerCallbackMock.transform(
+                eq(AnalyticsError(originalError.errorCode, originalError.message, originalError.errorSeverity)),
+                ErrorContext(null),
+            )
+        }
     }
 }

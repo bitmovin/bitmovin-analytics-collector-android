@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.dtos
 
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.utils.Util
 import kotlinx.serialization.Serializable
 
@@ -16,4 +17,5 @@ data class ErrorDetail(
     val data: ErrorData,
     val httpRequests: List<HttpRequest>?,
     val analyticsVersion: String = Util.analyticsVersion,
+    val severity: ErrorSeverity = ErrorSeverity.CRITICAL,
 )

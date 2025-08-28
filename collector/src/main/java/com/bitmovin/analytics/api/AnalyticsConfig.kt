@@ -1,6 +1,8 @@
 package com.bitmovin.analytics.api
 
 import android.os.Parcelable
+import com.bitmovin.analytics.api.error.ErrorTransformerCallback
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -49,6 +51,13 @@ data class AnalyticsConfig(
      * please contact Bitmovin Support to enable it for your account.
      */
     val ssaiEngagementTrackingEnabled: Boolean = false,
+    /**
+     * Callback to transform errors before they are sent to the analytics backend.
+     * This can be used to modify the error code, message or severity.
+     */
+    @IgnoredOnParcel
+    @Transient
+    val errorTransformerCallback: ErrorTransformerCallback? = null,
 ) : Parcelable {
     @JvmOverloads
     constructor(
@@ -137,6 +146,61 @@ data class AnalyticsConfig(
         ssaiEngagementTrackingEnabled = false,
     )
 
+    constructor(
+        /**
+         * The analytics license key
+         */
+        licenseKey: String,
+        /**
+         * Value indicating if ad tracking is disabled.
+         *
+         * Default is `false`
+         */
+        adTrackingDisabled: Boolean = false,
+        /**
+         * Generate a random UserId for the session
+         *
+         * Default is `false`
+         */
+        randomizeUserId: Boolean = false,
+        /**
+         * Specifies the retry behavior in case an analytics request cannot be sent to the analytics backend.
+         * See [RetryPolicy] for the available settings.
+         *
+         * Default is [RetryPolicy.NO_RETRY]
+         */
+        retryPolicy: RetryPolicy = RetryPolicy.NO_RETRY,
+        /**
+         * The URL of the Bitmovin Analytics backend.
+         *
+         * Default is the bitmovin backend URL
+         */
+        backendUrl: String = DEFAULT_BACKEND_URL,
+        /**
+         * Config to define the log level of the SDK.
+         *
+         * Default is ERROR, which means only error logs are printed.
+         */
+        logLevel: LogLevel = LogLevel.ERROR,
+        /**
+         * Config to enable tracking of SSAI engagement metrics (quartile level)
+         * This is an opt in feature and off by default.
+         *
+         * It also needs to be enabled on account level,
+         * please contact Bitmovin Support to enable it for your account.
+         */
+        ssaiEngagementTrackingEnabled: Boolean = false,
+    ) : this(
+        licenseKey = licenseKey,
+        adTrackingDisabled = adTrackingDisabled,
+        randomizeUserId = randomizeUserId,
+        retryPolicy = retryPolicy,
+        backendUrl = backendUrl,
+        logLevel = logLevel,
+        ssaiEngagementTrackingEnabled = ssaiEngagementTrackingEnabled,
+        errorTransformerCallback = null,
+    )
+
     companion object {
         internal const val DEFAULT_BACKEND_URL = "https://analytics-ingress-global.bitmovin.com/"
     }
@@ -148,6 +212,7 @@ data class AnalyticsConfig(
         private var backendUrl: String = DEFAULT_BACKEND_URL
         private var logLevel: LogLevel = LogLevel.ERROR
         private var ssaiEngagementTrackingEnabled: Boolean = false
+        private var errorTransformerCallback: ErrorTransformerCallback? = null
 
         fun setAdTrackingDisabled(adTrackingDisabled: Boolean) = apply { this.adTrackingDisabled = adTrackingDisabled }
 
@@ -164,6 +229,11 @@ data class AnalyticsConfig(
                 this.ssaiEngagementTrackingEnabled = ssaiEngagementTrackingEnabled
             }
 
+        fun setErrorTransformerCallback(errorTransformerCallback: ErrorTransformerCallback?) =
+            apply {
+                this.errorTransformerCallback = errorTransformerCallback
+            }
+
         fun build(): AnalyticsConfig {
             return AnalyticsConfig(
                 licenseKey = licenseKey,
@@ -173,6 +243,7 @@ data class AnalyticsConfig(
                 backendUrl = backendUrl,
                 logLevel = logLevel,
                 ssaiEngagementTrackingEnabled = ssaiEngagementTrackingEnabled,
+                errorTransformerCallback = errorTransformerCallback,
             )
         }
     }

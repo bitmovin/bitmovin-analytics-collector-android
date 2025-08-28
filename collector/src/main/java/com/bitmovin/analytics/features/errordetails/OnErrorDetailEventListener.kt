@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.features.errordetails
 
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.dtos.ErrorData
 
 interface OnErrorDetailEventListener {
@@ -8,5 +9,6 @@ interface OnErrorDetailEventListener {
         code: Int?,
         message: String?,
         errorData: ErrorData?,
+        errorSeverity: ErrorSeverity,
     )
 }

@@ -5,6 +5,9 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.api.error.AnalyticsError
+import com.bitmovin.analytics.api.error.ErrorContext
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
@@ -16,6 +19,7 @@ import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
+import com.bitmovin.analytics.systemtest.utils.MockedIngress.waitForErrorDetailSample
 import com.bitmovin.analytics.systemtest.utils.SsaiDataVerifier
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.TestSources
@@ -23,6 +27,8 @@ import com.bitmovin.analytics.systemtest.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
+import com.bitmovin.player.api.analytics.AnalyticsApi.Companion.analytics
+import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.media.AdaptationConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.source.Source
@@ -36,9 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-// System test for basic playing and error scenario using bitmovin player
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
-// Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
 class SsaiScenariosTest {
     private val mainScope = MainScope()
@@ -1421,4 +1425,76 @@ class SsaiScenariosTest {
                 )
             SsaiDataVerifier.verifyCustomData(adEventDataList, expectedSsaiCustomData)
         }
+
+    @Test
+    fun test_errorTransformerCallback_Should_sendErrorSampleWithTransformedErrorDuringSsaiAd() =
+        runBlockingTest {
+            val stream = Samples.CORRUPT_DASH
+            val sourceMetadata =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                )
+
+            val source = Source.create(SourceConfig.fromUrl(stream.uri.toString()), sourceMetadata)
+
+            val configWithTransformer =
+                defaultAnalyticsConfig.copy(
+                    errorTransformerCallback = ::errorTransformerCallback,
+                )
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                val playerConfig =
+                    PlayerConfig(
+                        key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
+                        playbackConfig = PlaybackConfig(),
+                    )
+                val player = Player.create(appContext, playerConfig, configWithTransformer)
+
+                player.analytics?.ssai?.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
+                )
+
+                player.analytics?.ssai?.adStart(
+                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                )
+
+                player.load(source)
+            }
+
+            waitForErrorDetailSample()
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
+
+            val eventData = impression.eventDataList.first()
+            assertThat(eventData.ad).isEqualTo(2)
+            assertThat(eventData.errorMessage).startsWith("Transformed message: A general error occurred:")
+            assertThat(eventData.errorCode).isEqualTo(102001)
+            assertThat(eventData.errorSeverity).isEqualTo(ErrorSeverity.INFO)
+
+            val adEventDataList = impression.adEventDataList
+            assertThat(adEventDataList).hasSize(1)
+            val ssaiAdEventData = adEventDataList[0]
+            assertThat(ssaiAdEventData.errorCode).isEqualTo(102001)
+            assertThat(ssaiAdEventData.errorMessage).startsWith("Transformed message: A general error occurred:")
+        }
+
+    fun errorTransformerCallback(
+        error: AnalyticsError,
+        errorContext: ErrorContext,
+    ): AnalyticsError {
+        // make sure that the error context is set (this mixes testing and setting up a bit)
+        assertThat(errorContext.originalError).isNotNull
+
+        return AnalyticsError(
+            code = 100_000 + error.code,
+            message = "Transformed message: ${error.message}",
+            severity = ErrorSeverity.INFO,
+        )
+    }
 }

@@ -613,7 +613,7 @@ internal class BitmovinSdkAdapter(
     }
 
     private fun handleErrorEvent(
-        @Suppress("UNUSED_PARAMETER") event: ErrorEvent,
+        originalNativeError: ErrorEvent,
         errorCode: ErrorCode,
     ) {
         try {
@@ -621,7 +621,7 @@ internal class BitmovinSdkAdapter(
             if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
                 stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
             }
-            stateMachine.error(videoTime, errorCode)
+            stateMachine.error(videoTime, errorCode, originalNativeError)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
         }

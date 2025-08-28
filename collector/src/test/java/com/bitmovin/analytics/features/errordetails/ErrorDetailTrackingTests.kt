@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.features.errordetails
 
 import com.bitmovin.analytics.ObservableSupport
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.dtos.ErrorData
 import com.bitmovin.analytics.dtos.ErrorDetail
 import com.bitmovin.analytics.dtos.ErrorDetailTrackingConfig
@@ -22,12 +23,12 @@ class ErrorDetailTrackingTests {
         val support2 = ObservableSupport<OnErrorDetailEventListener>()
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, null, support1, support2)
         mockkObject(errorDetailTracking)
-        support1.notify { it.onError("", null, null, ErrorData()) }
-        support1.notify { it.onError("", null, null, ErrorData()) }
-        support2.notify { it.onError("", null, null, ErrorData()) }
-        support2.notify { it.onError("", null, null, ErrorData()) }
+        support1.notify { it.onError("", null, null, ErrorData(), ErrorSeverity.CRITICAL) }
+        support1.notify { it.onError("", null, null, ErrorData(), ErrorSeverity.CRITICAL) }
+        support2.notify { it.onError("", null, null, ErrorData(), ErrorSeverity.CRITICAL) }
+        support2.notify { it.onError("", null, null, ErrorData(), ErrorSeverity.CRITICAL) }
 
-        verify(exactly = 4) { errorDetailTracking.onError(any(), any(), any(), any()) }
+        verify(exactly = 4) { errorDetailTracking.onError(any(), any(), any(), any(), eq(ErrorSeverity.CRITICAL)) }
     }
 
     @Test
@@ -36,13 +37,13 @@ class ErrorDetailTrackingTests {
         val backend = mockk<ErrorDetailBackend>(relaxed = true)
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, null, support)
         mockkObject(errorDetailTracking)
-        support.notify { it.onError("", null, null, ErrorData()) }
-        verify { errorDetailTracking.onError(any(), any(), any(), any()) }
+        support.notify { it.onError("", null, null, ErrorData(), ErrorSeverity.CRITICAL) }
+        verify { errorDetailTracking.onError(any(), any(), any(), any(), eq(ErrorSeverity.CRITICAL)) }
         clearMocks(errorDetailTracking)
         errorDetailTracking.disable()
         verify { backend.clear() }
-        support.notify { it.onError("", null, null, ErrorData()) }
-        verify(exactly = 0) { errorDetailTracking.onError(any(), any(), any(), any()) }
+        support.notify { it.onError("", null, null, ErrorData(), ErrorSeverity.CRITICAL) }
+        verify(exactly = 0) { errorDetailTracking.onError(any(), any(), any(), any(), eq(ErrorSeverity.CRITICAL)) }
     }
 
     @Test
@@ -72,7 +73,7 @@ class ErrorDetailTrackingTests {
         httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
         httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking)
-        errorDetailTracking.onError("", null, null, ErrorData())
+        errorDetailTracking.onError("", null, null, ErrorData(), ErrorSeverity.CRITICAL)
         val slot = slot<ErrorDetail>()
         verify { backend.send(capture(slot)) }
         assertThat(slot.captured.httpRequests).isNotNull
@@ -87,7 +88,7 @@ class ErrorDetailTrackingTests {
         httpRequestTracking.onDownloadFinished(OnDownloadFinishedEventObject(mockk()))
         httpRequestTracking.disable()
         val errorDetailTracking = ErrorDetailTracking(mockk(relaxed = true), mockk(relaxed = true), backend, httpRequestTracking)
-        errorDetailTracking.onError("", null, null, ErrorData())
+        errorDetailTracking.onError("", null, null, ErrorData(), ErrorSeverity.CRITICAL)
         val slot = slot<ErrorDetail>()
         verify { backend.send(capture(slot)) }
         assertThat(slot.captured.httpRequests?.size ?: 0).isEqualTo(0)

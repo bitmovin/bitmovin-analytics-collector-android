@@ -24,7 +24,7 @@ class BitmovinPLayerExceptionMapperTest {
         val errorCode = exceptionMapper.map(errorEvent)
 
         // assert
-        assertEquals("Source error occurred", errorCode.description)
+        assertEquals("Source error occurred", errorCode.message)
         assertEquals(2001, errorCode.errorCode)
         assertEquals("test exception message", errorCode.errorData.exceptionMessage)
 

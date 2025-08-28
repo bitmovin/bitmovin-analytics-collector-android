@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.dtos
 
 import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.data.DeviceInformation
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.utils.Util
@@ -56,6 +57,7 @@ data class EventData(
     var errorCode: Int? = null,
     var errorMessage: String? = null,
     var errorData: String? = null,
+    var errorSeverity: ErrorSeverity? = null,
     var playerStartupTime: Long = 0,
     var pageLoadType: Int = 1,
     var pageLoadTime: Int = 0,

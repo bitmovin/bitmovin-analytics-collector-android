@@ -12,9 +12,11 @@ import com.bitmovin.analytics.enums.AnalyticsErrorCodes
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.error.IdenticalErrorReportingLimiter
 import com.bitmovin.analytics.utils.BitmovinLog
+import com.bitmovin.analytics.utils.ErrorTransformationHelper.transformErrorWithUserCallback
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
 
+@Suppress("ktlint:standard:max-line-length")
 class PlayerStateMachine(
     private val analytics: BitmovinAnalytics,
     internal val bufferingTimeoutTimer: ObservableTimer,
@@ -258,8 +260,10 @@ class PlayerStateMachine(
     fun error(
         videoTime: Long,
         errorCode: ErrorCode,
+        originalNativeError: Any?,
     ) {
-        transitionState(PlayerStates.ERROR, videoTime, errorCode)
+        val transformedErrorCode = transformErrorWithUserCallback(analytics.config.errorTransformerCallback, errorCode, originalNativeError)
+        transitionState(PlayerStates.ERROR, videoTime, transformedErrorCode)
     }
 
     fun sourceChange(
@@ -393,6 +397,7 @@ class PlayerStateMachine(
         error(
             playerContext.position,
             AnalyticsErrorCodes.ANALYTICS_BUFFERING_TIMEOUT_REACHED.errorCode,
+            null,
         )
         disableRebufferHeartbeat()
         resetStateMachine()

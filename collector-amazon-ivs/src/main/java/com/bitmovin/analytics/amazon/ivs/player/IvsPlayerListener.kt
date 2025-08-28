@@ -72,7 +72,7 @@ internal class IvsPlayerListener(
             if (!stateMachine.isStartupFinished) {
                 stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
             }
-            stateMachine.error(playerContext.position, errorCode)
+            stateMachine.error(playerContext.position, errorCode, pe)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "Something went wrong while processing error, e: ${e.message}", e)
         }

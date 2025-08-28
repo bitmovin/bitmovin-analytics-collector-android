@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- New API to transform errors and mark them with severity CRITICAL (default) or INFO
+
 ## v3.18.0
 
 ### Changed

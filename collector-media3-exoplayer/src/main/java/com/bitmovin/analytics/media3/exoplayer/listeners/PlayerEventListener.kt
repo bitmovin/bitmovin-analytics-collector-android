@@ -22,7 +22,7 @@ internal class PlayerEventListener(
             if (!stateMachine.isStartupFinished) {
                 stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
             }
-            stateMachine.error(videoTime, errorCode)
+            stateMachine.error(videoTime, errorCode, error)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
         }

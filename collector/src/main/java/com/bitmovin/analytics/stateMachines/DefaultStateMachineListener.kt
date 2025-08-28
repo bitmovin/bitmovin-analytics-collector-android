@@ -3,6 +3,7 @@ package com.bitmovin.analytics.stateMachines
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.PlayerAdapter
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.dtos.ErrorCode
 import com.bitmovin.analytics.dtos.SubtitleDto
 import com.bitmovin.analytics.enums.AdType
@@ -12,6 +13,7 @@ import com.bitmovin.analytics.features.errordetails.OnErrorDetailEventListener
 import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.DataSerializerKotlinX.serialize
+import com.bitmovin.analytics.utils.ErrorTransformationHelper
 import com.bitmovin.analytics.utils.Util
 
 class DefaultStateMachineListener(
@@ -146,12 +148,13 @@ class DefaultStateMachineListener(
 
         if (errorCode != null) {
             data.errorCode = errorCode.errorCode
-            data.errorMessage = errorCode.description
+            data.errorMessage = errorCode.message
             data.errorData = serialize(errorCode.legacyErrorData)
+            data.errorSeverity = errorCode.errorSeverity
 
             // send ad Error Sample to report errors also in ad metrics in case ssai ad is currently running
             if (errorCode.errorCode != AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode.errorCode) {
-                ssaiService.sendAdErrorSample(errorCode.errorCode, errorCode.description)
+                ssaiService.sendAdErrorSample(errorCode.errorCode, errorCode.message)
             }
         }
 
@@ -161,8 +164,9 @@ class DefaultStateMachineListener(
             it.onError(
                 analytics.impressionId,
                 errorCode?.errorCode,
-                errorCode?.description,
+                errorCode?.message,
                 errorCode?.errorData,
+                errorCode?.errorSeverity ?: ErrorSeverity.CRITICAL,
             )
         }
     }
@@ -261,22 +265,31 @@ class DefaultStateMachineListener(
         data.state = stateMachine.currentState.name
         data.videoStartFailed = true
         val errorCode = videoStartFailedReason.errorCode
+
         if (errorCode != null) {
-            data.errorCode = errorCode.errorCode
-            data.errorMessage = errorCode.description
+            // we don't have an original error here
+            // since this code path can only be reached from synthetic errors and not player errors
+            val transformedError =
+                ErrorTransformationHelper.transformErrorWithUserCallback(
+                    analytics.config.errorTransformerCallback,
+                    errorCode,
+                    null,
+                )
+
+            data.errorCode = transformedError.errorCode
+            data.errorMessage = transformedError.message
             data.errorData = serialize(errorCode.legacyErrorData)
 
             // send ad Error Sample to report errors also in ad metrics in case ssai ad is currently running
-            if (errorCode.errorCode != AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode.errorCode) {
-                ssaiService.sendAdErrorSample(errorCode.errorCode, errorCode.description)
-            }
+            ssaiService.sendAdErrorSample(transformedError.errorCode, transformedError.message)
 
             errorDetailObservable.notify {
                 it.onError(
                     analytics.impressionId,
-                    errorCode.errorCode,
-                    errorCode.description,
+                    transformedError.errorCode,
+                    transformedError.message,
                     errorCode.errorData,
+                    transformedError.errorSeverity,
                 )
             }
         }
@@ -284,6 +297,7 @@ class DefaultStateMachineListener(
         data.duration = durationInStartupStateMs
         analytics.sendEventData(data)
         // we implicitly detach and don't want to send the last sample out
+        // since this function is only called when there is timeout during startup or EBVS (as of 2025-08)
         analytics.detachPlayer(shouldSendOutSamples = false)
     }
 }

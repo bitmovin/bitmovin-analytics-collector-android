@@ -505,7 +505,7 @@ object DataVerifier {
     }
 
     fun verifyVideoStartEndTimesOnContinuousPlayback(eventDataList: MutableList<EventData>) {
-        // TODO: we skip the startup sample here, since the videotime start and videotime end are sometimes not 0 for these (seen on bitmovin player)
+        // We skip the startup sample here, since the videotime start and videotime end are sometimes not 0 for these (seen on bitmovin player)
         var previousVideoTimeEnd = eventDataList[0].videoTimeEnd
         var previousWasAd = false
 

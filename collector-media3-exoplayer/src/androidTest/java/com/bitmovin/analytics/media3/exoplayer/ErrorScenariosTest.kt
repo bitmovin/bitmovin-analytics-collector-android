@@ -8,6 +8,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.api.error.AnalyticsError
+import com.bitmovin.analytics.api.error.ErrorContext
+import com.bitmovin.analytics.api.error.ErrorSeverity
+import com.bitmovin.analytics.api.error.ErrorTransformerCallback
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.media3.exoplayer.api.IMedia3ExoPlayerCollector
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
@@ -497,4 +501,118 @@ class ErrorScenariosTest {
             assertThat(secondImpression.errorDetailList).hasSize(1)
             assertThat(secondImpression.eventDataList).allMatch { e -> e.videoId == "source2" }
         }
+
+    @Test
+    fun test_errorTransformation_wrongConfigWithRetryShouldMarkSeverityDynamically() =
+        runBlockingTest {
+            // arrange
+            val sample = TestSources.DRM_DASH_WIDEVINE
+            val analyticsConfigWithErrorTransformer =
+                defaultAnalyticsConfig.copy(
+                    errorTransformerCallback = ErrorTransformer()::transform,
+                )
+
+            val collector = IMedia3ExoPlayerCollector.create(appContext, analyticsConfigWithErrorTransformer)
+
+            // using clearkey_uuid instead of widevine to simulate error
+            val mediaItem =
+                MediaItem.Builder()
+                    .setDrmConfiguration(
+                        MediaItem.DrmConfiguration.Builder(C.CLEARKEY_UUID)
+                            .setLicenseUri(sample.drmLicenseUrl)
+                            .build(),
+                    )
+                    .setUri(sample.mpdUrl)
+                    .build()
+            val drmSourceMetadata =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                    videoId = "transformerCallbackTest",
+                )
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.attachPlayer(player)
+                player.playWhenReady = true
+                player.setMediaItem(mediaItem)
+                collector.sourceMetadata = drmSourceMetadata
+                player.prepare()
+            }
+
+            Media3PlayerPlaybackUtils.waitUntilPlayerHasError(player)
+
+            // wait a bit to make sure the error samples are sent
+            Thread.sleep(300)
+            waitForErrorDetailSample()
+
+            // force second error
+            withContext(mainScope.coroutineContext) {
+                player.prepare()
+            }
+
+            Thread.sleep(300)
+            Media3PlayerPlaybackUtils.waitUntilPlayerHasError(player)
+            waitForErrorDetailSample()
+
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
+            val impression = impressionsList.first()
+            assertThat(impression.eventDataList.size).isEqualTo(2)
+
+            val firstStartupSample = impression.eventDataList.first()
+            assertThat(firstStartupSample.videoStartFailed).isTrue
+            assertThat(firstStartupSample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            assertThat(firstStartupSample.errorMessage).startsWith("Source Error: ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED")
+            assertThat(firstStartupSample.errorCode).isEqualTo(PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED)
+            assertThat(firstStartupSample.errorSeverity).isEqualTo(ErrorSeverity.INFO)
+
+            val firstErrorDetail = impression.errorDetailList.first()
+            assertThat(firstErrorDetail.data.exceptionMessage).startsWith("Source error ")
+            assertThat(firstErrorDetail.data.exceptionStacktrace).isNotEmpty
+            assertThat(firstErrorDetail.data.exceptionStacktrace).hasSizeGreaterThan(4)
+            assertThat(firstErrorDetail.data.exceptionStacktrace?.first()).contains("ExoPlaybackException")
+            assertThat(firstErrorDetail.severity).isEqualTo(ErrorSeverity.INFO)
+
+            val secondStartupSample = impression.eventDataList[1]
+            assertThat(secondStartupSample.videoStartFailed).isTrue
+            assertThat(secondStartupSample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            assertThat(secondStartupSample.errorMessage).startsWith("Source Error: ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED")
+            assertThat(secondStartupSample.errorCode).isEqualTo(PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED)
+            assertThat(secondStartupSample.errorSeverity).isEqualTo(ErrorSeverity.CRITICAL)
+
+            val secondErrorDetail = impression.errorDetailList[1]
+            assertThat(secondErrorDetail.severity).isEqualTo(ErrorSeverity.CRITICAL)
+
+            // detach collector to clean up after test is done
+            // we do this here to make sure detaching does not interfere with the test
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+            }
+            Thread.sleep(100)
+        }
+}
+
+// Test Class to mark first error as INFO and all following errors as critical
+class ErrorTransformer : ErrorTransformerCallback {
+    override fun transform(
+        error: AnalyticsError,
+        context: ErrorContext,
+    ): AnalyticsError {
+        return try {
+            if (retryCounter < 1) {
+                AnalyticsError(
+                    code = error.code,
+                    message = error.message,
+                    severity = ErrorSeverity.INFO,
+                )
+            } else {
+                error
+            }
+        } finally {
+            retryCounter++
+        }
+    }
+
+    companion object {
+        var retryCounter = 0
+    }
 }

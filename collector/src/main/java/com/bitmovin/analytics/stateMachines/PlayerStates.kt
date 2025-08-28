@@ -110,6 +110,7 @@ class PlayerStates {
                 }
             }
 
+        // This state is only used when EBVS or when we have a timeout during startup (as of 2025-08)
         @JvmField val VIDEOSTART_FAILED =
             object : DefaultPlayerState<Void>("videostart_failed") {
                 override fun onEnterState(

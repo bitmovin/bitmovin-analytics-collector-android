@@ -7,6 +7,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.api.error.AnalyticsError
+import com.bitmovin.analytics.api.error.ErrorContext
+import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
 import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
@@ -255,6 +258,7 @@ class ErrorScenariosTest {
                         playbackConfig = PlaybackConfig(),
                     )
                 val player = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+
                 player.load(source)
             }
 
@@ -275,8 +279,76 @@ class ErrorScenariosTest {
                 eventData.errorMessage,
             ).startsWith("A general error occurred: Skipping atom with length")
             assertThat(eventData.errorCode).isEqualTo(2001)
+            assertThat(eventData.errorSeverity).isEqualTo(ErrorSeverity.CRITICAL)
             DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
             assertThat(errorDetail.data.exceptionStacktrace).isNotEmpty()
             assertThat(errorDetail.data.exceptionMessage).isNotEmpty()
+            assertThat(errorDetail.severity).isEqualTo(ErrorSeverity.CRITICAL)
         }
+
+    @Test
+    fun test_errorTransformerCallback_Should_sendErrorSampleWithTransformedError() =
+        runBlockingTest {
+            val stream = Samples.CORRUPT_DASH
+            val sourceMetadata =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                )
+
+            val source = Source.create(SourceConfig.fromUrl(stream.uri.toString()), sourceMetadata)
+
+            val configWithTransformer =
+                defaultAnalyticsConfig.copy(
+                    errorTransformerCallback = ::errorTransformerCallback,
+                )
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                val playerConfig =
+                    PlayerConfig(
+                        key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
+                        playbackConfig = PlaybackConfig(),
+                    )
+                val player = Player.create(appContext, playerConfig, configWithTransformer)
+
+                player.load(source)
+            }
+
+            waitForErrorDetailSample()
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            assertThat(impression.errorDetailList.size).isEqualTo(1)
+
+            val eventData = impression.eventDataList.first()
+            val errorDetail = impression.errorDetailList.first()
+
+            val impressionId = eventData.impressionId
+            assertThat(eventData.errorMessage).startsWith("Transformed message: A general error occurred:")
+            assertThat(eventData.errorCode).isEqualTo(102001)
+            assertThat(eventData.errorSeverity).isEqualTo(ErrorSeverity.INFO)
+            DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
+            assertThat(errorDetail.data.exceptionStacktrace).isNotEmpty()
+            assertThat(errorDetail.data.exceptionMessage).isNotEmpty()
+            assertThat(errorDetail.code).isEqualTo(102001)
+            assertThat(errorDetail.severity).isEqualTo(ErrorSeverity.INFO)
+            assertThat(errorDetail.message).startsWith("Transformed message: A general error occurred:")
+        }
+
+    fun errorTransformerCallback(
+        error: AnalyticsError,
+        errorContext: ErrorContext,
+    ): AnalyticsError {
+        // make sure that the error context is set (this mixes testing and setting up a bit)
+        assertThat(errorContext.originalError).isNotNull
+
+        return AnalyticsError(
+            code = 100_000 + error.code,
+            message = "Transformed message: ${error.message}",
+            severity = ErrorSeverity.INFO,
+        )
+    }
 }

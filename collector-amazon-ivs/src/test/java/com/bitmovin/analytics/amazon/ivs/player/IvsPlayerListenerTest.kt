@@ -15,7 +15,6 @@ import org.junit.Before
 import org.junit.Test
 
 class IvsPlayerListenerTest {
-
     private lateinit var playerContextMock: PlayerContext
     private lateinit var stateMachineMock: PlayerStateMachine
     private lateinit var statisticsProviderMock: PlayerStatisticsProvider
@@ -40,7 +39,7 @@ class IvsPlayerListenerTest {
         playerListener.onError(pe)
 
         // assert
-        verify(exactly = 1) { stateMachineMock.error(123, any()) }
+        verify(exactly = 1) { stateMachineMock.error(123, any(), any()) }
         verify(inverse = true) { stateMachineMock setProperty "videoStartFailedReason" value VideoStartFailedReason.PLAYER_ERROR }
     }
 
@@ -57,7 +56,7 @@ class IvsPlayerListenerTest {
         playerListener.onError(pe)
 
         // assert
-        verify(exactly = 1) { stateMachineMock.error(123, any()) }
+        verify(exactly = 1) { stateMachineMock.error(123, any(), any()) }
         verify(exactly = 1) { stateMachineMock setProperty "videoStartFailedReason" value VideoStartFailedReason.PLAYER_ERROR }
     }
 
@@ -78,12 +77,13 @@ class IvsPlayerListenerTest {
     fun testOnQualityChange_ShouldTransitionStateToQualityChange() {
         // arrange
         val playbackQualityProvider = PlaybackQualityProvider()
-        val playerListener = createPlayerListener(
-            stateMachineMock,
-            playerContextMock,
-            playbackQualityProvider,
-            playerStatisticsProvider = statisticsProviderMock,
-        )
+        val playerListener =
+            createPlayerListener(
+                stateMachineMock,
+                playerContextMock,
+                playbackQualityProvider,
+                playerStatisticsProvider = statisticsProviderMock,
+            )
         every { playerContextMock.position }.returns(123L)
 
         val qualityMock = mockk<Quality>(relaxed = true)
@@ -134,12 +134,13 @@ class IvsPlayerListenerTest {
     fun testOnQualityChange_ShouldNotHaveQualityChange_WithSameQuality() {
         // arrange
         val playbackQualityProvider = PlaybackQualityProvider()
-        val playerListener = createPlayerListener(
-            stateMachineMock,
-            playerContextMock,
-            playbackQualityProvider,
-            playerStatisticsProvider = statisticsProviderMock,
-        )
+        val playerListener =
+            createPlayerListener(
+                stateMachineMock,
+                playerContextMock,
+                playbackQualityProvider,
+                playerStatisticsProvider = statisticsProviderMock,
+            )
         every { playerContextMock.position }.returns(123L)
 
         val qualityMock = mockk<Quality>(relaxed = true)
