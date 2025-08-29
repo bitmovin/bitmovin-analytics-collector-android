@@ -209,7 +209,7 @@ public final class com/bitmovin/analytics/api/AnalyticsConfig : android/os/Parce
 	public final fun component8 ()Lcom/bitmovin/analytics/api/error/ErrorTransformerCallback;
 	public final fun copy (Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;Ljava/lang/String;Lcom/bitmovin/analytics/api/LogLevel;ZLcom/bitmovin/analytics/api/error/ErrorTransformerCallback;)Lcom/bitmovin/analytics/api/AnalyticsConfig;
 	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/AnalyticsConfig;Ljava/lang/String;ZZLcom/bitmovin/analytics/api/RetryPolicy;Ljava/lang/String;Lcom/bitmovin/analytics/api/LogLevel;ZLcom/bitmovin/analytics/api/error/ErrorTransformerCallback;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/AnalyticsConfig;
-	public fun describeContents ()I
+	public final fun describeContents ()I
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAdTrackingDisabled ()Z
 	public final fun getBackendUrl ()Ljava/lang/String;
@@ -221,7 +221,7 @@ public final class com/bitmovin/analytics/api/AnalyticsConfig : android/os/Parce
 	public final fun getSsaiEngagementTrackingEnabled ()Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-	public fun writeToParcel (Landroid/os/Parcel;I)V
+	public final fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class com/bitmovin/analytics/api/AnalyticsConfig$Builder {
@@ -309,7 +309,7 @@ public final class com/bitmovin/analytics/api/CustomData : android/os/Parcelable
 	public final fun component9 ()Ljava/lang/String;
 	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData;
 	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/CustomData;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILjava/lang/Object;)Lcom/bitmovin/analytics/api/CustomData;
-	public fun describeContents ()I
+	public final fun describeContents ()I
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCustomData1 ()Ljava/lang/String;
 	public final fun getCustomData10 ()Ljava/lang/String;
@@ -364,7 +364,7 @@ public final class com/bitmovin/analytics/api/CustomData : android/os/Parcelable
 	public final fun getExperimentName ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-	public fun writeToParcel (Landroid/os/Parcel;I)V
+	public final fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class com/bitmovin/analytics/api/CustomData$Builder {
@@ -444,14 +444,14 @@ public final class com/bitmovin/analytics/api/DefaultMetadata : android/os/Parce
 	public final fun component3 ()Lcom/bitmovin/analytics/api/CustomData;
 	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/DefaultMetadata;
 	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/DefaultMetadata;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/DefaultMetadata;
-	public fun describeContents ()I
+	public final fun describeContents ()I
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCdnProvider ()Ljava/lang/String;
 	public final fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
 	public final fun getCustomUserId ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-	public fun writeToParcel (Landroid/os/Parcel;I)V
+	public final fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class com/bitmovin/analytics/api/DefaultMetadata$Builder {
@@ -505,7 +505,7 @@ public final class com/bitmovin/analytics/api/SourceMetadata : android/os/Parcel
 	public final fun component6 ()Lcom/bitmovin/analytics/api/CustomData;
 	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/SourceMetadata;
 	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/SourceMetadata;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Lcom/bitmovin/analytics/api/CustomData;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/SourceMetadata;
-	public fun describeContents ()I
+	public final fun describeContents ()I
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCdnProvider ()Ljava/lang/String;
 	public final fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
@@ -515,7 +515,7 @@ public final class com/bitmovin/analytics/api/SourceMetadata : android/os/Parcel
 	public fun hashCode ()I
 	public final fun isLive ()Ljava/lang/Boolean;
 	public fun toString ()Ljava/lang/String;
-	public fun writeToParcel (Landroid/os/Parcel;I)V
+	public final fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class com/bitmovin/analytics/api/SourceMetadata$Builder {

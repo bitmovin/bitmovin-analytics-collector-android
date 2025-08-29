@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Upgrade kotlin to 2.1.21. Important: This change means that customers need to have at least kotlin 2.0.0 in order to use the library
+
 ## v3.19.0
 
 ### Added
