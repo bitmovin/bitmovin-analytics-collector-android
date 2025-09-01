@@ -34,7 +34,7 @@ object TestConfig {
     }
 
     fun createAnalyticsConfig(
-        analyticsKey: String = "45adcf9b-8f7c-4e28-91c5-50ba3d442cd4",
+        analyticsKey: String = "bf260cc0-ac73-46e3-bc31-7fe6f8f8cd4a", // Analytics Demo - demo@bitmovin.com
         backendUrl: String? = null,
         ssaiEngagementTrackingEnabled: Boolean = true,
     ): AnalyticsConfig {
