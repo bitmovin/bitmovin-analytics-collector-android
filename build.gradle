@@ -104,10 +104,10 @@ ext {
     targetSdkVersion = 36
 
     // player versions
-    bitmovinPlayerVersion = '3.112.0'
+    bitmovinPlayerVersion = '3.126.0'
     exoplayerVersion = '2.19.1'
     amazonIvsPlayerVersion = '1.38.0'
-    media3PlayerVersion = '1.6.1'
+    media3PlayerVersion = '1.8.0'
 
     // collector dependencies
     gsonVersion = '2.12.1'
@@ -131,7 +131,7 @@ ext {
     junitVersion = '4.13.2'
     junitXVersion = '1.1.5'
     mockkVersion = '1.13.13'
-    assertjCoreVersion = '3.26.3'
+    assertjCoreVersion = '3.27.4'
     robolectricVersion = '4.14.1'
     testCoreXVersion = '1.6.1'
     kotlinMetadataJvmVersion = '0.9.0'

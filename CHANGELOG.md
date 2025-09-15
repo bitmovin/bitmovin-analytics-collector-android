@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Upgraded media3-exoplayer to 1.8.0 and bitmovin player to 3.126.0
+
 ## v3.20.0
 
 ### Changed

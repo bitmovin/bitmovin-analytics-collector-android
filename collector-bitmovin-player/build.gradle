@@ -74,6 +74,18 @@ android {
     lint {
         abortOnError false
     }
+
+
+    // we need to exclude the MANIFEST.MF file under META-INF/versions/9/OSGI-INF
+    // since there is conflict between assertJ and dagger from the player
+    // this is only relevant for tests
+    packaging {
+        resources {
+            excludes += [
+                    "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            ]
+        }
+    }
 }
 
 dependencies {
