@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Upgraded media3-exoplayer to 1.8.0 and bitmovin player to 3.126.0
+- we now track up to 100 lines of stack trace if there is an error
 
 ## v3.20.0
 

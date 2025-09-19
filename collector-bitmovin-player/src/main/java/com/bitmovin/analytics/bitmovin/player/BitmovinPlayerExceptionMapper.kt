@@ -5,7 +5,7 @@ import com.bitmovin.analytics.dtos.ErrorCode
 import com.bitmovin.analytics.dtos.ErrorData
 import com.bitmovin.analytics.dtos.LegacyErrorData
 import com.bitmovin.analytics.error.ExceptionMapper
-import com.bitmovin.analytics.utils.topOfStacktrace
+import com.bitmovin.analytics.utils.extractStackTraceForErrorTracking
 import com.bitmovin.player.api.deficiency.ErrorEvent
 
 internal class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
@@ -21,7 +21,7 @@ internal class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
                 additionalData = DataSerializerGson.trySerialize(ErrorData.fromThrowable(cause))
             }
             errorData = ErrorData.fromThrowable(throwable, additionalData)
-            legacyErrorData = LegacyErrorData(throwable.message ?: throwable.toString(), throwable.topOfStacktrace)
+            legacyErrorData = LegacyErrorData(throwable.message ?: throwable.toString(), throwable.extractStackTraceForErrorTracking())
         } else {
             additionalData = DataSerializerGson.trySerialize(event.data)
             errorData = ErrorData(additionalData = additionalData)

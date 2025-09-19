@@ -8,7 +8,7 @@ import androidx.media3.exoplayer.source.BehindLiveWindowException
 import com.bitmovin.analytics.dtos.ErrorCode
 import com.bitmovin.analytics.dtos.ErrorData
 import com.bitmovin.analytics.dtos.LegacyErrorData
-import com.bitmovin.analytics.utils.topOfStacktrace
+import com.bitmovin.analytics.utils.extractStackTraceForErrorTracking
 
 internal object Media3ExoPlayerExceptionMapper {
     private val errorTypeMap =
@@ -49,9 +49,9 @@ internal object Media3ExoPlayerExceptionMapper {
             errorMessage = exceptionMessage
         }
 
-        val topOfStackTrace = playbackException.topOfStacktrace
-        val legacyErrorData = LegacyErrorData(errorMessage, topOfStackTrace)
-        val errorData = ErrorData(errorMessage, topOfStackTrace)
+        val stackTrace = playbackException.extractStackTraceForErrorTracking()
+        val legacyErrorData = LegacyErrorData(errorMessage, stackTrace)
+        val errorData = ErrorData(errorMessage, stackTrace)
         val errorCodeDescription = errorTypeMap[getExceptionType(playbackException)] + ": " + playbackException.errorCodeName
         return ErrorCode(playbackException.errorCode, errorCodeDescription, errorData, legacyErrorData)
     }

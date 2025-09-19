@@ -121,17 +121,84 @@ class UtilTest {
     }
 
     @Test
-    fun testTopOfStacktrace_Should_includeExceptionName() {
+    fun extractStackTraceForErrorTracking_Should_includeExceptionName() {
         try {
             throw RuntimeException("RUNTIMEEXCEPTION")
         } catch (e: Exception) {
-            val top = e.topOfStacktrace
+            val top = e.extractStackTraceForErrorTracking()
             assertThat(top.size).isGreaterThan(4)
             assertThat(top.size).isLessThanOrEqualTo(50)
             assertThat(top[0]).contains("java.lang.RuntimeException: RUNTIMEEXCEPTION")
-            assertThat(top).anySatisfy { element -> assertThat(element).contains("testTopOfStacktrace") }
+            assertThat(top).anySatisfy {
+                    element ->
+                assertThat(element).contains("extractStackTraceForErrorTracking_Should_includeExceptionName")
+            }
         }
     }
+
+    @Test
+    fun extractStackTraceForErrorTracking_WhenStackTraceExceeds100Lines() {
+        try {
+            // Generate a deep call stack to create > 100 lines
+            generateDeepCallStack(150)
+        } catch (e: Exception) {
+            val stackTrace = e.extractStackTraceForErrorTracking()
+
+            // Should be exactly 101 lines: 50 first + 1 truncation indicator + 50 last
+            assertThat(stackTrace.size).isEqualTo(101)
+
+            // Should contain exception name in first line
+            assertThat(stackTrace[0]).contains("java.lang.RuntimeException: Deep stack trace test")
+
+            // Should contain truncation indicator at position 50
+            assertThat(stackTrace[50]).contains("lines removed")
+
+            // Should contain test method name in the stack trace
+            assertThat(stackTrace).anySatisfy { element ->
+                assertThat(element).contains("extractStackTraceForErrorTracking_WhenStackTraceExceeds100Lines")
+            }
+        }
+    }
+
+    // mocking a recursive call chain for testing
+    private fun generateDeepCallStack(depth: Int) {
+        if (depth <= 0) {
+            throw RuntimeException("Deep stack trace test")
+        }
+        when (depth % 10) {
+            0 -> methodA(depth - 1)
+            1 -> methodB(depth - 1)
+            2 -> methodC(depth - 1)
+            3 -> methodD(depth - 1)
+            4 -> methodE(depth - 1)
+            5 -> methodF(depth - 1)
+            6 -> methodG(depth - 1)
+            7 -> methodH(depth - 1)
+            8 -> methodI(depth - 1)
+            else -> methodJ(depth - 1)
+        }
+    }
+
+    // mock methods to call itself in recursive manner
+    private fun methodA(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodB(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodC(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodD(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodE(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodF(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodG(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodH(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodI(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodJ(depth: Int) = generateDeepCallStack(depth)
 
     @Test
     fun toPrimitiveLong() {

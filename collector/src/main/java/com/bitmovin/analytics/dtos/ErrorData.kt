@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.dtos
 
-import com.bitmovin.analytics.utils.topOfStacktrace
+import com.bitmovin.analytics.utils.extractStackTraceForErrorTracking
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,6 +13,6 @@ data class ErrorData(
         fun fromThrowable(
             throwable: Throwable,
             additionalData: String? = null,
-        ): ErrorData = ErrorData(throwable.message ?: throwable.toString(), throwable.topOfStacktrace, additionalData)
+        ): ErrorData = ErrorData(throwable.message ?: throwable.toString(), throwable.extractStackTraceForErrorTracking(), additionalData)
     }
 }
