@@ -28,6 +28,9 @@ import com.bitmovin.player.api.decoder.DecoderConfig
 import com.bitmovin.player.api.decoder.DecoderPriorityProvider
 import com.bitmovin.player.api.decoder.MediaCodecInfo
 import com.bitmovin.player.api.media.MediaType
+import com.bitmovin.player.api.network.HttpRequest
+import com.bitmovin.player.api.network.HttpRequestType
+import com.bitmovin.player.api.network.NetworkConfig
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
@@ -38,6 +41,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 @RunWith(AndroidJUnit4::class)
 class ErrorScenariosTest {
@@ -338,6 +344,54 @@ class ErrorScenariosTest {
             assertThat(errorDetail.message).startsWith("Transformed message: A general error occurred:")
         }
 
+    @Test
+    fun test_generateLongStackTrace_Should_Send50LinesTopAnd50LinesBottom() =
+        runBlockingTest {
+            val stream = Samples.DASH
+            val sourceMetadata =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                )
+
+            val source = Source.create(SourceConfig.fromUrl(stream.uri.toString()), sourceMetadata)
+            // act
+            withContext(mainScope.coroutineContext) {
+                val playerConfig =
+                    PlayerConfig(
+                        key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
+                        playbackConfig = PlaybackConfig(),
+                        networkConfig = NetworkConfig(preprocessHttpRequestCallback = ::preprocessHttpRequest),
+                    )
+                val player = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+                player.load(source)
+            }
+
+            waitForErrorDetailSample()
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            assertThat(impression.errorDetailList.size).isEqualTo(1)
+
+            val eventData = impression.eventDataList.first()
+            val errorDetail = impression.errorDetailList.first()
+            val impressionId = eventData.impressionId
+            assertThat(
+                eventData.errorMessage,
+            ).startsWith("A general IO error occurred: Deep stack trace test")
+            assertThat(eventData.errorCode).isEqualTo(2200)
+            assertThat(eventData.errorSeverity).isEqualTo(ErrorSeverity.CRITICAL)
+            DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
+            assertThat(errorDetail.data.exceptionStacktrace).hasSize(101)
+
+            // verifying that it is split in the middle
+            assertThat(errorDetail.data.exceptionStacktrace?.elementAt(50)).contains("lines removed) ...")
+            assertThat(errorDetail.data.exceptionMessage).isNotEmpty()
+            assertThat(errorDetail.severity).isEqualTo(ErrorSeverity.CRITICAL)
+        }
+
     fun errorTransformerCallback(
         error: AnalyticsError,
         errorContext: ErrorContext,
@@ -351,4 +405,51 @@ class ErrorScenariosTest {
             severity = ErrorSeverity.INFO,
         )
     }
+
+    fun preprocessHttpRequest(
+        httpRequestType: HttpRequestType,
+        httpRequest: HttpRequest,
+    ): Future<HttpRequest> {
+        generateDeepCallStack(110)
+        return Executors.newSingleThreadExecutor().submit(Callable { httpRequest })
+    }
+
+    private fun generateDeepCallStack(depth: Int) {
+        if (depth <= 0) {
+            throw RuntimeException("Deep stack trace test")
+        }
+        when (depth % 10) {
+            0 -> methodA(depth - 1)
+            1 -> methodB(depth - 1)
+            2 -> methodC(depth - 1)
+            3 -> methodD(depth - 1)
+            4 -> methodE(depth - 1)
+            5 -> methodF(depth - 1)
+            6 -> methodG(depth - 1)
+            7 -> methodH(depth - 1)
+            8 -> methodI(depth - 1)
+            else -> methodJ(depth - 1)
+        }
+    }
+
+    // mock methods to call itself in recursive manner
+    private fun methodA(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodB(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodC(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodD(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodE(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodF(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodG(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodH(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodI(depth: Int) = generateDeepCallStack(depth)
+
+    private fun methodJ(depth: Int) = generateDeepCallStack(depth)
 }
