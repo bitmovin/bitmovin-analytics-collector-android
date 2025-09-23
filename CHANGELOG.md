@@ -6,9 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.20.1
+
 ### Changed
 - Upgraded media3-exoplayer to 1.8.0 and bitmovin player to 3.126.0
-- we now track up to 100 lines of stack trace if there is an error
+- We now track up to 100 lines of stack trace if there is an error
 
 ## v3.20.0
 
