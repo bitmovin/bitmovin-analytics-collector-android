@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- [Internal] Moved buildconfig setting into core module since it is deprecated as global setting
+
 ## v3.20.1
 
 ### Changed
