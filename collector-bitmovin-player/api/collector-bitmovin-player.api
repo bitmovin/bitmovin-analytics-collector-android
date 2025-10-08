@@ -13,13 +13,6 @@ public final class com/bitmovin/analytics/bitmovin/player/BitmovinPlayerCollecto
 	public fun setSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/SourceMetadata;)V
 }
 
-public final class com/bitmovin/analytics/bitmovin/player/BuildConfig {
-	public static final field BUILD_TYPE Ljava/lang/String;
-	public static final field DEBUG Z
-	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
-	public fun <init> ()V
-}
-
 public abstract interface class com/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector : com/bitmovin/analytics/api/AnalyticsCollector {
 	public static final field Factory Lcom/bitmovin/analytics/bitmovin/player/api/IBitmovinPlayerCollector$Factory;
 	public abstract fun addSourceMetadata (Lcom/bitmovin/player/api/source/Source;Lcom/bitmovin/analytics/api/SourceMetadata;)V

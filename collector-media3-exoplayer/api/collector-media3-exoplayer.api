@@ -1,10 +1,3 @@
-public final class com/bitmovin/analytics/media3/exoplayer/BuildConfig {
-	public static final field BUILD_TYPE Ljava/lang/String;
-	public static final field DEBUG Z
-	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
-	public fun <init> ()V
-}
-
 public abstract interface class com/bitmovin/analytics/media3/exoplayer/api/IMedia3ExoPlayerCollector : com/bitmovin/analytics/api/AnalyticsCollector {
 	public static final field Factory Lcom/bitmovin/analytics/media3/exoplayer/api/IMedia3ExoPlayerCollector$Factory;
 	public static fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;)Lcom/bitmovin/analytics/media3/exoplayer/api/IMedia3ExoPlayerCollector;
