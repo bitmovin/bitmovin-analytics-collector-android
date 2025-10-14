@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - [Internal] Moved buildconfig setting into core module since it is deprecated as global setting
+- [Internal] Fixed memory visibility for eventdatabase
 
 ## v3.20.1
 
