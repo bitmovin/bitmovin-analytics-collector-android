@@ -20,9 +20,13 @@ import com.bitmovin.analytics.systemtest.utils.RepeatRule
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.noAvailableDecoder
 import com.bitmovin.analytics.systemtest.utils.runBlockingTest
+import com.bitmovin.player.api.DebugConfig
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
+import com.bitmovin.player.api.TweaksConfig
+import com.bitmovin.player.api.analytics.AnalyticsPlayerConfig
+import com.bitmovin.player.api.analytics.AnalyticsSourceConfig
 import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.decoder.DecoderConfig
 import com.bitmovin.player.api.decoder.DecoderPriorityProvider
@@ -31,6 +35,10 @@ import com.bitmovin.player.api.media.MediaType
 import com.bitmovin.player.api.network.HttpRequest
 import com.bitmovin.player.api.network.HttpRequestType
 import com.bitmovin.player.api.network.NetworkConfig
+import com.bitmovin.player.api.playlist.PlaylistConfig
+import com.bitmovin.player.api.playlist.PlaylistOptions
+import com.bitmovin.player.api.recovery.RetryPlaybackAction
+import com.bitmovin.player.api.recovery.RetryPlaybackConfig
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
@@ -390,6 +398,86 @@ class ErrorScenariosTest {
             assertThat(errorDetail.data.exceptionStacktrace?.elementAt(50)).contains("lines removed) ...")
             assertThat(errorDetail.data.exceptionMessage).isNotEmpty()
             assertThat(errorDetail.severity).isEqualTo(ErrorSeverity.CRITICAL)
+        }
+
+    @Test
+    fun test_retryPlaybackAttemptWithSkipToNextSource_Should_sendErrorSample() =
+        runBlockingTest {
+            DebugConfig.isLoggingEnabled = true
+            val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
+            val validStreamSample = Samples.DASH
+
+            val sourceMetadata1 = SourceMetadata(
+                title = metadataGenerator.getTestTitle(),
+                customData = CustomData(customData1 = "retryPlaybackAttempt"),
+            )
+            val sourceMetadata2 = SourceMetadata(
+                title = metadataGenerator.getTestTitle(),
+                customData = CustomData(customData1 = "validStream"),
+            )
+
+            val nonExistingSource = Source(
+                SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()),
+                AnalyticsSourceConfig.Enabled(sourceMetadata1),
+            )
+            val validSource = Source(
+                SourceConfig.fromUrl(validStreamSample.uri.toString()),
+                AnalyticsSourceConfig.Enabled(sourceMetadata2),
+            )
+
+            val playlistConfig = PlaylistConfig(
+                sources = listOf(nonExistingSource, validSource),
+                options = PlaylistOptions()
+            )
+            val playerConfig = PlayerConfig(
+                key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
+                playbackConfig = PlaybackConfig(),
+                tweaksConfig = TweaksConfig(
+                    retryPlaybackConfig = RetryPlaybackConfig(
+                        retryPlaybackCallback = { RetryPlaybackAction.SkipToNextSource }
+                    )
+                )
+            )
+            val analyticsConfig = AnalyticsPlayerConfig.Enabled(defaultAnalyticsConfig)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                val player = Player(appContext, playerConfig, analyticsConfig)
+                try {
+                    player.load(playlistConfig)
+                    player.play()
+
+                    // it seems to take a while until the error is consistently reported
+                    waitForErrorDetailSample()
+                } finally {
+                    player.destroy()
+                }
+            }
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isGreaterThanOrEqualTo(1)
+
+            val firstImpression = impressionList.first()
+            assertThat(firstImpression.eventDataList.size).isGreaterThanOrEqualTo(1)
+            assertThat(firstImpression.errorDetailList.size).isEqualTo(1)
+
+            val eventData = firstImpression.eventDataList.first()
+            val errorDetail = firstImpression.errorDetailList.first()
+
+            val impressionId = eventData.impressionId
+            assertThat(eventData.errorMessage).isEqualTo("An unexpected HTTP status code was received: Response code: 404")
+            assertThat(eventData.errorCode).isEqualTo(2203)
+            assertThat(eventData.videoStartFailed).isTrue()
+            assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
+
+            DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
+            assertThat(errorDetail.data.exceptionStacktrace?.size).isGreaterThan(0)
+            assertThat(errorDetail.data.exceptionMessage).isEqualTo("Response code: 404")
+            assertThat(errorDetail.httpRequests?.size).isGreaterThan(0)
+
+            DataVerifier.verifySourceMetadata(eventData, sourceMetadata1)
         }
 
     fun errorTransformerCallback(
