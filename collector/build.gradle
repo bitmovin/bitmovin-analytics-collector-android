@@ -14,6 +14,10 @@ android {
     namespace "com.bitmovin.analytics"
     compileSdk rootProject.ext.compileSdk
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion

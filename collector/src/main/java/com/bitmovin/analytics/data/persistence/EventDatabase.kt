@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.annotation.VisibleForTesting
+import kotlin.concurrent.Volatile
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -112,6 +113,7 @@ internal class EventDatabase private constructor(context: Context) : EventDataba
     }
 
     companion object {
+        @Volatile
         private var instance: EventDatabase? = null
 
         fun getInstance(context: Context): EventDatabase {
