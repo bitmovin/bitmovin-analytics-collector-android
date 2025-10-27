@@ -128,8 +128,8 @@ class BitmovinSdkAdapterTest {
         bitmovinSdkAdapter.init()
         val audioPlaybackQualityChangedEvent =
             PlayerEvent.AudioPlaybackQualityChanged(
-                AudioQuality("", "", 200, 123, 123, null),
-                AudioQuality("", "", 300, 123, 123, null),
+                AudioQuality("", "", 200, 123, 123, null, 2),
+                AudioQuality("", "", 300, 123, 123, null, 2),
             )
         listenerSlot.captured(audioPlaybackQualityChangedEvent)
 
@@ -161,7 +161,7 @@ class BitmovinSdkAdapterTest {
 
         // act
         bitmovinSdkAdapter.init()
-        val sameAudioQuality = AudioQuality("", "", 200, 123, 123, null)
+        val sameAudioQuality = AudioQuality("", "", 200, 123, 123, null, 2)
         val audioPlaybackQualityChangedEvent =
             PlayerEvent.AudioPlaybackQualityChanged(sameAudioQuality, sameAudioQuality)
         listenerSlot.captured(audioPlaybackQualityChangedEvent)

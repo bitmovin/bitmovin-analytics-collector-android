@@ -20,7 +20,6 @@ import com.bitmovin.analytics.systemtest.utils.RepeatRule
 import com.bitmovin.analytics.systemtest.utils.TestConfig
 import com.bitmovin.analytics.systemtest.utils.noAvailableDecoder
 import com.bitmovin.analytics.systemtest.utils.runBlockingTest
-import com.bitmovin.player.api.DebugConfig
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -36,7 +35,6 @@ import com.bitmovin.player.api.network.HttpRequest
 import com.bitmovin.player.api.network.HttpRequestType
 import com.bitmovin.player.api.network.NetworkConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
-import com.bitmovin.player.api.playlist.PlaylistOptions
 import com.bitmovin.player.api.recovery.RetryPlaybackAction
 import com.bitmovin.player.api.recovery.RetryPlaybackConfig
 import com.bitmovin.player.api.source.Source
@@ -403,7 +401,6 @@ class ErrorScenariosTest {
     @Test
     fun test_retryPlaybackAttemptWithSkipToNextSource_Should_sendErrorSample() =
         runBlockingTest {
-            DebugConfig.isLoggingEnabled = true
             val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
             val validStreamSample = Samples.DASH
 
@@ -425,10 +422,7 @@ class ErrorScenariosTest {
                 AnalyticsSourceConfig.Enabled(sourceMetadata2),
             )
 
-            val playlistConfig = PlaylistConfig(
-                sources = listOf(nonExistingSource, validSource),
-                options = PlaylistOptions()
-            )
+            val playlistConfig = PlaylistConfig(sources = listOf(nonExistingSource, validSource))
             val playerConfig = PlayerConfig(
                 key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
                 playbackConfig = PlaybackConfig(),
@@ -447,7 +441,6 @@ class ErrorScenariosTest {
                     player.load(playlistConfig)
                     player.play()
 
-                    // it seems to take a while until the error is consistently reported
                     waitForErrorDetailSample()
                 } finally {
                     player.destroy()

@@ -10,6 +10,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.runInterruptible
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -18,7 +20,8 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 object MockedIngress {
     private lateinit var server: MockWebServer
@@ -187,61 +190,22 @@ object MockedIngress {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun waitForErrorDetailSample(
-        timeout: Long = 10,
-        unit: TimeUnit = TimeUnit.SECONDS,
-    ) {
-        runBlocking {
-            val start = System.currentTimeMillis()
-
-            while (true) {
-                val request = server.takeRequest(timeout, unit)
-                if (request == null) {
-                    throw RuntimeException("No request received within the timeout")
-                }
-
-                alreadyTakenRequests.add(request)
-
-                when (request.requestUrl?.encodedPath) {
-                    "/analytics/error" -> {
-                        break
-                    }
-                }
-
-                if (start.plus(unit.toMillis(timeout)) <= System.currentTimeMillis()) {
-                    throw RuntimeException("No error detail sample received within the timeout")
-                }
-            }
-        }
-    }
+    suspend fun waitForErrorDetailSample(timeout: Duration = 10.seconds) =
+        waitForRequest("/analytics/error", timeout)
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun waitForAnalyticsSample(
-        timeout: Long = 10,
-        unit: TimeUnit = TimeUnit.SECONDS,
-    ) {
-        runBlocking {
-            val start = System.currentTimeMillis()
+    suspend fun waitForAnalyticsSample( timeout: Duration = 10.seconds) =
+        waitForRequest("/analytics", timeout)
 
-            while (true) {
-                val request = server.takeRequest(timeout, unit)
-                if (request == null) {
-                    throw RuntimeException("No request received within the timeout")
-                }
-
-                alreadyTakenRequests.add(request)
-
-                when (request.requestUrl?.encodedPath) {
-                    "/analytics" -> {
-                        break
-                    }
-                }
-
-                if (start.plus(unit.toMillis(timeout)) <= System.currentTimeMillis()) {
-                    throw RuntimeException("No analytics sample received within the timeout")
-                }
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun waitForRequest(encodedPath: String, timeout: Duration) {
+        withTimeoutOrNull(timeout) {
+            runInterruptible(Dispatchers.IO) { // server.takeRequest is blocking
+                generateSequence { server.takeRequest() }
+                    .onEach { alreadyTakenRequests.add(it) }
+                    .first { it.requestUrl?.encodedPath == encodedPath }
             }
-        }
+        } ?: throw RuntimeException("No request received within the timeout")
     }
 
     fun extractImpressions(): List<Impression> {
