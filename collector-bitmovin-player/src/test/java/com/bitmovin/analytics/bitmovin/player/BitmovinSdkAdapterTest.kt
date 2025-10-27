@@ -286,10 +286,11 @@ class BitmovinSdkAdapterTest {
     fun `onRetryPlaybackAttempt with SkipToNextSource triggers error`() {
         val listener = captureRetryPlaybackAttemptListener()
         val mockError = mockk<ErrorEvent>(relaxed = true)
-        val retryEvent = mockk<SourceEvent.RetryPlaybackAttempt>(relaxed = true) {
-            every { retryAction } returns RetryPlaybackAction.SkipToNextSource
-            every { errorEvent } returns mockError
-        }
+        val retryEvent =
+            mockk<SourceEvent.RetryPlaybackAttempt>(relaxed = true) {
+                every { retryAction } returns RetryPlaybackAction.SkipToNextSource
+                every { errorEvent } returns mockError
+            }
 
         listener(retryEvent)
 
@@ -299,9 +300,10 @@ class BitmovinSdkAdapterTest {
     @Test
     fun `onRetryPlaybackAttempt with other action does not trigger error`() {
         val listener = captureRetryPlaybackAttemptListener()
-        val retryEvent = mockk<SourceEvent.RetryPlaybackAttempt>(relaxed = true) {
-            every { retryAction } returns RetryPlaybackAction.LimitBitrate(10)
-        }
+        val retryEvent =
+            mockk<SourceEvent.RetryPlaybackAttempt>(relaxed = true) {
+                every { retryAction } returns RetryPlaybackAction.LimitBitrate(10)
+            }
 
         listener(retryEvent)
 

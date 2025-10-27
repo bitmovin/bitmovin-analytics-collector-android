@@ -404,34 +404,36 @@ class ErrorScenariosTest {
             val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
             val validStreamSample = Samples.DASH
 
-            val sourceMetadata1 = SourceMetadata(
-                title = metadataGenerator.getTestTitle(),
-                customData = CustomData(customData1 = "retryPlaybackAttempt"),
-            )
-            val sourceMetadata2 = SourceMetadata(
-                title = metadataGenerator.getTestTitle(),
-                customData = CustomData(customData1 = "validStream"),
-            )
+            val sourceMetadata1 =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                    customData = CustomData(customData1 = "retryPlaybackAttempt"),
+                )
+            val sourceMetadata2 =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                    customData = CustomData(customData1 = "validStream"),
+                )
 
-            val nonExistingSource = Source(
-                SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()),
-                AnalyticsSourceConfig.Enabled(sourceMetadata1),
-            )
-            val validSource = Source(
-                SourceConfig.fromUrl(validStreamSample.uri.toString()),
-                AnalyticsSourceConfig.Enabled(sourceMetadata2),
-            )
+            val nonExistingSource =
+                Source(
+                    SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()),
+                    AnalyticsSourceConfig.Enabled(sourceMetadata1),
+                )
+            val validSource =
+                Source(
+                    SourceConfig.fromUrl(validStreamSample.uri.toString()),
+                    AnalyticsSourceConfig.Enabled(sourceMetadata2),
+                )
 
             val playlistConfig = PlaylistConfig(sources = listOf(nonExistingSource, validSource))
-            val playerConfig = PlayerConfig(
-                key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
-                playbackConfig = PlaybackConfig(),
-                tweaksConfig = TweaksConfig(
-                    retryPlaybackConfig = RetryPlaybackConfig(
-                        retryPlaybackCallback = { RetryPlaybackAction.SkipToNextSource }
-                    )
+            val retryPlaybackConfig = RetryPlaybackConfig(retryPlaybackCallback = { RetryPlaybackAction.SkipToNextSource })
+            val playerConfig =
+                PlayerConfig(
+                    key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
+                    playbackConfig = PlaybackConfig(),
+                    tweaksConfig = TweaksConfig(retryPlaybackConfig = retryPlaybackConfig),
                 )
-            )
             val analyticsConfig = AnalyticsPlayerConfig.Enabled(defaultAnalyticsConfig)
 
             // act

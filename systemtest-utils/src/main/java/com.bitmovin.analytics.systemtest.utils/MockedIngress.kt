@@ -9,7 +9,6 @@ import com.bitmovin.analytics.utils.DataSerializerKotlinX
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.MediaType.Companion.toMediaType
@@ -190,15 +189,16 @@ object MockedIngress {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun waitForErrorDetailSample(timeout: Duration = 10.seconds) =
-        waitForRequest("/analytics/error", timeout)
+    suspend fun waitForErrorDetailSample(timeout: Duration = 10.seconds) = waitForRequest("/analytics/error", timeout)
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun waitForAnalyticsSample( timeout: Duration = 10.seconds) =
-        waitForRequest("/analytics", timeout)
+    suspend fun waitForAnalyticsSample(timeout: Duration = 10.seconds) = waitForRequest("/analytics", timeout)
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private suspend fun waitForRequest(encodedPath: String, timeout: Duration) {
+    private suspend fun waitForRequest(
+        encodedPath: String,
+        timeout: Duration,
+    ) {
         withTimeoutOrNull(timeout) {
             runInterruptible(Dispatchers.IO) { // server.takeRequest is blocking
                 generateSequence { server.takeRequest() }
