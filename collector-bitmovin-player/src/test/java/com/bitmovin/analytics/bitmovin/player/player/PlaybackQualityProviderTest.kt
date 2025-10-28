@@ -42,7 +42,7 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentAudioQuality_Should_returnQualityStored() {
         // arrange
-        val quality = AudioQuality("id", "label", 123, 123, 123, "dummy")
+        val quality = AudioQuality("id", "label", 123, 123, 123, "dummy", 2)
         qualityProvider.currentAudioQuality = quality
 
         // act and assert
@@ -52,7 +52,7 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentAudioQuality_Should_returnQualityFromPlayerInitially() {
         // arrange
-        val quality = AudioQuality("id", "label", 123, 123, 123, "dummy")
+        val quality = AudioQuality("id", "label", 123, 123, 123, "dummy", 2)
         every { playerMock.playbackAudioData }.returns(quality)
 
         // act and assert
@@ -92,8 +92,8 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_didAudioQualityChange_Should_returnFalseWithSameQuality() {
         // arrage
-        val oldAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy")
-        val newAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy")
+        val oldAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy", 2)
+        val newAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy", 2)
 
         qualityProvider.currentAudioQuality = oldAudioQuality
 
@@ -107,8 +107,8 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_didAudioQualityChange_Should_returnTrueWithDifferentQuality() {
         // arrage
-        val oldAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy")
-        val newAudioQuality = AudioQuality("id2", "label2", 456, 123, 123, "dummy")
+        val oldAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy", 2)
+        val newAudioQuality = AudioQuality("id2", "label2", 456, 123, 123, "dummy", 2)
 
         qualityProvider.currentAudioQuality = oldAudioQuality
 
@@ -123,10 +123,10 @@ class PlaybackQualityProviderTest {
     fun test_resetPlaybackQualities_Should_setQualitiesToNull() {
         // arrage
         val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
-        val oldAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy")
+        val oldAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy", 2)
 
         val newVideoQuality = VideoQuality("id2", "label2", 456, 123, 123, "dummy", 30.0f, 1, 1)
-        val newAudioQuality = AudioQuality("id2", "label2", 456, 123, 123, "dummy")
+        val newAudioQuality = AudioQuality("id2", "label2", 456, 123, 123, "dummy", 2)
 
         // since qualities are null after reset, player will be called for current qualities
         every { playerMock.playbackAudioData }.returns(newAudioQuality)

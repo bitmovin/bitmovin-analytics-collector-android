@@ -14,9 +14,12 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.QualityChangeEventLimiter
 import com.bitmovin.player.api.Player
+import com.bitmovin.player.api.deficiency.ErrorEvent
 import com.bitmovin.player.api.event.Event
 import com.bitmovin.player.api.event.PlayerEvent
+import com.bitmovin.player.api.event.SourceEvent
 import com.bitmovin.player.api.media.audio.quality.AudioQuality
+import com.bitmovin.player.api.recovery.RetryPlaybackAction
 import com.bitmovin.player.api.source.Source
 import io.mockk.MockKAnnotations
 import io.mockk.clearMocks
@@ -125,8 +128,8 @@ class BitmovinSdkAdapterTest {
         bitmovinSdkAdapter.init()
         val audioPlaybackQualityChangedEvent =
             PlayerEvent.AudioPlaybackQualityChanged(
-                AudioQuality("", "", 200, 123, 123, null),
-                AudioQuality("", "", 300, 123, 123, null),
+                AudioQuality("", "", 200, 123, 123, null, 2),
+                AudioQuality("", "", 300, 123, 123, null, 2),
             )
         listenerSlot.captured(audioPlaybackQualityChangedEvent)
 
@@ -158,7 +161,7 @@ class BitmovinSdkAdapterTest {
 
         // act
         bitmovinSdkAdapter.init()
-        val sameAudioQuality = AudioQuality("", "", 200, 123, 123, null)
+        val sameAudioQuality = AudioQuality("", "", 200, 123, 123, null, 2)
         val audioPlaybackQualityChangedEvent =
             PlayerEvent.AudioPlaybackQualityChanged(sameAudioQuality, sameAudioQuality)
         listenerSlot.captured(audioPlaybackQualityChangedEvent)
@@ -277,6 +280,43 @@ class BitmovinSdkAdapterTest {
         // assert
         assertThat(eventData.isLive).isTrue
         assertThat(eventData.videoDuration).isEqualTo(1234000L)
+    }
+
+    @Test
+    fun `onRetryPlaybackAttempt with SkipToNextSource triggers error`() {
+        val listener = captureRetryPlaybackAttemptListener()
+        val mockError = mockk<ErrorEvent>(relaxed = true)
+        val retryEvent =
+            mockk<SourceEvent.RetryPlaybackAttempt>(relaxed = true) {
+                every { retryAction } returns RetryPlaybackAction.SkipToNextSource
+                every { errorEvent } returns mockError
+            }
+
+        listener(retryEvent)
+
+        verify { playerStateMachine.error(any(), any(), mockError) }
+    }
+
+    @Test
+    fun `onRetryPlaybackAttempt with other action does not trigger error`() {
+        val listener = captureRetryPlaybackAttemptListener()
+        val retryEvent =
+            mockk<SourceEvent.RetryPlaybackAttempt>(relaxed = true) {
+                every { retryAction } returns RetryPlaybackAction.LimitBitrate(10)
+            }
+
+        listener(retryEvent)
+
+        verify(inverse = true) { playerStateMachine.error(any(), any(), any()) }
+    }
+
+    private fun captureRetryPlaybackAttemptListener(): (SourceEvent.RetryPlaybackAttempt) -> Unit {
+        val slot = slot<(SourceEvent.RetryPlaybackAttempt) -> Unit>()
+        every { player.on(SourceEvent.RetryPlaybackAttempt::class, capture(slot)) } answers { }
+        every { player.currentTime } returns 0.0
+        bitmovinSdkAdapter.init()
+        clearMocks(playerStateMachine, answers = false)
+        return slot.captured
     }
 
     private fun createTestEventData(sourceMetadata: SourceMetadata = SourceMetadata()): EventData {

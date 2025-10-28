@@ -22,7 +22,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 class ErrorScenariosTest {
     private val mainScope = MainScope()
@@ -188,7 +188,7 @@ class ErrorScenariosTest {
             ExoPlayerPlaybackUtils.waitUntilPlayerHasError(player)
 
             // seems like sample can take a bit to be sent out
-            waitForErrorDetailSample(timeout = 20, TimeUnit.SECONDS)
+            waitForErrorDetailSample(timeout = 20.seconds)
 
             withContext(mainScope.coroutineContext) {
                 collector.detachPlayer()

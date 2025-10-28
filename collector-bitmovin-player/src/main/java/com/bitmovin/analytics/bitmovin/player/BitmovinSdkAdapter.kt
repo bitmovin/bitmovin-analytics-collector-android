@@ -43,6 +43,7 @@ import com.bitmovin.player.api.event.SourceEvent
 import com.bitmovin.player.api.event.on
 import com.bitmovin.player.api.media.subtitle.SubtitleTrack
 import com.bitmovin.player.api.network.HttpRequestType
+import com.bitmovin.player.api.recovery.RetryPlaybackAction
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceType
 import java.util.Date
@@ -124,6 +125,8 @@ internal class BitmovinSdkAdapter(
         player.on(::onPlayerEventAdBreakFinished)
         player.on(::onPlayerEventTimeChanged)
         player.on(::onPlayerEventPlaylistTransition)
+        // Event was added in Player 3.128.0
+        runCatching { player.on(::onPlayerEventRetryPlaybackAttempt) }
     }
 
     private fun removePlayerListener() {
@@ -151,6 +154,7 @@ internal class BitmovinSdkAdapter(
         player.off(::onPlayerEventAdBreakFinished)
         player.off(::onPlayerEventTimeChanged)
         player.off(::onPlayerEventPlaylistTransition)
+        runCatching { player.off(::onPlayerEventRetryPlaybackAttempt) }
     }
 
     private val currentSource: Source?
@@ -674,6 +678,14 @@ internal class BitmovinSdkAdapter(
             stateMachine.sourceChange(videoEndTimeOfPreviousSource, position, shouldStartup)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
+        }
+    }
+
+    private fun onPlayerEventRetryPlaybackAttempt(event: SourceEvent.RetryPlaybackAttempt) {
+        BitmovinLog.d(TAG, "onRetryPlaybackAttempt: action=${event.retryAction}")
+        if (event.retryAction == RetryPlaybackAction.SkipToNextSource) {
+            val error = event.errorEvent
+            handleErrorEvent(error, exceptionMapper.map(error))
         }
     }
 
