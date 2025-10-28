@@ -436,22 +436,26 @@ class ErrorScenariosTest {
                 )
             val analyticsConfig = AnalyticsPlayerConfig.Enabled(defaultAnalyticsConfig)
 
+            var player: Player
             // act
             withContext(mainScope.coroutineContext) {
-                val player = Player(appContext, playerConfig, analyticsConfig)
-                try {
-                    player.load(playlistConfig)
-                    player.play()
+                player = Player(appContext, playerConfig, analyticsConfig)
+                player.load(playlistConfig)
+                player.play()
+            }
 
-                    waitForErrorDetailSample()
-                } finally {
-                    player.destroy()
-                }
+            waitForErrorDetailSample()
+            // we want to make sure that the player played the valid source after skipping
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(player, 500)
+
+            withContext(mainScope.coroutineContext) {
+                player.destroy()
             }
 
             // assert
             val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isGreaterThanOrEqualTo(1)
+            // make sure that we get two sessions
+            assertThat(impressionList.size).isEqualTo(2)
 
             val firstImpression = impressionList.first()
             assertThat(firstImpression.eventDataList.size).isGreaterThanOrEqualTo(1)
