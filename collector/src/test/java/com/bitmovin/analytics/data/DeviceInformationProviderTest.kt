@@ -42,6 +42,17 @@ class DeviceInformationProviderTest {
     }
 
     @Test
+    @Config(qualifiers = "sw720dp-xlarge-long-notround-any-xhdpi-keyshidden-nonav")
+    fun testGetDeviceInformation_Tablet_targetAPI_ShouldReturnInfo() {
+        // arrange
+        val dip = DeviceInformationProvider(ApplicationProvider.getApplicationContext())
+
+        // act
+        val deviceInfo = dip.getDeviceInformation()
+        Assert.assertEquals(DeviceClass.Tablet.value, deviceInfo.deviceClass)
+    }
+
+    @Test
     @Config(qualifiers = "en-rUS-w1080dp-h1920dp-xhdpi", sdk = [26])
     fun testGetDeviceInformation_4kPhone_API_V26_ShouldReturnInfo() {
         // arrange
