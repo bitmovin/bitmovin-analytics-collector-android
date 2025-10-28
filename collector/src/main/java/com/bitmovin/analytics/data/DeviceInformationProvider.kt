@@ -38,6 +38,8 @@ open class DeviceInformationProvider(
 ) {
     val isTV: Boolean = Util.isTVDevice(context)
 
+    val isTablet: Boolean = Util.isTablet(context)
+
     // https://developer.amazon.com/docs/fire-tablets/fire-os-8.html#target-your-app-for-fire-os-8-devices
     val isFireOs8OrHigher: Boolean
         get() = Build.VERSION.SDK_INT >= 30 && isFireOS(context.packageManager)
@@ -73,7 +75,16 @@ open class DeviceInformationProvider(
         // we parse the useragent in ingress for this info in the default case
         var operatingSystem: String? = null
         var operatingSystemMajor: String? = null
-        var deviceClass: DeviceClass? = if (isTV) DeviceClass.TV else null
+
+        // set device class for tvs and tablets
+        var deviceClass: DeviceClass? =
+            if (isTV) {
+                DeviceClass.TV
+            } else if (isTablet) {
+                DeviceClass.Tablet
+            } else {
+                null
+            }
 
         val packageManager = context.packageManager
 

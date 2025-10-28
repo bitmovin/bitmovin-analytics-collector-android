@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - [Internal] Moved buildconfig setting into core module since it is deprecated as global setting
 - [Internal] Fixed memory visibility for eventdatabase
+- Improved tablet detection since user agent doesn't work reliably on newer android versions
 
 ## v3.20.1
 

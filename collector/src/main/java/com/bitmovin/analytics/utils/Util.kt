@@ -154,6 +154,17 @@ object Util {
         return false
     }
 
+    // this is best effort, thus we exclude TV devices first
+    // reference: https://android-developers.googleblog.com/2011/07/new-tools-for-managing-screen-sizes.html
+    fun isTablet(context: Context): Boolean {
+        if (isTVDevice(context)) {
+            return false
+        }
+
+        val smallestWidth = context.resources.configuration.smallestScreenWidthDp
+        return smallestWidth >= 600
+    }
+
     fun getPlatform(isTV: Boolean): String {
         return if (isTV) "androidTV" else "android"
     }
