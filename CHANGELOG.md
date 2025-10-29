@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.21.0
+
 ### Added
 - Bitmovin Player: Tracking of errors that are causing playlist items to be skipped
 
