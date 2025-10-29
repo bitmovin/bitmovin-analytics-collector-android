@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- Bitmovin Player: Tracking of errors that are causing playlist items to be skipped
+
 ### Fixed
 - [Internal] Moved buildconfig setting into core module since it is deprecated as global setting
 - [Internal] Fixed memory visibility for eventdatabase
