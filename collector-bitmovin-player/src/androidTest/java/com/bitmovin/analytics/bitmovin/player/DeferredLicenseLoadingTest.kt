@@ -127,8 +127,7 @@ class DeferredLicenseLoadingTest {
                 defaultPlayer.load(nonExistingSource)
             }
 
-            // it seems to take a while until the error is consistently reported
-            Thread.sleep(10000)
+            MockedIngress.waitForErrorDetailSample()
 
             withContext(mainScope.coroutineContext) { collector.detachPlayer() }
 
