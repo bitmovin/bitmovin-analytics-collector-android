@@ -19,6 +19,8 @@ class ErrorDetailBackend(
     private val backendUrl = Util.joinUrl(config.backendUrl, "/analytics/error")
     private val _queue = LinkedList<ErrorDetail>()
     val queue: List<ErrorDetail> = _queue
+
+    @Volatile
     var enabled: Boolean = false
 
     fun limitHttpRequestsInQueue(max: Int) {

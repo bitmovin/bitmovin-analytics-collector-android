@@ -1,9 +1,9 @@
 package com.bitmovin.analytics.stateMachines
 
-import android.util.Log
 import com.bitmovin.analytics.dtos.ErrorCode
 import com.bitmovin.analytics.dtos.SubtitleDto
 import com.bitmovin.analytics.enums.AnalyticsErrorCodes
+import com.bitmovin.analytics.utils.BitmovinLog
 
 class PlayerStates {
     companion object {
@@ -93,7 +93,7 @@ class PlayerStates {
                 ) {
                     machine.videoStartTimeoutTimer.cancel()
                     if (data != null && !machine.shouldReportError(data.errorCode)) {
-                        Log.i(TAG, "ErrorCode ${data.errorCode} already reported 5 times, not reporting this occurrence!")
+                        BitmovinLog.d(TAG, "ErrorCode ${data.errorCode} already reported 5 times, not reporting this occurrence!")
                         return
                     }
 

@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- [Internal] Memory Visibility of errorDetailBackend flag
+
 ## v3.21.0
 
 ### Added
