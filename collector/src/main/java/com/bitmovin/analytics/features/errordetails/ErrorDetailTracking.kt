@@ -68,7 +68,7 @@ class ErrorDetailTracking(
         if (!isEnabled) {
             return
         }
-        val httpRequests = httpRequestTracking?.httpRequests?.toMutableList()
+        val httpRequests = httpRequestTracking?.httpRequests
         val errorIndexLocal = errorIndex
         this.errorIndex++
         val timestamp = Util.timestamp

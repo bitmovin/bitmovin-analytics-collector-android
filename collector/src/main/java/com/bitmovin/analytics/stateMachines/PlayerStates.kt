@@ -92,8 +92,12 @@ class PlayerStates {
                     data: ErrorCode?,
                 ) {
                     machine.videoStartTimeoutTimer.cancel()
-                    if (data != null && !machine.shouldReportError(data.errorCode)) {
-                        BitmovinLog.d(TAG, "ErrorCode ${data.errorCode} already reported 5 times, not reporting this occurrence!")
+                    if (data != null && !machine.shouldReportError(data)) {
+                        BitmovinLog.d(
+                            TAG,
+                            "ErrorCode ${data.errorCode} with severity ${data.errorSeverity} " +
+                                "already reported 5 times, not reporting this occurrence!",
+                        )
                         return
                     }
 

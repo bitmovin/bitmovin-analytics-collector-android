@@ -175,6 +175,7 @@ class PlayerStateMachine(
         bufferingTimeoutTimer.cancel()
         qualityChangeEventLimiter.reset()
         analytics.resetSourceRelatedState()
+        identicalErrorReportingLimiter.reset()
 
         videoStartFailedReason = null
         isStartupFinished = false
@@ -355,7 +356,7 @@ class PlayerStateMachine(
         triggerSample(ssaiRelated)
     }
 
-    fun shouldReportError(errorCode: Int): Boolean {
+    fun shouldReportError(errorCode: ErrorCode): Boolean {
         return identicalErrorReportingLimiter.shouldReportError(errorCode)
     }
 

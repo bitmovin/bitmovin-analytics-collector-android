@@ -21,7 +21,7 @@ class HttpRequestTracking(private vararg val observables: Observable<OnDownloadF
     var maxRequests = DEFAULT_MAX_REQUESTS
         private set
 
-    val httpRequests: Collection<HttpRequest>
+    val httpRequests: List<HttpRequest>
         get() {
             // threadsafe copy of the linked list
             synchronized(lock) {

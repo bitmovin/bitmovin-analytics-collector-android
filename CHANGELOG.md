@@ -6,7 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- [Internal] ErrorLimiter takes severity into account
+
 ### Fixed
+- Collector stopped reporting of errors after 5 identical errors
 - [Internal] Memory Visibility of errorDetailBackend flag
 
 ## v3.21.0

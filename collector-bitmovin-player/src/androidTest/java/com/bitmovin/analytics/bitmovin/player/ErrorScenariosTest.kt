@@ -39,6 +39,7 @@ import com.bitmovin.player.api.recovery.RetryPlaybackAction
 import com.bitmovin.player.api.recovery.RetryPlaybackConfig
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
+import com.bitmovin.player.api.source.SourceType
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.withContext
 import org.assertj.core.api.Assertions.assertThat
@@ -50,6 +51,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class ErrorScenariosTest {
@@ -396,6 +398,33 @@ class ErrorScenariosTest {
             assertThat(errorDetail.data.exceptionStacktrace?.elementAt(50)).contains("lines removed) ...")
             assertThat(errorDetail.data.exceptionMessage).isNotEmpty()
             assertThat(errorDetail.severity).isEqualTo(ErrorSeverity.CRITICAL)
+        }
+
+    @Test
+    fun test_loadingOfSource_should_resetErrorLimiter() =
+        runBlockingTest {
+            // act
+            // errorLimiter would stop after 5 identical errors, thus we expect 6 errors in order to test
+            // reseting on source loads
+            for (i in 1..6) {
+                withContext(mainScope.coroutineContext) {
+                    // creating different source urls that are failing
+                    val source =
+                        SourceConfig(
+                            "https://fcc3ddae59ed.us-west-2.playback.live-video.net/" +
+                                "api/video/v1/us-west-2.893648527354.channel.DmumNckWFTqz_invalid$i.m3u8",
+                            SourceType.Hls,
+                        )
+                    defaultPlayer.load(source)
+                    defaultPlayer.play()
+                }
+
+                waitForErrorDetailSample(15.seconds)
+            }
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(6)
         }
 
     @Test
