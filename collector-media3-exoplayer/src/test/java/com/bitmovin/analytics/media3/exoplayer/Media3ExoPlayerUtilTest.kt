@@ -11,9 +11,15 @@ import io.mockk.mockk
 import org.assertj.core.api.Assertions
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+// had to involve robolectric here since v1.9.0 broke the unittest
+// https://github.com/androidx/media/issues/2985
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33])
 class Media3ExoPlayerUtilTest {
-
     private lateinit var mockExoPlayer: ExoPlayer
 
     @Before
@@ -34,7 +40,10 @@ class Media3ExoPlayerUtilTest {
         Assertions.assertThat(selectedSubtitle?.language).isEqualTo("de")
     }
 
-    private fun prepareExoToReturnFormat(exoPlayer: ExoPlayer, subtitleFormat: Format) {
+    private fun prepareExoToReturnFormat(
+        exoPlayer: ExoPlayer,
+        subtitleFormat: Format,
+    ) {
         every { exoPlayer.isCommandAvailable(Player.COMMAND_GET_TRACKS) } returns true
         every { exoPlayer.currentTracks } returns Tracks(arrayListOf(buildMockTrackSelection(subtitleFormat)))
     }

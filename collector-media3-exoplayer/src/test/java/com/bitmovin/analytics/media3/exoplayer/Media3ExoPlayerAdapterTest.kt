@@ -2,6 +2,7 @@ package com.bitmovin.analytics.media3.exoplayer
 
 import androidx.media3.common.Format
 import androidx.media3.common.Timeline
+import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
@@ -10,19 +11,26 @@ import com.bitmovin.analytics.stateMachines.QualityChangeEventLimiter
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 
 class Media3ExoPlayerAdapterTest {
-    private val player: ExoPlayer = mockk(relaxed = true)
+    private lateinit var player: ExoPlayer
     private lateinit var adapter: Media3ExoPlayerAdapter
     private val qualityChangeEventLimiter: QualityChangeEventLimiter = mockk()
     private lateinit var stateMachine: PlayerStateMachine
 
     @Before
     fun setup() {
+        // https://github.com/androidx/media/issues/2985
+        // needed for tests to work with media3 1.9.0
+        mockkStatic(Util::class)
+        every { Util.isRunningOnEmulator() } returns true
+
+        player = mockk(relaxed = true)
         every { player.currentMediaItemIndex } returns 0
         val timeline =
             mockk<Timeline>(relaxed = true) {

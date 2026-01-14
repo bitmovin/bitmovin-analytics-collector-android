@@ -2,6 +2,7 @@ package com.bitmovin.analytics.media3.exoplayer.manipulators
 
 import android.net.Uri
 import androidx.media3.common.Player
+import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.manifest.DashManifest
 import com.bitmovin.analytics.api.SourceMetadata
@@ -14,6 +15,7 @@ import com.bitmovin.analytics.media3.exoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -30,6 +32,11 @@ class PlaybackEventDataManipulatorTest {
 
     @Before
     fun setup() {
+        // https://github.com/androidx/media/issues/2985
+        // needed for tests to work with media3 1.9.0
+        mockkStatic(Util::class)
+        every { Util.isRunningOnEmulator() } returns true
+
         mockExoPlayer = mockk(relaxed = true)
         mockPlaybackInfoProvider = mockk(relaxed = true)
         mockMetadataProvider = mockk(relaxed = true)

@@ -1,21 +1,33 @@
 package com.bitmovin.analytics.media3.exoplayer.manipulators
 
 import androidx.media3.common.Format
+import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import com.bitmovin.analytics.dtos.EventData
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33])
 class QualityEventDataManipulatorTest {
     private lateinit var mockExoPlayer: ExoPlayer
     private lateinit var qualityEventDataManipulator: QualityEventDataManipulator
 
     @Before
     fun setup() {
+        // https://github.com/androidx/media/issues/2985
+        // needed for tests to work with media3 1.9.0
+        mockkStatic(Util::class)
+        every { Util.isRunningOnEmulator() } returns true
+
         mockExoPlayer = mockk(relaxed = true)
         qualityEventDataManipulator = QualityEventDataManipulator(mockExoPlayer)
     }
