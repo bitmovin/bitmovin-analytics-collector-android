@@ -12,7 +12,6 @@ import org.robolectric.annotation.Config
     RobolectricTestRunner::class,
 )
 class UserAgentProviderTest {
-
     @Test
     @Config(sdk = [33])
     fun `userAgentProvider_returnsDefaultValues`() {
@@ -39,7 +38,7 @@ class UserAgentProviderTest {
     }
 
     @Test
-    @Config(sdk = [21])
+    @Config(sdk = [23])
     fun `userAgentProvider_generatesUserAgentWhenSystemPropertyIsNull_onMinSdk`() {
         // arrange
         val applicationInfo = ApplicationInfo()
@@ -50,7 +49,7 @@ class UserAgentProviderTest {
         val userAgentProvider = UserAgentProvider(applicationInfo, packageInfo, null)
 
         // act & assert
-        Assert.assertEquals("test/1 (Linux;Android 5.0.2)", userAgentProvider.userAgent)
+        Assert.assertEquals("test/1 (Linux;Android 6.0.1)", userAgentProvider.userAgent)
     }
 
     @Test

@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.bitmovin.analytics.amazonivs.example"
-        minSdkVersion rootProject.ext.amazonIvsMinSdkVersion
+        minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
         versionCode 1

@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Changed minimum required android version to android 6.0 (API level 23)
+
 ## v3.21.1
 
 ### Changed

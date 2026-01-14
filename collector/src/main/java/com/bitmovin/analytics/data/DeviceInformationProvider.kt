@@ -19,7 +19,6 @@
 package com.bitmovin.analytics.data
 
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Point
@@ -127,7 +126,6 @@ open class DeviceInformationProvider(
                     Build.VERSION.SDK_INT >= 28 -> "7"
                     Build.VERSION.SDK_INT >= 25 -> "6"
                     Build.VERSION.SDK_INT >= 22 -> "5"
-                    Build.VERSION.SDK_INT >= 19 -> "4"
                     else -> "Unknown"
                 }
 
@@ -162,12 +160,7 @@ open class DeviceInformationProvider(
             return displaySize
         }
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            getDisplaySizeV23(display, displaySize)
-        } else if (Build.VERSION.SDK_INT >= 17) {
-            getDisplaySizeV17(display, displaySize)
-        }
-
+        getDisplaySizeV23(display, displaySize)
         return displaySize
     }
 
@@ -208,7 +201,6 @@ open class DeviceInformationProvider(
     }
 
     // This code is copied from exoplayer https://github.com/google/ExoPlayer, converted into kotlin and adapted to iterate over all display modes
-    @TargetApi(23)
     private fun getDisplaySizeV23(
         display: Display,
         outSize: Point,
@@ -228,15 +220,6 @@ open class DeviceInformationProvider(
                 }
             }
         }
-    }
-
-    // This code is copied from exoplayer https://github.com/google/ExoPlayer and converted into kotlin
-    @TargetApi(17)
-    private fun getDisplaySizeV17(
-        display: Display,
-        outSize: Point,
-    ) {
-        display.getRealSize(outSize)
     }
 
     // This code is copied from exoplayer https://github.com/google/ExoPlayer and converted into kotlin

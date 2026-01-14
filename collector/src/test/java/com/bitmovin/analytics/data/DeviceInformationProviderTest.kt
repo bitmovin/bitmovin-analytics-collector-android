@@ -121,24 +121,6 @@ class DeviceInformationProviderTest {
     }
 
     @Test
-    @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [21])
-    fun testGetDeviceInformation_4kTV_API_V21_ShouldReturnInfo() {
-        // arrange
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        setTvMode(context)
-        val dip = DeviceInformationProvider(context)
-
-        // act
-        val deviceInfo = dip.getDeviceInformation()
-
-        // assert
-        Assert.assertEquals(true, deviceInfo.isTV)
-        Assert.assertEquals(DeviceClass.TV.value, deviceInfo.deviceClass)
-        Assert.assertEquals(2160, deviceInfo.screenWidth)
-        Assert.assertEquals(3840, deviceInfo.screenHeight)
-    }
-
-    @Test
     @Config(qualifiers = "w1080dp-h1920dp-xhdpi-notouch-keyshidden", sdk = [33])
     fun testGetDeviceInformation_FireOS_8_TV_API_V33_ShouldReturnInfo() {
         // arrange

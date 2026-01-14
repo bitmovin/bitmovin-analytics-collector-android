@@ -87,11 +87,11 @@ ext {
 
     version = System.getProperty("version", "0.0.0") + (developLocal ? '-local' : '')
 
-    // minSdkVersion we officially support is 21
+    // minSdkVersion we officially support is 23
     // Emulators need to have at least API level 25, since lower don't emulate
     // the media stack correctly
     // (ref: https://developer.android.com/guide/topics/media/exoplayer/supported-devices)
-    minSdkVersion = 21
+    minSdkVersion = 23
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -100,7 +100,6 @@ ext {
     exampleAppJvmTarget = jvmTarget
 
     compileSdk = 36
-    amazonIvsMinSdkVersion = 21
     targetSdkVersion = 36
 
     // player versions
