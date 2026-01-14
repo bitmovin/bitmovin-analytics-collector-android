@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Changed minimum required android version to android 6.0 (API level 23)
+- Upgraded bitmovin player to 3.138.0
 
 ## v3.21.1
 
