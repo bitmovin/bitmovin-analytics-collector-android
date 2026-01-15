@@ -8,15 +8,35 @@ import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.convertDoubleSecondsToLongMs
 import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
 import com.bitmovin.analytics.utils.BitmovinLog
+import com.theoplayer.android.api.event.EventListener
+import com.theoplayer.android.api.event.player.CanPlayEvent
+import com.theoplayer.android.api.event.player.CanPlayThroughEvent
+import com.theoplayer.android.api.event.player.ContentProtectionErrorEvent
+import com.theoplayer.android.api.event.player.ContentProtectionSuccessEvent
 import com.theoplayer.android.api.event.player.DestroyEvent
+import com.theoplayer.android.api.event.player.DurationChangeEvent
+import com.theoplayer.android.api.event.player.EndedEvent
 import com.theoplayer.android.api.event.player.ErrorEvent
+import com.theoplayer.android.api.event.player.LoadStartEvent
+import com.theoplayer.android.api.event.player.LoadedDataEvent
+import com.theoplayer.android.api.event.player.LoadedMetadataEvent
+import com.theoplayer.android.api.event.player.MediaEncryptedEvent
+import com.theoplayer.android.api.event.player.NoSupportedRepresentationFoundEvent
 import com.theoplayer.android.api.event.player.PauseEvent
 import com.theoplayer.android.api.event.player.PlayEvent
 import com.theoplayer.android.api.event.player.PlayerEventTypes
 import com.theoplayer.android.api.event.player.PlayingEvent
+import com.theoplayer.android.api.event.player.PresentationModeChange
+import com.theoplayer.android.api.event.player.ProgressEvent
+import com.theoplayer.android.api.event.player.RateChangeEvent
+import com.theoplayer.android.api.event.player.ReadyStateChangeEvent
+import com.theoplayer.android.api.event.player.ResizeEvent
 import com.theoplayer.android.api.event.player.SeekedEvent
 import com.theoplayer.android.api.event.player.SeekingEvent
+import com.theoplayer.android.api.event.player.SegmentNotFoundEvent
 import com.theoplayer.android.api.event.player.SourceChangeEvent
+import com.theoplayer.android.api.event.player.TimeUpdateEvent
+import com.theoplayer.android.api.event.player.VolumeChangeEvent
 import com.theoplayer.android.api.event.player.WaitingEvent
 import com.theoplayer.android.api.player.Player
 
@@ -30,42 +50,98 @@ internal class AnalyticsEventListeners(
     // -> effort to make core library more compact
     private var isVideoAttemptedPlay = false
 
+    // Event listener references for registration and unregistration
+    private val playListener = EventListener<PlayEvent> { event -> handlePlayEvent(event) }
+    private val playingListener = EventListener<PlayingEvent> { event -> handlePlayingEvent(event) }
+    private val pauseListener = EventListener<PauseEvent> { event -> onPause(event) }
+    private val endedListener = EventListener<EndedEvent> { Log.i(TAG, "Event: ENDED") }
+    private val errorListener = EventListener<ErrorEvent> { event -> handleErrorEvent(event) }
+    private val seekedListener = EventListener<SeekedEvent> { event -> onSeeked(event) }
+    private val seekingListener = EventListener<SeekingEvent> { event -> onSeeking(event) }
+    private val waitingListener = EventListener<WaitingEvent> { event -> onBuffering(event) }
+    private val sourceChangeListener = EventListener<SourceChangeEvent> { event -> handleSourceChange(event) }
+    private val rateChangeListener = EventListener<RateChangeEvent> { Log.i(TAG, "Event: RATECHANGE") }
+    private val volumeChangeListener = EventListener<VolumeChangeEvent> { Log.i(TAG, "Event: VOLUMECHANGE") }
+    private val progressListener = EventListener<ProgressEvent> { Log.i(TAG, "Event: PROGRESS") }
+    private val durationChangeListener = EventListener<DurationChangeEvent> { Log.i(TAG, "Event: DURATIONCHANGE") }
+    private val readyStateChangeListener = EventListener<ReadyStateChangeEvent> { Log.i(TAG, "Event: READYSTATECHANGE") }
+    private val timeUpdateListener = EventListener<TimeUpdateEvent> { Log.i(TAG, "Event: TIMEUPDATE") }
+    private val loadedMetadataListener = EventListener<LoadedMetadataEvent> { Log.i(TAG, "Event: LOADEDMETADATA") }
+    private val loadedDataListener = EventListener<LoadedDataEvent> { Log.i(TAG, "Event: LOADEDDATA") }
+    private val canPlayListener = EventListener<CanPlayEvent> { Log.i(TAG, "Event: CANPLAY") }
+    private val canPlayThroughListener = EventListener<CanPlayThroughEvent> { Log.i(TAG, "Event: CANPLAYTHROUGH") }
+    private val segmentNotFoundListener = EventListener<SegmentNotFoundEvent> { Log.i(TAG, "Event: SEGMENTNOTFOUND") }
+    private val encryptedListener = EventListener<MediaEncryptedEvent> { Log.i(TAG, "Event: ENCRYPTED") }
+    private val contentProtectionErrorListener = EventListener<ContentProtectionErrorEvent> { Log.i(TAG, "Event: CONTENTPROTECTIONERROR") }
+    private val contentProtectionSuccessListener =
+        EventListener<ContentProtectionSuccessEvent> { Log.i(TAG, "Event: CONTENTPROTECTIONSUCCESS") }
+    private val noSupportedRepresentationFoundListener =
+        EventListener<NoSupportedRepresentationFoundEvent> { Log.i(TAG, "Event: NOSUPPORTEDREPRESENTATIONFOUND") }
+    private val presentationModeChangeListener = EventListener<PresentationModeChange> { Log.i(TAG, "Event: PRESENTATIONMODECHANGE") }
+    private val destroyListener = EventListener<DestroyEvent> { event -> onDestroy(event) }
+    private val loadStartListener = EventListener<LoadStartEvent> { Log.i(TAG, "Event: LOADSTART") }
+    private val resizeListener = EventListener<ResizeEvent> { Log.i(TAG, "Event: RESIZE") }
+
     internal fun registerEventListeners() {
-        player.addEventListener(PlayerEventTypes.PLAY) { event -> handlePlayEvent(event) }
-        player.addEventListener(PlayerEventTypes.PLAYING) { event -> handlePlayingEvent(event) }
-        player.addEventListener(PlayerEventTypes.PAUSE) { event -> onPause(event) }
-        player.addEventListener(PlayerEventTypes.ENDED) { event -> Log.i(TAG, "Event: ENDED") }
-        player.addEventListener(PlayerEventTypes.ERROR) { event -> handleErrorEvent(event) }
-        player.addEventListener(PlayerEventTypes.SEEKED) { event -> onSeeked(event) }
-        player.addEventListener(PlayerEventTypes.SEEKING) { event -> onSeeking(event) }
-        player.addEventListener(PlayerEventTypes.WAITING) { event -> onBuffering(event) }
-        player.addEventListener(PlayerEventTypes.SOURCECHANGE) { event -> handleSourceChange(event) }
-        player.addEventListener(PlayerEventTypes.RATECHANGE) { event -> Log.i(TAG, "Event: RATECHANGE") }
-        player.addEventListener(PlayerEventTypes.VOLUMECHANGE) { event -> Log.i(TAG, "Event: VOLUMECHANGE") }
-        player.addEventListener(PlayerEventTypes.PROGRESS) { event -> Log.i(TAG, "Event: PROGRESS") }
-        player.addEventListener(PlayerEventTypes.DURATIONCHANGE) { event -> Log.i(TAG, "Event: DURATIONCHANGE") }
-        player.addEventListener(PlayerEventTypes.READYSTATECHANGE) { event -> Log.i(TAG, "Event: READYSTATECHANGE") }
-        player.addEventListener(PlayerEventTypes.TIMEUPDATE) { event -> Log.i(TAG, "Event: TIMEUPDATE") }
-        player.addEventListener(PlayerEventTypes.LOADEDMETADATA) { event -> Log.i(TAG, "Event: LOADEDMETADATA") }
-        player.addEventListener(PlayerEventTypes.LOADEDDATA) { event -> Log.i(TAG, "Event: LOADEDDATA") }
-        player.addEventListener(PlayerEventTypes.CANPLAY) { event -> Log.i(TAG, "Event: CANPLAY") }
-        player.addEventListener(PlayerEventTypes.CANPLAYTHROUGH) { event -> Log.i(TAG, "Event: CANPLAYTHROUGH") }
-        player.addEventListener(PlayerEventTypes.SEGMENTNOTFOUND) { event -> Log.i(TAG, "Event: SEGMENTNOTFOUND") }
-        player.addEventListener(PlayerEventTypes.ENCRYPTED) { event -> Log.i(TAG, "Event: ENCRYPTED") }
-        player.addEventListener(PlayerEventTypes.CONTENTPROTECTIONERROR) { event -> Log.i(TAG, "Event: CONTENTPROTECTIONERROR") }
-        player.addEventListener(PlayerEventTypes.CONTENTPROTECTIONSUCCESS) { event -> Log.i(TAG, "Event: CONTENTPROTECTIONSUCCESS") }
-        player.addEventListener(
-            PlayerEventTypes.NOSUPPORTEDREPRESENTATIONFOUND,
-        ) { event -> Log.i(TAG, "Event: NOSUPPORTEDREPRESENTATIONFOUND") }
-        player.addEventListener(PlayerEventTypes.PRESENTATIONMODECHANGE) { event -> Log.i(TAG, "Event: PRESENTATIONMODECHANGE") }
-        player.addEventListener(PlayerEventTypes.DESTROY) { event -> onDestroy(event) }
-        player.addEventListener(PlayerEventTypes.LOADSTART) { event -> Log.i(TAG, "Event: LOADSTART") }
-        player.addEventListener(PlayerEventTypes.RESIZE) { event -> Log.i(TAG, "Event: RESIZE") }
+        player.addEventListener(PlayerEventTypes.PLAY, playListener)
+        player.addEventListener(PlayerEventTypes.PLAYING, playingListener)
+        player.addEventListener(PlayerEventTypes.PAUSE, pauseListener)
+        player.addEventListener(PlayerEventTypes.ENDED, endedListener)
+        player.addEventListener(PlayerEventTypes.ERROR, errorListener)
+        player.addEventListener(PlayerEventTypes.SEEKED, seekedListener)
+        player.addEventListener(PlayerEventTypes.SEEKING, seekingListener)
+        player.addEventListener(PlayerEventTypes.WAITING, waitingListener)
+        player.addEventListener(PlayerEventTypes.SOURCECHANGE, sourceChangeListener)
+        player.addEventListener(PlayerEventTypes.RATECHANGE, rateChangeListener)
+        player.addEventListener(PlayerEventTypes.VOLUMECHANGE, volumeChangeListener)
+        player.addEventListener(PlayerEventTypes.PROGRESS, progressListener)
+        player.addEventListener(PlayerEventTypes.DURATIONCHANGE, durationChangeListener)
+        player.addEventListener(PlayerEventTypes.READYSTATECHANGE, readyStateChangeListener)
+        player.addEventListener(PlayerEventTypes.TIMEUPDATE, timeUpdateListener)
+        player.addEventListener(PlayerEventTypes.LOADEDMETADATA, loadedMetadataListener)
+        player.addEventListener(PlayerEventTypes.LOADEDDATA, loadedDataListener)
+        player.addEventListener(PlayerEventTypes.CANPLAY, canPlayListener)
+        player.addEventListener(PlayerEventTypes.CANPLAYTHROUGH, canPlayThroughListener)
+        player.addEventListener(PlayerEventTypes.SEGMENTNOTFOUND, segmentNotFoundListener)
+        player.addEventListener(PlayerEventTypes.ENCRYPTED, encryptedListener)
+        player.addEventListener(PlayerEventTypes.CONTENTPROTECTIONERROR, contentProtectionErrorListener)
+        player.addEventListener(PlayerEventTypes.CONTENTPROTECTIONSUCCESS, contentProtectionSuccessListener)
+        player.addEventListener(PlayerEventTypes.NOSUPPORTEDREPRESENTATIONFOUND, noSupportedRepresentationFoundListener)
+        player.addEventListener(PlayerEventTypes.PRESENTATIONMODECHANGE, presentationModeChangeListener)
+        player.addEventListener(PlayerEventTypes.DESTROY, destroyListener)
+        player.addEventListener(PlayerEventTypes.LOADSTART, loadStartListener)
+        player.addEventListener(PlayerEventTypes.RESIZE, resizeListener)
     }
 
-    // TODO: removing seems odd this way
     internal fun unregisterEventListeners() {
-//        player.removeEventListener(PlayerEventTypes.PLAY) { event -> onStartup(event) }
+        player.removeEventListener(PlayerEventTypes.PLAY, playListener)
+        player.removeEventListener(PlayerEventTypes.PLAYING, playingListener)
+        player.removeEventListener(PlayerEventTypes.PAUSE, pauseListener)
+        player.removeEventListener(PlayerEventTypes.ENDED, endedListener)
+        player.removeEventListener(PlayerEventTypes.ERROR, errorListener)
+        player.removeEventListener(PlayerEventTypes.SEEKED, seekedListener)
+        player.removeEventListener(PlayerEventTypes.SEEKING, seekingListener)
+        player.removeEventListener(PlayerEventTypes.WAITING, waitingListener)
+        player.removeEventListener(PlayerEventTypes.SOURCECHANGE, sourceChangeListener)
+        player.removeEventListener(PlayerEventTypes.RATECHANGE, rateChangeListener)
+        player.removeEventListener(PlayerEventTypes.VOLUMECHANGE, volumeChangeListener)
+        player.removeEventListener(PlayerEventTypes.PROGRESS, progressListener)
+        player.removeEventListener(PlayerEventTypes.DURATIONCHANGE, durationChangeListener)
+        player.removeEventListener(PlayerEventTypes.READYSTATECHANGE, readyStateChangeListener)
+        player.removeEventListener(PlayerEventTypes.TIMEUPDATE, timeUpdateListener)
+        player.removeEventListener(PlayerEventTypes.LOADEDMETADATA, loadedMetadataListener)
+        player.removeEventListener(PlayerEventTypes.LOADEDDATA, loadedDataListener)
+        player.removeEventListener(PlayerEventTypes.CANPLAY, canPlayListener)
+        player.removeEventListener(PlayerEventTypes.CANPLAYTHROUGH, canPlayThroughListener)
+        player.removeEventListener(PlayerEventTypes.SEGMENTNOTFOUND, segmentNotFoundListener)
+        player.removeEventListener(PlayerEventTypes.ENCRYPTED, encryptedListener)
+        player.removeEventListener(PlayerEventTypes.CONTENTPROTECTIONERROR, contentProtectionErrorListener)
+        player.removeEventListener(PlayerEventTypes.CONTENTPROTECTIONSUCCESS, contentProtectionSuccessListener)
+        player.removeEventListener(PlayerEventTypes.NOSUPPORTEDREPRESENTATIONFOUND, noSupportedRepresentationFoundListener)
+        player.removeEventListener(PlayerEventTypes.PRESENTATIONMODECHANGE, presentationModeChangeListener)
+        player.removeEventListener(PlayerEventTypes.DESTROY, destroyListener)
+        player.removeEventListener(PlayerEventTypes.LOADSTART, loadStartListener)
+        player.removeEventListener(PlayerEventTypes.RESIZE, resizeListener)
     }
 
     private fun handlePlayEvent(playEvent: PlayEvent) {

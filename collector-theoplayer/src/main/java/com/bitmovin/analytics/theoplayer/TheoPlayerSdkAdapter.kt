@@ -21,6 +21,7 @@ import com.bitmovin.analytics.theoplayer.manipulators.PlaybackEventDataManipulat
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.theoplayer.android.api.player.Player
 
 internal class TheoPlayerSdkAdapter(
@@ -74,6 +75,18 @@ internal class TheoPlayerSdkAdapter(
         playerStatisticsProvider.reset()
     }
 
+    override fun release() {
+        try {
+            analyticsEventListeners.unregisterEventListeners()
+            sourceEventListeners.unregisterSourceListeners()
+
+            playerStatisticsProvider.reset()
+            stateMachine.resetStateMachine()
+        } catch (e: Exception) {
+            BitmovinLog.e(TAG, e.toString())
+        }
+    }
+
     override val position: Long
         get() = player.currentPositionInMs()
 
@@ -85,8 +98,6 @@ internal class TheoPlayerSdkAdapter(
 
     companion object {
         private const val TAG = "TheoPlayerSdkAdapter"
-
-        // TODO: discuss naming
         private const val PLAYER_TECH = "Android:THEOplayer"
         private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.THEOPLAYER)
     }
