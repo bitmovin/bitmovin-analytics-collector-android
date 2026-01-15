@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Upgraded agp to 8.10.1 in order to support theo player
+
 ### Added
 - Initial version of theoplayer collector
 
