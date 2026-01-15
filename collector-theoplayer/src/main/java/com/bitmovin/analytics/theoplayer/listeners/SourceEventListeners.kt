@@ -11,13 +11,11 @@ import com.theoplayer.android.api.event.track.mediatrack.video.list.AddTrackEven
 import com.theoplayer.android.api.event.track.mediatrack.video.list.VideoTrackListEventTypes
 import com.theoplayer.android.api.player.Player
 
-// TODO: how does this work on source change?
 internal class SourceEventListeners(
     private val stateMachine: PlayerStateMachine,
     private val player: Player,
     private val playbackQualityProvider: PlaybackQualityProvider,
 ) {
-    // TODO: is this the way to go?
     internal fun registerSourceListeners() {
         player.videoTracks.addEventListener(VideoTrackListEventTypes.ADDTRACK, handleAddTrackEvent)
     }

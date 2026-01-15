@@ -9,8 +9,6 @@ import com.theoplayer.android.api.player.track.texttrack.TextTrackMode
 import java.lang.Double.isFinite
 import kotlin.Boolean
 import kotlin.Long
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 internal fun Player.currentPositionInMs(): Long {
     val positionInMs = this.currentTime * 1000
@@ -53,7 +51,27 @@ internal fun Player.getCurrentActiveAudioTrack(): MediaTrack<AudioQuality>? {
 }
 
 internal fun Player.getDurationInMs(): Long {
-    return this.duration.toDuration(DurationUnit.SECONDS).toLong(DurationUnit.MILLISECONDS)
+    val duration = this.duration
+    if (duration.isFinite()) {
+        try {
+            val durationInMs = duration * 1000
+            return durationInMs.toLongSafe()
+        } catch (e: Exception) {
+            return 0
+        }
+    }
+
+    return 0
+}
+
+internal fun Double.toLongSafe(): Long {
+    return when {
+        this.isNaN() -> 0
+        this.isInfinite() -> 0
+        this > Long.MAX_VALUE -> Long.MAX_VALUE
+        this < Long.MIN_VALUE -> Long.MIN_VALUE
+        else -> this.toLong()
+    }
 }
 
 internal fun Player.getCurrentActiveTextTrack(): TextTrack? {
