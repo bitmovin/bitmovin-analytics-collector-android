@@ -1,0 +1,74 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+android {
+    namespace "com.bitmovin.analytics.theoplayer.example"
+    compileSdk rootProject.ext.compileSdk
+
+    defaultConfig {
+        applicationId 'com.bitmovin.analytics.theoplayer.example'
+        minSdkVersion 23 // TODO: make global configurable
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.version
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibility
+        targetCompatibility rootProject.ext.targetCompatibility
+    }
+
+    kotlinOptions {
+        jvmTarget = rootProject.ext.exampleAppJvmTarget
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+// we need to exclude the theoplayer analytics module since we work with a local development version
+// otherwise we would run into dex errors due to duplicate classes
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute module('com.bitmovin.analytics:collector') using project(':collector') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
+        substitute module('com.bitmovin.analytics:collector-theoplayer') using project(':collector-theoplayer') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
+    implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
+    implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
+    implementation "androidx.work:work-runtime-ktx:${rootProject.ext.workRuntimeKtxVersion}"
+    implementation "androidx.activity:activity-ktx:${rootProject.ext.ActivityKtxVersion}"
+
+    implementation "com.theoplayer.theoplayer-sdk-android:core:10.7.0"
+
+    if (rootProject.ext.developLocal) {
+        implementation project(':collector-theoplayer')
+    } else {
+        implementation "com.bitmovin.analytics:collector-theoplayer:${rootProject.ext.version}"
+    }
+    implementation project(':example-shared')
+}

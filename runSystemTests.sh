@@ -38,6 +38,12 @@ yes | sdkmanager --licenses
 ## run test
 ./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest || exit
 
+# run systemtest for THEOplayer
+## clean test to make sure we run test everytime
+./gradlew :collector-theoplayer:cleanPixel6api35DebugAndroidTest
+## run test
+./gradlew :collector-theoplayer:pixel6api35DebugAndroidTest || exit
+
 
 ## Commands that can be used for local testing of specific test classes and tests
 

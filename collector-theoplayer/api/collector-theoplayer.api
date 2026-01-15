@@ -1,0 +1,18 @@
+public abstract interface class com/bitmovin/analytics/theoplayer/api/ITHEOplayerCollector : com/bitmovin/analytics/api/AnalyticsCollector {
+	public static final field Factory Lcom/bitmovin/analytics/theoplayer/api/ITHEOplayerCollector$Factory;
+	public static fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;)Lcom/bitmovin/analytics/theoplayer/api/ITHEOplayerCollector;
+	public static fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;)Lcom/bitmovin/analytics/theoplayer/api/ITHEOplayerCollector;
+	public abstract fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
+	public static fun getSdkVersion ()Ljava/lang/String;
+	public abstract fun getSourceMetadata ()Lcom/bitmovin/analytics/api/SourceMetadata;
+	public abstract fun setCustomData (Lcom/bitmovin/analytics/api/CustomData;)V
+	public abstract fun setSourceMetadata (Lcom/bitmovin/analytics/api/SourceMetadata;)V
+}
+
+public final class com/bitmovin/analytics/theoplayer/api/ITHEOplayerCollector$Factory {
+	public final fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;)Lcom/bitmovin/analytics/theoplayer/api/ITHEOplayerCollector;
+	public final fun create (Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;)Lcom/bitmovin/analytics/theoplayer/api/ITHEOplayerCollector;
+	public static synthetic fun create$default (Lcom/bitmovin/analytics/theoplayer/api/ITHEOplayerCollector$Factory;Landroid/content/Context;Lcom/bitmovin/analytics/api/AnalyticsConfig;Lcom/bitmovin/analytics/api/DefaultMetadata;ILjava/lang/Object;)Lcom/bitmovin/analytics/theoplayer/api/ITHEOplayerCollector;
+	public final fun getSdkVersion ()Ljava/lang/String;
+}
+

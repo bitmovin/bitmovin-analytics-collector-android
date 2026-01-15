@@ -58,6 +58,12 @@ jobs:
         run: |
           ./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest
 
+# Collector THEOplayer Test
+      - name: Tests Collector THEOplayer
+        if: always()
+        run: |
+          ./gradlew :collector-theoplayer:pixel6api35DebugAndroidTest
+
 # Collector Exo Player Test
       - name: Tests Collector Exoplayer
         if: always()
@@ -107,6 +113,7 @@ jobs:
             cp -r collector-exoplayer/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-exoplayer
             cp -r collector-media3-exoplayer/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-media3-exoplayer
             cp -r collector-amazon-ivs/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-amazon-ivs
+            cp -r collector-theoplayer/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-theoplayer
 
             cp .github/tests-report/INDEX_TEST_REPORTS.html reports/index.html
 

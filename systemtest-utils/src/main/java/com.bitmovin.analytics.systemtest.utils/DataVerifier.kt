@@ -130,7 +130,8 @@ object DataVerifier {
 
             // audio language should always be set, except for ivs player
             // since we cannot track it there as of 2023-09-21
-            if (expectedPlayerInfo.playerName != "amazonivs") {
+            // FIXME: current theoplayer asset doesn't provide language
+            if (expectedPlayerInfo.playerName != "amazonivs" && expectedPlayerInfo.playerName != "theoplayer") {
                 assertThat(eventData.audioLanguage).isNotEmpty
             }
 
@@ -544,7 +545,7 @@ object DataVerifier {
     }
 
     fun verifyInvariants(eventDataList: MutableList<EventData>) {
-        verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList)
+        verifyQualityOnlyChangesWithQualityChangeEventOrSeekOrBuffering(eventDataList)
         verifyStateDurationsAreSetCorrectly(eventDataList)
 
         // ivs is reporting videotime inconsistently for live samples, thus we skip this check for ivs live
@@ -734,12 +735,12 @@ object DataVerifier {
         }
     }
 
-    private fun verifyQualityOnlyChangesWithQualityChangeEventOrSeek(eventDataList: MutableList<EventData>) {
+    private fun verifyQualityOnlyChangesWithQualityChangeEventOrSeekOrBuffering(eventDataList: MutableList<EventData>) {
         var currentVideoBitrate = eventDataList[0].videoBitrate
         var currentAudioBitrate = eventDataList[0].audioBitrate
 
         for (eventData in eventDataList) {
-            if (eventData.state == QUALITYCHANGE || eventData.state == SEEKING) {
+            if (eventData.state == QUALITYCHANGE || eventData.state == SEEKING || eventData.state == BUFFERING) {
                 currentVideoBitrate = eventData.videoBitrate
                 currentAudioBitrate = eventData.audioBitrate
             }

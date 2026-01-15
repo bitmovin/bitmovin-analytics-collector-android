@@ -44,6 +44,7 @@ allprojects {
             }
             url 'https://bitmovin.jfrog.io/bitmovin/libs-snapshot-local/'
         }
+        maven { url "https://maven.theoplayer.com/releases" }
 
     }
 
@@ -107,6 +108,7 @@ ext {
     exoplayerVersion = '2.19.1'
     amazonIvsPlayerVersion = '1.38.0'
     media3PlayerVersion = '1.9.0'
+    theoPlayerVersion = '10.7.0'
 
     // collector dependencies
     gsonVersion = '2.12.1'
@@ -238,6 +240,7 @@ apiValidation {
                         "collector-exoplayer-example",
                         "collector-amazon-ivs-example",
                         "collector-media3-exoplayer-example",
+                        "collector-theoplayer-example",
                         "example-shared",
                         "systemtest-utils"]
 

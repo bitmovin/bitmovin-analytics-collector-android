@@ -5,6 +5,7 @@
 /local.properties
 .DS_Store
 /build
+collector-theoplayer/build/
 /captures
 .externalNativeBuild
 bitmovin.properties

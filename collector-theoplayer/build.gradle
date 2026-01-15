@@ -1,0 +1,184 @@
+import com.android.build.api.dsl.ManagedVirtualDevice
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'maven-publish'
+apply from: '../jacoco.gradle'
+apply from: '../bitmovinpropertiesloader.gradle'
+
+kotlin {
+    explicitApi()
+    explicitApi 'strict'
+}
+
+android {
+    namespace "com.bitmovin.analytics.theoplayer"
+    compileSdk rootProject.ext.compileSdk
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibility
+        targetCompatibility rootProject.ext.targetCompatibility
+    }
+
+    kotlinOptions {
+        jvmTarget = rootProject.ext.jvmTarget
+        freeCompilerArgs += "-opt-in=com.bitmovin.analytics.internal.InternalBitmovinApi"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            enableUnitTestCoverage true
+            enableAndroidTestCoverage true
+        }
+    }
+
+    testOptions {
+        // https://developer.android.com/studio/test/gradle-managed-devices
+        managedDevices {
+            devices {
+                pixel6api35 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                    // Use device profiles you typically see in Android Studio.
+                    device = "Pixel 6"
+                    // Use only API levels 27 and higher.
+                    apiLevel = 34
+                    // google is used since atd and aosp don't support widevine anymore
+                    systemImageSource = "google"
+                }
+                pixel6api30 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                    // Use device profiles you typically see in Android Studio.
+                    device = "Pixel 6"
+                    // Use only API levels 27 and higher.
+                    apiLevel = 30
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
+        unitTests.returnDefaultValues = true
+    }
+    lint {
+        abortOnError false
+    }
+
+    // FIXME: verify if this is really needed (seems like it is??)
+    // we need to exclude the MANIFEST.MF file under META-INF/versions/9/OSGI-INF
+    // since there is conflict
+    packaging {
+        resources {
+            excludes += [
+                    "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            ]
+        }
+    }
+}
+
+dependencies {
+    if (rootProject.ext.developLocal) {
+        api project(':collector')
+    } else {
+        api "com.bitmovin.analytics:collector:${rootProject.ext.version}"
+    }
+
+    compileOnly "com.theoplayer.theoplayer-sdk-android:core:${rootProject.ext.theoPlayerVersion}"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
+
+    // TODO: needed for unitests?
+    testImplementation "com.theoplayer.theoplayer-sdk-android:core:${rootProject.ext.theoPlayerVersion}"
+    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+    testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
+
+    androidTestImplementation "com.theoplayer.theoplayer-sdk-android:core:${rootProject.ext.theoPlayerVersion}"
+    androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
+    androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
+    androidTestImplementation "androidx.work:work-runtime-ktx:${rootProject.ext.workRuntimeKtxVersion}"
+
+    androidTestImplementation  "org.jetbrains.kotlinx:kotlinx-metadata-jvm:${rootProject.ext.kotlinMetadataJvmVersion}"
+
+    androidTestImplementation project(':example-shared')
+    androidTestImplementation project(':systemtest-utils')
+}
+
+// we need to exclude the theoplayer analytics module since we work with a local development version
+// otherwise we would run into dex errors due to duplicate classes
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute module('com.bitmovin.analytics:collector') using project(':collector') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
+        substitute module('com.bitmovin.analytics:collector-theoplayer') using project(':collector-theoplayer') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
+    }
+}
+
+publishing {
+    publications {
+        aar(MavenPublication) {
+            groupId rootProject.ext.packageGroupId
+            version = rootProject.ext.version
+            artifactId project.getName()
+
+            // Tell maven to prepare the generated "*.aar" file for publishing
+            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                //Defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
+                def configurationNames = ['api']
+
+                configurationNames.each { configurationName ->
+                    configurations[configurationName].allDependencies.each {
+
+                        if (it.group == null || it.name == null) {
+                            throw new GradleException("Group or name is null for dependency: $it")
+                        }
+
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                    }
+                }
+            }
+        }
+    }
+}
+
+artifactory {
+    contextUrl = 'https://bitmovin.jfrog.io/bitmovin'
+    publish {
+        repository {
+            // The Artifactory repository key to publish to
+            repoKey = rootProject.ext.version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
+            username = bitmovinProperties.getProperty('artifactoryUser') // The publisher user name
+            password = bitmovinProperties.getProperty('artifactoryPassword') // The publisher password
+
+            maven = true
+        }
+        defaults {
+            // Tell the Artifactory Plugin which artifacts should be published to Artifactory.
+            publications('aar')
+            publishArtifacts = true
+
+            // Properties to be attached to the published artifacts.
+            properties = ['qa.level': 'basic', 'dev.team': 'core']
+            // Publish generated POM files to Artifactory (true by default)
+            publishPom = true
+        }
+    }
+}

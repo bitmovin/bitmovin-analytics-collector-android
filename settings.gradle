@@ -7,6 +7,8 @@ include 'collector-amazon-ivs'
 include 'collector-amazon-ivs-example'
 include 'collector-media3-exoplayer'
 include 'collector-media3-exoplayer-example'
+include 'collector-theoplayer'
+include 'collector-theoplayer-example'
 
 include 'example-shared'
 include 'collector-bitmovin-player-tv-example'

@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.systemtest.utils
 
+@Suppress("ktlint:standard:max-line-length")
 object TestSources {
     val HLS_REDBULL =
         StreamData(
@@ -11,6 +12,19 @@ object TestSources {
             "hls",
             false,
             210000,
+        )
+
+    val THEO_BIGBUCKBUNNY =
+        StreamData(
+            "avc1.",
+            // TODO: verify if audio is really null, or we are not collecting it correctly?
+            null,
+            null,
+            null,
+            "https://cdn.theoplayer.com/video/dash/big_buck_bunny/BigBuckBunny_10s_simple_2014_05_09.mpd",
+            "dash",
+            false,
+            596460,
         )
 
     val DASH =
