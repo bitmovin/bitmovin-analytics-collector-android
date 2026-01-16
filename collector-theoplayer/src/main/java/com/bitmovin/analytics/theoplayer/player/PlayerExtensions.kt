@@ -2,6 +2,7 @@ package com.bitmovin.analytics.theoplayer.player
 
 import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.player.Player
+import com.theoplayer.android.api.player.ReadyState
 import com.theoplayer.android.api.player.track.mediatrack.MediaTrack
 import com.theoplayer.android.api.player.track.mediatrack.quality.AudioQuality
 import com.theoplayer.android.api.player.track.mediatrack.quality.VideoQuality
@@ -11,6 +12,15 @@ import com.theoplayer.android.api.source.TypedSource
 import java.lang.Double.isFinite
 import kotlin.Boolean
 import kotlin.Long
+
+// This is similar how it is tracked in the conviva adapter
+internal fun Player.isPlaying(): Boolean {
+    if (this.isPaused && this.isEnded) {
+        return false
+    }
+
+    return this.readyState >= ReadyState.HAVE_FUTURE_DATA
+}
 
 internal fun Player.currentPositionInMs(): Long {
     return Util.secondsToMillis(this.currentTime)

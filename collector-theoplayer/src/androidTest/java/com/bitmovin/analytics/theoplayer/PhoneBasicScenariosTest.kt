@@ -220,13 +220,15 @@ class PhoneBasicScenariosTest {
                 player.source = liveSourceDescription
             }
 
-            Thread.sleep(6000)
+            TheoPlayerPlaybackUtils.waitUntilPlayerIsPlaying(player)
+
+            Thread.sleep(500)
 
             withContext(mainScope.coroutineContext) {
                 collector.detachPlayer()
             }
 
-            Thread.sleep(200)
+            MockedIngress.waitForAnalyticsSample()
 
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)
@@ -409,6 +411,7 @@ class PhoneBasicScenariosTest {
             }
 
             Thread.sleep(500)
+            TheoPlayerPlaybackUtils.waitUntilPlayerIsPlaying(player)
             TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
 
             withContext(mainScope.coroutineContext) {

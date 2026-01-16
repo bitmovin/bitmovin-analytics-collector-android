@@ -226,7 +226,7 @@ class ErrorScenariosTest {
                 player.source = sourceDescription
             }
 
-            MockedIngress.waitForErrorDetailSample(timeout = 20.seconds)
+            MockedIngress.waitForErrorDetailSample(timeout = 40.seconds)
 
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)

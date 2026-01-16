@@ -9,24 +9,19 @@ object TheoPlayerPlaybackUtils {
         player: Player,
         playedToMs: Long,
     ) {
-        PlaybackUtils.waitUntil("playerIsPlaying") { !player.isPaused }
+        waitUntilPlayerIsPlaying(player)
         PlaybackUtils.waitUntil("playerPlayedTo=${playedToMs}ms") { (player.currentTime * 1000).toLong() >= playedToMs }
     }
 
     // TODO: verify if this is correct
     fun waitUntilPlayerIsReady(player: Player) {
-        PlaybackUtils.waitUntil { player.readyState != ReadyState.HAVE_NOTHING }
+        PlaybackUtils.waitUntil { player.readyState >= ReadyState.HAVE_CURRENT_DATA }
     }
 
-    // TODO: probably doesn't work
+    // This is similar as in the conviva connector
     fun waitUntilPlayerIsPlaying(player: Player) {
         PlaybackUtils.waitUntil {
-            println(player.readyState)
-            player.readyState >= ReadyState.HAVE_ENOUGH_DATA && !player.isPaused
+            player.readyState >= ReadyState.HAVE_FUTURE_DATA && !player.isPaused && !player.isEnded
         }
-    }
-
-    fun waitUntilPlayerHasError(player: Player) {
-        PlaybackUtils.waitUntil { player.error != null }
     }
 }
