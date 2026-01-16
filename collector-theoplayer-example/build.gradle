@@ -45,15 +45,6 @@ android {
     }
 }
 
-// we need to exclude the theoplayer analytics module since we work with a local development version
-// otherwise we would run into dex errors due to duplicate classes
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute module('com.bitmovin.analytics:collector') using project(':collector') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
-        substitute module('com.bitmovin.analytics:collector-theoplayer') using project(':collector-theoplayer') because "we work with local development version and need to exclude bundled analytics to avoid conflicts"
-    }
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
@@ -63,7 +54,7 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:${rootProject.ext.workRuntimeKtxVersion}"
     implementation "androidx.activity:activity-ktx:${rootProject.ext.ActivityKtxVersion}"
 
-    implementation "com.theoplayer.theoplayer-sdk-android:core:10.7.0"
+    implementation "com.theoplayer.theoplayer-sdk-android:core:${rootProject.ext.theoPlayerVersion}"
 
     if (rootProject.ext.developLocal) {
         implementation project(':collector-theoplayer')
