@@ -50,6 +50,7 @@ internal class AnalyticsEventListeners(
     // we should get rid of these though, and hide this in the statemachine
     // -> effort to make core library more compact
     private var isVideoAttemptedPlay = false
+    private var lastUpdatedPositionMs = 0L
 
     // Event listener references for registration and unregistration
     private val playListener = EventListener<PlayEvent> { event -> handlePlayEvent(event) }
@@ -66,7 +67,7 @@ internal class AnalyticsEventListeners(
     private val progressListener = EventListener<ProgressEvent> { Log.i(TAG, "Event: PROGRESS") }
     private val durationChangeListener = EventListener<DurationChangeEvent> { Log.i(TAG, "Event: DURATIONCHANGE") }
     private val readyStateChangeListener = EventListener<ReadyStateChangeEvent> { Log.i(TAG, "Event: READYSTATECHANGE") }
-    private val timeUpdateListener = EventListener<TimeUpdateEvent> { Log.i(TAG, "Event: TIMEUPDATE") }
+    private val timeUpdateListener = EventListener<TimeUpdateEvent> { event -> handleTimeUpdateEvent(event) }
     private val loadedMetadataListener = EventListener<LoadedMetadataEvent> { Log.i(TAG, "Event: LOADEDMETADATA") }
     private val loadedDataListener = EventListener<LoadedDataEvent> { Log.i(TAG, "Event: LOADEDDATA") }
     private val canPlayListener = EventListener<CanPlayEvent> { Log.i(TAG, "Event: CANPLAY") }
@@ -182,10 +183,11 @@ internal class AnalyticsEventListeners(
 
     private fun onSeeking(seekingEvent: SeekingEvent) {
         Log.i(TAG, "Event: SEEKING")
-        // FIXME: this is not correct, given that we would need to position of seekStart and this is
-        // returning where we seek to
+        // for some reason the seekingEvent contains the currentTime it was seeked to
+        // and not the original position it was seeked from
         val positionAfterSeek = Util.secondsToMillis(seekingEvent.currentTime)
-        stateMachine.transitionState(PlayerStates.SEEKING, positionAfterSeek)
+        val positionBeforeSeek = lastUpdatedPositionMs
+        stateMachine.transitionState(PlayerStates.SEEKING, positionBeforeSeek)
     }
 
     private fun handlePlayingEvent(playingEvent: PlayingEvent) {
@@ -203,6 +205,10 @@ internal class AnalyticsEventListeners(
     private fun onPause(pauseEvent: PauseEvent) {
         Log.i(TAG, "Event: PauseEvent")
         stateMachine.pause(player.currentPositionInMs())
+    }
+
+    private fun handleTimeUpdateEvent(timeUpdateEvent: TimeUpdateEvent) {
+        lastUpdatedPositionMs = Util.secondsToMillis(timeUpdateEvent.currentTime)
     }
 
     private fun onBuffering(waitingEvent: WaitingEvent) {

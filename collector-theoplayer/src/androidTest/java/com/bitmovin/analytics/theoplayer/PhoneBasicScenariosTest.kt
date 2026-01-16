@@ -2,6 +2,7 @@ package com.bitmovin.analytics.theoplayer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
@@ -15,6 +16,7 @@ import com.bitmovin.analytics.systemtest.utils.runBlockingTest
 import com.bitmovin.analytics.theoplayer.api.ITHEOplayerCollector
 import com.theoplayer.android.api.THEOplayerConfig
 import com.theoplayer.android.api.THEOplayerView
+import com.theoplayer.android.api.event.player.PlayerEventTypes
 import com.theoplayer.android.api.player.Player
 import com.theoplayer.android.api.player.PreloadType
 import com.theoplayer.android.api.player.track.texttrack.TextTrackMode
@@ -338,9 +340,7 @@ class PhoneBasicScenariosTest {
 
             DataVerifier.verifyStartupSample(startupSample)
             DataVerifier.verifyIsPlayingEvent(playingSample)
-
-            // TODO: disabled since seeking videotime tracking is not working currently
-//            DataVerifier.verifyInvariants(eventDataList)
+            DataVerifier.verifyInvariants(eventDataList)
         }
     }
 
@@ -430,8 +430,7 @@ class PhoneBasicScenariosTest {
 
             DataVerifier.verifyStartupSample(startupSample)
             DataVerifier.verifyIsPlayingEvent(playingSample)
-            // TODO: disabled since seeking videotime tracking is not working currently
-//            DataVerifier.verifyInvariants(eventDataList)
+            DataVerifier.verifyInvariants(eventDataList)
         }
     }
 
@@ -723,6 +722,56 @@ class PhoneBasicScenariosTest {
             assertThat(
                 impression.eventDataList.size,
             ).isEqualTo(englishSubtitleSamples.size + germanSubtitleSamples.size + subtitleDisabledSamples.size)
+        }
+    }
+
+    @Test
+    fun test_vod_setCdnDuringStartup() {
+        // This scenario was mentioned by theo folks
+        // cdn provider is determined from the manifest and thus updated while already starting up
+        runBlockingTest {
+            // arrange
+            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+            collector.sourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
+            val sintelSource =
+                TypedSource
+                    .Builder(DASH_SINTEL_WITH_SUBTITLES.mpdUrl!!)
+                    .type(SourceType.DASH)
+                    .build()
+            val sintelSourceDescription =
+                SourceDescription
+                    .Builder(sintelSource)
+                    .build()
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                collector.attachPlayer(player)
+                player.source = sintelSourceDescription
+
+                // this mimics the usecase to dynamically set the cdn provider after manifest is loaded
+                player.addEventListener(PlayerEventTypes.LOADEDMETADATA, {
+                    collector.customData = CustomData("dynamicCdnProvider")
+                })
+                player.play()
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 5000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(300)
+
+            val impressionsList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionsList).hasSize(1)
+
+            val impression = impressionsList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList).allSatisfy { it.customData1 == "dynamicCdnProvider" }
         }
     }
 }

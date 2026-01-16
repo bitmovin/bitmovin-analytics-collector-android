@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.LogLevel
+import com.bitmovin.analytics.theoplayer.api.ITHEOplayerCollector
 import com.theoplayer.android.api.THEOplayerConfig
 import com.theoplayer.android.api.THEOplayerView
 import com.theoplayer.android.api.event.player.PlayerEventTypes
@@ -33,8 +36,11 @@ class MainActivity : ComponentActivity() {
         // Step 2: Create THEOplayerView
         theoPlayerView = THEOplayerView(this, playerConfig)
 
+        val analyticsConfig = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", logLevel = LogLevel.DEBUG)
+        val collector = ITHEOplayerCollector.create(this, analyticsConfig)
+        collector.attachPlayer(theoPlayerView.player)
+
         val theoPlayerAsset = "https://cdn.theoplayer.com/video/dash/big_buck_bunny/BigBuckBunny_10s_simple_2014_05_09.mpd"
-        // liveAsset seems to need some different way of initialising (TheoLive sourcetype)
 
         val typedSource =
             TypedSource
