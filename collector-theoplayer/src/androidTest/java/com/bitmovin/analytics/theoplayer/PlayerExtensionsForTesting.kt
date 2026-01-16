@@ -13,3 +13,13 @@ fun Player.useLowestRendition() {
         },
     )
 }
+
+fun Player.useHighestRendition() {
+    this.videoTracks.addEventListener(
+        VideoTrackListEventTypes.ADDTRACK,
+        EventListener {
+            this.videoTracks.getItem(0).targetQuality =
+                this.videoTracks.getItem(0).getQualities().maxBy { quality -> quality.bandwidth }
+        },
+    )
+}

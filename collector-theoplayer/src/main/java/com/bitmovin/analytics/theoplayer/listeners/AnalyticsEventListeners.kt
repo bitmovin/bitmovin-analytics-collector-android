@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.theoplayer.listeners
 
 import android.util.Log
+import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
@@ -42,6 +43,7 @@ import com.theoplayer.android.api.event.player.WaitingEvent
 import com.theoplayer.android.api.player.Player
 
 internal class AnalyticsEventListeners(
+    private val bitmovinAnalytics: BitmovinAnalytics,
     private val stateMachine: PlayerStateMachine,
     private val player: Player,
     private val playbackQualityProvider: PlaybackQualityProvider,
@@ -199,7 +201,7 @@ internal class AnalyticsEventListeners(
         Log.i("TAG", "Event DestroyEvent")
         // TODO: we probably need to do a detach here, to also handle ssai and others
         // and clean up
-        stateMachine.triggerLastSampleOfSession()
+        bitmovinAnalytics.detachPlayer(true)
     }
 
     private fun onPause(pauseEvent: PauseEvent) {

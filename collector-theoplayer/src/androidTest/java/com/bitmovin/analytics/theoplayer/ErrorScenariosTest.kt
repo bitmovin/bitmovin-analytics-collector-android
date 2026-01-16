@@ -2,9 +2,11 @@ package com.bitmovin.analytics.theoplayer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.example.shared.Samples
+import com.bitmovin.analytics.systemtest.utils.DataVerifier
 import com.bitmovin.analytics.systemtest.utils.MetadataUtils
 import com.bitmovin.analytics.systemtest.utils.MockedIngress
 import com.bitmovin.analytics.systemtest.utils.RepeatRule
@@ -26,6 +28,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class ErrorScenariosTest {
@@ -56,14 +59,82 @@ class ErrorScenariosTest {
     private lateinit var mockedIngressUrl: String
 
     @Before
-    fun setup() {
-        mockedIngressUrl = MockedIngress.startServer()
-        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
-    }
+    fun setup() =
+        runBlockingTest {
+            mockedIngressUrl = MockedIngress.startServer()
+            defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
+        }
 
     @After
     fun teardown() {
         MockedIngress.stopServer()
+    }
+
+    @Test
+    fun test_exitBeforeVideoStart_Should_setPageClosedAsReason() {
+        runBlockingTest {
+            val sourceMetadata =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                    customData = CustomData(customData1 = "exitBeforeVideoStart"),
+                )
+
+            var theoPlayerView: THEOplayerView?
+
+            withContext(mainScope.coroutineContext) {
+                val playerConfig =
+                    THEOplayerConfig.Builder()
+                        .license(TheoPlayerTestUtils.TESTING_LICENSE)
+                        .build()
+
+                theoPlayerView = THEOplayerView(appContext, playerConfig)
+                player = theoPlayerView.player
+                player.isAutoplay = true
+
+                // forcing highest rendition to make sure that startup would take a bit
+                player.useHighestRendition()
+
+                val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+                collector.sourceMetadata = sourceMetadata
+                collector.attachPlayer(player)
+
+                val typedSource =
+                    TypedSource
+                        .Builder(defaultSample.m3u8Url!!)
+                        .type(SourceType.HLS)
+                        .build()
+
+                val sourceDescription =
+                    SourceDescription
+                        .Builder(typedSource)
+                        .build()
+
+                player.source = sourceDescription
+            }
+
+            // we wait 100ms to make sure that player is in startup state
+            Thread.sleep(100)
+
+            withContext(mainScope.coroutineContext) {
+                theoPlayerView?.onDestroy()
+            }
+
+            MockedIngress.waitForAnalyticsSample()
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+            val impression = impressionList.first()
+
+            assertThat(impression.eventDataList).hasSize(1)
+
+            val eventData = impression.eventDataList.first()
+            assertThat(eventData.videoStartFailed).isTrue()
+            assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
+            assertThat(eventData.duration).isGreaterThan(10)
+            assertThat(eventData.errorCode).isNull()
+            DataVerifier.verifyStartupSampleOnError(eventData, TheoPlayerConstants.playerInfo)
+        }
     }
 
     @Test
@@ -155,7 +226,7 @@ class ErrorScenariosTest {
                 player.source = sourceDescription
             }
 
-            MockedIngress.waitForErrorDetailSample()
+            MockedIngress.waitForErrorDetailSample(timeout = 20.seconds)
 
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)

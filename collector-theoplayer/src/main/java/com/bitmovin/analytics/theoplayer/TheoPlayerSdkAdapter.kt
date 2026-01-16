@@ -54,7 +54,7 @@ internal class TheoPlayerSdkAdapter(
     override val playerInfo: PlayerInfo
         get() = PLAYER_INFO
 
-    private val analyticsEventListeners = AnalyticsEventListeners(stateMachine, player, playbackQualityProvider)
+    private val analyticsEventListeners = AnalyticsEventListeners(bitmovinAnalytics, stateMachine, player, playbackQualityProvider)
     private val sourceEventListeners = SourceEventListeners(stateMachine, player, playbackQualityProvider)
 
     // TODO: having two different inits is weird
@@ -88,7 +88,6 @@ internal class TheoPlayerSdkAdapter(
     }
 
     override fun triggerLastSampleOfSession() {
-        // TODO: cover with test
         if (stateMachine.isInStartupState()) {
             stateMachine.exitBeforeVideoStart(player.currentPositionInMs())
         } else {
