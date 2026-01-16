@@ -119,7 +119,7 @@ class BitmovinAnalytics(
         }
 
     fun closeCurrentSampleForCustomDataChangeIfNeeded() {
-        playerAdapter?.stateMachine?.closeCurrentSampleForCustomDataChangeIfNeeded(playerAdapter?.position ?: 0)
+        playerAdapter?.stateMachine?.closeCurrentSampleForCustomDataChangeIfNeeded()
     }
 
     fun sendCustomDataEvent(customData: CustomData) {
@@ -134,7 +134,7 @@ class BitmovinAnalytics(
         val activeSourceMetadata = mergedSourceMetadata.copy(customData = mergedCustomData)
         val eventData = playerAdapter.createEventDataForCustomDataEvent(activeSourceMetadata)
         eventData.state = PlayerStates.CUSTOMDATACHANGE.name
-        eventData.videoTimeStart = playerAdapter.position
+        eventData.videoTimeStart = playerAdapter.stateMachine.playerContext.position
         eventData.videoTimeEnd = eventData.videoTimeStart
         sendEventData(eventData)
     }

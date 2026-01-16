@@ -11,7 +11,6 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 
 interface PlayerAdapter {
     val stateMachine: PlayerStateMachine
-    val position: Long
     val drmDownloadTime: Long?
     var defaultMetadata: DefaultMetadata
     val playerInfo: PlayerInfo

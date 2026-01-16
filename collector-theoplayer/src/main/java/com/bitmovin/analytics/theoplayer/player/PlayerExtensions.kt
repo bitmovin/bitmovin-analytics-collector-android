@@ -1,18 +1,19 @@
 package com.bitmovin.analytics.theoplayer.player
 
+import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.player.Player
 import com.theoplayer.android.api.player.track.mediatrack.MediaTrack
 import com.theoplayer.android.api.player.track.mediatrack.quality.AudioQuality
 import com.theoplayer.android.api.player.track.mediatrack.quality.VideoQuality
 import com.theoplayer.android.api.player.track.texttrack.TextTrack
 import com.theoplayer.android.api.player.track.texttrack.TextTrackMode
+import com.theoplayer.android.api.source.TypedSource
 import java.lang.Double.isFinite
 import kotlin.Boolean
 import kotlin.Long
 
 internal fun Player.currentPositionInMs(): Long {
-    val positionInMs = this.currentTime * 1000
-    return positionInMs.toLong()
+    return Util.secondsToMillis(this.currentTime)
 }
 
 internal fun Player.isLiveStream(): Boolean? {
@@ -21,6 +22,10 @@ internal fun Player.isLiveStream(): Boolean? {
     } else {
         null
     }
+}
+
+internal fun Player.getActiveSource(): TypedSource? {
+    return this.source?.sources?.firstOrNull()
 }
 
 internal fun Player.getCurrentActiveVideoQuality(): VideoQuality? {
@@ -53,32 +58,16 @@ internal fun Player.getCurrentActiveAudioTrack(): MediaTrack<AudioQuality>? {
 internal fun Player.getDurationInMs(): Long {
     val duration = this.duration
     if (duration.isFinite()) {
-        try {
-            val durationInMs = duration * 1000
-            return durationInMs.toLongSafe()
-        } catch (e: Exception) {
-            return 0
-        }
+        return Util.secondsToMillis(duration)
     }
 
     return 0
 }
 
-internal fun Double.toLongSafe(): Long {
-    return when {
-        this.isNaN() -> 0
-        this.isInfinite() -> 0
-        this > Long.MAX_VALUE -> Long.MAX_VALUE
-        this < Long.MIN_VALUE -> Long.MIN_VALUE
-        else -> this.toLong()
-    }
-}
-
 internal fun Player.getCurrentActiveTextTrack(): TextTrack? {
-    // FIXME: should we track hidden?
     val enabledTextTrack =
         this.textTracks.firstOrNull {
-            it.mode == TextTrackMode.SHOWING || it.mode == TextTrackMode.HIDDEN
+            it.mode == TextTrackMode.SHOWING
         }
     if (enabledTextTrack == null) {
         return null

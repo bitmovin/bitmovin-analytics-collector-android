@@ -103,7 +103,7 @@ internal class Media3ExoPlayerAdapter(
     override fun triggerLastSampleOfSession() {
         Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
             if (stateMachine.isInStartupState()) {
-                stateMachine.exitBeforeVideoStart(position)
+                stateMachine.exitBeforeVideoStart(exoplayerContext.position)
             } else {
                 stateMachine.triggerLastSampleOfSession()
             }
@@ -139,11 +139,6 @@ internal class Media3ExoPlayerAdapter(
         ssaiService.resetSourceRelatedState()
     }
 
-    override val position: Long
-        get() {
-            return exoplayerContext.position
-        }
-
     private fun startup(position: Long) {
         qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
         stateMachine.transitionState(PlayerStates.STARTUP, position)
@@ -165,7 +160,7 @@ internal class Media3ExoPlayerAdapter(
         val isAlreadyPlaying = player.playWhenReady && playbackState == Player.STATE_READY
         if (isBufferingAndWillAutoPlay || isAlreadyPlaying) {
             playbackInfoProvider.isPlaying = true
-            val position = position
+            val position = exoplayerContext.position
             BitmovinLog.d(
                 TAG,
                 "Collector was attached while media source was already loading, transitioning to startup state.",

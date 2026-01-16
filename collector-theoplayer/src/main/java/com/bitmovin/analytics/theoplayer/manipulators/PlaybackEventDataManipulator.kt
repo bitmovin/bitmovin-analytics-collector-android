@@ -7,6 +7,7 @@ import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.PlayerStatisticsProvider
+import com.bitmovin.analytics.theoplayer.player.getActiveSource
 import com.bitmovin.analytics.theoplayer.player.getCurrentActiveAudioTrack
 import com.bitmovin.analytics.theoplayer.player.getCurrentActiveTextTrack
 import com.bitmovin.analytics.theoplayer.player.getDurationInMs
@@ -20,7 +21,6 @@ internal class PlaybackEventDataManipulator(
     private val playbackQualityProvider: PlaybackQualityProvider,
     private val metadataProvider: MetadataProvider,
     private val playerStatisticsProvider: PlayerStatisticsProvider,
-//    private val downloadSpeedMeter: DownloadSpeedMeter,
 ) : EventDataManipulator {
     override fun manipulate(data: EventData) {
         data.isLive = metadataProvider.getSourceMetadata()?.isLive ?: player.isLiveStream() ?: false
@@ -55,19 +55,14 @@ internal class PlaybackEventDataManipulator(
 
         val activeAudioTrack = player.getCurrentActiveAudioTrack()
         if (activeAudioTrack != null) {
-            // TODO: language or label first? what makes sense here?
             data.audioLanguage = activeAudioTrack.language ?: activeAudioTrack.label
         }
 
         val activeTextTrack = player.getCurrentActiveTextTrack()
         data.subtitleEnabled = activeTextTrack != null
         if (activeTextTrack != null) {
-            // TODO: language or label first? what makes sense here? sync with audio
-            data.subtitleLanguage = activeTextTrack.label ?: activeTextTrack.language
+            data.subtitleLanguage = activeTextTrack.language ?: activeTextTrack.label
         }
-
-//
-//        data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
 //
 //        // DRM Information
 //        data.drmType = drmInfoProvider.drmType
@@ -89,8 +84,7 @@ internal class PlaybackEventDataManipulator(
     }
 
     private fun setStreamFormatAndUrl(data: EventData) {
-        // TODO: how to detect active source?
-        val activeSource = player.source?.sources?.first()
+        val activeSource = player.getActiveSource()
         if (activeSource == null) {
             return
         }

@@ -96,8 +96,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
 
-    // TODO: needed for unitests?
-    testImplementation "com.theoplayer.theoplayer-sdk-android:core:${rootProject.ext.theoPlayerVersion}"
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"

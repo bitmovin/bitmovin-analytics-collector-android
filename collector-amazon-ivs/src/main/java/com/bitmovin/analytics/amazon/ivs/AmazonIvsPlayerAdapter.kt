@@ -75,9 +75,6 @@ internal class AmazonIvsPlayerAdapter(
 
     override val eventDataManipulators: Collection<EventDataManipulator> = manipulators
 
-    override val position: Long
-        get() = playerContext.position
-
     override val drmDownloadTime: Long?
         get() = null // drm is not supported by IVS player
 

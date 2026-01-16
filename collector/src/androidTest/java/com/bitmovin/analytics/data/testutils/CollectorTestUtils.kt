@@ -38,8 +38,7 @@ internal class DummyPlayerAdapter(
         )
     override val isAutoplayEnabled: Boolean?
         get() = null
-    override val position: Long
-        get() = 0
+
     override val drmDownloadTime: Long
         get() = 0
 

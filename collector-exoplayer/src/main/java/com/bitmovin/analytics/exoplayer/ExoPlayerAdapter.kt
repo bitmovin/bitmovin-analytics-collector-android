@@ -128,11 +128,6 @@ internal class ExoPlayerAdapter(
         ssaiService.resetSourceRelatedState()
     }
 
-    override val position: Long
-        get() {
-            return exoplayerContext.position
-        }
-
     private fun startup(position: Long) {
         qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
         stateMachine.transitionState(PlayerStates.STARTUP, position)
@@ -163,7 +158,7 @@ internal class ExoPlayerAdapter(
         val isAlreadyPlaying = exoplayer.playWhenReady && playbackState == Player.STATE_READY
         if (isBufferingAndWillAutoPlay || isAlreadyPlaying) {
             playbackInfoProvider.isPlaying = true
-            val position = position
+            val position = exoplayerContext.position
 
             BitmovinLog.d(
                 TAG,

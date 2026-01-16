@@ -87,8 +87,14 @@ internal class TheoPlayerSdkAdapter(
         }
     }
 
-    override val position: Long
-        get() = player.currentPositionInMs()
+    override fun triggerLastSampleOfSession() {
+        // TODO: cover with test
+        if (stateMachine.isInStartupState()) {
+            stateMachine.exitBeforeVideoStart(player.currentPositionInMs())
+        } else {
+            stateMachine.triggerLastSampleOfSession()
+        }
+    }
 
     override val eventDataManipulators: Collection<EventDataManipulator>
         get() = listOf(playbackEventDataManipulator)

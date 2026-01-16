@@ -1,13 +1,14 @@
 package com.bitmovin.analytics.theoplayer.listeners
 
 import android.util.Log
+import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.theoplayer.errors.TheoPlayerExceptionMapper
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
-import com.bitmovin.analytics.theoplayer.player.convertDoubleSecondsToLongMs
 import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
 import com.bitmovin.analytics.utils.BitmovinLog
+import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.event.EventListener
 import com.theoplayer.android.api.event.player.CanPlayEvent
 import com.theoplayer.android.api.event.player.CanPlayThroughEvent
@@ -148,7 +149,8 @@ internal class AnalyticsEventListeners(
         Log.i(TAG, "Event: PlayEvent")
 
         if (!stateMachine.isStartupFinished) {
-            startupInitiated(playEvent.currentTime.convertDoubleSecondsToLongMs())
+            val currentTimeMs = Util.secondsToMillis(playEvent.currentTime)
+            startupInitiated(currentTimeMs)
         }
     }
 
@@ -178,12 +180,11 @@ internal class AnalyticsEventListeners(
         }
     }
 
-    private fun onSeeking(seekEvent: SeekingEvent) {
+    private fun onSeeking(seekingEvent: SeekingEvent) {
         Log.i(TAG, "Event: SEEKING")
-
         // FIXME: this is not correct, given that we would need to position of seekStart and this is
         // returning where we seek to
-        val positionAfterSeek = convertDoubleSecondsToMilliseconds(seekEvent.currentTime)
+        val positionAfterSeek = Util.secondsToMillis(seekingEvent.currentTime)
         stateMachine.transitionState(PlayerStates.SEEKING, positionAfterSeek)
     }
 
@@ -219,10 +220,10 @@ internal class AnalyticsEventListeners(
 
         try {
             val videoTime = player.currentPositionInMs()
-            // TODO: handle startup errors
-//            if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
-//                stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
-//            }
+            // TODO: add test for startup error
+            if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
+                stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
+            }
             val errorCode = TheoPlayerExceptionMapper.map(originalNativeError.errorObject)
             stateMachine.error(videoTime, errorCode, originalNativeError)
         } catch (e: Exception) {
@@ -232,9 +233,5 @@ internal class AnalyticsEventListeners(
 
     companion object {
         private const val TAG = "AnalyticsEventListeners"
-
-        internal fun convertDoubleSecondsToMilliseconds(seconds: Double): Long {
-            return (seconds * 1000).toLong()
-        }
     }
 }

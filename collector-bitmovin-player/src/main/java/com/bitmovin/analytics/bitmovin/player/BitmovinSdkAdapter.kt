@@ -280,7 +280,7 @@ internal class BitmovinSdkAdapter(
         ssaiService.resetSourceRelatedState()
     }
 
-    override val position: Long
+    val position: Long
         get() = BitmovinUtil.getCurrentTimeInMs(player)
 
     override fun createAdAdapter(): AdAdapter {

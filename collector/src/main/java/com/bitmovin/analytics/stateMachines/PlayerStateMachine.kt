@@ -22,7 +22,7 @@ class PlayerStateMachine(
     internal val bufferingTimeoutTimer: ObservableTimer,
     internal val qualityChangeEventLimiter: QualityChangeEventLimiter,
     internal val videoStartTimeoutTimer: ObservableTimer,
-    private val playerContext: PlayerContext,
+    internal val playerContext: PlayerContext,
     looper: Looper,
     private val deviceInformationProvider: DeviceInformationProvider,
     private val identicalErrorReportingLimiter: IdenticalErrorReportingLimiter,
@@ -299,7 +299,8 @@ class PlayerStateMachine(
         transitionState(PlayerStates.ADFINISHED, videoTimeEnd)
     }
 
-    fun closeCurrentSampleForCustomDataChangeIfNeeded(position: Long) {
+    fun closeCurrentSampleForCustomDataChangeIfNeeded() {
+        val position = playerContext.position
         val originalState = currentState
         val shouldTransition = isPlayingOrPaused
         if (shouldTransition) {

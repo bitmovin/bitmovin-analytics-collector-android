@@ -61,7 +61,7 @@ yes | sdkmanager --licenses
 #  ./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.bitmovin.player.SsaiScenariosTest
 #done
 
-#  ./gradlew :collector-exoplayer:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.exoplayer.ErrorScenariosTest.test_vodWithDrm_wrongConfig || exit
+#  ./gradlew :collector-theoplayer:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.theoplayer.ErrorScenariosTest || exit
 
 
 #for i in {1..50}; do
