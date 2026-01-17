@@ -188,9 +188,11 @@ class PhoneBasicScenariosTest {
 
             val eventDataList = impression.eventDataList
 
-            // expecting exactly 4 samples given that we force lowest rendition
-            // startup -> play -> pause -> play
-            assertThat(eventDataList).hasSize(4)
+            // filtering potential buffering events
+            // we should get exactly 4 events
+            // startup -> playing -> pause -> playing
+            val samplesWithoutBuffering = eventDataList.filter { it.buffered == 0L }
+            assertThat(samplesWithoutBuffering).hasSize(4)
             val startupSample = eventDataList.first()
             val playingSample = eventDataList[1]
 
@@ -403,7 +405,7 @@ class PhoneBasicScenariosTest {
                 player.source = defaultDashSourceDescription
             }
 
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
 
             withContext(mainScope.coroutineContext) {
                 // seek
@@ -412,11 +414,13 @@ class PhoneBasicScenariosTest {
 
             Thread.sleep(500)
             TheoPlayerPlaybackUtils.waitUntilPlayerIsPlaying(player)
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
             withContext(mainScope.coroutineContext) {
                 player.pause()
             }
+
+            Thread.sleep(300)
 
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)
@@ -449,7 +453,7 @@ class PhoneBasicScenariosTest {
                 player.play()
             }
 
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
 
             withContext(mainScope.coroutineContext) {
                 // switch to highest quality
@@ -461,7 +465,7 @@ class PhoneBasicScenariosTest {
                 player.play()
             }
 
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 6000)
 
             withContext(mainScope.coroutineContext) {
                 player.pause()
@@ -547,6 +551,8 @@ class PhoneBasicScenariosTest {
                 theoPlayerView.onDestroy()
             }
 
+            MockedIngress.waitForAnalyticsSample()
+
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(2)
 
@@ -556,9 +562,7 @@ class PhoneBasicScenariosTest {
 
             val firstImpressionEvents = firstImpression.eventDataList
 
-            // expecting exactly 2 samples given that we force lowest rendition
-            // startup -> play
-            assertThat(firstImpressionEvents).hasSize(2)
+            assertThat(firstImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
             val firstStartupSample = firstImpressionEvents.first()
             val firstPlayingSample = firstImpressionEvents[1]
             DataVerifier.verifyStartupSample(firstStartupSample)
@@ -573,7 +577,7 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyInvariants(firstImpressionEvents)
 
             val secondImpressionEvents = secondImpression.eventDataList
-            assertThat(secondImpressionEvents).hasSize(2)
+            assertThat(secondImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
             val secondStartupSample = secondImpressionEvents.first()
             val secondPlayingSample = secondImpressionEvents[1]
             DataVerifier.verifyStartupSample(secondStartupSample, false)

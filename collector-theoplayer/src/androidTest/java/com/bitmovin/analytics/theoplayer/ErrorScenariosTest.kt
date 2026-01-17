@@ -168,7 +168,7 @@ class ErrorScenariosTest {
                 player.source = sourceDescription
             }
 
-            MockedIngress.waitForErrorDetailSample()
+            MockedIngress.waitForErrorDetailSample(40.seconds)
 
             val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
             assertThat(impressions).hasSize(1)
