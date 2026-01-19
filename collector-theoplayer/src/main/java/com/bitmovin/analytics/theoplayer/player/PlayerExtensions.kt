@@ -38,6 +38,16 @@ internal fun Player.getActiveSource(): TypedSource? {
     return this.source?.sources?.firstOrNull()
 }
 
+internal fun Player.getDrmType(): String? {
+    val drmConfig = this.getActiveSource()?.drm
+
+    if (drmConfig == null) {
+        return null
+    }
+
+    return PlayerUtils.getDrmTypeFromConfiguration(drmConfig)
+}
+
 internal fun Player.getCurrentActiveVideoQuality(): VideoQuality? {
     val enabledVideoTrack = this.videoTracks.firstOrNull { it.isEnabled }
     if (enabledVideoTrack == null) {

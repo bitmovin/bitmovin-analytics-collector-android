@@ -431,6 +431,7 @@ object DataVerifier {
         isFirstImpression: Boolean = true,
         isAutoPlay: Boolean = true,
         verifyDrmType: Boolean = true,
+        verifyDrmLoadTime: Boolean = true,
     ) {
         verifyStartupSample(eventData, isFirstImpression)
 
@@ -439,15 +440,18 @@ object DataVerifier {
         if (verifyDrmType) {
             assertThat(eventData.drmType).isEqualTo(drmType)
         }
-        assertThat(eventData.drmLoadTime).isGreaterThan(0)
 
-        if (isAutoPlay) {
-            assertThat(eventData.drmLoadTime).isLessThan(eventData.videoStartupTime)
-        } else {
-            // since we wait until player is ready, drmLoadTime should be greater
-            // than videoStartupTime. Drm load time is the actual request time
-            // and videoStartupTime the perceived time of the user
-            assertThat(eventData.drmLoadTime).isGreaterThan(eventData.videoStartupTime)
+        if (verifyDrmLoadTime) {
+            assertThat(eventData.drmLoadTime).isGreaterThan(0)
+
+            if (isAutoPlay) {
+                assertThat(eventData.drmLoadTime).isLessThan(eventData.videoStartupTime)
+            } else {
+                // since we wait until player is ready, drmLoadTime should be greater
+                // than videoStartupTime. Drm load time is the actual request time
+                // and videoStartupTime the perceived time of the user
+                assertThat(eventData.drmLoadTime).isGreaterThan(eventData.videoStartupTime)
+            }
         }
     }
 

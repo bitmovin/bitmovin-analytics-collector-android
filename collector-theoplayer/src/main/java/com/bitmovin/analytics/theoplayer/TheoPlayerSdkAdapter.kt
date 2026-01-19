@@ -94,8 +94,9 @@ internal class TheoPlayerSdkAdapter(
     override val eventDataManipulators: Collection<EventDataManipulator>
         get() = listOf(playbackEventDataManipulator)
 
-    override var drmDownloadTime: Long? = null
-        private set
+    // TODO
+    override val drmDownloadTime: Long?
+        get() = null
 
     companion object {
         private const val TAG = "TheoPlayerSdkAdapter"

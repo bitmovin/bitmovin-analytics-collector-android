@@ -5,4 +5,5 @@ enum class StreamFormat(val value: String) {
     HLS("hls"),
     PROGRESSIVE("progressive"),
     SMOOTH("smooth"),
+    // TODO: add HESP and others for theo
 }

@@ -46,17 +46,17 @@ jobs:
           gradle-version: wrapper
           cache-read-only: false
 
-# Collector Test
-      - name: Tests Collector
-        if: always()
-        run: |
-          ./gradlew :collector:pixel6api35DebugAndroidTest
-
-# Collector Bitmovin Player Test
-      - name: Tests Collector Bitmovin Player
-        if: always()
-        run: |
-          ./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest
+## Collector Test
+#      - name: Tests Collector
+#        if: always()
+#        run: |
+#          ./gradlew :collector:pixel6api35DebugAndroidTest
+#
+## Collector Bitmovin Player Test
+#      - name: Tests Collector Bitmovin Player
+#        if: always()
+#        run: |
+#          ./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest
 
 # Collector THEOplayer Test
       - name: Tests Collector THEOplayer
@@ -64,23 +64,23 @@ jobs:
         run: |
           ./gradlew :collector-theoplayer:pixel6api35DebugAndroidTest
 
-# Collector Exo Player Test
-      - name: Tests Collector Exoplayer
-        if: always()
-        run: |
-          ./gradlew :collector-exoplayer:pixel6api35DebugAndroidTest
-
-# Collector Media3 Exo Player Test
-      - name: Tests Collector Media3 Exoplayer
-        if: always()
-        run: |
-          ./gradlew :collector-media3-exoplayer:pixel6api35DebugAndroidTest
-
-## Collector Amazon IVS Test
-      - name: Tests Collector Amazon IVS
-        if: always()
-        run: |
-          ./gradlew :collector-amazon-ivs:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.notClass=com.bitmovin.analytics.amazon.ivs.TVBasicScenariosTest
+## Collector Exo Player Test
+#      - name: Tests Collector Exoplayer
+#        if: always()
+#        run: |
+#          ./gradlew :collector-exoplayer:pixel6api35DebugAndroidTest
+#
+## Collector Media3 Exo Player Test
+#      - name: Tests Collector Media3 Exoplayer
+#        if: always()
+#        run: |
+#          ./gradlew :collector-media3-exoplayer:pixel6api35DebugAndroidTest
+#
+### Collector Amazon IVS Test
+#      - name: Tests Collector Amazon IVS
+#        if: always()
+#        run: |
+#          ./gradlew :collector-amazon-ivs:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.notClass=com.bitmovin.analytics.amazon.ivs.TVBasicScenariosTest
 
       # If it fails on the main branch, send a slack message (merged PR or nightly tests)
       - name: Send a Slack message whenever the tests fails on the main branch

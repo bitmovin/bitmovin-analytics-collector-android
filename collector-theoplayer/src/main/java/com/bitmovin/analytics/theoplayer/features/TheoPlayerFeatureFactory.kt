@@ -19,7 +19,8 @@ internal class TheoPlayerFeatureFactory(
     override fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
 
-        val httpRequestTrackingAdapter = TheoPlayerHttpRequestTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
+        val httpRequestTrackingAdapter =
+            TheoPlayerHttpRequestTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
         val httpRequestTracking = HttpRequestTracking(httpRequestTrackingAdapter)
 
         val errorDetailsBackend = ErrorDetailBackend(analytics.config, analytics.context)

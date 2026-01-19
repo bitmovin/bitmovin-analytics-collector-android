@@ -765,6 +765,78 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    fun test_vodWithDrm_playWithAutoPlay() {
+        runBlockingTest {
+            // arrange
+            val sample = TestSources.DRM_DASH_WIDEVINE
+            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            val drmSource =
+                TypedSource
+                    .Builder(sample.mpdUrl!!)
+                    .type(SourceType.DASH)
+                    .drm(
+                        com.theoplayer.android.api.source.drm.DRMConfiguration
+                            .Builder()
+                            .widevine(
+                                com.theoplayer.android.api.source.drm.KeySystemConfiguration
+                                    .Builder(sample.drmLicenseUrl!!)
+                                    .build(),
+                            )
+                            .build(),
+                    )
+                    .build()
+
+            val drmSourceDescription =
+                SourceDescription
+                    .Builder(drmSource)
+                    .build()
+
+            val drmSourceMetadata =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                    videoId = "drmTest",
+                    cdnProvider = "cdn_provider",
+                    customData = TestConfig.createDummyCustomData(),
+                )
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                player.isAutoplay = false
+                collector.sourceMetadata = drmSourceMetadata
+                collector.attachPlayer(player)
+                player.source = drmSourceDescription
+            }
+
+            // we are waiting a bit before starting
+            // in order to verify that drm request time is not
+            // affected by late start
+            Thread.sleep(1000)
+            withContext(mainScope.coroutineContext) {
+                player.play()
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(300)
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(1)
+
+            val drmImpression = impressions[0]
+            DataVerifier.verifyHasNoErrorSamples(drmImpression)
+            val startupSample = drmImpression.eventDataList.first()
+            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, verifyDrmType = true, verifyDrmLoadTime = false)
+
+            assertThat(drmImpression.eventDataList).allSatisfy { it.drmType == "widevine" }
+        }
+    }
+
+    @Test
     fun test_vod_setCdnDuringStartup() {
         // This scenario was mentioned by theo folks
         // cdn provider is determined from the manifest and thus updated while already starting up

@@ -10,6 +10,7 @@ import com.bitmovin.analytics.theoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.theoplayer.player.getActiveSource
 import com.bitmovin.analytics.theoplayer.player.getCurrentActiveAudioTrack
 import com.bitmovin.analytics.theoplayer.player.getCurrentActiveTextTrack
+import com.bitmovin.analytics.theoplayer.player.getDrmType
 import com.bitmovin.analytics.theoplayer.player.getDurationInMs
 import com.bitmovin.analytics.theoplayer.player.isLiveStream
 import com.theoplayer.android.api.THEOplayerGlobal
@@ -65,10 +66,10 @@ internal class PlaybackEventDataManipulator(
         if (activeTextTrack != null) {
             data.subtitleLanguage = activeTextTrack.language ?: activeTextTrack.label
         }
-//
-//        // DRM Information
-//        data.drmType = drmInfoProvider.drmType
-//
+
+        // DRM Information, set on every sample (this is similar to other collectors)
+        data.drmType = player.getDrmType()
+
         data.isMuted = isMuted(player)
     }
 
