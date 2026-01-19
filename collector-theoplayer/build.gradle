@@ -74,7 +74,7 @@ android {
 
     // FIXME: verify if this is really needed (seems like it is??)
     // we need to exclude the MANIFEST.MF file under META-INF/versions/9/OSGI-INF
-    // since there is conflict
+    // since there is a conflict
     packaging {
         resources {
             excludes += [
