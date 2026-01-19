@@ -17,7 +17,6 @@ internal class PlaybackQualityProvider(private val player: Player) {
             return field
         }
 
-    // TODO: verify if we should update this on every read
     var currentAudioQuality: AudioQuality? = null
         get() {
             if (field == null) {

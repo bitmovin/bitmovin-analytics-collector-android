@@ -17,7 +17,6 @@ object TestSources {
     val THEO_BIGBUCKBUNNY =
         StreamData(
             "avc1.",
-            // TODO: verify if audio is really null, or we are not collecting it correctly?
             null,
             null,
             null,

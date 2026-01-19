@@ -22,6 +22,8 @@ internal class PlaybackEventDataManipulator(
     private val metadataProvider: MetadataProvider,
     private val playerStatisticsProvider: PlayerStatisticsProvider,
 ) : EventDataManipulator {
+    // TODO: this should be pushed into the core collector
+    // only an interface with the collected fields should be necessary
     override fun manipulate(data: EventData) {
         data.isLive = metadataProvider.getSourceMetadata()?.isLive ?: player.isLiveStream() ?: false
 

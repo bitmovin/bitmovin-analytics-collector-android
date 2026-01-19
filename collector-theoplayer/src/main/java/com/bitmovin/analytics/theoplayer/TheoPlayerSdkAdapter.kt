@@ -57,16 +57,12 @@ internal class TheoPlayerSdkAdapter(
     private val analyticsEventListeners = AnalyticsEventListeners(bitmovinAnalytics, stateMachine, player, playbackQualityProvider)
     private val sourceEventListeners = SourceEventListeners(stateMachine, player, playbackQualityProvider)
 
-    // TODO: having two different inits is weird
-    init {
-        analyticsEventListeners.registerEventListeners()
-        sourceEventListeners.registerSourceListeners()
-    }
-
     override val isAutoplayEnabled: Boolean = player.isAutoplay
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = super.init()
+        analyticsEventListeners.registerEventListeners()
+        sourceEventListeners.registerSourceListeners()
         return features
     }
 

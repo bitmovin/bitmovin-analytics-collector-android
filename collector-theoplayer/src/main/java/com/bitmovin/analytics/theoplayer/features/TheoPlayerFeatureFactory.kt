@@ -13,6 +13,9 @@ internal class TheoPlayerFeatureFactory(
     private val analytics: BitmovinAnalytics,
     private val player: Player,
 ) : FeatureFactory {
+    // TODO: this should be pushed into the core collector
+    // the interface should only provide the requestTrackingAdapter
+    // follow up with refactoring
     override fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
 

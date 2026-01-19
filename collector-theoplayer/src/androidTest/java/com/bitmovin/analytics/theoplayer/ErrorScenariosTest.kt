@@ -248,4 +248,73 @@ class ErrorScenariosTest {
             assertThat(errorDetail.data.exceptionMessage).isNotEmpty()
         }
     }
+
+    @Test
+    fun test_streamWithCorruptedSource_Should_sendErrorSample() {
+        runBlockingTest {
+            val corruptedStreamSample = Samples.CORRUPT_DASH
+            val sourceMetadata =
+                SourceMetadata(
+                    title = metadataGenerator.getTestTitle(),
+                    videoId = "dash_corrupted_id",
+                    path = "dash_corrupted_path",
+                    customData = TestConfig.createDummyCustomData(),
+                    cdnProvider = "cdn_provider",
+                )
+
+            withContext(mainScope.coroutineContext) {
+                val playerConfig =
+                    THEOplayerConfig.Builder()
+                        .license(TheoPlayerTestUtils.TESTING_LICENSE)
+                        .build()
+
+                val theoPlayerView = THEOplayerView(appContext, playerConfig)
+                player = theoPlayerView.player
+                player.isAutoplay = true
+
+                val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+
+                collector.sourceMetadata = sourceMetadata
+                collector.attachPlayer(player)
+
+                val typedSource =
+                    TypedSource
+                        .Builder(corruptedStreamSample.uri.toString())
+                        .type(SourceType.DASH)
+                        .build()
+
+                val sourceDescription =
+                    SourceDescription
+                        .Builder(typedSource)
+                        .build()
+
+                player.source = sourceDescription
+            }
+
+            MockedIngress.waitForErrorDetailSample(timeout = 40.seconds)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(1)
+
+            val impression = impressions.first()
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList).hasSize(1)
+
+            val sample = eventDataList.first()
+            assertThat(sample.videoStartFailed).isTrue()
+            assertThat(sample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            assertThat(sample.errorMessage).isNotEmpty()
+            assertThat(sample.errorCode).isEqualTo(5000)
+            assertThat(sample.errorSeverity).isEqualTo(ErrorSeverity.CRITICAL)
+
+            val errorDetailList = impression.errorDetailList
+            assertThat(errorDetailList).hasSize(1)
+            val errorDetail = errorDetailList.first()
+            assertThat(errorDetail.data.exceptionMessage).isNotEmpty()
+            assertThat(errorDetail.data.exceptionStacktrace).isNotNull()
+
+            DataVerifier.verifyStartupSampleOnError(sample, TheoPlayerConstants.playerInfo)
+            DataVerifier.verifySourceMetadata(sample, sourceMetadata)
+        }
+    }
 }

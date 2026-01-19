@@ -48,10 +48,6 @@ internal class AnalyticsEventListeners(
     private val player: Player,
     private val playbackQualityProvider: PlaybackQualityProvider,
 ) {
-    // TODO: these flags are mimicing what bitmovin player is doing
-    // we should get rid of these though, and hide this in the statemachine
-    // -> effort to make core library more compact
-    private var isVideoAttemptedPlay = false
     private var lastUpdatedPositionMs = 0L
 
     // Event listener references for registration and unregistration
@@ -165,14 +161,6 @@ internal class AnalyticsEventListeners(
     private fun startupInitiated(currentPositionMs: Long) {
         playbackQualityProvider.resetPlaybackQualities()
         stateMachine.transitionState(PlayerStates.STARTUP, currentPositionMs)
-
-        // TODO: verify if this works
-        if (!player.ads.isPlaying) {
-            // if ad is playing as first thing we prevent from sending the
-            // VideoStartFailedReason.PAGE_CLOSED / VideoStartFailedReason.PLAYER_ERROR
-            // because actual video is not playing yet
-            isVideoAttemptedPlay = true
-        }
     }
 
     private fun onSeeked(seekedEvent: SeekedEvent) {
@@ -186,7 +174,8 @@ internal class AnalyticsEventListeners(
     private fun onSeeking(seekingEvent: SeekingEvent) {
         Log.i(TAG, "Event: SEEKING")
         // for some reason the seekingEvent contains the currentTime it was seeked to
-        // and not the original position it was seeked from
+        // and not the original position it was seeked from, therefore
+        // we use a workaround and just use the last updated position
         val positionAfterSeek = Util.secondsToMillis(seekingEvent.currentTime)
         val positionBeforeSeek = lastUpdatedPositionMs
         stateMachine.transitionState(PlayerStates.SEEKING, positionBeforeSeek)
@@ -198,9 +187,7 @@ internal class AnalyticsEventListeners(
     }
 
     private fun onDestroy(destroyEvent: DestroyEvent) {
-        Log.i("TAG", "Event DestroyEvent")
-        // TODO: we probably need to do a detach here, to also handle ssai and others
-        // and clean up
+        Log.i(TAG, "Event DestroyEvent")
         bitmovinAnalytics.detachPlayer(true)
     }
 
@@ -216,7 +203,6 @@ internal class AnalyticsEventListeners(
     private fun onBuffering(waitingEvent: WaitingEvent) {
         Log.i(TAG, "Event: waitingEvent")
         // optiview player emits waiting event while seeking, thus we don't want to move to buffering
-        // TODO: why isn't this handle on state machine level?
         if (stateMachine.currentState == PlayerStates.SEEKING) {
             return
         }
@@ -225,11 +211,9 @@ internal class AnalyticsEventListeners(
 
     private fun handleErrorEvent(originalNativeError: ErrorEvent) {
         Log.i(TAG, "Event: ErrorEvent")
-
         try {
             val videoTime = player.currentPositionInMs()
-            // TODO: add test for startup error
-            if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
+            if (stateMachine.isInStartupState()) {
                 stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
             }
             val errorCode = TheoPlayerExceptionMapper.map(originalNativeError.errorObject)

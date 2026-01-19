@@ -130,8 +130,7 @@ object DataVerifier {
 
             // audio language should always be set, except for ivs player
             // since we cannot track it there as of 2023-09-21
-            // FIXME: current theoplayer asset doesn't provide language
-            if (expectedPlayerInfo.playerName != "amazonivs" && expectedPlayerInfo.playerName != "theoplayer") {
+            if (expectedPlayerInfo.playerName != "amazonivs") {
                 assertThat(eventData.audioLanguage).isNotEmpty
             }
 
