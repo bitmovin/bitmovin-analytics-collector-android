@@ -296,7 +296,7 @@ class PhoneBasicScenariosTest {
                 player.source = defaultDashSourceDescription
             }
 
-            TheoPlayerPlaybackUtils.waitUntilPlayerIsReady(player)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasDataLoaded(player)
 
             withContext(mainScope.coroutineContext) {
                 player.play()

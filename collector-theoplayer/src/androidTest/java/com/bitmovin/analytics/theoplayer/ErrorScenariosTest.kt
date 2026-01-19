@@ -112,8 +112,7 @@ class ErrorScenariosTest {
                 player.source = sourceDescription
             }
 
-            // we wait 100ms to make sure that player is in startup state
-            Thread.sleep(100)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasMetadataLoaded(player)
 
             withContext(mainScope.coroutineContext) {
                 theoPlayerView?.onDestroy()

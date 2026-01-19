@@ -13,8 +13,11 @@ object TheoPlayerPlaybackUtils {
         PlaybackUtils.waitUntil("playerPlayedTo=${playedToMs}ms") { (player.currentTime * 1000).toLong() >= playedToMs }
     }
 
-    // TODO: verify if this is correct
-    fun waitUntilPlayerIsReady(player: Player) {
+    fun waitUntilPlayerHasMetadataLoaded(player: Player) {
+        PlaybackUtils.waitUntil { player.readyState >= ReadyState.HAVE_METADATA }
+    }
+
+    fun waitUntilPlayerHasDataLoaded(player: Player) {
         PlaybackUtils.waitUntil { player.readyState >= ReadyState.HAVE_CURRENT_DATA }
     }
 
