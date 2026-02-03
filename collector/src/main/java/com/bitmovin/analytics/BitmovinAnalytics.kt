@@ -111,9 +111,9 @@ class BitmovinAnalytics(
         sequenceNumberAndImpressionIdProvider.reset()
     }
 
-    fun programChange() {
+    fun programChange(onMetadataUpdate: () -> Unit) {
         val adapter = playerAdapter ?: return
-        adapter.stateMachine.programChange(adapter.stateMachine.playerContext.position)
+        adapter.stateMachine.programChange(adapter.stateMachine.playerContext.position, onMetadataUpdate)
     }
 
     val activeCustomData: CustomData

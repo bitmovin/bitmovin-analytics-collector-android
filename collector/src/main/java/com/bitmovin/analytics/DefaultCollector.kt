@@ -112,8 +112,8 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         if (!analytics.isAttachedToPlayer()) {
             return
         }
-        metadataProvider.setSourceMetadata(newSourceMetadata)
-        analytics.programChange()
+        // First flush current sample with OLD metadata, then update metadata for the new session
+        analytics.programChange { metadataProvider.setSourceMetadata(newSourceMetadata) }
     }
 
     fun setDeprecatedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) {

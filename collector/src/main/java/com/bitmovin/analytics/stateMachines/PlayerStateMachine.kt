@@ -38,7 +38,6 @@ class PlayerStateMachine(
     private var elapsedTimeOnEnter: Long = 0
 
     var isStartupFinished = false
-    private var isProgramChange = false
 
     var videoTimeStart: Long = 0
         private set
@@ -281,7 +280,10 @@ class PlayerStateMachine(
         }
     }
 
-    fun programChange(videoTime: Long) {
+    fun programChange(videoTime: Long, onMetadataUpdate: () -> Unit) {
+        // First transition to SOURCE_CHANGED to flush any pending sample with the OLD metadata and impression ID
+        transitionState(PlayerStates.SOURCE_CHANGED, videoTime, null)
+
         // Reset source-related state but NOT the heartbeat timer
         // This keeps heartbeat samples spread out during large live events
         disableRebufferHeartbeat()
@@ -292,17 +294,21 @@ class PlayerStateMachine(
         identicalErrorReportingLimiter.reset()
 
         videoStartFailedReason = null
-        isStartupFinished = false
         startupTime = 0
-        isProgramChange = true
 
-        transitionState(PlayerStates.STARTUP, videoTime, null)
-    }
+        // Update metadata AFTER resetting state but BEFORE sending the new startup sample
+        onMetadataUpdate()
 
-    fun getAndResetIsProgramChange(): Boolean {
-        val value = isProgramChange
-        isProgramChange = false
-        return value
+        // Update video time tracking for the new session
+        videoTimeStart = videoTime
+        videoTimeEnd = videoTime
+
+        // Send the programChange startup sample directly with the NEW metadata
+        listeners.notify { it.onProgramChanged(this) }
+
+        // Mark startup as finished and transition to PLAYING since player is already playing
+        isStartupFinished = true
+        currentState = PlayerStates.PLAYING
     }
 
     fun pause(position: Long) {

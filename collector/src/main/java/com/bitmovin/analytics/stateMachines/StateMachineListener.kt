@@ -67,4 +67,6 @@ interface StateMachineListener {
         stateMachine: PlayerStateMachine,
         durationInStartupStateMs: Long,
     )
+
+    fun onProgramChanged(stateMachine: PlayerStateMachine)
 }
