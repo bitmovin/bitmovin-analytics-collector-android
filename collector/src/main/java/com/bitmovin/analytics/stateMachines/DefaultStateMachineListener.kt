@@ -35,7 +35,6 @@ class DefaultStateMachineListener(
         val data = playerAdapter.createEventData()
         data.supportedVideoCodecs = Util.supportedVideoFormats
         data.state = "startup"
-        data.videoStartupTime = videoStartupTime
 
         // Player specific data that the player adapter can provide.
         data.autoplay = playerAdapter.isAutoplayEnabled
@@ -47,12 +46,13 @@ class DefaultStateMachineListener(
         val isProgramChange = stateMachine.getAndResetIsProgramChange()
         if (isProgramChange) {
             data.programChange = true
-            // Ensure startup times are at least 1 to avoid missing fast program changes
+            // Ensure startup times are at least 1 to avoid underreporting plays
             data.videoStartupTime = maxOf(1, videoStartupTime)
             val totalStartupTime = maxOf(1, videoStartupTime + playerStartupTime)
             data.startupTime = totalStartupTime
             data.duration = totalStartupTime
         } else {
+            data.videoStartupTime = videoStartupTime
             data.startupTime = videoStartupTime + playerStartupTime
             data.duration = videoStartupTime + playerStartupTime
         }

@@ -285,26 +285,16 @@ class PlayerStateMachine(
 
     fun programChange(
         videoTime: Long,
-        onMetadataUpdate: () -> Unit,
+        updateMetadata: () -> Unit,
     ) {
-        // Flush last sample with OLD metadata and impression ID
         triggerLastSampleOfSession()
-
-        // Reset source-related state but keep heartbeat running
-        // (keeps heartbeat samples spread out during large live events)
         resetSourceRelatedState(keepHeartbeatRunning = true)
+        updateMetadata()
 
-        // Update metadata for the new program
-        onMetadataUpdate()
-
-        // Mark this as a program change so the startup sample gets the flag
         isProgramChange = true
-
-        // Set state to STARTUP directly (no transition callbacks)
         currentState = PlayerStates.STARTUP
 
-        // If player is already playing, transition to PLAYING
-        // This triggers STARTUP's onExitState which calls onStartup
+        // If player is currently playing, transition to back to playing
         if (playerContext.isPlaying()) {
             transitionState(PlayerStates.PLAYING, videoTime, null)
         }

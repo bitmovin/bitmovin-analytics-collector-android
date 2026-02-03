@@ -112,7 +112,6 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         if (!analytics.isAttachedToPlayer()) {
             return
         }
-        // First flush current sample with OLD metadata, then update metadata for the new session
         analytics.programChange { metadataProvider.setSourceMetadata(newSourceMetadata) }
     }
 
