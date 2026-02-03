@@ -108,6 +108,14 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         analytics.sendCustomDataEvent(customData)
     }
 
+    override fun programChange(newSourceMetadata: SourceMetadata) {
+        if (!analytics.isAttachedToPlayer()) {
+            return
+        }
+        metadataProvider.setSourceMetadata(newSourceMetadata)
+        analytics.programChange()
+    }
+
     fun setDeprecatedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) {
         metadataProvider.setDeprecatedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig)
     }

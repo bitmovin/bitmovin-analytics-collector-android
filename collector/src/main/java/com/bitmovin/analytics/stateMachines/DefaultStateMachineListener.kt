@@ -43,7 +43,16 @@ class DefaultStateMachineListener(
         data.drmLoadTime = playerAdapter.drmDownloadTime
 
         data.playerStartupTime = playerStartupTime
-        data.startupTime = videoStartupTime + playerStartupTime
+
+        // Check if this startup was triggered by a program change
+        val isProgramChange = stateMachine.getAndResetIsProgramChange()
+        if (isProgramChange) {
+            data.programChange = true
+            // Set startupTime to 1 to avoid missing fast startups in dashboards
+            data.startupTime = 1
+        } else {
+            data.startupTime = videoStartupTime + playerStartupTime
+        }
 
         data.videoTimeStart = stateMachine.videoTimeStart
         data.videoTimeEnd = stateMachine.videoTimeEnd

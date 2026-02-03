@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.api
 
 import com.bitmovin.analytics.api.ssai.SsaiApi
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 
 /**
  * Public interface which is shared by all collectors
@@ -58,4 +59,19 @@ interface AnalyticsCollector<TPlayer> {
      * https://developer.bitmovin.com/playback/docs/how-can-values-of-customdata-and-other-metadata-fields-be-changed
      */
     fun sendCustomDataEvent(customData: CustomData)
+
+    /**
+     * Signals a program change during a streaming session.
+     *
+     * Use this method when the content changes logically but the underlying stream continues,
+     * such as channel changes in live TV or EPG program transitions within the same manifest.
+     *
+     * Calling this method starts a new analytics session with a new impression ID while keeping
+     * the existing player attachment. The [newSourceMetadata] will be used for all subsequent
+     * analytics samples.
+     *
+     * @param newSourceMetadata The metadata for the new program.
+     */
+    @InternalBitmovinApi
+    fun programChange(newSourceMetadata: SourceMetadata)
 }

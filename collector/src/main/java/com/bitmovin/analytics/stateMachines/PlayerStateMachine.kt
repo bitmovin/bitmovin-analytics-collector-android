@@ -38,6 +38,7 @@ class PlayerStateMachine(
     private var elapsedTimeOnEnter: Long = 0
 
     var isStartupFinished = false
+    private var isProgramChange = false
 
     var videoTimeStart: Long = 0
         private set
@@ -278,6 +279,30 @@ class PlayerStateMachine(
         if (shouldStartup) {
             transitionState(PlayerStates.STARTUP, newVideoTime, null)
         }
+    }
+
+    fun programChange(videoTime: Long) {
+        // Reset source-related state but NOT the heartbeat timer
+        // This keeps heartbeat samples spread out during large live events
+        disableRebufferHeartbeat()
+        videoStartTimeoutTimer.cancel()
+        bufferingTimeoutTimer.cancel()
+        qualityChangeEventLimiter.reset()
+        analytics.resetSourceRelatedState()
+        identicalErrorReportingLimiter.reset()
+
+        videoStartFailedReason = null
+        isStartupFinished = false
+        startupTime = 0
+        isProgramChange = true
+
+        transitionState(PlayerStates.STARTUP, videoTime, null)
+    }
+
+    fun getAndResetIsProgramChange(): Boolean {
+        val value = isProgramChange
+        isProgramChange = false
+        return value
     }
 
     fun pause(position: Long) {
