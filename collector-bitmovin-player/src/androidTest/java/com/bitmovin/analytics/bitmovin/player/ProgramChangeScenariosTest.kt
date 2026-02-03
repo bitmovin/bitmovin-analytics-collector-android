@@ -16,6 +16,8 @@ import com.bitmovin.analytics.systemtest.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
+import com.bitmovin.player.api.playlist.PlaylistConfig
+import com.bitmovin.player.api.playlist.PlaylistOptions
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
@@ -400,5 +402,106 @@ class ProgramChangeScenariosTest {
             assertThat(thirdStartup.videoId).isEqualTo("program-3")
             assertThat(thirdStartup.programChange).isTrue()
             assertThat(thirdStartup.startupTime).isGreaterThanOrEqualTo(1)
+        }
+
+    @Test
+    fun test_programChange_withPlaylist_onlyUpdatesActiveSourceMetadata() =
+        runBlockingTest {
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            // Create two sources for the playlist
+            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+            val dashSample = TestSources.DASH
+            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+
+            val hlsMetadata =
+                SourceMetadata(
+                    videoId = "hls-video-id",
+                    title = "HLS Video",
+                    customData = CustomData(customData1 = "hls-data"),
+                )
+
+            val dashMetadata =
+                SourceMetadata(
+                    videoId = "dash-video-id",
+                    title = "DASH Video",
+                    customData = CustomData(customData1 = "dash-data"),
+                )
+
+            val programChangeMetadata =
+                SourceMetadata(
+                    videoId = "program-change-video-id",
+                    title = "Program Changed",
+                    customData = CustomData(customData1 = "program-change-data"),
+                )
+
+            // Set metadata for both sources
+            collector.setSourceMetadata(hlsSource, hlsMetadata)
+            collector.setSourceMetadata(dashSource, dashMetadata)
+
+            val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
+
+            withContext(mainScope.coroutineContext) {
+                collector.attachPlayer(player)
+                player.load(playlistConfig)
+            }
+
+            // Play first source (HLS) for a bit
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(player, 2000)
+
+            // Call programChange - this should only update HLS source metadata
+            withContext(mainScope.coroutineContext) {
+                collector.programChange(programChangeMetadata)
+            }
+
+            // Continue playing after program change
+            BitmovinPlaybackUtils.waitUntilPlaybackStarted(player)
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(player, 4000)
+
+            // Seek to end of first source to trigger playlist transition
+            val seekTo = hlsSample.duration / 1000 - 1.0
+            withContext(mainScope.coroutineContext) {
+                player.seek(seekTo)
+            }
+
+            // Wait for second source (DASH) to play
+            BitmovinPlaybackUtils.waitUntilNextSourcePlayedToMs(player, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(500)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(3)
+
+            // Impression 1: HLS with original metadata
+            val impression1 = impressions[0]
+            DataVerifier.verifyHasNoErrorSamples(impression1)
+            val startup1 = impression1.eventDataList.first()
+            assertThat(startup1.videoId).isEqualTo("hls-video-id")
+            assertThat(startup1.customData1).isEqualTo("hls-data")
+            assertThat(startup1.programChange).isNull()
+
+            // Impression 2: HLS with program change metadata
+            val impression2 = impressions[1]
+            DataVerifier.verifyHasNoErrorSamples(impression2)
+            val startup2 = impression2.eventDataList.first()
+            assertThat(startup2.videoId).isEqualTo("program-change-video-id")
+            assertThat(startup2.customData1).isEqualTo("program-change-data")
+            assertThat(startup2.programChange).isTrue()
+
+            // Impression 3: DASH with its original metadata (not affected by programChange)
+            val impression3 = impressions[2]
+            DataVerifier.verifyHasNoErrorSamples(impression3)
+            val startup3 = impression3.eventDataList.first()
+            assertThat(startup3.videoId).isEqualTo("dash-video-id")
+            assertThat(startup3.customData1).isEqualTo("dash-data")
+            assertThat(startup3.programChange).isNull()
+
+            // Verify all three impressions have different impression IDs
+            val impressionIds = impressions.map { it.eventDataList.first().impressionId }
+            assertThat(impressionIds.distinct()).hasSize(3)
         }
 }
