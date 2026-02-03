@@ -312,5 +312,4 @@ class DefaultStateMachineListener(
         // since this function is only called when there is timeout during startup or EBVS (as of 2025-08)
         analytics.detachPlayer(shouldSendOutSamples = false)
     }
-
 }
