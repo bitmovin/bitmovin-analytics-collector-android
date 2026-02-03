@@ -66,8 +66,8 @@ interface AnalyticsCollector<TPlayer> {
      * such as channel changes in live TV or EPG program transitions within the same manifest.
      *
      * Calling this method starts a new analytics session with a new impression ID while keeping
-     * the existing player attachment. The [newSourceMetadata] will be used for all subsequent
-     * analytics samples.
+     * the existing player attachment. The [newSourceMetadata] will replace the metadata of the
+     * currently active source and will be used for all subsequent analytics samples.
      *
      * @param newSourceMetadata The metadata for the new program.
      */
