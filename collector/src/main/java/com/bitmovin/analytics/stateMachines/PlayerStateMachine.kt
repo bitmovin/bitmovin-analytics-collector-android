@@ -280,7 +280,10 @@ class PlayerStateMachine(
         }
     }
 
-    fun programChange(videoTime: Long, onMetadataUpdate: () -> Unit) {
+    fun programChange(
+        videoTime: Long,
+        onMetadataUpdate: () -> Unit,
+    ) {
         // First transition to SOURCE_CHANGED to flush any pending sample with the OLD metadata and impression ID
         transitionState(PlayerStates.SOURCE_CHANGED, videoTime, null)
 
