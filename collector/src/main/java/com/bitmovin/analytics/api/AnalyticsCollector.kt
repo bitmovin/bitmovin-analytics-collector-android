@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.api
 
 import com.bitmovin.analytics.api.ssai.SsaiApi
-import com.bitmovin.analytics.internal.InternalBitmovinApi
 
 /**
  * Public interface which is shared by all collectors
@@ -72,6 +71,5 @@ interface AnalyticsCollector<TPlayer> {
      *
      * @param newSourceMetadata The metadata for the new program.
      */
-    @InternalBitmovinApi
     fun programChange(newSourceMetadata: SourceMetadata)
 }
