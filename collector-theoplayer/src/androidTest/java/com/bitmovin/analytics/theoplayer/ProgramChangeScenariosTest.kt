@@ -170,7 +170,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.programChange).isTrue()
-            assertThat(secondStartupSample.startupTime).isEqualTo(1)
+            assertThat(secondStartupSample.startupTime).isGreaterThanOrEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -260,7 +260,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.programChange).isTrue()
-            assertThat(secondStartupSample.startupTime).isEqualTo(1)
+            assertThat(secondStartupSample.startupTime).isGreaterThanOrEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -338,7 +338,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.programChange).isTrue()
-            assertThat(secondStartupSample.startupTime).isEqualTo(1)
+            assertThat(secondStartupSample.startupTime).isGreaterThanOrEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -415,13 +415,13 @@ class ProgramChangeScenariosTest {
             val secondStartup = impressions[1].eventDataList.first()
             assertThat(secondStartup.videoId).isEqualTo("program-2")
             assertThat(secondStartup.programChange).isTrue()
-            assertThat(secondStartup.startupTime).isEqualTo(1)
+            assertThat(secondStartup.startupTime).isGreaterThanOrEqualTo(1)
 
             // Verify third impression (programChange flag)
             val thirdStartup = impressions[2].eventDataList.first()
             assertThat(thirdStartup.videoId).isEqualTo("program-3")
             assertThat(thirdStartup.programChange).isTrue()
-            assertThat(thirdStartup.startupTime).isEqualTo(1)
+            assertThat(thirdStartup.startupTime).isGreaterThanOrEqualTo(1)
         }
     }
 }

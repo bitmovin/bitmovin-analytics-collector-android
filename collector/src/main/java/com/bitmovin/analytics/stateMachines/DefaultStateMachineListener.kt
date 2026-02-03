@@ -35,7 +35,6 @@ class DefaultStateMachineListener(
         val data = playerAdapter.createEventData()
         data.supportedVideoCodecs = Util.supportedVideoFormats
         data.state = "startup"
-        data.duration = videoStartupTime + playerStartupTime
         data.videoStartupTime = videoStartupTime
 
         // Player specific data that the player adapter can provide.
@@ -43,7 +42,20 @@ class DefaultStateMachineListener(
         data.drmLoadTime = playerAdapter.drmDownloadTime
 
         data.playerStartupTime = playerStartupTime
-        data.startupTime = videoStartupTime + playerStartupTime
+
+        // Check if this startup was triggered by a program change
+        val isProgramChange = stateMachine.getAndResetIsProgramChange()
+        if (isProgramChange) {
+            data.programChange = true
+            // Ensure startup times are at least 1 to avoid missing fast program changes
+            data.videoStartupTime = maxOf(1, videoStartupTime)
+            val totalStartupTime = maxOf(1, videoStartupTime + playerStartupTime)
+            data.startupTime = totalStartupTime
+            data.duration = totalStartupTime
+        } else {
+            data.startupTime = videoStartupTime + playerStartupTime
+            data.duration = videoStartupTime + playerStartupTime
+        }
 
         data.videoTimeStart = stateMachine.videoTimeStart
         data.videoTimeEnd = stateMachine.videoTimeEnd
@@ -301,19 +313,4 @@ class DefaultStateMachineListener(
         analytics.detachPlayer(shouldSendOutSamples = false)
     }
 
-    override fun onProgramChanged(stateMachine: PlayerStateMachine) {
-        BitmovinLog.d(TAG, String.format("onProgramChanged %s", analytics.impressionId))
-        val data = playerAdapter.createEventData()
-        data.supportedVideoCodecs = Util.supportedVideoFormats
-        data.state = "startup"
-        data.programChange = true
-        // Set startupTime to 1 to avoid missing fast startups in dashboards
-        data.startupTime = 1
-        data.videoStartupTime = 1
-        data.playerStartupTime = 0
-        data.duration = 1
-        data.videoTimeStart = stateMachine.videoTimeStart
-        data.videoTimeEnd = stateMachine.videoTimeEnd
-        analytics.sendEventData(data)
-    }
 }

@@ -38,6 +38,7 @@ class PlayerStateMachine(
     private var elapsedTimeOnEnter: Long = 0
 
     var isStartupFinished = false
+    private var isProgramChange = false
 
     var videoTimeStart: Long = 0
         private set
@@ -168,8 +169,10 @@ class PlayerStateMachine(
         videoTimeStart = videoTimeEnd
     }
 
-    private fun resetSourceRelatedState() {
-        disableHeartbeat()
+    private fun resetSourceRelatedState(keepHeartbeatRunning: Boolean = false) {
+        if (!keepHeartbeatRunning) {
+            disableHeartbeat()
+        }
         disableRebufferHeartbeat()
         videoStartTimeoutTimer.cancel()
         bufferingTimeoutTimer.cancel()
@@ -284,34 +287,33 @@ class PlayerStateMachine(
         videoTime: Long,
         onMetadataUpdate: () -> Unit,
     ) {
-        // First transition to SOURCE_CHANGED to flush any pending sample with the OLD metadata and impression ID
-        transitionState(PlayerStates.SOURCE_CHANGED, videoTime, null)
+        // Flush last sample with OLD metadata and impression ID
+        triggerLastSampleOfSession()
 
-        // Reset source-related state but NOT the heartbeat timer
-        // This keeps heartbeat samples spread out during large live events
-        disableRebufferHeartbeat()
-        videoStartTimeoutTimer.cancel()
-        bufferingTimeoutTimer.cancel()
-        qualityChangeEventLimiter.reset()
-        analytics.resetSourceRelatedState()
-        identicalErrorReportingLimiter.reset()
+        // Reset source-related state but keep heartbeat running
+        // (keeps heartbeat samples spread out during large live events)
+        resetSourceRelatedState(keepHeartbeatRunning = true)
 
-        videoStartFailedReason = null
-        startupTime = 0
-
-        // Update metadata AFTER resetting state but BEFORE sending the new startup sample
+        // Update metadata for the new program
         onMetadataUpdate()
 
-        // Update video time tracking for the new session
-        videoTimeStart = videoTime
-        videoTimeEnd = videoTime
+        // Mark this as a program change so the startup sample gets the flag
+        isProgramChange = true
 
-        // Send the programChange startup sample directly with the NEW metadata
-        listeners.notify { it.onProgramChanged(this) }
+        // Set state to STARTUP directly (no transition callbacks)
+        currentState = PlayerStates.STARTUP
 
-        // Mark startup as finished and transition to PLAYING since player is already playing
-        isStartupFinished = true
-        currentState = PlayerStates.PLAYING
+        // If player is already playing, transition to PLAYING
+        // This triggers STARTUP's onExitState which calls onStartup
+        if (playerContext.isPlaying()) {
+            transitionState(PlayerStates.PLAYING, videoTime, null)
+        }
+    }
+
+    fun getAndResetIsProgramChange(): Boolean {
+        val value = isProgramChange
+        isProgramChange = false
+        return value
     }
 
     fun pause(position: Long) {
