@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.theoplayer
 
+import android.os.Handler
 import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
@@ -48,6 +49,7 @@ internal class TheoPlayerSdkAdapter(
         ssaiApiProxy,
         looper,
     ) {
+    private val mainHandler = Handler(Looper.getMainLooper())
     private val playbackEventDataManipulator =
         PlaybackEventDataManipulator(player, playbackQualityProvider, metadataProvider, playerStatisticsProvider)
 
@@ -84,11 +86,15 @@ internal class TheoPlayerSdkAdapter(
     }
 
     override fun triggerLastSampleOfSession() {
-        if (stateMachine.isInStartupState()) {
-            stateMachine.exitBeforeVideoStart(player.currentPositionInMs())
-        } else {
-            stateMachine.triggerLastSampleOfSession()
+        val sendSampleCodeBlock = {
+            if (stateMachine.isInStartupState()) {
+                stateMachine.exitBeforeVideoStart(player.currentPositionInMs())
+            } else {
+                stateMachine.triggerLastSampleOfSession()
+            }
         }
+        // We need to make sure this is executed on Main thread because THEO does not always send detach events from main
+        if (Looper.getMainLooper().isCurrentThread) sendSampleCodeBlock() else mainHandler.post(sendSampleCodeBlock)
     }
 
     override val eventDataManipulators: Collection<EventDataManipulator>
