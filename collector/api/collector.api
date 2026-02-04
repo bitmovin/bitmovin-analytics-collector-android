@@ -179,6 +179,7 @@ public abstract interface class com/bitmovin/analytics/api/AnalyticsCollector {
 	public abstract fun getImpressionId ()Ljava/lang/String;
 	public abstract fun getSsai ()Lcom/bitmovin/analytics/api/ssai/SsaiApi;
 	public abstract fun getUserId ()Ljava/lang/String;
+	public abstract fun programChange (Lcom/bitmovin/analytics/api/SourceMetadata;)V
 	public abstract fun sendCustomDataEvent (Lcom/bitmovin/analytics/api/CustomData;)V
 	public abstract fun setCustomDataOnce (Lcom/bitmovin/analytics/api/CustomData;)V
 	public abstract fun setDefaultMetadata (Lcom/bitmovin/analytics/api/DefaultMetadata;)V
