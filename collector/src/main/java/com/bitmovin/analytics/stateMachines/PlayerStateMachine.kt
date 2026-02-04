@@ -287,6 +287,7 @@ class PlayerStateMachine(
         videoTime: Long,
         updateMetadataForActiveSourceAfterPreviousSessionHasEnded: () -> Unit,
     ) {
+        val lastStateBeforeProgramChange = currentState
         triggerLastSampleOfSession()
         resetSourceRelatedState(keepHeartbeatRunning = true)
         updateMetadataForActiveSourceAfterPreviousSessionHasEnded()
@@ -294,8 +295,10 @@ class PlayerStateMachine(
         isProgramChange = true
         currentState = PlayerStates.STARTUP
 
-        // If player is currently playing, transition to back to playing
-        if (playerContext.isPlaying()) {
+        // If player is currently playing, transition back to playing
+        // We don't transition into Playing if the player is seeking
+        // This check is needed because some players (like THEO) return isPlaying=true while seeking
+        if (playerContext.isPlaying() && lastStateBeforeProgramChange != PlayerStates.SEEKING) {
             transitionState(PlayerStates.PLAYING, videoTime, null)
         }
     }
