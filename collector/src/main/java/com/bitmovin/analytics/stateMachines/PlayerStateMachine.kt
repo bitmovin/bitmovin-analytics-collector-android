@@ -285,11 +285,11 @@ class PlayerStateMachine(
 
     fun programChange(
         videoTime: Long,
-        updateMetadata: () -> Unit,
+        updateMetadataForActiveSourceAfterPreviousSessionHasEnded: () -> Unit,
     ) {
         triggerLastSampleOfSession()
         resetSourceRelatedState(keepHeartbeatRunning = true)
-        updateMetadata()
+        updateMetadataForActiveSourceAfterPreviousSessionHasEnded()
 
         isProgramChange = true
         currentState = PlayerStates.STARTUP

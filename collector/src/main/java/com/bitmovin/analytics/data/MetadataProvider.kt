@@ -19,6 +19,26 @@ class MetadataProvider {
         sourceMetadataMap[source] = sourceMetadata
     }
 
+    fun setSourceMetadata(sourceMetadata: SourceMetadata?) {
+        setSourceMetadata(DEFAULT_KEY, sourceMetadata)
+    }
+
+    fun setSourceMetadataForActiveSource(
+        sourceMetadata: SourceMetadata?,
+        isActiveSource: (Any) -> Boolean,
+    ) {
+        val activeSource =
+            sourceMetadataMap.keys
+                .filter { it != DEFAULT_KEY }
+                .find { isActiveSource(it) }
+
+        if (activeSource != null) {
+            setSourceMetadata(activeSource, sourceMetadata)
+        } else {
+            setSourceMetadata(sourceMetadata)
+        }
+    }
+
     // For backwards compatibility reason we extract the data from the deprecatedAnalyticsConfig
     // in case there is no source metadata
     fun getSourceMetadata(source: Any): SourceMetadata? {
@@ -39,14 +59,6 @@ class MetadataProvider {
 
     fun getSourceMetadata(): SourceMetadata? {
         return getSourceMetadata(DEFAULT_KEY)
-    }
-
-    fun setSourceMetadata(sourceMetadata: SourceMetadata?) {
-        setSourceMetadata(DEFAULT_KEY, sourceMetadata)
-    }
-
-    fun getRegisteredSources(): Set<Any> {
-        return sourceMetadataMap.keys.filter { it != DEFAULT_KEY }.toSet()
     }
 
     // For backwards compatibility reason we extract the data from the deprecatedAnalyticsConfig

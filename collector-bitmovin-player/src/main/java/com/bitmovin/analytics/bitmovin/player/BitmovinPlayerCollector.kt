@@ -189,15 +189,8 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
         }
 
         analytics.programChange {
-            val activeSource =
-                metadataProvider.getRegisteredSources()
-                    .filterIsInstance<Source>()
-                    .find { it.isActive }
-
-            if (activeSource != null) {
-                metadataProvider.setSourceMetadata(activeSource, newSourceMetadata)
-            } else {
-                metadataProvider.setSourceMetadata(newSourceMetadata)
+            metadataProvider.setSourceMetadataForActiveSource(newSourceMetadata) { source ->
+                (source as? Source)?.isActive == true
             }
         }
     }
