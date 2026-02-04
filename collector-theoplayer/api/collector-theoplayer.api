@@ -16,3 +16,8 @@ public final class com/bitmovin/analytics/theoplayer/api/ITHEOplayerCollector$Fa
 	public final fun getSdkVersion ()Ljava/lang/String;
 }
 
+public final class com/bitmovin/analytics/theoplayer/player/PlayerUtils {
+	public static final field INSTANCE Lcom/bitmovin/analytics/theoplayer/player/PlayerUtils;
+	public final fun getDrmTypeFromConfiguration (Lcom/theoplayer/android/api/source/drm/DRMConfiguration;)Ljava/lang/String;
+}
+
