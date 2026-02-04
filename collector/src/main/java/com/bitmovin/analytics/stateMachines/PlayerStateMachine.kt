@@ -285,14 +285,15 @@ class PlayerStateMachine(
 
     fun programChange(
         videoTime: Long,
-        updateMetadataForActiveSourceAfterPreviousSessionHasEnded: () -> Unit,
+        onAfterSessionReset: () -> Unit,
     ) {
         val lastStateBeforeProgramChange = currentState
         triggerLastSampleOfSession()
         resetSourceRelatedState(keepHeartbeatRunning = true)
-        updateMetadataForActiveSourceAfterPreviousSessionHasEnded()
+        onAfterSessionReset()
 
         isProgramChange = true
+        isStartupFinished = true
         currentState = PlayerStates.STARTUP
 
         // If player is currently playing, transition back to playing
