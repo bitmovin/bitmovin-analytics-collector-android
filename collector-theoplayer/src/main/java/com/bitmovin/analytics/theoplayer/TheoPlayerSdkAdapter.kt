@@ -95,7 +95,6 @@ internal class TheoPlayerSdkAdapter(
         }
         // We need to make sure this is executed on Main thread because THEO does not always send detach events from main
         if (Looper.getMainLooper().isCurrentThread) sendSampleCodeBlock() else mainHandler.post(sendSampleCodeBlock)
-
     }
 
     override val eventDataManipulators: Collection<EventDataManipulator>
