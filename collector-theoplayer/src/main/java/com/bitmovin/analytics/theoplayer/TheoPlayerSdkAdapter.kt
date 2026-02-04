@@ -86,14 +86,16 @@ internal class TheoPlayerSdkAdapter(
     }
 
     override fun triggerLastSampleOfSession() {
-        // We need to push this onto the Main thread because THEO does not always send it from main
-        mainHandler.post {
+        val sendSampleCodeBlock = {
             if (stateMachine.isInStartupState()) {
                 stateMachine.exitBeforeVideoStart(player.currentPositionInMs())
             } else {
                 stateMachine.triggerLastSampleOfSession()
             }
         }
+        // We need to make sure this is executed on Main thread because THEO does not always send detach events from main
+        if (Looper.getMainLooper().isCurrentThread) sendSampleCodeBlock() else mainHandler.post(sendSampleCodeBlock)
+
     }
 
     override val eventDataManipulators: Collection<EventDataManipulator>
