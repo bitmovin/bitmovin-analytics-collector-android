@@ -12,8 +12,31 @@ class MetadataProvider {
     private val internalDefaultMetadata: AtomicReference<DefaultMetadata?> = AtomicReference(null)
     private val deprecatedBitmovinAnalyticsConfig: AtomicReference<BitmovinAnalyticsConfig?> = AtomicReference(null)
 
-    fun setSourceMetadata(source: Any, sourceMetadata: SourceMetadata?) {
+    fun setSourceMetadata(
+        source: Any,
+        sourceMetadata: SourceMetadata?,
+    ) {
         sourceMetadataMap[source] = sourceMetadata
+    }
+
+    fun setSourceMetadata(sourceMetadata: SourceMetadata?) {
+        setSourceMetadata(DEFAULT_KEY, sourceMetadata)
+    }
+
+    fun setSourceMetadataForActiveSource(
+        sourceMetadata: SourceMetadata?,
+        isActiveSource: (Any) -> Boolean,
+    ) {
+        val activeSource =
+            sourceMetadataMap.keys
+                .filter { it != DEFAULT_KEY }
+                .find { isActiveSource(it) }
+
+        if (activeSource != null) {
+            setSourceMetadata(activeSource, sourceMetadata)
+        } else {
+            setSourceMetadata(sourceMetadata)
+        }
     }
 
     // For backwards compatibility reason we extract the data from the deprecatedAnalyticsConfig
@@ -36,10 +59,6 @@ class MetadataProvider {
 
     fun getSourceMetadata(): SourceMetadata? {
         return getSourceMetadata(DEFAULT_KEY)
-    }
-
-    fun setSourceMetadata(sourceMetadata: SourceMetadata?) {
-        setSourceMetadata(DEFAULT_KEY, sourceMetadata)
     }
 
     // For backwards compatibility reason we extract the data from the deprecatedAnalyticsConfig

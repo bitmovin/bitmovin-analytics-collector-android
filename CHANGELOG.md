@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded agp to 8.10.1 in order to support theo player
 
 ### Added
+- New programChange API method to update SourceMetadata without changing the underlying stream
 - Initial version of theoplayer collector
 
 ## v3.22.0

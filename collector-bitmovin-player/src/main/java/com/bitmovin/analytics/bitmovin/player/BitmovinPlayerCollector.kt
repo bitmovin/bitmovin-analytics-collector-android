@@ -183,6 +183,18 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
         return currentSourceMetadata?.customData ?: CustomData()
     }
 
+    override fun programChange(newSourceMetadata: SourceMetadata) {
+        if (!analytics.isAttachedToPlayer()) {
+            return
+        }
+
+        analytics.programChange {
+            metadataProvider.setSourceMetadataForActiveSource(newSourceMetadata) { source ->
+                (source as? Source)?.isActive == true
+            }
+        }
+    }
+
     override val ssai: SsaiApi
         get() = ssaiApiProxy
 }
