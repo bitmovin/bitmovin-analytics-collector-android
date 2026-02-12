@@ -5,14 +5,13 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.error.ErrorSeverity
-import com.bitmovin.analytics.example.shared.Samples
-import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.MetadataUtils
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.RepeatRule
-import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSources
-import com.bitmovin.analytics.systemtest.utils.runBlockingTest
+import com.bitmovin.analytics.test.utils.DataVerifier
+import com.bitmovin.analytics.test.utils.MetadataUtils
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.RepeatRule
+import com.bitmovin.analytics.test.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.analytics.theoplayer.api.ITHEOplayerCollector
 import com.theoplayer.android.api.THEOplayerConfig
 import com.theoplayer.android.api.THEOplayerView
@@ -198,7 +197,7 @@ class ErrorScenariosTest {
 
                 val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
 
-                val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
+                val nonExistingStreamSample = TestSources.NONE_EXISTING_STREAM
                 val sourceMetadata =
                     SourceMetadata(
                         title = metadataGenerator.getTestTitle(),
@@ -213,7 +212,7 @@ class ErrorScenariosTest {
 
                 val typedSource =
                     TypedSource
-                        .Builder(nonExistingStreamSample.uri.toString())
+                        .Builder(nonExistingStreamSample.m3u8Url!!)
                         .type(SourceType.HLS)
                         .build()
 
@@ -251,7 +250,7 @@ class ErrorScenariosTest {
     @Test
     fun test_streamWithCorruptedSource_Should_sendErrorSample() {
         runBlockingTest {
-            val corruptedStreamSample = Samples.CORRUPT_DASH
+            val corruptedStreamSample = TestSources.CORRUPT_DASH
             val sourceMetadata =
                 SourceMetadata(
                     title = metadataGenerator.getTestTitle(),
@@ -278,7 +277,7 @@ class ErrorScenariosTest {
 
                 val typedSource =
                     TypedSource
-                        .Builder(corruptedStreamSample.uri.toString())
+                        .Builder(corruptedStreamSample.mpdUrl!!)
                         .type(SourceType.DASH)
                         .build()
 

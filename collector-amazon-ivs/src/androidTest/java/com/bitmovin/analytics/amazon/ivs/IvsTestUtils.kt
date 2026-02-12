@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.amazon.ivs
 
 import com.amazonaws.ivs.player.Player
-import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
+import com.bitmovin.analytics.test.utils.PlaybackUtils
 
 object IvsTestUtils {
     fun waitUntilPlayerIsReady(player: Player) {

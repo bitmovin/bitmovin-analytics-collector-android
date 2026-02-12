@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.systemtest.utils
+package com.bitmovin.analytics.test.utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import org.junit.rules.TestRule

@@ -63,5 +63,5 @@ dependencies {
     } else {
         implementation "com.bitmovin.analytics:collector-media3-exoplayer:${rootProject.ext.version}"
     }
-    implementation project(':example-shared')
+    implementation project(':test-utils')
 }

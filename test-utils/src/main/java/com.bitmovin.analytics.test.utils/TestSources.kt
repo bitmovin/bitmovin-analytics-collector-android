@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.systemtest.utils
+package com.bitmovin.analytics.test.utils
 
 @Suppress("ktlint:standard:max-line-length")
 object TestSources {
@@ -6,7 +6,7 @@ object TestSources {
         StreamData(
             "avc1.",
             "mp4a.40.2",
-            "https://bitmovin-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
+            "https://bitmovin-player-eu-west1-ci-input.s3.amazonaws.com/general/aom/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
             null,
             null,
             "hls",
@@ -32,7 +32,7 @@ object TestSources {
             "mp4a.40.2",
             null,
             null,
-            "https://bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd",
+            "https://bitmovin-player-eu-west1-ci-input.s3.amazonaws.com/general/hls/art-of-motion/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd",
             "dash",
             false,
             210000,
@@ -62,7 +62,7 @@ object TestSources {
             "mp4a.40.2",
             null,
             null,
-            "https://bitmovin-a.akamaihd.net/content/sintel/sintel_single_quality.mpd",
+            "https://bitmovin-player-eu-west1-ci-input.s3.amazonaws.com/general/sintel/sintel_single_quality.mpd",
             "dash",
             false,
             888000,
@@ -77,7 +77,7 @@ object TestSources {
         StreamData(
             "avc1.",
             "mp4a.40.2",
-            "https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+            "https://bitmovin-player-eu-west1-ci-input.s3.amazonaws.com/general/sintel/hls/playlist.m3u8",
             null,
             null,
             "hls",
@@ -90,7 +90,7 @@ object TestSources {
             "avc1.",
             "mp4a.40.2",
             null,
-            "https://bitmovin-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4",
+            "https://bitmovin-player-eu-west1-ci-input.s3.amazonaws.com/general/hls/art-of-motion/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4",
             null,
             "progressive",
             false,
@@ -136,13 +136,61 @@ object TestSources {
             362356,
         )
 
+    val BBB =
+        StreamData(
+            "avc1.",
+            "mp4a.40.2",
+            null,
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/mp4/BigBuckBunny.mp4",
+            null,
+            "progressive",
+            false,
+            596000,
+        )
+
+    val CORRUPT_DASH =
+        StreamData(
+            "avc1.",
+            "mp4a.40.2",
+            null,
+            null,
+            "https://bitmovin-player-eu-west1-ci-input.s3-eu-west-1.amazonaws.com/general/dash/corrupted_segment/corrupted_first_segment.mpd",
+            "dash",
+            false,
+            0,
+        )
+
+    val MISSING_SEGMENT =
+        StreamData(
+            "avc1.",
+            "mp4a.40.2",
+            null,
+            null,
+            "https://storage.googleapis.com/bitmovin-analytics-test-assets/corrupted-assets/redbull-parkour/stream_segment_not_found.mpd",
+            "dash",
+            false,
+            0,
+        )
+
+    val NONE_EXISTING_STREAM =
+        StreamData(
+            "",
+            null,
+            "https://fcc3ddae59ed.us-west-2.playback.live-video.net/api/video/v1/us-west-2.893648527354.channel.DmumNckWFTqz_invalid.m3u8",
+            null,
+            null,
+            "hls",
+            false,
+            0,
+        )
+
     val DRM_DASH_WIDEVINE =
         StreamData(
             "avc1.",
             "mp4a.40.2",
             null,
             null,
-            "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/mpds/11331.mpd",
+            "https://bitmovin-player-eu-west1-ci-input.s3.amazonaws.com/general/hls/art-of-motion-aes-128-multivariant/mpds/11331.mpd",
             "dash",
             false,
             210000,
@@ -150,31 +198,9 @@ object TestSources {
             drmLicenseUrl = "https://cwip-shaka-proxy.appspot.com/no_auth",
         )
 
-    val DRM_HLS_WIDEVINE =
-        StreamData(
-            "avc1.",
-            "mp4a.40.2",
-            "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/m3u8s/widevine-hls.m3u8",
-            null,
-            null,
-            "hls",
-            false,
-            210000,
-            drmSchema = "widevine",
-            drmLicenseUrl = "https://cwip-shaka-proxy.appspot.com/no_auth",
-        )
-
-    val DRM_HLS_WIDEVINE_ENCRYPTED =
-        StreamData(
-            "avc1.",
-            "mp4a.40.2",
-            "https://bitmovin-a.akamaihd.net/content/art-of-motion_drm/m3u8s/11331.m3u8",
-            null,
-            null,
-            "hls",
-            false,
-            210000,
-            drmSchema = "widevine",
-            drmLicenseUrl = "https://widevine-proxy.appspot.com/proxy",
-        )
+    // These are IMA Sample Tags from https://developers.google.com/interactive-media-ads/docs/sdks/android/tags
+    val IMA_AD_SOURCE_1 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&nofb=1&correlator="
+    val IMA_AD_SOURCE_2 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="
+    val IMA_AD_SOURCE_3 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator="
+    val IMA_AD_SOURCE_4 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator="
 }

@@ -15,15 +15,14 @@ import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartileMetadata
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
-import com.bitmovin.analytics.example.shared.Samples
-import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.MetadataUtils
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.MockedIngress.waitForErrorDetailSample
-import com.bitmovin.analytics.systemtest.utils.SsaiDataVerifier
-import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSources
-import com.bitmovin.analytics.systemtest.utils.runBlockingTest
+import com.bitmovin.analytics.test.utils.DataVerifier
+import com.bitmovin.analytics.test.utils.MetadataUtils
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.MockedIngress.waitForErrorDetailSample
+import com.bitmovin.analytics.test.utils.SsaiDataVerifier
+import com.bitmovin.analytics.test.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -442,8 +441,8 @@ class SsaiScenariosTest {
     @Test
     fun test_adEngagementMetrics_track_error() =
         runBlockingTest {
-            val corruptedStream = Samples.CORRUPT_DASH
-            val corruptedStreamSource = Source(SourceConfig.fromUrl(corruptedStream.uri.toString()))
+            val corruptedStream = TestSources.CORRUPT_DASH
+            val corruptedStreamSource = Source(SourceConfig.fromUrl(corruptedStream.mpdUrl!!))
             // arrange
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
@@ -492,8 +491,8 @@ class SsaiScenariosTest {
     @Test
     fun test_adEngagementMetricsDisabled_do_NOT_track_error() =
         runBlockingTest {
-            val corruptedStream = Samples.CORRUPT_DASH
-            val corruptedStreamSource = Source(SourceConfig.fromUrl(corruptedStream.uri.toString()))
+            val corruptedStream = TestSources.CORRUPT_DASH
+            val corruptedStreamSource = Source(SourceConfig.fromUrl(corruptedStream.mpdUrl!!))
             // arrange
             val configWithSsaiEngagementTrackingDisabled =
                 AnalyticsConfig(
@@ -1425,13 +1424,13 @@ class SsaiScenariosTest {
     @Test
     fun test_errorTransformerCallback_Should_sendErrorSampleWithTransformedErrorDuringSsaiAd() =
         runBlockingTest {
-            val stream = Samples.CORRUPT_DASH
+            val stream = TestSources.CORRUPT_DASH
             val sourceMetadata =
                 SourceMetadata(
                     title = metadataGenerator.getTestTitle(),
                 )
 
-            val source = Source.create(SourceConfig.fromUrl(stream.uri.toString()), sourceMetadata)
+            val source = Source.create(SourceConfig.fromUrl(stream.mpdUrl!!), sourceMetadata)
 
             val configWithTransformer =
                 defaultAnalyticsConfig.copy(

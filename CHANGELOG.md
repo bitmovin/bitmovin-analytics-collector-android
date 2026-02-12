@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Upgraded agp to 8.10.1 in order to support theo player
+- [Internal] Switched to different test assets due to permissions changes
+- [Internal] Removed API v2 tests for bitmovin and exoplayer
 
 ### Added
 - New programChange API method to update SourceMetadata without changing the underlying stream

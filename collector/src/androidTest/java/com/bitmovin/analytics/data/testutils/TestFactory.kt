@@ -9,7 +9,7 @@ import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.enums.PlayerType
-import com.bitmovin.analytics.systemtest.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.utils.ApiV3Utils
 import com.bitmovin.analytics.utils.Util
 import java.util.UUID

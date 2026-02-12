@@ -5,14 +5,14 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
-import com.bitmovin.analytics.systemtest.utils.CsaiDataVerifier
-import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.EventDataUtils
-import com.bitmovin.analytics.systemtest.utils.MetadataUtils
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSources
-import com.bitmovin.analytics.systemtest.utils.runBlockingTest
+import com.bitmovin.analytics.test.utils.CsaiDataVerifier
+import com.bitmovin.analytics.test.utils.DataVerifier
+import com.bitmovin.analytics.test.utils.EventDataUtils
+import com.bitmovin.analytics.test.utils.MetadataUtils
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -54,7 +54,8 @@ class CsaiScenariosTest {
         runBlockingTest {
             // arrange
             // for some reason IMA tags do not work with the gradle managed devices, thus using progressive ads here
-            val adSource = AdSource(AdSourceType.Progressive, "https://bitmovin-a.akamaihd.net/content/testing/ads/testad2s.mp4")
+            val adSource =
+                AdSource(AdSourceType.Progressive, "https://bitmovin-player-eu-west1-ci-input.s3.amazonaws.com/general/ads/testad2s.mp4")
             val preRoll = AdItem("pre", adSource)
             // play midroll after 6 seconds
             val midRoll = AdItem("6", adSource)

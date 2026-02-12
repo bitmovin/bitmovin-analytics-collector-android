@@ -11,15 +11,15 @@ import com.bitmovin.analytics.api.error.AnalyticsError
 import com.bitmovin.analytics.api.error.ErrorContext
 import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
-import com.bitmovin.analytics.example.shared.Samples
-import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.MetadataUtils
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.MockedIngress.waitForErrorDetailSample
-import com.bitmovin.analytics.systemtest.utils.RepeatRule
-import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.noAvailableDecoder
-import com.bitmovin.analytics.systemtest.utils.runBlockingTest
+import com.bitmovin.analytics.test.utils.DataVerifier
+import com.bitmovin.analytics.test.utils.MetadataUtils
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.MockedIngress.waitForErrorDetailSample
+import com.bitmovin.analytics.test.utils.RepeatRule
+import com.bitmovin.analytics.test.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.analytics.test.utils.noAvailableDecoder
+import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -95,13 +95,13 @@ class ErrorScenariosTest {
     @Test
     fun test_exitBeforeVideoStart_Should_setPageClosedAsReason() =
         runBlockingTest {
-            val sample = Samples.DASH
+            val sample = TestSources.DASH
             val sourceMetadata =
                 SourceMetadata(
                     title = metadataGenerator.getTestTitle(),
                     customData = CustomData(customData1 = "exitBeforeVideoStart"),
                 )
-            val source = Source.create(SourceConfig.fromUrl(sample.uri.toString()), sourceMetadata)
+            val source = Source.create(SourceConfig.fromUrl(sample.mpdUrl!!), sourceMetadata)
             // act
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.load(source)
@@ -129,7 +129,7 @@ class ErrorScenariosTest {
     @Test
     fun test_nonExistingStream_Should_sendErrorSample() =
         runBlockingTest {
-            val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
+            val nonExistingStreamSample = TestSources.NONE_EXISTING_STREAM
 
             // we set isLive to true to test that isLive is also set in error cases
             val sourceMetadata =
@@ -138,7 +138,7 @@ class ErrorScenariosTest {
                     customData = CustomData(customData1 = "nonExistingStream"),
                     isLive = true,
                 )
-            val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()), sourceMetadata)
+            val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.m3u8Url!!), sourceMetadata)
             // act
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.load(nonExistingSource)
@@ -178,7 +178,7 @@ class ErrorScenariosTest {
     @Test
     fun test_streamWithDecodingError_Should_sendErrorSample() =
         runBlockingTest {
-            val stream = Samples.DASH
+            val stream = TestSources.DASH
             val sourceMetadata =
                 SourceMetadata(
                     title = metadataGenerator.getTestTitle(),
@@ -188,7 +188,7 @@ class ErrorScenariosTest {
             // we simulate a decoding error by occupying all available decoders
             // and disable software decoders
             noAvailableDecoder(MediaFormat.createVideoFormat(MimeTypes.VIDEO_H264, 1920, 1080)) {
-                val source = Source.create(SourceConfig.fromUrl(stream.uri.toString()), sourceMetadata)
+                val source = Source.create(SourceConfig.fromUrl(stream.mpdUrl!!), sourceMetadata)
                 // act
                 withContext(mainScope.coroutineContext) {
                     val playerConfig =
@@ -257,13 +257,13 @@ class ErrorScenariosTest {
     @Test
     fun test_streamWithCorruptedSource_Should_sendErrorSample() =
         runBlockingTest {
-            val stream = Samples.CORRUPT_DASH
+            val stream = TestSources.CORRUPT_DASH
             val sourceMetadata =
                 SourceMetadata(
                     title = metadataGenerator.getTestTitle(),
                 )
 
-            val source = Source.create(SourceConfig.fromUrl(stream.uri.toString()), sourceMetadata)
+            val source = Source.create(SourceConfig.fromUrl(stream.mpdUrl!!), sourceMetadata)
             // act
             withContext(mainScope.coroutineContext) {
                 val playerConfig =
@@ -303,13 +303,13 @@ class ErrorScenariosTest {
     @Test
     fun test_errorTransformerCallback_Should_sendErrorSampleWithTransformedError() =
         runBlockingTest {
-            val stream = Samples.CORRUPT_DASH
+            val stream = TestSources.CORRUPT_DASH
             val sourceMetadata =
                 SourceMetadata(
                     title = metadataGenerator.getTestTitle(),
                 )
 
-            val source = Source.create(SourceConfig.fromUrl(stream.uri.toString()), sourceMetadata)
+            val source = Source.create(SourceConfig.fromUrl(stream.mpdUrl!!), sourceMetadata)
 
             val configWithTransformer =
                 defaultAnalyticsConfig.copy(
@@ -355,13 +355,13 @@ class ErrorScenariosTest {
     @Test
     fun test_generateLongStackTrace_Should_Send50LinesTopAnd50LinesBottom() =
         runBlockingTest {
-            val stream = Samples.DASH
+            val stream = TestSources.DASH
             val sourceMetadata =
                 SourceMetadata(
                     title = metadataGenerator.getTestTitle(),
                 )
 
-            val source = Source.create(SourceConfig.fromUrl(stream.uri.toString()), sourceMetadata)
+            val source = Source.create(SourceConfig.fromUrl(stream.mpdUrl!!), sourceMetadata)
             // act
             withContext(mainScope.coroutineContext) {
                 val playerConfig =
@@ -430,8 +430,8 @@ class ErrorScenariosTest {
     @Test
     fun test_retryPlaybackAttemptWithSkipToNextSource_Should_sendErrorSample() =
         runBlockingTest {
-            val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-            val validStreamSample = Samples.DASH
+            val nonExistingStreamSample = TestSources.NONE_EXISTING_STREAM
+            val validStreamSample = TestSources.DASH
 
             val sourceMetadata1 =
                 SourceMetadata(
@@ -446,12 +446,12 @@ class ErrorScenariosTest {
 
             val nonExistingSource =
                 Source(
-                    SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()),
+                    SourceConfig.fromUrl(nonExistingStreamSample.m3u8Url!!),
                     AnalyticsSourceConfig.Enabled(sourceMetadata1),
                 )
             val validSource =
                 Source(
-                    SourceConfig.fromUrl(validStreamSample.uri.toString()),
+                    SourceConfig.fromUrl(validStreamSample.mpdUrl!!),
                     AnalyticsSourceConfig.Enabled(sourceMetadata2),
                 )
 

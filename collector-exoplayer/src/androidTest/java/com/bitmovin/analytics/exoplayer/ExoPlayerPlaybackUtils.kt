@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.exoplayer
 
-import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
+import com.bitmovin.analytics.test.utils.PlaybackUtils
 import com.google.android.exoplayer2.ExoPlayer
 
 object ExoPlayerPlaybackUtils {

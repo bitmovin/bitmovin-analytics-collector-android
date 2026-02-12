@@ -4,19 +4,18 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.enums.StreamFormat
-import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
-import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.EventDataUtils
-import com.bitmovin.analytics.systemtest.utils.MetadataUtils
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.PlayerSettings
-import com.bitmovin.analytics.systemtest.utils.RepeatRule
-import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSources
-import com.bitmovin.analytics.systemtest.utils.TestSources.DASH_SINTEL_WITH_SUBTITLES
-import com.bitmovin.analytics.systemtest.utils.TestSources.HLS_MULTIPLE_AUDIO_LANGUAGES
-import com.bitmovin.analytics.systemtest.utils.runBlockingTest
+import com.bitmovin.analytics.test.utils.DataVerifier
+import com.bitmovin.analytics.test.utils.EventDataUtils
+import com.bitmovin.analytics.test.utils.MetadataUtils
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.PlayerSettings
+import com.bitmovin.analytics.test.utils.RepeatRule
+import com.bitmovin.analytics.test.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.analytics.test.utils.TestSources.DASH_SINTEL_WITH_SUBTITLES
+import com.bitmovin.analytics.test.utils.TestSources.HLS_MULTIPLE_AUDIO_LANGUAGES
+import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -846,13 +845,13 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() =
         runBlockingTest {
-            val sample = Samples.HLS_REDBULL
+            val sample = TestSources.HLS_REDBULL
             val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey", backendUrl = mockedIngressUrl)
             val collector = IExoPlayerCollector.create(appContext, analyticsConfig)
 
             withContext(mainScope.coroutineContext) {
                 collector.attachPlayer(player)
-                player.setMediaItem(MediaItem.fromUri(sample.uri))
+                player.setMediaItem(MediaItem.fromUri(sample.m3u8Url!!))
                 player.prepare()
                 player.play()
             }

@@ -8,10 +8,10 @@ import com.amazonaws.ivs.player.Player
 import com.bitmovin.analytics.amazon.ivs.api.IAmazonIvsPlayerCollector
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSources
+import com.bitmovin.analytics.test.utils.DataVerifier
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestSources
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before

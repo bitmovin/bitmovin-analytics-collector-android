@@ -2,7 +2,7 @@ package com.bitmovin.analytics.media3.exoplayer
 
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_BUFFERING
-import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
+import com.bitmovin.analytics.test.utils.PlaybackUtils
 
 object Media3PlayerPlaybackUtils {
     fun waitUntilPlayerIsReady(player: Player) {

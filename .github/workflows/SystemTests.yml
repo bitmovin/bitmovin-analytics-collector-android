@@ -46,6 +46,13 @@ jobs:
           gradle-version: wrapper
           cache-read-only: false
 
+      - name: Allow access to Test Sources
+        if: always()
+        env:
+          S3_AUTHORIZE_KEY: ${{ secrets.S3_AUTHORIZE_KEY }}
+        run: |
+          curl --ipv4 "https://us-central1-bitmovin-api.cloudfunctions.net/authorizeS3Bucket?key=$S3_AUTHORIZE_KEY"
+
 # Collector Test
       - name: Tests Collector
         if: always()

@@ -10,9 +10,9 @@ import com.bitmovin.analytics.data.persistence.EventDatabase
 import com.bitmovin.analytics.data.testutils.TestFactory
 import com.bitmovin.analytics.data.testutils.createDummyPlayerAdapter
 import com.bitmovin.analytics.data.testutils.createTestImpressionId
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.RepeatRule
-import com.bitmovin.analytics.systemtest.utils.combineByImpressionId
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.RepeatRule
+import com.bitmovin.analytics.test.utils.combineByImpressionId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before

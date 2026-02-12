@@ -2,15 +2,14 @@ package com.bitmovin.analytics.exoplayer
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector
-import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.MetadataUtils
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.MockedIngress.waitForErrorDetailSample
-import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSources
-import com.bitmovin.analytics.systemtest.utils.runBlockingTest
+import com.bitmovin.analytics.test.utils.DataVerifier
+import com.bitmovin.analytics.test.utils.MetadataUtils
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.MockedIngress.waitForErrorDetailSample
+import com.bitmovin.analytics.test.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -62,14 +61,14 @@ class ErrorScenariosTest {
     fun test_nonExistingStream_Should_sendErrorSample() =
         runBlockingTest {
             // arrange
-            val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
+            val nonExistingStreamSample = TestSources.NONE_EXISTING_STREAM
             val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
             // act
             withContext(mainScope.coroutineContext) {
                 collector.attachPlayer(player)
                 collector.sourceMetadata = defaultSourceMetadata
-                player.setMediaItem(MediaItem.fromUri(nonExistingStreamSample.uri))
+                player.setMediaItem(MediaItem.fromUri(nonExistingStreamSample.m3u8Url!!))
                 player.prepare()
             }
 
@@ -108,7 +107,7 @@ class ErrorScenariosTest {
     fun test_corruptedStream_Should_sendErrorSample() =
         runBlockingTest {
             // arrange
-            val corruptedStream = Samples.CORRUPT_DASH
+            val corruptedStream = TestSources.CORRUPT_DASH
             val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
             val sourceMetadata =
@@ -124,7 +123,7 @@ class ErrorScenariosTest {
             withContext(mainScope.coroutineContext) {
                 collector.attachPlayer(player)
                 collector.sourceMetadata = sourceMetadata
-                player.setMediaItem(MediaItem.fromUri(corruptedStream.uri))
+                player.setMediaItem(MediaItem.fromUri(corruptedStream.mpdUrl!!))
                 player.prepare()
                 player.play()
             }
@@ -149,7 +148,7 @@ class ErrorScenariosTest {
             val impressionId = eventData.impressionId
             Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED")
             Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED)
-            DataVerifier.verifyMpdSourceUrl(impression.eventDataList, corruptedStream.uri.toString())
+            DataVerifier.verifyMpdSourceUrl(impression.eventDataList, corruptedStream.mpdUrl!!)
             DataVerifier.verifyStartupSampleOnError(eventData, ExoplayerConstants.playerInfo)
             DataVerifier.verifySourceMetadata(eventData, sourceMetadata = sourceMetadata)
 
@@ -164,7 +163,7 @@ class ErrorScenariosTest {
     fun test_missingSegmentInStream_Should_sendErrorSample() =
         runBlockingTest {
             // arrange
-            val missingSegmentStream = Samples.MISSING_SEGMENT
+            val missingSegmentStream = TestSources.MISSING_SEGMENT
             val collector = IExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
             val sourceMetadata =
@@ -180,7 +179,7 @@ class ErrorScenariosTest {
             withContext(mainScope.coroutineContext) {
                 collector.attachPlayer(player)
                 collector.sourceMetadata = sourceMetadata
-                player.setMediaItem(MediaItem.fromUri(missingSegmentStream.uri))
+                player.setMediaItem(MediaItem.fromUri(missingSegmentStream.mpdUrl!!))
                 player.prepare()
                 player.play()
             }
@@ -204,7 +203,7 @@ class ErrorScenariosTest {
             val impressionId = eventData.impressionId
             Assertions.assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_IO_BAD_HTTP_STATUS")
             Assertions.assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
-            DataVerifier.verifyMpdSourceUrl(impression.eventDataList, missingSegmentStream.uri.toString())
+            DataVerifier.verifyMpdSourceUrl(impression.eventDataList, missingSegmentStream.mpdUrl!!)
             DataVerifier.verifySourceMetadata(eventData, sourceMetadata = sourceMetadata)
 
             Assertions.assertThat(impression.errorDetailList.size).isEqualTo(1)

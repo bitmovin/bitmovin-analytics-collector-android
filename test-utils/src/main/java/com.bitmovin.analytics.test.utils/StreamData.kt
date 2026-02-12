@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.systemtest.utils
+package com.bitmovin.analytics.test.utils
 
 data class StreamData(
     val videoCodecStartsWith: String,

@@ -211,8 +211,7 @@ def nonSonarProjects = ["collector-bitmovin-player-example",
                         "collector-exoplayer-example",
                         "collector-amazon-ivs-example",
                         "collector-media3-exoplayer-example",
-                        "example-shared",
-                        "systemtest-utils"
+                        "test-utils"
 ]
 nonSonarProjects.forEach {
     project(":$it") {
@@ -241,8 +240,7 @@ apiValidation {
                         "collector-amazon-ivs-example",
                         "collector-media3-exoplayer-example",
                         "collector-theoplayer-example",
-                        "example-shared",
-                        "systemtest-utils"]
+                        "test-utils"]
 
     /*
     We can't use the publicPackages property because it doesn't work for some reason.

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace "com.bitmovin.analytics.systemtest.utils"
+    namespace "com.bitmovin.analytics.test.utils"
 
     compileSdk rootProject.ext.compileSdk
 
@@ -26,8 +26,6 @@ android {
 
 dependencies {
     implementation project(':collector')
-    implementation project(':example-shared')
-
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     implementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"

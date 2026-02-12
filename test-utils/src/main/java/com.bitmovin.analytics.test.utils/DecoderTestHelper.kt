@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.systemtest.utils
+package com.bitmovin.analytics.test.utils
 
 // copied from player folks
 // https://github.com/bitmovin-engineering/player-android/blob/main/player-core/src/androidTest/java/com/bitmovin/player/tests/player/DecoderTestHelper.kt

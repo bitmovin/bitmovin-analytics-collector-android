@@ -84,8 +84,7 @@ dependencies {
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     androidTestImplementation  "org.jetbrains.kotlinx:kotlinx-metadata-jvm:${rootProject.ext.kotlinMetadataJvmVersion}"
 
-    androidTestImplementation project(':example-shared')
-    androidTestImplementation project(':systemtest-utils')
+    androidTestImplementation project(':test-utils')
 }
 
 publishing {

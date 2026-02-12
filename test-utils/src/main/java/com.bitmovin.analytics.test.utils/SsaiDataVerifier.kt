@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.systemtest.utils
+package com.bitmovin.analytics.test.utils
 
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.dtos.EventData

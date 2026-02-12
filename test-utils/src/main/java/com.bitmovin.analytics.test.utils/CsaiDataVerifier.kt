@@ -1,4 +1,4 @@
-package com.bitmovin.analytics.systemtest.utils
+package com.bitmovin.analytics.test.utils
 
 import com.bitmovin.analytics.api.AnalyticsConfig
 import org.assertj.core.api.Assertions.assertThat

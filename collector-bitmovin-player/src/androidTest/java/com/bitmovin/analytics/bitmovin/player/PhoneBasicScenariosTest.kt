@@ -9,16 +9,15 @@ import com.bitmovin.analytics.api.RetryPolicy
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
-import com.bitmovin.analytics.example.shared.Samples
-import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.EventDataUtils
-import com.bitmovin.analytics.systemtest.utils.MetadataUtils
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.PlayerSettings
-import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSources
-import com.bitmovin.analytics.systemtest.utils.combineByImpressionId
-import com.bitmovin.analytics.systemtest.utils.runBlockingTest
+import com.bitmovin.analytics.test.utils.DataVerifier
+import com.bitmovin.analytics.test.utils.EventDataUtils
+import com.bitmovin.analytics.test.utils.MetadataUtils
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.PlayerSettings
+import com.bitmovin.analytics.test.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.analytics.test.utils.combineByImpressionId
+import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -763,8 +762,8 @@ class PhoneBasicScenariosTest {
     @Test
     fun test_nonExistingStream_Should_sendErrorSample() =
         runBlockingTest {
-            val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
-            val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()))
+            val nonExistingStreamSample = TestSources.NONE_EXISTING_STREAM
+            val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.m3u8Url!!))
 
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
             val sourceMetadata =

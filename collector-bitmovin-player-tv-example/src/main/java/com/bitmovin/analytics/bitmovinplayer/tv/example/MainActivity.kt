@@ -10,7 +10,7 @@ import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovinplayer.tv.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
-import com.bitmovin.analytics.example.shared.Samples
+import com.bitmovin.analytics.test.utils.TestSources
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -93,9 +93,9 @@ class MainActivity : AppCompatActivity() {
                 customData = CustomData(customData1 = "customData_source_widevine"),
             )
 
-        val liveSimSource = Source.create(SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()), liveSimMetadata)
-        val redbullSource = Source.create(SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()), redbullMetadata)
-        val sintelSource = Source.create(SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()), sintelMetadata)
+        val liveSimSource = Source.create(SourceConfig.fromUrl(TestSources.DASH_LIVE.mpdUrl!!), liveSimMetadata)
+        val redbullSource = Source.create(SourceConfig.fromUrl(TestSources.HLS_REDBULL.m3u8Url!!), redbullMetadata)
+        val sintelSource = Source.create(SourceConfig.fromUrl(TestSources.DASH.mpdUrl!!), sintelMetadata)
         val drmSource = Source.create(createDRMSourceConfig(), drmMetadata)
 
         val playlistConfig = PlaylistConfig(listOf(drmSource, redbullSource, sintelSource, liveSimSource), PlaylistOptions())
@@ -233,14 +233,14 @@ class MainActivity : AppCompatActivity() {
         )
 
     companion object {
-        private val corruptedSource = Source.create(SourceConfig.fromUrl(Samples.CORRUPT_DASH.uri.toString()))
+        private val corruptedSource = Source.create(SourceConfig.fromUrl(TestSources.CORRUPT_DASH.mpdUrl!!))
 
         private fun createDRMSourceConfig(): SourceConfig {
             // Create a new source config
-            val sourceConfig = SourceConfig.fromUrl(Samples.DASH_DRM_WIDEVINE.uri.toString())
+            val sourceConfig = SourceConfig.fromUrl(TestSources.DRM_DASH_WIDEVINE.mpdUrl!!)
 
             // Attach DRM handling to the source config
-            sourceConfig.drmConfig = WidevineConfig(Samples.DASH_DRM_WIDEVINE.drmLicenseUri.toString())
+            sourceConfig.drmConfig = WidevineConfig(TestSources.DRM_DASH_WIDEVINE.drmLicenseUrl)
             return sourceConfig
         }
     }

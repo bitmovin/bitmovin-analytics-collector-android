@@ -117,8 +117,7 @@ dependencies {
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
 
-    androidTestImplementation project(':example-shared')
-    androidTestImplementation project(':systemtest-utils')
+    androidTestImplementation project(':test-utils')
 }
 
 publishing {

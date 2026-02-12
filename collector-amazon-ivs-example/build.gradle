@@ -51,5 +51,5 @@ dependencies {
         implementation "com.bitmovin.analytics:collector-amazon-ivs:${rootProject.ext.version}"
     }
 
-    implementation project(':example-shared')
+    implementation project(':test-utils')
 }

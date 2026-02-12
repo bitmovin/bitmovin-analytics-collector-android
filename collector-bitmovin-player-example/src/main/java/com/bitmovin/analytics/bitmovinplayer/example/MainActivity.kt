@@ -19,7 +19,7 @@ import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
-import com.bitmovin.analytics.example.shared.Samples
+import com.bitmovin.analytics.test.utils.TestSources
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerBuilder
@@ -226,15 +226,15 @@ class MainActivity : AppCompatActivity() {
 
         // add metadata to sources
         val liveSimSource =
-            SourceBuilder(sourceConfig = SourceConfig.fromUrl(Samples.DASH_LIVE.uri.toString()))
+            SourceBuilder(sourceConfig = SourceConfig.fromUrl(TestSources.DASH_LIVE.mpdUrl!!))
                 .configureAnalytics(liveSimMetadata).build()
 
         val redbullSource =
-            SourceBuilder(sourceConfig = SourceConfig.fromUrl(Samples.HLS_REDBULL.uri.toString()))
+            SourceBuilder(sourceConfig = SourceConfig.fromUrl(TestSources.HLS_REDBULL.m3u8Url!!))
                 .configureAnalytics(redbullMetadata).build()
 
         val sintelSource =
-            SourceBuilder(sourceConfig = SourceConfig.fromUrl(Samples.DASH_SINTEL.uri.toString()))
+            SourceBuilder(sourceConfig = SourceConfig.fromUrl(TestSources.DASH_SINTEL_WITH_SUBTITLES.mpdUrl!!))
                 .configureAnalytics(sintelMetadata).build()
 
         val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource, liveSimSource), PlaylistOptions())
@@ -267,25 +267,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val corruptedSource = Source.create(SourceConfig.fromUrl(Samples.CORRUPT_DASH.uri.toString()))
-        private val bbbSource = Source.create(SourceConfig.fromUrl(Samples.BBB.uri.toString()))
-        private val progresiveSource = Source.create(SourceConfig.fromUrl(Samples.PROGRESSIVE.uri.toString()))
+        private val corruptedSource = Source.create(SourceConfig.fromUrl(TestSources.CORRUPT_DASH.mpdUrl!!))
+        private val bbbSource = Source.create(SourceConfig.fromUrl(TestSources.BBB.progUrl!!))
+        private val progresiveSource = Source.create(SourceConfig.fromUrl(TestSources.PROGRESSIVE.progUrl!!))
 
         private fun createDRMSourceConfig(): SourceConfig {
             // Create a new source config
-            val sourceConfig = SourceConfig.fromUrl(Samples.DASH_DRM_WIDEVINE.uri.toString())
+            val sourceConfig = SourceConfig.fromUrl(TestSources.DRM_DASH_WIDEVINE.mpdUrl!!)
 
             // Attach DRM handling to the source config
-            sourceConfig.drmConfig = WidevineConfig(Samples.DASH_DRM_WIDEVINE.drmLicenseUri.toString())
+            sourceConfig.drmConfig = WidevineConfig(TestSources.DRM_DASH_WIDEVINE.drmLicenseUrl)
             return sourceConfig
         }
 
         private fun createAdvertisingConfig(): AdvertisingConfig {
             // Create AdSources
-            val firstAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_1.uri.toString())
-            val secondAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_2.uri.toString())
-            val thirdAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_3.uri.toString())
-            val fourthAdSource = AdSource(AdSourceType.Ima, Samples.IMA_AD_SOURCE_4.uri.toString())
+            val firstAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_AD_SOURCE_1)
+            val secondAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_AD_SOURCE_2)
+            val thirdAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_AD_SOURCE_3)
+            val fourthAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_AD_SOURCE_4)
 
             // Set up a pre-roll ad
             val preRoll = AdItem("pre", thirdAdSource)

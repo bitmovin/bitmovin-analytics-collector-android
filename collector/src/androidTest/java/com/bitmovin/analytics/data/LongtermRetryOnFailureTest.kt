@@ -13,9 +13,9 @@ import com.bitmovin.analytics.data.testutils.createDummyPlayerAdapter
 import com.bitmovin.analytics.data.testutils.createTestImpressionId
 import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.persistence.EventQueueConfig
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.RepeatRule
-import com.bitmovin.analytics.systemtest.utils.combineByImpressionId
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.RepeatRule
+import com.bitmovin.analytics.test.utils.combineByImpressionId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

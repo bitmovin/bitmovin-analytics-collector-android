@@ -4,13 +4,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
-import com.bitmovin.analytics.example.shared.Samples
-import com.bitmovin.analytics.systemtest.utils.MetadataUtils
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
-import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSources
-import com.bitmovin.analytics.systemtest.utils.runBlockingTest
+import com.bitmovin.analytics.test.utils.MetadataUtils
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.PlaybackUtils
+import com.bitmovin.analytics.test.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -111,10 +110,10 @@ class DeferredLicenseLoadingTest {
             // arrange
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
             initializePlayer()
-            val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
+            val nonExistingStreamSample = TestSources.NONE_EXISTING_STREAM
             val nonExistingSource =
                 Source.create(
-                    SourceConfig.fromUrl(nonExistingStreamSample.uri.toString()),
+                    SourceConfig.fromUrl(nonExistingStreamSample.m3u8Url!!),
                 )
             lateinit var deferredLicenseKey: String
 
@@ -152,7 +151,7 @@ class DeferredLicenseLoadingTest {
                             "pre",
                             AdSource(
                                 AdSourceType.Progressive,
-                                "https://bitmovin-a.akamaihd.net/content/testing/ads/testad2s.mp4",
+                                "https://bitmovin-player-eu-west1-ci-input.s3.amazonaws.com/general/ads/testad2s.mp4",
                             ),
                         ),
                     ),

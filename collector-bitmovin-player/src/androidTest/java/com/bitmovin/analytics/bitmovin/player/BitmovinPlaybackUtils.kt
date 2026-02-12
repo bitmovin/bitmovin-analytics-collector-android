@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
-import com.bitmovin.analytics.systemtest.utils.PlaybackUtils
+import com.bitmovin.analytics.test.utils.PlaybackUtils
 import com.bitmovin.player.api.Player
 import org.assertj.core.api.Assertions
 

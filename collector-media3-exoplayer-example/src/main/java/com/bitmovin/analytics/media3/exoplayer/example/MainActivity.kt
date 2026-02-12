@@ -19,10 +19,10 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.enums.CDNProvider
-import com.bitmovin.analytics.example.shared.Sample
-import com.bitmovin.analytics.example.shared.Samples
 import com.bitmovin.analytics.media3.exoplayer.api.IMedia3ExoPlayerCollector
 import com.bitmovin.analytics.media3.exoplayer.example.databinding.ActivityMainBinding
+import com.bitmovin.analytics.test.utils.StreamData
+import com.bitmovin.analytics.test.utils.TestSources
 
 class MainActivity : AppCompatActivity(), Player.Listener {
     private val viewBinding by lazy(LazyThreadSafetyMode.NONE) {
@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
             collector?.attachPlayer(exoPlayer)
 
             // Step 4: set SourceMetadata and load source into player
-            val mediaItem = buildMediaItem(Samples.HLS_REDBULL)
+            val mediaItem = buildMediaItem(TestSources.HLS_REDBULL)
             val sourceMetadata =
                 SourceMetadata(
                     videoId = mediaItem.mediaId,
@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
     private fun setToLiveStream() {
         collector?.detachPlayer()
 
-        val liveSource = buildMediaItem(Samples.DASH_LIVE)
+        val liveSource = buildMediaItem(TestSources.DASH_LIVE)
         val sourceMetadata =
             SourceMetadata(
                 isLive = true,
@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
     private fun setToDrmStream() {
         collector?.detachPlayer()
 
-        val drmMediaSource = buildMediaItem(Samples.DASH_DRM_WIDEVINE)
+        val drmMediaSource = buildMediaItem(TestSources.DRM_DASH_WIDEVINE)
         val sourceMetadata =
             SourceMetadata(
                 videoId = drmMediaSource.mediaId,
@@ -212,19 +212,19 @@ class MainActivity : AppCompatActivity(), Player.Listener {
         this.collector?.sendCustomDataEvent(customData)
     }
 
-    private fun buildMediaItem(sample: Sample): MediaItem {
+    private fun buildMediaItem(source: StreamData): MediaItem {
+        val url = source.m3u8Url ?: source.mpdUrl ?: source.progUrl!!
         val mediaItemBuilder =
             MediaItem.Builder()
-                .setUri(sample.uri)
-                .setMediaId(sample.name)
+                .setUri(url)
+                .setMediaId(url)
 
-        val sampleDrmLicenseUri = sample.drmLicenseUri
-        if (sample.drmScheme != null && sampleDrmLicenseUri != null) {
-            val sampleDrmSchemeUUID = Util.getDrmUuid(sample.drmScheme!!)
-            if (sampleDrmSchemeUUID != null) {
+        if (source.drmSchema != null && source.drmLicenseUrl != null) {
+            val drmSchemeUUID = Util.getDrmUuid(source.drmSchema!!)
+            if (drmSchemeUUID != null) {
                 val drmConfiguration =
-                    MediaItem.DrmConfiguration.Builder(sampleDrmSchemeUUID)
-                        .setLicenseUri(sampleDrmLicenseUri)
+                    MediaItem.DrmConfiguration.Builder(drmSchemeUUID)
+                        .setLicenseUri(source.drmLicenseUrl)
                         .build()
                 mediaItemBuilder.setDrmConfiguration(drmConfiguration)
             }

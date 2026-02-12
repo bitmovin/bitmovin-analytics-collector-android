@@ -9,15 +9,14 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.example.shared.Samples
-import com.bitmovin.analytics.systemtest.utils.DataVerifier
-import com.bitmovin.analytics.systemtest.utils.EventDataUtils
-import com.bitmovin.analytics.systemtest.utils.MetadataUtils
-import com.bitmovin.analytics.systemtest.utils.MockedIngress
-import com.bitmovin.analytics.systemtest.utils.PlayerSettings
-import com.bitmovin.analytics.systemtest.utils.TestConfig
-import com.bitmovin.analytics.systemtest.utils.TestSources
-import com.bitmovin.analytics.systemtest.utils.runBlockingTest
+import com.bitmovin.analytics.test.utils.DataVerifier
+import com.bitmovin.analytics.test.utils.EventDataUtils
+import com.bitmovin.analytics.test.utils.MetadataUtils
+import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.PlayerSettings
+import com.bitmovin.analytics.test.utils.TestConfig
+import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.analytics.test.utils.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -327,7 +326,7 @@ class PhoneBasicScenariosTest {
     fun test_nonExistingStream_Should_sendErrorSample() =
         runBlockingTest {
             // arrange
-            val nonExistingStreamSample = Samples.NONE_EXISTING_STREAM
+            val nonExistingStreamSample = TestSources.NONE_EXISTING_STREAM
             val collector = IAmazonIvsPlayerCollector.create(appContext, defaultAnalyticsConfig)
             val nonExistingStreamSourceMetadata =
                 SourceMetadata(
@@ -339,7 +338,7 @@ class PhoneBasicScenariosTest {
             collector.attachPlayer(player)
 
             // act
-            player.load(nonExistingStreamSample.uri)
+            player.load(Uri.parse(nonExistingStreamSample.m3u8Url!!))
 
             Thread.sleep(4000) // we need to wait a bit until player goes into error state
 
@@ -358,7 +357,7 @@ class PhoneBasicScenariosTest {
 
             DataVerifier.verifyStartupSampleOnError(eventData, IvsPlayerConstants.playerInfo)
             DataVerifier.verifySourceMetadata(eventData, nonExistingStreamSourceMetadata)
-            DataVerifier.verifyM3u8SourceUrl(impression.eventDataList, nonExistingStreamSample.uri.toString())
+            DataVerifier.verifyM3u8SourceUrl(impression.eventDataList, nonExistingStreamSample.m3u8Url!!)
 
             assertThat(impression.errorDetailList).hasSize(1)
             val errorDetail = impression.errorDetailList.first()
