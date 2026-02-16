@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.theoplayer.listeners
 
-import android.util.Log
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
@@ -31,7 +30,6 @@ internal class SourceEventListeners(
         object : EventListener<AddTrackEvent> {
             var handleActiveQualityChangedEvent: EventListener<ActiveQualityChangedEvent> =
                 EventListener<ActiveQualityChangedEvent> { activeQualityChangedEvent ->
-                    Log.i(TAG, "activeVideoQualityChangedEvent " + activeQualityChangedEvent.quality?.toString())
                     val newVideoQuality = activeQualityChangedEvent.quality
                     stateMachine.videoQualityChanged(
                         player.currentPositionInMs(),
@@ -56,7 +54,6 @@ internal class SourceEventListeners(
         object : EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.list.AddTrackEvent> {
             var handleActiveQualityChangedEvent: EventListener<ActiveQualityChangedEvent> =
                 EventListener<ActiveQualityChangedEvent> { activeQualityChangedEvent ->
-                    Log.i(TAG, "activeAudioQualityChangedEvent " + activeQualityChangedEvent.quality?.toString())
                     val newAudioQuality = activeQualityChangedEvent.quality
                     playbackQualityProvider.currentVideoQuality = newAudioQuality
                 }

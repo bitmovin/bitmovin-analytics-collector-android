@@ -1,6 +1,5 @@
 package com.bitmovin.analytics.theoplayer.listeners
 
-import android.util.Log
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
@@ -54,33 +53,35 @@ internal class AnalyticsEventListeners(
     private val playListener = EventListener<PlayEvent> { event -> handlePlayEvent(event) }
     private val playingListener = EventListener<PlayingEvent> { event -> handlePlayingEvent(event) }
     private val pauseListener = EventListener<PauseEvent> { event -> onPause(event) }
-    private val endedListener = EventListener<EndedEvent> { Log.i(TAG, "Event: ENDED") }
+    private val endedListener = EventListener<EndedEvent> { BitmovinLog.d(TAG, "Event: ENDED") }
     private val errorListener = EventListener<ErrorEvent> { event -> handleErrorEvent(event) }
     private val seekedListener = EventListener<SeekedEvent> { event -> onSeeked(event) }
     private val seekingListener = EventListener<SeekingEvent> { event -> onSeeking(event) }
     private val waitingListener = EventListener<WaitingEvent> { event -> onBuffering(event) }
     private val sourceChangeListener = EventListener<SourceChangeEvent> { event -> handleSourceChange(event) }
-    private val rateChangeListener = EventListener<RateChangeEvent> { Log.i(TAG, "Event: RATECHANGE") }
-    private val volumeChangeListener = EventListener<VolumeChangeEvent> { Log.i(TAG, "Event: VOLUMECHANGE") }
-    private val progressListener = EventListener<ProgressEvent> { Log.i(TAG, "Event: PROGRESS") }
-    private val durationChangeListener = EventListener<DurationChangeEvent> { Log.i(TAG, "Event: DURATIONCHANGE") }
-    private val readyStateChangeListener = EventListener<ReadyStateChangeEvent> { Log.i(TAG, "Event: READYSTATECHANGE") }
+    private val rateChangeListener = EventListener<RateChangeEvent> { BitmovinLog.d(TAG, "Event: RATECHANGE") }
+    private val volumeChangeListener = EventListener<VolumeChangeEvent> { BitmovinLog.d(TAG, "Event: VOLUMECHANGE") }
+    private val progressListener = EventListener<ProgressEvent> { BitmovinLog.d(TAG, "Event: PROGRESS") }
+    private val durationChangeListener = EventListener<DurationChangeEvent> { BitmovinLog.d(TAG, "Event: DURATIONCHANGE") }
+    private val readyStateChangeListener = EventListener<ReadyStateChangeEvent> { BitmovinLog.d(TAG, "Event: READYSTATECHANGE") }
     private val timeUpdateListener = EventListener<TimeUpdateEvent> { event -> handleTimeUpdateEvent(event) }
-    private val loadedMetadataListener = EventListener<LoadedMetadataEvent> { Log.i(TAG, "Event: LOADEDMETADATA") }
-    private val loadedDataListener = EventListener<LoadedDataEvent> { Log.i(TAG, "Event: LOADEDDATA") }
-    private val canPlayListener = EventListener<CanPlayEvent> { Log.i(TAG, "Event: CANPLAY") }
-    private val canPlayThroughListener = EventListener<CanPlayThroughEvent> { Log.i(TAG, "Event: CANPLAYTHROUGH") }
-    private val segmentNotFoundListener = EventListener<SegmentNotFoundEvent> { Log.i(TAG, "Event: SEGMENTNOTFOUND") }
-    private val encryptedListener = EventListener<MediaEncryptedEvent> { Log.i(TAG, "Event: ENCRYPTED") }
-    private val contentProtectionErrorListener = EventListener<ContentProtectionErrorEvent> { Log.i(TAG, "Event: CONTENTPROTECTIONERROR") }
+    private val loadedMetadataListener = EventListener<LoadedMetadataEvent> { BitmovinLog.d(TAG, "Event: LOADEDMETADATA") }
+    private val loadedDataListener = EventListener<LoadedDataEvent> { BitmovinLog.d(TAG, "Event: LOADEDDATA") }
+    private val canPlayListener = EventListener<CanPlayEvent> { BitmovinLog.d(TAG, "Event: CANPLAY") }
+    private val canPlayThroughListener = EventListener<CanPlayThroughEvent> { BitmovinLog.d(TAG, "Event: CANPLAYTHROUGH") }
+    private val segmentNotFoundListener = EventListener<SegmentNotFoundEvent> { BitmovinLog.d(TAG, "Event: SEGMENTNOTFOUND") }
+    private val encryptedListener = EventListener<MediaEncryptedEvent> { BitmovinLog.d(TAG, "Event: ENCRYPTED") }
+    private val contentProtectionErrorListener =
+        EventListener<ContentProtectionErrorEvent> { BitmovinLog.d(TAG, "Event: CONTENTPROTECTIONERROR") }
     private val contentProtectionSuccessListener =
-        EventListener<ContentProtectionSuccessEvent> { Log.i(TAG, "Event: CONTENTPROTECTIONSUCCESS") }
+        EventListener<ContentProtectionSuccessEvent> { BitmovinLog.d(TAG, "Event: CONTENTPROTECTIONSUCCESS") }
     private val noSupportedRepresentationFoundListener =
-        EventListener<NoSupportedRepresentationFoundEvent> { Log.i(TAG, "Event: NOSUPPORTEDREPRESENTATIONFOUND") }
-    private val presentationModeChangeListener = EventListener<PresentationModeChange> { Log.i(TAG, "Event: PRESENTATIONMODECHANGE") }
+        EventListener<NoSupportedRepresentationFoundEvent> { BitmovinLog.d(TAG, "Event: NOSUPPORTEDREPRESENTATIONFOUND") }
+    private val presentationModeChangeListener =
+        EventListener<PresentationModeChange> { BitmovinLog.d(TAG, "Event: PRESENTATIONMODECHANGE") }
     private val destroyListener = EventListener<DestroyEvent> { event -> onDestroy(event) }
-    private val loadStartListener = EventListener<LoadStartEvent> { Log.i(TAG, "Event: LOADSTART") }
-    private val resizeListener = EventListener<ResizeEvent> { Log.i(TAG, "Event: RESIZE") }
+    private val loadStartListener = EventListener<LoadStartEvent> { BitmovinLog.d(TAG, "Event: LOADSTART") }
+    private val resizeListener = EventListener<ResizeEvent> { BitmovinLog.d(TAG, "Event: RESIZE") }
 
     internal fun registerEventListeners() {
         player.addEventListener(PlayerEventTypes.PLAY, playListener)
@@ -145,7 +146,7 @@ internal class AnalyticsEventListeners(
     }
 
     private fun handlePlayEvent(playEvent: PlayEvent) {
-        Log.i(TAG, "Event: PlayEvent")
+        BitmovinLog.d(TAG, "Event: PlayEvent")
 
         if (!stateMachine.isStartupFinished) {
             val currentTimeMs = Util.secondsToMillis(playEvent.currentTime)
@@ -154,7 +155,7 @@ internal class AnalyticsEventListeners(
     }
 
     private fun handleSourceChange(sourceChangeEvent: SourceChangeEvent) {
-        Log.i(TAG, "Event: SourceChange")
+        BitmovinLog.d(TAG, "Event: SourceChange")
         stateMachine.resetStateMachine()
     }
 
@@ -164,7 +165,7 @@ internal class AnalyticsEventListeners(
     }
 
     private fun onSeeked(seekedEvent: SeekedEvent) {
-        Log.i(TAG, "Event: SEEKED")
+        BitmovinLog.d(TAG, "Event: SEEKED")
 
         if (player.isPaused) {
             stateMachine.transitionState(PlayerStates.PAUSE, player.currentPositionInMs())
@@ -172,7 +173,7 @@ internal class AnalyticsEventListeners(
     }
 
     private fun onSeeking(seekingEvent: SeekingEvent) {
-        Log.i(TAG, "Event: SEEKING")
+        BitmovinLog.d(TAG, "Event: SEEKING")
         // for some reason the seekingEvent contains the currentTime it was seeked to
         // and not the original position it was seeked from, therefore
         // we use a workaround and just use the last updated position
@@ -182,17 +183,17 @@ internal class AnalyticsEventListeners(
     }
 
     private fun handlePlayingEvent(playingEvent: PlayingEvent) {
-        Log.i(TAG, "Event: PlayingEvent")
+        BitmovinLog.d(TAG, "Event: PlayingEvent")
         stateMachine.transitionState(PlayerStates.PLAYING, player.currentPositionInMs())
     }
 
     private fun onDestroy(destroyEvent: DestroyEvent) {
-        Log.i(TAG, "Event DestroyEvent")
+        BitmovinLog.d(TAG, "Event DestroyEvent")
         bitmovinAnalytics.detachPlayer(true)
     }
 
     private fun onPause(pauseEvent: PauseEvent) {
-        Log.i(TAG, "Event: PauseEvent")
+        BitmovinLog.d(TAG, "Event: PauseEvent")
         stateMachine.pause(player.currentPositionInMs())
     }
 
@@ -201,7 +202,7 @@ internal class AnalyticsEventListeners(
     }
 
     private fun onBuffering(waitingEvent: WaitingEvent) {
-        Log.i(TAG, "Event: waitingEvent")
+        BitmovinLog.d(TAG, "Event: waitingEvent")
         // optiview player emits waiting event while seeking, thus we don't want to move to buffering
         if (stateMachine.currentState == PlayerStates.SEEKING) {
             return
@@ -210,13 +211,13 @@ internal class AnalyticsEventListeners(
     }
 
     private fun handleErrorEvent(originalNativeError: ErrorEvent) {
-        Log.i(TAG, "Event: ErrorEvent")
+        BitmovinLog.d(TAG, "Event: ErrorEvent")
         try {
             val videoTime = player.currentPositionInMs()
             if (stateMachine.isInStartupState()) {
                 stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
             }
-            val errorCode = TheoPlayerExceptionMapper.map(originalNativeError.errorObject)
+            val errorCode = TheoPlayerExceptionMapper.map(originalNativeError)
             stateMachine.error(videoTime, errorCode, originalNativeError)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
