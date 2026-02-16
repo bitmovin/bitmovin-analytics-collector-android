@@ -134,6 +134,16 @@ data class AdEventData(
     var customData48: String? = null,
     var customData49: String? = null,
     var customData50: String? = null,
+    var customData51: String? = null,
+    var customData52: String? = null,
+    var customData53: String? = null,
+    var customData54: String? = null,
+    var customData55: String? = null,
+    var customData56: String? = null,
+    var customData57: String? = null,
+    var customData58: String? = null,
+    var customData59: String? = null,
+    var customData60: String? = null,
     var customUserId: String? = null,
     var domain: String,
     var experimentName: String? = null,
@@ -232,6 +242,16 @@ data class AdEventData(
                 customData48 = eventData.customData48,
                 customData49 = eventData.customData49,
                 customData50 = eventData.customData50,
+                customData51 = eventData.customData51,
+                customData52 = eventData.customData52,
+                customData53 = eventData.customData53,
+                customData54 = eventData.customData54,
+                customData55 = eventData.customData55,
+                customData56 = eventData.customData56,
+                customData57 = eventData.customData57,
+                customData58 = eventData.customData58,
+                customData59 = eventData.customData59,
+                customData60 = eventData.customData60,
                 customUserId = eventData.customUserId,
                 domain = eventData.domain,
                 experimentName = eventData.experimentName,
@@ -310,6 +330,16 @@ data class AdEventData(
         customData48 = customData.customData48
         customData49 = customData.customData49
         customData50 = customData.customData50
+        customData51 = customData.customData51
+        customData52 = customData.customData52
+        customData53 = customData.customData53
+        customData54 = customData.customData54
+        customData55 = customData.customData55
+        customData56 = customData.customData56
+        customData57 = customData.customData57
+        customData58 = customData.customData58
+        customData59 = customData.customData59
+        customData60 = customData.customData60
     }
 
     fun setAdBreak(adBreak: AdBreak) {

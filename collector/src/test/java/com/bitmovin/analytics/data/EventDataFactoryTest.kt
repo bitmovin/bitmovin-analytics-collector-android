@@ -36,6 +36,7 @@ class EventDataFactoryTest {
                 customData5 = "default-custom-data-5",
                 customData49 = "default-custom-data-49",
                 customData50 = "default-custom-data-50",
+                customData60 = "default-custom-data-60",
             )
         val sourceCustomData =
             CustomData(
@@ -43,6 +44,7 @@ class EventDataFactoryTest {
                 customData4 = "source-custom-data-4",
                 customData6 = "source-custom-data-6",
                 customData50 = "source-custom-data-50",
+                customData60 = "source-custom-data-60",
             )
 
         // mocks

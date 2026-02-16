@@ -35,7 +35,13 @@ class DefaultCollectorTest {
         }.returns(CustomData(customData2 = "test2", customData29 = "test29", customData49 = "test49"))
 
         // act
-        defaultCollector.customData = CustomData(customData1 = "test1", customData30 = "test30", customData50 = "test50")
+        defaultCollector.customData =
+            CustomData(
+                customData1 = "test1",
+                customData30 = "test30",
+                customData50 = "test50",
+                customData60 = "test60",
+            )
 
         // assert
         verify(exactly = 1) { mockedBitmovinAnalytics.closeCurrentSampleForCustomDataChangeIfNeeded() }

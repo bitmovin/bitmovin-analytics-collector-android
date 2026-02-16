@@ -212,6 +212,46 @@ data class CustomData(
      * Optional free-form data. Not enabled by default. Must be activated for your organization
      */
     val customData50: String? = null,
+    /**
+     * Optional free-form data. Not enabled by default. Must be activated for your organization
+     */
+    val customData51: String? = null,
+    /**
+     * Optional free-form data. Not enabled by default. Must be activated for your organization
+     */
+    val customData52: String? = null,
+    /**
+     * Optional free-form data. Not enabled by default. Must be activated for your organization
+     */
+    val customData53: String? = null,
+    /**
+     * Optional free-form data. Not enabled by default. Must be activated for your organization
+     */
+    val customData54: String? = null,
+    /**
+     * Optional free-form data. Not enabled by default. Must be activated for your organization
+     */
+    val customData55: String? = null,
+    /**
+     * Optional free-form data. Not enabled by default. Must be activated for your organization
+     */
+    val customData56: String? = null,
+    /**
+     * Optional free-form data. Not enabled by default. Must be activated for your organization
+     */
+    val customData57: String? = null,
+    /**
+     * Optional free-form data. Not enabled by default. Must be activated for your organization
+     */
+    val customData58: String? = null,
+    /**
+     * Optional free-form data. Not enabled by default. Must be activated for your organization
+     */
+    val customData59: String? = null,
+    /**
+     * Optional free-form data. Not enabled by default. Must be activated for your organization
+     */
+    val customData60: String? = null,
 ) : Parcelable {
     constructor(
         /**
@@ -408,6 +448,16 @@ data class CustomData(
             this.customData48 = customData.customData48
             this.customData49 = customData.customData49
             this.customData50 = customData.customData50
+            this.customData51 = customData.customData51
+            this.customData52 = customData.customData52
+            this.customData53 = customData.customData53
+            this.customData54 = customData.customData54
+            this.customData55 = customData.customData55
+            this.customData56 = customData.customData56
+            this.customData57 = customData.customData57
+            this.customData58 = customData.customData58
+            this.customData59 = customData.customData59
+            this.customData60 = customData.customData60
         }
 
         private var customData1: String? = null
@@ -461,6 +511,16 @@ data class CustomData(
         private var customData48: String? = null
         private var customData49: String? = null
         private var customData50: String? = null
+        private var customData51: String? = null
+        private var customData52: String? = null
+        private var customData53: String? = null
+        private var customData54: String? = null
+        private var customData55: String? = null
+        private var customData56: String? = null
+        private var customData57: String? = null
+        private var customData58: String? = null
+        private var customData59: String? = null
+        private var customData60: String? = null
 
         fun setCustomData1(customData1: String?) = apply { this.customData1 = customData1 }
 
@@ -564,6 +624,26 @@ data class CustomData(
 
         fun setCustomData50(customData50: String?) = apply { this.customData50 = customData50 }
 
+        fun setCustomData51(customData51: String?) = apply { this.customData51 = customData51 }
+
+        fun setCustomData52(customData52: String?) = apply { this.customData52 = customData52 }
+
+        fun setCustomData53(customData53: String?) = apply { this.customData53 = customData53 }
+
+        fun setCustomData54(customData54: String?) = apply { this.customData54 = customData54 }
+
+        fun setCustomData55(customData55: String?) = apply { this.customData55 = customData55 }
+
+        fun setCustomData56(customData56: String?) = apply { this.customData56 = customData56 }
+
+        fun setCustomData57(customData57: String?) = apply { this.customData57 = customData57 }
+
+        fun setCustomData58(customData58: String?) = apply { this.customData58 = customData58 }
+
+        fun setCustomData59(customData59: String?) = apply { this.customData59 = customData59 }
+
+        fun setCustomData60(customData60: String?) = apply { this.customData60 = customData60 }
+
         fun build(): CustomData {
             return CustomData(
                 customData1 = customData1,
@@ -617,6 +697,16 @@ data class CustomData(
                 customData48 = customData48,
                 customData49 = customData49,
                 customData50 = customData50,
+                customData51 = customData51,
+                customData52 = customData52,
+                customData53 = customData53,
+                customData54 = customData54,
+                customData55 = customData55,
+                customData56 = customData56,
+                customData57 = customData57,
+                customData58 = customData58,
+                customData59 = customData59,
+                customData60 = customData60,
             )
         }
     }

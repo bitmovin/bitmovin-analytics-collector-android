@@ -159,6 +159,16 @@ object MetadataUtils {
             customData48 = mainCustomData.customData48 ?: fallbackCustomData.customData48,
             customData49 = mainCustomData.customData49 ?: fallbackCustomData.customData49,
             customData50 = mainCustomData.customData50 ?: fallbackCustomData.customData50,
+            customData51 = mainCustomData.customData51 ?: fallbackCustomData.customData51,
+            customData52 = mainCustomData.customData52 ?: fallbackCustomData.customData52,
+            customData53 = mainCustomData.customData53 ?: fallbackCustomData.customData53,
+            customData54 = mainCustomData.customData54 ?: fallbackCustomData.customData54,
+            customData55 = mainCustomData.customData55 ?: fallbackCustomData.customData55,
+            customData56 = mainCustomData.customData56 ?: fallbackCustomData.customData56,
+            customData57 = mainCustomData.customData57 ?: fallbackCustomData.customData57,
+            customData58 = mainCustomData.customData58 ?: fallbackCustomData.customData58,
+            customData59 = mainCustomData.customData59 ?: fallbackCustomData.customData59,
+            customData60 = mainCustomData.customData60 ?: fallbackCustomData.customData60,
         )
     }
 }

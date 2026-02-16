@@ -81,6 +81,16 @@ object SsaiDataVerifier {
         assertThat(adEventData.customData48).isEqualTo(expectedCustomData.customData48)
         assertThat(adEventData.customData49).isEqualTo(expectedCustomData.customData49)
         assertThat(adEventData.customData50).isEqualTo(expectedCustomData.customData50)
+        assertThat(adEventData.customData51).isEqualTo(expectedCustomData.customData51)
+        assertThat(adEventData.customData52).isEqualTo(expectedCustomData.customData52)
+        assertThat(adEventData.customData53).isEqualTo(expectedCustomData.customData53)
+        assertThat(adEventData.customData54).isEqualTo(expectedCustomData.customData54)
+        assertThat(adEventData.customData55).isEqualTo(expectedCustomData.customData55)
+        assertThat(adEventData.customData56).isEqualTo(expectedCustomData.customData56)
+        assertThat(adEventData.customData57).isEqualTo(expectedCustomData.customData57)
+        assertThat(adEventData.customData58).isEqualTo(expectedCustomData.customData58)
+        assertThat(adEventData.customData59).isEqualTo(expectedCustomData.customData59)
+        assertThat(adEventData.customData60).isEqualTo(expectedCustomData.customData60)
         assertThat(adEventData.experimentName).isEqualTo(expectedCustomData.experimentName)
     }
 

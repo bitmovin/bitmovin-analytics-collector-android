@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - New programChange API method to update SourceMetadata without changing the underlying stream
 - Initial version of theoplayer collector
+- Support for additional customData fields 51-60
 
 ## v3.22.0
 

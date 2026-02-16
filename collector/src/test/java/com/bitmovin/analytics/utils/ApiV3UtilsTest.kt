@@ -92,6 +92,16 @@ class ApiV3UtilsTest {
                 customData48 = "customData48"
                 customData49 = "customData49"
                 customData50 = "customData50"
+                customData51 = "customData51"
+                customData52 = "customData52"
+                customData53 = "customData53"
+                customData54 = "customData54"
+                customData55 = "customData55"
+                customData56 = "customData56"
+                customData57 = "customData57"
+                customData58 = "customData58"
+                customData59 = "customData59"
+                customData60 = "customData60"
                 experimentName = "experimentName"
                 customUserId = "customUserId"
                 cdnProvider = "cdnProvider"
@@ -152,6 +162,16 @@ class ApiV3UtilsTest {
                 customData48 = "customData48",
                 customData49 = "customData49",
                 customData50 = "customData50",
+                customData51 = "customData51",
+                customData52 = "customData52",
+                customData53 = "customData53",
+                customData54 = "customData54",
+                customData55 = "customData55",
+                customData56 = "customData56",
+                customData57 = "customData57",
+                customData58 = "customData58",
+                customData59 = "customData59",
+                customData60 = "customData60",
                 experimentName = "experimentName",
             )
 
@@ -328,6 +348,10 @@ class ApiV3UtilsTest {
                 customData42 = prefix + "42", customData43 = prefix + "43", customData44 = prefix + "34",
                 customData45 = prefix + "45", customData46 = prefix + "46", customData47 = prefix + "47",
                 customData48 = prefix + "48", customData49 = prefix + "49", customData50 = prefix + "50",
+                customData51 = prefix + "51", customData52 = prefix + "52", customData53 = prefix + "53",
+                customData54 = prefix + "54", customData55 = prefix + "55", customData56 = prefix + "56",
+                customData57 = prefix + "57", customData58 = prefix + "58", customData59 = prefix + "59",
+                customData60 = prefix + "60",
             )
         }
     }

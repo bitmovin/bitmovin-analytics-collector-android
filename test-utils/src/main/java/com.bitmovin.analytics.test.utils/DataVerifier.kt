@@ -289,6 +289,16 @@ object DataVerifier {
         assertThat(eventData.customData48).isEqualTo(analyticsConfig.customData48)
         assertThat(eventData.customData49).isEqualTo(analyticsConfig.customData49)
         assertThat(eventData.customData50).isEqualTo(analyticsConfig.customData50)
+        assertThat(eventData.customData51).isEqualTo(analyticsConfig.customData51)
+        assertThat(eventData.customData52).isEqualTo(analyticsConfig.customData52)
+        assertThat(eventData.customData53).isEqualTo(analyticsConfig.customData53)
+        assertThat(eventData.customData54).isEqualTo(analyticsConfig.customData54)
+        assertThat(eventData.customData55).isEqualTo(analyticsConfig.customData55)
+        assertThat(eventData.customData56).isEqualTo(analyticsConfig.customData56)
+        assertThat(eventData.customData57).isEqualTo(analyticsConfig.customData57)
+        assertThat(eventData.customData58).isEqualTo(analyticsConfig.customData58)
+        assertThat(eventData.customData59).isEqualTo(analyticsConfig.customData59)
+        assertThat(eventData.customData60).isEqualTo(analyticsConfig.customData60)
     }
 
     fun verifyCustomData(
@@ -354,6 +364,16 @@ object DataVerifier {
         assertThat(eventData.customData48).isEqualTo(expectedCustomData.customData48)
         assertThat(eventData.customData49).isEqualTo(expectedCustomData.customData49)
         assertThat(eventData.customData50).isEqualTo(expectedCustomData.customData50)
+        assertThat(eventData.customData51).isEqualTo(expectedCustomData.customData51)
+        assertThat(eventData.customData52).isEqualTo(expectedCustomData.customData52)
+        assertThat(eventData.customData53).isEqualTo(expectedCustomData.customData53)
+        assertThat(eventData.customData54).isEqualTo(expectedCustomData.customData54)
+        assertThat(eventData.customData55).isEqualTo(expectedCustomData.customData55)
+        assertThat(eventData.customData56).isEqualTo(expectedCustomData.customData56)
+        assertThat(eventData.customData57).isEqualTo(expectedCustomData.customData57)
+        assertThat(eventData.customData58).isEqualTo(expectedCustomData.customData58)
+        assertThat(eventData.customData59).isEqualTo(expectedCustomData.customData59)
+        assertThat(eventData.customData60).isEqualTo(expectedCustomData.customData60)
         assertThat(eventData.experimentName).isEqualTo(expectedCustomData.experimentName)
     }
 

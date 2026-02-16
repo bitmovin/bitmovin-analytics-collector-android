@@ -299,6 +299,16 @@ class EventDataTest {
                         customData48 = "customData48",
                         customData49 = "customData49",
                         customData50 = "customData50",
+                        customData51 = "customData51",
+                        customData52 = "customData52",
+                        customData53 = "customData53",
+                        customData54 = "customData54",
+                        customData55 = "customData55",
+                        customData56 = "customData56",
+                        customData57 = "customData57",
+                        customData58 = "customData58",
+                        customData59 = "customData59",
+                        customData60 = "customData60",
                     ),
                 impressionId = "impressionId",
                 userId = "userId",
@@ -413,6 +423,11 @@ class EventDataTest {
                     "\"customData45\":\"customData45\",\"customData46\":\"customData46\"," +
                     "\"customData47\":\"customData47\",\"customData48\":\"customData48\"," +
                     "\"customData49\":\"customData49\",\"customData50\":\"customData50\"," +
+                    "\"customData51\":\"customData51\",\"customData52\":\"customData52\"," +
+                    "\"customData53\":\"customData53\",\"customData54\":\"customData54\"," +
+                    "\"customData55\":\"customData55\",\"customData56\":\"customData56\"," +
+                    "\"customData57\":\"customData57\",\"customData58\":\"customData58\"," +
+                    "\"customData59\":\"customData59\",\"customData60\":\"customData60\"," +
                     "\"experimentName\":\"experimentName\"}",
             )
     }

@@ -72,6 +72,16 @@ object ApiV3Utils {
                 customData48 = bitmovinAnalyticsConfig.customData48,
                 customData49 = bitmovinAnalyticsConfig.customData49,
                 customData50 = bitmovinAnalyticsConfig.customData50,
+                customData51 = bitmovinAnalyticsConfig.customData51,
+                customData52 = bitmovinAnalyticsConfig.customData52,
+                customData53 = bitmovinAnalyticsConfig.customData53,
+                customData54 = bitmovinAnalyticsConfig.customData54,
+                customData55 = bitmovinAnalyticsConfig.customData55,
+                customData56 = bitmovinAnalyticsConfig.customData56,
+                customData57 = bitmovinAnalyticsConfig.customData57,
+                customData58 = bitmovinAnalyticsConfig.customData58,
+                customData59 = bitmovinAnalyticsConfig.customData59,
+                customData60 = bitmovinAnalyticsConfig.customData60,
             )
 
         return DefaultMetadata(
@@ -180,6 +190,16 @@ object ApiV3Utils {
             customData48 = mainCustomData?.customData48 ?: fallbackCustomData?.customData48,
             customData49 = mainCustomData?.customData49 ?: fallbackCustomData?.customData49,
             customData50 = mainCustomData?.customData50 ?: fallbackCustomData?.customData50,
+            customData51 = mainCustomData?.customData51 ?: fallbackCustomData?.customData51,
+            customData52 = mainCustomData?.customData52 ?: fallbackCustomData?.customData52,
+            customData53 = mainCustomData?.customData53 ?: fallbackCustomData?.customData53,
+            customData54 = mainCustomData?.customData54 ?: fallbackCustomData?.customData54,
+            customData55 = mainCustomData?.customData55 ?: fallbackCustomData?.customData55,
+            customData56 = mainCustomData?.customData56 ?: fallbackCustomData?.customData56,
+            customData57 = mainCustomData?.customData57 ?: fallbackCustomData?.customData57,
+            customData58 = mainCustomData?.customData58 ?: fallbackCustomData?.customData58,
+            customData59 = mainCustomData?.customData59 ?: fallbackCustomData?.customData59,
+            customData60 = mainCustomData?.customData60 ?: fallbackCustomData?.customData60,
         )
     }
 

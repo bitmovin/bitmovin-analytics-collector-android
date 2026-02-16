@@ -172,5 +172,15 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         deprecatedBitmovinAnalyticsConfig?.customData48 = customData.customData48
         deprecatedBitmovinAnalyticsConfig?.customData49 = customData.customData49
         deprecatedBitmovinAnalyticsConfig?.customData50 = customData.customData50
+        deprecatedBitmovinAnalyticsConfig?.customData51 = customData.customData51
+        deprecatedBitmovinAnalyticsConfig?.customData52 = customData.customData52
+        deprecatedBitmovinAnalyticsConfig?.customData53 = customData.customData53
+        deprecatedBitmovinAnalyticsConfig?.customData54 = customData.customData54
+        deprecatedBitmovinAnalyticsConfig?.customData55 = customData.customData55
+        deprecatedBitmovinAnalyticsConfig?.customData56 = customData.customData56
+        deprecatedBitmovinAnalyticsConfig?.customData57 = customData.customData57
+        deprecatedBitmovinAnalyticsConfig?.customData58 = customData.customData58
+        deprecatedBitmovinAnalyticsConfig?.customData59 = customData.customData59
+        deprecatedBitmovinAnalyticsConfig?.customData60 = customData.customData60
     }
 }

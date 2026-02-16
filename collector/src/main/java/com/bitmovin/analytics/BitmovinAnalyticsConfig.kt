@@ -285,6 +285,56 @@ class BitmovinAnalyticsConfig() : Parcelable {
     var customData50: String? = null
 
     /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData51: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData52: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData53: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData54: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData55: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData56: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData57: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData58: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData59: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData60: String? = null
+
+    /**
      * User-ID in the Customer System
      */
     var customUserId: String? = null
@@ -414,6 +464,16 @@ class BitmovinAnalyticsConfig() : Parcelable {
         customData48 = parcel.readString()
         customData49 = parcel.readString()
         customData50 = parcel.readString()
+        customData51 = parcel.readString()
+        customData52 = parcel.readString()
+        customData53 = parcel.readString()
+        customData54 = parcel.readString()
+        customData55 = parcel.readString()
+        customData56 = parcel.readString()
+        customData57 = parcel.readString()
+        customData58 = parcel.readString()
+        customData59 = parcel.readString()
+        customData60 = parcel.readString()
         customUserId = parcel.readString()
         experimentName = parcel.readString()
         mpdUrl = parcel.readString()
@@ -487,6 +547,16 @@ class BitmovinAnalyticsConfig() : Parcelable {
         dest.writeString(customData48)
         dest.writeString(customData49)
         dest.writeString(customData50)
+        dest.writeString(customData51)
+        dest.writeString(customData52)
+        dest.writeString(customData53)
+        dest.writeString(customData54)
+        dest.writeString(customData55)
+        dest.writeString(customData56)
+        dest.writeString(customData57)
+        dest.writeString(customData58)
+        dest.writeString(customData59)
+        dest.writeString(customData60)
         dest.writeString(customUserId)
         dest.writeString(experimentName)
         dest.writeString(mpdUrl)

@@ -12,6 +12,7 @@ public class DefaultMetadataBuilderJavaTest {
                 .setCustomData1("customData1")
                 .setCustomData30("customData30")
                 .setCustomData50("customData50")
+                .setCustomData60("customData60")
                 .setExperimentName("experimentName")
                 .build();
 

@@ -134,6 +134,16 @@ data class EventData(
     val customData48: String? = null,
     val customData49: String? = null,
     val customData50: String? = null,
+    val customData51: String? = null,
+    val customData52: String? = null,
+    val customData53: String? = null,
+    val customData54: String? = null,
+    val customData55: String? = null,
+    val customData56: String? = null,
+    val customData57: String? = null,
+    val customData58: String? = null,
+    val customData59: String? = null,
+    val customData60: String? = null,
     val experimentName: String? = null,
     // Field used to mark a sample that is ssai related as such
     // this is needed since ssai samples on live events
@@ -235,5 +245,15 @@ data class EventData(
         customData48 = customData.customData48,
         customData49 = customData.customData49,
         customData50 = customData.customData50,
+        customData51 = customData.customData51,
+        customData52 = customData.customData52,
+        customData53 = customData.customData53,
+        customData54 = customData.customData54,
+        customData55 = customData.customData55,
+        customData56 = customData.customData56,
+        customData57 = customData.customData57,
+        customData58 = customData.customData58,
+        customData59 = customData.customData59,
+        customData60 = customData.customData60,
     )
 }
