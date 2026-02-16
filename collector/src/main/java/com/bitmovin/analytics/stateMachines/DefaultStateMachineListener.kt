@@ -39,23 +39,10 @@ class DefaultStateMachineListener(
         // Player specific data that the player adapter can provide.
         data.autoplay = playerAdapter.isAutoplayEnabled
         data.drmLoadTime = playerAdapter.drmDownloadTime
-
         data.playerStartupTime = playerStartupTime
-
-        // Check if this startup was triggered by a program change
-        val isProgramChange = stateMachine.getAndResetIsProgramChange()
-        if (isProgramChange) {
-            data.programChange = true
-            // Ensure startup times are at least 1 to avoid underreporting plays
-            data.videoStartupTime = maxOf(1, videoStartupTime)
-            val totalStartupTime = maxOf(1, videoStartupTime + playerStartupTime)
-            data.startupTime = totalStartupTime
-            data.duration = totalStartupTime
-        } else {
-            data.videoStartupTime = videoStartupTime
-            data.startupTime = videoStartupTime + playerStartupTime
-            data.duration = videoStartupTime + playerStartupTime
-        }
+        data.videoStartupTime = videoStartupTime
+        data.startupTime = videoStartupTime + playerStartupTime
+        data.duration = videoStartupTime + playerStartupTime
 
         data.videoTimeStart = stateMachine.videoTimeStart
         data.videoTimeEnd = stateMachine.videoTimeEnd
@@ -311,5 +298,17 @@ class DefaultStateMachineListener(
         // we implicitly detach and don't want to send the last sample out
         // since this function is only called when there is timeout during startup or EBVS (as of 2025-08)
         analytics.detachPlayer(shouldSendOutSamples = false)
+    }
+
+    override fun onProgramChange(stateMachine: PlayerStateMachine) {
+        val eventData = playerAdapter.createEventData()
+        eventData.state = "programchange"
+        eventData.videoStartupTime = 1 // synthetic startup for metrics, billing purpose
+        eventData.duration = 0
+        eventData.programChange = true
+        eventData.videoTimeStart = stateMachine.videoTimeStart
+        eventData.videoTimeEnd = stateMachine.videoTimeEnd
+
+        analytics.sendEventData(eventData)
     }
 }

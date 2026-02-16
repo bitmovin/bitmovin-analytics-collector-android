@@ -38,7 +38,6 @@ class PlayerStateMachine(
     private var elapsedTimeOnEnter: Long = 0
 
     var isStartupFinished = false
-    private var isProgramChange = false
 
     var videoTimeStart: Long = 0
         private set
@@ -169,6 +168,12 @@ class PlayerStateMachine(
         videoTimeStart = videoTimeEnd
     }
 
+    fun triggerProgramChangeSample() {
+        val elapsedTime = Util.elapsedTime
+        listeners.notify { it.onProgramChange(this) }
+        elapsedTimeOnEnter = elapsedTime
+    }
+
     private fun resetSourceRelatedState(keepHeartbeatRunning: Boolean = false) {
         if (!keepHeartbeatRunning) {
             disableHeartbeat()
@@ -283,31 +288,11 @@ class PlayerStateMachine(
         }
     }
 
-    fun programChange(
-        videoTime: Long,
-        onAfterSessionReset: () -> Unit,
-    ) {
-        val lastStateBeforeProgramChange = currentState
+    fun programChange(onAfterSessionReset: () -> Unit) {
         triggerLastSampleOfSession()
-        resetSourceRelatedState(keepHeartbeatRunning = true)
+        analytics.resetSequenceNumberAndImpressionId()
         onAfterSessionReset()
-
-        isProgramChange = true
-        isStartupFinished = true
-        currentState = PlayerStates.STARTUP
-
-        // If player is currently playing, transition back to playing
-        // We don't transition into Playing if the player is seeking
-        // This check is needed because some players (like THEO) return isPlaying=true while seeking
-        if (playerContext.isPlaying() && lastStateBeforeProgramChange != PlayerStates.SEEKING) {
-            transitionState(PlayerStates.PLAYING, videoTime, null)
-        }
-    }
-
-    fun getAndResetIsProgramChange(): Boolean {
-        val value = isProgramChange
-        isProgramChange = false
-        return value
+        triggerProgramChangeSample()
     }
 
     fun pause(position: Long) {

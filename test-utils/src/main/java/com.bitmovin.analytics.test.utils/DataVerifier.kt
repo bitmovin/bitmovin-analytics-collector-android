@@ -457,6 +457,10 @@ object DataVerifier {
         }
     }
 
+    fun verifySessionHasOnlyOneSampleWithVideoStartupTime(eventDataList: List<EventData>) {
+        assertThat(eventDataList.filter { it.videoStartupTime > 0 }).hasSize(1)
+    }
+
     fun verifyStartupSampleOnError(
         eventData: EventData,
         expectedPlayerInfo: PlayerInfo,

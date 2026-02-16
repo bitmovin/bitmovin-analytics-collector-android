@@ -41,6 +41,8 @@ class ProgramChangeScenariosTest {
     private lateinit var mockedIngressUrl: String
     private lateinit var theoPlayerView: THEOplayerView
 
+    private val programChangeStateName = "programchange"
+
     private val hlsSource =
         TypedSource
             .Builder(TestSources.HLS_REDBULL.m3u8Url!!)
@@ -164,13 +166,13 @@ class ProgramChangeScenariosTest {
             val secondStartupSample = secondImpressionEvents.first()
 
             // Second session startup SHOULD have programChange flag
-            assertThat(secondStartupSample.state).isEqualTo("startup")
+            assertThat(secondStartupSample.state).isEqualTo(programChangeStateName)
             assertThat(secondStartupSample.videoId).isEqualTo(sourceMetadataProgram2.videoId)
             assertThat(secondStartupSample.videoTitle).isEqualTo(sourceMetadataProgram2.title)
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.programChange).isTrue()
-            assertThat(secondStartupSample.startupTime).isGreaterThanOrEqualTo(1)
+            assertThat(secondStartupSample.videoStartupTime).isGreaterThanOrEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -236,6 +238,7 @@ class ProgramChangeScenariosTest {
             val firstImpressionEvents = firstImpression.eventDataList
 
             assertThat(firstImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
+            DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(firstImpressionEvents)
             val firstStartupSample = firstImpressionEvents.first()
 
             assertThat(firstStartupSample.state).isEqualTo("startup")
@@ -251,16 +254,17 @@ class ProgramChangeScenariosTest {
             val secondImpressionEvents = secondImpression.eventDataList
 
             assertThat(secondImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
+            DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(secondImpressionEvents)
             val secondStartupSample = secondImpressionEvents.first()
 
             // Second session startup SHOULD have programChange flag
-            assertThat(secondStartupSample.state).isEqualTo("startup")
+            assertThat(secondStartupSample.state).isEqualTo(programChangeStateName)
             assertThat(secondStartupSample.videoId).isEqualTo(sourceMetadataProgram2.videoId)
             assertThat(secondStartupSample.videoTitle).isEqualTo(sourceMetadataProgram2.title)
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.programChange).isTrue()
-            assertThat(secondStartupSample.startupTime).isGreaterThanOrEqualTo(1)
+            assertThat(secondStartupSample.videoStartupTime).isGreaterThanOrEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -315,6 +319,7 @@ class ProgramChangeScenariosTest {
             val firstImpressionEvents = firstImpression.eventDataList
 
             assertThat(firstImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
+            DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(firstImpressionEvents)
             val firstStartupSample = firstImpressionEvents.first()
 
             assertThat(firstStartupSample.state).isEqualTo("startup")
@@ -329,16 +334,17 @@ class ProgramChangeScenariosTest {
             val secondImpressionEvents = secondImpression.eventDataList
 
             assertThat(secondImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
+            DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(secondImpressionEvents)
             val secondStartupSample = secondImpressionEvents.first()
 
             // Second session startup SHOULD have programChange flag
-            assertThat(secondStartupSample.state).isEqualTo("startup")
+            assertThat(secondStartupSample.state).isEqualTo(programChangeStateName)
             assertThat(secondStartupSample.videoId).isEqualTo(sourceMetadataProgram2.videoId)
             assertThat(secondStartupSample.videoTitle).isEqualTo(sourceMetadataProgram2.title)
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.programChange).isTrue()
-            assertThat(secondStartupSample.startupTime).isGreaterThanOrEqualTo(1)
+            assertThat(secondStartupSample.videoStartupTime).isGreaterThanOrEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -406,22 +412,25 @@ class ProgramChangeScenariosTest {
             val impressionIds = impressions.map { it.eventDataList.first().impressionId }
             assertThat(impressionIds.distinct()).hasSize(3)
 
+            DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(impressions[0].eventDataList)
             // Verify first impression (no programChange flag)
             val firstStartup = impressions[0].eventDataList.first()
             assertThat(firstStartup.videoId).isEqualTo("program-1")
             assertThat(firstStartup.programChange).isNull()
 
             // Verify second impression (programChange flag)
+            DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(impressions[1].eventDataList)
             val secondStartup = impressions[1].eventDataList.first()
             assertThat(secondStartup.videoId).isEqualTo("program-2")
             assertThat(secondStartup.programChange).isTrue()
-            assertThat(secondStartup.startupTime).isGreaterThanOrEqualTo(1)
+            assertThat(secondStartup.videoStartupTime).isEqualTo(1)
 
             // Verify third impression (programChange flag)
+            DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(impressions[2].eventDataList)
             val thirdStartup = impressions[2].eventDataList.first()
             assertThat(thirdStartup.videoId).isEqualTo("program-3")
             assertThat(thirdStartup.programChange).isTrue()
-            assertThat(thirdStartup.startupTime).isGreaterThanOrEqualTo(1)
+            assertThat(thirdStartup.videoStartupTime).isEqualTo(1)
         }
     }
 }
