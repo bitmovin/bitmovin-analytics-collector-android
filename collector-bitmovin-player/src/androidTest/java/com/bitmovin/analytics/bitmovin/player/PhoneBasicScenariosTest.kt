@@ -203,6 +203,7 @@ class PhoneBasicScenariosTest {
         runBlockingTest {
             // arrange
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            defaultPlayer.useLowestRendition()
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -1152,9 +1153,9 @@ class PhoneBasicScenariosTest {
                 )
             val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
-
             // act
             withContext(mainScope.coroutineContext) {
+                defaultPlayer.useLowestRendition()
                 collector.setSourceMetadata(dashSource, dashSourceMetadata)
                 collector.attachPlayer(defaultPlayer)
                 defaultPlayer.load(dashSource)

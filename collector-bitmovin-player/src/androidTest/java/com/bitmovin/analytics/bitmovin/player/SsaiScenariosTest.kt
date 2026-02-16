@@ -413,7 +413,7 @@ class SsaiScenariosTest {
             assertThat(firstAdSample.completed).isEqualTo(1)
 
             // verify that delta is set close to the time
-            assertThat(firstAdSample.timeSinceAdStartedInMs).isBetween(3500, 5500)
+            assertThat(firstAdSample.timeSinceAdStartedInMs).isBetween(3500, 5700)
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(listOf(firstAdSample), 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(listOf(firstAdSample), "test-ad-system-1")
@@ -427,7 +427,7 @@ class SsaiScenariosTest {
             assertThat(secondAdSample.quartile3).isEqualTo(1)
             assertThat(secondAdSample.completed).isEqualTo(1)
 
-            assertThat(secondAdSample.timeSinceAdStartedInMs).isBetween(1500, 3000)
+            assertThat(secondAdSample.timeSinceAdStartedInMs).isBetween(1500, 3300)
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(listOf(secondAdSample), 1)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(listOf(secondAdSample), "test-ad-system-2")

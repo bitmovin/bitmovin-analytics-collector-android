@@ -223,6 +223,7 @@ class BundledAnalyticsTest {
         runBlockingTest {
             // act
             withContext(mainScope.coroutineContext) {
+                defaultPlayer.useLowestRendition()
                 defaultPlayer.load(defaultSource)
                 defaultPlayer.play() // calling play immediately, is similar to configuring autoplay
             }
@@ -1221,6 +1222,7 @@ class BundledAnalyticsTest {
 
             // act
             withContext(mainScope.coroutineContext) {
+                defaultPlayer.useLowestRendition()
                 defaultPlayer.load(dashSource)
                 defaultPlayer.play()
             }
