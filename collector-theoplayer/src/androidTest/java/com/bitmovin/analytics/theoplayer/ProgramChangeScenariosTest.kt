@@ -147,7 +147,7 @@ class ProgramChangeScenariosTest {
             assertThat(firstStartupSample.videoTitle).isEqualTo(sourceMetadataProgram1.title)
             assertThat(firstStartupSample.customData1).isEqualTo("program1-data")
             assertThat(firstStartupSample.sequenceNumber).isEqualTo(0)
-            assertThat(firstStartupSample.programChange).isNull()
+            assertThat(firstStartupSample.isProgramChange).isNull()
 
             val impressionId1 = firstStartupSample.impressionId
 
@@ -171,7 +171,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.videoTitle).isEqualTo(sourceMetadataProgram2.title)
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
-            assertThat(secondStartupSample.programChange).isTrue()
+            assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isGreaterThanOrEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
@@ -182,7 +182,7 @@ class ProgramChangeScenariosTest {
             assertThat(playingSamples2).hasSizeGreaterThanOrEqualTo(1)
             assertThat(playingSamples2.all { it.impressionId == impressionId2 }).isTrue()
             assertThat(playingSamples2.all { it.videoId == sourceMetadataProgram2.videoId }).isTrue()
-            assertThat(playingSamples2.all { it.programChange == null }).isTrue()
+            assertThat(playingSamples2.all { it.isProgramChange == null }).isTrue()
         }
     }
 
@@ -244,7 +244,7 @@ class ProgramChangeScenariosTest {
             assertThat(firstStartupSample.state).isEqualTo("startup")
             assertThat(firstStartupSample.videoId).isEqualTo(sourceMetadataProgram1.videoId)
             assertThat(firstStartupSample.sequenceNumber).isEqualTo(0)
-            assertThat(firstStartupSample.programChange).isNull()
+            assertThat(firstStartupSample.isProgramChange).isNull()
 
             val impressionId1 = firstStartupSample.impressionId
 
@@ -263,7 +263,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.videoTitle).isEqualTo(sourceMetadataProgram2.title)
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
-            assertThat(secondStartupSample.programChange).isTrue()
+            assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isGreaterThanOrEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
@@ -274,7 +274,7 @@ class ProgramChangeScenariosTest {
             assertThat(playingSamples2).hasSizeGreaterThanOrEqualTo(1)
             assertThat(playingSamples2.all { it.impressionId == impressionId2 }).isTrue()
             assertThat(playingSamples2.all { it.videoId == sourceMetadataProgram2.videoId }).isTrue()
-            assertThat(playingSamples2.all { it.programChange == null }).isTrue()
+            assertThat(playingSamples2.all { it.isProgramChange == null }).isTrue()
         }
     }
 
@@ -324,7 +324,7 @@ class ProgramChangeScenariosTest {
 
             assertThat(firstStartupSample.state).isEqualTo("startup")
             assertThat(firstStartupSample.videoId).isEqualTo(sourceMetadataProgram1.videoId)
-            assertThat(firstStartupSample.programChange).isNull()
+            assertThat(firstStartupSample.isProgramChange).isNull()
 
             val impressionId1 = firstStartupSample.impressionId
 
@@ -343,7 +343,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.videoTitle).isEqualTo(sourceMetadataProgram2.title)
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
-            assertThat(secondStartupSample.programChange).isTrue()
+            assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isGreaterThanOrEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
@@ -354,7 +354,7 @@ class ProgramChangeScenariosTest {
             assertThat(playingSamples2).hasSizeGreaterThanOrEqualTo(1)
             assertThat(playingSamples2.all { it.impressionId == impressionId2 }).isTrue()
             assertThat(playingSamples2.all { it.videoId == sourceMetadataProgram2.videoId }).isTrue()
-            assertThat(playingSamples2.all { it.programChange == null }).isTrue()
+            assertThat(playingSamples2.all { it.isProgramChange == null }).isTrue()
         }
     }
 
@@ -416,20 +416,20 @@ class ProgramChangeScenariosTest {
             // Verify first impression (no programChange flag)
             val firstStartup = impressions[0].eventDataList.first()
             assertThat(firstStartup.videoId).isEqualTo("program-1")
-            assertThat(firstStartup.programChange).isNull()
+            assertThat(firstStartup.isProgramChange).isNull()
 
             // Verify second impression (programChange flag)
             DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(impressions[1].eventDataList)
             val secondStartup = impressions[1].eventDataList.first()
             assertThat(secondStartup.videoId).isEqualTo("program-2")
-            assertThat(secondStartup.programChange).isTrue()
+            assertThat(secondStartup.isProgramChange).isTrue()
             assertThat(secondStartup.videoStartupTime).isEqualTo(1)
 
             // Verify third impression (programChange flag)
             DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(impressions[2].eventDataList)
             val thirdStartup = impressions[2].eventDataList.first()
             assertThat(thirdStartup.videoId).isEqualTo("program-3")
-            assertThat(thirdStartup.programChange).isTrue()
+            assertThat(thirdStartup.isProgramChange).isTrue()
             assertThat(thirdStartup.videoStartupTime).isEqualTo(1)
         }
     }

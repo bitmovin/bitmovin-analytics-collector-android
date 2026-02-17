@@ -305,7 +305,7 @@ class DefaultStateMachineListener(
         eventData.state = "programchange"
         eventData.videoStartupTime = 1 // synthetic startup for metrics, billing purpose
         eventData.duration = 0
-        eventData.programChange = true
+        eventData.isProgramChange = true
         eventData.videoTimeStart = stateMachine.videoTimeStart
         eventData.videoTimeEnd = stateMachine.videoTimeEnd
 

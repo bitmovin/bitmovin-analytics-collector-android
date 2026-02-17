@@ -131,7 +131,7 @@ class ProgramChangeScenariosTest {
             assertThat(firstStartupSample.videoTitle).isEqualTo(sourceMetadataProgram1.title)
             assertThat(firstStartupSample.customData1).isEqualTo("program1-data")
             assertThat(firstStartupSample.sequenceNumber).isEqualTo(0)
-            assertThat(firstStartupSample.programChange).isNull()
+            assertThat(firstStartupSample.isProgramChange).isNull()
 
             val impressionId1 = firstStartupSample.impressionId
 
@@ -156,7 +156,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.videoTitle).isEqualTo(sourceMetadataProgram2.title)
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
-            assertThat(secondStartupSample.programChange).isTrue()
+            assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
@@ -167,7 +167,7 @@ class ProgramChangeScenariosTest {
             assertThat(playingSamples2).hasSizeGreaterThanOrEqualTo(1)
             assertThat(playingSamples2.all { it.impressionId == impressionId2 }).isTrue()
             assertThat(playingSamples2.all { it.videoId == sourceMetadataProgram2.videoId }).isTrue()
-            assertThat(playingSamples2.all { it.programChange == null }).isTrue
+            assertThat(playingSamples2.all { it.isProgramChange == null }).isTrue
         }
 
     @Test
@@ -225,7 +225,7 @@ class ProgramChangeScenariosTest {
             assertThat(firstStartupSample.state).isEqualTo("startup")
             assertThat(firstStartupSample.videoId).isEqualTo(sourceMetadataProgram1.videoId)
             assertThat(firstStartupSample.sequenceNumber).isEqualTo(0)
-            assertThat(firstStartupSample.programChange).isNull()
+            assertThat(firstStartupSample.isProgramChange).isNull()
 
             val impressionId1 = firstStartupSample.impressionId
 
@@ -245,7 +245,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.videoTitle).isEqualTo(sourceMetadataProgram2.title)
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
-            assertThat(secondStartupSample.programChange).isTrue()
+            assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
@@ -256,7 +256,7 @@ class ProgramChangeScenariosTest {
             assertThat(playingSamples2).hasSizeGreaterThanOrEqualTo(1)
             assertThat(playingSamples2.all { it.impressionId == impressionId2 }).isTrue()
             assertThat(playingSamples2.all { it.videoId == sourceMetadataProgram2.videoId }).isTrue()
-            assertThat(playingSamples2.all { it.programChange == null }).isTrue()
+            assertThat(playingSamples2.all { it.isProgramChange == null }).isTrue()
         }
 
     @Test
@@ -301,7 +301,7 @@ class ProgramChangeScenariosTest {
 
             assertThat(firstStartupSample.state).isEqualTo("startup")
             assertThat(firstStartupSample.videoId).isEqualTo(sourceMetadataProgram1.videoId)
-            assertThat(firstStartupSample.programChange).isNull()
+            assertThat(firstStartupSample.isProgramChange).isNull()
 
             val impressionId1 = firstStartupSample.impressionId
 
@@ -320,7 +320,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.videoTitle).isEqualTo(sourceMetadataProgram2.title)
             assertThat(secondStartupSample.customData1).isEqualTo("program2-data")
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
-            assertThat(secondStartupSample.programChange).isTrue()
+            assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isEqualTo(1)
 
             val impressionId2 = secondStartupSample.impressionId
@@ -331,7 +331,7 @@ class ProgramChangeScenariosTest {
             assertThat(playingSamples2).hasSizeGreaterThanOrEqualTo(1)
             assertThat(playingSamples2.all { it.impressionId == impressionId2 }).isTrue()
             assertThat(playingSamples2.all { it.videoId == sourceMetadataProgram2.videoId }).isTrue()
-            assertThat(playingSamples2.all { it.programChange == null }).isTrue()
+            assertThat(playingSamples2.all { it.isProgramChange == null }).isTrue()
         }
 
     @Test
@@ -389,20 +389,20 @@ class ProgramChangeScenariosTest {
             // Verify first impression (no programChange flag)
             val firstStartup = impressions[0].eventDataList.first()
             assertThat(firstStartup.videoId).isEqualTo("program-1")
-            assertThat(firstStartup.programChange).isNull()
+            assertThat(firstStartup.isProgramChange).isNull()
 
             // Verify second impression (programChange flag)
             val secondStartup = impressions[1].eventDataList.first()
             DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(impressions[1].eventDataList)
             assertThat(secondStartup.videoId).isEqualTo("program-2")
-            assertThat(secondStartup.programChange).isTrue()
+            assertThat(secondStartup.isProgramChange).isTrue()
             assertThat(secondStartup.videoStartupTime).isEqualTo(1)
 
             // Verify third impression (programChange flag)
             val thirdStartup = impressions[2].eventDataList.first()
             DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(impressions[2].eventDataList)
             assertThat(thirdStartup.videoId).isEqualTo("program-3")
-            assertThat(thirdStartup.programChange).isTrue()
+            assertThat(thirdStartup.isProgramChange).isTrue()
             assertThat(thirdStartup.videoStartupTime).isEqualTo(1)
         }
 
@@ -484,7 +484,7 @@ class ProgramChangeScenariosTest {
             val startup1 = impression1.eventDataList.first()
             assertThat(startup1.videoId).isEqualTo("hls-video-id")
             assertThat(startup1.customData1).isEqualTo("hls-data")
-            assertThat(startup1.programChange).isNull()
+            assertThat(startup1.isProgramChange).isNull()
 
             // Impression 2: HLS with program change metadata
             val impression2 = impressions[1]
@@ -493,7 +493,7 @@ class ProgramChangeScenariosTest {
             val startup2 = impression2.eventDataList.first()
             assertThat(startup2.videoId).isEqualTo("program-change-video-id")
             assertThat(startup2.customData1).isEqualTo("program-change-data")
-            assertThat(startup2.programChange).isTrue()
+            assertThat(startup2.isProgramChange).isTrue()
 
             // Impression 3: DASH with its original metadata (not affected by programChange)
             val impression3 = impressions[2]
@@ -501,7 +501,7 @@ class ProgramChangeScenariosTest {
             val startup3 = impression3.eventDataList.first()
             assertThat(startup3.videoId).isEqualTo("dash-video-id")
             assertThat(startup3.customData1).isEqualTo("dash-data")
-            assertThat(startup3.programChange).isNull()
+            assertThat(startup3.isProgramChange).isNull()
 
             // Verify all three impressions have different impression IDs
             val impressionIds = impressions.map { it.eventDataList.first().impressionId }

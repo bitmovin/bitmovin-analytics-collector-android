@@ -79,7 +79,7 @@ data class EventData(
     var drmLoadTime: Long? = null,
     var videoStartFailed: Boolean = false,
     var videoStartFailedReason: String? = null,
-    var programChange: Boolean? = null,
+    var isProgramChange: Boolean? = null,
     var downloadSpeedInfo: DownloadSpeedInfo? = null,
     var retryCount: Int = 0,
     val player: String,
