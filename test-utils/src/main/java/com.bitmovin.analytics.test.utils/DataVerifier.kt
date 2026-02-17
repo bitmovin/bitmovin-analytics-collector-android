@@ -7,6 +7,7 @@ import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.dtos.ErrorDetail
 import com.bitmovin.analytics.dtos.EventData
+import com.bitmovin.analytics.dtos.HttpRequest
 import com.bitmovin.analytics.enums.StreamFormat
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
@@ -571,6 +572,17 @@ object DataVerifier {
         assertThat(errorDetail.analyticsVersion).isEqualTo("0.0.0-local")
         assertThat(errorDetail.timestamp).isGreaterThan(0)
         assertThat(errorDetail.domain).isNotEmpty
+    }
+
+    fun verifyHttpRequestSuccessful(httpRequest: HttpRequest) {
+        assertThat(httpRequest.timestamp).isGreaterThan(0)
+        assertThat(httpRequest.type).isNotEmpty
+        assertThat(httpRequest.url).isNotEmpty
+        assertThat(httpRequest.httpStatus).isBetween(200, 399)
+        assertThat(httpRequest.downloadTime).isGreaterThanOrEqualTo(0)
+        assertThat(httpRequest.size).isNotNull
+        assertThat(httpRequest.size).isGreaterThanOrEqualTo(0)
+        assertThat(httpRequest.success).isTrue
     }
 
     fun verifyInvariants(eventDataList: MutableList<EventData>) {

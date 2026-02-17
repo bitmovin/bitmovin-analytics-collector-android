@@ -244,6 +244,14 @@ class ErrorScenariosTest {
             assertThat(errorDetailList).hasSize(1)
             val errorDetail = errorDetailList.first()
             assertThat(errorDetail.data.exceptionMessage).isNotEmpty()
+            assertThat(errorDetail.httpRequests).hasSizeGreaterThan(0)
+            errorDetail.httpRequests?.forEach {
+                assertThat(it.httpStatus).isEqualTo(404)
+                assertThat(it.url).isNotEmpty
+                assertThat(it.type).isNotEmpty
+                assertThat(it.success).isFalse
+                assertThat(it.downloadTime).isGreaterThan(0)
+            }
         }
     }
 
@@ -310,6 +318,10 @@ class ErrorScenariosTest {
             val errorDetail = errorDetailList.first()
             assertThat(errorDetail.data.exceptionMessage).isNotEmpty()
             assertThat(errorDetail.data.exceptionStacktrace).isNotNull()
+            assertThat(errorDetail.httpRequests).hasSizeGreaterThan(0)
+            errorDetail.httpRequests?.forEach {
+                DataVerifier.verifyHttpRequestSuccessful(it)
+            }
 
             DataVerifier.verifyStartupSampleOnError(sample, TheoPlayerConstants.playerInfo)
             DataVerifier.verifySourceMetadata(sample, sourceMetadata)

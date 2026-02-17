@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.theoplayer.features
 
+import android.util.LruCache
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
@@ -10,7 +11,11 @@ import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEve
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.network.http.HTTPInterceptor
+import com.theoplayer.android.api.network.http.InterceptableHTTPRequest
 import com.theoplayer.android.api.network.http.InterceptableHTTPResponse
+import com.theoplayer.android.api.network.http.RequestMediaType
+import com.theoplayer.android.api.network.http.RequestSubType
+import com.theoplayer.android.api.network.http.RequestType
 import com.theoplayer.android.api.player.Player
 
 internal class TheoPlayerHttpRequestTrackingAdapter(
@@ -24,23 +29,6 @@ internal class TheoPlayerHttpRequestTrackingAdapter(
         wireEvents()
     }
 
-//    private fun mapHttpRequestType(requestType: HttpRequestType?): HttpRequestType {
-//        return when (requestType) {
-//            HttpRequestType.DrmLicenseWidevine -> HttpRequestType.DRM_LICENSE_WIDEVINE
-//            HttpRequestType.MediaThumbnails -> HttpRequestType.MEDIA_THUMBNAILS
-//            HttpRequestType.ManifestDash -> HttpRequestType.MANIFEST_DASH
-//            HttpRequestType.ManifestHlsMaster -> HttpRequestType.MANIFEST_HLS_MASTER
-//            HttpRequestType.ManifestHlsVariant -> HttpRequestType.MANIFEST_HLS_VARIANT
-//            HttpRequestType.ManifestSmooth -> HttpRequestType.MANIFEST_SMOOTH
-//            HttpRequestType.MediaVideo -> HttpRequestType.MEDIA_VIDEO
-//            HttpRequestType.MediaAudio -> HttpRequestType.MEDIA_AUDIO
-//            HttpRequestType.MediaProgressive -> HttpRequestType.MEDIA_PROGRESSIVE
-//            HttpRequestType.MediaSubtitles -> HttpRequestType.MEDIA_SUBTITLES
-//            HttpRequestType.KeyHlsAes -> HttpRequestType.KEY_HLS_AES
-//            else -> HttpRequestType.UNKNOWN
-//        }
-//    }
-
     private fun wireEvents() {
         // TODO: get rid of this circular dependency, not good style
         onAnalyticsReleasingObservable.subscribe(this)
@@ -50,6 +38,7 @@ internal class TheoPlayerHttpRequestTrackingAdapter(
     private fun unwireEvents() {
         onAnalyticsReleasingObservable.unsubscribe(this)
         player.network.removeHTTPInterceptor(interceptor)
+        interceptor.reset()
     }
 
     override fun subscribe(listener: OnDownloadFinishedEventListener) {
@@ -63,32 +52,44 @@ internal class TheoPlayerHttpRequestTrackingAdapter(
     override fun onReleasing() {
         unwireEvents()
     }
-
-    companion object {
-        private val TAG = TheoPlayerHttpRequestTrackingAdapter::class.java.name
-    }
 }
 
 internal class TheoPlayerNetworkRequestInterceptor(
     private val observableSupport: ObservableSupport<OnDownloadFinishedEventListener>,
 ) : HTTPInterceptor {
+    // Urls can practically be up to 2000 characters, this means we could
+    // potentially have 100*2000*4bytes (utf-8) = 800kb cache
+    private val requestStartTimes = LruCache<String, Long>(100)
+
+    fun reset() {
+        requestStartTimes.evictAll()
+    }
+
+    override suspend fun onRequest(request: InterceptableHTTPRequest) {
+        val trimmedUrl = limitLengthFromTheStart(request.url.toString())
+        requestStartTimes.put(trimmedUrl, Util.timestamp)
+    }
+
     override suspend fun onResponse(response: InterceptableHTTPResponse) {
-        catchAndLogException("Exception occurred in SourceEvent.DownloadFinished") {
-            val url = response.url.path
+        catchAndLogException("Exception occurred in TheoPlayer HTTP response interceptor") {
+            val url = response.url.toString()
             val httpStatus = response.status
-            // TODO: can we get that one?
-            val lastRedirectLocation = null
-            // TODO: does this work?, do we need to use content size from the header?
-            val sizeInBytes = response.request.body?.size?.toLong()
-            val isSuccess = true
-            val downloadTime = 0L // TODO: is this possible?
+            val trimmedUrl = limitLengthFromTheStart(response.url.toString())
+            val requestStartTime: Long? = requestStartTimes.remove(trimmedUrl)
+            val downloadTime = if (requestStartTime != null) Util.timestamp - requestStartTime else 0L
+            val sizeInBytes =
+                response.headers.entries
+                    .firstOrNull { it.key.equals("content-length", ignoreCase = true) }
+                    ?.value?.toLongOrNull()
+            val isSuccess = httpStatus in 200..399
+            val requestType = mapHttpRequestType(response.request)
 
             val httpRequest =
                 HttpRequest(
                     Util.timestamp,
-                    HttpRequestType.UNKNOWN.value,
+                    requestType.value,
                     url,
-                    lastRedirectLocation,
+                    null,
                     httpStatus,
                     downloadTime,
                     null,
@@ -102,6 +103,17 @@ internal class TheoPlayerNetworkRequestInterceptor(
     }
 
     companion object {
+        private val TAG = TheoPlayerNetworkRequestInterceptor::class.java.name
+        private const val MAX_PATH_LENGTH = 2000
+
+        private fun limitLengthFromTheStart(stringToLimit: String): String {
+            if (stringToLimit.length <= MAX_PATH_LENGTH) {
+                return stringToLimit
+            }
+
+            return stringToLimit.takeLast(MAX_PATH_LENGTH)
+        }
+
         private fun catchAndLogException(
             msg: String,
             block: () -> Unit,
@@ -113,6 +125,35 @@ internal class TheoPlayerNetworkRequestInterceptor(
             }
         }
 
-        private val TAG = TheoPlayerNetworkRequestInterceptor::class.java.name
+        private fun mapHttpRequestType(request: com.theoplayer.android.api.network.http.HTTPRequest): HttpRequestType {
+            return when (request.type) {
+                RequestType.CONTENT_PROTECTION -> mapContentProtectionType(request.subType)
+                RequestType.MANIFEST -> HttpRequestType.MANIFEST
+                RequestType.SEGMENT -> mapSegmentType(request.mediaType)
+                else -> HttpRequestType.UNKNOWN
+            }
+        }
+
+        private fun mapContentProtectionType(subType: RequestSubType): HttpRequestType {
+            return when (subType) {
+                RequestSubType.WIDEVINE_LICENSE, RequestSubType.WIDEVINE_CERTIFICATE -> HttpRequestType.DRM_LICENSE_WIDEVINE
+                RequestSubType.AES128_KEY -> HttpRequestType.KEY_HLS_AES
+                RequestSubType.FAIRPLAY_LICENSE, RequestSubType.FAIRPLAY_CERTIFICATE,
+                RequestSubType.PLAYREADY_LICENSE, RequestSubType.CLEARKEY_LICENSE,
+                -> HttpRequestType.DRM_OTHER
+
+                else -> HttpRequestType.DRM_OTHER
+            }
+        }
+
+        private fun mapSegmentType(mediaType: RequestMediaType): HttpRequestType {
+            return when (mediaType) {
+                RequestMediaType.AUDIO -> HttpRequestType.MEDIA_AUDIO
+                RequestMediaType.VIDEO -> HttpRequestType.MEDIA_VIDEO
+                RequestMediaType.TEXT -> HttpRequestType.MEDIA_SUBTITLES
+                RequestMediaType.IMAGE -> HttpRequestType.MEDIA_THUMBNAILS
+                else -> HttpRequestType.UNKNOWN
+            }
+        }
     }
 }
