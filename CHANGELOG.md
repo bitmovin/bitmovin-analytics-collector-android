@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.23.0
+
 ### Changed
 - Upgraded agp to 8.10.1 in order to support theo player
 - [Internal] Switched to different test assets due to permissions changes
@@ -13,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - New programChange API method to update SourceMetadata without changing the underlying stream
-- Initial version of theoplayer collector
+- New collector for THEOplayer
 - Support for additional customData fields 51-60
 
 ## v3.22.0
