@@ -4,6 +4,7 @@ import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
 import com.theoplayer.android.api.event.EventListener
+import com.theoplayer.android.api.event.track.mediatrack.audio.AudioTrackEventTypes
 import com.theoplayer.android.api.event.track.mediatrack.audio.list.AudioTrackListEventTypes
 import com.theoplayer.android.api.event.track.mediatrack.video.ActiveQualityChangedEvent
 import com.theoplayer.android.api.event.track.mediatrack.video.VideoTrackEventTypes
@@ -41,7 +42,6 @@ internal class SourceEventListeners(
                     }
                 }
 
-            // TODO: do we need to clean this up when a track is removed?
             public override fun handleEvent(addTrackEvent: AddTrackEvent) {
                 addTrackEvent.track.addEventListener(
                     VideoTrackEventTypes.ACTIVEQUALITYCHANGEDEVENT,
@@ -52,23 +52,19 @@ internal class SourceEventListeners(
 
     val handleAudioAddTrackEvent: EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.list.AddTrackEvent> =
         object : EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.list.AddTrackEvent> {
-            var handleActiveQualityChangedEvent: EventListener<ActiveQualityChangedEvent> =
-                EventListener<ActiveQualityChangedEvent> { activeQualityChangedEvent ->
+            var handleActiveQualityChangedEvent:
+                EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.ActiveQualityChangedEvent> =
+                EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.ActiveQualityChangedEvent> {
+                        activeQualityChangedEvent ->
                     val newAudioQuality = activeQualityChangedEvent.quality
-                    playbackQualityProvider.currentVideoQuality = newAudioQuality
+                    playbackQualityProvider.currentAudioQuality = newAudioQuality
                 }
 
-            // TODO: do we need to clean this up when a track is removed?
             public override fun handleEvent(addTrackEvent: com.theoplayer.android.api.event.track.mediatrack.audio.list.AddTrackEvent) {
-                // FIXME: why is this VideoTrackEventTypes?
                 addTrackEvent.track.addEventListener(
-                    VideoTrackEventTypes.ACTIVEQUALITYCHANGEDEVENT,
+                    AudioTrackEventTypes.ACTIVEQUALITYCHANGEDEVENT,
                     handleActiveQualityChangedEvent,
                 )
             }
         }
-
-    companion object {
-        private const val TAG = "SourceEventListener"
-    }
 }

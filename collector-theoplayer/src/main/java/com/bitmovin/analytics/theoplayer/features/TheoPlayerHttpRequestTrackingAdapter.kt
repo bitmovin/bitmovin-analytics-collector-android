@@ -59,28 +59,26 @@ internal class TheoPlayerNetworkRequestInterceptor(
 ) : HTTPInterceptor {
     // Urls can practically be up to 2000 characters, this means we could
     // potentially have 100*2000*4bytes (utf-8) = 800kb cache
-    private val requestStartTimes = LruCache<String, Long>(100)
+    private val requestStartTimes = LruCache<String, Long>(MAX_CACHE_SIZE)
 
     fun reset() {
         requestStartTimes.evictAll()
     }
 
     override suspend fun onRequest(request: InterceptableHTTPRequest) {
-        val trimmedUrl = limitLengthFromTheStart(request.url.toString())
-        requestStartTimes.put(trimmedUrl, Util.timestamp)
+        val trimmedUrl = truncateStartOfString(request.url.toString())
+        requestStartTimes.put(trimmedUrl, Util.elapsedTime)
     }
 
     override suspend fun onResponse(response: InterceptableHTTPResponse) {
         catchAndLogException("Exception occurred in TheoPlayer HTTP response interceptor") {
             val url = response.url.toString()
-            val httpStatus = response.status
-            val trimmedUrl = limitLengthFromTheStart(response.url.toString())
+            val trimmedUrl = truncateStartOfString(url)
             val requestStartTime: Long? = requestStartTimes.remove(trimmedUrl)
-            val downloadTime = if (requestStartTime != null) Util.timestamp - requestStartTime else 0L
-            val sizeInBytes =
-                response.headers.entries
-                    .firstOrNull { it.key.equals("content-length", ignoreCase = true) }
-                    ?.value?.toLongOrNull()
+            val downloadTimeInMs = if (requestStartTime != null) Util.elapsedTime - requestStartTime else 0L
+            val sizeInBytes = extractContentLengthFromHeaders(response.headers)
+
+            val httpStatus = response.status
             val isSuccess = httpStatus in 200..399
             val requestType = mapHttpRequestType(response.request)
 
@@ -91,7 +89,7 @@ internal class TheoPlayerNetworkRequestInterceptor(
                     url,
                     null,
                     httpStatus,
-                    downloadTime,
+                    downloadTimeInMs,
                     null,
                     sizeInBytes,
                     isSuccess,
@@ -104,14 +102,24 @@ internal class TheoPlayerNetworkRequestInterceptor(
 
     companion object {
         private val TAG = TheoPlayerNetworkRequestInterceptor::class.java.name
-        private const val MAX_PATH_LENGTH = 2000
+        private const val MAX_URL_LENGTH = 2000
+        private const val MAX_CACHE_SIZE = 100
 
-        private fun limitLengthFromTheStart(stringToLimit: String): String {
-            if (stringToLimit.length <= MAX_PATH_LENGTH) {
+        // truncate string if it exceeds limit
+        private fun truncateStartOfString(stringToLimit: String): String {
+            if (stringToLimit.length <= MAX_URL_LENGTH) {
                 return stringToLimit
             }
 
-            return stringToLimit.takeLast(MAX_PATH_LENGTH)
+            return stringToLimit.takeLast(MAX_URL_LENGTH)
+        }
+
+        private fun extractContentLengthFromHeaders(headers: MutableMap<String, String>): Long? {
+            val sizeInBytes =
+                headers.entries
+                    .firstOrNull { it.key.equals("content-length", ignoreCase = true) }
+                    ?.value?.toLongOrNull()
+            return sizeInBytes
         }
 
         private fun catchAndLogException(
