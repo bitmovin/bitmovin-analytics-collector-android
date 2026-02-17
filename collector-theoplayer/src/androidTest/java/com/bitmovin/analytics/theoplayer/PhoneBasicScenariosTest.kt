@@ -81,6 +81,17 @@ class PhoneBasicScenariosTest {
             )
         set(_) {}
 
+    private var progressiveSourceMetadata: SourceMetadata
+        get() =
+            SourceMetadata(
+                title = metadataGenerator.getTestTitle(),
+                videoId = "progressive",
+                path = "progressivePath",
+                customData = TestConfig.createDummyCustomData(),
+                cdnProvider = "cdn_provider",
+            )
+        set(_) {}
+
     private var liveSourceMetadata: SourceMetadata
         get() =
             SourceMetadata(
@@ -127,6 +138,15 @@ class PhoneBasicScenariosTest {
     private val dashVodDescription =
         SourceDescription
             .Builder(dashVod)
+            .build()
+
+    private val progressiveSource =
+        TypedSource
+            .Builder(TestSources.PROGRESSIVE.progUrl!!)
+            .build()
+    private val progressiveSourceDescription =
+        SourceDescription
+            .Builder(progressiveSource)
             .build()
 
     private val liveSource =
@@ -883,6 +903,55 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyHasNoErrorSamples(impression)
             val eventDataList = impression.eventDataList
             assertThat(eventDataList).allSatisfy { it.customData1 == "dynamicCdnProvider" }
+        }
+    }
+
+    @Test
+    fun test_vodProgressive_playPauseWithAutoPlay() {
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                player.isAutoplay = true
+                player.volume = 0.0
+                val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+                collector.sourceMetadata = progressiveSourceMetadata
+                collector.attachPlayer(player)
+                player.source = progressiveSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            // wait a bit to make sure all samples are handled
+            Thread.sleep(500)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(1)
+
+            val impression = impressions.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+
+            // we should get at least 2 events
+            // startup -> playing
+            assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(2)
+            val startupSample = eventDataList.first()
+            val playingSamples = eventDataList.filter { it.played > 0 }
+            assertThat(playingSamples).hasSizeGreaterThanOrEqualTo(1)
+
+            DataVerifier.verifyStaticData(
+                eventDataList,
+                progressiveSourceMetadata,
+                TestSources.PROGRESSIVE,
+                TheoPlayerConstants.playerInfo,
+                false,
+            )
+            DataVerifier.verifyStartupSample(startupSample)
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
+            DataVerifier.verifyInvariants(eventDataList)
         }
     }
 }
