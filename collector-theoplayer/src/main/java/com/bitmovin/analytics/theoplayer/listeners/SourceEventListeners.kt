@@ -60,6 +60,7 @@ internal class SourceEventListeners(
 
             // TODO: do we need to clean this up when a track is removed?
             public override fun handleEvent(addTrackEvent: com.theoplayer.android.api.event.track.mediatrack.audio.list.AddTrackEvent) {
+                // FIXME: why is this VideoTrackEventTypes?
                 addTrackEvent.track.addEventListener(
                     VideoTrackEventTypes.ACTIVEQUALITYCHANGEDEVENT,
                     handleActiveQualityChangedEvent,
