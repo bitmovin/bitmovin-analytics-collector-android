@@ -136,10 +136,12 @@ class ProgramChangeScenariosTest {
             val impressionId1 = firstStartupSample.impressionId
 
             // There should be a playing sample that closes session 1
-            val playingSamples1 = firstImpressionEvents.filter { it.state == "playing" }
-            assertThat(playingSamples1).hasSizeGreaterThanOrEqualTo(1)
-            assertThat(playingSamples1.all { it.impressionId == impressionId1 }).isTrue()
-            assertThat(playingSamples1.all { it.videoId == sourceMetadataProgram1.videoId }).isTrue()
+            // this sample should also be marked with isProgramChange
+            val lastSampleOfSession1 = firstImpressionEvents.last()
+            assertThat(lastSampleOfSession1.played).isGreaterThan(0)
+            assertThat(lastSampleOfSession1.impressionId).isEqualTo(impressionId1)
+            assertThat(lastSampleOfSession1.videoId).isEqualTo(sourceMetadataProgram1.videoId)
+            assertThat(lastSampleOfSession1.isProgramChange).isTrue
 
             // Verify second impression (program 2)
             val secondImpression = impressions[1]
@@ -391,12 +393,17 @@ class ProgramChangeScenariosTest {
             assertThat(firstStartup.videoId).isEqualTo("program-1")
             assertThat(firstStartup.isProgramChange).isNull()
 
+            val lastSampleOfSession1 = impressions[0].eventDataList.last()
+            assertThat(lastSampleOfSession1.isProgramChange).isTrue
+
             // Verify second impression (programChange flag)
             val secondStartup = impressions[1].eventDataList.first()
             DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(impressions[1].eventDataList)
             assertThat(secondStartup.videoId).isEqualTo("program-2")
             assertThat(secondStartup.isProgramChange).isTrue()
             assertThat(secondStartup.videoStartupTime).isEqualTo(1)
+            val lastSampleOfSession2 = impressions[1].eventDataList.last()
+            assertThat(lastSampleOfSession2.isProgramChange).isTrue
 
             // Verify third impression (programChange flag)
             val thirdStartup = impressions[2].eventDataList.first()
@@ -404,6 +411,9 @@ class ProgramChangeScenariosTest {
             assertThat(thirdStartup.videoId).isEqualTo("program-3")
             assertThat(thirdStartup.isProgramChange).isTrue()
             assertThat(thirdStartup.videoStartupTime).isEqualTo(1)
+
+            val lastSampleOfSession3 = impressions[2].eventDataList.last()
+            assertThat(lastSampleOfSession3.isProgramChange).isNull()
         }
 
     @Test

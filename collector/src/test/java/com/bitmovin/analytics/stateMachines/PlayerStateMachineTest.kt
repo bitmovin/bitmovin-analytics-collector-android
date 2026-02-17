@@ -60,7 +60,7 @@ class PlayerStateMachineTest {
         playerStateMachine.triggerLastSampleOfSession()
 
         // Assert
-        verify { listener.onTriggerSample(any(), eq(0), eq(false)) }
+        verify { listener.onTriggerSample(any(), eq(0), eq(SampleTriggerReason.SESSION_ENDED)) }
         assertEquals(PlayerStates.PLAYING, playerStateMachine.currentState)
     }
 
@@ -75,7 +75,7 @@ class PlayerStateMachineTest {
         playerStateMachine.triggerLastSampleOfSession()
 
         // Assert
-        verify { listener.onTriggerSample(any(), eq(0), eq(false)) }
+        verify { listener.onTriggerSample(any(), eq(0), eq(SampleTriggerReason.SESSION_ENDED)) }
         assertEquals(PlayerStates.AD, playerStateMachine.currentState)
     }
 
@@ -92,7 +92,7 @@ class PlayerStateMachineTest {
         playerStateMachine.triggerLastSampleOfSession()
 
         // Assert
-        verify(exactly = 1) { listener.onTriggerSample(any(), eq(0), eq(false)) }
+        verify(exactly = 1) { listener.onTriggerSample(any(), eq(0), eq(SampleTriggerReason.SESSION_ENDED)) }
         assertEquals(PlayerStates.BUFFERING, playerStateMachine.currentState)
     }
 

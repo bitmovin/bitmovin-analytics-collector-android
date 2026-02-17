@@ -10,6 +10,7 @@ import com.bitmovin.analytics.dtos.ErrorCode
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.SampleTriggerReason
 
 private enum class SsaiState {
     AD_BREAK_STARTED, // Ad Break Started but no ssai ad is running yet
@@ -48,7 +49,7 @@ class SsaiService(
         }
         this.ssaiEngagementMetricsService.flushCurrentAdSample()
 
-        stateMachine.triggerSampleIfPlaying(ssaiRelated = true)
+        stateMachine.triggerSampleIfPlaying(SampleTriggerReason.SSAI)
 
         this.state = SsaiState.AD_RUNNING
         // to include the adIndex in the next sample which will be the first sample of this started ad
@@ -66,7 +67,7 @@ class SsaiService(
         this.ssaiEngagementMetricsService.flushCurrentAdSample()
 
         if (this.state == SsaiState.AD_RUNNING) {
-            stateMachine.triggerSampleIfPlaying(ssaiRelated = true)
+            stateMachine.triggerSampleIfPlaying(SampleTriggerReason.SSAI)
         }
         this.resetAdBreakRelatedState()
     }

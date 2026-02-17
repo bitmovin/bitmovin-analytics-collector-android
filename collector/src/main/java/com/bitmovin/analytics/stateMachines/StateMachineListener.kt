@@ -23,7 +23,7 @@ interface StateMachineListener {
     fun onTriggerSample(
         stateMachine: PlayerStateMachine,
         duration: Long,
-        ssaiRelated: Boolean,
+        sampleTriggerReason: SampleTriggerReason,
     )
 
     fun onRebuffering(

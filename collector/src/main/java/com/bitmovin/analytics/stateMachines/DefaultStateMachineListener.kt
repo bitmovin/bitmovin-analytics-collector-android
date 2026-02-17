@@ -80,7 +80,7 @@ class DefaultStateMachineListener(
     override fun onTriggerSample(
         stateMachine: PlayerStateMachine,
         duration: Long,
-        ssaiRelated: Boolean,
+        sampleTriggerReason: SampleTriggerReason,
     ) {
         BitmovinLog.d(
             TAG,
@@ -107,8 +107,12 @@ class DefaultStateMachineListener(
         data.videoTimeStart = stateMachine.videoTimeStart
         data.videoTimeEnd = stateMachine.videoTimeEnd
 
-        if (ssaiRelated || data.ad == AdType.SERVER_SIDE.value) {
+        if (sampleTriggerReason == SampleTriggerReason.SSAI || data.ad == AdType.SERVER_SIDE.value) {
             data.ssaiRelatedSample = true
+        }
+
+        if (sampleTriggerReason == SampleTriggerReason.PROGRAMCHANGE) {
+            data.isProgramChange = true
         }
 
         analytics.sendEventData(data)

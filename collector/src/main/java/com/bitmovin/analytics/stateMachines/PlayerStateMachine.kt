@@ -102,15 +102,15 @@ class PlayerStateMachine(
     }
 
     // last sample of session when collector is detached
-    // player destroyed, or source unloaded
-    fun triggerLastSampleOfSession() {
+    // player destroyed, or source unloaded, or programChange happened
+    fun triggerLastSampleOfSession(sampleTriggerReason: SampleTriggerReason = SampleTriggerReason.SESSION_ENDED) {
         // we only send the last sample if we are in a state that is not triggering
         // an immediate sample by itself and ignore PAUSE, since that one is not relevant as a last sample
         if (currentState === PlayerStates.PLAYING ||
             currentState === PlayerStates.BUFFERING ||
             currentState === PlayerStates.AD
         ) {
-            triggerSample()
+            triggerSample(sampleTriggerReason)
         }
     }
 
@@ -160,10 +160,10 @@ class PlayerStateMachine(
     }
 
     // Trigger sample that is not caused by a player event directly (heartbeat, ssai ad block, detaching,...
-    private fun triggerSample(ssaiRelated: Boolean = false) {
+    private fun triggerSample(sampleTriggerReason: SampleTriggerReason = SampleTriggerReason.SESSION_ENDED) {
         val elapsedTime = Util.elapsedTime
         videoTimeEnd = playerContext.position
-        listeners.notify { it.onTriggerSample(this, elapsedTime - elapsedTimeOnEnter, ssaiRelated) }
+        listeners.notify { it.onTriggerSample(this, elapsedTime - elapsedTimeOnEnter, sampleTriggerReason) }
         elapsedTimeOnEnter = elapsedTime
         videoTimeStart = videoTimeEnd
     }
@@ -289,7 +289,7 @@ class PlayerStateMachine(
     }
 
     fun programChange(onAfterSessionReset: () -> Unit) {
-        triggerLastSampleOfSession()
+        triggerLastSampleOfSession(SampleTriggerReason.PROGRAMCHANGE)
         analytics.resetSequenceNumberAndImpressionId()
         onAfterSessionReset()
         triggerProgramChangeSample()
@@ -364,12 +364,12 @@ class PlayerStateMachine(
         transitionState(PlayerStates.VIDEOSTART_FAILED, position)
     }
 
-    fun triggerSampleIfPlaying(ssaiRelated: Boolean = false) {
+    fun triggerSampleIfPlaying(sampleTriggerReason: SampleTriggerReason) {
         if (currentState != PlayerStates.PLAYING) {
             return
         }
 
-        triggerSample(ssaiRelated)
+        triggerSample(sampleTriggerReason)
     }
 
     fun shouldReportError(errorCode: ErrorCode): Boolean {

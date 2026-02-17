@@ -6,6 +6,7 @@ import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.SampleTriggerReason
 import io.mockk.mockk
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
@@ -41,7 +42,7 @@ class SsaiServiceTests {
         ssaiService.manipulate(sample)
 
         // assert
-        verify(exactly = 1) { stateMachineMock.triggerSampleIfPlaying(eq(true)) }
+        verify(exactly = 1) { stateMachineMock.triggerSampleIfPlaying(eq(SampleTriggerReason.SSAI)) }
         assertThat(sample.ad).isEqualTo(2)
         assertThat(sample.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
         assertThat(sample.adIndex).isEqualTo(0)
@@ -62,7 +63,7 @@ class SsaiServiceTests {
         ssaiService.manipulate(sample)
 
         // assert
-        verify(exactly = 1) { stateMachineMock.triggerSampleIfPlaying(eq(true)) }
+        verify(exactly = 1) { stateMachineMock.triggerSampleIfPlaying(eq(SampleTriggerReason.SSAI)) }
         assertThat(sample.ad).isEqualTo(2)
         assertThat(sample.adPosition).isNull()
         assertThat(sample.adIndex).isEqualTo(0)
@@ -120,7 +121,7 @@ class SsaiServiceTests {
         assertThat(sample1.adIndex).isEqualTo(0)
         assertThat(sample2.adIndex).isNull()
         assertThat(sample3.adIndex).isEqualTo(1)
-        verify(exactly = 2) { stateMachineMock.triggerSampleIfPlaying(eq(true)) }
+        verify(exactly = 2) { stateMachineMock.triggerSampleIfPlaying(eq(SampleTriggerReason.SSAI)) }
     }
 
     @Test
@@ -142,7 +143,7 @@ class SsaiServiceTests {
         ssaiService.manipulate(sample3)
 
         // assert
-        verify(exactly = 3) { stateMachineMock.triggerSampleIfPlaying(eq(true)) }
+        verify(exactly = 3) { stateMachineMock.triggerSampleIfPlaying(eq(SampleTriggerReason.SSAI)) }
         assertThat(sample1.ad).isEqualTo(2)
         assertThat(sample1.adPosition).isEqualTo(SsaiAdPosition.PREROLL.toString())
         assertThat(sample1.adIndex).isEqualTo(0)
@@ -180,7 +181,7 @@ class SsaiServiceTests {
         ssaiService.manipulate(sample2)
 
         // assert
-        verify(exactly = 3) { stateMachineMock.triggerSampleIfPlaying(eq(true)) }
+        verify(exactly = 3) { stateMachineMock.triggerSampleIfPlaying(eq(SampleTriggerReason.SSAI)) }
         assertThat(sample1.adIndex).isEqualTo(0)
         assertThat(sample2.adIndex).isEqualTo(0)
     }
