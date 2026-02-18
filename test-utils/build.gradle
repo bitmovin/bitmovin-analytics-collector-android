@@ -25,6 +25,7 @@ android {
 }
 
 dependencies {
+    api project(':test-assets')
     implementation project(':collector')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"

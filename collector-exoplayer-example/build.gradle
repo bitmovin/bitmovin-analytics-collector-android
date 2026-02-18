@@ -62,5 +62,5 @@ dependencies {
     } else {
         implementation "com.bitmovin.analytics:collector-exoplayer:${rootProject.ext.version}"
     }
-    implementation project(':test-utils')
+    implementation project(':test-assets')
 }

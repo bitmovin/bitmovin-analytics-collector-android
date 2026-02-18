@@ -61,5 +61,5 @@ dependencies {
     } else {
         implementation "com.bitmovin.analytics:collector-theoplayer:${rootProject.ext.version}"
     }
-    implementation project(':test-utils')
+    implementation project(':test-assets')
 }

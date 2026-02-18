@@ -11,4 +11,5 @@ include 'collector-theoplayer'
 include 'collector-theoplayer-example'
 
 include 'collector-bitmovin-player-tv-example'
+include 'test-assets'
 include 'test-utils'
