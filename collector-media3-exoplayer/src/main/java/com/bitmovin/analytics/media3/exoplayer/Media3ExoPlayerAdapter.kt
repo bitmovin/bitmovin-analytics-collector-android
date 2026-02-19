@@ -52,7 +52,7 @@ internal class Media3ExoPlayerAdapter(
         looper,
     ) {
     private val meter = DownloadSpeedMeter()
-    private val exoplayerContext = Media3ExoPlayerContext(player)
+    override val playerContext: Media3ExoPlayerContext = Media3ExoPlayerContext(player)
     private val playerStatisticsProvider = PlayerStatisticsProvider()
     private val playbackInfoProvider = PlaybackInfoProvider()
     private val drmInfoProvider = DrmInfoProvider()
@@ -64,7 +64,7 @@ internal class Media3ExoPlayerAdapter(
     internal val defaultAnalyticsListener =
         AnalyticsEventListener(
             stateMachine,
-            exoplayerContext,
+            playerContext,
             qualityEventDataManipulator,
             meter,
             playerStatisticsProvider,
@@ -72,7 +72,7 @@ internal class Media3ExoPlayerAdapter(
             drmInfoProvider,
         )
 
-    private val defaultPlayerEventListener = PlayerEventListener(stateMachine, exoplayerContext)
+    private val defaultPlayerEventListener = PlayerEventListener(stateMachine, playerContext)
 
     override val drmDownloadTime: Long?
         get() = drmInfoProvider.drmDownloadTime
@@ -103,7 +103,7 @@ internal class Media3ExoPlayerAdapter(
     override fun triggerLastSampleOfSession() {
         Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
             if (stateMachine.isInStartupState()) {
-                stateMachine.exitBeforeVideoStart(exoplayerContext.position)
+                stateMachine.exitBeforeVideoStart(playerContext.position)
             } else {
                 stateMachine.triggerLastSampleOfSession()
             }
@@ -160,7 +160,7 @@ internal class Media3ExoPlayerAdapter(
         val isAlreadyPlaying = player.playWhenReady && playbackState == Player.STATE_READY
         if (isBufferingAndWillAutoPlay || isAlreadyPlaying) {
             playbackInfoProvider.isPlaying = true
-            val position = exoplayerContext.position
+            val position = playerContext.position
             BitmovinLog.d(
                 TAG,
                 "Collector was attached while media source was already loading, transitioning to startup state.",

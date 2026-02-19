@@ -74,6 +74,7 @@ class BitmovinSdkAdapterTest {
             BitmovinSdkAdapter(
                 player,
                 mockk(relaxed = true),
+                mockk(relaxed = true),
                 playerStateMachine,
                 mockk(relaxed = true),
                 mockk(relaxed = true),

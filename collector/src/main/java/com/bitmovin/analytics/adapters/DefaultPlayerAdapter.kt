@@ -31,13 +31,12 @@ abstract class DefaultPlayerAdapter(
     looper: Looper,
 ) : PlayerAdapter {
     protected abstract val eventDataManipulators: Collection<EventDataManipulator>
+    abstract override val playerContext: PlayerContext
 
     // TODO [AN-4317]: this wiring is not good, we should aim for getting rid of the PlayerAdapter dependency
     private val ssaiEngagementMetricsService: SsaiEngagementMetricsService =
         SsaiEngagementMetricsService(analytics = bitmovinAnalytics, analyticsConfig = config, playerAdapter = this, Handler(looper))
     final override val ssaiService = SsaiService(stateMachine, ssaiEngagementMetricsService)
-
-    override val isAutoplayEnabled: Boolean? = null
 
     init {
         // store log config settings in a static field to make it accessible for the whole SDK

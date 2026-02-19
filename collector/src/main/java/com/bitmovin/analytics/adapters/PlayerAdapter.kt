@@ -14,7 +14,7 @@ interface PlayerAdapter {
     val drmDownloadTime: Long?
     var defaultMetadata: DefaultMetadata
     val playerInfo: PlayerInfo
-    val isAutoplayEnabled: Boolean?
+    val playerContext: PlayerContext
     val ssaiService: SsaiService
 
     fun init(): Collection<Feature<FeatureConfigContainer, *>>

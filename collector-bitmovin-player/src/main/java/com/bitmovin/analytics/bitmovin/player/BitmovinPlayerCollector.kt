@@ -111,6 +111,7 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
         val playbackQualityProvider = PlaybackQualityProvider(player)
         return BitmovinSdkAdapter(
             player,
+            playerContext,
             config,
             stateMachine,
             featureFactory,

@@ -27,7 +27,7 @@ internal fun createTestImpressionId(numberOfImpression: Int = 1) = UUID(0xB177E5
 
 internal class DummyPlayerAdapter(
     analytics: BitmovinAnalytics,
-    playerContext: PlayerContext,
+    override val playerContext: PlayerContext,
 ) : PlayerAdapter {
     override val stateMachine: PlayerStateMachine =
         PlayerStateMachine.Factory.create(
@@ -36,8 +36,6 @@ internal class DummyPlayerAdapter(
             Looper.getMainLooper(),
             deviceInformationProvider = DeviceInformationProvider(analytics.context),
         )
-    override val isAutoplayEnabled: Boolean?
-        get() = null
 
     override val drmDownloadTime: Long
         get() = 0
@@ -88,6 +86,8 @@ internal class DummyPlayerContext : PlayerContext {
     override fun isPlaying(): Boolean {
         return false
     }
+
+    override fun isAutoplay(): Boolean? = null
 
     override val position: Long
         get() = 0

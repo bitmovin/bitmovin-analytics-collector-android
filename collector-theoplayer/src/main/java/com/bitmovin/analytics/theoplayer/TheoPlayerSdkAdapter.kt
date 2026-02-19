@@ -4,6 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
@@ -27,6 +28,7 @@ import com.theoplayer.android.api.player.Player
 
 internal class TheoPlayerSdkAdapter(
     private val player: Player,
+    override val playerContext: PlayerContext,
     config: AnalyticsConfig,
     stateMachine: PlayerStateMachine,
     featureFactory: FeatureFactory,
@@ -58,8 +60,6 @@ internal class TheoPlayerSdkAdapter(
 
     private val analyticsEventListeners = AnalyticsEventListeners(bitmovinAnalytics, stateMachine, player, playbackQualityProvider)
     private val sourceEventListeners = SourceEventListeners(stateMachine, player, playbackQualityProvider)
-
-    override val isAutoplayEnabled: Boolean = player.isAutoplay
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = super.init()

@@ -9,6 +9,8 @@ internal class BitmovinPlayerContext(private val player: Player) : PlayerContext
         return player.isPlaying
     }
 
+    override fun isAutoplay(): Boolean = player.config.playbackConfig.isAutoplayEnabled
+
     override val position: Long
         get() = BitmovinUtil.getCurrentTimeInMs(player)
 }

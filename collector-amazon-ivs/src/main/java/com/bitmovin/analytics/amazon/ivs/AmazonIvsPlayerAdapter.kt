@@ -33,7 +33,7 @@ internal class AmazonIvsPlayerAdapter(
     private val playerListener: IvsPlayerListener,
     manipulators: List<EventDataManipulator>,
     private val playerStatisticsProvider: PlayerStatisticsProvider,
-    private val playerContext: PlayerContext,
+    override val playerContext: PlayerContext,
     metadataProvider: MetadataProvider,
     bitmovinAnalytics: BitmovinAnalytics,
     ssaiApiProxy: SsaiApiProxy,

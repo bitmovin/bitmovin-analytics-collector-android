@@ -52,7 +52,7 @@ internal class ExoPlayerAdapter(
         looper,
     ) {
     private val meter = DownloadSpeedMeter()
-    private val exoplayerContext = ExoPlayerContext(exoplayer)
+    override val playerContext: ExoPlayerContext = ExoPlayerContext(exoplayer)
     private val playerStatisticsProvider = PlayerStatisticsProvider()
     private val playbackInfoProvider = PlaybackInfoProvider()
     private val drmInfoProvider = DrmInfoProvider()
@@ -64,14 +64,14 @@ internal class ExoPlayerAdapter(
     internal val defaultAnalyticsListener =
         AnalyticsEventListener(
             stateMachine,
-            exoplayerContext,
+            playerContext,
             qualityEventDataManipulator,
             meter,
             playerStatisticsProvider,
             playbackInfoProvider,
             drmInfoProvider,
         )
-    private val defaultPlayerEventListener = PlayerEventListener(stateMachine, exoplayerContext)
+    private val defaultPlayerEventListener = PlayerEventListener(stateMachine, playerContext)
 
     override val drmDownloadTime: Long?
         get() = drmInfoProvider.drmDownloadTime
@@ -158,7 +158,7 @@ internal class ExoPlayerAdapter(
         val isAlreadyPlaying = exoplayer.playWhenReady && playbackState == Player.STATE_READY
         if (isBufferingAndWillAutoPlay || isAlreadyPlaying) {
             playbackInfoProvider.isPlaying = true
-            val position = exoplayerContext.position
+            val position = playerContext.position
 
             BitmovinLog.d(
                 TAG,

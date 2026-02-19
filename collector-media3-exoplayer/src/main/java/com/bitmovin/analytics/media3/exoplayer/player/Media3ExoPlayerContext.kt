@@ -35,6 +35,8 @@ internal class Media3ExoPlayerContext(private val player: Player) : PlayerContex
             return 0
         }
 
+    override fun isAutoplay(): Boolean = player.playWhenReady
+
     val playWhenReady get() = player.playWhenReady
 
     val getUriOfCurrentMedia get() = player.currentMediaItem?.localConfiguration?.uri

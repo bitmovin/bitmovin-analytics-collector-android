@@ -147,7 +147,7 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyStartupSample(eventDataList[0])
             DataVerifier.verifyInvariants(eventDataList)
             DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true, true))
             DataVerifier.verifyBandwidthMetrics(eventDataList)
         }
 
@@ -342,7 +342,7 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyStartupSample(eventDataList[0])
             DataVerifier.verifyInvariants(eventDataList)
             DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true))
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true, true))
         }
 
     @Test
@@ -474,7 +474,7 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyMpdSourceUrl(eventDataList, liveSample.mpdUrl!!)
             DataVerifier.verifyStartupSample(eventDataList[0])
             DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(false))
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(false, isAutoPlayEnabled = true))
             DataVerifier.verifyInvariants(eventDataList)
 
             val filteredList = EventDataUtils.filterNonDeterministicEvents(eventDataList)

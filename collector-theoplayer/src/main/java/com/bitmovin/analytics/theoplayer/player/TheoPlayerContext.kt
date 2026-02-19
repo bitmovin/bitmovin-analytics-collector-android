@@ -8,6 +8,8 @@ internal class TheoPlayerContext(private val player: Player) : PlayerContext {
         return player.isPlaying()
     }
 
+    override fun isAutoplay(): Boolean = player.isAutoplay
+
     override val position: Long
         get() = player.currentPositionInMs()
 }

@@ -25,7 +25,7 @@ internal class ExoPlayerContext(private val player: Player) : PlayerContext {
                     var position = (
                         player.currentPosition -
                             firstPeriodInWindow.positionInWindowMs
-                        )
+                    )
                     if (position < 0) {
                         position = 0
                     }
@@ -34,6 +34,8 @@ internal class ExoPlayerContext(private val player: Player) : PlayerContext {
             }
             return 0
         }
+
+    override fun isAutoplay(): Boolean = player.playWhenReady
 
     val playWhenReady get() = player.playWhenReady
 }

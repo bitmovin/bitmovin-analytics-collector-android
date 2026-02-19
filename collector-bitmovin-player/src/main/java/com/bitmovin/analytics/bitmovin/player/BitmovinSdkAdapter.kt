@@ -4,6 +4,7 @@ import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
@@ -50,6 +51,7 @@ import java.util.Date
 
 internal class BitmovinSdkAdapter(
     private val player: Player,
+    override val playerContext: PlayerContext,
     config: AnalyticsConfig,
     stateMachine: PlayerStateMachine,
     featureFactory: FeatureFactory,
@@ -84,8 +86,6 @@ internal class BitmovinSdkAdapter(
     private var overrideCurrentSource: Source? = null
     override var drmDownloadTime: Long? = null
         private set
-
-    override val isAutoplayEnabled: Boolean = player.config.playbackConfig.isAutoplayEnabled
 
     override val eventDataManipulators: Collection<EventDataManipulator> by lazy { listOf(this) }
 

@@ -8,6 +8,9 @@ internal class IvsPlayerContext(private val player: Player) : PlayerContext {
         return player.state == Player.State.PLAYING
     }
 
+    // IVS player doesn't report if it is autoplay or not
+    override fun isAutoplay(): Boolean? = null
+
     override val position: Long
         get() = player.position
 }

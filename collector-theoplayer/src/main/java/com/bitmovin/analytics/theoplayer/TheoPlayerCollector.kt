@@ -60,6 +60,7 @@ internal class TheoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Co
         val playerStatisticsProvider = PlayerStatisticsProvider()
         return TheoPlayerSdkAdapter(
             player,
+            playerContext,
             config,
             stateMachine,
             featureFactory,

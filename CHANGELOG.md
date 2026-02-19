@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
+- Add autoplay tracking for media3 exoplayer and exoplayer
 - [Internal] Refactoring around audiotrackchange handling
+- [Internal] Refactor autoplay tracking to be pushed into player context
 
 ## v3.23.0
 
