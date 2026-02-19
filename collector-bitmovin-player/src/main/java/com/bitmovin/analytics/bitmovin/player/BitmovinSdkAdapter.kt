@@ -480,25 +480,15 @@ internal class BitmovinSdkAdapter(
         }
     }
 
-    private fun onSourceEventAudioChanged(
-        @Suppress("UNUSED_PARAMETER") event: SourceEvent.AudioChanged,
-    ) {
+    private fun onSourceEventAudioChanged(event: SourceEvent.AudioChanged) {
         try {
             BitmovinLog.d(TAG, "On AudioChanged")
 
-            // TODO AN-3298 add a audio track changed to the statemachine that will check if
-            // transition is allowed and make sure the old sample is send with the old audio track value
-            if (!stateMachine.isStartupFinished) {
-                return
-            }
-            if (stateMachine.currentState !== PlayerStates.PLAYING &&
-                stateMachine.currentState !== PlayerStates.PAUSE
-            ) {
-                return
-            }
-            val originalState = stateMachine.currentState
-            stateMachine.transitionState(PlayerStates.AUDIOTRACKCHANGE, position)
-            stateMachine.transitionState(originalState, position)
+            stateMachine.audioTrackChanged(
+                position,
+                event.oldAudioTrack?.language,
+                event.newAudioTrack?.language,
+            )
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
         }

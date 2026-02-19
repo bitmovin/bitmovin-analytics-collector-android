@@ -245,7 +245,10 @@ class DefaultStateMachineListener(
         analytics.sendEventData(data)
     }
 
-    override fun onAudioTrackChange(stateMachine: PlayerStateMachine) {
+    override fun onAudioTrackChange(
+        stateMachine: PlayerStateMachine,
+        oldAudioLanguage: String?,
+    ) {
         BitmovinLog.d(TAG, String.format("onAudioTrackChange %s", analytics.impressionId))
         val data = playerAdapter.createEventData()
         data.state = stateMachine.currentState.name

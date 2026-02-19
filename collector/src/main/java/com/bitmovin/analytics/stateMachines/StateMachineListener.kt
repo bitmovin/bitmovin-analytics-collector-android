@@ -61,7 +61,10 @@ interface StateMachineListener {
         oldValue: SubtitleDto?,
     )
 
-    fun onAudioTrackChange(stateMachine: PlayerStateMachine)
+    fun onAudioTrackChange(
+        stateMachine: PlayerStateMachine,
+        oldAudioLanguage: String?,
+    )
 
     fun onVideoStartFailed(
         stateMachine: PlayerStateMachine,

@@ -197,14 +197,14 @@ class PlayerStates {
         @JvmField val CUSTOMDATACHANGE = DefaultPlayerState<Void>("customdatachange")
 
         @JvmField val AUDIOTRACKCHANGE =
-            object : DefaultPlayerState<Void>("audiotrackchange") {
+            object : DefaultPlayerState<String>("audiotrackchange") {
                 override fun onExitState(
                     machine: PlayerStateMachine,
                     elapsedTime: Long,
                     durationInState: Long,
                     destinationPlayerState: PlayerState<*>,
                 ) {
-                    machine.listeners.notify { it.onAudioTrackChange(machine) }
+                    machine.listeners.notify { it.onAudioTrackChange(machine, dataOnEnter) }
                 }
             }
 

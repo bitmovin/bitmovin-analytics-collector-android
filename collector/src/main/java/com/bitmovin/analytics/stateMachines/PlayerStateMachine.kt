@@ -343,6 +343,19 @@ class PlayerStateMachine(
         transitionState(originalState, videoTime)
     }
 
+    fun audioTrackChanged(
+        videoTime: Long,
+        oldAudioLanguage: String?,
+        newAudioLanguage: String?,
+    ) {
+        if (!isStartupFinished) return
+        if (!isPlayingOrPaused) return
+        if (oldAudioLanguage == newAudioLanguage) return
+        val originalState = currentState
+        transitionState(PlayerStates.AUDIOTRACKCHANGE, videoTime, oldAudioLanguage)
+        transitionState(originalState, videoTime)
+    }
+
     fun videoQualityChanged(
         videoTime: Long,
         didQualityChange: Boolean,
