@@ -6,9 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
-### Changed
-- Add autoplay tracking for media3 exoplayer and exoplayer
+## v3.23.1
+
+### Fixed
 - Provide more accurate data on the last sample before player is destroyed or source is changed
+
+### Added
+- Add autoplay tracking for media3 exoplayer and exoplayer
+
+### Changed
 - [Internal] Refactoring around audiotrackchange handling
 - [Internal] Refactor autoplay tracking to be pushed into player context
 
