@@ -24,6 +24,7 @@ import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
+import com.bitmovin.analytics.stateMachines.SampleTriggerReason
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.google.android.exoplayer2.ExoPlayer
@@ -133,12 +134,12 @@ internal class ExoPlayerAdapter(
         stateMachine.transitionState(PlayerStates.STARTUP, position)
     }
 
-    override fun triggerLastSampleOfSession() {
+    override fun triggerSampleOnDetach() {
         // this method ensure that we are accessing the exoplayer on the correct looper
         // on detaching, to send out the last sample.
         // player could crash otherwise
         ExoUtil.executeSyncOrAsyncOnLooperThread(exoplayer.applicationLooper) {
-            stateMachine.triggerLastSampleOfSession()
+            stateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
         }
     }
 

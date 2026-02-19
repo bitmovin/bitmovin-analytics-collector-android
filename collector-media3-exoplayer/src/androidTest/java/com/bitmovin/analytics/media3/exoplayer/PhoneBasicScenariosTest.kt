@@ -1061,5 +1061,6 @@ class PhoneBasicScenariosTest {
 
             val playingTime = filteredList.map { it.played }.reduce(Long::plus)
             assertThat(playingTime).isGreaterThan(1700)
+            DataVerifier.verifyDataOnLastSample(impression.eventDataList)
         }
 }

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Add autoplay tracking for media3 exoplayer and exoplayer
+- Provide more accurate data on the last sample before player is destroyed or source is changed
 - [Internal] Refactoring around audiotrackchange handling
 - [Internal] Refactor autoplay tracking to be pushed into player context
 

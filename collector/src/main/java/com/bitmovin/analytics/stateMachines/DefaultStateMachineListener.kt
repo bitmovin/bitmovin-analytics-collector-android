@@ -4,6 +4,7 @@ import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.error.ErrorSeverity
+import com.bitmovin.analytics.data.cache.CacheService
 import com.bitmovin.analytics.dtos.ErrorCode
 import com.bitmovin.analytics.dtos.SubtitleDto
 import com.bitmovin.analytics.enums.AdType
@@ -21,6 +22,7 @@ class DefaultStateMachineListener(
     private val playerAdapter: PlayerAdapter,
     private val errorDetailObservable: ObservableSupport<OnErrorDetailEventListener>,
     private val ssaiService: SsaiService,
+    private val cacheService: CacheService,
 ) : StateMachineListener {
     companion object {
         private val TAG = DefaultStateMachineListener::class.java.name
@@ -111,8 +113,12 @@ class DefaultStateMachineListener(
             data.ssaiRelatedSample = true
         }
 
-        if (sampleTriggerReason == SampleTriggerReason.PROGRAMCHANGE) {
+        if (sampleTriggerReason == SampleTriggerReason.PROGRAM_CHANGE) {
             data.isProgramChange = true
+        }
+
+        if (sampleTriggerReason == SampleTriggerReason.DETACH || sampleTriggerReason == SampleTriggerReason.SOURCE_CHANGE) {
+            cacheService.applyCacheOnEventData(eventData = data)
         }
 
         analytics.sendEventData(data)

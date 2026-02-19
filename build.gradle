@@ -240,6 +240,7 @@ apiValidation {
                         "collector-amazon-ivs-example",
                         "collector-media3-exoplayer-example",
                         "collector-theoplayer-example",
+                        "test-assets",
                         "test-utils"]
 
     /*

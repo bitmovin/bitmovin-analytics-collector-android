@@ -1,7 +1,9 @@
 package com.bitmovin.analytics.stateMachines
 
 enum class SampleTriggerReason {
-    SESSION_ENDED,
+    HEARTBEAT,
+    DETACH,
+    SOURCE_CHANGE,
     SSAI,
-    PROGRAMCHANGE,
+    PROGRAM_CHANGE,
 }

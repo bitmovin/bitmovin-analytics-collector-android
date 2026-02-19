@@ -1485,5 +1485,7 @@ class BundledAnalyticsTest {
 
             val playingTime = filteredList.map { it.played }.reduce(Long::plus)
             assertThat(playingTime).isGreaterThan(1700)
+            val lastSample = impression.eventDataList.last()
+            assertThat(lastSample.videoTimeEnd).isGreaterThan(0)
         }
 }

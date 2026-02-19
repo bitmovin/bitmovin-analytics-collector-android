@@ -57,10 +57,10 @@ class PlayerStateMachineTest {
         playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
 
         // Act
-        playerStateMachine.triggerLastSampleOfSession()
+        playerStateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
 
         // Assert
-        verify { listener.onTriggerSample(any(), eq(0), eq(SampleTriggerReason.SESSION_ENDED)) }
+        verify { listener.onTriggerSample(any(), eq(0), eq(SampleTriggerReason.DETACH)) }
         assertEquals(PlayerStates.PLAYING, playerStateMachine.currentState)
     }
 
@@ -72,10 +72,10 @@ class PlayerStateMachineTest {
         playerStateMachine.transitionState(PlayerStates.AD, 0)
 
         // Act
-        playerStateMachine.triggerLastSampleOfSession()
+        playerStateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
 
         // Assert
-        verify { listener.onTriggerSample(any(), eq(0), eq(SampleTriggerReason.SESSION_ENDED)) }
+        verify { listener.onTriggerSample(any(), eq(0), eq(SampleTriggerReason.DETACH)) }
         assertEquals(PlayerStates.AD, playerStateMachine.currentState)
     }
 
@@ -89,10 +89,10 @@ class PlayerStateMachineTest {
         playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
 
         // Act
-        playerStateMachine.triggerLastSampleOfSession()
+        playerStateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
 
         // Assert
-        verify(exactly = 1) { listener.onTriggerSample(any(), eq(0), eq(SampleTriggerReason.SESSION_ENDED)) }
+        verify(exactly = 1) { listener.onTriggerSample(any(), eq(0), eq(SampleTriggerReason.DETACH)) }
         assertEquals(PlayerStates.BUFFERING, playerStateMachine.currentState)
     }
 
@@ -103,7 +103,7 @@ class PlayerStateMachineTest {
         playerStateMachine.listeners.subscribe(listener)
         playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
         // Act
-        playerStateMachine.triggerLastSampleOfSession()
+        playerStateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
 
         // Assert that no sample is triggered
         verify(exactly = 0) { listener.onTriggerSample(any(), any(), any()) }
@@ -119,7 +119,7 @@ class PlayerStateMachineTest {
         playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
         playerStateMachine.transitionState(PlayerStates.PAUSE, 0)
         // Act
-        playerStateMachine.triggerLastSampleOfSession()
+        playerStateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
 
         // Assert that no sample is triggered
         verify(exactly = 0) { listener.onTriggerSample(any(), any(), any()) }
@@ -133,7 +133,7 @@ class PlayerStateMachineTest {
         playerStateMachine.transitionState(PlayerStates.ERROR, 0)
         playerStateMachine.listeners.subscribe(listener)
         // Act
-        playerStateMachine.triggerLastSampleOfSession()
+        playerStateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
 
         // Assert that no sample is triggered
         verify(exactly = 0) { listener.onTriggerSample(any(), any(), any()) }
@@ -146,7 +146,7 @@ class PlayerStateMachineTest {
         val listener = mockk<StateMachineListener>(relaxed = true)
         playerStateMachine.listeners.subscribe(listener)
         // Act
-        playerStateMachine.triggerLastSampleOfSession()
+        playerStateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
 
         // Assert that no sample is triggered
         verify(exactly = 0) { listener.onTriggerSample(any(), any(), any()) }

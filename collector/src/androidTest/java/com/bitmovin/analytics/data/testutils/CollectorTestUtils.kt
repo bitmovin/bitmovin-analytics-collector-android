@@ -79,7 +79,7 @@ internal class DummyPlayerAdapter(
         return TestFactory.createEventData(createTestImpressionId(1))
     }
 
-    override fun triggerLastSampleOfSession() {}
+    override fun triggerSampleOnDetach() {}
 }
 
 internal class DummyPlayerContext : PlayerContext {

@@ -17,6 +17,7 @@ import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.SampleTriggerReason
 import com.bitmovin.analytics.theoplayer.listeners.AnalyticsEventListeners
 import com.bitmovin.analytics.theoplayer.listeners.SourceEventListeners
 import com.bitmovin.analytics.theoplayer.manipulators.PlaybackEventDataManipulator
@@ -85,12 +86,12 @@ internal class TheoPlayerSdkAdapter(
         }
     }
 
-    override fun triggerLastSampleOfSession() {
+    override fun triggerSampleOnDetach() {
         val sendSampleCodeBlock = {
             if (stateMachine.isInStartupState()) {
                 stateMachine.exitBeforeVideoStart(player.currentPositionInMs())
             } else {
-                stateMachine.triggerLastSampleOfSession()
+                stateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
             }
         }
         // We need to make sure this is executed on Main thread because THEO does not always send detach events from main

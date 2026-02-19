@@ -65,7 +65,8 @@ class BitmovinAnalyticsTest {
             BitmovinAnalytics(analyticsConfig, context, sequenceNumberAndImpressionIdProvider = mockImpressionIdProvider)
         val observable = ObservableSupport<OnErrorDetailEventListener>()
         val ssaiService = mockk<SsaiService>(relaxed = true)
-        val defaultStateMachineListener = DefaultStateMachineListener(analytics, mockk(relaxed = true), observable, ssaiService)
+        val defaultStateMachineListener =
+            DefaultStateMachineListener(analytics, mockk(relaxed = true), observable, ssaiService, mockk(relaxed = true))
         val stateMachine = mockk<PlayerStateMachine>()
         val impressionId = "randomImpressionId"
         val durationInStartupStateMs = 123L

@@ -17,6 +17,7 @@ import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.ssai.SsaiEngagementMetricsService
 import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.stateMachines.SampleTriggerReason
 import com.bitmovin.analytics.utils.LogLevelConfig
 
 abstract class DefaultPlayerAdapter(
@@ -74,8 +75,8 @@ abstract class DefaultPlayerAdapter(
             ssaiService.adMetadata,
         )
 
-    override fun triggerLastSampleOfSession() {
-        stateMachine.triggerLastSampleOfSession()
+    override fun triggerSampleOnDetach() {
+        stateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
     }
 
     override fun createEventDataForCustomDataEvent(sourceMetadata: SourceMetadata) =

@@ -522,7 +522,6 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
-            // TODO: verify if buffering or quality change events are happening
             // we expect startup, playing, qualitychange/buffering, playing
             assertThat(eventDataList).hasSizeGreaterThanOrEqualTo(4)
             val startupSample = eventDataList.first()
@@ -565,6 +564,88 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    fun test_vod_sourceChangeDolbyScenario() {
+        runBlockingTest {
+            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                player.isAutoplay = true
+                collector.sourceMetadata = dashSourceMetadata
+                collector.attachPlayer(player)
+                player.source = dashVodDescription
+
+                // This scenario mimics what dolby folks reported as valid scenario
+                // on source change we detach and switch the source
+                player.addEventListener(PlayerEventTypes.SOURCECHANGE) {
+                    if (it.source == hlsRedBullSourceDescription) {
+                        collector.detachPlayer()
+                        collector.sourceMetadata = redBullHlsSourceMetadata
+                        collector.attachPlayer(player)
+                    }
+                }
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
+
+            withContext(mainScope.coroutineContext) {
+                player.source = hlsRedBullSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+                theoPlayerView.onDestroy()
+            }
+
+            Thread.sleep(500)
+
+            MockedIngress.waitForAnalyticsSample()
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(2)
+
+            val firstImpression = impressions.first()
+            DataVerifier.verifyHasNoErrorSamples(firstImpression)
+            val secondImpression = impressions[1]
+
+            val firstImpressionEvents = firstImpression.eventDataList
+
+            assertThat(firstImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
+            val firstStartupSample = firstImpressionEvents.first()
+            val firstPlayingSample = firstImpressionEvents[1]
+            DataVerifier.verifyStartupSample(firstStartupSample)
+            DataVerifier.verifyIsPlayingEvent(firstPlayingSample)
+            DataVerifier.verifyStaticData(
+                firstImpressionEvents,
+                dashSourceMetadata,
+                TestSources.DASH,
+                TheoPlayerConstants.playerInfo,
+                false,
+            )
+            DataVerifier.verifyInvariants(firstImpressionEvents)
+            DataVerifier.verifyDataOnLastSample(firstImpressionEvents)
+
+            val secondImpressionEvents = secondImpression.eventDataList
+            assertThat(secondImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
+            val secondStartupSample = secondImpressionEvents.first()
+            val secondPlayingSample = secondImpressionEvents[1]
+            DataVerifier.verifyStartupSample(secondStartupSample, false)
+            DataVerifier.verifyIsPlayingEvent(secondPlayingSample)
+
+            DataVerifier.verifyStaticData(
+                secondImpressionEvents,
+                redBullHlsSourceMetadata,
+                TestSources.HLS_REDBULL,
+                TheoPlayerConstants.playerInfo,
+                false,
+            )
+            DataVerifier.verifyInvariants(secondImpressionEvents)
+            DataVerifier.verifyDataOnLastSample(secondImpressionEvents)
+        }
+    }
+
+    @Test
     fun test_vod_sourceChangeWithDetachAndAttach() {
         runBlockingTest {
             val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
@@ -578,14 +659,11 @@ class PhoneBasicScenariosTest {
 
             TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
 
+            // Normal detaching/attaching scenario
             withContext(mainScope.coroutineContext) {
-                // switch source
                 collector.detachPlayer()
-                collector.sourceMetadata = redBullHlsSourceMetadata
                 player.source = hlsRedBullSourceDescription
-
-                // TODO: seems like it doesn't matter if we attach after or before the source change
-                // something to be verified
+                collector.sourceMetadata = redBullHlsSourceMetadata
                 collector.attachPlayer(player)
             }
 
@@ -622,6 +700,7 @@ class PhoneBasicScenariosTest {
                 false,
             )
             DataVerifier.verifyInvariants(firstImpressionEvents)
+            DataVerifier.verifyDataOnLastSample(firstImpressionEvents)
 
             val secondImpressionEvents = secondImpression.eventDataList
             assertThat(secondImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
@@ -630,10 +709,6 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyStartupSample(secondStartupSample, false)
             DataVerifier.verifyIsPlayingEvent(secondPlayingSample)
 
-            // TODO: test is a bit flaky, since it seems like on destroy
-            // sometimes the language cannot be tracked anymore
-            // we might have to switch to a different approach
-            // and store the language
             DataVerifier.verifyStaticData(
                 secondImpressionEvents,
                 redBullHlsSourceMetadata,
@@ -642,6 +717,7 @@ class PhoneBasicScenariosTest {
                 false,
             )
             DataVerifier.verifyInvariants(secondImpressionEvents)
+            DataVerifier.verifyDataOnLastSample(secondImpressionEvents)
         }
     }
 

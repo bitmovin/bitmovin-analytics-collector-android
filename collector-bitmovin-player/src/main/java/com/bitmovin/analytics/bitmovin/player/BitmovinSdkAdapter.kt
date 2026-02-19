@@ -83,6 +83,7 @@ internal class BitmovinSdkAdapter(
     // When transitioning in a Playlist, BitmovinPlayer will already return the
     // new source in `getSource`, but we are still interested in sending a sample
     // with information of the previous one.
+    // TODO: we should solve this with the cache, and avoid the properties here
     private var overrideCurrentSource: Source? = null
     override var drmDownloadTime: Long? = null
         private set
@@ -427,6 +428,8 @@ internal class BitmovinSdkAdapter(
             if (!player.isStalled && !player.isPaused && player.isPlaying) {
                 stateMachine.transitionState(PlayerStates.PLAYING, position)
             }
+
+            stateMachine.handlePlayerTimeUpdate()
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
         }

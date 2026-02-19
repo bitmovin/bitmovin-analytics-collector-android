@@ -35,5 +35,5 @@ interface PlayerAdapter {
 
     fun getCurrentSourceMetadata(): SourceMetadata
 
-    fun triggerLastSampleOfSession()
+    fun triggerSampleOnDetach()
 }

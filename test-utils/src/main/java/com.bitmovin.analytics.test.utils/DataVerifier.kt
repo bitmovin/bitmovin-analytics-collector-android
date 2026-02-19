@@ -844,4 +844,26 @@ object DataVerifier {
         assertThat(pausedDuration)
             .isBetween((expectedPauseTimeInMs * 0.85 - 50).toLong(), (expectedPauseTimeInMs * 1.20 + 50).toLong())
     }
+
+    fun verifyDataOnLastSample(eventDataList: List<EventData>) {
+        val lastSample = eventDataList.last()
+        assertThat(lastSample.videoTimeEnd).isGreaterThan(0)
+
+        if (!lastSample.isLive) {
+            assertThat(lastSample.duration).isGreaterThan(0)
+        }
+
+        // make sure that source url is set in at least one field
+        if (lastSample.progUrl == null &&
+            lastSample.mpdUrl == null &&
+            lastSample.m3u8Url == null
+        ) {
+            fail<Nothing>("source url not set on last sample")
+        }
+
+        assertThat(lastSample.streamFormat).isNotEmpty
+        assertThat(lastSample.impressionId).isNotEmpty
+        assertThat(lastSample.videoPlaybackWidth).isGreaterThan(0)
+        assertThat(lastSample.videoPlaybackHeight).isGreaterThan(0)
+    }
 }

@@ -80,7 +80,7 @@ class PlayerStateMachine(
         heartbeatHandler.postDelayed(
             object : Runnable {
                 override fun run() {
-                    triggerSample()
+                    triggerSample(sampleTriggerReason = SampleTriggerReason.HEARTBEAT)
                     currentRebufferingIntervalIndex =
                         Math.min(
                             currentRebufferingIntervalIndex + 1,
@@ -103,7 +103,7 @@ class PlayerStateMachine(
 
     // last sample of session when collector is detached
     // player destroyed, or source unloaded, or programChange happened
-    fun triggerLastSampleOfSession(sampleTriggerReason: SampleTriggerReason = SampleTriggerReason.SESSION_ENDED) {
+    fun triggerLastSampleOfSession(sampleTriggerReason: SampleTriggerReason) {
         // we only send the last sample if we are in a state that is not triggering
         // an immediate sample by itself and ignore PAUSE, since that one is not relevant as a last sample
         if (currentState === PlayerStates.PLAYING ||
@@ -129,14 +129,14 @@ class PlayerStateMachine(
             // https://bitmovin.atlassian.net/browse/AN-4679
             if (deviceInformationProvider.isFireOs8OrHigher) {
                 if (playerIsMakingProgressBetweenHeartbeats()) {
-                    triggerSample()
+                    triggerSample(sampleTriggerReason = SampleTriggerReason.HEARTBEAT)
                     return true
                 } else {
                     pause(playerContext.position)
                     return false
                 }
             } else {
-                triggerSample()
+                triggerSample(sampleTriggerReason = SampleTriggerReason.HEARTBEAT)
                 return true
             }
         } else {
@@ -160,7 +160,7 @@ class PlayerStateMachine(
     }
 
     // Trigger sample that is not caused by a player event directly (heartbeat, ssai ad block, detaching,...
-    private fun triggerSample(sampleTriggerReason: SampleTriggerReason = SampleTriggerReason.SESSION_ENDED) {
+    private fun triggerSample(sampleTriggerReason: SampleTriggerReason) {
         val elapsedTime = Util.elapsedTime
         videoTimeEnd = playerContext.position
         listeners.notify { it.onTriggerSample(this, elapsedTime - elapsedTimeOnEnter, sampleTriggerReason) }
@@ -289,7 +289,7 @@ class PlayerStateMachine(
     }
 
     fun programChange(onAfterSessionReset: () -> Unit) {
-        triggerLastSampleOfSession(SampleTriggerReason.PROGRAMCHANGE)
+        triggerLastSampleOfSession(SampleTriggerReason.PROGRAM_CHANGE)
         analytics.resetSequenceNumberAndImpressionId()
         onAfterSessionReset()
         triggerProgramChangeSample()
@@ -383,6 +383,10 @@ class PlayerStateMachine(
         }
 
         triggerSample(sampleTriggerReason)
+    }
+
+    fun handlePlayerTimeUpdate() {
+        analytics.updateCacheVideoTime(playerContext.position)
     }
 
     fun shouldReportError(errorCode: ErrorCode): Boolean {

@@ -681,7 +681,7 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             // since use lowest quality, we expect only 1 startup and 2 playing sample
-            // (one for the hearbeat itself and one for detaching)
+            // (one for the heartbeat itself and one for detaching)
             // (using lowest quality doesn't trigger qualitychange events)
             assertThat(impression.eventDataList).hasSize(3)
             DataVerifier.verifyStartupSample(impression.eventDataList[0])
@@ -690,6 +690,12 @@ class PhoneBasicScenariosTest {
             val secondSample = impression.eventDataList[1]
             assertThat(secondSample.state).isEqualTo(DataVerifier.PLAYING)
             assertThat(secondSample.played).isGreaterThan(55000L)
+
+            // verify that we set the videoTimeEnd on detaching
+            // this is best effort since we update the videoTime end consistently
+            // and use the last known value when the session ends
+            val lastSample = impression.eventDataList.last()
+            assertThat(lastSample.videoTimeEnd).isGreaterThan(60000)
         }
 
     @Test

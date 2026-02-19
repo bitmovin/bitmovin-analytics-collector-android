@@ -18,7 +18,8 @@ class DefaultStateMachineListenerTest {
         val analyticsMock = mockk<BitmovinAnalytics>(relaxed = true)
         val playerAdapterMock = mockk<PlayerAdapter>(relaxed = true)
         val ssaiServiceMock = mockk<SsaiService>(relaxed = true)
-        val listener = DefaultStateMachineListener(analyticsMock, playerAdapterMock, mockk(relaxed = true), ssaiServiceMock)
+        val listener =
+            DefaultStateMachineListener(analyticsMock, playerAdapterMock, mockk(relaxed = true), ssaiServiceMock, mockk(relaxed = true))
 
         val stateMachineMock = mockk<PlayerStateMachine>(relaxed = true)
         val eventData = createDefaultEventData()

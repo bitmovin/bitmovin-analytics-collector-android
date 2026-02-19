@@ -26,6 +26,7 @@ import com.bitmovin.analytics.media3.exoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
+import com.bitmovin.analytics.stateMachines.SampleTriggerReason
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 
@@ -100,12 +101,12 @@ internal class Media3ExoPlayerAdapter(
         )
     }
 
-    override fun triggerLastSampleOfSession() {
+    override fun triggerSampleOnDetach() {
         Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
             if (stateMachine.isInStartupState()) {
                 stateMachine.exitBeforeVideoStart(playerContext.position)
             } else {
-                stateMachine.triggerLastSampleOfSession()
+                stateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
             }
         }
     }

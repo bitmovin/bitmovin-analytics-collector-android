@@ -297,10 +297,17 @@ class SpecialScenariosTest {
             DataVerifier.verifyHasNoErrorSamples(progEvents)
             DataVerifier.verifyHasNoErrorSamples(dashEvents)
 
+            // at least two samples are sent (startup and playing)
+            assertThat(progEvents.eventDataList).hasSizeGreaterThanOrEqualTo(2)
+            assertThat(dashEvents.eventDataList).hasSizeGreaterThanOrEqualTo(2)
+
             val progStartup = EventDataUtils.getStartupEvent(progEvents.eventDataList)
             val dashStartup = EventDataUtils.getStartupEvent(dashEvents.eventDataList)
 
             assertStartupSamples(progStartup, dashStartup)
+
+            DataVerifier.verifyDataOnLastSample(progEvents.eventDataList)
+            DataVerifier.verifyDataOnLastSample(dashEvents.eventDataList)
         }
 
     private fun assertStartupSamples(

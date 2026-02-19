@@ -4,6 +4,7 @@ import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
+import com.bitmovin.analytics.stateMachines.SampleTriggerReason
 import com.bitmovin.analytics.theoplayer.errors.TheoPlayerExceptionMapper
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
@@ -156,6 +157,7 @@ internal class AnalyticsEventListeners(
 
     private fun handleSourceChange(sourceChangeEvent: SourceChangeEvent) {
         BitmovinLog.d(TAG, "Event: SourceChange")
+        stateMachine.triggerLastSampleOfSession(SampleTriggerReason.SOURCE_CHANGE)
         stateMachine.resetStateMachine()
     }
 
@@ -199,6 +201,7 @@ internal class AnalyticsEventListeners(
 
     private fun handleTimeUpdateEvent(timeUpdateEvent: TimeUpdateEvent) {
         lastUpdatedPositionMs = Util.secondsToMillis(timeUpdateEvent.currentTime)
+        stateMachine.handlePlayerTimeUpdate()
     }
 
     private fun onBuffering(waitingEvent: WaitingEvent) {

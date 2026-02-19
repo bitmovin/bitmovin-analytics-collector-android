@@ -120,8 +120,9 @@ class SourceChangeScenarios {
             assertThat(impressionList.size).isEqualTo(2)
 
             val firstImpression = impressionList.first()
-            val secondImpression = impressionList.last()
             DataVerifier.verifyHasNoErrorSamples(firstImpression)
+
+            val secondImpression = impressionList.last()
             DataVerifier.verifyHasNoErrorSamples(secondImpression)
         }
     }

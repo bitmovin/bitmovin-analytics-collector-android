@@ -8,6 +8,7 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.data.EventDataDispatcherFactory
 import com.bitmovin.analytics.data.SEQUENCE_NUMBER_LIMIT
 import com.bitmovin.analytics.data.SequenceNumberAndImpressionIdProvider
+import com.bitmovin.analytics.data.cache.CacheService
 import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.dtos.FeatureConfigContainer
@@ -41,6 +42,8 @@ class BitmovinAnalytics(
     private val adAnalytics: BitmovinAdAnalytics? =
         if (!config.adTrackingDisabled) BitmovinAdAnalytics(this) else null
 
+    private val cacheService = CacheService()
+
     // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
     // first startup sample, in case the collector supports multiple sources)
     private var playerStartupTime = 1L
@@ -66,7 +69,7 @@ class BitmovinAnalytics(
      */
     fun attach(adapter: PlayerAdapter) {
         val stateMachineListener =
-            DefaultStateMachineListener(this, adapter, eventBus[OnErrorDetailEventListener::class], adapter.ssaiService)
+            DefaultStateMachineListener(this, adapter, eventBus[OnErrorDetailEventListener::class], adapter.ssaiService, cacheService)
         adapter.stateMachine.subscribe(stateMachineListener)
         this.stateMachineListener = stateMachineListener
         eventDataDispatcher.enable()
@@ -91,7 +94,7 @@ class BitmovinAnalytics(
 
         if (shouldSendOutSamples) {
             playerAdapter?.ssaiService?.flushCurrentAdSample()
-            playerAdapter?.triggerLastSampleOfSession()
+            playerAdapter?.triggerSampleOnDetach()
         }
         adAnalytics?.detachAdapter()
         featureManager.unregisterFeatures()
@@ -103,12 +106,18 @@ class BitmovinAnalytics(
         // cleanup references
         playerAdapter = null
         stateMachineListener = null
+        cacheService.resetSourceCache()
     }
 
     fun resetSourceRelatedState() {
         featureManager.resetFeatures()
         playerAdapter?.resetSourceRelatedState()
+        cacheService.resetSourceCache()
         sequenceNumberAndImpressionIdProvider.reset()
+    }
+
+    fun updateCacheVideoTime(videoTimeEnd: Long) {
+        cacheService.setVideoTimeEnd(videoTimeEnd)
     }
 
     fun resetSequenceNumberAndImpressionId() {
@@ -157,6 +166,7 @@ class BitmovinAnalytics(
             return
         }
 
+        cacheService.setSourceCacheFromEventData(data)
         eventDataDispatcher.add(data)
     }
 
