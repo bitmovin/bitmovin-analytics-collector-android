@@ -6,12 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
-## v3.23.1
-
 ### Fixed
 - Provide more accurate data on the last sample before player is destroyed or source is changed
 
 ### Added
+- Support for additional customData fields 61-100
 - Add autoplay tracking for media3 exoplayer and exoplayer
 
 ### Changed
