@@ -197,4 +197,4 @@ notifyApi "android-media3-exo" $VERSION "collector-media3-exoplayer"
 ##notifyApi "android-theoplayer" $VERSION "collector-theoplayer"
 
 echo "Don't forget to update the changelog in readme.io"
-open "https://dash.readme.com/project/bitmovin-playback/v1/docs/analytics-collector-android-releases"
+open "https://developer.bitmovin.com/playback/update/docs/analytics-collector-android-releases"
