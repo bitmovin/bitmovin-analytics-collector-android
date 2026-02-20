@@ -309,6 +309,46 @@ class EventDataTest {
                         customData58 = "customData58",
                         customData59 = "customData59",
                         customData60 = "customData60",
+                        customData61 = "customData61",
+                        customData62 = "customData62",
+                        customData63 = "customData63",
+                        customData64 = "customData64",
+                        customData65 = "customData65",
+                        customData66 = "customData66",
+                        customData67 = "customData67",
+                        customData68 = "customData68",
+                        customData69 = "customData69",
+                        customData70 = "customData70",
+                        customData71 = "customData71",
+                        customData72 = "customData72",
+                        customData73 = "customData73",
+                        customData74 = "customData74",
+                        customData75 = "customData75",
+                        customData76 = "customData76",
+                        customData77 = "customData77",
+                        customData78 = "customData78",
+                        customData79 = "customData79",
+                        customData80 = "customData80",
+                        customData81 = "customData81",
+                        customData82 = "customData82",
+                        customData83 = "customData83",
+                        customData84 = "customData84",
+                        customData85 = "customData85",
+                        customData86 = "customData86",
+                        customData87 = "customData87",
+                        customData88 = "customData88",
+                        customData89 = "customData89",
+                        customData90 = "customData90",
+                        customData91 = "customData91",
+                        customData92 = "customData92",
+                        customData93 = "customData93",
+                        customData94 = "customData94",
+                        customData95 = "customData95",
+                        customData96 = "customData96",
+                        customData97 = "customData97",
+                        customData98 = "customData98",
+                        customData99 = "customData99",
+                        customData100 = "customData100",
                     ),
                 impressionId = "impressionId",
                 userId = "userId",
@@ -428,6 +468,26 @@ class EventDataTest {
                     "\"customData55\":\"customData55\",\"customData56\":\"customData56\"," +
                     "\"customData57\":\"customData57\",\"customData58\":\"customData58\"," +
                     "\"customData59\":\"customData59\",\"customData60\":\"customData60\"," +
+                    "\"customData61\":\"customData61\",\"customData62\":\"customData62\"," +
+                    "\"customData63\":\"customData63\",\"customData64\":\"customData64\"," +
+                    "\"customData65\":\"customData65\",\"customData66\":\"customData66\"," +
+                    "\"customData67\":\"customData67\",\"customData68\":\"customData68\"," +
+                    "\"customData69\":\"customData69\",\"customData70\":\"customData70\"," +
+                    "\"customData71\":\"customData71\",\"customData72\":\"customData72\"," +
+                    "\"customData73\":\"customData73\",\"customData74\":\"customData74\"," +
+                    "\"customData75\":\"customData75\",\"customData76\":\"customData76\"," +
+                    "\"customData77\":\"customData77\",\"customData78\":\"customData78\"," +
+                    "\"customData79\":\"customData79\",\"customData80\":\"customData80\"," +
+                    "\"customData81\":\"customData81\",\"customData82\":\"customData82\"," +
+                    "\"customData83\":\"customData83\",\"customData84\":\"customData84\"," +
+                    "\"customData85\":\"customData85\",\"customData86\":\"customData86\"," +
+                    "\"customData87\":\"customData87\",\"customData88\":\"customData88\"," +
+                    "\"customData89\":\"customData89\",\"customData90\":\"customData90\"," +
+                    "\"customData91\":\"customData91\",\"customData92\":\"customData92\"," +
+                    "\"customData93\":\"customData93\",\"customData94\":\"customData94\"," +
+                    "\"customData95\":\"customData95\",\"customData96\":\"customData96\"," +
+                    "\"customData97\":\"customData97\",\"customData98\":\"customData98\"," +
+                    "\"customData99\":\"customData99\",\"customData100\":\"customData100\"," +
                     "\"experimentName\":\"experimentName\"}",
             )
     }

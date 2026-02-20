@@ -79,6 +79,20 @@ object TestConfig {
             customData52 = prefix + "52", customData53 = prefix + "53", customData54 = prefix + "54",
             customData55 = prefix + "55", customData56 = prefix + "56", customData57 = prefix + "57",
             customData58 = prefix + "58", customData59 = prefix + "59", customData60 = prefix + "60",
+            customData61 = prefix + "61", customData62 = prefix + "62", customData63 = prefix + "63",
+            customData64 = prefix + "64", customData65 = prefix + "65", customData66 = prefix + "66",
+            customData67 = prefix + "67", customData68 = prefix + "68", customData69 = prefix + "69",
+            customData70 = prefix + "70", customData71 = prefix + "71", customData72 = prefix + "72",
+            customData73 = prefix + "73", customData74 = prefix + "74", customData75 = prefix + "75",
+            customData76 = prefix + "76", customData77 = prefix + "77", customData78 = prefix + "78",
+            customData79 = prefix + "79", customData80 = prefix + "80", customData81 = prefix + "81",
+            customData82 = prefix + "82", customData83 = prefix + "83", customData84 = prefix + "84",
+            customData85 = prefix + "85", customData86 = prefix + "86", customData87 = prefix + "87",
+            customData88 = prefix + "88", customData89 = prefix + "89", customData90 = prefix + "90",
+            customData91 = prefix + "91", customData92 = prefix + "92", customData93 = prefix + "93",
+            customData94 = prefix + "94", customData95 = prefix + "95", customData96 = prefix + "96",
+            customData97 = prefix + "97", customData98 = prefix + "98", customData99 = prefix + "99",
+            customData100 = prefix + "100",
         )
     }
 }

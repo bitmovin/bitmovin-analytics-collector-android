@@ -335,6 +335,206 @@ class BitmovinAnalyticsConfig() : Parcelable {
     var customData60: String? = null
 
     /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData61: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData62: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData63: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData64: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData65: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData66: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData67: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData68: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData69: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData70: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData71: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData72: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData73: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData74: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData75: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData76: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData77: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData78: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData79: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData80: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData81: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData82: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData83: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData84: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData85: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData86: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData87: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData88: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData89: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData90: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData91: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData92: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData93: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData94: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData95: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData96: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData97: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData98: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData99: String? = null
+
+    /**
+     * Optional free-form data Not enabled by default Must be activated for your organization
+     */
+    var customData100: String? = null
+
+    /**
      * User-ID in the Customer System
      */
     var customUserId: String? = null
@@ -474,6 +674,46 @@ class BitmovinAnalyticsConfig() : Parcelable {
         customData58 = parcel.readString()
         customData59 = parcel.readString()
         customData60 = parcel.readString()
+        customData61 = parcel.readString()
+        customData62 = parcel.readString()
+        customData63 = parcel.readString()
+        customData64 = parcel.readString()
+        customData65 = parcel.readString()
+        customData66 = parcel.readString()
+        customData67 = parcel.readString()
+        customData68 = parcel.readString()
+        customData69 = parcel.readString()
+        customData70 = parcel.readString()
+        customData71 = parcel.readString()
+        customData72 = parcel.readString()
+        customData73 = parcel.readString()
+        customData74 = parcel.readString()
+        customData75 = parcel.readString()
+        customData76 = parcel.readString()
+        customData77 = parcel.readString()
+        customData78 = parcel.readString()
+        customData79 = parcel.readString()
+        customData80 = parcel.readString()
+        customData81 = parcel.readString()
+        customData82 = parcel.readString()
+        customData83 = parcel.readString()
+        customData84 = parcel.readString()
+        customData85 = parcel.readString()
+        customData86 = parcel.readString()
+        customData87 = parcel.readString()
+        customData88 = parcel.readString()
+        customData89 = parcel.readString()
+        customData90 = parcel.readString()
+        customData91 = parcel.readString()
+        customData92 = parcel.readString()
+        customData93 = parcel.readString()
+        customData94 = parcel.readString()
+        customData95 = parcel.readString()
+        customData96 = parcel.readString()
+        customData97 = parcel.readString()
+        customData98 = parcel.readString()
+        customData99 = parcel.readString()
+        customData100 = parcel.readString()
         customUserId = parcel.readString()
         experimentName = parcel.readString()
         mpdUrl = parcel.readString()
@@ -557,6 +797,46 @@ class BitmovinAnalyticsConfig() : Parcelable {
         dest.writeString(customData58)
         dest.writeString(customData59)
         dest.writeString(customData60)
+        dest.writeString(customData61)
+        dest.writeString(customData62)
+        dest.writeString(customData63)
+        dest.writeString(customData64)
+        dest.writeString(customData65)
+        dest.writeString(customData66)
+        dest.writeString(customData67)
+        dest.writeString(customData68)
+        dest.writeString(customData69)
+        dest.writeString(customData70)
+        dest.writeString(customData71)
+        dest.writeString(customData72)
+        dest.writeString(customData73)
+        dest.writeString(customData74)
+        dest.writeString(customData75)
+        dest.writeString(customData76)
+        dest.writeString(customData77)
+        dest.writeString(customData78)
+        dest.writeString(customData79)
+        dest.writeString(customData80)
+        dest.writeString(customData81)
+        dest.writeString(customData82)
+        dest.writeString(customData83)
+        dest.writeString(customData84)
+        dest.writeString(customData85)
+        dest.writeString(customData86)
+        dest.writeString(customData87)
+        dest.writeString(customData88)
+        dest.writeString(customData89)
+        dest.writeString(customData90)
+        dest.writeString(customData91)
+        dest.writeString(customData92)
+        dest.writeString(customData93)
+        dest.writeString(customData94)
+        dest.writeString(customData95)
+        dest.writeString(customData96)
+        dest.writeString(customData97)
+        dest.writeString(customData98)
+        dest.writeString(customData99)
+        dest.writeString(customData100)
         dest.writeString(customUserId)
         dest.writeString(experimentName)
         dest.writeString(mpdUrl)
