@@ -289,10 +289,17 @@ class PlayerStateMachine(
     }
 
     fun programChange(onAfterSessionReset: () -> Unit) {
-        triggerLastSampleOfSession(SampleTriggerReason.PROGRAM_CHANGE)
-        analytics.resetSequenceNumberAndImpressionId()
-        onAfterSessionReset()
-        triggerProgramChangeSample()
+        // if we are still in startup, we only set the metadata
+        // but ignore everything else, since we just want to
+        // track the normal startup with the new sourceMetadata
+        if (!isStartupFinished) {
+            onAfterSessionReset()
+        } else {
+            triggerLastSampleOfSession(SampleTriggerReason.PROGRAM_CHANGE)
+            analytics.resetSequenceNumberAndImpressionId()
+            onAfterSessionReset()
+            triggerProgramChangeSample()
+        }
     }
 
     fun pause(position: Long) {

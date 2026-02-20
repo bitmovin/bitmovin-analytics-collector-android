@@ -87,6 +87,56 @@ class ProgramChangeScenariosTest {
         }
 
     @Test
+    fun test_programChange_duringStartup_ShouldOnlySetMetadataAndNotSendAdditionalSamples() =
+        runBlockingTest {
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(source, sourceMetadataProgram1)
+                collector.attachPlayer(player)
+                player.load(source)
+            }
+
+            // wait a very short time so that we are in startup
+            Thread.sleep(10)
+
+            // Call programChange during startup
+            withContext(mainScope.coroutineContext) {
+                collector.programChange(sourceMetadataProgram2)
+            }
+
+            // Session 2: Wait for playback to continue with new session
+            BitmovinPlaybackUtils.waitUntilPlaybackStarted(player)
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(player, 1000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(200)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            // only one session should be created
+            assertThat(impressions).hasSize(1)
+
+            // Verify first impression (program 1)
+            val firstImpression = impressions[0]
+            DataVerifier.verifyHasNoErrorSamples(firstImpression)
+            val firstImpressionEvents = firstImpression.eventDataList
+
+            assertThat(firstImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
+            val firstStartupSample = firstImpressionEvents.first()
+
+            // Startup should NOT have programChange flag and just act as normal startup
+            // but with metadata two
+            assertThat(firstStartupSample.state).isEqualTo("startup")
+            assertThat(firstStartupSample.videoId).isEqualTo(sourceMetadataProgram2.videoId)
+            assertThat(firstStartupSample.videoTitle).isEqualTo(sourceMetadataProgram2.title)
+            assertThat(firstStartupSample.customData1).isEqualTo("program2-data")
+            assertThat(firstStartupSample.sequenceNumber).isEqualTo(0)
+            assertThat(firstStartupSample.isProgramChange).isNull()
+        }
+
+    @Test
     fun test_programChange_duringPlayingState_createsNewSessionWithProgramChangeFlag() =
         runBlockingTest {
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
