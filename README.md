@@ -87,6 +87,26 @@ dependencies {
 </tr>
 </table>
 
+### THEOplayer
+
+<table>
+<tr>
+<td> Player Version </td> <td> Dependency </td>
+</tr>
+<tr>
+<td> >= 10.7.0 </td>
+<td>
+
+```gradle
+dependencies {
+    implementation 'com.bitmovin.analytics:collector-theoplayer:3.23.0'
+}
+```
+
+</td>
+</tr>
+</table>
+
 ### ExoPlayer
 
 <table>
@@ -188,6 +208,22 @@ analyticsCollector.attachPlayer(player)
 analyticsCollector.detachPlayer()
 ```
 
+### Basic analytics monitoring with THEOplayer
+
+```kotlin
+// Create an AnalyticsConfig using your Bitmovin analytics license key (minimal config required)
+val analyticsConfig = AnalyticsConfig("<BITMOVIN_ANALYTICS_LICENSE_KEY>")
+
+// Create Analytics Collector for THEOplayer
+val analyticsCollector = ITHEOplayerCollector.Factory.create(getApplicationContext(), analyticsConfig)
+
+// Attach your THEOplayer instance
+analyticsCollector.attachPlayer(player)
+
+// Detach your player when you are done. For example, call this method before you call THEOplayer's onDestroy() method
+analyticsCollector.detachPlayer()
+```
+
 ### Basic analytics monitoring with ExoPlayer
 
 ```kotlin
@@ -248,7 +284,7 @@ analyticsCollector.attachPlayer(newPlayer)
 player.load(source)
 ```
 
-### Switching to a new Video with Media3 ExoPlayer, ExoPlayer and Amazon IVS Player SDK
+### Switching to a new Video with Media3 ExoPlayer, THEOplayer, ExoPlayer and Amazon IVS Player SDK
 
 When switching to a new video we recommend that you follow the sequence of events below.
 
@@ -269,10 +305,10 @@ val sourceMetadata = SourceMetadata(
 
 analyticsCollector.setSourceMetadata(sourceMetadata)
 
+//Load new source into the player
+
 //Reattach your player instance
 analyticsCollector.attachPlayer(newPlayer)
-
-//Load new source after attaching
 ```
 
 
