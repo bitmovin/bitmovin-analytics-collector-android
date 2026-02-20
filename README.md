@@ -99,7 +99,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-theoplayer:3.23.0'
+    implementation 'com.bitmovin.analytics:collector-theoplayer:3.24.0'
 }
 ```
 

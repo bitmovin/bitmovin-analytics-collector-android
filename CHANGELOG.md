@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.24.0
+
 ### Fixed
 - Provide more accurate data on the last sample before player is destroyed or source is changed
 
