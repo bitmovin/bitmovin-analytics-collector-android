@@ -3,6 +3,8 @@ package com.bitmovin.analytics.adapters
 import android.os.Handler
 import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
+import com.bitmovin.analytics.Observable
+import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
@@ -11,8 +13,11 @@ import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.dtos.FeatureConfigContainer
+import com.bitmovin.analytics.features.DefaultFeatureFactory
 import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.license.InstantLicenseKeyProvider
+import com.bitmovin.analytics.license.LicenseKeyProvider
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.ssai.SsaiEngagementMetricsService
 import com.bitmovin.analytics.ssai.SsaiService
@@ -24,7 +29,6 @@ abstract class DefaultPlayerAdapter(
     protected val config: AnalyticsConfig,
     protected val eventDataFactory: EventDataFactory,
     final override val stateMachine: PlayerStateMachine,
-    private val featureFactory: FeatureFactory,
     private val deviceInformationProvider: DeviceInformationProvider,
     protected val metadataProvider: MetadataProvider,
     private val bitmovinAnalytics: BitmovinAnalytics,
@@ -46,8 +50,20 @@ abstract class DefaultPlayerAdapter(
         ssaiApiProxy.attach(ssaiService)
     }
 
+    protected open fun createHttpRequestTrackingAdapter(
+        onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>,
+    ): Observable<OnDownloadFinishedEventListener>? = null
+
+    protected open fun createLicenseKeyProvider(): LicenseKeyProvider = InstantLicenseKeyProvider(config.licenseKey)
+
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         eventDataManipulators.forEach { eventDataFactory.registerEventDataManipulator(it) }
+        val featureFactory =
+            DefaultFeatureFactory(
+                bitmovinAnalytics,
+                createHttpRequestTrackingAdapter(bitmovinAnalytics.onAnalyticsReleasingObservable),
+                createLicenseKeyProvider(),
+            )
         return featureFactory.createFeatures()
     }
 

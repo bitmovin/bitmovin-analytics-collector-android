@@ -3,6 +3,8 @@ package com.bitmovin.analytics.theoplayer
 import android.os.Handler
 import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
+import com.bitmovin.analytics.Observable
+import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.api.AnalyticsConfig
@@ -14,10 +16,11 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.dtos.FeatureConfigContainer
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.SampleTriggerReason
+import com.bitmovin.analytics.theoplayer.features.TheoPlayerHttpRequestTrackingAdapter
 import com.bitmovin.analytics.theoplayer.listeners.AnalyticsEventListeners
 import com.bitmovin.analytics.theoplayer.listeners.SourceEventListeners
 import com.bitmovin.analytics.theoplayer.manipulators.PlaybackEventDataManipulator
@@ -32,7 +35,6 @@ internal class TheoPlayerSdkAdapter(
     override val playerContext: PlayerContext,
     config: AnalyticsConfig,
     stateMachine: PlayerStateMachine,
-    featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
     private val playbackQualityProvider: PlaybackQualityProvider,
@@ -45,7 +47,6 @@ internal class TheoPlayerSdkAdapter(
         config,
         eventDataFactory,
         stateMachine,
-        featureFactory,
         deviceInformationProvider,
         metadataProvider,
         bitmovinAnalytics,
@@ -54,10 +55,14 @@ internal class TheoPlayerSdkAdapter(
     ) {
     private val mainHandler = Handler(Looper.getMainLooper())
     private val playbackEventDataManipulator =
-        PlaybackEventDataManipulator(player, playbackQualityProvider, metadataProvider, playerStatisticsProvider)
+        PlaybackEventDataManipulator(player, playbackQualityProvider, metadataProvider, playerStatisticsProvider, playerContext)
 
     override val playerInfo: PlayerInfo
         get() = PLAYER_INFO
+
+    override fun createHttpRequestTrackingAdapter(
+        onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>,
+    ): Observable<OnDownloadFinishedEventListener> = TheoPlayerHttpRequestTrackingAdapter(player, onAnalyticsReleasingObservable)
 
     private val analyticsEventListeners = AnalyticsEventListeners(bitmovinAnalytics, stateMachine, player, playbackQualityProvider)
     private val sourceEventListeners = SourceEventListeners(stateMachine, player, playbackQualityProvider)

@@ -4,6 +4,8 @@ import android.os.Looper
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.bitmovin.analytics.BitmovinAnalytics
+import com.bitmovin.analytics.Observable
+import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
@@ -14,7 +16,8 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.dtos.FeatureConfigContainer
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.media3.exoplayer.features.Media3ExoPlayerHttpRequestTrackingAdapter
 import com.bitmovin.analytics.media3.exoplayer.listeners.AnalyticsEventListener
 import com.bitmovin.analytics.media3.exoplayer.listeners.PlayerEventListener
 import com.bitmovin.analytics.media3.exoplayer.manipulators.PlaybackEventDataManipulator
@@ -34,7 +37,6 @@ internal class Media3ExoPlayerAdapter(
     private val player: ExoPlayer,
     config: AnalyticsConfig,
     stateMachine: PlayerStateMachine,
-    featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
     metadataProvider: MetadataProvider,
@@ -45,7 +47,6 @@ internal class Media3ExoPlayerAdapter(
         config,
         eventDataFactory,
         stateMachine,
-        featureFactory,
         deviceInformationProvider,
         metadataProvider,
         bitmovinAnalytics,
@@ -60,7 +61,15 @@ internal class Media3ExoPlayerAdapter(
 
     private val qualityEventDataManipulator = QualityEventDataManipulator(player)
     private val playbackEventDataManipulator =
-        PlaybackEventDataManipulator(player, playbackInfoProvider, metadataProvider, drmInfoProvider, playerStatisticsProvider, meter)
+        PlaybackEventDataManipulator(
+            player,
+            playbackInfoProvider,
+            metadataProvider,
+            drmInfoProvider,
+            playerStatisticsProvider,
+            meter,
+            playerContext,
+        )
 
     internal val defaultAnalyticsListener =
         AnalyticsEventListener(
@@ -77,6 +86,10 @@ internal class Media3ExoPlayerAdapter(
 
     override val drmDownloadTime: Long?
         get() = drmInfoProvider.drmDownloadTime
+
+    override fun createHttpRequestTrackingAdapter(
+        onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>,
+    ): Observable<OnDownloadFinishedEventListener> = Media3ExoPlayerHttpRequestTrackingAdapter(player, onAnalyticsReleasingObservable)
 
     init {
         player.addListener(defaultPlayerEventListener)

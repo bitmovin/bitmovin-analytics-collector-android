@@ -1,9 +1,9 @@
 package com.bitmovin.analytics.theoplayer.manipulators
 
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.dtos.EventData
-import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.PlayerStatisticsProvider
@@ -13,7 +13,6 @@ import com.bitmovin.analytics.theoplayer.player.getCurrentActiveTextTrack
 import com.bitmovin.analytics.theoplayer.player.getDrmType
 import com.bitmovin.analytics.theoplayer.player.getDurationInMs
 import com.bitmovin.analytics.theoplayer.player.isLiveStream
-import com.theoplayer.android.api.THEOplayerGlobal
 import com.theoplayer.android.api.player.Player
 import com.theoplayer.android.api.source.SourceType
 
@@ -22,6 +21,7 @@ internal class PlaybackEventDataManipulator(
     private val playbackQualityProvider: PlaybackQualityProvider,
     private val metadataProvider: MetadataProvider,
     private val playerStatisticsProvider: PlayerStatisticsProvider,
+    private val playerContext: PlayerContext,
 ) : EventDataManipulator {
     // TODO: this should be pushed into the core collector
     // only an interface with the collected fields should be necessary
@@ -36,7 +36,7 @@ internal class PlaybackEventDataManipulator(
         }
 
         // version
-        data.version = PlayerType.THEOPLAYER.toString() + "-" + THEOplayerGlobal.getVersion()
+        data.version = playerContext.playerVersion
 
         val droppedFramesAbsolute = player.metrics?.droppedVideoFrames?.toInt() ?: 0
         data.droppedFrames = playerStatisticsProvider.droppedFramesDeltaSinceLastSample(droppedFramesAbsolute)
@@ -70,20 +70,7 @@ internal class PlaybackEventDataManipulator(
         // DRM Information, set on every sample (this is similar to other collectors)
         data.drmType = player.getDrmType()
 
-        data.isMuted = isMuted(player)
-    }
-
-    // it is enough to have isMuted to true or volume to 0 to report as muted
-    private fun isMuted(player: Player): Boolean {
-        if (player.isMuted) {
-            return true
-        }
-
-        if (player.volume <= 0.01f) {
-            return true
-        }
-
-        return false
+        data.isMuted = playerContext.isMuted
     }
 
     private fun setStreamFormatAndUrl(data: EventData) {

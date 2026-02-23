@@ -89,6 +89,9 @@ internal class DummyPlayerContext : PlayerContext {
 
     override fun isAutoplay(): Boolean? = null
 
+    override val isMuted: Boolean = false
+    override val playerVersion: String
+        get() = "DUMMY"
     override val position: Long
         get() = 0
 }

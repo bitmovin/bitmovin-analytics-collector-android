@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.exoplayer.manipulators
 
 import android.net.Uri
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.dtos.DownloadSpeedInfo
@@ -10,7 +11,6 @@ import com.bitmovin.analytics.exoplayer.player.PlaybackInfoProvider
 import com.bitmovin.analytics.exoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.dash.manifest.DashManifest
 import io.mockk.every
 import io.mockk.mockk
@@ -26,6 +26,7 @@ class PlaybackEventDataManipulatorTest {
     private lateinit var mockDrmInfoProvider: DrmInfoProvider
     private lateinit var mockPlayerStatisticsProvider: PlayerStatisticsProvider
     private lateinit var mockDownloadSpeedMeter: DownloadSpeedMeter
+    private lateinit var mockPlayerContext: PlayerContext
     private lateinit var playbackEventDataManipulator: PlaybackEventDataManipulator
 
     @Before
@@ -36,6 +37,7 @@ class PlaybackEventDataManipulatorTest {
         mockDrmInfoProvider = mockk(relaxed = true)
         mockPlayerStatisticsProvider = mockk(relaxed = true)
         mockDownloadSpeedMeter = mockk(relaxed = true)
+        mockPlayerContext = mockk(relaxed = true)
         playbackEventDataManipulator =
             PlaybackEventDataManipulator(
                 mockExoPlayer,
@@ -44,6 +46,7 @@ class PlaybackEventDataManipulatorTest {
                 mockDrmInfoProvider,
                 mockPlayerStatisticsProvider,
                 mockDownloadSpeedMeter,
+                mockPlayerContext,
             )
     }
 
@@ -135,51 +138,10 @@ class PlaybackEventDataManipulatorTest {
     }
 
     @Test
-    fun `track player is muted when volume is smaller 0_01`() {
+    fun `track player is muted`() {
         // arrange
         val eventData = TestUtils.createMinimalEventData()
-        every { mockExoPlayer.isCommandAvailable(Player.COMMAND_GET_VOLUME) } returns true
-        every { mockExoPlayer.volume } returns 0.0f
-
-        every { mockExoPlayer.isCommandAvailable(Player.COMMAND_GET_DEVICE_VOLUME) } returns true
-        every { mockExoPlayer.deviceVolume } returns 20
-        every { mockExoPlayer.isDeviceMuted } returns false
-
-        // act
-        playbackEventDataManipulator.manipulate(eventData)
-
-        // assert
-        assertThat(eventData.isMuted).isTrue
-    }
-
-    @Test
-    fun `track player is muted when device is muted`() {
-        // arrange
-        val eventData = TestUtils.createMinimalEventData()
-        every { mockExoPlayer.isCommandAvailable(Player.COMMAND_GET_VOLUME) } returns true
-        every { mockExoPlayer.volume } returns 0.4f
-
-        every { mockExoPlayer.isCommandAvailable(Player.COMMAND_GET_DEVICE_VOLUME) } returns true
-        every { mockExoPlayer.deviceVolume } returns 20
-        every { mockExoPlayer.isDeviceMuted } returns true
-
-        // act
-        playbackEventDataManipulator.manipulate(eventData)
-
-        // assert
-        assertThat(eventData.isMuted).isTrue
-    }
-
-    @Test
-    fun `track player is muted when device volume is 0`() {
-        // arrange
-        val eventData = TestUtils.createMinimalEventData()
-        every { mockExoPlayer.isCommandAvailable(Player.COMMAND_GET_VOLUME) } returns true
-        every { mockExoPlayer.volume } returns 0.4f
-
-        every { mockExoPlayer.isCommandAvailable(Player.COMMAND_GET_DEVICE_VOLUME) } returns true
-        every { mockExoPlayer.deviceVolume } returns 0
-        every { mockExoPlayer.isDeviceMuted } returns false
+        every { mockPlayerContext.isMuted } returns true
 
         // act
         playbackEventDataManipulator.manipulate(eventData)
@@ -192,13 +154,7 @@ class PlaybackEventDataManipulatorTest {
     fun `track player is not muted`() {
         // arrange
         val eventData = TestUtils.createMinimalEventData()
-
-        every { mockExoPlayer.isCommandAvailable(Player.COMMAND_GET_VOLUME) } returns true
-        every { mockExoPlayer.volume } returns 0.4f
-
-        every { mockExoPlayer.isCommandAvailable(Player.COMMAND_GET_DEVICE_VOLUME) } returns true
-        every { mockExoPlayer.deviceVolume } returns 20
-        every { mockExoPlayer.isDeviceMuted } returns false
+        every { mockPlayerContext.isMuted } returns false
 
         // act
         playbackEventDataManipulator.manipulate(eventData)

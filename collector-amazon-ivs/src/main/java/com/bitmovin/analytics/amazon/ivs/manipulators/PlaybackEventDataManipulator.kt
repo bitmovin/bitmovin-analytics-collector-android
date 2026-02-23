@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.amazon.ivs.manipulators
 
 import com.amazonaws.ivs.player.Player
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.amazon.ivs.Utils
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
@@ -11,10 +12,11 @@ import com.bitmovin.analytics.utils.BitmovinLog
 internal class PlaybackEventDataManipulator(
     private val player: Player,
     private val metaDataProvider: MetadataProvider,
+    private val playerContext: PlayerContext,
 ) : EventDataManipulator {
     override fun manipulate(data: EventData) {
         try {
-            data.isMuted = player.isMuted
+            data.isMuted = playerContext.isMuted
             // IVS player only supports HLS, thus we hardcode it here
             data.streamFormat = StreamFormat.HLS.value
 

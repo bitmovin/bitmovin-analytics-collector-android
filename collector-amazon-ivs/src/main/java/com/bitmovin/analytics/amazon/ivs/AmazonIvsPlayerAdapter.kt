@@ -17,7 +17,6 @@ import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.dtos.FeatureConfigContainer
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.BitmovinLog
@@ -26,7 +25,6 @@ internal class AmazonIvsPlayerAdapter(
     private val player: Player,
     config: AnalyticsConfig,
     stateMachine: PlayerStateMachine,
-    featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
     private val videoStartupService: VideoStartupService,
@@ -42,7 +40,6 @@ internal class AmazonIvsPlayerAdapter(
         config,
         eventDataFactory,
         stateMachine,
-        featureFactory,
         deviceInformationProvider,
         metadataProvider,
         bitmovinAnalytics,

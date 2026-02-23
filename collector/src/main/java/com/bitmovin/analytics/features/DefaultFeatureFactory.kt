@@ -1,24 +1,22 @@
-package com.bitmovin.analytics.bitmovin.player.features
+package com.bitmovin.analytics.features
 
 import com.bitmovin.analytics.BitmovinAnalytics
+import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.dtos.FeatureConfigContainer
-import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend
 import com.bitmovin.analytics.features.errordetails.ErrorDetailTracking
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.license.InstantLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseKeyProvider
-import com.bitmovin.player.api.Player
 
-internal class BitmovinFeatureFactory(
+internal class DefaultFeatureFactory(
     private val analytics: BitmovinAnalytics,
-    private val player: Player,
-    private val licenseKeyProvider: LicenseKeyProvider,
-) : FeatureFactory {
-    override fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
-        val features = mutableListOf<Feature<FeatureConfigContainer, *>>()
-        val httpRequestTrackingAdapter = BitmovinHttpRequestTrackingAdapter(player, analytics.onAnalyticsReleasingObservable)
-        val httpRequestTracking = HttpRequestTracking(httpRequestTrackingAdapter)
+    private val httpRequestTrackingAdapter: Observable<OnDownloadFinishedEventListener>?,
+    private val licenseKeyProvider: LicenseKeyProvider = InstantLicenseKeyProvider(analytics.config.licenseKey),
+) {
+    fun createFeatures(): Collection<Feature<FeatureConfigContainer, *>> {
+        val httpRequestTracking = httpRequestTrackingAdapter?.let { HttpRequestTracking(it) }
         val errorDetailsBackend = ErrorDetailBackend(analytics.config, analytics.context)
         val errorDetailTracking =
             ErrorDetailTracking(
@@ -29,7 +27,6 @@ internal class BitmovinFeatureFactory(
                 analytics.onErrorDetailObservable,
                 licenseKeyProvider = licenseKeyProvider,
             )
-        features.add(errorDetailTracking)
-        return features
+        return listOf(errorDetailTracking)
     }
 }

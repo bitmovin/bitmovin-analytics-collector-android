@@ -7,11 +7,11 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.dash.manifest.DashManifest
 import androidx.media3.exoplayer.hls.HlsManifest
 import androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.AdType
-import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerUtil
 import com.bitmovin.analytics.media3.exoplayer.player.DrmInfoProvider
@@ -27,6 +27,7 @@ internal class PlaybackEventDataManipulator(
     private val drmInfoProvider: DrmInfoProvider,
     private val playerStatisticsProvider: PlayerStatisticsProvider,
     private val downloadSpeedMeter: DownloadSpeedMeter,
+    private val playerContext: PlayerContext,
 ) : EventDataManipulator {
     override fun manipulate(data: EventData) {
         // ad
@@ -48,7 +49,7 @@ internal class PlaybackEventDataManipulator(
         }
 
         // version
-        data.version = PlayerType.MEDIA3_EXOPLAYER.toString() + "-" + Media3ExoPlayerUtil.playerVersion
+        data.version = playerContext.playerVersion
 
         // DroppedVideoFrames
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
@@ -61,7 +62,7 @@ internal class PlaybackEventDataManipulator(
         // DRM Information
         data.drmType = drmInfoProvider.drmType
 
-        data.isMuted = isMuted(player)
+        data.isMuted = playerContext.isMuted
 
         setSubtitleInfo(data)
     }
@@ -88,24 +89,6 @@ internal class PlaybackEventDataManipulator(
                 Util.setEventDataFormatTypeAndUrlBasedOnExtension(data, it)
             }
         }
-    }
-
-    // it is enough to have volume OR deviceVolume set to muted
-    // this means as soon as one is to muted we report it as muted
-    private fun isMuted(player: Player): Boolean {
-        if (player.isCommandAvailable(Player.COMMAND_GET_VOLUME)) {
-            if (player.volume <= 0.01f) {
-                return true
-            }
-        }
-
-        if (player.isCommandAvailable(Player.COMMAND_GET_DEVICE_VOLUME)) {
-            if (player.isDeviceMuted || player.deviceVolume <= 0.01f) {
-                return true
-            }
-        }
-
-        return false
     }
 
     private fun setSubtitleInfo(eventData: EventData) {

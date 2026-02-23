@@ -9,11 +9,9 @@ import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiApi
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
-import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.theoplayer.api.ITHEOplayerCollector
-import com.bitmovin.analytics.theoplayer.features.TheoPlayerFeatureFactory
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.theoplayer.player.TheoPlayerContext
@@ -40,11 +38,6 @@ internal class TheoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Co
         player: Player,
         analytics: BitmovinAnalytics,
     ): PlayerAdapter {
-        val featureFactory: FeatureFactory =
-            TheoPlayerFeatureFactory(
-                analytics,
-                player,
-            )
         val userAgentProvider =
             UserAgentProvider(
                 Util.getApplicationInfoOrNull(analytics.context),
@@ -63,7 +56,6 @@ internal class TheoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Co
             playerContext,
             config,
             stateMachine,
-            featureFactory,
             eventDataFactory,
             deviceInformationProvider,
             playbackQualityProvider,

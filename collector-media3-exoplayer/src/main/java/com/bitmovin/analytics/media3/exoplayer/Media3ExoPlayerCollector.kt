@@ -10,9 +10,7 @@ import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiApi
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
-import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.media3.exoplayer.api.IMedia3ExoPlayerCollector
-import com.bitmovin.analytics.media3.exoplayer.features.Media3ExoPlayerFeatureFactory
 import com.bitmovin.analytics.media3.exoplayer.player.Media3ExoPlayerContext
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
@@ -38,7 +36,6 @@ internal class Media3ExoPlayerCollector(analyticsConfig: AnalyticsConfig, contex
         player: ExoPlayer,
         analytics: BitmovinAnalytics,
     ): PlayerAdapter {
-        val featureFactory: FeatureFactory = Media3ExoPlayerFeatureFactory(analytics, player)
         val userAgentProvider =
             UserAgentProvider(
                 Util.getApplicationInfoOrNull(analytics.context),
@@ -54,7 +51,6 @@ internal class Media3ExoPlayerCollector(analyticsConfig: AnalyticsConfig, contex
             player,
             config,
             stateMachine,
-            featureFactory,
             eventDataFactory,
             deviceInformationProvider,
             metadataProvider,

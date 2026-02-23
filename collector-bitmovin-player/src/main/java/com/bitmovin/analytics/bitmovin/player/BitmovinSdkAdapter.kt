@@ -2,11 +2,14 @@ package com.bitmovin.analytics.bitmovin.player
 
 import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
+import com.bitmovin.analytics.Observable
+import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.bitmovin.player.features.BitmovinHttpRequestTrackingAdapter
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
 import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.bitmovin.player.player.attachCollector
@@ -27,7 +30,8 @@ import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.license.LicenseKeyProvider
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
@@ -54,7 +58,6 @@ internal class BitmovinSdkAdapter(
     override val playerContext: PlayerContext,
     config: AnalyticsConfig,
     stateMachine: PlayerStateMachine,
-    featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
     private val playerLicenseProvider: PlayerLicenseProvider,
@@ -63,11 +66,11 @@ internal class BitmovinSdkAdapter(
     bitmovinAnalytics: BitmovinAnalytics,
     ssaiApiProxy: SsaiApiProxy,
     looper: Looper,
+    private val analyticsLicenseKeyProvider: LicenseKeyProvider,
 ) : DefaultPlayerAdapter(
         config,
         eventDataFactory,
         stateMachine,
-        featureFactory,
         deviceInformationProvider,
         metadataProvider,
         bitmovinAnalytics,
@@ -89,6 +92,12 @@ internal class BitmovinSdkAdapter(
         private set
 
     override val eventDataManipulators: Collection<EventDataManipulator> by lazy { listOf(this) }
+
+    override fun createHttpRequestTrackingAdapter(
+        onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>,
+    ): Observable<OnDownloadFinishedEventListener> = BitmovinHttpRequestTrackingAdapter(player, onAnalyticsReleasingObservable)
+
+    override fun createLicenseKeyProvider(): LicenseKeyProvider = analyticsLicenseKeyProvider
 
     override val playerInfo: PlayerInfo
         get() = PLAYER_INFO
@@ -214,7 +223,7 @@ internal class BitmovinSdkAdapter(
         }
 
         // version
-        data.version = PlayerType.BITMOVIN.toString() + "-" + BitmovinUtil.playerVersion
+        data.version = playerContext.playerVersion
 
         // isCasting
         data.isCasting = player.isCasting
@@ -255,7 +264,7 @@ internal class BitmovinSdkAdapter(
 
         data.playerKey = playerLicenseProvider.getBitmovinPlayerLicenseKey(player.config)
 
-        data.isMuted = player.isMuted
+        data.isMuted = playerContext.isMuted
     }
 
     private fun getSubtitleDto(subtitleTrack: SubtitleTrack?): SubtitleDto {

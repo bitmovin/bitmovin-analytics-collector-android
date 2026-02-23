@@ -6,4 +6,8 @@ interface PlayerContext {
     fun isAutoplay(): Boolean?
 
     val position: Long
+
+    val isMuted: Boolean
+
+    val playerVersion: String
 }

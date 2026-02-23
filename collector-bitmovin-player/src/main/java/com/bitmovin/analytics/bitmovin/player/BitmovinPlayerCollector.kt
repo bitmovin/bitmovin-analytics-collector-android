@@ -10,13 +10,11 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiApi
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
-import com.bitmovin.analytics.bitmovin.player.features.BitmovinFeatureFactory
 import com.bitmovin.analytics.bitmovin.player.player.BitmovinPlayerContext
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
 import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.data.DeviceInformationProvider
 import com.bitmovin.analytics.data.EventDataFactory
-import com.bitmovin.analytics.features.FeatureFactory
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.utils.ApiV3Utils
@@ -84,12 +82,6 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
         analytics: BitmovinAnalytics,
     ): PlayerAdapter {
         val licenseKeyProvider = deferredLicenseManager.licenseKeyProvider
-        val featureFactory: FeatureFactory =
-            BitmovinFeatureFactory(
-                analytics,
-                player,
-                licenseKeyProvider,
-            )
         val userAgentProvider =
             UserAgentProvider(
                 Util.getApplicationInfoOrNull(analytics.context),
@@ -114,7 +106,6 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
             playerContext,
             config,
             stateMachine,
-            featureFactory,
             eventDataFactory,
             deviceInformationProvider,
             playerLicenseProvider,
@@ -123,6 +114,7 @@ public class BitmovinPlayerCollector(analyticsConfig: AnalyticsConfig, context: 
             analytics,
             ssaiApiProxy,
             mainLooper,
+            licenseKeyProvider,
         )
     }
 

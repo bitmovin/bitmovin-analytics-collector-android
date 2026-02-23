@@ -2,6 +2,8 @@ package com.bitmovin.analytics.exoplayer
 
 import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
+import com.bitmovin.analytics.Observable
+import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.data.DeviceInformationProvider
@@ -11,6 +13,7 @@ import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.dtos.FeatureConfigContainer
 import com.bitmovin.analytics.enums.PlayerType
+import com.bitmovin.analytics.exoplayer.features.ExoPlayerHttpRequestTrackingAdapter
 import com.bitmovin.analytics.exoplayer.listeners.AnalyticsEventListener
 import com.bitmovin.analytics.exoplayer.listeners.PlayerEventListener
 import com.bitmovin.analytics.exoplayer.manipulators.PlaybackEventDataManipulator
@@ -20,7 +23,7 @@ import com.bitmovin.analytics.exoplayer.player.ExoPlayerContext
 import com.bitmovin.analytics.exoplayer.player.PlaybackInfoProvider
 import com.bitmovin.analytics.exoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.features.Feature
-import com.bitmovin.analytics.features.FeatureFactory
+import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
@@ -34,7 +37,6 @@ internal class ExoPlayerAdapter(
     private val exoplayer: ExoPlayer,
     config: AnalyticsConfig,
     stateMachine: PlayerStateMachine,
-    featureFactory: FeatureFactory,
     eventDataFactory: EventDataFactory,
     deviceInformationProvider: DeviceInformationProvider,
     metadataProvider: MetadataProvider,
@@ -45,7 +47,6 @@ internal class ExoPlayerAdapter(
         config,
         eventDataFactory,
         stateMachine,
-        featureFactory,
         deviceInformationProvider,
         metadataProvider,
         bitmovinAnalytics,
@@ -60,7 +61,15 @@ internal class ExoPlayerAdapter(
 
     private val qualityEventDataManipulator = QualityEventDataManipulator(exoplayer)
     private val playbackEventDataManipulator =
-        PlaybackEventDataManipulator(exoplayer, playbackInfoProvider, metadataProvider, drmInfoProvider, playerStatisticsProvider, meter)
+        PlaybackEventDataManipulator(
+            exoplayer,
+            playbackInfoProvider,
+            metadataProvider,
+            drmInfoProvider,
+            playerStatisticsProvider,
+            meter,
+            playerContext,
+        )
 
     internal val defaultAnalyticsListener =
         AnalyticsEventListener(
@@ -76,6 +85,10 @@ internal class ExoPlayerAdapter(
 
     override val drmDownloadTime: Long?
         get() = drmInfoProvider.drmDownloadTime
+
+    override fun createHttpRequestTrackingAdapter(
+        onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>,
+    ): Observable<OnDownloadFinishedEventListener> = ExoPlayerHttpRequestTrackingAdapter(exoplayer, onAnalyticsReleasingObservable)
 
     init {
         exoplayer.addListener(defaultPlayerEventListener)

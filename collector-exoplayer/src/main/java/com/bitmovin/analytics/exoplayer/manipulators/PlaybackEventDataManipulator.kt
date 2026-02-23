@@ -1,10 +1,10 @@
 package com.bitmovin.analytics.exoplayer.manipulators
 
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.AdType
-import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.enums.StreamFormat
 import com.bitmovin.analytics.exoplayer.ExoUtil
 import com.bitmovin.analytics.exoplayer.player.DrmInfoProvider
@@ -14,7 +14,6 @@ import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.bitmovin.analytics.utils.Util
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.dash.manifest.DashManifest
 import com.google.android.exoplayer2.source.hls.HlsManifest
 import com.google.android.exoplayer2.source.hls.playlist.HlsMultivariantPlaylist
@@ -26,6 +25,7 @@ internal class PlaybackEventDataManipulator(
     private val drmInfoProvider: DrmInfoProvider,
     private val playerStatisticsProvider: PlayerStatisticsProvider,
     private val downloadSpeedMeter: DownloadSpeedMeter,
+    private val playerContext: PlayerContext,
 ) : EventDataManipulator {
     override fun manipulate(data: EventData) {
         // ad
@@ -47,7 +47,7 @@ internal class PlaybackEventDataManipulator(
         }
 
         // version
-        data.version = PlayerType.EXOPLAYER.toString() + "-" + ExoUtil.playerVersion
+        data.version = playerContext.playerVersion
 
         // DroppedVideoFrames
         data.droppedFrames = playerStatisticsProvider.getAndResetDroppedFrames()
@@ -60,7 +60,7 @@ internal class PlaybackEventDataManipulator(
         // DRM Information
         data.drmType = drmInfoProvider.drmType
 
-        data.isMuted = isMuted(exoPlayer)
+        data.isMuted = playerContext.isMuted
 
         setSubtitleInfo(data)
     }
@@ -86,24 +86,6 @@ internal class PlaybackEventDataManipulator(
                 Util.setEventDataFormatTypeAndUrlBasedOnExtension(data, it)
             }
         }
-    }
-
-    // it is enough to have volume OR deviceVolume set to muted
-    // this means as soon as one is to muted we report it as muted
-    private fun isMuted(exoPlayer: ExoPlayer): Boolean {
-        if (exoPlayer.isCommandAvailable(Player.COMMAND_GET_VOLUME)) {
-            if (exoPlayer.volume <= 0.01f) {
-                return true
-            }
-        }
-
-        if (exoPlayer.isCommandAvailable(Player.COMMAND_GET_DEVICE_VOLUME)) {
-            if (exoPlayer.isDeviceMuted || exoPlayer.deviceVolume <= 0.01f) {
-                return true
-            }
-        }
-
-        return false
     }
 
     private fun setSubtitleInfo(eventData: EventData) {

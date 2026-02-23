@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.amazon.ivs.manipulators
 
 import com.amazonaws.ivs.player.Player
+import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.amazon.ivs.TestUtils
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.data.MetadataProvider
@@ -138,7 +139,8 @@ internal class PlaybackEventDataManipulatorTest {
     private fun createPlaybackEventDataManipulator(
         player: Player = mockk(relaxed = true),
         metadataProvider: MetadataProvider = mockk(relaxed = true),
+        playerContext: PlayerContext = mockk(relaxed = true),
     ): PlaybackEventDataManipulator {
-        return PlaybackEventDataManipulator(player, metadataProvider)
+        return PlaybackEventDataManipulator(player, metadataProvider, playerContext)
     }
 }
