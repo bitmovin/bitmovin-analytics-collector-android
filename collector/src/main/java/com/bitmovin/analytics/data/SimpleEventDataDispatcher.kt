@@ -73,19 +73,19 @@ internal class SimpleEventDataDispatcher(
         enabled = false
     }
 
-    override fun add(eventData: EventData) {
+    override fun add(data: EventData) {
         if (enabled) {
-            backend.send(eventData)
+            backend.send(data)
         } else {
-            data.add(eventData)
+            this.data.add(data)
         }
     }
 
-    override fun addAd(eventData: AdEventData) {
+    override fun addAd(data: AdEventData) {
         if (enabled) {
-            backend.sendAd(eventData)
+            backend.sendAd(data)
         } else {
-            adData.add(eventData)
+            adData.add(data)
         }
     }
 

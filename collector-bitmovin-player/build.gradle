@@ -72,7 +72,7 @@ android {
         unitTests.returnDefaultValues = true
     }
     lint {
-        abortOnError false
+        abortOnError true
     }
 
 

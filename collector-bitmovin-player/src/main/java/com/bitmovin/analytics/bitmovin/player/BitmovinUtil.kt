@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.bitmovin.player
 
 import com.bitmovin.analytics.utils.Util
@@ -17,13 +19,15 @@ internal object BitmovinUtil {
         return Util.secondsToMillis(player.currentTime)
     }
 
-    private fun getVersionWithReflection(): String? = kotlin.runCatching {
-        BuildConfig::class.java.getField("VERSION_NAME").get(null) as String?
-    }.getOrNull()
+    private fun getVersionWithReflection(): String? =
+        kotlin.runCatching {
+            BuildConfig::class.java.getField("VERSION_NAME").get(null) as String?
+        }.getOrNull()
 
-    private fun getVersionByClassNameWithReflection(buildConfigName: String): String? = kotlin.runCatching {
-        Class.forName(buildConfigName, /* initialize = */ true, Player::class.java.classLoader)
-            .getField("VERSION_NAME")
-            .get(null) as String?
-    }.getOrNull()
+    private fun getVersionByClassNameWithReflection(buildConfigName: String): String? =
+        kotlin.runCatching {
+            Class.forName(buildConfigName, true, Player::class.java.classLoader)
+                .getField("VERSION_NAME")
+                .get(null) as String?
+        }.getOrNull()
 }

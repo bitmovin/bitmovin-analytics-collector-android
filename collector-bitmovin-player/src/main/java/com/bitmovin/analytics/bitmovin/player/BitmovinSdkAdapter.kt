@@ -171,6 +171,7 @@ internal class BitmovinSdkAdapter(
         get() = overrideCurrentSource ?: player.source
 
     // TODO [AN-3689]: refactor to use separate manipulators for this method
+    @Suppress("DEPRECATION") // player.subtitle and player.audio are deprecated in newer Bitmovin Player SDK versions
     override fun manipulate(data: EventData) {
         val source = currentSource
         val sourceMetadata = this.getCurrentSourceMetadata()
@@ -492,6 +493,7 @@ internal class BitmovinSdkAdapter(
         }
     }
 
+    @Suppress("DEPRECATION") // SourceEvent.AudioChanged is deprecated in newer Bitmovin Player SDK versions
     private fun onSourceEventAudioChanged(event: SourceEvent.AudioChanged) {
         try {
             BitmovinLog.d(TAG, "On AudioChanged")
@@ -506,6 +508,7 @@ internal class BitmovinSdkAdapter(
         }
     }
 
+    @Suppress("DEPRECATION") // SourceEvent.SubtitleChanged is deprecated in newer Bitmovin Player SDK versions
     private fun onSourceEventSubtitleChanged(event: SourceEvent.SubtitleChanged) {
         try {
             BitmovinLog.d(TAG, "On SubtitleChanged")

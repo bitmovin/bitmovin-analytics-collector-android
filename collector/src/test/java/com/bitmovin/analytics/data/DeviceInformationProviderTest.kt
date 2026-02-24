@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.data
 
 import android.app.UiModeManager

@@ -7,6 +7,7 @@ import kotlin.reflect.KClass
 internal class EventBus {
     private val observableMap = hashMapOf<KClass<*>, ObservableSupport<*>>()
 
+    @Suppress("UNCHECKED_CAST")
     fun <TEventListener : Any> notify(
         type: KClass<TEventListener>,
         action: (listener: TEventListener) -> Unit,
@@ -43,6 +44,7 @@ internal class EventBus {
         return get(type.kotlin)
     }
 
+    @Suppress("UNCHECKED_CAST")
     operator fun <TEventListener : Any> get(type: KClass<TEventListener>): ObservableSupport<TEventListener> {
         observableMap[type] = observableMap[type] ?: ObservableSupport<TEventListener>()
         return observableMap[type] as ObservableSupport<TEventListener>

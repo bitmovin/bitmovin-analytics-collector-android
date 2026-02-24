@@ -115,6 +115,7 @@ abstract class DefaultCollector<TPlayer> protected constructor(
         analytics.programChange { metadataProvider.setSourceMetadata(newSourceMetadata) }
     }
 
+    @Suppress("DEPRECATION")
     fun setDeprecatedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig: BitmovinAnalyticsConfig) {
         metadataProvider.setDeprecatedBitmovinAnalyticsConfig(bitmovinAnalyticsConfig)
     }

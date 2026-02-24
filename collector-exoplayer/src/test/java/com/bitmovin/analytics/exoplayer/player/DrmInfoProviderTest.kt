@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.exoplayer.player
 
 import com.google.android.exoplayer2.C.CLEARKEY_UUID
@@ -13,7 +15,6 @@ import org.junit.Before
 import org.junit.Test
 
 class DrmInfoProviderTest {
-
     private lateinit var provider: DrmInfoProvider
 
     @Before
@@ -57,9 +58,10 @@ class DrmInfoProviderTest {
     fun `evaluateDrmType should detect widevine`() {
         val schemeData = DrmInitData.SchemeData(WIDEVINE_UUID, "mimeType", byteArrayOf())
         val drmInitData = DrmInitData(schemeData)
-        val format = Format.Builder()
-            .setDrmInitData(drmInitData)
-            .build()
+        val format =
+            Format.Builder()
+                .setDrmInitData(drmInitData)
+                .build()
         val mediaLoadData = MediaLoadData(DATA_TYPE_DRM, 0, format, 0, null, 0, 0)
         provider.evaluateDrmType(mediaLoadData)
         assertEquals("widevine", provider.drmType)
@@ -69,9 +71,10 @@ class DrmInfoProviderTest {
     fun `evaluateDrmType should detect playready`() {
         val schemeData = DrmInitData.SchemeData(PLAYREADY_UUID, "mimeType", byteArrayOf())
         val drmInitData = DrmInitData(schemeData)
-        val format = Format.Builder()
-            .setDrmInitData(drmInitData)
-            .build()
+        val format =
+            Format.Builder()
+                .setDrmInitData(drmInitData)
+                .build()
         val mediaLoadData = MediaLoadData(DATA_TYPE_DRM, 0, format, 0, null, 0, 0)
         provider.evaluateDrmType(mediaLoadData)
         assertEquals("playready", provider.drmType)
@@ -81,9 +84,10 @@ class DrmInfoProviderTest {
     fun `evaluateDrmType should detect clearkey`() {
         val schemeData = DrmInitData.SchemeData(CLEARKEY_UUID, "mimeType", byteArrayOf())
         val drmInitData = DrmInitData(schemeData)
-        val format = Format.Builder()
-            .setDrmInitData(drmInitData)
-            .build()
+        val format =
+            Format.Builder()
+                .setDrmInitData(drmInitData)
+                .build()
         val mediaLoadData = MediaLoadData(DATA_TYPE_DRM, 0, format, 0, null, 0, 0)
         provider.evaluateDrmType(mediaLoadData)
         assertEquals("clearkey", provider.drmType)

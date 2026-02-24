@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.exoplayer
 
 import android.os.Handler
@@ -9,7 +11,6 @@ import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.Player
 
 internal object ExoUtil {
-
     private const val DASH_MANIFEST_CLASSNAME =
         "com.google.android.exoplayer2.source.dash.manifest.DashManifest"
     private const val HLS_MANIFEST_CLASSNAME =
@@ -54,7 +55,10 @@ internal object ExoUtil {
     // Be careful, given code is either executed synchronously when calling
     // thread is same thread as applicationLooper, or asynchronously if not
     // This means code calling this cannot rely on order of execution
-    fun executeSyncOrAsyncOnLooperThread(applicationLooper: Looper, function: () -> Unit) {
+    fun executeSyncOrAsyncOnLooperThread(
+        applicationLooper: Looper,
+        function: () -> Unit,
+    ) {
         if (Thread.currentThread() != applicationLooper.thread) {
             val handler = Handler(applicationLooper)
             handler.post {

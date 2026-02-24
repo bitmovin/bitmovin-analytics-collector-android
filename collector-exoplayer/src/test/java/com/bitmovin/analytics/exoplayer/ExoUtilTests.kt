@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.exoplayer
 
 import com.google.android.exoplayer2.C
@@ -33,7 +35,10 @@ class ExoUtilTests {
         Assertions.assertThat(selectedSubtitle?.language).isEqualTo("de")
     }
 
-    private fun prepareExoToReturnFormat(exoPlayer: ExoPlayer, subtitleFormat: Format) {
+    private fun prepareExoToReturnFormat(
+        exoPlayer: ExoPlayer,
+        subtitleFormat: Format,
+    ) {
         every { exoPlayer.isCommandAvailable(Player.COMMAND_GET_TRACKS) } returns true
         every { exoPlayer.currentTracks } returns Tracks(arrayListOf(buildMockTrackSelection(subtitleFormat)))
     }

@@ -1,3 +1,5 @@
+@file:Suppress("OVERRIDE_DEPRECATION")
+
 package com.bitmovin.analytics.media3.exoplayer.listeners
 
 import androidx.media3.common.C

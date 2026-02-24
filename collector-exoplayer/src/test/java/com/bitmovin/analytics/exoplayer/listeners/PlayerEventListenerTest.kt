@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.exoplayer.listeners
 
 import com.bitmovin.analytics.dtos.ErrorCode

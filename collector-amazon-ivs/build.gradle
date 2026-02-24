@@ -38,6 +38,10 @@ android {
         freeCompilerArgs += "-opt-in=com.bitmovin.analytics.internal.InternalBitmovinApi"
     }
 
+    lint {
+        abortOnError true
+    }
+
     testOptions {
         // https://developer.android.com/studio/test/gradle-managed-devices
         managedDevices {

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.exoplayer.player
 
 import com.bitmovin.analytics.adapters.PlayerContext

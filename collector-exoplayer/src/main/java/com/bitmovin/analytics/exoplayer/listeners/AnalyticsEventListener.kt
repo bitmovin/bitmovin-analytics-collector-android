@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.exoplayer.listeners
 
 import com.bitmovin.analytics.exoplayer.ExoUtil
@@ -131,6 +133,7 @@ internal class AnalyticsEventListener(
         }
     }
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun onSeekStarted(eventTime: AnalyticsListener.EventTime) {
         try {
             val videoTime = eventTime.currentPlaybackPositionMs

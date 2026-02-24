@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.exoplayer
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig
@@ -8,7 +10,6 @@ import io.mockk.mockk
 import org.junit.Test
 
 class IExoPlayerCollectorKotlinTest {
-
     // This test is a sanity check that the kotlin factory stays stable and consistent with the naming
     @Test
     fun testFactory_shouldCreateNewCollectorObject() {

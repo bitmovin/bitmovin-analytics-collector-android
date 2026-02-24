@@ -15,6 +15,7 @@ import com.bitmovin.analytics.utils.Util.HEARTBEAT_INTERVAL
     "Use AnalyticsConfig, DefaultMetadata and SourceMetadata instead",
     ReplaceWith("AnalyticsConfig(licenseKey)", "com.bitmovin.analytics.api.AnalyticsConfig"),
 )
+@Suppress("DEPRECATION")
 class BitmovinAnalyticsConfig() : Parcelable {
     constructor(key: String, playerKey: String) : this() {
         this.key = key

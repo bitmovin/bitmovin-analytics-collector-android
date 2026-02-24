@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.bitmovin.player
 
 import com.bitmovin.player.BuildConfig

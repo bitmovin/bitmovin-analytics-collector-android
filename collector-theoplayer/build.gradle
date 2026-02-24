@@ -69,7 +69,7 @@ android {
         unitTests.returnDefaultValues = true
     }
     lint {
-        abortOnError false
+        abortOnError true
     }
 
     // we need to exclude the MANIFEST.MF file under META-INF/versions/9/OSGI-INF

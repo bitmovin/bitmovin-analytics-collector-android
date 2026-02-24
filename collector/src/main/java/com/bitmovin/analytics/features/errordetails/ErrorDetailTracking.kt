@@ -10,11 +10,13 @@ import com.bitmovin.analytics.dtos.ErrorDetailTrackingConfig
 import com.bitmovin.analytics.dtos.FeatureConfigContainer
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.license.InstantLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseKeyProvider
 import com.bitmovin.analytics.license.licenseKeyOrNull
 import com.bitmovin.analytics.utils.Util
 
+@OptIn(InternalBitmovinApi::class)
 class ErrorDetailTracking(
     private val context: Context,
     private val analyticsConfig: AnalyticsConfig,

@@ -6,12 +6,14 @@ import com.bitmovin.player.api.advertising.ima.ImaAdData
 import com.bitmovin.player.api.advertising.vast.VastAdData
 
 internal class AdMapper {
-
     fun fromPlayerAd(playerAd: com.bitmovin.player.api.advertising.Ad): Ad {
         return fromPlayerAd(Ad(), playerAd)
     }
 
-    fun fromPlayerAd(collectorAd: Ad, playerAd: com.bitmovin.player.api.advertising.Ad): Ad {
+    fun fromPlayerAd(
+        collectorAd: Ad,
+        playerAd: com.bitmovin.player.api.advertising.Ad,
+    ): Ad {
         collectorAd.isLinear = playerAd.isLinear
         collectorAd.width = playerAd.width
         collectorAd.height = playerAd.height
@@ -38,12 +40,16 @@ internal class AdMapper {
         return collectorAd
     }
 
-    private fun fromLinearAd(collectorAd: Ad, linearAd: LinearAd) {
+    private fun fromLinearAd(
+        collectorAd: Ad,
+        linearAd: LinearAd,
+    ) {
         collectorAd.duration = linearAd.duration?.toLong()?.times(1000)
         collectorAd.skippable = linearAd.skippableAfter != null
         collectorAd.skippableAfter = linearAd.skippableAfter?.toLong()?.times(1000)
     }
 
+    @Suppress("DEPRECATION") // universalAdId is deprecated in newer Bitmovin Player SDK versions
     private fun fromVastAdData(collectorAd: Ad, vastData: VastAdData) {
         collectorAd.title = vastData.adTitle
         collectorAd.adSystemName = vastData.adSystem?.name

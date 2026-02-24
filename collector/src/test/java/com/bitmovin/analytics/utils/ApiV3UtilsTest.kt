@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.utils
 
 import com.bitmovin.analytics.BitmovinAnalyticsConfig

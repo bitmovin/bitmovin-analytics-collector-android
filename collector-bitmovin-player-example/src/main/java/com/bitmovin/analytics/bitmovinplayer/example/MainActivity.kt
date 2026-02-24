@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.bitmovinplayer.example
 
 import android.os.Bundle

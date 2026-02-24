@@ -7,9 +7,11 @@ import com.bitmovin.analytics.features.errordetails.ErrorDetailBackend
 import com.bitmovin.analytics.features.errordetails.ErrorDetailTracking
 import com.bitmovin.analytics.features.httprequesttracking.HttpRequestTracking
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.license.InstantLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseKeyProvider
 
+@OptIn(InternalBitmovinApi::class)
 internal class DefaultFeatureFactory(
     private val analytics: BitmovinAnalytics,
     private val httpRequestTrackingAdapter: Observable<OnDownloadFinishedEventListener>?,

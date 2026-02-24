@@ -9,6 +9,7 @@ import com.bitmovin.analytics.utils.extractStackTraceForErrorTracking
 import com.bitmovin.player.api.deficiency.ErrorEvent
 
 internal class BitmovinPlayerExceptionMapper : ExceptionMapper<ErrorEvent> {
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun map(event: ErrorEvent): ErrorCode {
         var legacyErrorData: LegacyErrorData? = null
         var additionalData: String? = null

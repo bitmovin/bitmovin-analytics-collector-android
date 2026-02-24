@@ -10,6 +10,7 @@ import com.bitmovin.analytics.exoplayer.api.IExoPlayerCollector;
 import org.junit.Assert;
 import org.junit.Test;
 
+@SuppressWarnings("deprecation")
 public class IExoPlayerCollectorJavaTest {
 
     // This test is a sanity check that the kotlin factory stays stable and consistent with the naming

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.bitmovin.player.utils
 
 import com.bitmovin.analytics.ads.AdPosition
@@ -14,7 +16,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 
 class AdBreakMapperTest {
-
     @Mock
     private lateinit var adConfiguration: AdConfig
 
@@ -25,11 +26,6 @@ class AdBreakMapperTest {
     private lateinit var imaAdBreak: ImaAdBreak
 
     private var adBreakMapper = AdBreakMapper()
-
-    private val TEN_SECONDS = 10.0
-    private val TEN_SECONDS_IN_MS: Long = TEN_SECONDS.toLong() * 1000
-    private val ID = "id"
-    private val PRE = "pre"
 
     @Before
     fun setup() {
@@ -45,35 +41,35 @@ class AdBreakMapperTest {
     }
 
     @Test
-    fun FromPlayerAdConfigurationWithAdConfigurationShouldSetValuesOfAdConfiguration() {
+    fun fromPlayerAdConfigurationWithAdConfigurationShouldSetValuesOfAdConfiguration() {
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(adConfiguration)
 
         assertThat(collectorAdBreak.replaceContentDuration).isEqualTo(TEN_SECONDS_IN_MS)
     }
 
     @Test
-    fun FromPlayerAdConfigurationWithAdConfigurationShouldNotSetValuesOfAdBreak() {
+    fun fromPlayerAdConfigurationWithAdConfigurationShouldNotSetValuesOfAdBreak() {
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(adConfiguration)
 
         assertThat(collectorAdBreak.scheduleTime).isNull()
     }
 
     @Test
-    fun FromPlayerAdConfigurationWithAdBreakShouldSetValuesOfAdBreak() {
+    fun fromPlayerAdConfigurationWithAdBreakShouldSetValuesOfAdBreak() {
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(adBreak)
 
         assertThat(collectorAdBreak.scheduleTime).isEqualTo(TEN_SECONDS_IN_MS)
     }
 
     @Test
-    fun FromPlayerAdConfigurationWithAdBreakShouldNotSetValuesOfImaAdBreak() {
+    fun fromPlayerAdConfigurationWithAdBreakShouldNotSetValuesOfImaAdBreak() {
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(adBreak)
 
         assertThat(collectorAdBreak.position).isNull()
     }
 
     @Test
-    fun FromPlayerAdConfigurationWithImaAdBreakShouldSetValuesOfImaAdBreak() {
+    fun fromPlayerAdConfigurationWithImaAdBreakShouldSetValuesOfImaAdBreak() {
         `when`(imaAdBreak.currentFallbackIndex).thenReturn(1)
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
 
@@ -81,7 +77,7 @@ class AdBreakMapperTest {
     }
 
     @Test
-    fun FromPlayerAdConfigurationPlayerPositionPREShouldSetPREPlayerPosition() {
+    fun fromPlayerAdConfigurationPlayerPositionPREShouldSetPREPlayerPosition() {
         `when`(imaAdBreak.position).thenReturn("pre")
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
 
@@ -89,7 +85,7 @@ class AdBreakMapperTest {
     }
 
     @Test
-    fun FromPlayerAdConfigurationPlayerPositionPOSTShouldSetPOSTPlayerPosition() {
+    fun fromPlayerAdConfigurationPlayerPositionPOSTShouldSetPOSTPlayerPosition() {
         `when`(imaAdBreak.position).thenReturn("post")
         val collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
 
@@ -97,7 +93,7 @@ class AdBreakMapperTest {
     }
 
     @Test
-    fun FromPlayerAdConfigurationPlayerPositionMIDShouldSetMIDPlayerPosition() {
+    fun fromPlayerAdConfigurationPlayerPositionMIDShouldSetMIDPlayerPosition() {
         `when`(imaAdBreak.position).thenReturn("10")
         var collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
         assertThat(collectorAdBreak.position).isEqualTo(AdPosition.MID)
@@ -109,5 +105,12 @@ class AdBreakMapperTest {
         `when`(imaAdBreak.position).thenReturn("00:10:00.000")
         collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
         assertThat(collectorAdBreak.position).isEqualTo(AdPosition.MID)
+    }
+
+    companion object {
+        private const val TEN_SECONDS = 10.0
+        private const val TEN_SECONDS_IN_MS: Long = TEN_SECONDS.toLong() * 1000
+        private const val ID = "id"
+        private const val PRE = "pre"
     }
 }

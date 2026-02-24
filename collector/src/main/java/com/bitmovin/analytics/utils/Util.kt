@@ -6,7 +6,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.media.MediaCodecList
 import android.net.Uri
 import android.os.Build
@@ -48,9 +47,21 @@ object Util {
         get() = SystemClock.elapsedRealtime()
     val timestamp: Long
         get() = System.currentTimeMillis()
-    val locale: String
-        get() = Resources.getSystem().configuration.locale.toString()
 
+    fun getLocale(context: Context): String {
+        val locale =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                context.resources.configuration.locales[0]
+            } else {
+                @Suppress("DEPRECATION")
+                context.resources.configuration.locale
+            }
+        // for backwards compatibility we are using toString instead of toLanguageTag
+        // since toString format is fr_FR and toLanguageTag return fr-FR
+        return locale.toString()
+    }
+
+    // TODO [AN-5196]: find better way to detect this (more efficient, and move away from deprecated function)
     val supportedVideoFormats: List<String>
         get() {
             val codecs: MutableList<String> = ArrayList()
@@ -62,6 +73,7 @@ object Util {
             return codecs
         }
 
+    @Suppress("DEPRECATION")
     private fun isMimeTypeSupported(mimeType: String?): Boolean {
         val numCodecs = MediaCodecList.getCodecCount()
         for (i in 0 until numCodecs) {

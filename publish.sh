@@ -95,6 +95,12 @@ if ! ./gradlew spotlessCheck --daemon; then
   exit
 fi
 
+echo "\nCheck lint..."
+if ! ./gradlew lintRelease --daemon; then
+  echo "Lint errors detected, please fix them first on main as otherwise the build will fail."
+  exit
+fi
+
 echo "\n:collector project build and publishing..."
 ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector:clean || exit
 ./gradlew -DdevelopLocal=false -Dversion="$VERSION" :collector:build || exit

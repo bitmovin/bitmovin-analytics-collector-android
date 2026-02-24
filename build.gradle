@@ -274,3 +274,12 @@ java {
     sourceCompatibility = rootProject.ext.sourceCompatibility
     targetCompatibility = rootProject.ext.targetCompatibility
 }
+
+tasks.withType(JavaCompile).configureEach {
+    // don't show deprecations warnings for tests
+    // this is needed since the annotations don't work for javac
+    // we only have tests that use java, thus we are fine
+    if (name.toLowerCase().contains("test")) {
+        options.compilerArgs << "-Xlint:-deprecation"
+    }
+}

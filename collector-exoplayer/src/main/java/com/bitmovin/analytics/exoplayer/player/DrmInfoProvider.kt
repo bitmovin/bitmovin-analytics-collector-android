@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.exoplayer.player
 
 import com.bitmovin.analytics.enums.DRMType
@@ -22,6 +24,7 @@ internal class DrmInfoProvider {
     fun drmLoadStartedAt(loadStartedAtMs: Long) {
         this.drmLoadStartTime = loadStartedAtMs
     }
+
     fun drmLoadFinishedAt(loadFinishedAtMs: Long) {
         this.drmDownloadTime = loadFinishedAtMs - drmLoadStartTime
     }

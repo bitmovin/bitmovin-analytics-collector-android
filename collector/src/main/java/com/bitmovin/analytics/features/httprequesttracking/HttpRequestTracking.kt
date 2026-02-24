@@ -2,11 +2,13 @@ package com.bitmovin.analytics.features.httprequesttracking
 
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.dtos.HttpRequest
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.QueueExtensions.Companion.limit
 import java.util.LinkedList
 import java.util.Queue
 
+@OptIn(InternalBitmovinApi::class)
 class HttpRequestTracking(private vararg val observables: Observable<OnDownloadFinishedEventListener>) :
     OnDownloadFinishedEventListener {
     companion object {

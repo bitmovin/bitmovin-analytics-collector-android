@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.bitmovin.analytics.exoplayer
 
 import com.google.android.exoplayer2.ExoPlaybackException

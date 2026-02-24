@@ -62,12 +62,16 @@ sealed interface LicenseKeyState {
 /**
  * Waits for a specified amount of time for the license key to be provided or a failure to occur.
  */
-internal suspend fun LicenseKeyProvider.waitForResult(): Result = withTimeoutOrNull(
-    DEFERRED_LICENSE_KEY_LOADING_TIMEOUT,
-) { licenseKey.filterIsInstance<Result>().first() } ?: Timeout
+@InternalBitmovinApi
+internal suspend fun LicenseKeyProvider.waitForResult(): Result =
+    withTimeoutOrNull(
+        DEFERRED_LICENSE_KEY_LOADING_TIMEOUT,
+    ) { licenseKey.filterIsInstance<Result>().first() } ?: Timeout
 
+@InternalBitmovinApi
 internal val LicenseKeyProvider.licenseKeyOrNull: String?
-    get() = when (val result = licenseKey.value) {
-        is Provided -> result.licenseKey
-        else -> null
-    }
+    get() =
+        when (val result = licenseKey.value) {
+            is Provided -> result.licenseKey
+            else -> null
+        }

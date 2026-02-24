@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
+- Avoid deprecated method to get locale if possible
 - [Internal] Moved more player methods into the playerContext, moved the featurefactory into the core
+- [Internal] Ignore deprecation warnings when old api still needs to be used for backwards compatibility, and for tests in general
+- [Internal] Enable abort on linting, add linter check to publish script
 
 ## v3.24.0
 

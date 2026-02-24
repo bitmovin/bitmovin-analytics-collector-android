@@ -34,7 +34,10 @@ class CollectorConfig() : Parcelable {
         backendUrl = parcel.readString() ?: DEFAULT_BACKEND_URL
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
+    override fun writeToParcel(
+        dest: Parcel,
+        flags: Int,
+    ) {
         dest.writeString(backendUrl)
     }
 
@@ -46,9 +49,12 @@ class CollectorConfig() : Parcelable {
         internal const val DEFAULT_BACKEND_URL = "https://analytics-ingress-global.bitmovin.com/"
 
         @JvmField
-        val CREATOR = object : Parcelable.Creator<CollectorConfig> {
-            override fun createFromParcel(parcel: Parcel) = CollectorConfig(parcel)
-            override fun newArray(size: Int) = arrayOfNulls<CollectorConfig>(size)
-        }
+        @Suppress("DEPRECATION")
+        val CREATOR =
+            object : Parcelable.Creator<CollectorConfig> {
+                override fun createFromParcel(parcel: Parcel) = CollectorConfig(parcel)
+
+                override fun newArray(size: Int) = arrayOfNulls<CollectorConfig>(size)
+            }
     }
 }

@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
+import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.license.DeferredLicenseKeyProvider
 import com.bitmovin.analytics.license.InstantLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseKeyProvider
@@ -17,15 +18,17 @@ import kotlinx.coroutines.flow.update
  */
 private const val DEFERRED_LICENSE_KEY_PLACEHOLDER = "DEFERRED"
 
+@OptIn(InternalBitmovinApi::class)
 internal class DeferredLicenseRelay(licenseKey: String) {
     private val deferredLoadingEnabled = licenseKey == DEFERRED_LICENSE_KEY_PLACEHOLDER
     private val licenseKeyFlow = MutableStateFlow<LicenseKeyState>(LicenseKeyState.Deferred)
 
-    val licenseKeyProvider: LicenseKeyProvider = if (deferredLoadingEnabled) {
-        DeferredLicenseKeyProvider(licenseKeyFlow)
-    } else {
-        InstantLicenseKeyProvider(licenseKey)
-    }
+    val licenseKeyProvider: LicenseKeyProvider =
+        if (deferredLoadingEnabled) {
+            DeferredLicenseKeyProvider(licenseKeyFlow)
+        } else {
+            InstantLicenseKeyProvider(licenseKey)
+        }
 
     private var eventEmitter: EventEmitter<Event>? = null
 
@@ -43,11 +46,12 @@ internal class DeferredLicenseRelay(licenseKey: String) {
     private fun onPlayerLicenseValidated(event: PlayerEvent.LicenseValidated) {
         detachInternally()
         val licenseKey = event.data.analytics.key
-        val state = if (licenseKey != null) {
-            LicenseKeyState.Provided(licenseKey)
-        } else {
-            LicenseKeyState.NotProvided
-        }
+        val state =
+            if (licenseKey != null) {
+                LicenseKeyState.Provided(licenseKey)
+            } else {
+                LicenseKeyState.NotProvided
+            }
         licenseKeyFlow.update { state }
     }
 
