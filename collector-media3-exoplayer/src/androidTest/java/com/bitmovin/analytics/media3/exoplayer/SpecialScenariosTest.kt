@@ -36,7 +36,7 @@ class SpecialScenariosTest {
     val metadataGenerator = MetadataUtils.MetadataGenerator()
 
     private val forceLowestQuality =
-        TrackSelectionParameters.Builder(appContext)
+        TrackSelectionParameters.Builder()
             .setForceLowestBitrate(true)
             .build()
 

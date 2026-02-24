@@ -42,7 +42,7 @@ class ErrorScenariosTest {
     val metadataGenerator = MetadataUtils.MetadataGenerator()
 
     private val forceHighestQuality =
-        TrackSelectionParameters.Builder(appContext)
+        TrackSelectionParameters.Builder()
             .setForceHighestSupportedBitrate(true)
             .build()
 

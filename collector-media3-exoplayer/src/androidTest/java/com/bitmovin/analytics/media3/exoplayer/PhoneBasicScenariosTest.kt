@@ -54,7 +54,7 @@ class PhoneBasicScenariosTest {
         set(_) {}
 
     private val forceLowestQuality =
-        TrackSelectionParameters.Builder(appContext)
+        TrackSelectionParameters.Builder()
             .setForceLowestBitrate(true)
             .build()
 
@@ -857,7 +857,7 @@ class PhoneBasicScenariosTest {
 
             // act
             val preferGermanSubtitle =
-                TrackSelectionParameters.Builder(appContext)
+                TrackSelectionParameters.Builder()
                     .setForceLowestBitrate(true)
                     .setPreferredTextLanguage("de")
                     .build()
@@ -876,7 +876,7 @@ class PhoneBasicScenariosTest {
             Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
             val preferEnglishSubtitle =
-                TrackSelectionParameters.Builder(appContext)
+                TrackSelectionParameters.Builder()
                     .setForceLowestBitrate(true)
                     .setPreferredTextLanguage("en")
                     .build()
@@ -889,7 +889,7 @@ class PhoneBasicScenariosTest {
             Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 6000)
 
             val disableTextTrack =
-                TrackSelectionParameters.Builder(appContext)
+                TrackSelectionParameters.Builder()
                     .setForceLowestBitrate(true)
                     .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
                     .build()
@@ -945,7 +945,7 @@ class PhoneBasicScenariosTest {
             val mediaItem = MediaItem.fromUri(HLS_MULTIPLE_AUDIO_LANGUAGES.m3u8Url!!)
 
             val preferDubbingAudio =
-                TrackSelectionParameters.Builder(appContext)
+                TrackSelectionParameters.Builder()
                     .setForceLowestBitrate(true)
                     .setPreferredAudioLanguage("dubbing")
                     .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
@@ -965,7 +965,7 @@ class PhoneBasicScenariosTest {
             Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
 
             val preferEnglishAudio =
-                TrackSelectionParameters.Builder(appContext)
+                TrackSelectionParameters.Builder()
                     .setForceLowestBitrate(true)
                     .setPreferredAudioLanguage("en")
                     .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)

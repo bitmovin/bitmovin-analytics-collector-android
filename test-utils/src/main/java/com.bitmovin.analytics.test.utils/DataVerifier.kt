@@ -131,11 +131,9 @@ object DataVerifier {
 
             // audio language should always be set, except for ivs player
             // since we cannot track it there as of 2023-09-21
-
-// FIXME: this doesn't consistently work anymore
-//            if (expectedPlayerInfo.playerName != "amazonivs") {
-//                assertThat(eventData.audioLanguage).isNotEmpty
-//            }
+            if (expectedPlayerInfo.playerName != "amazonivs") {
+                assertThat(eventData.audioLanguage).isNotEmpty
+            }
 
             verifyStreamFormatAndUrlTracking(eventData)
 
