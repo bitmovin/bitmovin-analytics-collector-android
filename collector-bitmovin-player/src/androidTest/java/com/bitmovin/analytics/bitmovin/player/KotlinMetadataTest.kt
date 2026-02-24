@@ -12,7 +12,7 @@ class KotlinMetadataTest {
     // is stable (we have seen accidental upgrades in the past)
     @Test
     fun verifyMetadata() {
-        val metadata = KotlinClassMetadata.readLenient(BitmovinSdkAdapter::class.java.getAnnotation(Metadata::class.java))
+        val metadata = KotlinClassMetadata.readLenient(BitmovinSdkAdapter::class.java.getAnnotation(Metadata::class.java)!!)
         assertThat(metadata.version.toString()).isEqualTo("2.1.0")
     }
 }

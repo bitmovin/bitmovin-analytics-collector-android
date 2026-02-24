@@ -89,8 +89,7 @@ internal class PlaybackEventDataManipulator(
             data.m3u8Url = sourceUrl
             data.streamFormat = StreamFormat.HLS.value
         } else {
-            // TODO: how to store other formats?
-            // for now we just dump everything into progressive source
+            // for now we just dump everything into progressive source if it is not dash or hls
             data.progUrl = sourceUrl
             data.streamFormat = StreamFormat.PROGRESSIVE.value
         }

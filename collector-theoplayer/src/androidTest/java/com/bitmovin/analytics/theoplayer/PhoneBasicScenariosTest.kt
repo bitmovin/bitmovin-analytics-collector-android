@@ -585,13 +585,13 @@ class PhoneBasicScenariosTest {
                 }
             }
 
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
 
             withContext(mainScope.coroutineContext) {
                 player.source = hlsRedBullSourceDescription
             }
 
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
 
             withContext(mainScope.coroutineContext) {
                 collector.detachPlayer()

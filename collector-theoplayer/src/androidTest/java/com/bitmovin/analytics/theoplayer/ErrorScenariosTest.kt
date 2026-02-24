@@ -179,7 +179,14 @@ class ErrorScenariosTest {
             assertThat(sample.errorMessage).isNotEmpty
             assertThat(sample.errorSeverity).isEqualTo(ErrorSeverity.CRITICAL)
 
-            // TODO: verify errorDetails
+            val errorDetails = impression.errorDetailList
+            assertThat(errorDetails).hasSize(1)
+            val errorDetail = errorDetails.first()
+            assertThat(errorDetail.errorId).isEqualTo(0)
+            assertThat(errorDetail.code).isEqualTo(sample.errorCode)
+            assertThat(errorDetail.message).isNotEmpty
+            assertThat(errorDetail.data).isNotNull
+            assertThat(errorDetail.platform).isEqualTo("android")
         }
     }
 
