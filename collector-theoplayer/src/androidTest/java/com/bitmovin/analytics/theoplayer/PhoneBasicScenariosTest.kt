@@ -564,6 +564,93 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    fun test_vod_sourceChangeWithCustomDataDolbyScenario() {
+        runBlockingTest {
+            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                player.isAutoplay = true
+                collector.sourceMetadata = dashSourceMetadata
+                collector.attachPlayer(player)
+                player.source = dashVodDescription
+
+                // This scenario mimics what dolby folks reported as valid scenario
+                // on source change we detach and switch the source
+                player.addEventListener(PlayerEventTypes.SOURCECHANGE) {
+                    if (it.source == hlsRedBullSourceDescription) {
+                        collector.detachPlayer()
+                        collector.sourceMetadata = redBullHlsSourceMetadata
+                        collector.customData = CustomData(customData1 = "changedInCallback1", customData10 = "changedInCallback10")
+                        collector.attachPlayer(player)
+                    }
+                }
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                player.source = hlsRedBullSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+                theoPlayerView.onDestroy()
+            }
+
+            Thread.sleep(500)
+
+            MockedIngress.waitForAnalyticsSample()
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(2)
+
+            val firstImpression = impressions.first()
+            DataVerifier.verifyHasNoErrorSamples(firstImpression)
+            val secondImpression = impressions[1]
+
+            val firstImpressionEvents = firstImpression.eventDataList
+
+            assertThat(firstImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
+            val firstStartupSample = firstImpressionEvents.first()
+            val firstPlayingSample = firstImpressionEvents[1]
+            DataVerifier.verifyStartupSample(firstStartupSample)
+            DataVerifier.verifyIsPlayingEvent(firstPlayingSample)
+            DataVerifier.verifyStaticData(
+                firstImpressionEvents,
+                dashSourceMetadata,
+                TestSources.DASH,
+                TheoPlayerConstants.playerInfo,
+                false,
+            )
+            DataVerifier.verifyInvariants(firstImpressionEvents)
+            DataVerifier.verifyDataOnLastSample(firstImpressionEvents)
+
+            val secondImpressionEvents = secondImpression.eventDataList
+            assertThat(secondImpressionEvents).hasSizeGreaterThanOrEqualTo(2)
+            val secondStartupSample = secondImpressionEvents.first()
+            val secondPlayingSample = secondImpressionEvents[1]
+            DataVerifier.verifyStartupSample(secondStartupSample, false)
+            DataVerifier.verifyIsPlayingEvent(secondPlayingSample)
+
+            val expectedCustomData = CustomData(customData1 = "changedInCallback1", customData10 = "changedInCallback10")
+            val expectedSourceMetadata =
+                redBullHlsSourceMetadata.copy(customData = expectedCustomData)
+
+            DataVerifier.verifyStaticData(
+                secondImpressionEvents,
+                expectedSourceMetadata,
+                TestSources.HLS_REDBULL,
+                TheoPlayerConstants.playerInfo,
+                false,
+            )
+            DataVerifier.verifyInvariants(secondImpressionEvents)
+            DataVerifier.verifyDataOnLastSample(secondImpressionEvents)
+        }
+    }
+
+    @Test
     fun test_vod_sourceChangeDolbyScenario() {
         runBlockingTest {
             val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
