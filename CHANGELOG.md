@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- THEOplayer: DRM Load Time tracking
+
 ### Changed
 - Avoid deprecated method to get locale if possible
 - [Internal] Moved more player methods into the playerContext, moved the featurefactory into the core

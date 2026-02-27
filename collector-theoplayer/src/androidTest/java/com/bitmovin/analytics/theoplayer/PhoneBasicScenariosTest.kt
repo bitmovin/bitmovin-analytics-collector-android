@@ -1013,7 +1013,7 @@ class PhoneBasicScenariosTest {
             val drmImpression = impressions[0]
             DataVerifier.verifyHasNoErrorSamples(drmImpression)
             val startupSample = drmImpression.eventDataList.first()
-            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, verifyDrmType = true, verifyDrmLoadTime = false)
+            DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, verifyDrmType = true, verifyDrmLoadTime = true)
 
             assertThat(drmImpression.eventDataList).allSatisfy { it.drmType == "widevine" }
         }

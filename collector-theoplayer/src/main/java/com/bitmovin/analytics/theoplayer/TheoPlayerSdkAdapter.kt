@@ -24,6 +24,7 @@ import com.bitmovin.analytics.theoplayer.features.TheoPlayerHttpRequestTrackingA
 import com.bitmovin.analytics.theoplayer.listeners.AnalyticsEventListeners
 import com.bitmovin.analytics.theoplayer.listeners.SourceEventListeners
 import com.bitmovin.analytics.theoplayer.manipulators.PlaybackEventDataManipulator
+import com.bitmovin.analytics.theoplayer.player.DrmInfoProvider
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
@@ -54,6 +55,8 @@ internal class TheoPlayerSdkAdapter(
         looper,
     ) {
     private val mainHandler = Handler(Looper.getMainLooper())
+    private val drmInfoProvider = DrmInfoProvider()
+
     private val playbackEventDataManipulator =
         PlaybackEventDataManipulator(player, playbackQualityProvider, metadataProvider, playerStatisticsProvider, playerContext)
 
@@ -62,7 +65,8 @@ internal class TheoPlayerSdkAdapter(
 
     override fun createHttpRequestTrackingAdapter(
         onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>,
-    ): Observable<OnDownloadFinishedEventListener> = TheoPlayerHttpRequestTrackingAdapter(player, onAnalyticsReleasingObservable)
+    ): Observable<OnDownloadFinishedEventListener> =
+        TheoPlayerHttpRequestTrackingAdapter(player, onAnalyticsReleasingObservable, drmInfoProvider)
 
     private val analyticsEventListeners = AnalyticsEventListeners(bitmovinAnalytics, stateMachine, player, playbackQualityProvider)
     private val sourceEventListeners = SourceEventListeners(stateMachine, player, playbackQualityProvider)
@@ -77,6 +81,7 @@ internal class TheoPlayerSdkAdapter(
     override fun resetSourceRelatedState() {
         playbackQualityProvider.resetPlaybackQualities()
         playerStatisticsProvider.reset()
+        drmInfoProvider.reset()
     }
 
     override fun release() {
@@ -106,9 +111,8 @@ internal class TheoPlayerSdkAdapter(
     override val eventDataManipulators: Collection<EventDataManipulator>
         get() = listOf(playbackEventDataManipulator)
 
-    // TODO: AN-5120
     override val drmDownloadTime: Long?
-        get() = null
+        get() = drmInfoProvider.getAndResetDrmLoadTime()
 
     companion object {
         private const val TAG = "TheoPlayerSdkAdapter"

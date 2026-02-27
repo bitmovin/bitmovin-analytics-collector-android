@@ -8,9 +8,11 @@ import com.bitmovin.analytics.dtos.HttpRequest
 import com.bitmovin.analytics.dtos.HttpRequestType
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventObject
+import com.bitmovin.analytics.theoplayer.player.DrmInfoProvider
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.network.http.HTTPInterceptor
+import com.theoplayer.android.api.network.http.HTTPRequest
 import com.theoplayer.android.api.network.http.InterceptableHTTPRequest
 import com.theoplayer.android.api.network.http.InterceptableHTTPResponse
 import com.theoplayer.android.api.network.http.RequestMediaType
@@ -21,9 +23,10 @@ import com.theoplayer.android.api.player.Player
 internal class TheoPlayerHttpRequestTrackingAdapter(
     private val player: Player,
     private val onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>,
+    drmInfoProvider: DrmInfoProvider,
 ) : Observable<OnDownloadFinishedEventListener>, OnAnalyticsReleasingEventListener {
     private val observableSupport = ObservableSupport<OnDownloadFinishedEventListener>()
-    private val interceptor = TheoPlayerNetworkRequestInterceptor(observableSupport)
+    private val interceptor = TheoPlayerNetworkRequestInterceptor(drmInfoProvider, observableSupport)
 
     init {
         wireEvents()
@@ -55,6 +58,7 @@ internal class TheoPlayerHttpRequestTrackingAdapter(
 }
 
 internal class TheoPlayerNetworkRequestInterceptor(
+    private val drmInfoProvider: DrmInfoProvider,
     private val observableSupport: ObservableSupport<OnDownloadFinishedEventListener>,
 ) : HTTPInterceptor {
     // Urls can practically be up to 2000 characters, this means we could
@@ -63,6 +67,7 @@ internal class TheoPlayerNetworkRequestInterceptor(
 
     fun reset() {
         requestStartTimes.evictAll()
+        drmInfoProvider.reset()
     }
 
     override suspend fun onRequest(request: InterceptableHTTPRequest) {
@@ -77,10 +82,16 @@ internal class TheoPlayerNetworkRequestInterceptor(
             val requestStartTime: Long? = requestStartTimes.remove(trimmedUrl)
             val downloadTimeInMs = if (requestStartTime != null) Util.elapsedTime - requestStartTime else 0L
             val sizeInBytes = extractContentLengthFromHeaders(response.headers)
-
             val httpStatus = response.status
             val isSuccess = httpStatus in 200..399
             val requestType = mapHttpRequestType(response.request)
+
+            // in case we detect a DRM request, we set the request time
+            // this is only done for licensing requests to be consistent
+            // we ignore the provisioning calls
+            if (isDrmLicensingRequest(response.request.subType) && downloadTimeInMs != 0L) {
+                drmInfoProvider.setDrmLicenseRequestTimeInMs(downloadTimeInMs)
+            }
 
             val httpRequest =
                 HttpRequest(
@@ -162,6 +173,13 @@ internal class TheoPlayerNetworkRequestInterceptor(
                 RequestMediaType.IMAGE -> HttpRequestType.MEDIA_THUMBNAILS
                 else -> HttpRequestType.UNKNOWN
             }
+        }
+
+        private fun isDrmLicensingRequest(subType: RequestSubType): Boolean {
+            return subType == RequestSubType.WIDEVINE_LICENSE ||
+                subType == RequestSubType.CLEARKEY_LICENSE ||
+                subType == RequestSubType.FAIRPLAY_LICENSE ||
+                subType == RequestSubType.PLAYREADY_LICENSE
         }
     }
 }

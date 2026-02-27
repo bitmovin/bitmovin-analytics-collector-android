@@ -48,6 +48,7 @@ internal class AnalyticsEventListeners(
     private val player: Player,
     private val playbackQualityProvider: PlaybackQualityProvider,
 ) {
+    @Volatile
     private var lastUpdatedPositionMs = 0L
 
     // Event listener references for registration and unregistration
