@@ -19,7 +19,7 @@ import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdvertisingConfig
 import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.event.on
-import com.bitmovin.player.api.source.Source
+import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import com.bitmovin.player.api.source.SourceType
 import kotlinx.coroutines.MainScope
@@ -45,12 +45,12 @@ class DeferredLicenseLoadingTest {
     val metadataGenerator = MetadataUtils.MetadataGenerator()
 
     private val defaultSource =
-        Source.create(
+        SourceBuilder(
             SourceConfig(
                 TestSources.HLS_REDBULL.m3u8Url!!,
                 SourceType.Hls,
             ),
-        )
+        ).build()
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
 
     @Before
@@ -112,9 +112,9 @@ class DeferredLicenseLoadingTest {
             initializePlayer()
             val nonExistingStreamSample = TestSources.NONE_EXISTING_STREAM
             val nonExistingSource =
-                Source.create(
+                SourceBuilder(
                     SourceConfig.fromUrl(nonExistingStreamSample.m3u8Url!!),
-                )
+                ).build()
             lateinit var deferredLicenseKey: String
 
             // act

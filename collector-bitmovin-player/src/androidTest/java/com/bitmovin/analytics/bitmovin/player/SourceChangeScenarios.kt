@@ -14,8 +14,10 @@ import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
-import com.bitmovin.player.api.analytics.create
+import com.bitmovin.player.api.analytics.AnalyticsPlayerConfig
+import com.bitmovin.player.api.analytics.SourceAnalyticsApi.Companion.analytics
 import com.bitmovin.player.api.source.Source
+import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.withContext
@@ -52,11 +54,11 @@ class SourceChangeScenarios {
 
     // Source depends on defaultSourceMetaData which depends on the Test, so it has to be generated dynamically
     private var defaultSource: Source
-        get() = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), defaultSourceMetadata)
+        get() = SourceBuilder(SourceConfig.fromUrl(defaultSample.m3u8Url!!)).configureAnalytics(defaultSourceMetadata).build()
         set(_) {}
 
     private var defaultSourceTwo: Source
-        get() = Source.create(SourceConfig.fromUrl(TestSources.DASH.mpdUrl!!), defaultSourceMetadataTwo)
+        get() = SourceBuilder(SourceConfig.fromUrl(TestSources.DASH.mpdUrl!!)).configureAnalytics(defaultSourceMetadataTwo).build()
         set(_) {}
 
     private val defaultPlayerConfig =
@@ -79,7 +81,7 @@ class SourceChangeScenarios {
 
             withContext(mainScope.coroutineContext) {
                 defaultPlayer =
-                    Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig)
+                    Player(appContext, defaultPlayerConfig, AnalyticsPlayerConfig.Enabled(defaultAnalyticsConfig))
             }
         }
 

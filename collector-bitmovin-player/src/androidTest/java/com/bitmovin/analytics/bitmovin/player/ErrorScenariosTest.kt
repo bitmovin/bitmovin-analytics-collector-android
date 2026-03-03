@@ -25,7 +25,7 @@ import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
 import com.bitmovin.player.api.TweaksConfig
 import com.bitmovin.player.api.analytics.AnalyticsPlayerConfig
-import com.bitmovin.player.api.analytics.AnalyticsSourceConfig
+import com.bitmovin.player.api.analytics.SourceAnalyticsApi.Companion.analytics
 import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.decoder.DecoderConfig
 import com.bitmovin.player.api.decoder.DecoderPriorityProvider
@@ -37,7 +37,7 @@ import com.bitmovin.player.api.network.NetworkConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.recovery.RetryPlaybackAction
 import com.bitmovin.player.api.recovery.RetryPlaybackConfig
-import com.bitmovin.player.api.source.Source
+import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import com.bitmovin.player.api.source.SourceType
 import kotlinx.coroutines.MainScope
@@ -80,7 +80,7 @@ class ErrorScenariosTest {
             defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
 
             withContext(mainScope.coroutineContext) {
-                defaultPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig)
+                defaultPlayer = Player(appContext, defaultPlayerConfig, AnalyticsPlayerConfig.Enabled(defaultAnalyticsConfig))
             }
         }
 
@@ -101,7 +101,7 @@ class ErrorScenariosTest {
                     title = metadataGenerator.getTestTitle(),
                     customData = CustomData(customData1 = "exitBeforeVideoStart"),
                 )
-            val source = Source.create(SourceConfig.fromUrl(sample.mpdUrl!!), sourceMetadata)
+            val source = SourceBuilder(SourceConfig.fromUrl(sample.mpdUrl!!)).configureAnalytics(sourceMetadata).build()
             // act
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.load(source)
@@ -138,7 +138,10 @@ class ErrorScenariosTest {
                     customData = CustomData(customData1 = "nonExistingStream"),
                     isLive = true,
                 )
-            val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.m3u8Url!!), sourceMetadata)
+            val nonExistingSource =
+                SourceBuilder(
+                    SourceConfig.fromUrl(nonExistingStreamSample.m3u8Url!!),
+                ).configureAnalytics(sourceMetadata).build()
             // act
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.load(nonExistingSource)
@@ -188,7 +191,7 @@ class ErrorScenariosTest {
             // we simulate a decoding error by occupying all available decoders
             // and disable software decoders
             noAvailableDecoder(MediaFormat.createVideoFormat(MimeTypes.VIDEO_H264, 1920, 1080)) {
-                val source = Source.create(SourceConfig.fromUrl(stream.mpdUrl!!), sourceMetadata)
+                val source = SourceBuilder(SourceConfig.fromUrl(stream.mpdUrl!!)).configureAnalytics(sourceMetadata).build()
                 // act
                 withContext(mainScope.coroutineContext) {
                     val playerConfig =
@@ -263,7 +266,7 @@ class ErrorScenariosTest {
                     title = metadataGenerator.getTestTitle(),
                 )
 
-            val source = Source.create(SourceConfig.fromUrl(stream.mpdUrl!!), sourceMetadata)
+            val source = SourceBuilder(SourceConfig.fromUrl(stream.mpdUrl!!)).configureAnalytics(sourceMetadata).build()
             // act
             withContext(mainScope.coroutineContext) {
                 val playerConfig =
@@ -309,7 +312,7 @@ class ErrorScenariosTest {
                     title = metadataGenerator.getTestTitle(),
                 )
 
-            val source = Source.create(SourceConfig.fromUrl(stream.mpdUrl!!), sourceMetadata)
+            val source = SourceBuilder(SourceConfig.fromUrl(stream.mpdUrl!!)).configureAnalytics(sourceMetadata).build()
 
             val configWithTransformer =
                 defaultAnalyticsConfig.copy(
@@ -361,7 +364,7 @@ class ErrorScenariosTest {
                     title = metadataGenerator.getTestTitle(),
                 )
 
-            val source = Source.create(SourceConfig.fromUrl(stream.mpdUrl!!), sourceMetadata)
+            val source = SourceBuilder(SourceConfig.fromUrl(stream.mpdUrl!!)).configureAnalytics(sourceMetadata).build()
             // act
             withContext(mainScope.coroutineContext) {
                 val playerConfig =
@@ -445,15 +448,13 @@ class ErrorScenariosTest {
                 )
 
             val nonExistingSource =
-                Source(
+                SourceBuilder(
                     SourceConfig.fromUrl(nonExistingStreamSample.m3u8Url!!),
-                    AnalyticsSourceConfig.Enabled(sourceMetadata1),
-                )
+                ).configureAnalytics(sourceMetadata1).build()
             val validSource =
-                Source(
+                SourceBuilder(
                     SourceConfig.fromUrl(validStreamSample.mpdUrl!!),
-                    AnalyticsSourceConfig.Enabled(sourceMetadata2),
-                )
+                ).configureAnalytics(sourceMetadata2).build()
 
             val playlistConfig = PlaylistConfig(sources = listOf(nonExistingSource, validSource))
             val retryPlaybackConfig = RetryPlaybackConfig(retryPlaybackCallback = { RetryPlaybackAction.SkipToNextSource })

@@ -32,6 +32,7 @@ import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
 import com.bitmovin.player.api.source.Source
+import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -67,7 +68,7 @@ class BundledAnalyticsTest {
 
     // Source depends on defaultSourceMetaData which depends on the Test, so it has to be generated dynamically
     private var defaultSource: Source
-        get() = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), defaultSourceMetadata)
+        get() = SourceBuilder(SourceConfig.fromUrl(defaultSample.m3u8Url!!)).configureAnalytics(defaultSourceMetadata).build()
         set(_) {}
     private val defaultPlayerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
 
@@ -186,7 +187,7 @@ class BundledAnalyticsTest {
                     customData = TestConfig.createDummyCustomData(),
                     cdnProvider = "cdn_provider",
                 )
-            val drmSource = Source.create(drmSourceConfig, drmSourceMetadata)
+            val drmSource = SourceBuilder(drmSourceConfig).configureAnalytics(drmSourceMetadata).build()
 
             defaultPlayer.config.playbackConfig.isAutoplayEnabled = true
 
@@ -367,7 +368,7 @@ class BundledAnalyticsTest {
                     customData = TestConfig.createDummyCustomData("liveSource"),
                     isLive = true,
                 )
-            val liveSource = Source.create(SourceConfig.fromUrl(liveSample.mpdUrl!!), liveSourceMetadata)
+            val liveSource = SourceBuilder(SourceConfig.fromUrl(liveSample.mpdUrl!!)).configureAnalytics(liveSourceMetadata).build()
             lateinit var localPlayer: Player
 
             // act
@@ -422,7 +423,7 @@ class BundledAnalyticsTest {
                     path = "hlsPath",
                     isLive = true,
                 )
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), hlsSourceMetadata)
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).configureAnalytics(hlsSourceMetadata).build()
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -446,7 +447,7 @@ class BundledAnalyticsTest {
     fun test_vod_2Impressions_Should_NotCarryOverDataFromFirstImpression() =
         runBlockingTest {
             val hlsSample = TestSources.HLS_REDBULL
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), defaultSourceMetadata)
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).configureAnalytics(defaultSourceMetadata).build()
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -465,7 +466,7 @@ class BundledAnalyticsTest {
                     cdnProvider = "dashCdnProvider",
                     path = "dashPath",
                 )
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashSourceMetadata)
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).configureAnalytics(dashSourceMetadata).build()
 
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.pause()
@@ -520,7 +521,7 @@ class BundledAnalyticsTest {
         runBlockingTest {
             val hlsSample = TestSources.HLS_REDBULL
             val sourceMetadata = metadataGenerator.generate()
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), sourceMetadata)
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).configureAnalytics(sourceMetadata).build()
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -579,11 +580,11 @@ class BundledAnalyticsTest {
                 )
 
             val hlsSample = TestSources.HLS_REDBULL
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), hlsMetadata)
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).configureAnalytics(hlsMetadata).build()
             val dashSample = TestSources.DASH
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashMetadata)
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).configureAnalytics(dashMetadata).build()
             val progSample = TestSources.PROGRESSIVE
-            val progSource = Source.create(SourceConfig.fromUrl(progSample.progUrl!!), progMetadata)
+            val progSource = SourceBuilder(SourceConfig.fromUrl(progSample.progUrl!!)).configureAnalytics(progMetadata).build()
 
             lateinit var localPlayer: Player
 
@@ -705,9 +706,9 @@ class BundledAnalyticsTest {
                 )
 
             val hlsSample = TestSources.HLS_REDBULL
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), hlsMetadata)
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).configureAnalytics(hlsMetadata).build()
             val dashSample = TestSources.DASH
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashMetadata)
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).configureAnalytics(dashMetadata).build()
             val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
 
             lateinit var localPlayer: Player
@@ -790,10 +791,10 @@ class BundledAnalyticsTest {
         runBlockingTest {
             val hlsSample = TestSources.HLS_REDBULL
             val hlsSourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle("hls"))
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), hlsSourceMetadata)
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).configureAnalytics(hlsSourceMetadata).build()
             val dashSample = TestSources.DASH
             val dashSourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle("DASH"))
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashSourceMetadata)
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).configureAnalytics(dashSourceMetadata).build()
             val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
 
             // act
@@ -896,7 +897,7 @@ class BundledAnalyticsTest {
                     path = "path/Source1",
                     customData = source1CustomData,
                 )
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!), sourceMetadata1)
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).configureAnalytics(sourceMetadata1).build()
 
             val source2CustomData =
                 CustomData(
@@ -913,7 +914,7 @@ class BundledAnalyticsTest {
                     customData = source2CustomData,
                 )
             val dashSample = TestSources.DASH
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), sourceMetadata2)
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).configureAnalytics(sourceMetadata2).build()
 
             lateinit var localPlayer: Player
 
@@ -1031,10 +1032,9 @@ class BundledAnalyticsTest {
                     retryPolicy = RetryPolicy.LONG_TERM,
                 )
             val offlineSource =
-                Source.create(
-                    SourceConfig.fromUrl(defaultSample.m3u8Url!!),
-                    SourceMetadata(title = metadataGenerator.getTestTitle("OFFLINE")),
-                )
+                SourceBuilder(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
+                    .configureAnalytics(SourceMetadata(title = metadataGenerator.getTestTitle("OFFLINE")))
+                    .build()
 
             lateinit var localPlayer: Player
 
@@ -1064,10 +1064,9 @@ class BundledAnalyticsTest {
             assertThat(MockedIngress.hasNoSamplesReceived()).isTrue()
 
             val onlineSource =
-                Source.create(
-                    SourceConfig.fromUrl(defaultSample.m3u8Url!!),
-                    SourceMetadata(title = metadataGenerator.getTestTitle("ONLINE")),
-                )
+                SourceBuilder(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
+                    .configureAnalytics(SourceMetadata(title = metadataGenerator.getTestTitle("ONLINE")))
+                    .build()
 
             lateinit var localPlayerOnline: Player
             withContext(mainScope.coroutineContext) {
@@ -1102,7 +1101,7 @@ class BundledAnalyticsTest {
                     customData = TestConfig.createDummyCustomData("vod_"),
                 )
 
-            val source = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!), sourceMetadata)
+            val source = SourceBuilder(SourceConfig.fromUrl(defaultSample.m3u8Url!!)).configureAnalytics(sourceMetadata).build()
             val customData1 = TestConfig.createDummyCustomData("test1_customData")
             val customData2 = TestConfig.createDummyCustomData("test2_customData")
             val customData3 = TestConfig.createDummyCustomData("test3_customData")
@@ -1218,7 +1217,7 @@ class BundledAnalyticsTest {
                     cdnProvider = "dashCdnProvider",
                     path = "dashPath",
                 )
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!), dashSourceMetadata)
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).configureAnalytics(dashSourceMetadata).build()
 
             // act
             withContext(mainScope.coroutineContext) {

@@ -20,7 +20,7 @@ import com.bitmovin.player.api.advertising.AdItem
 import com.bitmovin.player.api.advertising.AdSource
 import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdvertisingConfig
-import com.bitmovin.player.api.source.Source
+import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.withContext
@@ -35,7 +35,7 @@ class CsaiScenariosTest {
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var defaultSample = TestSources.HLS_REDBULL
-    private var defaultSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
+    private var defaultSource = SourceBuilder(SourceConfig.fromUrl(defaultSample.m3u8Url!!)).build()
 
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()

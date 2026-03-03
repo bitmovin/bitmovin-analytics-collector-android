@@ -18,7 +18,7 @@ import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
-import com.bitmovin.player.api.source.Source
+import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.withContext
@@ -42,7 +42,7 @@ class ProgramChangeScenariosTest {
     private lateinit var mockedIngressUrl: String
 
     private val hlsSample = TestSources.HLS_REDBULL
-    private val source = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+    private val source = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).build()
 
     private val programChangeStateName = "programchange"
 
@@ -472,9 +472,9 @@ class ProgramChangeScenariosTest {
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
             // Create two sources for the playlist
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).build()
             val dashSample = TestSources.DASH
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).build()
 
             val hlsMetadata =
                 SourceMetadata(

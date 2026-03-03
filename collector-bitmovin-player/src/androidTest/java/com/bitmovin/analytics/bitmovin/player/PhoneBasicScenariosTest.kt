@@ -24,7 +24,7 @@ import com.bitmovin.player.api.PlayerConfig
 import com.bitmovin.player.api.drm.WidevineConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
-import com.bitmovin.player.api.source.Source
+import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.withContext
@@ -49,7 +49,7 @@ class PhoneBasicScenariosTest {
     val metadataGenerator = MetadataUtils.MetadataGenerator()
 
     private val defaultSample = TestSources.HLS_REDBULL
-    private val defaultSource = Source.create(SourceConfig.fromUrl(defaultSample.m3u8Url!!))
+    private val defaultSource = SourceBuilder(SourceConfig.fromUrl(defaultSample.m3u8Url!!)).build()
 
     // Source metadata title depends on the test, so it has to be generated dynamically
     private var defaultSourceMetadata: SourceMetadata
@@ -149,7 +149,7 @@ class PhoneBasicScenariosTest {
             val drmSourceConfig = SourceConfig.fromUrl(sample.mpdUrl!!)
             drmSourceConfig.drmConfig = WidevineConfig(sample.drmLicenseUrl!!)
 
-            val drmSource = Source.create(drmSourceConfig)
+            val drmSource = SourceBuilder(drmSourceConfig).build()
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
             val drmSourceMetadata =
                 SourceMetadata(
@@ -304,7 +304,7 @@ class PhoneBasicScenariosTest {
         runBlockingTest {
             // arrange
             val liveSample = TestSources.DASH_LIVE
-            val liveSource = Source.create(SourceConfig.fromUrl(liveSample.mpdUrl!!))
+            val liveSource = SourceBuilder(SourceConfig.fromUrl(liveSample.mpdUrl!!)).build()
 
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
             val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
@@ -367,7 +367,7 @@ class PhoneBasicScenariosTest {
     fun test_vod_2Impressions_Should_NotCarryOverDataFromFirstImpression() =
         runBlockingTest {
             val hlsSample = TestSources.HLS_REDBULL
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).build()
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
 
             // act
@@ -381,7 +381,7 @@ class PhoneBasicScenariosTest {
             BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 1500)
 
             val dashSample = TestSources.DASH
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).build()
             val dashSourceMetadata =
                 SourceMetadata(
                     title = metadataGenerator.getTestTitle("DASH"),
@@ -447,11 +447,11 @@ class PhoneBasicScenariosTest {
     fun test_vod_3ImpressionsWithPlaylist_Should_DetectNewSessions() =
         runBlockingTest {
             val hlsSample = TestSources.HLS_REDBULL
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).build()
             val dashSample = TestSources.DASH
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).build()
             val progSample = TestSources.PROGRESSIVE
-            val progSource = Source.create(SourceConfig.fromUrl(progSample.progUrl!!))
+            val progSource = SourceBuilder(SourceConfig.fromUrl(progSample.progUrl!!)).build()
 
             val defaultMetadata =
                 DefaultMetadata(
@@ -587,9 +587,9 @@ class PhoneBasicScenariosTest {
                 )
 
             val hlsSample = TestSources.HLS_REDBULL
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).build()
             val dashSample = TestSources.DASH
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).build()
 
             val hlsMetadata =
                 SourceMetadata(
@@ -686,9 +686,9 @@ class PhoneBasicScenariosTest {
     fun test_vod_2ImpressionsWithPlaylist_Should_SetCustomDataOnlyOnFirstSource() =
         runBlockingTest {
             val hlsSample = TestSources.HLS_REDBULL
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).build()
             val dashSample = TestSources.DASH
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).build()
 
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
             val playlistConfig = PlaylistConfig(listOf(hlsSource, dashSource), PlaylistOptions())
@@ -764,7 +764,7 @@ class PhoneBasicScenariosTest {
     fun test_nonExistingStream_Should_sendErrorSample() =
         runBlockingTest {
             val nonExistingStreamSample = TestSources.NONE_EXISTING_STREAM
-            val nonExistingSource = Source.create(SourceConfig.fromUrl(nonExistingStreamSample.m3u8Url!!))
+            val nonExistingSource = SourceBuilder(SourceConfig.fromUrl(nonExistingStreamSample.m3u8Url!!)).build()
 
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
             val sourceMetadata =
@@ -830,7 +830,7 @@ class PhoneBasicScenariosTest {
                     path = "path/Source1",
                     customData = source1CustomData,
                 )
-            val hlsSource = Source.create(SourceConfig.fromUrl(hlsSample.m3u8Url!!))
+            val hlsSource = SourceBuilder(SourceConfig.fromUrl(hlsSample.m3u8Url!!)).build()
             val defaultMetadata =
                 DefaultMetadata(
                     cdnProvider = "cndProviderDefault",
@@ -844,7 +844,7 @@ class PhoneBasicScenariosTest {
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig, defaultMetadata)
 
             val dashSample = TestSources.DASH
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).build()
             val source2CustomData =
                 CustomData(
                     customData1 = "source2CustomData1",
@@ -1151,7 +1151,7 @@ class PhoneBasicScenariosTest {
                     cdnProvider = "dashCdnProvider",
                     path = "dashPath",
                 )
-            val dashSource = Source.create(SourceConfig.fromUrl(dashSample.mpdUrl!!))
+            val dashSource = SourceBuilder(SourceConfig.fromUrl(dashSample.mpdUrl!!)).build()
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
             // act
             withContext(mainScope.coroutineContext) {

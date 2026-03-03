@@ -14,9 +14,10 @@ import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
+import com.bitmovin.player.api.analytics.SourceAnalyticsApi.Companion.analytics
 import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.source.NetworkEngine
-import com.bitmovin.player.api.source.Source
+import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import com.bitmovin.player.api.source.SourceNetworkConfig
 import kotlinx.coroutines.MainScope
@@ -89,7 +90,7 @@ class CronetNetworkTest {
                         ),
                 )
 
-            val source = Source.create(sourceConfig, defaultSourceMetadata)
+            val source = SourceBuilder(sourceConfig).configureAnalytics(defaultSourceMetadata).build()
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.load(source)
                 defaultPlayer.play()

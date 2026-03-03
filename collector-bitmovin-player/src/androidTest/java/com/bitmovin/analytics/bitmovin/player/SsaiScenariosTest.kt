@@ -27,10 +27,12 @@ import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
 import com.bitmovin.player.api.analytics.AnalyticsApi.Companion.analytics
+import com.bitmovin.player.api.analytics.SourceAnalyticsApi.Companion.analytics
 import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.media.AdaptationConfig
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.source.Source
+import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.withContext
@@ -1430,7 +1432,7 @@ class SsaiScenariosTest {
                     title = metadataGenerator.getTestTitle(),
                 )
 
-            val source = Source.create(SourceConfig.fromUrl(stream.mpdUrl!!), sourceMetadata)
+            val source = SourceBuilder(SourceConfig.fromUrl(stream.mpdUrl!!)).configureAnalytics(sourceMetadata).build()
 
             val configWithTransformer =
                 defaultAnalyticsConfig.copy(
