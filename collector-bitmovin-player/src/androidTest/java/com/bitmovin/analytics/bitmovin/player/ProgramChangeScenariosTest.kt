@@ -134,6 +134,7 @@ class ProgramChangeScenariosTest {
             assertThat(firstStartupSample.customData1).isEqualTo("program2-data")
             assertThat(firstStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(firstStartupSample.isProgramChange).isNull()
+            assertThat(firstStartupSample.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
         }
 
     @Test
@@ -210,6 +211,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isEqualTo(1)
+            assertThat(secondStartupSample.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -299,6 +301,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isEqualTo(1)
+            assertThat(secondStartupSample.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -374,6 +377,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isEqualTo(1)
+            assertThat(secondStartupSample.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -452,6 +456,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartup.videoId).isEqualTo("program-2")
             assertThat(secondStartup.isProgramChange).isTrue()
             assertThat(secondStartup.videoStartupTime).isEqualTo(1)
+            assertThat(secondStartup.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
             val lastSampleOfSession2 = impressions[1].eventDataList.last()
             assertThat(lastSampleOfSession2.isProgramChange).isTrue
 
@@ -461,6 +466,7 @@ class ProgramChangeScenariosTest {
             assertThat(thirdStartup.videoId).isEqualTo("program-3")
             assertThat(thirdStartup.isProgramChange).isTrue()
             assertThat(thirdStartup.videoStartupTime).isEqualTo(1)
+            assertThat(thirdStartup.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
 
             val lastSampleOfSession3 = impressions[2].eventDataList.last()
             assertThat(lastSampleOfSession3.isProgramChange).isNull()
@@ -554,6 +560,7 @@ class ProgramChangeScenariosTest {
             assertThat(startup2.videoId).isEqualTo("program-change-video-id")
             assertThat(startup2.customData1).isEqualTo("program-change-data")
             assertThat(startup2.isProgramChange).isTrue()
+            assertThat(startup2.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
 
             // Impression 3: DASH with its original metadata (not affected by programChange)
             val impression3 = impressions[2]

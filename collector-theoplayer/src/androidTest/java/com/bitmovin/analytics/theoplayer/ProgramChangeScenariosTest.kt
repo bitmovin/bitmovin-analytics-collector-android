@@ -173,6 +173,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isGreaterThanOrEqualTo(1)
+            assertThat(secondStartupSample.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -265,6 +266,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isGreaterThanOrEqualTo(1)
+            assertThat(secondStartupSample.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -345,6 +347,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartupSample.sequenceNumber).isEqualTo(0)
             assertThat(secondStartupSample.isProgramChange).isTrue()
             assertThat(secondStartupSample.videoStartupTime).isGreaterThanOrEqualTo(1)
+            assertThat(secondStartupSample.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
 
             val impressionId2 = secondStartupSample.impressionId
             assertThat(impressionId2).isNotEqualTo(impressionId1)
@@ -424,6 +427,7 @@ class ProgramChangeScenariosTest {
             assertThat(secondStartup.videoId).isEqualTo("program-2")
             assertThat(secondStartup.isProgramChange).isTrue()
             assertThat(secondStartup.videoStartupTime).isEqualTo(1)
+            assertThat(secondStartup.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
 
             // Verify third impression (programChange flag)
             DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(impressions[2].eventDataList)
@@ -431,6 +435,7 @@ class ProgramChangeScenariosTest {
             assertThat(thirdStartup.videoId).isEqualTo("program-3")
             assertThat(thirdStartup.isProgramChange).isTrue()
             assertThat(thirdStartup.videoStartupTime).isEqualTo(1)
+            assertThat(thirdStartup.supportedVideoCodecs).containsAll(listOf("av1", "avc", "hevc", "vp9"))
         }
     }
 }

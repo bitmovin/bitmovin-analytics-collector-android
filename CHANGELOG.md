@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - [Internal] Set 1ms duration for programchange sample
+- [Internal] Set supported video codecs for programchange sample
 
 ## v3.24.1
 

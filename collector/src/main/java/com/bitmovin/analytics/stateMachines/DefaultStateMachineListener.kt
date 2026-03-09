@@ -321,6 +321,7 @@ class DefaultStateMachineListener(
         eventData.isProgramChange = true
         eventData.videoTimeStart = stateMachine.videoTimeStart
         eventData.videoTimeEnd = stateMachine.videoTimeEnd
+        eventData.supportedVideoCodecs = Util.supportedVideoFormats
 
         analytics.sendEventData(eventData)
     }
