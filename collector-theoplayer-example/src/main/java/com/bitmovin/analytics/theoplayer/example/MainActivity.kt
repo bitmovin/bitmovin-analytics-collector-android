@@ -2,10 +2,12 @@ package com.bitmovin.analytics.theoplayer.example
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.LogLevel
+import com.bitmovin.analytics.test.utils.TestSources
 import com.bitmovin.analytics.theoplayer.api.ITHEOplayerCollector
 import com.theoplayer.android.api.THEOplayerConfig
 import com.theoplayer.android.api.THEOplayerView
@@ -13,28 +15,30 @@ import com.theoplayer.android.api.event.player.PlayerEventTypes
 import com.theoplayer.android.api.source.SourceDescription
 import com.theoplayer.android.api.source.SourceType
 import com.theoplayer.android.api.source.TypedSource
+import com.theoplayer.android.api.source.addescription.GoogleImaAdDescription
 
 /**
  * Example MainActivity for THEOplayer Analytics Collector
  *
  * This demonstrates basic THEOplayer setup with analytics integration.
  */
+@Suppress("ktlint:standard:max-line-length")
 class MainActivity : ComponentActivity() {
     private lateinit var theoPlayerView: THEOplayerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        theoPlayerView = findViewById(R.id.theoplayer)
-        theoPlayerView.fullScreenManager.isFullScreenOrientationCoupled = true
-
         val playerConfig =
             THEOplayerConfig.Builder()
-                .license(PLAYER_LICENSE_KEY)
+                .license(TESTING_LICENSE)
                 .build()
 
-        // Step 2: Create THEOplayerView
         theoPlayerView = THEOplayerView(this, playerConfig)
+        theoPlayerView.fullScreenManager.isFullScreenOrientationCoupled = true
+
+        val playerContainer = findViewById<FrameLayout>(R.id.playerContainer)
+        playerContainer.addView(theoPlayerView)
 
         val analyticsConfig = AnalyticsConfig(licenseKey = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0", logLevel = LogLevel.DEBUG)
         val collector = ITHEOplayerCollector.create(this, analyticsConfig)
@@ -48,9 +52,16 @@ class MainActivity : ComponentActivity() {
                 .type(SourceType.DASH)
                 .build()
 
+        val preRollAd1 =
+            GoogleImaAdDescription
+                .Builder(TestSources.IMA_AD_SOURCE_3)
+                .timeOffset("start")
+                .build()
+
         val sourceDescription =
             SourceDescription
                 .Builder(typedSource)
+                .ads(preRollAd1)
                 .build()
 
         theoPlayerView.player.source = sourceDescription
@@ -110,6 +121,6 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
-        private const val PLAYER_LICENSE_KEY = ""
+        private const val TESTING_LICENSE = "sZP7IYe6T6P60l0rIS4eC6zkCl4gFSacIKh-CS3KIOzLISX10ux10SUK3LR6FOPlUY3zWokgbgjNIOf9flxg0LIlIl5zFS5LTDh-3uaZ0Zzr3LaZFSA60SRL3oCZ3Sg1ImfVfK4_bQgZCYxNWoryIQXzImf90SRi0Sat3l5i0u5i0Oi6Io4pIYP1UQgqWgjeCYxgflEc3LC_0L0i0LRo0uCLFOPeWok1dDrLYtA1Ioh6TgV6v6fVfKcqCoXVdQjLUOfVfGxEIDjiWQXrIYfpCoj-fgzVfKxqWDXNWG3ybojkbK3gflNWf6E6FOPVWo31WQ1qbta6FOPzdQ4qbQc1sD4ZFK3qWmPUFOPLIQ-LflNWfKXpIwPqdDa6Ymi6bo4pIXjNWYAZIY3LdDjpflNzbG4gFOPKIDXzUYPgbZf9Dkkj"
     }
 }

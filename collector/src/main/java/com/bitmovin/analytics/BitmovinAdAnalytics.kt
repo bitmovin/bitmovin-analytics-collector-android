@@ -218,6 +218,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         this.elapsedTimeAdStartup = Util.elapsedTime
         this.isPlaying = false
         this.sendAnalyticsRequest(adBreak, adSample)
+        // TODO: should we also clear the current ad sample here, since we sent out the sample?
     }
 
     private fun resetActiveAd() {

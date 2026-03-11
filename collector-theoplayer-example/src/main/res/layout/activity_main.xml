@@ -4,21 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.theoplayer.android.api.THEOplayerView
-        android:id="@+id/theoplayer"
+    <FrameLayout
+        android:id="@+id/playerContainer"
         android:layout_width="match_parent"
-        android:layout_height="300dp">
-    </com.theoplayer.android.api.THEOplayerView>
-
-<!--    <FrameLayout-->
-<!--        android:id="@+id/playerContainer"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:background="#000000"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
+        android:layout_height="300dp" />
 
     <Button
         android:layout_width="wrap_content"

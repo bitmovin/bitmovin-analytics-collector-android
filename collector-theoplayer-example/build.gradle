@@ -55,6 +55,7 @@ dependencies {
     implementation "androidx.activity:activity-ktx:${rootProject.ext.ActivityKtxVersion}"
 
     implementation "com.theoplayer.theoplayer-sdk-android:core:${rootProject.ext.theoPlayerVersion}"
+    implementation "com.theoplayer.theoplayer-sdk-android:integration-ads-ima:${rootProject.ext.theoPlayerVersion}"
 
     if (rootProject.ext.developLocal) {
         implementation project(':collector-theoplayer')
