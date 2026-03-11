@@ -5,6 +5,7 @@ import android.os.Looper
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.Observable
 import com.bitmovin.analytics.OnAnalyticsReleasingEventListener
+import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.DefaultPlayerAdapter
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.api.AnalyticsConfig
@@ -20,6 +21,7 @@ import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEve
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.SampleTriggerReason
+import com.bitmovin.analytics.theoplayer.ads.TheoPlayerAdAdapter
 import com.bitmovin.analytics.theoplayer.features.TheoPlayerHttpRequestTrackingAdapter
 import com.bitmovin.analytics.theoplayer.listeners.AnalyticsEventListeners
 import com.bitmovin.analytics.theoplayer.listeners.SourceEventListeners
@@ -107,6 +109,8 @@ internal class TheoPlayerSdkAdapter(
         // We need to make sure this is executed on Main thread because THEO does not always send detach events from main
         if (Looper.getMainLooper().isCurrentThread) sendSampleCodeBlock() else mainHandler.post(sendSampleCodeBlock)
     }
+
+    override fun createAdAdapter(): AdAdapter = TheoPlayerAdAdapter(player, stateMachine)
 
     override val eventDataManipulators: Collection<EventDataManipulator>
         get() = listOf(playbackEventDataManipulator)

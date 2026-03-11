@@ -863,7 +863,11 @@ object DataVerifier {
         var currentAudioBitrate = eventDataList[0].audioBitrate
 
         for (eventData in eventDataList) {
-            if (eventData.state == QUALITYCHANGE || eventData.state == SEEKING || eventData.state == BUFFERING) {
+            if (eventData.state == QUALITYCHANGE ||
+                eventData.state == SEEKING ||
+                eventData.state == BUFFERING ||
+                eventData.videoStartupTime > 0
+            ) {
                 currentVideoBitrate = eventData.videoBitrate
                 currentAudioBitrate = eventData.audioBitrate
             }

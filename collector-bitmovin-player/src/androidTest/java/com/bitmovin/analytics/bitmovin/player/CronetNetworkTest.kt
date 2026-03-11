@@ -14,7 +14,6 @@ import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
-import com.bitmovin.player.api.analytics.SourceAnalyticsApi.Companion.analytics
 import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.source.NetworkEngine
 import com.bitmovin.player.api.source.SourceBuilder

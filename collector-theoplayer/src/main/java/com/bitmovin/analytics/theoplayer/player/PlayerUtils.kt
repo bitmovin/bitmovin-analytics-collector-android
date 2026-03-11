@@ -23,4 +23,20 @@ public object PlayerUtils {
         // FairPlay is not tracked for Android
         return null
     }
+
+    public fun isPreRollAdOffset(timeOffset: String?): Boolean {
+        if (timeOffset == null) {
+            return false
+        }
+
+        if (timeOffset.equals("start", true)) {
+            return true
+        }
+
+        if (timeOffset.equals("0", true)) {
+            return true
+        }
+
+        return false
+    }
 }

@@ -54,7 +54,7 @@ internal class AdBreakMapper {
     ) {
         collectorAdBreak.position = getPositionFromPlayerPosition(imaAdBreak.position)
         collectorAdBreak.fallbackIndex = imaAdBreak.currentFallbackIndex?.toLong() ?: 0
-        collectorAdBreak.tagType = AdTagFactory().FromPlayerAdTag(imaAdBreak.tag)
+        collectorAdBreak.tagType = AdTagFactory.fromPlayerAdTag(imaAdBreak.tag)
         collectorAdBreak.tagUrl = imaAdBreak.tag.url
     }
 

@@ -94,6 +94,7 @@ class BitmovinAnalytics(
 
         if (shouldSendOutSamples) {
             playerAdapter?.ssaiService?.flushCurrentAdSample()
+            adAnalytics?.flushCurrentAdSampleOnDetach()
             playerAdapter?.triggerSampleOnDetach()
         }
         adAnalytics?.detachAdapter()

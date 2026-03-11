@@ -7,8 +7,9 @@ object CsaiDataVerifier {
     fun verifyStaticAdData(
         adSample: AdEventDataForTest,
         analyticsConfig: AnalyticsConfig,
+        expectedPlayer: String = "bitmovin",
     ) {
-        verifyAdIndependentData(adSample, analyticsConfig)
+        verifyAdIndependentData(adSample, analyticsConfig, expectedPlayer)
     }
 
     fun verifyFullyPlayedAd(adSample: AdEventDataForTest) {
@@ -24,11 +25,12 @@ object CsaiDataVerifier {
     private fun verifyAdIndependentData(
         adSample: AdEventDataForTest,
         analyticsConfig: AnalyticsConfig,
+        expectedPlayer: String,
     ) {
         assertThat(adSample.adType).isEqualTo(1)
         assertThat(adSample.adImpressionId).isNotBlank()
         assertThat(adSample.platform).isEqualTo("android")
-        assertThat(adSample.player).isEqualTo("bitmovin")
+
         assertThat(adSample.version).isNotBlank() // aka playerVersion
         assertThat(adSample.userId).isNotBlank()
         assertThat(adSample.analyticsVersion).isNotBlank()
@@ -39,7 +41,11 @@ object CsaiDataVerifier {
         assertThat(adSample.language).isNotBlank()
         assertThat(adSample.userAgent).isNotBlank()
         assertThat(adSample.playerTech).isNotBlank()
-        assertThat(adSample.playerKey).isNotBlank()
         assertThat(adSample.pageLoadType).isEqualTo(1)
+        assertThat(adSample.player).isEqualTo(expectedPlayer)
+
+        if (expectedPlayer == "bitmovin") {
+            assertThat(adSample.key).isNotEmpty
+        }
     }
 }

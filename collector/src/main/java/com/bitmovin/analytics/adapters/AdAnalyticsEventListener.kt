@@ -5,6 +5,8 @@ import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdQuartile
 
 interface AdAnalyticsEventListener {
+    fun onPreRollStartup()
+
     fun onAdStarted(ad: Ad)
 
     fun onAdFinished()
@@ -30,7 +32,5 @@ interface AdAnalyticsEventListener {
 
     fun onAdQuartile(quartile: AdQuartile)
 
-    fun onPlay()
-
-    fun onPause()
+    fun flushCurrentAdSampleOnDetach()
 }

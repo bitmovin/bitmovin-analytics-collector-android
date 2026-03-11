@@ -104,6 +104,10 @@ class DefaultStateMachineListener(
             data.buffered = duration
         } else if (stateMachine.currentState === PlayerStates.SEEKING) {
             data.seeked = duration
+        } else if (stateMachine.currentState === PlayerStates.AD) {
+            // in case we trigger a sample while in AD state, this means we are playing
+            // a client side ad currently (there is no specific PlayerState for SSAI)
+            data.ad = AdType.CLIENT_SIDE.value
         }
 
         data.videoTimeStart = stateMachine.videoTimeStart

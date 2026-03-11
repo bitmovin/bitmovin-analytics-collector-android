@@ -24,6 +24,7 @@ internal class AdMapper {
         collectorAd.minBitrate = playerAd.data?.minBitrate
         collectorAd.maxBitrate = playerAd.data?.maxBitrate
         collectorAd.mimeType = playerAd.data?.mimeType
+        collectorAd.adModule = "DefaultAdvertisingService"
 
         if (playerAd.data is VastAdData) {
             fromVastAdData(collectorAd, playerAd.data as VastAdData)

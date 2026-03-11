@@ -91,6 +91,7 @@ dependencies {
     }
 
     compileOnly "com.theoplayer.theoplayer-sdk-android:core:${rootProject.ext.theoPlayerVersion}"
+    compileOnly "com.theoplayer.theoplayer-sdk-android:integration-ads-ima:${rootProject.ext.theoPlayerVersion}"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
@@ -101,6 +102,7 @@ dependencies {
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 
     androidTestImplementation "com.theoplayer.theoplayer-sdk-android:core:${rootProject.ext.theoPlayerVersion}"
+    androidTestImplementation "com.theoplayer.theoplayer-sdk-android:integration-ads-ima:${rootProject.ext.theoPlayerVersion}"
     androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"
@@ -110,6 +112,7 @@ dependencies {
     androidTestImplementation  "org.jetbrains.kotlinx:kotlinx-metadata-jvm:${rootProject.ext.kotlinMetadataJvmVersion}"
 
     androidTestImplementation project(':test-utils')
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:${rootProject.ext.okhttp3Version}"
 }
 
 publishing {

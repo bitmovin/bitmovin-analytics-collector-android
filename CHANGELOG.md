@@ -7,8 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Fixed
+- CSAI: Improve tracking of abandoned ads
 - [Internal] Set 1ms duration for programchange sample
 - [Internal] Set supported video codecs for programchange sample
+
+### Added
+- CSAI tracking for THEOplayer when using Google IMA SDK
+
+### Changed
+- Upgraded THEOplayer to version 10.10.0
 
 ## v3.24.1
 

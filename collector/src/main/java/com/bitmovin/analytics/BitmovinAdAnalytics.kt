@@ -15,19 +15,25 @@ import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.ErrorTransformationHelper
 import com.bitmovin.analytics.utils.Util
+import java.util.concurrent.ConcurrentHashMap
 
 @InternalBitmovinApi
 class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalyticsEventListener {
+    // TODO: this class has way too many flags, we need to refactor this
     private var activeAdBreak: AdBreak? = null
     private var activeAdSample: AdSample? = null
     private var adPodPosition: Int = 0
     private var elapsedTimeAdStartup: Long? = null
     private var elapsedTimeBeginPlaying: Long? = null
     private var isPlaying: Boolean = false
-    private val adManifestDownloadTimes: HashMap<String, Long> = hashMapOf()
+    private var preRollAdTracked = false
+
+    // TODO: we are not cleaning the list
+    private val adManifestDownloadTimes: ConcurrentHashMap<String, Long> = ConcurrentHashMap()
     private var playerAdapter: PlayerAdapter? = null
     private var adAdapter: AdAdapter? = null
 
+    // TODO: is this needed? can we simplify this?
     private var currentTime: Long? = null
         get() =
             if (this.isPlaying) {
@@ -54,6 +60,18 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         this.adAdapter?.unsubscribe(this)
         this.adAdapter?.release()
         this.adAdapter = null
+        this.preRollAdTracked = false
+    }
+
+    override fun onPreRollStartup() {
+        // TODO: we can only track this once since
+        // we are doing this with the onPlay event, which is also
+        // issued right after the ad, which would lead to wrong results
+        // we should simplify this though and avoid another flag
+        if (!preRollAdTracked) {
+            this.elapsedTimeAdStartup = Util.elapsedTime
+            preRollAdTracked = true
+        }
     }
 
     override fun onAdStarted(ad: Ad) {
@@ -84,11 +102,20 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
     override fun onAdBreakStarted(adBreak: AdBreak) {
         this.adPodPosition = 0
         this.activeAdBreak = adBreak
-        this.elapsedTimeAdStartup = Util.elapsedTime
+
+        // in order to track ad startuptime for pre-roll ads
+        // correctly, we have to set the elapsed time already
+        // with the onPlay event, which happens way before
+        // the adBreakStarted event on theoplayer for example
+        // thus we only set teh elapsedTime with it wasn't set yet
+        if (this.elapsedTimeAdStartup == null) {
+            this.elapsedTimeAdStartup = Util.elapsedTime
+        }
     }
 
     override fun onAdBreakFinished() {
         this.resetActiveAd()
+        this.elapsedTimeAdStartup = null
         this.activeAdBreak = null
     }
 
@@ -132,26 +159,18 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         downloadTime: Long,
     ) {
         this.adManifestDownloadTimes[adBreak.id] = downloadTime
+
         if (adBreak.tagType == AdTagType.VMAP) {
             this.sendAnalyticsRequest(adBreak)
         }
     }
 
-    override fun onPlay() {
-        if (adAdapter?.isLinearAdActive == true && this.activeAdSample != null) {
-            val elapsedTime = Util.elapsedTime
-            this.elapsedTimeBeginPlaying = elapsedTime
-            this.isPlaying = true
-        }
-    }
-
-    override fun onPause() {
-        if (adAdapter?.isLinearAdActive == true && this.activeAdSample != null) {
-            if (this.currentTime != null) {
-                this.currentTime = this.currentTime
-            }
-            this.isPlaying = false
-        }
+    override fun flushCurrentAdSampleOnDetach() {
+        // flush current sample to get partly watched ad info
+        val activeAdBreak = this.activeAdBreak ?: return
+        val activeAdSample = this.activeAdSample ?: return
+        activeAdSample.closed = 1
+        this.completeAd(activeAdBreak, activeAdSample, this.currentTime)
     }
 
     override fun onAdSkipped() {
@@ -206,11 +225,12 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         this.activeAdSample = null
     }
 
-    private fun getAdManifestDownloadTime(adBreak: AdBreak?): Long? {
-        if (adBreak == null || !adManifestDownloadTimes.containsKey(adBreak.id)) {
+    private fun getAndRemoveAdManifestDownloadTime(adBreak: AdBreak?): Long? {
+        if (adBreak == null) {
             return null
         }
-        return adManifestDownloadTimes[adBreak.id]
+
+        return adManifestDownloadTimes.remove(adBreak.id)
     }
 
     private fun sendAnalyticsRequest(
@@ -221,15 +241,13 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         val adEventData = AdEventData.fromEventData(eventData, AdType.CLIENT_SIDE)
 
         adEventData.analyticsVersion = Util.analyticsVersion
-        val moduleInfo = adAdapter?.moduleInformation
-        if (moduleInfo != null) {
-            adEventData.adModule = moduleInfo.name
-            adEventData.adModuleVersion = moduleInfo.version
-        }
-        adEventData.manifestDownloadTime = getAdManifestDownloadTime(adBreak)
-        adEventData.playerStartupTime = 1
-        adEventData.autoplay = adAdapter?.isAutoplayEnabled
 
+        adEventData.adModule = adSample?.ad?.adModule
+        adEventData.adModuleVersion = playerAdapter?.playerContext?.playerVersion
+
+        adEventData.manifestDownloadTime = getAndRemoveAdManifestDownloadTime(adBreak)
+        adEventData.playerStartupTime = 1
+        adEventData.autoplay = playerAdapter?.playerContext?.isAutoplay()
         adEventData.setAdBreak(adBreak)
         adEventData.setAdSample(adSample)
         adEventData.adImpressionId = Util.uUID

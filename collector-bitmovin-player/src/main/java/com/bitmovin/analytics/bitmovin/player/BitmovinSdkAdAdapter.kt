@@ -6,7 +6,6 @@ import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
 import com.bitmovin.analytics.bitmovin.player.utils.AdBreakMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdQuartileFactory
-import com.bitmovin.analytics.data.AdModuleInformation
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.PlayerEvent
@@ -128,10 +127,6 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     override val isLinearAdActive: Boolean
         get() = bitmovinPlayer.isAd
-    override val moduleInformation: AdModuleInformation
-        get() = AdModuleInformation("DefaultAdvertisingService", BitmovinUtil.playerVersion)
-    override val isAutoplayEnabled: Boolean?
-        get() = bitmovinPlayer.config.playbackConfig?.isAutoplayEnabled
 
     override fun subscribe(listener: AdAnalyticsEventListener) {
         observableSupport.subscribe(listener)
