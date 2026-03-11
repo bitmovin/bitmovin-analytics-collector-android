@@ -604,7 +604,7 @@ class CsaiScenariosTest {
         }
 
     @Test
-    fun test_vodWithSkippablePreRollAd_adIsSkipped() =
+    fun test_vodWithSkippablePreRollAd_adIsPlayedFully() =
         runBlockingTest {
             // arrange
             // IMA_AD_SOURCE_3 is a skippable linear ad (5-second skip offset, ~15s duration)
@@ -635,7 +635,7 @@ class CsaiScenariosTest {
             Thread.sleep(6000)
 
             withContext(mainScope.coroutineContext) {
-//                skipping doesn't work through the API anymore according to theo folks
+//                skipping doesn't work through the API anymore according to theo folk
 //                player.ads.skip()
             }
 
@@ -665,6 +665,8 @@ class CsaiScenariosTest {
             assertThat(adSample.adPosition).isEqualTo("pre")
             assertThat(adSample.started).isEqualTo(1)
 
+            // this test only verifies that we track the skip metadata correctly
+            // the skip api call is a noop thus we cannot automate testing the skipping
             assertThat(adSample.adSkippable).isTrue()
             assertThat(adSample.adSkippableAfter).isGreaterThan(0)
             assertThat(adSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
