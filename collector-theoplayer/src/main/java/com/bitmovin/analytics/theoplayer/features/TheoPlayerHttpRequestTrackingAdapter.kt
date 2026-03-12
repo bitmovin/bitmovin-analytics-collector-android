@@ -12,7 +12,6 @@ import com.bitmovin.analytics.theoplayer.player.DrmInfoProvider
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.network.http.HTTPInterceptor
-import com.theoplayer.android.api.network.http.HTTPRequest
 import com.theoplayer.android.api.network.http.InterceptableHTTPRequest
 import com.theoplayer.android.api.network.http.InterceptableHTTPResponse
 import com.theoplayer.android.api.network.http.RequestMediaType
