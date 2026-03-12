@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.25.0
+
 ### Fixed
 - CSAI: Improve tracking of abandoned ads
 - [Internal] Set 1ms duration for programchange sample
