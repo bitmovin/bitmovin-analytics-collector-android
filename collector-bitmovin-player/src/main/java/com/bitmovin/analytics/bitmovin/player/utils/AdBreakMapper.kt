@@ -22,6 +22,7 @@ internal class AdBreakMapper {
     ): AdBreak {
         collectorAdBreak.replaceContentDuration = adConfig.replaceContentDuration?.toLong()?.times(1000)
 
+        // FIXME: [AN-2514]
         if (adConfig is com.bitmovin.player.api.advertising.AdBreak) {
             fromPlayerAdBreak(collectorAdBreak, adConfig)
         }

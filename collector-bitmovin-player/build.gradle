@@ -131,6 +131,7 @@ dependencies {
     androidTestImplementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     androidTestImplementation project(':test-utils')
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:${rootProject.ext.okhttp3Version}"
 }
 
 // we need to exclude the bitmovin player analytics module since we work with a local development version
