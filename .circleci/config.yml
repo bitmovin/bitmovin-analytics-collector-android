@@ -30,11 +30,8 @@ jobs:
           name: Run Tests
           command: ./gradlew test --no-daemon --max-workers=2 #https://support.circleci.com/hc/en-us/articles/360021812453-Common-Android-memory-issues
       - run:
-          name: Unshallow git fetch for SonarQube blame analysis
-          command: git fetch --unshallow || true
-      - run:
           name: SonarQube
-          command: ./gradlew --no-daemon --max-workers=2 sonar -Dsonar.token=$SONAR_TOKEN #https://support.circleci.com/hc/en-us/articles/360021812453-Common-Android-memory-issues
+          command: ./gradlew --no-daemon --max-workers=2 sonar -Dsonar.token=$SONAR_TOKEN -Dsonar.scm.disabled=true #https://support.circleci.com/hc/en-us/articles/360021812453-Common-Android-memory-issues
       - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
           path: collector/build/reports
           destination: reports
