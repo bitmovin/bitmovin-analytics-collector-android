@@ -679,6 +679,77 @@ class CsaiScenariosTest {
         }
 
     @Test
+    fun test_vodWithVmapMidRollPod_twoAdsPlayedSequentially_adPodPositionIncreases() =
+        runBlockingTest {
+            // arrange
+            // VMAP tag that returns a single pre-roll break with a pod of 2 linear ads
+            val vmapAd =
+                GoogleImaAdDescription
+                    .Builder(TestSources.IMA_VMAP_MIDROLL_2ADS)
+                    .build()
+
+            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
+            val sourceDescription =
+                SourceDescription
+                    .Builder(contentSource)
+                    .ads(vmapAd)
+                    .build()
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                val collector = ITHEOplayerCollector.create(appContext, analyticsConfig)
+                collector.sourceMetadata = defaultSourceMetadata
+                collector.attachPlayer(player)
+                player.source = sourceDescription
+                // ad starts at 15th second, thus seeking to 14
+                player.currentTime = 14.0
+            }
+
+            // wait for first pre-roll ad to start and finish
+            PlaybackUtils.waitUntil("midRoll ad bread started") { player.ads.isPlaying }
+            PlaybackUtils.waitUntil("midRoll ad bread finished") { !player.ads.isPlaying }
+
+            // wait for content to play briefly after the ad break
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 16000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            // both pre-roll ads from the VMAP pod must be tracked
+            assertThat(impression.adEventDataList).hasSize(2)
+
+            val firstAdSample = impression.adEventDataList[0]
+            CsaiDataVerifier.verifyStaticAdData(firstAdSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
+            CsaiDataVerifier.verifyFullyPlayedAd(firstAdSample)
+            assertThat(firstAdSample.adPosition).isEqualTo("mid")
+            assertThat(firstAdSample.adPodPosition).isEqualTo(0)
+            assertThat(firstAdSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+
+            val secondAdSample = impression.adEventDataList[1]
+            CsaiDataVerifier.verifyStaticAdData(secondAdSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
+            CsaiDataVerifier.verifyFullyPlayedAd(secondAdSample)
+            assertThat(secondAdSample.adPosition).isEqualTo("mid")
+            // adPodPosition must be higher than the first ad, confirming it increments within the break
+            assertThat(secondAdSample.adPodPosition).isEqualTo(1)
+            assertThat(secondAdSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyInvariants(eventDataList)
+            val eventDataWithAdState = eventDataList.filter { it.ad == 1 }
+            assertThat(eventDataWithAdState).hasSize(1)
+        }
+
+    @Test
     fun test_vodWithPreRollAdError_sendsAdErrorSample() =
         runBlockingTest {
             // arrange
