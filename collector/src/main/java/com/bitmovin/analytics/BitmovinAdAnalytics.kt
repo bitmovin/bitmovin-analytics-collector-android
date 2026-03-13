@@ -1,5 +1,6 @@
 package com.bitmovin.analytics
 
+import android.util.LruCache
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
 import com.bitmovin.analytics.adapters.PlayerAdapter
@@ -15,7 +16,6 @@ import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.ErrorTransformationHelper
 import com.bitmovin.analytics.utils.Util
-import java.util.concurrent.ConcurrentHashMap
 
 @InternalBitmovinApi
 class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalyticsEventListener {
@@ -28,8 +28,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
     private var isPlaying: Boolean = false
     private var preRollAdTracked = false
 
-    // TODO: we are not cleaning the list
-    private val adManifestDownloadTimes: ConcurrentHashMap<String, Long> = ConcurrentHashMap()
+    private val adManifestDownloadTimes: LruCache<String, Long> = LruCache(MAX_CACHE_SIZE)
     private var playerAdapter: PlayerAdapter? = null
     private var adAdapter: AdAdapter? = null
 
@@ -158,7 +157,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         adBreak: AdBreak,
         downloadTime: Long,
     ) {
-        this.adManifestDownloadTimes[adBreak.id] = downloadTime
+        this.adManifestDownloadTimes.put(adBreak.id, downloadTime)
 
         if (adBreak.tagType == AdTagType.VMAP) {
             this.sendAnalyticsRequest(adBreak)
@@ -253,5 +252,9 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         adEventData.setAdSample(adSample)
         adEventData.adImpressionId = Util.uUID
         analytics.sendAdEventData(adEventData)
+    }
+
+    companion object {
+        private const val MAX_CACHE_SIZE = 100
     }
 }

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - CSAI: Improve tracking of abandoned ads
 - [Internal] Set 1ms duration for programchange sample
 - [Internal] Set supported video codecs for programchange sample
+- [Internal] Use LRU cache for ad manifest download time tracking
 
 ### Added
 - CSAI tracking for THEOplayer when using Google IMA SDK
