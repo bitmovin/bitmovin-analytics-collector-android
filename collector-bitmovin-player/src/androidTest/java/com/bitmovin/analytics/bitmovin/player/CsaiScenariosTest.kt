@@ -3,6 +3,7 @@ package com.bitmovin.analytics.bitmovin.player
 import android.widget.LinearLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
@@ -22,6 +23,7 @@ import com.bitmovin.player.api.advertising.AdItem
 import com.bitmovin.player.api.advertising.AdSource
 import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdvertisingConfig
+import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
@@ -42,13 +44,19 @@ import org.junit.runner.RunWith
 class CsaiScenariosTest {
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-    private var defaultSample = TestSources.HLS_REDBULL
-    private var defaultSource = SourceBuilder(SourceConfig.fromUrl(defaultSample.m3u8Url!!)).build()
+    private val defaultSample = TestSources.HLS_REDBULL
 
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()
 
     private lateinit var mockedIngressUrl: String
+    private lateinit var defaultAnalyticsConfig: AnalyticsConfig
+
+    private var defaultSourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
+    private var defaultSource =
+        SourceBuilder(
+            SourceConfig.fromUrl(defaultSample.m3u8Url!!),
+        ).configureAnalytics(defaultSourceMetadata).build()
 
     private val progressiveAdSource =
         AdSource(
@@ -58,27 +66,54 @@ class CsaiScenariosTest {
 
     @Before
     fun setup() {
-        mockedIngressUrl = MockedIngress.startServer()
-        // purging database to have a clean state for each test
         EventDatabaseTestHelper.purge(appContext)
+        mockedIngressUrl = MockedIngress.startServer()
+        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
     }
 
     @After
-    fun teardown() {
+    fun tearDown() {
         MockedIngress.stopServer()
     }
 
     private fun createPlayer(advertisingConfig: AdvertisingConfig): Player {
-        val playbackConfig = PlaybackConfig(isMuted = true, isAutoplayEnabled = true)
-        val playerConfig =
-            PlayerConfig(
-                key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
-                playbackConfig = playbackConfig,
-                advertisingConfig = advertisingConfig,
-            )
-        val player = Player.create(appContext, playerConfig)
-        player.setAdViewGroup(LinearLayout(appContext))
-        return player
+        var player: Player? = null
+
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                val playbackConfig = PlaybackConfig(isMuted = true, isAutoplayEnabled = true)
+                val playerConfig =
+                    PlayerConfig(
+                        key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
+                        playbackConfig = playbackConfig,
+                        advertisingConfig = advertisingConfig,
+                    )
+                player = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+                player.setAdViewGroup(LinearLayout(appContext))
+            }
+        }
+
+        return player!!
+    }
+
+    private fun createPlayerWithoutAnalytics(advertisingConfig: AdvertisingConfig): Player {
+        var player: Player? = null
+
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                val playbackConfig = PlaybackConfig(isMuted = true, isAutoplayEnabled = true)
+                val playerConfig =
+                    PlayerConfig(
+                        key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
+                        playbackConfig = playbackConfig,
+                        advertisingConfig = advertisingConfig,
+                    )
+                player = Player.create(appContext, playerConfig)
+                player.setAdViewGroup(LinearLayout(appContext))
+            }
+        }
+
+        return player!!
     }
 
     @Test
@@ -91,24 +126,10 @@ class CsaiScenariosTest {
             // play midroll after 6 seconds
             val midRoll = AdItem("6", adSource)
             val advertisingConfig = AdvertisingConfig(preRoll, midRoll)
-            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
-
-            val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
-            val playbackConfig = PlaybackConfig(isMuted = true)
-            val playerConfig =
-                PlayerConfig(
-                    key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
-                    playbackConfig = playbackConfig,
-                    advertisingConfig = advertisingConfig,
-                )
-            val localPlayer = Player.create(appContext, playerConfig)
-            localPlayer.setAdViewGroup(LinearLayout(appContext))
-            val sourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
+            val localPlayer = createPlayer(advertisingConfig)
 
             // act
             withContext(mainScope.coroutineContext) {
-                collector.attachPlayer(localPlayer)
-                collector.setSourceMetadata(defaultSource, sourceMetadata)
                 localPlayer.load(defaultSource)
                 localPlayer.play()
             }
@@ -124,7 +145,6 @@ class CsaiScenariosTest {
             Thread.sleep(500)
 
             withContext(mainScope.coroutineContext) {
-                collector.detachPlayer()
                 localPlayer.destroy()
             }
 
@@ -145,7 +165,7 @@ class CsaiScenariosTest {
             // TODO (AN-4378): what is expected behavior for startupTime? should it be always > 0?
             // This assertions is flaky
             // assertThat(firstAd.adStartupTime).isGreaterThan(0)
-            CsaiDataVerifier.verifyStaticAdData(firstAd, analyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(firstAd, defaultAnalyticsConfig)
             CsaiDataVerifier.verifyFullyPlayedAd(firstAd)
 
             val secondAd = impression.adEventDataList[1]
@@ -153,7 +173,7 @@ class CsaiScenariosTest {
             // This assertions is flaky
             // assertThat(secondAd.adStartupTime).isEqualTo(0)
 
-            CsaiDataVerifier.verifyStaticAdData(secondAd, analyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(secondAd, defaultAnalyticsConfig)
             CsaiDataVerifier.verifyFullyPlayedAd(secondAd)
 
             assertThat(firstAd.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
@@ -164,7 +184,7 @@ class CsaiScenariosTest {
             assertThat(eventDataWithAdState.size).isEqualTo(2)
 
             val eventDataList = impression.eventDataList
-            DataVerifier.verifyStaticData(eventDataList, sourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
+            DataVerifier.verifyStaticData(eventDataList, defaultSourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
 
             // startup sample is second sample (since order of events in player changed in 3.40.0)
             DataVerifier.verifyStartupSample(eventData = eventDataList[1], expectedSequenceNumber = 1)
@@ -183,15 +203,10 @@ class CsaiScenariosTest {
             // arrange
             val preRoll = AdItem("pre", progressiveAdSource)
             val advertisingConfig = AdvertisingConfig(preRoll)
-            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
-            val sourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
-            val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
             val localPlayer = createPlayer(advertisingConfig)
 
             // act
             withContext(mainScope.coroutineContext) {
-                collector.attachPlayer(localPlayer)
-                collector.setSourceMetadata(defaultSource, sourceMetadata)
                 localPlayer.load(defaultSource)
             }
 
@@ -207,7 +222,6 @@ class CsaiScenariosTest {
             Thread.sleep(500)
 
             withContext(mainScope.coroutineContext) {
-                collector.detachPlayer()
                 localPlayer.destroy()
             }
 
@@ -223,7 +237,7 @@ class CsaiScenariosTest {
             assertThat(impression.adEventDataList).hasSize(1)
             val adSample = impression.adEventDataList[0]
 
-            CsaiDataVerifier.verifyStaticAdData(adSample, analyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
             CsaiDataVerifier.verifyFullyPlayedAd(adSample)
             assertThat(adSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
 
@@ -239,15 +253,10 @@ class CsaiScenariosTest {
             // mid-roll scheduled at 3 seconds into content playback
             val midRoll = AdItem("3", progressiveAdSource)
             val advertisingConfig = AdvertisingConfig(midRoll)
-            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
-            val sourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
-            val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
             val localPlayer = createPlayer(advertisingConfig)
 
             // act
             withContext(mainScope.coroutineContext) {
-                collector.attachPlayer(localPlayer)
-                collector.setSourceMetadata(defaultSource, sourceMetadata)
                 localPlayer.load(defaultSource)
             }
 
@@ -265,7 +274,6 @@ class CsaiScenariosTest {
             Thread.sleep(500)
 
             withContext(mainScope.coroutineContext) {
-                collector.detachPlayer()
                 localPlayer.destroy()
             }
 
@@ -281,7 +289,7 @@ class CsaiScenariosTest {
             assertThat(impression.adEventDataList).hasSize(1)
             val midRollSample = impression.adEventDataList[0]
 
-            CsaiDataVerifier.verifyStaticAdData(midRollSample, analyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(midRollSample, defaultAnalyticsConfig)
             CsaiDataVerifier.verifyFullyPlayedAd(midRollSample)
             assertThat(midRollSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
 
@@ -296,15 +304,10 @@ class CsaiScenariosTest {
         runBlockingTest {
             val postRoll = AdItem("post", progressiveAdSource)
             val advertisingConfig = AdvertisingConfig(postRoll)
-            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
-            val sourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
-            val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
             val localPlayer = createPlayer(advertisingConfig)
 
             // act
             withContext(mainScope.coroutineContext) {
-                collector.attachPlayer(localPlayer)
-                collector.setSourceMetadata(defaultSource, sourceMetadata)
                 localPlayer.load(defaultSource)
             }
 
@@ -323,7 +326,6 @@ class CsaiScenariosTest {
             Thread.sleep(500)
 
             withContext(mainScope.coroutineContext) {
-                collector.detachPlayer()
                 localPlayer.destroy()
             }
 
@@ -339,7 +341,7 @@ class CsaiScenariosTest {
             assertThat(impression.adEventDataList).hasSize(1)
             val postRollSample = impression.adEventDataList[0]
 
-            CsaiDataVerifier.verifyStaticAdData(postRollSample, analyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(postRollSample, defaultAnalyticsConfig)
             CsaiDataVerifier.verifyFullyPlayedAd(postRollSample)
             assertThat(postRollSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
 
@@ -354,15 +356,10 @@ class CsaiScenariosTest {
         runBlockingTest {
             val preRoll = AdItem("pre", progressiveAdSource)
             val advertisingConfig = AdvertisingConfig(preRoll)
-            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
-            val sourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
-            val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
             val localPlayer = createPlayer(advertisingConfig)
 
             // act
             withContext(mainScope.coroutineContext) {
-                collector.attachPlayer(localPlayer)
-                collector.setSourceMetadata(defaultSource, sourceMetadata)
                 localPlayer.load(defaultSource)
             }
 
@@ -372,7 +369,6 @@ class CsaiScenariosTest {
 
             // destroy player while ad is still playing
             withContext(mainScope.coroutineContext) {
-                collector.detachPlayer()
                 localPlayer.destroy()
             }
 
@@ -388,7 +384,7 @@ class CsaiScenariosTest {
             assertThat(impression.adEventDataList).hasSize(1)
             val adSample = impression.adEventDataList[0]
 
-            CsaiDataVerifier.verifyStaticAdData(adSample, analyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
             assertThat(adSample.started).isEqualTo(1)
             assertThat(adSample.closed).isEqualTo(1)
             assertThat(adSample.completed).isEqualTo(0)
@@ -418,7 +414,7 @@ class CsaiScenariosTest {
                 )
 
             val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
-            val localPlayer = createPlayer(advertisingConfig)
+            val localPlayer = createPlayerWithoutAnalytics(advertisingConfig)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -466,8 +462,16 @@ class CsaiScenariosTest {
 
             // the ad sample must reference the same impression as the video event data
             val eventDataList = impression.eventDataList
-            DataVerifier.verifyInvariants(eventDataList)
             assertThat(adSample.videoImpressionId).isEqualTo(eventDataList.first().impressionId)
+
+            // make sure that the metadata is tracked correctly with the programChange
+            DataVerifier.verifyStaticData(
+                eventDataList,
+                sourceMetadataProgram2,
+                defaultSample,
+                BitmovinPlayerConstants.playerInfo,
+            )
+            DataVerifier.verifyInvariants(eventDataList)
 
             val eventDataWithAdState = eventDataList.filter { it.ad == 1 }
             assertThat(eventDataWithAdState).hasSize(1)
@@ -492,7 +496,7 @@ class CsaiScenariosTest {
                 )
 
             val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
-            val localPlayer = createPlayer(advertisingConfig)
+            val localPlayer = createPlayerWithoutAnalytics(advertisingConfig)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -566,15 +570,10 @@ class CsaiScenariosTest {
             val imaAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_AD_SOURCE_2)
             val preRoll = AdItem("pre", imaAdSource)
             val advertisingConfig = AdvertisingConfig(preRoll)
-            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
-            val sourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
-            val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
             val localPlayer = createPlayer(advertisingConfig)
 
             // act
             withContext(mainScope.coroutineContext) {
-                collector.attachPlayer(localPlayer)
-                collector.setSourceMetadata(defaultSource, sourceMetadata)
                 localPlayer.load(defaultSource)
             }
 
@@ -590,7 +589,6 @@ class CsaiScenariosTest {
             Thread.sleep(500)
 
             withContext(mainScope.coroutineContext) {
-                collector.detachPlayer()
                 localPlayer.destroy()
             }
 
@@ -606,7 +604,7 @@ class CsaiScenariosTest {
             assertThat(impression.adEventDataList).hasSize(1)
             val adSample = impression.adEventDataList[0]
 
-            CsaiDataVerifier.verifyStaticAdData(adSample, analyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
             CsaiDataVerifier.verifyFullyPlayedAd(adSample)
 
             assertThat(adSample.adStartupTime).isGreaterThan(0)
@@ -635,9 +633,6 @@ class CsaiScenariosTest {
             val imaAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_AD_SOURCE_1)
             val preRoll = AdItem("pre", imaAdSource)
             val advertisingConfig = AdvertisingConfig(preRoll)
-            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
-            val sourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
-            val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
             val localPlayer = createPlayer(advertisingConfig)
 
             var adErrorOccurred = false
@@ -645,9 +640,6 @@ class CsaiScenariosTest {
             // act
             withContext(mainScope.coroutineContext) {
                 localPlayer.on(PlayerEvent.AdError::class) { adErrorOccurred = true }
-
-                collector.attachPlayer(localPlayer)
-                collector.setSourceMetadata(defaultSource, sourceMetadata)
                 localPlayer.load(defaultSource)
             }
 
@@ -655,7 +647,6 @@ class CsaiScenariosTest {
             Thread.sleep(500)
 
             withContext(mainScope.coroutineContext) {
-                collector.detachPlayer()
                 localPlayer.destroy()
             }
 
@@ -671,7 +662,7 @@ class CsaiScenariosTest {
             assertThat(impression.adEventDataList).hasSize(1)
             val adSample = impression.adEventDataList[0]
 
-            CsaiDataVerifier.verifyStaticAdData(adSample, analyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
             // TODO: verify more fields
             assertThat(adSample.errorCode).isNotNull
             assertThat(adSample.errorMessage).isNotBlank
@@ -744,18 +735,12 @@ class CsaiScenariosTest {
                 val imaAdSource = AdSource(AdSourceType.Ima, adServer.url("/vast").toString())
                 val preRoll = AdItem("pre", imaAdSource)
                 val advertisingConfig = AdvertisingConfig(preRoll)
-                val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
-                val sourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
-                val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
                 val localPlayer = createPlayer(advertisingConfig)
 
                 var adErrorOccurred = false
 
                 withContext(mainScope.coroutineContext) {
                     localPlayer.on(PlayerEvent.AdError::class) { adErrorOccurred = true }
-
-                    collector.attachPlayer(localPlayer)
-                    collector.setSourceMetadata(defaultSource, sourceMetadata)
                     localPlayer.load(defaultSource)
                 }
 
@@ -763,7 +748,6 @@ class CsaiScenariosTest {
                 Thread.sleep(500)
 
                 withContext(mainScope.coroutineContext) {
-                    collector.detachPlayer()
                     localPlayer.destroy()
                 }
 
@@ -777,7 +761,7 @@ class CsaiScenariosTest {
                 assertThat(impression.adEventDataList).hasSize(1)
                 val adSample = impression.adEventDataList[0]
 
-                CsaiDataVerifier.verifyStaticAdData(adSample, analyticsConfig)
+                CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
                 assertThat(adSample.errorCode).isNotNull
                 assertThat(adSample.errorMessage).isNotBlank
                 // TODO: add tag type
