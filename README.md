@@ -45,7 +45,7 @@ Check the [Getting Started Guide](https://developer.bitmovin.com/playback/docs/g
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-bitmovin-player:3.25.0'
+    implementation 'com.bitmovin.analytics:collector-bitmovin-player:3.25.1'
 }
 ```
 
@@ -66,7 +66,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-media3-exoplayer:3.25.0'
+    implementation 'com.bitmovin.analytics:collector-media3-exoplayer:3.25.1'
 }
 ```
 
@@ -86,7 +86,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-theoplayer:3.25.0'
+    implementation 'com.bitmovin.analytics:collector-theoplayer:3.25.1'
 }
 ```
 
@@ -106,7 +106,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:3.25.0'
+    implementation 'com.bitmovin.analytics:collector-exoplayer:3.25.1'
 }
 ```
 
@@ -128,7 +128,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.bitmovin.analytics:collector-amazon-ivs:3.25.0'
+    implementation 'com.bitmovin.analytics:collector-amazon-ivs:3.25.1'
 }
 ```
 

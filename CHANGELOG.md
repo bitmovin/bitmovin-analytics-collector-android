@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.25.1
+
 ### Fixed
 - THEOplayer: Fix measuring of video startuptime with preroll ads to only measure time from AD BREAK FINISHED to PLAYING
 - Bitmovin Player: Fix measuring of ad startuptime of a preroll ad when using autoplay, which is now measured from play event to Ad start
