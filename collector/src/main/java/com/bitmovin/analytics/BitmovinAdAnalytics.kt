@@ -259,7 +259,7 @@ class BitmovinAdAnalytics(
         analytics.sendAdEventData(adEventData)
     }
 
-    companion object {
+    internal companion object {
         private const val MAX_CACHE_SIZE = 100
     }
 }
