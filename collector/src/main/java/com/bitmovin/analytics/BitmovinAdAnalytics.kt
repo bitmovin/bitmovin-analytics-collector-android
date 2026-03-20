@@ -18,15 +18,17 @@ import com.bitmovin.analytics.utils.ErrorTransformationHelper
 import com.bitmovin.analytics.utils.Util
 
 @InternalBitmovinApi
-class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalyticsEventListener {
+class BitmovinAdAnalytics(
+    private val analytics: BitmovinAnalytics,
+) : AdAnalyticsEventListener {
     // TODO: this class has way too many flags, we need to refactor this
     private var activeAdBreak: AdBreak? = null
     private var activeAdSample: AdSample? = null
     private var adPodPosition: Int = 0
-    private var elapsedTimeAdStartup: Long? = null
+    private var elapsedTimeAtPlayEvent: Long? = null
+    private var elapsedTimeAtAdStartup: Long? = null
     private var elapsedTimeBeginPlaying: Long? = null
     private var isPlaying: Boolean = false
-    private var preRollAdTracked = false
 
     private val adManifestDownloadTimes: LruCache<String, Long> = LruCache(MAX_CACHE_SIZE)
     private var playerAdapter: PlayerAdapter? = null
@@ -36,10 +38,12 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
     private var currentTime: Long? = null
         get() =
             if (this.isPlaying) {
-                if (field == null || this.elapsedTimeBeginPlaying == null) {
+                val elapsedTimeBeginPlayingTemp = this.elapsedTimeBeginPlaying
+                val fieldTemp = field
+                if (fieldTemp == null || elapsedTimeBeginPlayingTemp == null) {
                     null
                 } else {
-                    field!! + Util.elapsedTime - this.elapsedTimeBeginPlaying!!
+                    fieldTemp + Util.elapsedTime - elapsedTimeBeginPlayingTemp
                 }
             } else {
                 field
@@ -59,17 +63,16 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         this.adAdapter?.unsubscribe(this)
         this.adAdapter?.release()
         this.adAdapter = null
-        this.preRollAdTracked = false
+        this.elapsedTimeAtPlayEvent = null
     }
 
-    override fun onPreRollStartup() {
-        // TODO: we can only track this once since
-        // we are doing this with the onPlay event, which is also
-        // issued right after the ad, which would lead to wrong results
-        // we should simplify this though and avoid another flag
-        if (!preRollAdTracked) {
-            this.elapsedTimeAdStartup = Util.elapsedTime
-            preRollAdTracked = true
+    // we measure the time the PLAY event was triggered
+    // in order to properly calculate ad startup time for pre-roll ads
+    // which is time between PLAY event and adStarted
+    // compared to adBreakStarted -> adStarted for other cases
+    override fun onPlayEvent() {
+        if (playerAdapter?.stateMachine?.isStartupFinished == false) {
+            this.elapsedTimeAtPlayEvent = Util.elapsedTime
         }
     }
 
@@ -80,11 +83,19 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
 
         this.resetActiveAd()
         val adSample = AdSample(ad = ad)
-        val elapsedTimeAdStartup = this.elapsedTimeAdStartup
-        adSample.adStartupTime = if (elapsedTimeAdStartup != null) Util.elapsedTime - elapsedTimeAdStartup else null
 
+        val elapsedTimeAtPlayEventTemp = this.elapsedTimeAtPlayEvent
+        var elapsedTimeAtAdStartupTemp = this.elapsedTimeAtAdStartup
+        // in case we are still not done with startup, we can assume that
+        // the current ad is a pre-roll ad, and thus we are measuring
+        // the time between PLAY and adStarted since this directly
+        // affected users in terms of waiting for the ad/video to start
+        if (playerAdapter?.stateMachine?.isStartupFinished == false && elapsedTimeAtPlayEventTemp != null) {
+            elapsedTimeAtAdStartupTemp = elapsedTimeAtPlayEventTemp
+        }
+
+        adSample.adStartupTime = if (elapsedTimeAtAdStartupTemp != null) Util.elapsedTime - elapsedTimeAtAdStartupTemp else null
         this.activeAdSample = adSample
-
         this.startAd(adSample)
     }
 
@@ -101,20 +112,13 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
     override fun onAdBreakStarted(adBreak: AdBreak) {
         this.adPodPosition = 0
         this.activeAdBreak = adBreak
-
-        // in order to track ad startuptime for pre-roll ads
-        // correctly, we have to set the elapsed time already
-        // with the onPlay event, which happens way before
-        // the adBreakStarted event on theoplayer for example
-        // thus we only set teh elapsedTime with it wasn't set yet
-        if (this.elapsedTimeAdStartup == null) {
-            this.elapsedTimeAdStartup = Util.elapsedTime
-        }
+        this.elapsedTimeAtAdStartup = Util.elapsedTime
     }
 
     override fun onAdBreakFinished() {
         this.resetActiveAd()
-        this.elapsedTimeAdStartup = null
+        this.elapsedTimeAtAdStartup = null
+        this.elapsedTimeAtPlayEvent = null
         this.activeAdBreak = null
     }
 
@@ -159,6 +163,7 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
     ) {
         this.adManifestDownloadTimes.put(adBreak.id, downloadTime)
 
+        // FIXME: why are we doing this?
         if (adBreak.tagType == AdTagType.VMAP) {
             this.sendAnalyticsRequest(adBreak)
         }
@@ -213,8 +218,8 @@ class BitmovinAdAnalytics(private val analytics: BitmovinAnalytics) : AdAnalytic
         adSample.timePlayed = exitPosition
         adSample.playPercentage = Util.calculatePercentage(adSample.timePlayed, adSample.ad.duration, true)
 
-        // reset elapsedTimeAdStartup for the next ad, in case there are multiple ads in one ad break
-        this.elapsedTimeAdStartup = Util.elapsedTime
+        // reset elapsedTimeAtAdStartup for the next ad, in case there are multiple ads in one ad break
+        this.elapsedTimeAtAdStartup = Util.elapsedTime
         this.isPlaying = false
         this.sendAnalyticsRequest(adBreak, adSample)
         // TODO: should we also clear the current ad sample here, since we sent out the sample?

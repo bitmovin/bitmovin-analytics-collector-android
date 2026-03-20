@@ -32,6 +32,7 @@ class PlayerStateMachine(
 
     var currentState: PlayerState<*> = PlayerStates.READY
         private set
+
     var startupTime: Long = 0
         private set
 

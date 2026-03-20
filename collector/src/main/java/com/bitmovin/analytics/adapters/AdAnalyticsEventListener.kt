@@ -5,7 +5,7 @@ import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdQuartile
 
 interface AdAnalyticsEventListener {
-    fun onPreRollStartup()
+    fun onPlayEvent()
 
     fun onAdStarted(ad: Ad)
 

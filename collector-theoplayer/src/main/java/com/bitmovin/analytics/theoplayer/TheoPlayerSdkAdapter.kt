@@ -110,7 +110,7 @@ internal class TheoPlayerSdkAdapter(
         if (Looper.getMainLooper().isCurrentThread) sendSampleCodeBlock() else mainHandler.post(sendSampleCodeBlock)
     }
 
-    override fun createAdAdapter(): AdAdapter = TheoPlayerAdAdapter(player, stateMachine)
+    override fun createAdAdapter(): AdAdapter = TheoPlayerAdAdapter(player)
 
     override val eventDataManipulators: Collection<EventDataManipulator>
         get() = listOf(playbackEventDataManipulator)

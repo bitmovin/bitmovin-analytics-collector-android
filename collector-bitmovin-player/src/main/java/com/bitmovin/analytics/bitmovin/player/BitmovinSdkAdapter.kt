@@ -380,7 +380,6 @@ internal class BitmovinSdkAdapter(
     ) {
         try {
             BitmovinLog.d(TAG, "On Playback Finished Listener")
-
             // if it's live stream we are using currentPosition of playback as videoTime
             val videoTime =
                 if (player.duration != Double.POSITIVE_INFINITY) Util.secondsToMillis(player.duration) else position
@@ -640,6 +639,7 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.AdBreakStarted,
     ) {
         try {
+            BitmovinLog.d(TAG, "Event: AdBreakStarted")
             stateMachine.startAd(position)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
@@ -650,6 +650,7 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.AdBreakFinished,
     ) {
         try {
+            BitmovinLog.d(TAG, "Event: AdBreakFinished")
             stateMachine.endAd()
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)

@@ -20,20 +20,21 @@ internal val Player.maybeExtensionPoint get() =
         null
     }
 
-internal fun Player.attachCollector() = maybeExtensionPoint?.run {
-    // We need to test if removing of plugin is supported with this player
-    // version, since we could otherwise end up in a bug where attaching works on the
-    // first run but not on the second run (since removal doesn't work)
-    if (!supportsRemovePlugin()) {
-        return Unit
-    }
+internal fun Player.attachCollector() =
+    maybeExtensionPoint?.run {
+        // We need to test if removing of plugin is supported with this player
+        // version, since we could otherwise end up in a bug where attaching works on the
+        // first run but not on the second run (since removal doesn't work)
+        if (!supportsRemovePlugin()) {
+            return Unit
+        }
 
-    if (this.getPlugin(CollectorPlayerPlugin::class) != null) {
-        throw IllegalStateException("Collector already attached to player")
-    }
+        if (this.getPlugin(CollectorPlayerPlugin::class) != null) {
+            throw IllegalStateException("Collector already attached to player")
+        }
 
-    this.addPlugin(CollectorPlayerPlugin())
-}
+        this.addPlugin(CollectorPlayerPlugin())
+    }
 
 /** Mark a [Player] as detached from any collector. */
 internal fun Player.detachCollector() {
@@ -42,6 +43,7 @@ internal fun Player.detachCollector() {
     }
 }
 
-internal fun Player.supportsRemovePlugin() = runCatching {
-    extensionPoint.removePlugin(DummyAnalyticsCollectorPlugin::class)
-}.isSuccess
+internal fun Player.supportsRemovePlugin() =
+    runCatching {
+        extensionPoint.removePlugin(DummyAnalyticsCollectorPlugin::class)
+    }.isSuccess

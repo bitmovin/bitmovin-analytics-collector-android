@@ -2,6 +2,7 @@
 
 package com.bitmovin.analytics.bitmovin.player
 
+import com.bitmovin.analytics.ads.AdPosition
 import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.BuildConfig
 import com.bitmovin.player.api.Player
@@ -30,4 +31,15 @@ internal object BitmovinUtil {
                 .getField("VERSION_NAME")
                 .get(null) as String?
         }.getOrNull()
+
+    fun getAdPositionFromPlayerPosition(playerPosition: String): AdPosition? {
+        return when {
+            playerPosition == AdPosition.PRE.position -> AdPosition.PRE
+            playerPosition == AdPosition.POST.position -> AdPosition.POST
+            playerPositionRegex.matches(playerPosition) -> AdPosition.MID
+            else -> null
+        }
+    }
+
+    private val playerPositionRegex by lazy { "([0-9]+.*)".toRegex() }
 }

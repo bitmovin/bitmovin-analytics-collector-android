@@ -307,3 +307,7 @@ object Util {
 fun Uri.getFileExtension(): String? {
     return this.path?.substringAfterLast(".")?.lowercase()
 }
+
+fun Double.secondsToMillisecondsLong(): Long {
+    return this.times(1000).toLong()
+}

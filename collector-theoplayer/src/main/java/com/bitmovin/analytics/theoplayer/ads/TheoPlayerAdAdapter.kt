@@ -6,10 +6,6 @@ import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
 import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdQuartile
-import com.bitmovin.analytics.stateMachines.PlayerStateMachine
-import com.bitmovin.analytics.stateMachines.PlayerStates
-import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
-import com.bitmovin.analytics.theoplayer.player.isPreRollAdScheduled
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.event.EventListener
@@ -31,10 +27,7 @@ import com.theoplayer.android.api.ads.AdBreak as TheoAdBreak
 
 internal class TheoPlayerAdAdapter(
     private val player: Player,
-    private val stateMachine: PlayerStateMachine,
 ) : AdAdapter {
-    // TODO: we should refactor to have the current ad stored somewhere
-    // and to send it out whenever we are done (similar to ssai)
     private val observableSupport = ObservableSupport<AdAnalyticsEventListener>()
     private var currentAd: Ad? = null
     private var currentTheoAdBreak: TheoAdBreak? = null
@@ -42,8 +35,6 @@ internal class TheoPlayerAdAdapter(
     private val adBreakBeginListener =
         EventListener<AdBreakBeginEvent> { event ->
             try {
-                // TODO: verify if the currentPosition could already be the adPosition vs the main source position
-                stateMachine.transitionState(PlayerStates.AD, player.currentPositionInMs())
                 BitmovinLog.d(TAG, "ad break begin")
                 val adBreak = event.adBreak ?: return@EventListener
                 currentTheoAdBreak = adBreak
@@ -85,7 +76,6 @@ internal class TheoPlayerAdAdapter(
                 BitmovinLog.d(TAG, "ad break end")
                 currentTheoAdBreak = null
                 observableSupport.notify { it.onAdBreakFinished() }
-                stateMachine.transitionState(PlayerStates.ADFINISHED, player.currentPositionInMs())
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Break End", e)
             }
@@ -163,9 +153,7 @@ internal class TheoPlayerAdAdapter(
 
     private val playListener =
         EventListener<PlayEvent> {
-            if (!stateMachine.isStartupFinished && player.isPreRollAdScheduled()) {
-                observableSupport.notify { it.onPreRollStartup() }
-            }
+            observableSupport.notify { it.onPlayEvent() }
         }
 
     init {

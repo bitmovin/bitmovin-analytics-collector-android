@@ -11,6 +11,9 @@ import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.event.EventListener
+import com.theoplayer.android.api.event.ads.AdBreakBeginEvent
+import com.theoplayer.android.api.event.ads.AdBreakEndEvent
+import com.theoplayer.android.api.event.ads.AdsEventTypes
 import com.theoplayer.android.api.event.player.CanPlayEvent
 import com.theoplayer.android.api.event.player.CanPlayThroughEvent
 import com.theoplayer.android.api.event.player.ContentProtectionErrorEvent
@@ -114,6 +117,8 @@ internal class AnalyticsEventListeners(
         player.addEventListener(PlayerEventTypes.DESTROY, destroyListener)
         player.addEventListener(PlayerEventTypes.LOADSTART, loadStartListener)
         player.addEventListener(PlayerEventTypes.RESIZE, resizeListener)
+        player.ads.addEventListener(AdsEventTypes.AD_BREAK_BEGIN, adBreakBeginListener)
+        player.ads.addEventListener(AdsEventTypes.AD_BREAK_END, adBreakEndListener)
     }
 
     internal fun unregisterEventListeners() {
@@ -145,6 +150,8 @@ internal class AnalyticsEventListeners(
         player.removeEventListener(PlayerEventTypes.DESTROY, destroyListener)
         player.removeEventListener(PlayerEventTypes.LOADSTART, loadStartListener)
         player.removeEventListener(PlayerEventTypes.RESIZE, resizeListener)
+        player.ads.removeEventListener(AdsEventTypes.AD_BREAK_BEGIN, adBreakBeginListener)
+        player.ads.removeEventListener(AdsEventTypes.AD_BREAK_END, adBreakEndListener)
     }
 
     private fun handlePlayEvent(playEvent: PlayEvent) {
@@ -227,6 +234,26 @@ internal class AnalyticsEventListeners(
             BitmovinLog.e(TAG, e.message, e)
         }
     }
+
+    private val adBreakBeginListener =
+        EventListener<AdBreakBeginEvent> { event ->
+            try {
+                BitmovinLog.d(TAG, "ad break begin")
+                stateMachine.startAd(player.currentPositionInMs())
+            } catch (e: Exception) {
+                BitmovinLog.e(TAG, "On Ad Break Begin", e)
+            }
+        }
+
+    private val adBreakEndListener =
+        EventListener<AdBreakEndEvent> { _ ->
+            try {
+                BitmovinLog.d(TAG, "ad break end")
+                stateMachine.endAd()
+            } catch (e: Exception) {
+                BitmovinLog.e(TAG, "On Ad Break End", e)
+            }
+        }
 
     companion object {
         private const val TAG = "AnalyticsEventListeners"

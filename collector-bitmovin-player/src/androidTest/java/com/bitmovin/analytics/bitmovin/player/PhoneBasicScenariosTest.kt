@@ -565,15 +565,8 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyInvariants(impression3.eventDataList)
 
             val startupSampleImpression1 = impression1.eventDataList.first()
-            val startupSampleImpression2 = impression2.eventDataList.first()
-            val startupSampleImpression3 = impression3.eventDataList.first()
 
             DataVerifier.verifyStartupSample(startupSampleImpression1)
-
-            // TODO [AN-3688] startupsample of consequent impressions have videoEndTime and start time set
-            // this probably needs to be fixed in the adapter
-//        DataVerifier.verifyStartupSample(startupSampleImpression2, false)
-//        DataVerifier.verifyStartupSample(startupSampleImpression3, false)
         }
 
     @Test

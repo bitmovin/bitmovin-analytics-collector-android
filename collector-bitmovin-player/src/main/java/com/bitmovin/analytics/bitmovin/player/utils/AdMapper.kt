@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player.utils
 
 import com.bitmovin.analytics.ads.Ad
+import com.bitmovin.analytics.utils.secondsToMillisecondsLong
 import com.bitmovin.player.api.advertising.LinearAd
 import com.bitmovin.player.api.advertising.ima.ImaAdData
 import com.bitmovin.player.api.advertising.vast.VastAdData
@@ -45,9 +46,9 @@ internal class AdMapper {
         collectorAd: Ad,
         linearAd: LinearAd,
     ) {
-        collectorAd.duration = linearAd.duration?.toLong()?.times(1000)
+        collectorAd.duration = linearAd.duration?.secondsToMillisecondsLong()
         collectorAd.skippable = linearAd.skippableAfter != null
-        collectorAd.skippableAfter = linearAd.skippableAfter?.toLong()?.times(1000)
+        collectorAd.skippableAfter = linearAd.skippableAfter?.secondsToMillisecondsLong()
     }
 
     @Suppress("DEPRECATION") // universalAdId is deprecated in newer Bitmovin Player SDK versions
@@ -65,7 +66,7 @@ internal class AdMapper {
         collectorAd.universalAdIdRegistry = vastData.creative?.universalAdId?.idRegistry
         collectorAd.universalAdIdValue = vastData.creative?.universalAdId?.value
         collectorAd.codec = vastData.codec
-        collectorAd.minSuggestedDuration = vastData.minSuggestedDuration?.toLong()?.times(1000)
+        collectorAd.minSuggestedDuration = vastData.minSuggestedDuration?.secondsToMillisecondsLong()
         collectorAd.pricingCurrency = vastData.pricing?.currency
         collectorAd.pricingModel = vastData.pricing?.model
         collectorAd.pricingValue = vastData.pricing?.value?.toLong()

@@ -9,7 +9,6 @@ import com.theoplayer.android.api.player.track.mediatrack.quality.VideoQuality
 import com.theoplayer.android.api.player.track.texttrack.TextTrack
 import com.theoplayer.android.api.player.track.texttrack.TextTrackMode
 import com.theoplayer.android.api.source.TypedSource
-import com.theoplayer.android.api.source.addescription.GoogleImaAdDescription
 import java.lang.Double.isFinite
 import kotlin.Boolean
 import kotlin.Long
@@ -95,14 +94,4 @@ internal fun Player.getCurrentActiveTextTrack(): TextTrack? {
     }
 
     return enabledTextTrack
-}
-
-internal fun Player.isPreRollAdScheduled(): Boolean {
-    this.source?.ads?.forEach {
-        when (it) {
-            is GoogleImaAdDescription -> return PlayerUtils.isPreRollAdOffset(it.timeOffset)
-        }
-    }
-
-    return false
 }

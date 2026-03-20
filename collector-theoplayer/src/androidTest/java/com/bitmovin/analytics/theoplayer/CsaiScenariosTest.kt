@@ -33,6 +33,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -166,6 +167,75 @@ class CsaiScenariosTest {
             assertThat(adSample.adStartupTime).isGreaterThan(0)
             assertThat(adSample.videoBitrate).isGreaterThan(0)
             assertThat(adSample.streamFormat).isEqualTo("video/mp4")
+
+            // verify event data is linked to the ad
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyInvariants(eventDataList)
+            val eventDataWithClientSideAdState = eventDataList.filter { it.ad == 1 }
+            assertThat(eventDataWithClientSideAdState).hasSize(1)
+        }
+
+    @Test
+    @Ignore("this test is mainly used for manual verification of ad startuptime tracking")
+    fun test_vodWithPreRollAd_playWithoutAutoplay() =
+        runBlockingTest {
+            // arrange
+            val preRollAd1 =
+                GoogleImaAdDescription
+                    .Builder(TestSources.IMA_AD_SOURCE_2)
+                    .timeOffset("start")
+                    .build()
+
+            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
+            val sourceDescription =
+                SourceDescription
+                    .Builder(contentSource)
+                    .ads(preRollAd1)
+                    .build()
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                val collector = ITHEOplayerCollector.create(appContext, analyticsConfig)
+                collector.sourceMetadata = defaultSourceMetadata
+                player.isAutoplay = false
+                collector.attachPlayer(player)
+                player.source = sourceDescription
+            }
+
+            // wait a bit before starting (seems like there is no proper event)
+            Thread.sleep(2000)
+            withContext(mainScope.coroutineContext) {
+                player.play()
+            }
+
+            // wait for the pre-roll ad to start and finish, then wait for content to play
+            PlaybackUtils.waitUntil("pre-roll ad started") { player.ads.isPlaying }
+            PlaybackUtils.waitUntil("pre-roll ad finished") { !player.ads.isPlaying }
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            // wait a bit to make sure the last play sample is sent
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            // verify 1 ad sample for the pre-roll
+            assertThat(impression.adEventDataList).hasSize(1)
+            val adSample = impression.adEventDataList[0]
+
+            CsaiDataVerifier.verifyStaticAdData(adSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
+            CsaiDataVerifier.verifyFullyPlayedAd(adSample)
+            assertThat(adSample.adPosition).isEqualTo("pre")
+            assertThat(adSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+            assertThat(adSample.adStartupTime).isGreaterThan(0)
 
             // verify event data is linked to the ad
             val eventDataList = impression.eventDataList
@@ -682,7 +752,7 @@ class CsaiScenariosTest {
     fun test_vodWithVmapMidRollPod_twoAdsPlayedSequentially_adPodPositionIncreases() =
         runBlockingTest {
             // arrange
-            // VMAP tag that returns a single pre-roll break with a pod of 2 linear ads
+            // VMAP tag that returns a single mid-roll break with a pod of 2 linear ads
             val vmapAd =
                 GoogleImaAdDescription
                     .Builder(TestSources.IMA_VMAP_MIDROLL_2ADS)
@@ -725,7 +795,7 @@ class CsaiScenariosTest {
             val impression = impressionList.first()
             DataVerifier.verifyHasNoErrorSamples(impression)
 
-            // both pre-roll ads from the VMAP pod must be tracked
+            // both mid-roll ads from the VMAP pod must be tracked
             assertThat(impression.adEventDataList).hasSize(2)
 
             val firstAdSample = impression.adEventDataList[0]

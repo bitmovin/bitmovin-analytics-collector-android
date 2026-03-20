@@ -13,7 +13,9 @@ import com.bitmovin.player.api.event.PlayerEvent
 /**
  * An adapter that maps the Ad Events to the BitmovinAdAnalytics class
  */
-internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
+internal class BitmovinSdkAdAdapter(
+    val bitmovinPlayer: Player,
+) : AdAdapter {
     private val observableSupport = ObservableSupport<AdAnalyticsEventListener>()
     private val adMapper: AdMapper = AdMapper()
     private val adBreakMapper: AdBreakMapper = AdBreakMapper()
@@ -21,6 +23,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     private val playerEventAdStartedListener: (PlayerEvent.AdStarted) -> Unit = method@{ event ->
         try {
+            BitmovinLog.d(TAG, "On Ad Started")
             val ad = event.ad ?: return@method
             observableSupport.notify { it.onAdStarted(adMapper.fromPlayerAd(ad)) }
         } catch (e: Exception) {
@@ -30,6 +33,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     private val playerEventAdFinishedListener: (PlayerEvent.AdFinished) -> Unit = {
         try {
+            BitmovinLog.d(TAG, "On Ad Finished")
             observableSupport.notify { it.onAdFinished() }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "On Ad Finished", e)
@@ -38,6 +42,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     private val playerEventAdBreakStartedListener: (PlayerEvent.AdBreakStarted) -> Unit = method@{ event ->
         try {
+            BitmovinLog.d(TAG, "On Ad Break Started")
             val adBreak = event.adBreak ?: return@method
             observableSupport.notify { it.onAdBreakStarted(adBreakMapper.fromPlayerAdConfiguration(adBreak)) }
         } catch (e: Exception) {
@@ -47,6 +52,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     private val playerEventAdBreakFinishedListener: (PlayerEvent.AdBreakFinished) -> Unit = {
         try {
+            BitmovinLog.d(TAG, "On Ad Break Finished")
             observableSupport.notify { it.onAdBreakFinished() }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "On Ad Break Finished", e)
@@ -55,6 +61,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     private val playerEventAdClickedListener: (PlayerEvent.AdClicked) -> Unit = { event ->
         try {
+            BitmovinLog.d(TAG, "On Ad Clicked")
             observableSupport.notify { it.onAdClicked(event.clickThroughUrl) }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "On Ad Clicked", e)
@@ -63,6 +70,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     private val playerEventAdErrorListener: (PlayerEvent.AdError) -> Unit = method@{ event ->
         try {
+            BitmovinLog.d(TAG, "On Ad Error")
             val adConf = event.adConfig ?: return@method
             observableSupport.notify {
                 it.onAdError(
@@ -78,6 +86,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     private val playerEventAdSkippedListener: (PlayerEvent.AdSkipped) -> Unit = {
         try {
+            BitmovinLog.d(TAG, "On Ad Skipped")
             observableSupport.notify { it.onAdSkipped() }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "On Ad Skipped", e)
@@ -86,6 +95,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     private val playerEventAdManifestLoadedListener: (PlayerEvent.AdManifestLoaded) -> Unit = method@{ event ->
         try {
+            BitmovinLog.d(TAG, "On Ad Manifest Loaded")
             val adBreak = event.adBreak ?: return@method
             observableSupport.notify { it.onAdManifestLoaded(adBreakMapper.fromPlayerAdConfiguration(adBreak), event.downloadTime) }
         } catch (e: Exception) {
@@ -95,13 +105,24 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
 
     private val playerEventAdQuartileListener: (PlayerEvent.AdQuartile) -> Unit = { event ->
         try {
+            BitmovinLog.d(TAG, "On Ad Quartile Listener")
             observableSupport.notify { it.onAdQuartile(adQuartileFactory.FromPlayerAdQuartile(event.quartile)) }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "On Ad Quartile Listener ", e)
         }
     }
 
+    private val playerEventPlayListener: (PlayerEvent.Play) -> Unit = method@{ event ->
+        try {
+            BitmovinLog.d(TAG, "On PlayListener")
+            observableSupport.notify { it.onPlayEvent() }
+        } catch (e: Exception) {
+            BitmovinLog.e(TAG, "On PlayListener", e)
+        }
+    }
+
     init {
+        bitmovinPlayer.on(PlayerEvent.Play::class, playerEventPlayListener)
         bitmovinPlayer.on(PlayerEvent.AdStarted::class, playerEventAdStartedListener)
         bitmovinPlayer.on(PlayerEvent.AdFinished::class, playerEventAdFinishedListener)
         bitmovinPlayer.on(PlayerEvent.AdBreakStarted::class, playerEventAdBreakStartedListener)
@@ -114,6 +135,7 @@ internal class BitmovinSdkAdAdapter(val bitmovinPlayer: Player) : AdAdapter {
     }
 
     override fun release() {
+        bitmovinPlayer.off(playerEventPlayListener)
         bitmovinPlayer.off(playerEventAdStartedListener)
         bitmovinPlayer.off(playerEventAdFinishedListener)
         bitmovinPlayer.off(playerEventAdBreakStartedListener)

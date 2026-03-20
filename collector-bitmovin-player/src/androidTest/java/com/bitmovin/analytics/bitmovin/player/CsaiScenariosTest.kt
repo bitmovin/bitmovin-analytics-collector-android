@@ -13,9 +13,11 @@ import com.bitmovin.analytics.test.utils.EventDataUtils
 import com.bitmovin.analytics.test.utils.MetadataUtils
 import com.bitmovin.analytics.test.utils.MockedIngress
 import com.bitmovin.analytics.test.utils.PlaybackUtils
+import com.bitmovin.analytics.test.utils.RepeatRule
 import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.test.utils.TestSources
 import com.bitmovin.analytics.test.utils.runBlockingTest
+import com.bitmovin.player.api.DebugConfig
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerConfig
@@ -25,6 +27,8 @@ import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdvertisingConfig
 import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.event.PlayerEvent
+import com.bitmovin.player.api.event.on
+import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
 import kotlinx.coroutines.MainScope
@@ -36,6 +40,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,14 +54,26 @@ class CsaiScenariosTest {
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()
 
+    @Rule @JvmField
+    val repeatRule = RepeatRule()
+
     private lateinit var mockedIngressUrl: String
     private lateinit var defaultAnalyticsConfig: AnalyticsConfig
 
-    private var defaultSourceMetadata = SourceMetadata(title = metadataGenerator.getTestTitle())
-    private var defaultSource =
-        SourceBuilder(
-            SourceConfig.fromUrl(defaultSample.m3u8Url!!),
-        ).configureAnalytics(defaultSourceMetadata).build()
+    private var defaultSourceMetadata: SourceMetadata
+        get() = metadataGenerator.generate(title = metadataGenerator.getTestTitle())
+
+        // Unused setter
+        set(_) {}
+
+    private var defaultSource: Source
+        get() =
+            SourceBuilder(
+                SourceConfig.fromUrl(defaultSample.m3u8Url!!),
+            ).configureAnalytics(defaultSourceMetadata).build()
+
+        // Unused setter
+        set(_) {}
 
     private val progressiveAdSource =
         AdSource(
@@ -76,12 +93,15 @@ class CsaiScenariosTest {
         MockedIngress.stopServer()
     }
 
-    private fun createPlayer(advertisingConfig: AdvertisingConfig): Player {
+    private fun createPlayer(
+        advertisingConfig: AdvertisingConfig,
+        isAutoplayEnabled: Boolean = true,
+    ): Player {
         var player: Player? = null
 
         runBlockingTest {
             withContext(mainScope.coroutineContext) {
-                val playbackConfig = PlaybackConfig(isMuted = true, isAutoplayEnabled = true)
+                val playbackConfig = PlaybackConfig(isMuted = true, isAutoplayEnabled = isAutoplayEnabled)
                 val playerConfig =
                     PlayerConfig(
                         key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
@@ -117,7 +137,7 @@ class CsaiScenariosTest {
     }
 
     @Test
-    fun test_vodWithAds_playWithAutoplayAndMuted() =
+    fun test_vodWithPreRollAndMidRollAds_playWithAutoplayAndMuted() =
         runBlockingTest {
             // arrange
             val adSource =
@@ -161,20 +181,19 @@ class CsaiScenariosTest {
             // we expect 2 adEventData to be sent since there are 2 ads played
             assertThat(impression.adEventDataList.size).isEqualTo(2)
             val firstAd = impression.adEventDataList[0]
+            assertThat(firstAd.adStartupTime).isGreaterThan(0)
 
-            // TODO (AN-4378): what is expected behavior for startupTime? should it be always > 0?
-            // This assertions is flaky
-            // assertThat(firstAd.adStartupTime).isGreaterThan(0)
-            CsaiDataVerifier.verifyStaticAdData(firstAd, defaultAnalyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(firstAd, defaultAnalyticsConfig, sourceMetadata = defaultSourceMetadata)
             CsaiDataVerifier.verifyFullyPlayedAd(firstAd)
+            assertThat(firstAd.adPosition).isEqualTo("pre")
+            assertThat(firstAd.adPodPosition).isEqualTo(0)
 
             val secondAd = impression.adEventDataList[1]
-            // TODO (AN-4378): what is expected behavior for startupTime? should it be always > 0?
-            // This assertions is flaky
-            // assertThat(secondAd.adStartupTime).isEqualTo(0)
-
             CsaiDataVerifier.verifyStaticAdData(secondAd, defaultAnalyticsConfig)
             CsaiDataVerifier.verifyFullyPlayedAd(secondAd)
+            // seems like we cannot detect adPosition for mid roll ads when using progressive
+//            assertThat(secondAd.adPosition).isEqualTo("mid")
+            assertThat(secondAd.adPodPosition).isEqualTo(0)
 
             assertThat(firstAd.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
             assertThat(secondAd.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
@@ -237,7 +256,7 @@ class CsaiScenariosTest {
             assertThat(impression.adEventDataList).hasSize(1)
             val adSample = impression.adEventDataList[0]
 
-            CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig, sourceMetadata = defaultSourceMetadata)
             CsaiDataVerifier.verifyFullyPlayedAd(adSample)
             assertThat(adSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
 
@@ -365,7 +384,7 @@ class CsaiScenariosTest {
 
             // wait for pre-roll ad to start and play for a bit
             PlaybackUtils.waitUntil("pre-roll ad started") { localPlayer.isAd }
-            Thread.sleep(500)
+            Thread.sleep(1000)
 
             // destroy player while ad is still playing
             withContext(mainScope.coroutineContext) {
@@ -418,9 +437,10 @@ class CsaiScenariosTest {
 
             // act
             withContext(mainScope.coroutineContext) {
+                val source = defaultSource
                 collector.attachPlayer(localPlayer)
-                collector.setSourceMetadata(defaultSource, sourceMetadataProgram1)
-                localPlayer.load(defaultSource)
+                collector.setSourceMetadata(source, sourceMetadataProgram1)
+                localPlayer.load(source)
             }
 
             // wait for pre-roll to start
@@ -500,9 +520,10 @@ class CsaiScenariosTest {
 
             // act
             withContext(mainScope.coroutineContext) {
+                val source = defaultSource
                 collector.attachPlayer(localPlayer)
-                collector.setSourceMetadata(defaultSource, sourceMetadataProgram1)
-                localPlayer.load(defaultSource)
+                collector.setSourceMetadata(source, sourceMetadataProgram1)
+                localPlayer.load(source)
             }
 
             // wait for mid-roll ad to start (triggered at 3s of content)
@@ -604,21 +625,89 @@ class CsaiScenariosTest {
             assertThat(impression.adEventDataList).hasSize(1)
             val adSample = impression.adEventDataList[0]
 
-            CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
+            CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig, sourceMetadata = defaultSourceMetadata)
             CsaiDataVerifier.verifyFullyPlayedAd(adSample)
 
             assertThat(adSample.adStartupTime).isGreaterThan(0)
             assertThat(adSample.timePlayed).isGreaterThan(9000)
 
             // IMA-specific fields
-            // TODO: add more fields to be checked
             assertThat(adSample.adPosition).isEqualTo("pre")
             assertThat(adSample.manifestDownloadTime).isGreaterThan(0)
             assertThat(adSample.isLinear).isTrue()
             assertThat(adSample.adTitle).isEqualTo("External NCA1C1L1 Linear Inline")
             assertThat(adSample.adDuration).isEqualTo(10000)
+            assertThat(adSample.adClickthroughUrl).isNotEmpty
+            assertThat(adSample.adTagUrl).isNotEmpty
+            assertThat(adSample.adTagType).isEqualTo("vast")
             assertThat(adSample.creativeId).isNotEmpty()
             assertThat(adSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyInvariants(eventDataList)
+            val eventDataWithAdState = eventDataList.filter { it.ad == 1 }
+            assertThat(eventDataWithAdState).hasSize(1)
+        }
+
+    @Volatile
+    var playerIsReady = false
+
+    @Test
+    @Ignore("test mainly used for manual verification of startup time tracking")
+    fun test_vodWithImaPreRollAd_playWithoutAutoplay() =
+        runBlockingTest {
+            // TODO: https://bitmovin.atlassian.net/browse/PA-3727
+            // currently we don't track the startup time correctly for non-autoplay pre load ads
+            // this is due to the missing onPlay event, see JIRA above
+            val imaAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_AD_SOURCE_2)
+            val preRoll = AdItem("pre", imaAdSource)
+            val advertisingConfig = AdvertisingConfig(preRoll)
+            DebugConfig.isLoggingEnabled = true
+            val localPlayer = createPlayer(advertisingConfig, isAutoplayEnabled = false)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                localPlayer.on(PlayerEvent.Ready::class, { playerIsReady = true })
+                localPlayer.load(defaultSource)
+            }
+
+            PlaybackUtils.waitUntil("wait until player is ready") { playerIsReady }
+
+            withContext(mainScope.coroutineContext) {
+                localPlayer.play()
+            }
+
+            // wait for pre-roll ad to start and finish, then wait for content to play
+            PlaybackUtils.waitUntil("pre-roll ad started") { localPlayer.isAd }
+            PlaybackUtils.waitUntil("pre-roll ad finished") { !localPlayer.isAd }
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                localPlayer.pause()
+            }
+
+            Thread.sleep(500)
+
+            withContext(mainScope.coroutineContext) {
+                localPlayer.destroy()
+            }
+
+            Thread.sleep(200)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            assertThat(impression.adEventDataList).hasSize(1)
+            val adSample = impression.adEventDataList[0]
+
+            CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig, sourceMetadata = defaultSourceMetadata)
+            CsaiDataVerifier.verifyFullyPlayedAd(adSample)
+
+            assertThat(adSample.adStartupTime).isGreaterThan(0)
+            assertThat(adSample.timePlayed).isGreaterThan(9000)
 
             val eventDataList = impression.eventDataList
             DataVerifier.verifyInvariants(eventDataList)
@@ -663,10 +752,74 @@ class CsaiScenariosTest {
             val adSample = impression.adEventDataList[0]
 
             CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
-            // TODO: verify more fields
+            assertThat(adSample.adPosition).isEqualTo("pre")
+            assertThat(adSample.adTagUrl).isNotEmpty
             assertThat(adSample.errorCode).isNotNull
             assertThat(adSample.errorMessage).isNotBlank
             assertThat(adSample.closed).isEqualTo(0)
+        }
+
+    @Test
+    fun test_vodWithVmapMidRollPod_twoAdsPlayedSequentially_adPodPositionIncreases() =
+        runBlockingTest {
+            // arrange
+            // VMAP tag that returns a single mid-roll break with a pod of 2 linear ads
+            val imaAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_VMAP_MIDROLL_2ADS)
+            val preRoll = AdItem(imaAdSource)
+            val advertisingConfig = AdvertisingConfig(preRoll)
+            val localPlayer = createPlayer(advertisingConfig)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                localPlayer.load(defaultSource)
+                localPlayer.seek(14.0)
+            }
+
+            PlaybackUtils.waitUntil("mid-roll ad bread started") { localPlayer.isAd }
+            PlaybackUtils.waitUntil("mid-roll ad bread finished") { !localPlayer.isAd }
+
+            // wait for content to play briefly after the ad break
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 17000)
+
+            withContext(mainScope.coroutineContext) {
+                localPlayer.pause()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            // both mid-roll ads from the VMAP pod must be tracked
+            assertThat(impression.adEventDataList).hasSize(2)
+
+            val firstAdSample = impression.adEventDataList[0]
+            CsaiDataVerifier.verifyStaticAdData(
+                firstAdSample,
+                defaultAnalyticsConfig,
+                BitmovinPlayerConstants.playerInfo.playerName,
+            )
+            CsaiDataVerifier.verifyFullyPlayedAd(firstAdSample)
+            assertThat(firstAdSample.adPosition).isEqualTo("mid")
+            assertThat(firstAdSample.adPodPosition).isEqualTo(0)
+            assertThat(firstAdSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+
+            val secondAdSample = impression.adEventDataList[1]
+            CsaiDataVerifier.verifyStaticAdData(secondAdSample, defaultAnalyticsConfig, BitmovinPlayerConstants.playerInfo.playerName)
+            CsaiDataVerifier.verifyFullyPlayedAd(secondAdSample)
+            assertThat(secondAdSample.adPosition).isEqualTo("mid")
+            // adPodPosition must be higher than the first ad, confirming it increments within the break
+            assertThat(secondAdSample.adPodPosition).isEqualTo(1)
+            assertThat(secondAdSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyInvariants(eventDataList)
+            val eventDataWithAdState = eventDataList.filter { it.ad == 1 }
+            assertThat(eventDataWithAdState).hasSize(1)
         }
 
     @Test
@@ -764,7 +917,8 @@ class CsaiScenariosTest {
                 CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
                 assertThat(adSample.errorCode).isNotNull
                 assertThat(adSample.errorMessage).isNotBlank
-                // TODO: add tag type
+                assertThat(adSample.adPosition).isEqualTo("pre")
+                assertThat(adSample.adTagUrl).isNotEmpty
             } finally {
                 adServer.shutdown()
             }

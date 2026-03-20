@@ -3,6 +3,9 @@ package com.bitmovin.analytics.bitmovin.player.utils
 import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdPosition
+import com.bitmovin.analytics.bitmovin.player.BitmovinUtil
+import com.bitmovin.analytics.utils.secondsToMillisecondsLong
+import com.bitmovin.player.api.advertising.AdBreakConfig
 import com.bitmovin.player.api.advertising.AdConfig
 import com.bitmovin.player.api.advertising.ima.ImaAdBreak
 import java.util.ArrayList
@@ -20,14 +23,26 @@ internal class AdBreakMapper {
         collectorAdBreak: AdBreak,
         adConfig: AdConfig,
     ): AdBreak {
-        collectorAdBreak.replaceContentDuration = adConfig.replaceContentDuration?.toLong()?.times(1000)
+        collectorAdBreak.replaceContentDuration = adConfig.replaceContentDuration?.secondsToMillisecondsLong()
 
-        // FIXME: [AN-2514]
         if (adConfig is com.bitmovin.player.api.advertising.AdBreak) {
             fromPlayerAdBreak(collectorAdBreak, adConfig)
+        } else if (adConfig is com.bitmovin.player.api.advertising.AdBreakConfig) {
+            // in cases of errors the adConfig is not inheriting form AdBreak anymore
+            fromPlayerConfig(collectorAdBreak, adConfig)
         }
 
         return collectorAdBreak
+    }
+
+    private fun fromPlayerConfig(
+        collectorAdBreak: AdBreak,
+        playerAdBreakConfig: AdBreakConfig,
+    ) {
+        collectorAdBreak.id = playerAdBreakConfig.id
+        collectorAdBreak.position = BitmovinUtil.getAdPositionFromPlayerPosition(playerAdBreakConfig.position)
+        collectorAdBreak.tagType = AdTagFactory.fromPlayerAdTag(playerAdBreakConfig.tag)
+        collectorAdBreak.tagUrl = playerAdBreakConfig.tag.url
     }
 
     private fun fromPlayerAdBreak(
@@ -42,10 +57,12 @@ internal class AdBreakMapper {
         collectorAdBreak.id = playerAdBreak.id
         collectorAdBreak.ads = ads
 
-        collectorAdBreak.scheduleTime = playerAdBreak.scheduleTime.toLong().times(1000)
+        collectorAdBreak.scheduleTime = playerAdBreak.scheduleTime.secondsToMillisecondsLong()
 
         if (playerAdBreak is ImaAdBreak) {
             fromImaAdBreak(collectorAdBreak, playerAdBreak)
+        } else {
+            fromDefaultAdBreak(collectorAdBreak, playerAdBreak)
         }
     }
 
@@ -53,22 +70,28 @@ internal class AdBreakMapper {
         collectorAdBreak: AdBreak,
         imaAdBreak: ImaAdBreak,
     ) {
-        collectorAdBreak.position = getPositionFromPlayerPosition(imaAdBreak.position)
+        collectorAdBreak.position = BitmovinUtil.getAdPositionFromPlayerPosition(imaAdBreak.position)
         collectorAdBreak.fallbackIndex = imaAdBreak.currentFallbackIndex?.toLong() ?: 0
         collectorAdBreak.tagType = AdTagFactory.fromPlayerAdTag(imaAdBreak.tag)
         collectorAdBreak.tagUrl = imaAdBreak.tag.url
     }
 
-    private fun getPositionFromPlayerPosition(playerPosition: String): AdPosition? {
-        return when {
-            playerPosition == AdPosition.PRE.position -> AdPosition.PRE
-            playerPosition == AdPosition.POST.position -> AdPosition.POST
-            playerPositionRegex.matches(playerPosition) -> AdPosition.MID
-            else -> null
-        }
+    private fun fromDefaultAdBreak(
+        collectorAdBreak: AdBreak,
+        adBreak: com.bitmovin.player.api.advertising.AdBreak,
+    ) {
+        collectorAdBreak.position = getPositionFromScheduledTime(adBreak.scheduleTime)
+        collectorAdBreak.replaceContentDuration = adBreak.replaceContentDuration?.secondsToMillisecondsLong()
     }
 
-    companion object {
-        private val playerPositionRegex by lazy { "([0-9]+.*)".toRegex() }
+    private fun getPositionFromScheduledTime(scheduleTime: Double): AdPosition? {
+        // we only detect pre roll for now since
+        // we would need to compare the asset duration with the schedule time
+        // for mid or post roll detection, which might get inaccurate
+        if (scheduleTime == 0.0) {
+            return AdPosition.PRE
+        }
+
+        return null
     }
 }

@@ -12,8 +12,7 @@ internal object AdBreakMapper {
     fun fromTheoAdBreak(playerAdBreak: TheoAdBreak): AdBreak {
         val result =
             AdBreak(
-                // TODO: what should we be using here?
-                // this is mapped to adIdPlayer
+                // For now we are using uuid since there seems to be property that can be used
                 id = Util.uUID,
                 ads = emptyList(),
             )
@@ -27,13 +26,7 @@ internal object AdBreakMapper {
                     result.position = getPosition(playerAdBreak.timeOffset)
 
 //                TODO: it seems like we cannot detect the tagType (vast vs vmap) same for tagUrl
-//                result.tagType
-//                result.tagUrl
-//                result.fallbackIndex
-//                result.persistent
-//                result.preloadOffset
-//                result.replaceContentDuration
-//                result.offset (vs scheduleTime?)
+//                TODO: Clarify: scheduleTime vs position vs offset? (also ad vs adBreak)
                 }
             }
         } catch (e: Exception) {

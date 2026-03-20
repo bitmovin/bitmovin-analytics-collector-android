@@ -1467,7 +1467,7 @@ class BundledAnalyticsTest {
                 defaultPlayer.play()
             }
 
-            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2500)
 
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.destroy()
