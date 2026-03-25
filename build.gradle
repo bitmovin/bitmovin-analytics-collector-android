@@ -105,8 +105,6 @@ ext {
 
     // player versions
     bitmovinPlayerVersion = '3.138.0'
-    exoplayerVersion = '2.19.1'
-    amazonIvsPlayerVersion = '1.38.0'
     media3PlayerVersion = '1.9.0'
     theoPlayerVersion = '10.10.0'
 
@@ -208,8 +206,6 @@ sonar {
 
 def nonSonarProjects = ["collector-bitmovin-player-example",
                         "collector-bitmovin-player-tv-example",
-                        "collector-exoplayer-example",
-                        "collector-amazon-ivs-example",
                         "collector-media3-exoplayer-example",
                         "test-utils"
 ]
@@ -236,8 +232,6 @@ apiValidation {
     */
     ignoredProjects += ["collector-bitmovin-player-example",
                         "collector-bitmovin-player-tv-example",
-                        "collector-exoplayer-example",
-                        "collector-amazon-ivs-example",
                         "collector-media3-exoplayer-example",
                         "collector-theoplayer-example",
                         "test-assets",

@@ -13,18 +13,6 @@ yes | sdkmanager --licenses
 ./gradlew :collector:cleanPixel6api35DebugAndroidTest
 ## run system tests
 ./gradlew :collector:pixel6api35DebugAndroidTest || exit
-#
-# run systemtest for ivs
-## clean test to make sure we run test everytime
-./gradlew :collector-amazon-ivs:cleanPixel6api35DebugAndroidTest
-## run all ivs tests except TV scenario, since TVs are not supported by gradle automated tests
-./gradlew :collector-amazon-ivs:pixel6api35DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.notClass=com.bitmovin.analytics.amazon.ivs.TVBasicScenariosTest || exit
-
-# run systemtest for exoplayer
-## clean test to make sure we run test everytime
-./gradlew :collector-exoplayer:cleanPixel6api35DebugAndroidTest
-## run test
-./gradlew :collector-exoplayer:pixel6api35DebugAndroidTest || exit
 
 # run systemtest for media3-exoplayer
 ## clean test to make sure we run test everytime

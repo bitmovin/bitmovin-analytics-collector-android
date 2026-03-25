@@ -11,5 +11,4 @@ collector-theoplayer/build/
 bitmovin.properties
 
 *.exec
-collector-exoplayer-example/src/main/java/com/bitmovin/analytics/example/shared/Samples.kt
 

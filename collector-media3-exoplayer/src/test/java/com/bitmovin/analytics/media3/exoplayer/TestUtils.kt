@@ -24,7 +24,7 @@ object TestUtils {
                 null,
                 null,
             )
-        val playerInfo = PlayerInfo("playerTech", PlayerType.AMAZON_IVS)
+        val playerInfo = PlayerInfo("playerTech", PlayerType.MEDIA3_EXOPLAYER)
 
         return EventData(
             deviceInfo, playerInfo, CustomData(), "aaa", "bbb",

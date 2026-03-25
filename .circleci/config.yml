@@ -12,14 +12,14 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "collector/build.gradle" }}-{{ checksum  "collector-exoplayer/build.gradle" }}-{{ checksum  "collector-bitmovin-player/build.gradle" }}
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "collector/build.gradle" }}-{{ checksum  "collector-bitmovin-player/build.gradle" }}
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies --no-daemon --max-workers=2 #https://support.circleci.com/hc/en-us/articles/360021812453-Common-Android-memory-issues
       - save_cache:
           paths:
             - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "collector/build.gradle" }}-{{ checksum  "collector-exoplayer/build.gradle" }}-{{ checksum  "collector-bitmovin-player/build.gradle" }}
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "collector/build.gradle" }}-{{ checksum  "collector-bitmovin-player/build.gradle" }}
       - run:
           name: Code style spotlessCheck
           command: ./gradlew spotlessCheck --no-daemon --max-workers=2 #https://support.circleci.com/hc/en-us/articles/360021812453-Common-Android-memory-issues
@@ -39,19 +39,14 @@ jobs:
           path: collector-bitmovin-player/build/reports
           destination: reports
       - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: collector-exoplayer/build/reports
-          destination: reports
-      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: collector-amazon-ivs/build/reports
+          path: collector-theoplayer/build/reports
           destination: reports
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: collector/build/test-results
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: collector-bitmovin-player/build/test-results
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: collector-exoplayer/build/test-results
-      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: collector-amazon-ivs/build/test-results
+          path: collector-theoplayer/build/test-results
 
 workflows:
   version: 2

@@ -115,7 +115,7 @@ class PlayerStateMachine(
         }
     }
 
-    // Exoplayer and IVsPlayer do not have a 'playerWasReleased' event, so we can not detect when
+    // Exoplayer does not have a 'playerWasReleased' event, so we can not detect when
     // the player was released. This is problematic when a customer releases player but does not
     // detach our collectors, as we do not transition into pause state and will continue sending
     // samples. The below check prevents this from happening.

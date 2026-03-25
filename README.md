@@ -94,27 +94,6 @@ dependencies {
 </tr>
 </table>
 
-### ExoPlayer
-
-<table>
-<tr>
-<td> Player Version </td> <td> Dependency </td>
-</tr>
-<tr>
-<td> >= v2.18.0 </td>
-<td>
-
-```gradle
-dependencies {
-    implementation 'com.bitmovin.analytics:collector-exoplayer:3.25.1'
-}
-```
-
-</td>
-</tr>
-</table>
-
-
 ### IVS Player
 
 <table>
@@ -136,6 +115,27 @@ dependencies {
 </tr>
 
 </table>
+
+### ExoPlayer
+
+<table>
+<tr>
+<td> Player Version </td> <td> Dependency </td>
+</tr>
+<tr>
+<td> >= v2.18.0 </td>
+<td>
+
+```gradle
+dependencies {
+    implementation 'com.bitmovin.analytics:collector-exoplayer:3.25.1'
+}
+```
+
+</td>
+</tr>
+</table>
+
 
 ## Examples
 

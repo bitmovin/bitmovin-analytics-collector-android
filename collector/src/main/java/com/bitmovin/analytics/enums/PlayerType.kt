@@ -6,7 +6,6 @@ import android.os.Parcelable
 enum class PlayerType(private val value: String) : Parcelable {
     BITMOVIN("bitmovin"),
     EXOPLAYER("exoplayer"),
-    AMAZON_IVS("amazonivs"),
     MEDIA3_EXOPLAYER("media3-exoplayer"),
     THEOPLAYER("theoplayer"),
     ;

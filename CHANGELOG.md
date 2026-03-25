@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Removed
+- [internal] ExoPlayer collector since the player is deprecated since > 2years
+- [internal] AmazonIVS player
+
 ## v3.25.1
 
 ### Fixed

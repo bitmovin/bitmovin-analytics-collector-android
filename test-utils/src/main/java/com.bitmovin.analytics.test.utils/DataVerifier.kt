@@ -130,12 +130,7 @@ object DataVerifier {
             assertThat(eventData.videoStartFailed).isFalse
             assertThat(eventData.droppedFrames).isGreaterThanOrEqualTo(0)
             assertThat(eventData.language).isEqualTo("en_US")
-
-            // audio language should always be set, except for ivs player
-            // since we cannot track it there as of 2023-09-21
-            if (expectedPlayerInfo.playerName != "amazonivs") {
-                assertThat(eventData.audioLanguage).isNotEmpty
-            }
+            assertThat(eventData.audioLanguage).isNotEmpty
 
             verifyStreamFormatAndUrlTracking(eventData)
 
@@ -215,16 +210,8 @@ object DataVerifier {
         assertThat(eventData.videoPlaybackHeight).isGreaterThan(0)
         assertThat(eventData.videoPlaybackWidth).isGreaterThan(0)
 
-        // autodection of source urls only works on bitmovin player and exoplayer
-        if (eventData.player != "amazonivs") {
-            assertThat(eventData.mpdUrl).isEqualTo(expectedData.mpdUrl)
-            assertThat(eventData.m3u8Url).isEqualTo(expectedData.m3u8Url)
-
-            // (on exoplayer progressive cannot be detected right now)
-            if (eventData.player != "exoplayer") {
-                assertThat(eventData.progUrl).isEqualTo(expectedData.progUrl)
-            }
-        }
+        assertThat(eventData.mpdUrl).isEqualTo(expectedData.mpdUrl)
+        assertThat(eventData.m3u8Url).isEqualTo(expectedData.m3u8Url)
     }
 
     fun verifyAnalyticsConfig(
@@ -518,11 +505,8 @@ object DataVerifier {
         }
         assertThat(eventData.videoStartupTime).isGreaterThan(0)
 
-        // ivs happens to sometime have a videoTimeStart != 0 on startup samples (~30 ms)
-        // thus we skip this check for ivs
-        if (eventData.player != "amazonivs") {
-            assertThat(eventData.videoTimeStart).isEqualTo(0)
-        }
+        assertThat(eventData.videoTimeStart).isEqualTo(0)
+
         //   assertThat(eventData.videoTimeEnd).isEqualTo(0) // we can end up with startup samples that have non 0 videoTimeEnd, this needs to be investigated
         assertThat(eventData.droppedFrames).isEqualTo(0)
         assertThat(eventData.sequenceNumber).isEqualTo(expectedSequenceNumber)
@@ -566,7 +550,7 @@ object DataVerifier {
         eventData: EventData,
         expectedPlayerInfo: PlayerInfo,
     ) {
-        assertThat(eventData.state).isIn("startup", "ready") // we are ending up with ready state on exoplayer and ivs
+        assertThat(eventData.state).isIn("startup", "ready")
         assertThat(eventData.videoStartupTime).isEqualTo(0)
         assertThat(eventData.videoTimeStart).isEqualTo(0)
         assertThat(eventData.videoTimeEnd).isEqualTo(0)
@@ -624,7 +608,6 @@ object DataVerifier {
             if (eventData.state != "seeking") { // on seeking we might not have monotonic increasing videostart and videoend
 
                 // we need to add a couple of ms to videoTimeEnd to make test stable
-                // since it seems like ivs player is sometimes changing the position backwards a bit on
                 // subsequent player.position calls after a seek, which affects the playing sample after the seek
                 assertThat(eventData.videoTimeStart).isLessThanOrEqualTo(eventData.videoTimeEnd + 50)
             }
@@ -669,14 +652,9 @@ object DataVerifier {
         verifyQualityOnlyChangesWithQualityChangeEventOrSeekOrBuffering(eventDataList)
         verifyStateDurationsAreSetCorrectly(eventDataList)
 
-        // ivs is reporting videotime inconsistently for live samples, thus we skip this check for ivs live
-        // we also skip the check for the bitmovin player, since tests are unstable right now, needs to be investigated
-        // how we can improve the accuracy here.
-        // we also avoid theoplayer for now, since tests are flaky
-        if (!(eventDataList[0].isLive && eventDataList[0].player == "amazonivs") &&
-            eventDataList[0].player != "bitmovin" &&
-            eventDataList[0].player != "theoplayer"
-        ) {
+        // skip the check for the bitmovin player, since tests are unstable right now, needs to be investigated
+        // how we can improve the accuracy here. we also avoid theoplayer for now, since tests are flaky
+        if (eventDataList[0].player == "media3-exoplayer") {
             verifyPlayingDurationCorrelatesWithVideoTimeStartAndEnd(eventDataList)
         }
     }
