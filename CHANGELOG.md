@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Upgrade kotlin to `2.2.21`
-- Upgrade theoplayer to `10.13.0`
+- Upgrade theoplayer to `10.13.0`, media3-exoplayer to `1.10.0`
 - Upgrade gson to `2.13.2`
 
 ### Removed

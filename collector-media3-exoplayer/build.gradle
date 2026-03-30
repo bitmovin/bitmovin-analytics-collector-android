@@ -109,8 +109,9 @@ dependencies {
     androidTestImplementation "androidx.media3:media3-exoplayer:${testVersion}"
     androidTestImplementation "androidx.media3:media3-exoplayer-dash:${testVersion}"
     androidTestImplementation "androidx.media3:media3-exoplayer-hls:${testVersion}"
-
     androidTestImplementation "androidx.media3:media3-datasource-cronet:${testVersion}"
+
+    androidTestImplementation "com.google.android.gms:play-services-cronet:${rootProject.ext.cronetGooglePlay}"
 
     androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
