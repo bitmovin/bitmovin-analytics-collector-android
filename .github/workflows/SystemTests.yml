@@ -10,7 +10,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Runs instrumented tests on a Pixel 6 API 34 emulator.
+  # Runs instrumented tests on a Pixel 6 API 35 emulator.
+  # All four modules run in parallel via matrix to minimise total wall-clock time.
   system-tests:
     # This condition is necessary to avoid having an endless search for the bitdash runner occurring on the public repo which is not part of the bitmovin-engineering organization.
     # Furthermore, we only needs these checks internally.
@@ -21,6 +22,15 @@ jobs:
     # This job cannot run on the default runner, as it requires many resources.
     runs-on: bitdash-4core
     timeout-minutes: 60
+    strategy:
+      # Keep running all modules even if one fails, so we get a full picture of failures.
+      fail-fast: false
+      matrix:
+        module:
+          - collector
+          - collector-bitmovin-player
+          - collector-theoplayer
+          - collector-media3-exoplayer
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,35 +57,79 @@ jobs:
           cache-read-only: false
 
       - name: Allow access to Test Sources
-        if: always()
         env:
           S3_AUTHORIZE_KEY: ${{ secrets.S3_AUTHORIZE_KEY }}
         run: |
           curl --ipv4 "https://us-central1-bitmovin-api.cloudfunctions.net/authorizeS3Bucket?key=$S3_AUTHORIZE_KEY"
 
-# Collector Test
-      - name: Tests Collector
-        if: always()
+      - name: Run Tests - ${{ matrix.module }}
         run: |
-          ./gradlew :collector:pixel6api35DebugAndroidTest
+          ./gradlew :${{ matrix.module }}:pixel6api35DebugAndroidTest
 
-# Collector Bitmovin Player Test
-      - name: Tests Collector Bitmovin Player
+      - name: Upload Test Results - ${{ matrix.module }}
+        uses: actions/upload-artifact@v4
         if: always()
-        run: |
-          ./gradlew :collector-bitmovin-player:pixel6api35DebugAndroidTest
+        with:
+          name: test-results-${{ matrix.module }}
+          path: ${{ matrix.module }}/build/outputs/androidTest-results/managedDevice/debug/pixel6api35/
 
-# Collector THEOplayer Test
-      - name: Tests Collector THEOplayer
+      - name: Upload Test Reports - ${{ matrix.module }}
+        uses: actions/upload-artifact@v4
         if: always()
-        run: |
-          ./gradlew :collector-theoplayer:pixel6api35DebugAndroidTest
+        with:
+          name: test-reports-${{ matrix.module }}
+          path: ${{ matrix.module }}/build/reports/androidTests/managedDevice/debug/pixel6api35/
 
-# Collector Media3 Exo Player Test
-      - name: Tests Collector Media3 Exoplayer
+  report:
+    needs: system-tests
+    if: always() && github.repository_id == 310696148
+    runs-on: bitdash-4core
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Test Results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          path: test-results
+          merge-multiple: false
+
+      - name: Download Test Reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-reports-*
+          path: test-reports
+          merge-multiple: false
+
+# Create Report which can be analyzed in the github ui directly
+      - name: Publish SystemTest Report
+        uses: mikepenz/action-junit-report@v4
         if: always()
+        with:
+          report_paths: 'test-results/**/TEST-*.xml'
+
+      - name: Combine Reports
+        if: always()
+        id: copy-reports
         run: |
-          ./gradlew :collector-media3-exoplayer:pixel6api35DebugAndroidTest
+            mkdir reports
+
+            cp -r test-reports/test-reports-collector/ reports/collector
+            cp -r test-reports/test-reports-collector-bitmovin-player/ reports/collector-bitmovin-player
+            cp -r test-reports/test-reports-collector-media3-exoplayer/ reports/collector-media3-exoplayer
+            cp -r test-reports/test-reports-collector-theoplayer/ reports/collector-theoplayer
+
+            cp .github/tests-report/INDEX_TEST_REPORTS.html reports/index.html
+
+            ./.github/tests-report/report_enhancer.sh reports
+
+      - name: Upload Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tests-report
+          path: reports
 
       # If it fails on the main branch, send a slack message (merged PR or nightly tests)
       - name: Send a Slack message whenever the tests fails on the main branch
@@ -89,32 +143,3 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-# Create Report which can be analyzed in the github ui directly
-      - name: Publish SystemTest Report
-        uses: mikepenz/action-junit-report@v4
-        if: success() || failure() # always run even if the previous step fails
-        with:
-          report_paths: '**/build/outputs/androidTest-results/managedDevice/debug/pixel6api35/TEST-*.xml'
-
-      - name: Copying Reports
-        if: always()
-        id: copy-reports
-        run: |
-            mkdir reports
-
-            cp -r collector/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector
-            cp -r collector-bitmovin-player/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-bitmovin-player
-            cp -r collector-media3-exoplayer/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-media3-exoplayer
-            cp -r collector-theoplayer/build/reports/androidTests/managedDevice/debug/pixel6api35/ reports/collector-theoplayer
-
-            cp .github/tests-report/INDEX_TEST_REPORTS.html reports/index.html
-
-            ./.github/tests-report/report_enhancer.sh reports
-
-      - name: Upload Reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: tests-report
-          path: reports
