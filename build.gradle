@@ -109,7 +109,7 @@ ext {
     theoPlayerVersion = '10.10.0'
 
     // collector dependencies
-    gsonVersion = '2.12.1'
+    gsonVersion = '2.13.2'
     okhttp3Version = '4.12.0'
     appCompatVersion = '1.7.0'
 

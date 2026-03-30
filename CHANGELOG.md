@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Upgrade kotlin to `2.2.21`
+- Upgrade gson to `2.13.2`
 
 ### Removed
 - [internal] ExoPlayer collector since the player is deprecated since > 2years
