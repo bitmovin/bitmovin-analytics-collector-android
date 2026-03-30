@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Upgrade kotlin to `2.2.21`
+
 ### Removed
 - [internal] ExoPlayer collector since the player is deprecated since > 2years
 - [internal] AmazonIVS player

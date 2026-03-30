@@ -14,6 +14,6 @@ class KotlinMetadataTest {
     @Test
     fun verifyMetadata() {
         val metadata = KotlinClassMetadata.readLenient(ITHEOplayerCollector::class.java.getAnnotation(Metadata::class.java)!!)
-        assertThat(metadata.version.toString()).isEqualTo("2.1.0")
+        assertThat(metadata.version.toString()).isEqualTo("2.2.0")
     }
 }
