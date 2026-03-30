@@ -536,8 +536,7 @@ class CsaiScenariosTest {
             CsaiDataVerifier.verifyStaticAdData(midRollSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
             CsaiDataVerifier.verifyFullyPlayedAd(midRollSample)
 
-//          TODO: theoplayer reports adPosition wrong (always pre-roll), reported it already
-//          assertThat(midRollSample.adPosition).isEqualTo("mid")
+            assertThat(midRollSample.adPosition).isEqualTo("mid")
 
             assertThat(preRollSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
             assertThat(midRollSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
@@ -599,8 +598,7 @@ class CsaiScenariosTest {
             CsaiDataVerifier.verifyStaticAdData(midRollSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
             CsaiDataVerifier.verifyFullyPlayedAd(midRollSample)
 
-//          TODO: theoplayer reports adPosition wrong (always pre-roll), reported it already
-//          assertThat(midRollSample.adPosition).isEqualTo("mid")
+            assertThat(midRollSample.adPosition).isEqualTo("mid")
             assertThat(midRollSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
 
             val eventDataList = impression.eventDataList
@@ -663,8 +661,7 @@ class CsaiScenariosTest {
             CsaiDataVerifier.verifyStaticAdData(postRollSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
             CsaiDataVerifier.verifyFullyPlayedAd(postRollSample)
 
-            // TODO: this is reported with timeoffset 0 by the player, this is a bug on player side
-//            assertThat(postRollSample.adPosition).isEqualTo("post")
+            assertThat(postRollSample.adPosition).isEqualTo("post")
             assertThat(postRollSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
 
             val eventDataList = impression.eventDataList
@@ -801,14 +798,17 @@ class CsaiScenariosTest {
             val firstAdSample = impression.adEventDataList[0]
             CsaiDataVerifier.verifyStaticAdData(firstAdSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
             CsaiDataVerifier.verifyFullyPlayedAd(firstAdSample)
-            assertThat(firstAdSample.adPosition).isEqualTo("mid")
+
+//            TODO: player reports offset=0 for this vmap asset, reported it to theo
+//            assertThat(firstAdSample.adPosition).isEqualTo("mid")
             assertThat(firstAdSample.adPodPosition).isEqualTo(0)
             assertThat(firstAdSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
 
             val secondAdSample = impression.adEventDataList[1]
             CsaiDataVerifier.verifyStaticAdData(secondAdSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
             CsaiDataVerifier.verifyFullyPlayedAd(secondAdSample)
-            assertThat(secondAdSample.adPosition).isEqualTo("mid")
+//            TODO: player reports offset=0 for this vmap asset, reported it to theo
+//            assertThat(secondAdSample.adPosition).isEqualTo("mid")
             // adPodPosition must be higher than the first ad, confirming it increments within the break
             assertThat(secondAdSample.adPodPosition).isEqualTo(1)
             assertThat(secondAdSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
