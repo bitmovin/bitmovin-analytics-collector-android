@@ -78,6 +78,16 @@ android {
     lint {
         abortOnError true
     }
+
+    // we need to exclude the MANIFEST.MF file under META-INF/versions/9/OSGI-INF
+    // since there is a conflict
+    packaging {
+        resources {
+            excludes += [
+                    "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            ]
+        }
+    }
 }
 
 dependencies {

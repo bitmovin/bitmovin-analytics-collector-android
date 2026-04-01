@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Upgrade kotlin to `2.2.21`
 - Upgrade theoplayer to `10.13.0`, media3-exoplayer to `1.10.0`
-- Upgrade gson to `2.13.2`
+- Upgrade gson to `2.13.2`, appCompat to `1.7.1`
+
 
 ### Removed
 - [internal] ExoPlayer collector since the player is deprecated since > 2years
