@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Upgrade kotlin to `2.2.21`
+- Upgrade okhttp to `5.3.2`
 - Upgrade theoplayer to `10.13.0`, media3-exoplayer to `1.10.0`
 - Upgrade gson to `2.13.2`, appCompat to `1.7.1`
 
