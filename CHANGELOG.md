@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- Bitmovin Player: Don't track audiotrack changes right at the beginning
+
 ### Changed
 - Upgrade kotlin to `2.2.21`
 - Upgrade theoplayer to `10.13.0`, media3-exoplayer to `1.10.0`

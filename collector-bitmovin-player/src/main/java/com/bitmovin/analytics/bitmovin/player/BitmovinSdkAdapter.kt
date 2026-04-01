@@ -497,6 +497,14 @@ internal class BitmovinSdkAdapter(
         try {
             BitmovinLog.d(TAG, "On AudioChanged")
 
+            // this event is sometime fired at the beginning after startup is finished
+            // in order to avoid unnecessary logging,
+            // we will ignore it if the current position didn't move yet
+            // this is best effort but should work for most cases
+            if (position < 0.01) {
+                return
+            }
+
             stateMachine.audioTrackChanged(
                 position,
                 event.oldAudioTrack?.language,
