@@ -1117,4 +1117,36 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyInvariants(eventDataList)
         }
     }
+
+    @Test
+    fun test_wrongAnalyticsLicense_ShouldNotInterfereWithPlayer() =
+        runBlockingTest {
+            // arrange
+            val analyticsConfig = TestConfig.createAnalyticsConfig("nonExistingKey", backendUrl = mockedIngressUrl)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                val collector = ITHEOplayerCollector.create(appContext, analyticsConfig)
+                collector.attachPlayer(player)
+                player.isAutoplay = true
+                player.volume = 0.0
+                player.source = defaultDashSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+
+                // assert
+                // make sure that player played for a couple of seconds and didn't crash
+                assertThat(player.currentTime).isGreaterThan(1.5)
+            }
+
+            Thread.sleep(300)
+
+            // assert that no samples are sent
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions.size).isEqualTo(0)
+        }
 }
