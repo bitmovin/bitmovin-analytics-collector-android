@@ -883,8 +883,11 @@ public final class com/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata {
 public abstract interface class com/bitmovin/analytics/api/ssai/SsaiApi {
 	public abstract fun adBreakEnd ()V
 	public abstract fun adBreakStart (Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;)V
+	public static synthetic fun adBreakStart$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;ILjava/lang/Object;)V
 	public abstract fun adQuartileFinished (Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata;)V
+	public static synthetic fun adQuartileFinished$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata;ILjava/lang/Object;)V
 	public abstract fun adStart (Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;)V
+	public static synthetic fun adStart$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;ILjava/lang/Object;)V
 }
 
 public final class com/bitmovin/analytics/api/ssai/SsaiApi$DefaultImpls {
