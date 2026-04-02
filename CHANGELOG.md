@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+## v3.26.0
+
 ### Fixed
 - Bitmovin Player: Don't track audiotrack changes right at the beginning
 
