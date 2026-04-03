@@ -928,4 +928,10 @@ object DataVerifier {
         assertThat(lastSample.videoPlaybackWidth).isGreaterThan(0)
         assertThat(lastSample.videoPlaybackHeight).isGreaterThan(0)
     }
+
+    fun verifyStartupSampleIsSentAfterPreRollAd(impression: Impression) {
+        val sampleWithAdState = impression.eventDataList.first { it.state == "ad" }
+        val startupSample = impression.eventDataList.first { it.videoStartupTime > 0 }
+        assertThat(startupSample.sequenceNumber).isEqualTo(sampleWithAdState.sequenceNumber + 1)
+    }
 }

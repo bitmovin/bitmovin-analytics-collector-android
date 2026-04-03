@@ -173,6 +173,8 @@ class CsaiScenariosTest {
             DataVerifier.verifyInvariants(eventDataList)
             val eventDataWithClientSideAdState = eventDataList.filter { it.ad == 1 }
             assertThat(eventDataWithClientSideAdState).hasSize(1)
+
+            DataVerifier.verifyStartupSampleIsSentAfterPreRollAd(impression)
         }
 
     @Test
@@ -242,6 +244,8 @@ class CsaiScenariosTest {
             DataVerifier.verifyInvariants(eventDataList)
             val eventDataWithClientSideAdState = eventDataList.filter { it.ad == 1 }
             assertThat(eventDataWithClientSideAdState).hasSize(1)
+
+            DataVerifier.verifyStartupSampleIsSentAfterPreRollAd(impression)
         }
 
     @Test
@@ -316,6 +320,8 @@ class CsaiScenariosTest {
             assertThat(firstEventData.sequenceNumber).isEqualTo(0)
             val eventDataWithAdState = eventDataList.filter { it.ad == 1 }
             assertThat(eventDataWithAdState).hasSize(1)
+
+            DataVerifier.verifyStartupSampleIsSentAfterPreRollAd(impression)
         }
 
     @Test
@@ -545,6 +551,8 @@ class CsaiScenariosTest {
             DataVerifier.verifyInvariants(eventDataList)
             val eventDataWithAdState = eventDataList.filter { it.ad == 1 }
             assertThat(eventDataWithAdState).hasSizeGreaterThanOrEqualTo(2)
+
+            DataVerifier.verifyStartupSampleIsSentAfterPreRollAd(impression)
         }
 
     @Test
