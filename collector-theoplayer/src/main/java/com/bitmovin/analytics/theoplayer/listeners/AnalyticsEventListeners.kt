@@ -250,6 +250,16 @@ internal class AnalyticsEventListeners(
             try {
                 BitmovinLog.d(TAG, "ad break end")
                 stateMachine.endAd()
+
+                // in case startup is not finished yet
+                // and player isn't paused after the ad (might not be pausible, but here
+                // for safety reasons) we are transitioning into startup
+                // this is needed since we saw issues in production where
+                // the PLAY event wasn't issued after the ad, which lead
+                // to missing startups after pre-roll ads
+                if (!stateMachine.isStartupFinished && !player.isPaused) {
+                    startupInitiated(player.currentPositionInMs())
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Break End", e)
             }

@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- THEOplayer CSAI: Startup samples were not issued after pre-roll ads, due to missing PLAY event
+
 ## v3.26.0
 
 ### Fixed
