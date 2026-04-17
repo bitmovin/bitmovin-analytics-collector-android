@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Changed
+- Upgrade theoplayer to `10.14.0`,
+
 ## v3.26.1
 
 ### Fixed

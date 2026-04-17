@@ -807,16 +807,14 @@ class CsaiScenariosTest {
             CsaiDataVerifier.verifyStaticAdData(firstAdSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
             CsaiDataVerifier.verifyFullyPlayedAd(firstAdSample)
 
-//            TODO: player reports offset=0 for this vmap asset, reported it to theo
-//            assertThat(firstAdSample.adPosition).isEqualTo("mid")
+            assertThat(firstAdSample.adPosition).isEqualTo("mid")
             assertThat(firstAdSample.adPodPosition).isEqualTo(0)
             assertThat(firstAdSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
 
             val secondAdSample = impression.adEventDataList[1]
             CsaiDataVerifier.verifyStaticAdData(secondAdSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
             CsaiDataVerifier.verifyFullyPlayedAd(secondAdSample)
-//            TODO: player reports offset=0 for this vmap asset, reported it to theo
-//            assertThat(secondAdSample.adPosition).isEqualTo("mid")
+            assertThat(secondAdSample.adPosition).isEqualTo("mid")
             // adPodPosition must be higher than the first ad, confirming it increments within the break
             assertThat(secondAdSample.adPodPosition).isEqualTo(1)
             assertThat(secondAdSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
