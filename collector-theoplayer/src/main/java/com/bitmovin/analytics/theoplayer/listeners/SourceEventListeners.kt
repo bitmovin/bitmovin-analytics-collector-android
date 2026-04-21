@@ -17,54 +17,67 @@ internal class SourceEventListeners(
     private val player: Player,
     private val playbackQualityProvider: PlaybackQualityProvider,
 ) {
+    private val eventListenerCleanupTracker = mutableListOf<() -> Unit>()
+    private val lock = Object()
+
+    private val videoQualityChangeListener =
+        EventListener<ActiveQualityChangedEvent> { event ->
+            val newVideoQuality = event.quality
+            stateMachine.videoQualityChanged(
+                player.currentPositionInMs(),
+                playbackQualityProvider.didVideoQualityChange(newVideoQuality),
+            ) {
+                playbackQualityProvider.currentVideoQuality = newVideoQuality
+            }
+        }
+
+    private val audioQualityChangeListener =
+        EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.ActiveQualityChangedEvent> { event ->
+            playbackQualityProvider.currentAudioQuality = event.quality
+        }
+
+    private val handleVideoAddTrackEvent =
+        EventListener<AddTrackEvent> { event ->
+            event.track.addEventListener(VideoTrackEventTypes.ACTIVEQUALITYCHANGEDEVENT, videoQualityChangeListener)
+
+            // storing the eventlistener, in order to cleanup properly later
+            synchronized(lock) {
+                eventListenerCleanupTracker.add {
+                    event.track.removeEventListener(VideoTrackEventTypes.ACTIVEQUALITYCHANGEDEVENT, videoQualityChangeListener)
+                }
+            }
+        }
+
+    private val handleAudioAddTrackEvent =
+        EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.list.AddTrackEvent> { event ->
+            event.track.addEventListener(AudioTrackEventTypes.ACTIVEQUALITYCHANGEDEVENT, audioQualityChangeListener)
+
+            // storing the eventlistener, in order to cleanup properly later
+            synchronized(lock) {
+                eventListenerCleanupTracker.add {
+                    event.track.removeEventListener(AudioTrackEventTypes.ACTIVEQUALITYCHANGEDEVENT, audioQualityChangeListener)
+                }
+            }
+        }
+
     internal fun registerSourceListeners() {
         player.videoTracks.addEventListener(VideoTrackListEventTypes.ADDTRACK, handleVideoAddTrackEvent)
         player.audioTracks.addEventListener(AudioTrackListEventTypes.ADDTRACK, handleAudioAddTrackEvent)
     }
 
     internal fun unregisterSourceListeners() {
-        player.videoTracks.removeEventListener(VideoTrackListEventTypes.ADDTRACK, handleVideoAddTrackEvent)
-        player.audioTracks.removeEventListener(AudioTrackListEventTypes.ADDTRACK, handleAudioAddTrackEvent)
+        player.videoTracks.removeEventListener(
+            VideoTrackListEventTypes.ADDTRACK,
+            handleVideoAddTrackEvent,
+        )
+        player.audioTracks.removeEventListener(
+            AudioTrackListEventTypes.ADDTRACK,
+            handleAudioAddTrackEvent,
+        )
+
+        synchronized(lock) {
+            eventListenerCleanupTracker.forEach { it() }
+            eventListenerCleanupTracker.clear()
+        }
     }
-
-    val handleVideoAddTrackEvent: EventListener<AddTrackEvent> =
-        object : EventListener<AddTrackEvent> {
-            var handleActiveQualityChangedEvent: EventListener<ActiveQualityChangedEvent> =
-                EventListener<ActiveQualityChangedEvent> { activeQualityChangedEvent ->
-                    val newVideoQuality = activeQualityChangedEvent.quality
-                    stateMachine.videoQualityChanged(
-                        player.currentPositionInMs(),
-                        playbackQualityProvider.didVideoQualityChange(
-                            newVideoQuality,
-                        ),
-                    ) {
-                        playbackQualityProvider.currentVideoQuality = newVideoQuality
-                    }
-                }
-
-            public override fun handleEvent(addTrackEvent: AddTrackEvent) {
-                addTrackEvent.track.addEventListener(
-                    VideoTrackEventTypes.ACTIVEQUALITYCHANGEDEVENT,
-                    handleActiveQualityChangedEvent,
-                )
-            }
-        }
-
-    val handleAudioAddTrackEvent: EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.list.AddTrackEvent> =
-        object : EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.list.AddTrackEvent> {
-            var handleActiveQualityChangedEvent:
-                EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.ActiveQualityChangedEvent> =
-                EventListener<com.theoplayer.android.api.event.track.mediatrack.audio.ActiveQualityChangedEvent> {
-                        activeQualityChangedEvent ->
-                    val newAudioQuality = activeQualityChangedEvent.quality
-                    playbackQualityProvider.currentAudioQuality = newAudioQuality
-                }
-
-            public override fun handleEvent(addTrackEvent: com.theoplayer.android.api.event.track.mediatrack.audio.list.AddTrackEvent) {
-                addTrackEvent.track.addEventListener(
-                    AudioTrackEventTypes.ACTIVEQUALITYCHANGEDEVENT,
-                    handleActiveQualityChangedEvent,
-                )
-            }
-        }
 }
