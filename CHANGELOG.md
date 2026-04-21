@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Fixed
+- Handle missing AD_CLICKED event for theoplayer version < 8.3 to avoid crashes
+
 ### Changed
 - Upgrade theoplayer to `11.0.0`,
 

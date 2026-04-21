@@ -10,9 +10,11 @@ import com.bitmovin.analytics.test.utils.MockedIngress
 import com.bitmovin.analytics.test.utils.PlaybackUtils
 import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.analytics.test.utils.Utils
 import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.analytics.theoplayer.api.ITHEOplayerCollector
 import com.theoplayer.android.api.THEOplayerConfig
+import com.theoplayer.android.api.THEOplayerGlobal
 import com.theoplayer.android.api.THEOplayerView
 import com.theoplayer.android.api.ads.ima.GoogleImaIntegrationFactory
 import com.theoplayer.android.api.event.EventListener
@@ -542,7 +544,9 @@ class CsaiScenariosTest {
             CsaiDataVerifier.verifyStaticAdData(midRollSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
             CsaiDataVerifier.verifyFullyPlayedAd(midRollSample)
 
-            assertThat(midRollSample.adPosition).isEqualTo("mid")
+            if (playerTracksAdPositionCorrectly(THEOplayerGlobal.getVersion())) {
+                assertThat(midRollSample.adPosition).isEqualTo("mid")
+            }
 
             assertThat(preRollSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
             assertThat(midRollSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
@@ -606,7 +610,9 @@ class CsaiScenariosTest {
             CsaiDataVerifier.verifyStaticAdData(midRollSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
             CsaiDataVerifier.verifyFullyPlayedAd(midRollSample)
 
-            assertThat(midRollSample.adPosition).isEqualTo("mid")
+            if (playerTracksAdPositionCorrectly(THEOplayerGlobal.getVersion())) {
+                assertThat(midRollSample.adPosition).isEqualTo("mid")
+            }
             assertThat(midRollSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
 
             val eventDataList = impression.eventDataList
@@ -669,7 +675,10 @@ class CsaiScenariosTest {
             CsaiDataVerifier.verifyStaticAdData(postRollSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
             CsaiDataVerifier.verifyFullyPlayedAd(postRollSample)
 
-            assertThat(postRollSample.adPosition).isEqualTo("post")
+            if (playerTracksAdPositionCorrectly(THEOplayerGlobal.getVersion())) {
+                assertThat(postRollSample.adPosition).isEqualTo("post")
+            }
+
             assertThat(postRollSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
 
             val eventDataList = impression.eventDataList
@@ -990,4 +999,20 @@ class CsaiScenariosTest {
                 adServer.shutdown()
             }
         }
+
+    // bug with adPosition tracking was fixed in version 10.14
+    private fun playerTracksAdPositionCorrectly(version: String): Boolean {
+        val majorVersion = Utils.extractMajorVersion(version)
+        val minorVersion = Utils.extractMinorVersion(version)
+
+        if (majorVersion >= 11) {
+            return true
+        }
+
+        if (majorVersion == 10L && minorVersion >= 14) {
+            return true
+        }
+
+        return false
+    }
 }

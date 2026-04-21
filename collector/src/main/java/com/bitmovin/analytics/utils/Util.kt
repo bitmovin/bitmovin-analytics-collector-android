@@ -136,6 +136,32 @@ object Util {
         return if (value == null || multiplicand == null) null else value * multiplicand
     }
 
+    fun extractMajorVersion(version: String): Long {
+        val splitted = version.split(".")
+        if (splitted.isNotEmpty()) {
+            try {
+                val major = splitted[0].toLong()
+                return major
+            } catch (_: Exception) {
+                return 0L
+            }
+        }
+        return 0L
+    }
+
+    fun extractMinorVersion(version: String): Long {
+        val splitted = version.split(".")
+        if (splitted.size >= 2) {
+            try {
+                val major = splitted[1].toLong()
+                return major
+            } catch (_: Exception) {
+                return 0L
+            }
+        }
+        return 0L
+    }
+
     fun secondsToMillis(seconds: Double?): Long {
         return toPrimitiveLong(multiply(seconds, MILLISECONDS_IN_SECONDS))
     }

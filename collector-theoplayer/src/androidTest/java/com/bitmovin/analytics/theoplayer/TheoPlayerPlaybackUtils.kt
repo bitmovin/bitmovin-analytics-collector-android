@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.theoplayer
 
 import com.bitmovin.analytics.test.utils.PlaybackUtils
+import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
 import com.theoplayer.android.api.player.Player
 import com.theoplayer.android.api.player.ReadyState
 
@@ -10,7 +11,7 @@ object TheoPlayerPlaybackUtils {
         playedToMs: Long,
     ) {
         waitUntilPlayerIsPlaying(player)
-        PlaybackUtils.waitUntil("playerPlayedTo=${playedToMs}ms") { (player.currentTime * 1000).toLong() >= playedToMs }
+        PlaybackUtils.waitUntil("playerPlayedTo=${playedToMs}ms") { (player.currentPositionInMs()) >= playedToMs }
     }
 
     fun waitUntilPlayerHasMetadataLoaded(player: Player) {

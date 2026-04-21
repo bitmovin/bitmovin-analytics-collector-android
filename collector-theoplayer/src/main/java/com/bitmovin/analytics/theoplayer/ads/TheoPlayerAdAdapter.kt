@@ -8,6 +8,7 @@ import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdQuartile
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
+import com.theoplayer.android.api.THEOplayerGlobal
 import com.theoplayer.android.api.event.EventListener
 import com.theoplayer.android.api.event.ads.AdBeginEvent
 import com.theoplayer.android.api.event.ads.AdBreakBeginEvent
@@ -167,7 +168,14 @@ internal class TheoPlayerAdAdapter(
         player.ads.addEventListener(AdsEventTypes.AD_FIRST_QUARTILE, adFirstQuartileListener)
         player.ads.addEventListener(AdsEventTypes.AD_MIDPOINT, adMidpointListener)
         player.ads.addEventListener(AdsEventTypes.AD_THIRD_QUARTILE, adThirdQuartileListener)
-        player.ads.addEventListener(AdsEventTypes.AD_CLICKED, adClickedListener)
+
+        if (supportsAdClickedEvent(THEOplayerGlobal.getVersion())) {
+            try {
+                player.ads.addEventListener(AdsEventTypes.AD_CLICKED, adClickedListener)
+            } catch (_: Exception) {
+                // ignore, added for safety reasons
+            }
+        }
     }
 
     override fun release() {
@@ -181,7 +189,14 @@ internal class TheoPlayerAdAdapter(
         player.ads.removeEventListener(AdsEventTypes.AD_FIRST_QUARTILE, adFirstQuartileListener)
         player.ads.removeEventListener(AdsEventTypes.AD_MIDPOINT, adMidpointListener)
         player.ads.removeEventListener(AdsEventTypes.AD_THIRD_QUARTILE, adThirdQuartileListener)
-        player.ads.removeEventListener(AdsEventTypes.AD_CLICKED, adClickedListener)
+
+        if (supportsAdClickedEvent(THEOplayerGlobal.getVersion())) {
+            try {
+                player.ads.removeEventListener(AdsEventTypes.AD_CLICKED, adClickedListener)
+            } catch (_: Exception) {
+                // ignore, added for safety reasons
+            }
+        }
     }
 
     override val isLinearAdActive: Boolean
@@ -193,6 +208,22 @@ internal class TheoPlayerAdAdapter(
 
     override fun unsubscribe(listener: AdAnalyticsEventListener) {
         observableSupport.unsubscribe(listener)
+    }
+
+    private fun supportsAdClickedEvent(version: String): Boolean {
+        // ad_clicked event was added in 8.3.0
+        val majorVersion = Util.extractMajorVersion(version)
+        val minorVersion = Util.extractMinorVersion(version)
+
+        if (majorVersion >= 9L) {
+            return true
+        }
+
+        if (majorVersion == 8L && minorVersion >= 3L) {
+            return true
+        }
+
+        return false
     }
 
     companion object {

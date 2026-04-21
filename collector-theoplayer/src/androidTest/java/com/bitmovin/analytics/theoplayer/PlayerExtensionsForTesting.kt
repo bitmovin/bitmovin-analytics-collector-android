@@ -9,7 +9,7 @@ fun Player.useLowestRendition() {
         VideoTrackListEventTypes.ADDTRACK,
         EventListener {
             this.videoTracks.getItem(0).targetQuality =
-                this.videoTracks.getItem(0).getQualities().minBy { quality -> quality.bandwidth }
+                this.videoTracks.getItem(0).getQualities()?.minBy { quality -> quality.bandwidth }
         },
     )
 }
@@ -19,7 +19,7 @@ fun Player.useHighestRendition() {
         VideoTrackListEventTypes.ADDTRACK,
         EventListener {
             this.videoTracks.getItem(0).targetQuality =
-                this.videoTracks.getItem(0).getQualities().maxBy { quality -> quality.bandwidth }
+                this.videoTracks.getItem(0).getQualities()?.maxBy { quality -> quality.bandwidth }
         },
     )
 }

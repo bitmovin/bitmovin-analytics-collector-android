@@ -503,7 +503,7 @@ class PhoneBasicScenariosTest {
                 // switch to highest quality
                 val desiredTrack = player.videoTracks.first()
                 desiredTrack?.let { track ->
-                    val minQuality = track.qualities.maxBy { quality -> quality.bandwidth }
+                    val minQuality = track.qualities?.maxBy { quality -> quality.bandwidth }
                     track.targetQuality = minQuality
                 }
                 player.play()
