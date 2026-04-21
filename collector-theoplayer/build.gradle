@@ -27,6 +27,7 @@ android {
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibility
         targetCompatibility rootProject.ext.targetCompatibility
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -92,6 +93,10 @@ dependencies {
 
     compileOnly "com.theoplayer.theoplayer-sdk-android:core:${rootProject.ext.theoPlayerVersion}"
     compileOnly "com.theoplayer.theoplayer-sdk-android:integration-ads-ima:${rootProject.ext.theoPlayerVersion}"
+
+    // desugaring is needed since theoplayer v11 in order to support ads-ima integration
+    // https://optiview.dolby.com/docs/theoplayer/how-to-guides/ads/google-ima/#android-sdk
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${rootProject.ext.desugarJdkLibsVersion}"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"

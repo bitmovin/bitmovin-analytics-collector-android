@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
-- Upgrade theoplayer to `10.14.0`,
+- Upgrade theoplayer to `11.0.0`,
 
 ## v3.26.1
 
