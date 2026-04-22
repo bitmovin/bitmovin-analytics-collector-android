@@ -377,13 +377,18 @@ class CsaiScenariosTest {
             val advertisingConfig = AdvertisingConfig(preRoll)
             val localPlayer = createPlayer(advertisingConfig)
 
+            var adStarted = false
+            localPlayer.on(PlayerEvent.AdStarted::class, {
+                adStarted = true
+            })
+
             // act
             withContext(mainScope.coroutineContext) {
                 localPlayer.load(defaultSource)
             }
 
             // wait for pre-roll ad to start and play for a bit
-            PlaybackUtils.waitUntil("pre-roll ad started") { localPlayer.isAd }
+            PlaybackUtils.waitUntil("pre-roll ad started") { adStarted }
             Thread.sleep(1000)
 
             // destroy player while ad is still playing
