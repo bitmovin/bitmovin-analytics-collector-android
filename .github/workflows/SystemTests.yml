@@ -132,8 +132,10 @@ jobs:
           path: reports
 
       # If it fails on the main branch, send a slack message (merged PR or nightly tests)
+      # Check the needed job's result explicitly: inside this job, failure() only
+      # reflects this job's own steps, not the upstream matrix job.
       - name: Send a Slack message whenever the tests fails on the main branch
-        if: failure() && github.ref == 'refs/heads/main'
+        if: needs.system-tests.result == 'failure' && github.ref == 'refs/heads/main'
         uses: slackapi/slack-github-action@v1
         with:
           # The Slack Webhook URL only takes one parameter which is the link to the failed action.
