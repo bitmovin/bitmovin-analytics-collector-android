@@ -345,7 +345,13 @@ While the collector might not crash when called from different threads, it can l
 
 ## Minification / Obfuscation
 
-Starting with version 3.15.0 there are no longer any specific ProGuard rules required for the Analytics Collector.
+If the API is not called through reflection no rules are necessary.
+
+If the API is called through reflection the following rule needs to be added to Pro Guard
+
+```
+-keep class com.bitmovin.analytics.api.** { *; }
+```
 
 ## Support
 
