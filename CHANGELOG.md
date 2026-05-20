@@ -6,14 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
+### Added
+- adPodPosition tracking for SSAI ads
+
 ### Fixed
 - Added proper cleanup of eventlisteners for theoplayer
 - Handle missing AD_CLICKED event for theoplayer version < 8.3 to avoid crashes
 
-
 ### Changed
 - Upgrade theoplayer to `11.0.0`,
-
 
 ## v3.26.1
 
