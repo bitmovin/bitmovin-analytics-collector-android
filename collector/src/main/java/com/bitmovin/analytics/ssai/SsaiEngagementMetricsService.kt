@@ -28,12 +28,14 @@ class SsaiEngagementMetricsService(
     private var errorSentForCurrentAd = false
     private var activeAdSample: AdEventData? = null
     private var adStartedAtInMs: Long = 0
+    private var adPodPosition: Int = 0
 
     @Synchronized
     fun markAdStart(
         adPosition: SsaiAdPosition?,
         adMetadata: SsaiAdMetadata?,
         adIndex: Int,
+        adPodPosition: Int,
     ) {
         if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
             return
@@ -42,6 +44,7 @@ class SsaiEngagementMetricsService(
         flushCurrentAdSample()
         resetStateOnNewAd()
         adImpressionId = Util.uUID
+        this.adPodPosition = adPodPosition
         val adEventData = createBasicSsaiAdEventData(adPosition, adMetadata, adIndex)
         adEventData.started = 1
         adStartedAtInMs = systemTimeService.elapsedRealtime()
@@ -158,6 +161,7 @@ class SsaiEngagementMetricsService(
         adEventData.adSystem = adMetadata?.adSystem
         adEventData.adPosition = adPosition?.position
         adEventData.adIndex = adIndex
+        adEventData.adPodPosition = this.adPodPosition
         return adEventData
     }
 

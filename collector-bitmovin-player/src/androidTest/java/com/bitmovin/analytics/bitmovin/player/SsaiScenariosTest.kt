@@ -249,6 +249,7 @@ class SsaiScenariosTest {
             assertThat(adSample.completed).isEqualTo(1)
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
+            SsaiDataVerifier.verifySamplesHaveSameAdPodPosition(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(adEventDataList, "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(adEventDataList, "test-ad-id-1")
             SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(adEventDataList)
@@ -418,6 +419,7 @@ class SsaiScenariosTest {
             assertThat(firstAdSample.timeSinceAdStartedInMs).isBetween(3500, 5700)
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(listOf(firstAdSample), 0)
+            SsaiDataVerifier.verifySamplesHaveSameAdPodPosition(listOf(firstAdSample), 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(listOf(firstAdSample), "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(listOf(firstAdSample), "test-ad-id-1")
             SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(listOf(firstAdSample))
@@ -432,6 +434,7 @@ class SsaiScenariosTest {
             assertThat(secondAdSample.timeSinceAdStartedInMs).isBetween(1500, 3300)
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(listOf(secondAdSample), 1)
+            SsaiDataVerifier.verifySamplesHaveSameAdPodPosition(listOf(secondAdSample), 1)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(listOf(secondAdSample), "test-ad-system-2")
             SsaiDataVerifier.verifySamplesHaveSameAdId(listOf(secondAdSample), "test-ad-id-2")
             SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(listOf(secondAdSample))
@@ -611,6 +614,7 @@ class SsaiScenariosTest {
             assertThat(adSample.completed).isEqualTo(1)
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
+            SsaiDataVerifier.verifySamplesHaveSameAdPodPosition(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(adEventDataList)
         }
 
@@ -670,6 +674,7 @@ class SsaiScenariosTest {
             assertThat(adSample.midpointFailedBeaconUrl).isEqualTo("https://failed-beacon-url.com")
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
+            SsaiDataVerifier.verifySamplesHaveSameAdPodPosition(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(adEventDataList)
         }
 
@@ -1294,6 +1299,7 @@ class SsaiScenariosTest {
             assertThat(adSample.completed).isEqualTo(0)
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
+            SsaiDataVerifier.verifySamplesHaveSameAdPodPosition(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(adEventDataList, "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(adEventDataList, "test-ad-id-1")
             SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(adEventDataList)
@@ -1353,6 +1359,7 @@ class SsaiScenariosTest {
             assertThat(adSample.completed).isEqualTo(0)
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
+            SsaiDataVerifier.verifySamplesHaveSameAdPodPosition(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(adEventDataList, "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(adEventDataList, "test-ad-id-1")
             SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(adEventDataList)
@@ -1412,6 +1419,7 @@ class SsaiScenariosTest {
             assertThat(adSample.completed).isEqualTo(0)
 
             SsaiDataVerifier.verifySamplesHaveSameAdIndex(adEventDataList, 0)
+            SsaiDataVerifier.verifySamplesHaveSameAdPodPosition(adEventDataList, 0)
             SsaiDataVerifier.verifySamplesHaveSameAdSystem(adEventDataList, "test-ad-system-1")
             SsaiDataVerifier.verifySamplesHaveSameAdId(adEventDataList, "test-ad-id-1")
             SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(adEventDataList)

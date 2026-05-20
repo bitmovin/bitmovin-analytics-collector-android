@@ -55,7 +55,7 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `markAdStart should createSampleWithStartedFlag`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
         ssaiEngagementMetricsService.flushCurrentAdSample()
 
         val adEventDataSlot = slot<AdEventData>()
@@ -71,14 +71,15 @@ class SsaiEngagementMetricsServiceTest {
         assertThat(adEventData.adId).isEqualTo("testId")
         assertThat(adEventData.adSystem).isEqualTo("testAdSystem")
         assertThat(adEventData.adIndex).isEqualTo(0)
+        assertThat(adEventData.adPodPosition).isEqualTo(0)
         assertThat(adEventData.adPosition).isEqualTo("midroll")
     }
 
     @Test
     fun `markAdStart should flush out existing sample before creating new one`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 1)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 1, 1)
 
         verify(exactly = 1) { analytics.sendAdEventData(any()) }
     }
@@ -86,16 +87,16 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `markAdStart should be noop if adEngagementTracking is disabled`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsServiceDisabled.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsServiceDisabled.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
         verify(exactly = 0) { analytics.sendAdEventData(any()) }
     }
 
     @Test
     fun `markAdStart should create new AdId on every call`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 1)
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 2)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 1, 1)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 2, 2)
 
         ssaiEngagementMetricsService.flushCurrentAdSample()
 
@@ -225,7 +226,7 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `flushCurrentAdSample sends out existing sample and clears it afterwards`() {
-        ssaiEngagementMetricsService.markAdStart(null, null, 0)
+        ssaiEngagementMetricsService.markAdStart(null, null, 0, 0)
 
         // first call should send out sample
         ssaiEngagementMetricsService.flushCurrentAdSample()
@@ -244,7 +245,7 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `sendAdErrorSample should sendout existing sample with error data`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
         ssaiEngagementMetricsService.markQuartileFinished(SsaiAdPosition.MIDROLL, SsaiAdQuartile.FIRST, adMetadata, null, 0)
         ssaiEngagementMetricsService.sendAdErrorSample(
             SsaiAdPosition.MIDROLL,
@@ -281,7 +282,7 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `sendAdErrorSample should NOT sendout sample if ssaiEngagement is disabled`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsServiceDisabled.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsServiceDisabled.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
         ssaiEngagementMetricsServiceDisabled.sendAdErrorSample(
             SsaiAdPosition.MIDROLL,
             adMetadata,
@@ -297,7 +298,7 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `sendAdErrorSample is not send twice on one ad`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
         ssaiEngagementMetricsService.sendAdErrorSample(
             SsaiAdPosition.MIDROLL,
             adMetadata,
@@ -320,7 +321,7 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `sendAdErrorSample is called once per ad`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
         ssaiEngagementMetricsService.sendAdErrorSample(
             SsaiAdPosition.MIDROLL,
             adMetadata,
@@ -330,7 +331,7 @@ class SsaiEngagementMetricsServiceTest {
             ErrorSeverity.INFO,
         )
 
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 1)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 1, 1)
         ssaiEngagementMetricsService.sendAdErrorSample(
             SsaiAdPosition.MIDROLL,
             adMetadata,
@@ -345,7 +346,7 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `timeout for flushing is reset on ad started`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
 
         verify(exactly = 2) { handlerMock.removeCallbacksAndMessages(any()) }
         verify(exactly = 1) { handlerMock.postDelayed(any(), any()) }
@@ -354,7 +355,7 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `timeout for flushing is postponed on quartile call`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
 
         // we clear the mock to only test that calls happen due to the quartile call, and not the started call
         clearMocks(handlerMock)
@@ -368,7 +369,7 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `timeout for flushing is cleared on error`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
 
         // we clear the mock to only test that calls happen due to the error, and not the started call
         clearMocks(handlerMock)
@@ -388,7 +389,7 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `timeout for flushing is cleared on completed`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
 
         // we clear the mock to only test that calls happen due to the completed call, and not the started call
         clearMocks(handlerMock)
@@ -400,7 +401,7 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `timeout for flushing is cleared on flushOfCurrentSamples`() {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
-        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0)
+        ssaiEngagementMetricsService.markAdStart(SsaiAdPosition.MIDROLL, adMetadata, 0, 0)
 
         // we clear the mock to only test that calls happen due to the adBreakEnd call, and not the started call
         clearMocks(handlerMock)

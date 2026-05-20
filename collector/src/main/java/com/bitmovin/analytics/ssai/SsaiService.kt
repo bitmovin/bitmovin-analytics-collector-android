@@ -33,6 +33,7 @@ class SsaiService(
     // we start with -1, to be able to increment it before sending the first sample
     // this way the current adIndex is the one of the current playing ad
     private var adIndex: Int = INDEX_INITIAL_VALUE
+    private var adPodPosition: Int = 0
 
     override fun adBreakStart(adBreakMetadata: SsaiAdBreakMetadata?) {
         if (this.state != SsaiState.NOT_ACTIVE) {
@@ -41,6 +42,7 @@ class SsaiService(
 
         this.state = SsaiState.AD_BREAK_STARTED
         this.adBreakMetadata = adBreakMetadata
+        this.adPodPosition = 0
     }
 
     override fun adStart(adMetadata: SsaiAdMetadata?) {
@@ -56,7 +58,8 @@ class SsaiService(
         this.isFirstSampleOfAd = true
         this.adIndex++
         this.adMetadata = adMetadata
-        ssaiEngagementMetricsService.markAdStart(this.adBreakMetadata?.adPosition, adMetadata, this.adIndex)
+        ssaiEngagementMetricsService.markAdStart(this.adBreakMetadata?.adPosition, adMetadata, this.adIndex, this.adPodPosition)
+        this.adPodPosition++
     }
 
     override fun adBreakEnd() {
