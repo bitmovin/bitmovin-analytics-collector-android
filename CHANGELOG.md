@@ -10,10 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added proper cleanup of eventlisteners for theoplayer
 - Handle missing AD_CLICKED event for theoplayer version < 8.3 to avoid crashes
 
-
 ### Changed
-- Upgrade theoplayer to `11.0.0`,
-
+- Upgrade theoplayer to `11.2.0`,
 
 ## v3.26.1
 
