@@ -251,7 +251,6 @@ class BitmovinAdAnalytics(
         adEventData.adModuleVersion = playerAdapter?.playerContext?.playerVersion
 
         adEventData.manifestDownloadTime = getAndRemoveAdManifestDownloadTime(adBreak)
-        adEventData.playerStartupTime = 1
         adEventData.autoplay = playerAdapter?.playerContext?.isAutoplay()
         adEventData.setAdBreak(adBreak)
         adEventData.setAdSample(adSample)

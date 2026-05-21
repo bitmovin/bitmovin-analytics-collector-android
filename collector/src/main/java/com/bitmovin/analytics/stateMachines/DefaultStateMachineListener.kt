@@ -31,7 +31,6 @@ class DefaultStateMachineListener(
     override fun onStartup(
         stateMachine: PlayerStateMachine,
         videoStartupTime: Long,
-        playerStartupTime: Long,
     ) {
         BitmovinLog.d(TAG, String.format("onStartup %s", analytics.impressionId))
         val data = playerAdapter.createEventData()
@@ -41,6 +40,10 @@ class DefaultStateMachineListener(
         // Player specific data that the player adapter can provide.
         data.autoplay = playerAdapter.playerContext.isAutoplay()
         data.drmLoadTime = playerAdapter.drmDownloadTime
+
+        // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
+        // first startup sample, in case the collector supports multiple sources)
+        val playerStartupTime = 1L
         data.playerStartupTime = playerStartupTime
         data.videoStartupTime = videoStartupTime
         data.startupTime = videoStartupTime + playerStartupTime

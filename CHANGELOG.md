@@ -4,7 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
 ## Development
+
+### Deprecated
+
+- [internal] `EventData.playerStartupTime` and changed to be also nullable to keep hardcoded value `1` only for "the startup sample", otherwise null
+
+### Removed
+
+- [internal] `AdEventData.playerStartupTime` to not send any `playerStartupTime` inside of Ad Sample
 
 ### Fixed
 - Added proper cleanup of eventlisteners for theoplayer

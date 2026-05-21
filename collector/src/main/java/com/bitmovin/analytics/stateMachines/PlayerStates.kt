@@ -40,9 +40,8 @@ class PlayerStates {
                             machine.addStartupTime(1)
                         }
 
-                        val playerStartupTime = machine.getAndResetPlayerStartupTime()
                         machine.listeners.notify {
-                            it.onStartup(machine, machine.startupTime, playerStartupTime)
+                            it.onStartup(machine, machine.startupTime)
                         }
                         machine.isStartupFinished = true
                     }
