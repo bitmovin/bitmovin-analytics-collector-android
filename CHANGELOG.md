@@ -4,26 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
-
 ## Development
-
-### Added
-- adPodPosition tracking for SSAI ads
-
-### Deprecated
-
-- [internal] `EventData.playerStartupTime` and changed to be also nullable to keep hardcoded value `1` only for "the startup sample", otherwise null
-
-### Removed
-
-- [internal] `AdEventData.playerStartupTime` to not send any `playerStartupTime` inside of Ad Sample
 
 ### Fixed
 - Added proper cleanup of eventlisteners for theoplayer
 - Handle missing AD_CLICKED event for theoplayer version < 8.3 to avoid crashes
 
 ### Changed
-- Upgrade theoplayer to `11.0.0`,
+- Upgrade theoplayer to `11.2.0`,
 
 ## v3.26.1
 
