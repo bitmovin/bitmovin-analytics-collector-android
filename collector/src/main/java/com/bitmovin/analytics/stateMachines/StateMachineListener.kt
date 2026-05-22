@@ -7,7 +7,6 @@ interface StateMachineListener {
     fun onStartup(
         stateMachine: PlayerStateMachine,
         videoStartupTime: Long,
-        playerStartupTime: Long,
     )
 
     fun onPauseExit(

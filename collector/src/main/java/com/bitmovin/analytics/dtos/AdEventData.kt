@@ -200,7 +200,6 @@ data class AdEventData(
     var videoTitle: String? = null,
     var videoWindowHeight: Int,
     var videoWindowWidth: Int,
-    var playerStartupTime: Long? = null,
     var analyticsVersion: String? = null,
     var autoplay: Boolean? = null,
     var platform: String,

@@ -265,8 +265,6 @@ class PlayerStateMachine(
         startupTime += elapsedTime
     }
 
-    fun getAndResetPlayerStartupTime() = analytics.getAndResetPlayerStartupTime()
-
     fun error(
         videoTime: Long,
         errorCode: ErrorCode,

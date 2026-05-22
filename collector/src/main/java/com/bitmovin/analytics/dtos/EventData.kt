@@ -58,7 +58,13 @@ data class EventData(
     var errorMessage: String? = null,
     var errorData: String? = null,
     var errorSeverity: ErrorSeverity? = null,
-    var playerStartupTime: Long = 0,
+    /**
+     * A time in milliseconds, how long did it take to start up the player.
+     *
+     * Deprecated with https://bitmovin.atlassian.net/browse/AN-5322
+     */
+    @Deprecated("Should be set to 1 only for the startup sample")
+    var playerStartupTime: Long? = null,
     var pageLoadType: Int = 1,
     var pageLoadTime: Int = 0,
     var version: String? = null,
@@ -192,8 +198,7 @@ data class EventData(
     // with a specific header when sending, which allows header
     // specific routing on load balancer side
     // we mark it as transient since we don't want to serialize this field
-    @Transient
-    var ssaiRelatedSample: Boolean = false,
+    @Transient var ssaiRelatedSample: Boolean = false,
 ) {
     constructor(
         deviceInfo: DeviceInformation,

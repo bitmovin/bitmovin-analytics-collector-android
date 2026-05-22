@@ -44,20 +44,10 @@ class BitmovinAnalytics(
 
     private val cacheService = CacheService()
 
-    // Setting a playerStartupTime of 1 to workaround dashboard issue (only for the
-    // first startup sample, in case the collector supports multiple sources)
-    private var playerStartupTime = 1L
-
     private var playerAdapter: PlayerAdapter? = null
 
     fun isAttachedToPlayer(): Boolean {
         return playerAdapter != null
-    }
-
-    fun getAndResetPlayerStartupTime(): Long {
-        val playerStartupTime = playerStartupTime
-        this.playerStartupTime = 0
-        return playerStartupTime
     }
 
     /**
