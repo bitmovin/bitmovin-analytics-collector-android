@@ -41,6 +41,7 @@ class SsaiService(
 
         this.state = SsaiState.AD_BREAK_STARTED
         this.adBreakMetadata = adBreakMetadata
+        this.ssaiEngagementMetricsService.adBreakStart()
     }
 
     override fun adStart(adMetadata: SsaiAdMetadata?) {

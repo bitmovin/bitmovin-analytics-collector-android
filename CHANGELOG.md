@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+- adPodPosition tracking for SSAI ads
+
 ### Deprecated
 
 - [internal] `EventData.playerStartupTime` and changed to be also nullable to keep hardcoded value `1` only for "the startup sample", otherwise null

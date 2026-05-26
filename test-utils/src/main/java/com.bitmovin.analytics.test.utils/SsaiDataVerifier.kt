@@ -18,6 +18,17 @@ object SsaiDataVerifier {
         }
     }
 
+    fun verifySamplesHaveSameAdPodPosition(
+        adEventDataList: List<AdEventDataForTest>,
+        adPodPosition: Int,
+    ) {
+        adEventDataList.forEach {
+            if (it.adPodPosition != adPodPosition) {
+                throw AssertionError("AdPodPosition is not correct. Expected: $adPodPosition, but was: ${it.adPodPosition}")
+            }
+        }
+    }
+
     fun verifyCustomData(
         adEventData: List<AdEventDataForTest>,
         expectedCustomData: CustomData,
