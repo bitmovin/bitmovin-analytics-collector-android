@@ -28,10 +28,10 @@ class SsaiEngagementMetricsService(
     private var errorSentForCurrentAd = false
     private var activeAdSample: AdEventData? = null
     private var adStartedAtInMs: Long = 0
-    private var adPodPosition: Int = 0
+    private var adPodPosition: Int = AD_POD_POSITION_INITIAL_VALUE
 
     fun adBreakStart() {
-        this.adPodPosition = 0
+        this.adPodPosition = AD_POD_POSITION_INITIAL_VALUE
     }
 
     @Synchronized
@@ -47,11 +47,11 @@ class SsaiEngagementMetricsService(
         flushCurrentAdSample()
         resetStateOnNewAd()
         adImpressionId = Util.uUID
+        this.adPodPosition++
         val adEventData = createBasicSsaiAdEventData(adPosition, adMetadata, adIndex)
         adEventData.started = 1
         adStartedAtInMs = systemTimeService.elapsedRealtime()
         activeAdSample = adEventData
-        this.adPodPosition++
         enableOrPostponeFlushTimeout()
     }
 
@@ -282,5 +282,6 @@ class SsaiEngagementMetricsService(
 
     companion object {
         private const val FLUSH_TIMEOUT_MS = 60000L
+        private const val AD_POD_POSITION_INITIAL_VALUE = -1
     }
 }
