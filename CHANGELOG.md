@@ -7,8 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
-### Added
-- adPodPosition tracking for SSAI ads
+## v3.27.0
 
 ### Deprecated
 
@@ -27,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Tracking of ad break abandonment for ssai
+- adPodPosition tracking for SSAI ads
 
 ## v3.26.1
 
