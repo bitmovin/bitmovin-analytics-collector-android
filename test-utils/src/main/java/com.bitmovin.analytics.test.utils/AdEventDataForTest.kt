@@ -216,6 +216,14 @@ data class AdEventDataForTest(
     var quartile3FailedBeaconUrl: String? = null,
     var completedFailedBeaconUrl: String? = null,
     var timeSinceAdStartedInMs: Long? = null,
+    var isSlate: Boolean = false,
+    var expectedPaidAds: Int? = null,
+    var expectedSlates: Int? = null,
+    var completedPaidAds: Int? = null,
+    var completedSlates: Int? = null,
+    // Flags the last ad sample sent out in an ad break; combined with completion counters
+    // this is used to detect ad break abandonment on the backend.
+    var exitedAdBreak: Boolean? = null,
     var pageLoadType: Int,
     var hasSsaiRoutingParamSet: Boolean = false,
 ) {
@@ -420,6 +428,10 @@ data class AdEventDataForTest(
             autoplay = autoplay,
             audioBitrate = audioBitrate,
             timeSinceAdStartedInMs = timeSinceAdStartedInMs,
+            expectedPaidAds = expectedPaidAds,
+            expectedSlates = expectedSlates,
+            exitedAdBreak = exitedAdBreak,
+            isSlate = isSlate,
             pageLoadType = pageLoadType,
         )
     }

@@ -214,6 +214,14 @@ data class AdEventData(
     var quartile3FailedBeaconUrl: String? = null,
     var completedFailedBeaconUrl: String? = null,
     var timeSinceAdStartedInMs: Long? = null,
+    var isSlate: Boolean = false,
+    var expectedPaidAds: Int? = null,
+    var expectedSlates: Int? = null,
+    var completedPaidAds: Int? = null,
+    var completedSlates: Int? = null,
+    // Flags the last ad sample sent out in an ad break; combined with completion counters
+    // this is used to detect ad break abandonment on the backend.
+    var exitedAdBreak: Boolean? = null,
     // This is hardcoded to 1 (FOREGROUND), since we need to mimic the behavior of web
     // and there is no background mode in android that we specifically track
     val pageLoadType: Int = 1,

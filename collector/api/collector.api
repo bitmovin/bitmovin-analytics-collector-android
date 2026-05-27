@@ -826,30 +826,60 @@ public final class com/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata {
 	public fun <init> ()V
 	public fun <init> (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;)V
 	public synthetic fun <init> (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;Ljava/lang/Integer;Ljava/lang/Integer;)V
+	public synthetic fun <init> (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;Ljava/lang/Integer;Ljava/lang/Integer;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
-	public final fun copy (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;)Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;
-	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;
+	public final fun component2 ()Ljava/lang/Integer;
+	public final fun component3 ()Ljava/lang/Integer;
+	public final fun copy (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;Ljava/lang/Integer;Ljava/lang/Integer;)Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;Ljava/lang/Integer;Ljava/lang/Integer;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAdPosition ()Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
+	public final fun getExpectedPaidAds ()Ljava/lang/Integer;
+	public final fun getExpectedSlates ()Ljava/lang/Integer;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;
+	public final fun setAdPosition (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;)Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata$Builder;
+	public final fun setExpectedPaidAds (Ljava/lang/Integer;)Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata$Builder;
+	public final fun setExpectedSlates (Ljava/lang/Integer;)Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata$Builder;
 }
 
 public final class com/bitmovin/analytics/api/ssai/SsaiAdMetadata {
 	public fun <init> ()V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;)V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ZLjava/time/Duration;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ZLjava/time/Duration;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Lcom/bitmovin/analytics/api/CustomData;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;
-	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;
+	public final fun component4 ()Z
+	public final fun component5 ()Ljava/time/Duration;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ZLjava/time/Duration;)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;
+	public static synthetic fun copy$default (Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ZLjava/time/Duration;ILjava/lang/Object;)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAdId ()Ljava/lang/String;
 	public final fun getAdSystem ()Ljava/lang/String;
 	public final fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
+	public final fun getDuration ()Ljava/time/Duration;
 	public fun hashCode ()I
+	public final fun isSlate ()Z
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/api/ssai/SsaiAdMetadata$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;
+	public final fun setAdId (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata$Builder;
+	public final fun setAdSystem (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata$Builder;
+	public final fun setCustomData (Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata$Builder;
+	public final fun setDuration (Ljava/time/Duration;)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata$Builder;
+	public final fun setIsSlate (Z)Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata$Builder;
 }
 
 public final class com/bitmovin/analytics/api/ssai/SsaiAdPosition : java/lang/Enum {

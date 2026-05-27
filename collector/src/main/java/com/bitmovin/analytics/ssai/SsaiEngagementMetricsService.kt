@@ -5,15 +5,18 @@ import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.error.ErrorSeverity
+import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
-import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartileMetadata
 import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.internal.InternalBitmovinApi
+import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.SystemTimeService
 import com.bitmovin.analytics.utils.Util
+import kotlin.time.DurationUnit
+import kotlin.time.toKotlinDuration
 
 @InternalBitmovinApi
 class SsaiEngagementMetricsService(
@@ -34,9 +37,13 @@ class SsaiEngagementMetricsService(
         this.adPodPosition = AD_POD_POSITION_INITIAL_VALUE
     }
 
+    private var completedPaidAds: Int = 0
+    private var completedSlates: Int = 0
+    private var currentAdIsSlate: Boolean = false
+
     @Synchronized
     fun markAdStart(
-        adPosition: SsaiAdPosition?,
+        adBreakMetadata: SsaiAdBreakMetadata?,
         adMetadata: SsaiAdMetadata?,
         adIndex: Int,
     ) {
@@ -46,9 +53,10 @@ class SsaiEngagementMetricsService(
 
         flushCurrentAdSample()
         resetStateOnNewAd()
+        currentAdIsSlate = adMetadata?.isSlate ?: false
         adImpressionId = Util.uUID
         this.adPodPosition++
-        val adEventData = createBasicSsaiAdEventData(adPosition, adMetadata, adIndex)
+        val adEventData = createBasicSsaiAdEventData(adBreakMetadata, adMetadata, adIndex)
         adEventData.started = 1
         adStartedAtInMs = systemTimeService.elapsedRealtime()
         activeAdSample = adEventData
@@ -57,7 +65,7 @@ class SsaiEngagementMetricsService(
 
     @Synchronized
     fun markQuartileFinished(
-        adPosition: SsaiAdPosition?,
+        adBreakMetadata: SsaiAdBreakMetadata?,
         quartile: SsaiAdQuartile,
         adMetadata: SsaiAdMetadata?,
         adQuartileMetadata: SsaiAdQuartileMetadata?,
@@ -70,22 +78,21 @@ class SsaiEngagementMetricsService(
         // we make sure that each quartile is sent at most once per ad id,
         // to avoid duplicates in the metrics
         if (quartilesFinishedWithCurrentAd.add(quartile)) {
-            createAndUpsertQuartileSample(adPosition, quartile, adMetadata, adQuartileMetadata, adIndex)
-
-            // we only send the sample out if the ad is completed
-            // partially watched ads are sent through
-            // pausing of the app, starting a new ad, or ad break end
             if (quartile == SsaiAdQuartile.COMPLETED) {
-                flushCurrentAdSample()
-            } else {
-                enableOrPostponeFlushTimeout()
+                incrementCompletedCountForCurrentAd()
             }
+
+            createAndUpsertQuartileSample(adBreakMetadata, quartile, adMetadata, adQuartileMetadata, adIndex)
+            // We intentionally do not flush on COMPLETED here: we can't tell yet whether
+            // this is the last sample of the ad break. The sample is flushed via the next
+            // ad start, ad break end, error, or the flush timeout.
+            enableOrPostponeFlushTimeout()
         }
     }
 
     @Synchronized
     fun sendAdErrorSample(
-        adPosition: SsaiAdPosition?,
+        adBreakMetadata: SsaiAdBreakMetadata?,
         adMetadata: SsaiAdMetadata?,
         adIndex: Int,
         errorCode: Int,
@@ -101,26 +108,39 @@ class SsaiEngagementMetricsService(
             return
         }
         errorSentForCurrentAd = true
-        val adEventData = createBasicSsaiAdEventData(adPosition, adMetadata, adIndex)
+        val adEventData = createBasicSsaiAdEventData(adBreakMetadata, adMetadata, adIndex)
         adEventData.errorMessage = errorMessage
         adEventData.errorCode = errorCode
         adEventData.errorSeverity = errorSeverity
         upsertAdSample(adEventData)
-        flushCurrentAdSample()
+        flushCurrentAdSample(isLastSampleOfAdBreak = false)
     }
 
     @Synchronized
-    fun flushCurrentAdSample() {
+    fun flushCurrentAdSample(isLastSampleOfAdBreak: Boolean = false) {
         if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
             return
         }
 
-        sendAndClearAdSample()
+        sendAndClearAdSample(isLastSampleOfAdBreak)
     }
 
-    private fun sendAndClearAdSample() {
+    @Synchronized
+    fun resetAdBreakState() {
+        completedPaidAds = 0
+        completedSlates = 0
+        currentAdIsSlate = false
+    }
+
+    private fun sendAndClearAdSample(isLastSampleOfAdBreak: Boolean) {
         activeAdSample?.let {
             it.timeSinceAdStartedInMs = systemTimeService.elapsedRealtime() - adStartedAtInMs
+            it.exitedAdBreak = isLastSampleOfAdBreak
+            // Refresh the videoImpressionId at flush time so the sample is grouped with the
+            // current impression. The sample was created at adStart and the impressionId may
+            // have changed since (e.g. a player-driven source change reset the state machine);
+            // without this, the ad sample would end up orphaned in a stale impression.
+            it.videoImpressionId = analytics.impressionId
             analytics.sendAdEventData(it)
         }
         activeAdSample = null
@@ -128,13 +148,13 @@ class SsaiEngagementMetricsService(
     }
 
     private fun createAndUpsertQuartileSample(
-        adPosition: SsaiAdPosition?,
+        adBreakMetadata: SsaiAdBreakMetadata?,
         adQuartile: SsaiAdQuartile,
         adMetadata: SsaiAdMetadata?,
         adQuartileMetadata: SsaiAdQuartileMetadata?,
         adIndex: Int,
     ) {
-        val adEventData = createBasicSsaiAdEventData(adPosition, adMetadata, adIndex)
+        val adEventData = createBasicSsaiAdEventData(adBreakMetadata, adMetadata, adIndex)
         if (adQuartile == SsaiAdQuartile.FIRST) {
             adEventData.quartile1 = 1
             adEventData.quartile1FailedBeaconUrl = adQuartileMetadata?.failedBeaconUrl
@@ -147,13 +167,15 @@ class SsaiEngagementMetricsService(
         } else if (adQuartile == SsaiAdQuartile.COMPLETED) {
             adEventData.completed = 1
             adEventData.completedFailedBeaconUrl = adQuartileMetadata?.failedBeaconUrl
+
+            updateCompletedAdsInfo(adEventData, adBreakMetadata)
         }
 
         upsertAdSample(adEventData)
     }
 
     private fun createBasicSsaiAdEventData(
-        adPosition: SsaiAdPosition?,
+        adBreakMetadata: SsaiAdBreakMetadata?,
         adMetadata: SsaiAdMetadata?,
         adIndex: Int,
     ): AdEventData {
@@ -162,10 +184,35 @@ class SsaiEngagementMetricsService(
         adEventData.adImpressionId = getOrCreateAdImpressionId()
         adEventData.adId = adMetadata?.adId
         adEventData.adSystem = adMetadata?.adSystem
-        adEventData.adPosition = adPosition?.position
+        adEventData.adPosition = adBreakMetadata?.adPosition?.position
         adEventData.adIndex = adIndex
         adEventData.adPodPosition = this.adPodPosition
+        adEventData.isSlate = adMetadata?.isSlate ?: false
+        adEventData.adDuration = adMetadata?.duration?.toKotlinDuration()?.toLong(DurationUnit.MILLISECONDS)
+        adEventData.expectedPaidAds = limitToPositiveValues(adBreakMetadata?.expectedPaidAds, "expectedPaidAds")
+        adEventData.expectedSlates = limitToPositiveValues(adBreakMetadata?.expectedSlates, "expectedSlates")
+
+        updateCompletedAdsInfo(adEventData, adBreakMetadata)
         return adEventData
+    }
+
+    private fun incrementCompletedCountForCurrentAd() {
+        if (currentAdIsSlate) {
+            completedSlates += 1
+        } else {
+            completedPaidAds += 1
+        }
+    }
+
+    private fun updateCompletedAdsInfo(
+        adEventData: AdEventData,
+        adBreakMetadata: SsaiAdBreakMetadata?,
+    ) {
+        // Completion counts are only meaningful when the surrounding break declared expected values
+        adEventData.completedPaidAds =
+            if (adBreakMetadata?.expectedPaidAds != null) completedPaidAds else null
+        adEventData.completedSlates =
+            if (adBreakMetadata?.expectedSlates != null) completedSlates else null
     }
 
     private fun upsertAdSample(newAdSample: AdEventData) {
@@ -180,6 +227,7 @@ class SsaiEngagementMetricsService(
         } else {
             mergeQuartileInfo(localAdSample, newAdSample)
             mergeErrorInfo(localAdSample, newAdSample)
+            mergeBreakCompletionInfo(localAdSample, newAdSample)
             this.activeAdSample = localAdSample
         }
     }
@@ -256,8 +304,34 @@ class SsaiEngagementMetricsService(
         }
     }
 
+    // The counters live on the service and are recomputed for every new sample;
+    // copy them over so the most recent (and highest) value wins after a merge.
+    private fun mergeBreakCompletionInfo(
+        adSample1: AdEventData,
+        adSample2: AdEventData,
+    ) {
+        adSample1.completedPaidAds = adSample2.completedPaidAds ?: adSample1.completedPaidAds
+        adSample1.completedSlates = adSample2.completedSlates ?: adSample1.completedSlates
+    }
+
     private fun getOrCreateAdImpressionId(): String {
         return adImpressionId ?: Util.uUID
+    }
+
+    private fun limitToPositiveValues(
+        number: Int?,
+        fieldName: String,
+    ): Int? {
+        if (number == null) {
+            return null
+        }
+
+        if (number < 0) {
+            BitmovinLog.w(TAG, "$fieldName must not be negative, but was $number. Clamping it to 0.")
+            return 0
+        }
+
+        return number
     }
 
     private fun resetStateOnNewAd() {
@@ -281,6 +355,7 @@ class SsaiEngagementMetricsService(
     }
 
     companion object {
+        private const val TAG = "SsaiEngagementMetrics"
         private const val FLUSH_TIMEOUT_MS = 60000L
         private const val AD_POD_POSITION_INITIAL_VALUE = -1
     }

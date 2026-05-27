@@ -83,7 +83,7 @@ class BitmovinAnalytics(
         }
 
         if (shouldSendOutSamples) {
-            playerAdapter?.ssaiService?.flushCurrentAdSample()
+            playerAdapter?.ssaiService?.flushCurrentAdSample(true)
             adAnalytics?.flushCurrentAdSampleOnDetach()
             playerAdapter?.triggerSampleOnDetach()
         }

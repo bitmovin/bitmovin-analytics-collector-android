@@ -7,9 +7,11 @@ import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
+import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.test.utils.DataVerifier
 import com.bitmovin.analytics.test.utils.MetadataUtils
 import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.SsaiDataVerifier
 import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.test.utils.TestSources
 import com.bitmovin.analytics.test.utils.runBlockingTest
@@ -687,5 +689,262 @@ class SsaiScenariosTest {
             assertThat(samplesAfterFirstAd.size).isGreaterThanOrEqualTo(2)
             DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterFirstAd)
             DataVerifier.verifyCustomData(samplesAfterFirstAd, defaultSourceMetadata.customData)
+        }
+
+    @Test
+    fun test_adEngagementMetrics_track_adbreakabandonment_metadata_when_adbreak_completes() =
+        runBlockingTest {
+            // arrange
+            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+            collector.sourceMetadata = defaultSourceMetadata
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                collector.attachPlayer(player)
+                player.source = defaultSourceDescription
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL, expectedPaidAds = 2, expectedSlates = 1),
+                )
+
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                )
+                player.play()
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 200)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 400)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 600)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 800)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData2 = "ad-test-custom-data-2")),
+                )
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1200)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1400)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1600)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
+                collector.ssai.adStart(
+                    SsaiAdMetadata(
+                        "test-ad-id-3-slate",
+                        "test-ad-system-3",
+                        CustomData(customData2 = "ad-test-custom-data-3"),
+                        isSlate = true,
+                    ),
+                )
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1800)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2200)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2400)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
+                collector.ssai.adBreakEnd()
+                player.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
+
+            val adEventDataList = impression.adEventDataList
+            assertThat(adEventDataList).hasSize(3)
+
+            val firstAdSample = adEventDataList[0]
+            assertThat(firstAdSample.started).isEqualTo(1)
+            assertThat(firstAdSample.quartile1).isEqualTo(1)
+            assertThat(firstAdSample.midpoint).isEqualTo(1)
+            assertThat(firstAdSample.quartile3).isEqualTo(1)
+            assertThat(firstAdSample.completed).isEqualTo(1)
+            assertThat(firstAdSample.exitedAdBreak).isFalse
+            assertThat(firstAdSample.expectedPaidAds).isEqualTo(2)
+            assertThat(firstAdSample.completedPaidAds).isEqualTo(1)
+            assertThat(firstAdSample.expectedSlates).isEqualTo(1)
+            assertThat(firstAdSample.completedSlates).isEqualTo(0)
+
+            val secondAdSample = adEventDataList[1]
+            assertThat(secondAdSample.started).isEqualTo(1)
+            assertThat(secondAdSample.quartile1).isEqualTo(1)
+            assertThat(secondAdSample.midpoint).isEqualTo(1)
+            assertThat(secondAdSample.quartile3).isEqualTo(1)
+            assertThat(secondAdSample.completed).isEqualTo(1)
+            assertThat(secondAdSample.exitedAdBreak).isFalse
+            assertThat(secondAdSample.expectedPaidAds).isEqualTo(2)
+            assertThat(secondAdSample.completedPaidAds).isEqualTo(2)
+            assertThat(secondAdSample.expectedSlates).isEqualTo(1)
+            assertThat(secondAdSample.completedSlates).isEqualTo(0)
+
+            val thirdAdSample = adEventDataList[2]
+            assertThat(thirdAdSample.started).isEqualTo(1)
+            assertThat(thirdAdSample.quartile1).isEqualTo(1)
+            assertThat(thirdAdSample.midpoint).isEqualTo(1)
+            assertThat(thirdAdSample.quartile3).isEqualTo(1)
+            assertThat(thirdAdSample.completed).isEqualTo(1)
+            assertThat(thirdAdSample.isSlate).isTrue
+            assertThat(thirdAdSample.exitedAdBreak).isTrue
+            assertThat(thirdAdSample.expectedPaidAds).isEqualTo(2)
+            assertThat(thirdAdSample.completedPaidAds).isEqualTo(2)
+            assertThat(thirdAdSample.expectedSlates).isEqualTo(1)
+            assertThat(thirdAdSample.completedSlates).isEqualTo(1)
+
+            assertThat(firstAdSample.adImpressionId).isNotEqualTo(secondAdSample.adImpressionId)
+            assertThat(firstAdSample.videoImpressionId).isEqualTo(secondAdSample.videoImpressionId)
+        }
+
+    @Test
+    fun test_adEngagementMetrics_sends_adabandonment_metadata_on_player_destroy() =
+        runBlockingTest {
+            // arrange
+            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+            collector.sourceMetadata = defaultSourceMetadata
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                collector.attachPlayer(player)
+                player.source = defaultSourceDescription
+                collector.ssai.adBreakStart(
+                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL, expectedPaidAds = 3, expectedSlates = 3),
+                )
+
+                collector.ssai.adStart(
+                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
+                )
+                player.play()
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 200)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 400)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 600)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 800)
+
+            withContext(mainScope.coroutineContext) {
+                collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
+                collector.ssai.adStart(
+                    adMetadata = SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData1 = "ad-test-custom-data-2")),
+                )
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1200)
+
+            withContext(mainScope.coroutineContext) {
+                theoPlayerView.onDestroy()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
+
+            val adEventDataList = impression.adEventDataList
+            assertThat(adEventDataList).hasSize(2)
+
+            val firstAdSample = adEventDataList[0]
+            assertThat(firstAdSample.started).isEqualTo(1)
+            assertThat(firstAdSample.quartile1).isEqualTo(1)
+            assertThat(firstAdSample.midpoint).isEqualTo(1)
+            assertThat(firstAdSample.quartile3).isEqualTo(1)
+            assertThat(firstAdSample.completed).isEqualTo(1)
+            assertThat(firstAdSample.exitedAdBreak).isFalse
+            assertThat(firstAdSample.expectedPaidAds).isEqualTo(3)
+            assertThat(firstAdSample.expectedSlates).isEqualTo(3)
+            assertThat(firstAdSample.completedPaidAds).isEqualTo(1)
+            assertThat(firstAdSample.completedSlates).isEqualTo(0)
+
+            val secondAdSample = adEventDataList[1]
+            assertThat(secondAdSample.started).isEqualTo(1)
+            assertThat(secondAdSample.quartile1).isEqualTo(0)
+            assertThat(secondAdSample.midpoint).isEqualTo(0)
+            assertThat(secondAdSample.quartile3).isEqualTo(0)
+            assertThat(secondAdSample.completed).isEqualTo(0)
+            assertThat(secondAdSample.exitedAdBreak).isTrue
+            assertThat(secondAdSample.expectedPaidAds).isEqualTo(3)
+            assertThat(secondAdSample.expectedSlates).isEqualTo(3)
+            assertThat(secondAdSample.completedPaidAds).isEqualTo(1)
+            assertThat(secondAdSample.completedSlates).isEqualTo(0)
         }
 }

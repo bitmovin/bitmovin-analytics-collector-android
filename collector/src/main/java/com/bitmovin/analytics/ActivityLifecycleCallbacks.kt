@@ -17,7 +17,7 @@ import com.bitmovin.analytics.ssai.SsaiService
  */
 internal class ActivityLifecycleCallbacks(private val ssaiService: SsaiService) : Application.ActivityLifecycleCallbacks {
     override fun onActivityPaused(activity: Activity) {
-        ssaiService.flushCurrentAdSample()
+        ssaiService.flushCurrentAdSample(false)
     }
 
     override fun onActivityCreated(

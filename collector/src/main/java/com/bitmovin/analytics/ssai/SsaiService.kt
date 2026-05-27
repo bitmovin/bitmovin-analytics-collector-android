@@ -57,7 +57,7 @@ class SsaiService(
         this.isFirstSampleOfAd = true
         this.adIndex++
         this.adMetadata = adMetadata
-        ssaiEngagementMetricsService.markAdStart(this.adBreakMetadata?.adPosition, adMetadata, this.adIndex)
+        ssaiEngagementMetricsService.markAdStart(this.adBreakMetadata, adMetadata, this.adIndex)
     }
 
     override fun adBreakEnd() {
@@ -65,7 +65,7 @@ class SsaiService(
             return
         }
 
-        this.ssaiEngagementMetricsService.flushCurrentAdSample()
+        this.ssaiEngagementMetricsService.flushCurrentAdSample(isLastSampleOfAdBreak = true)
 
         if (this.state == SsaiState.AD_RUNNING) {
             stateMachine.triggerSampleIfPlaying(SampleTriggerReason.SSAI)
@@ -82,7 +82,7 @@ class SsaiService(
         }
 
         ssaiEngagementMetricsService.markQuartileFinished(
-            this.adBreakMetadata?.adPosition,
+            this.adBreakMetadata,
             adQuartile,
             adMetadata,
             adQuartileMetadata,
@@ -90,8 +90,8 @@ class SsaiService(
         )
     }
 
-    fun flushCurrentAdSample() {
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+    fun flushCurrentAdSample(isLastAdBreakSample: Boolean) {
+        ssaiEngagementMetricsService.flushCurrentAdSample(isLastAdBreakSample)
     }
 
     fun sendAdErrorSample(errorCode: ErrorCode) {
@@ -100,7 +100,7 @@ class SsaiService(
         }
 
         ssaiEngagementMetricsService.sendAdErrorSample(
-            this.adBreakMetadata?.adPosition,
+            this.adBreakMetadata,
             adMetadata,
             adIndex,
             errorCode.errorCode,
@@ -119,6 +119,7 @@ class SsaiService(
         this.adBreakMetadata = null
         this.isFirstSampleOfAd = false
         this.state = SsaiState.NOT_ACTIVE
+        this.ssaiEngagementMetricsService.resetAdBreakState()
     }
 
     override fun manipulate(data: EventData) {

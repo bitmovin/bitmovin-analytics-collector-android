@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Upgrade theoplayer to `11.2.0`,
 
+### Added
+- Tracking of ad break abandonment for ssai
+
 ## v3.26.1
 
 ### Fixed
