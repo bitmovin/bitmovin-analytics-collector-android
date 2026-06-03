@@ -11,7 +11,6 @@ android {
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
     }
 
     compileOptions {
@@ -21,6 +20,12 @@ android {
 
     kotlinOptions {
         jvmTarget = rootProject.ext.jvmTarget
+    }
+    lint {
+        targetSdk rootProject.ext.targetSdkVersion
+    }
+    testOptions {
+        targetSdk rootProject.ext.targetSdkVersion
     }
 }
 

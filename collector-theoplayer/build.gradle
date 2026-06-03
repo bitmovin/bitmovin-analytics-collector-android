@@ -6,6 +6,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply from: '../jacoco.gradle'
 apply from: '../bitmovinpropertiesloader.gradle'
+apply from: '../managed-devices.gradle'
 
 kotlin {
     explicitApi()
@@ -18,7 +19,6 @@ android {
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -38,7 +38,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
             enableUnitTestCoverage true
@@ -47,30 +47,12 @@ android {
     }
 
     testOptions {
-        // https://developer.android.com/studio/test/gradle-managed-devices
-        managedDevices {
-            devices {
-                pixel6api35 (com.android.build.api.dsl.ManagedVirtualDevice) {
-                    // Use device profiles you typically see in Android Studio.
-                    device = "Pixel 6"
-                    // Use only API levels 27 and higher.
-                    apiLevel = 34
-                    // google is used since atd and aosp don't support widevine anymore
-                    systemImageSource = "google"
-                }
-                pixel6api30 (com.android.build.api.dsl.ManagedVirtualDevice) {
-                    // Use device profiles you typically see in Android Studio.
-                    device = "Pixel 6"
-                    // Use only API levels 27 and higher.
-                    apiLevel = 30
-                    systemImageSource = "aosp-atd"
-                }
-            }
-        }
         unitTests.returnDefaultValues = true
+        // targetSdk is provided by managed-devices.gradle (rootProject.ext.targetSdkVersion)
     }
     lint {
         abortOnError true
+        targetSdk rootProject.ext.targetSdkVersion
     }
 
     // we need to exclude the MANIFEST.MF file under META-INF/versions/9/OSGI-INF
@@ -162,8 +144,6 @@ artifactory {
             repoKey = rootProject.ext.version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
             username = bitmovinProperties.getProperty('artifactoryUser') // The publisher user name
             password = bitmovinProperties.getProperty('artifactoryPassword') // The publisher password
-
-            maven = true
         }
         defaults {
             // Tell the Artifactory Plugin which artifacts should be published to Artifactory.

@@ -1,0 +1,26 @@
+// gradle/managed-devices.gradle
+android {
+    testOptions {
+        // Needed to run system tests on Android 14+ devices.
+        targetSdk = rootProject.ext.targetSdkVersion
+        managedDevices {
+            localDevices {
+                pixel6api36 {
+                    // Use device profiles you typically see in Android Studio.
+                    device = "Pixel 6"
+                    // Use only API levels 27 and higher.
+                    apiLevel = 36
+                    // google is used since atd and aosp don't support widevine anymore
+                    systemImageSource = "google"
+                }
+                pixel6api30 {
+                    // Use device profiles you typically see in Android Studio.
+                    device = "Pixel 6"
+                    // Use only API levels 27 and higher.
+                    apiLevel = 30
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
+    }
+}

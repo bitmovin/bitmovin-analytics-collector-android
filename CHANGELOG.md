@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Changed
+- [Internal] Upgraded agp to `9.2.1`
+- [Internal] Upgrade sonar plugin to `7.3.0.8198`
+
 ## v3.27.0
 
 ### Deprecated

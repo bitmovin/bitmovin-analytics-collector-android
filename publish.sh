@@ -83,9 +83,9 @@ echo "  - com.bitmovin.analytics:collector-theoplayer:$VERSION (:collector-theop
 echo "\nAre all tokens, artifacts and versions correct ?"
 read -p "(Press enter to continue)"
 
-echo "\nGit Checkout and pull 'main' branch..."
-git checkout main
-git pull
+#echo "\nGit Checkout and pull 'main' branch..."
+#git checkout main
+#git pull
 
 echo "\nCheck correct code style..."
 if ! ./gradlew spotlessCheck --daemon; then

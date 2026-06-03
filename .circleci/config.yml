@@ -15,7 +15,7 @@ jobs:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "collector/build.gradle" }}-{{ checksum  "collector-bitmovin-player/build.gradle" }}
       - run:
           name: Download Dependencies
-          command: ./gradlew androidDependencies --no-daemon --max-workers=2 #https://support.circleci.com/hc/en-us/articles/360021812453-Common-Android-memory-issues
+          command: ./gradlew downloadDependencies --no-daemon --max-workers=2 #https://support.circleci.com/hc/en-us/articles/360021812453-Common-Android-memory-issues
       - save_cache:
           paths:
             - ~/.gradle

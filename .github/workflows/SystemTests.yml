@@ -64,21 +64,21 @@ jobs:
 
       - name: Run Tests - ${{ matrix.module }}
         run: |
-          ./gradlew :${{ matrix.module }}:pixel6api35DebugAndroidTest
+          ./gradlew :${{ matrix.module }}:pixel6api36DebugAndroidTest
 
       - name: Upload Test Results - ${{ matrix.module }}
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results-${{ matrix.module }}
-          path: ${{ matrix.module }}/build/outputs/androidTest-results/managedDevice/debug/pixel6api35/
+          path: ${{ matrix.module }}/build/outputs/androidTest-results/managedDevice/debug/pixel6api36/
 
       - name: Upload Test Reports - ${{ matrix.module }}
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-reports-${{ matrix.module }}
-          path: ${{ matrix.module }}/build/reports/androidTests/managedDevice/debug/pixel6api35/
+          path: ${{ matrix.module }}/build/reports/androidTests/managedDevice/debug/pixel6api36/
 
   report:
     needs: system-tests

@@ -10,9 +10,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.10.1'
+        classpath 'com.android.tools.build:gradle:9.2.1'
         classpath "com.diffplug.spotless:spotless-plugin-gradle:6.23.3"
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.33.1"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:6.0.4"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
 
@@ -24,7 +24,7 @@ buildscript {
 plugins {
     id 'java'
     id 'jacoco'
-    id "org.sonarqube" version "3.5.0.2730"
+    id "org.sonarqube" version "7.3.0.8198"
     id 'org.jetbrains.kotlinx.binary-compatibility-validator' version '0.16.3'
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
 }
@@ -121,7 +121,6 @@ ext {
     playServicesAdsVersion = '19.8.0'
     imaSdkVersion = '3.31.0'
     constraintlayoutVersion = '2.1.4'
-    multidexVersion = '2.0.1'
     workRuntimeKtxVersion = '2.9.0'
     ActivityKtxVersion = '1.10.1'
 
@@ -186,7 +185,26 @@ test {
     useJUnitPlatform()
 }
 
-// SonarQube configuration
+/**
+ * Resolves all resolvable configurations across every module so CI can warm the
+ * Gradle dependency cache in a single step before save_cache.
+ *
+ * Replaces the AGP 'androidDependencies' task, which was removed in AGP 9.
+ */
+tasks.register('downloadDependencies') {
+    notCompatibleWithConfigurationCache("Resolves configurations at execution time")
+    doLast {
+        allprojects.each { p ->
+            p.configurations.findAll { it.canBeResolved }.each { config ->
+                try {
+                    config.resolve()
+                } catch (Exception ignored) {
+                    // Some configurations can't be fully resolved standalone; skip them.
+                }
+            }
+        }
+    }
+}
 
 sonar {
     properties {
