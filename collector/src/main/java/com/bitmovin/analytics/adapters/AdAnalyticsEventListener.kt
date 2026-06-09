@@ -31,6 +31,4 @@ interface AdAnalyticsEventListener {
     )
 
     fun onAdQuartile(quartile: AdQuartile)
-
-    fun flushCurrentAdSampleOnDetach()
 }

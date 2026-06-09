@@ -416,7 +416,69 @@ class CsaiScenariosTest {
         }
 
     @Test
-    fun test_vodWithPreRollAd_closedWhilePlayingAd() =
+    fun test_vodWithPreRollAd_detachedWhilePlayingAd() =
+        runBlockingTest {
+            // arrange
+            val preRollAd =
+                GoogleImaAdDescription
+                    .Builder(TestSources.IMA_AD_SOURCE_2)
+                    .timeOffset("start")
+                    .build()
+            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
+            val sourceDescription =
+                SourceDescription
+                    .Builder(contentSource)
+                    .ads(preRollAd)
+                    .build()
+
+            var collector: ITHEOplayerCollector? = null
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector = ITHEOplayerCollector.create(appContext, analyticsConfig)
+                collector.sourceMetadata = defaultSourceMetadata
+                collector.attachPlayer(player)
+                player.source = sourceDescription
+            }
+
+            PlaybackUtils.waitUntil("pre-roll ad started") { player.ads.isPlaying }
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
+
+            withContext(mainScope.coroutineContext) {
+                collector?.detachPlayer()
+            }
+
+            // wait a bit to make sure the last play sample is sent
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            // verify 1 ad sample for the pre-roll
+            assertThat(impression.adEventDataList).hasSize(1)
+            val adSample = impression.adEventDataList[0]
+
+            CsaiDataVerifier.verifyStaticAdData(adSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
+            assertThat(adSample.started).isEqualTo(1)
+            assertThat(adSample.closed).isEqualTo(1)
+            assertThat(adSample.completed).isEqualTo(0)
+            assertThat(adSample.adPosition).isEqualTo("pre")
+            assertThat(adSample.playPercentage).isBetween(1, 99)
+            assertThat(adSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+
+            // expect event data sample reflecting the ad
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyInvariants(eventDataList)
+            val eventDataWithClientSideAdState = eventDataList.filter { it.ad == 1 }
+            assertThat(eventDataWithClientSideAdState).hasSize(1)
+        }
+
+    @Test
+    fun test_vodWithPreRollAd_destroyedWhilePlayingAd() =
         runBlockingTest {
             // arrange
             val preRollAd =

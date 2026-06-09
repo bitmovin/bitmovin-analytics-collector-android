@@ -353,7 +353,7 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: SourceEvent.Unloaded,
     ) {
         try {
-            ssaiService.flushCurrentAdSample(true)
+            ssaiService.flushCurrentActiveAd(true)
             BitmovinLog.d(TAG, "On Source Unloaded")
             stateMachine.resetStateMachine()
         } catch (e: Exception) {
@@ -365,7 +365,7 @@ internal class BitmovinSdkAdapter(
         @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Destroy,
     ) {
         try {
-            ssaiService.flushCurrentAdSample(true)
+            ssaiService.flushCurrentActiveAd(true)
             BitmovinLog.d(TAG, "On Destroy")
             if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
                 stateMachine.exitBeforeVideoStart(position)
@@ -689,7 +689,7 @@ internal class BitmovinSdkAdapter(
             val videoEndTimeOfPreviousSource =
                 Util.secondsToMillis(overrideCurrentSource?.duration)
             val shouldStartup = player.isPlaying
-            ssaiService.flushCurrentAdSample(true)
+            ssaiService.flushCurrentActiveAd(true)
             stateMachine.sourceChange(videoEndTimeOfPreviousSource, position, shouldStartup)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)

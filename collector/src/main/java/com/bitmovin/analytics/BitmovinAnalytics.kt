@@ -76,6 +76,11 @@ class BitmovinAnalytics(
         adAnalytics.attachAdapter(adapter, adAdapter)
     }
 
+    private fun flushLastAdSamplesOfCurrentSession() {
+        playerAdapter?.ssaiService?.flushCurrentActiveAd(true)
+        adAnalytics?.flushCurrentActiveAdOnExit()
+    }
+
     /** Detach the current player that is being used with Bitmovin Analytics.  */
     fun detachPlayer(shouldSendOutSamples: Boolean = true) {
         if (!isAttachedToPlayer()) {
@@ -83,8 +88,7 @@ class BitmovinAnalytics(
         }
 
         if (shouldSendOutSamples) {
-            playerAdapter?.ssaiService?.flushCurrentAdSample(true)
-            adAnalytics?.flushCurrentAdSampleOnDetach()
+            flushLastAdSamplesOfCurrentSession()
             playerAdapter?.triggerSampleOnDetach()
         }
         adAnalytics?.detachAdapter()

@@ -58,7 +58,7 @@ class SsaiEngagementMetricsServiceTest {
         val adMetadata = SsaiAdMetadata(adId = "testId", adSystem = "testAdSystem")
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL), adMetadata, 0)
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
 
         val adEventDataSlot = slot<AdEventData>()
         verify(exactly = 1) { analytics.sendAdEventData(capture(adEventDataSlot)) }
@@ -103,7 +103,7 @@ class SsaiEngagementMetricsServiceTest {
         ssaiEngagementMetricsService.markAdStart(SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL), adMetadata, 1)
         ssaiEngagementMetricsService.markAdStart(SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL), adMetadata, 2)
 
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
 
         val adEventDataList = mutableListOf<AdEventData>()
         verify(exactly = 3) { analytics.sendAdEventData(capture(adEventDataList)) }
@@ -129,7 +129,7 @@ class SsaiEngagementMetricsServiceTest {
             adQuartileMetadata,
             1,
         )
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
 
         val adEventDataSlot = slot<AdEventData>()
         verify(exactly = 1) { analytics.sendAdEventData(capture(adEventDataSlot)) }
@@ -160,7 +160,7 @@ class SsaiEngagementMetricsServiceTest {
             adQuartileMetadata,
             1,
         )
-        ssaiEngagementMetricsServiceDisabled.flushCurrentAdSample()
+        ssaiEngagementMetricsServiceDisabled.flushCurrentActiveAd(false)
 
         verify(exactly = 0) { analytics.sendAdEventData(any()) }
     }
@@ -198,7 +198,7 @@ class SsaiEngagementMetricsServiceTest {
             adQuartileMetadata,
             1,
         )
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
 
         val adEventDataSlot = slot<AdEventData>()
         verify(exactly = 1) { analytics.sendAdEventData(capture(adEventDataSlot)) }
@@ -222,10 +222,10 @@ class SsaiEngagementMetricsServiceTest {
     @Test
     fun `markQuartileFinished should be noop if called twice for same ad`() {
         ssaiEngagementMetricsService.markQuartileFinished(SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL), SsaiAdQuartile.FIRST, null, null, 1)
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
 
         ssaiEngagementMetricsService.markQuartileFinished(SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL), SsaiAdQuartile.FIRST, null, null, 1)
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
         verify(exactly = 1) { analytics.sendAdEventData(any()) }
     }
 
@@ -235,16 +235,16 @@ class SsaiEngagementMetricsServiceTest {
         ssaiEngagementMetricsService.markAdStart(null, null, 0)
 
         // first call should send out sample
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
         // second call should be noop
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
 
         verify(exactly = 1) { analytics.sendAdEventData(any()) }
     }
 
     @Test
     fun `flushCurrentAdSample is noop if no sample is existing`() {
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
         verify(exactly = 0) { analytics.sendAdEventData(any()) }
     }
 
@@ -440,7 +440,7 @@ class SsaiEngagementMetricsServiceTest {
 
         // we clear the mock to only test that calls happen due to the adBreakEnd call, and not the started call
         clearMocks(handlerMock)
-        ssaiEngagementMetricsService.flushCurrentAdSample()
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
         verify(exactly = 1) { handlerMock.removeCallbacksAndMessages(any()) }
         verify(exactly = 0) { handlerMock.postDelayed(any(), any()) }
     }

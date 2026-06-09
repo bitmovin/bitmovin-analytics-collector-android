@@ -51,7 +51,7 @@ class SsaiEngagementMetricsService(
             return
         }
 
-        flushCurrentAdSample()
+        flushCurrentActiveAd(false)
         resetStateOnNewAd()
         currentAdIsSlate = adMetadata?.isSlate ?: false
         adImpressionId = Util.uUID
@@ -113,11 +113,11 @@ class SsaiEngagementMetricsService(
         adEventData.errorCode = errorCode
         adEventData.errorSeverity = errorSeverity
         upsertAdSample(adEventData)
-        flushCurrentAdSample(isLastSampleOfAdBreak = false)
+        flushCurrentActiveAd(isLastSampleOfAdBreak = false)
     }
 
     @Synchronized
-    fun flushCurrentAdSample(isLastSampleOfAdBreak: Boolean = false) {
+    fun flushCurrentActiveAd(isLastSampleOfAdBreak: Boolean) {
         if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
             return
         }
@@ -346,7 +346,7 @@ class SsaiEngagementMetricsService(
 
     private fun enableFlushTimeout() {
         ssaiTimeoutHandler.postDelayed({
-            flushCurrentAdSample()
+            flushCurrentActiveAd(false)
         }, FLUSH_TIMEOUT_MS)
     }
 

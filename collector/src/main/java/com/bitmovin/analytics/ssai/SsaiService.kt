@@ -48,7 +48,7 @@ class SsaiService(
         if (this.state == SsaiState.NOT_ACTIVE) {
             return
         }
-        this.ssaiEngagementMetricsService.flushCurrentAdSample()
+        this.ssaiEngagementMetricsService.flushCurrentActiveAd(false)
 
         stateMachine.triggerSampleIfPlaying(SampleTriggerReason.SSAI)
 
@@ -65,7 +65,7 @@ class SsaiService(
             return
         }
 
-        this.ssaiEngagementMetricsService.flushCurrentAdSample(isLastSampleOfAdBreak = true)
+        this.ssaiEngagementMetricsService.flushCurrentActiveAd(isLastSampleOfAdBreak = true)
 
         if (this.state == SsaiState.AD_RUNNING) {
             stateMachine.triggerSampleIfPlaying(SampleTriggerReason.SSAI)
@@ -90,8 +90,8 @@ class SsaiService(
         )
     }
 
-    fun flushCurrentAdSample(isLastAdBreakSample: Boolean) {
-        ssaiEngagementMetricsService.flushCurrentAdSample(isLastAdBreakSample)
+    fun flushCurrentActiveAd(isLastAdBreakSample: Boolean) {
+        ssaiEngagementMetricsService.flushCurrentActiveAd(isLastAdBreakSample)
     }
 
     fun sendAdErrorSample(errorCode: ErrorCode) {

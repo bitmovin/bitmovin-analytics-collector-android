@@ -371,7 +371,7 @@ class CsaiScenariosTest {
         }
 
     @Test
-    fun test_vodWithPreRollAd_closedWhilePlayingAd() =
+    fun test_vodWithPreRollAd_destroyedWhilePlayingAd() =
         runBlockingTest {
             val preRoll = AdItem("pre", progressiveAdSource)
             val advertisingConfig = AdvertisingConfig(preRoll)

@@ -116,7 +116,7 @@ class BitmovinAdAnalytics(
     }
 
     override fun onAdBreakFinished() {
-        this.resetActiveAd()
+        this.flushCurrentActiveAdOnExit()
         this.elapsedTimeAtAdStartup = null
         this.elapsedTimeAtPlayEvent = null
         this.activeAdBreak = null
@@ -169,12 +169,21 @@ class BitmovinAdAnalytics(
         }
     }
 
-    override fun flushCurrentAdSampleOnDetach() {
-        // flush current sample to get partly watched ad info
-        val activeAdBreak = this.activeAdBreak ?: return
+    fun flushCurrentActiveAdOnExit() {
         val activeAdSample = this.activeAdSample ?: return
-        activeAdSample.closed = 1
-        this.completeAd(activeAdBreak, activeAdSample, this.currentTime)
+        val activeAdBreak = this.activeAdBreak ?: return
+
+        val adSample = activeAdSample.copy()
+
+        // if current sample is not marked as completed, we mark it with
+        // closed with means abandonment
+        if (adSample.completed == 0L) {
+            adSample.closed = 1
+        }
+
+        val currentTime = this.currentTime
+        this.resetActiveAd()
+        this.completeAd(activeAdBreak, adSample, currentTime)
     }
 
     override fun onAdSkipped() {
@@ -222,7 +231,6 @@ class BitmovinAdAnalytics(
         this.elapsedTimeAtAdStartup = Util.elapsedTime
         this.isPlaying = false
         this.sendAnalyticsRequest(adBreak, adSample)
-        // TODO: should we also clear the current ad sample here, since we sent out the sample?
     }
 
     private fun resetActiveAd() {
