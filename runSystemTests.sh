@@ -10,25 +10,25 @@ yes | sdkmanager --licenses
 
 # run systemtest for collector core
 ## clean test to make sure we run test everytime
-./gradlew :collector:cleanpixel6api36DebugAndroidTest
+./gradlew :collector:cleanPixel6api36DebugAndroidTest
 ## run system tests
 ./gradlew :collector:pixel6api36DebugAndroidTest || exit
 
 # run systemtest for media3-exoplayer
 ## clean test to make sure we run test everytime
-./gradlew :collector-media3-exoplayer:cleanpixel6api36DebugAndroidTest
+./gradlew :collector-media3-exoplayer:cleanPixel6api36DebugAndroidTest
 ## run test
 ./gradlew :collector-media3-exoplayer:pixel6api36DebugAndroidTest || exit
 
 # run systemtest for bitmovin-player
 ## clean test to make sure we run test everytime
-./gradlew :collector-bitmovin-player:cleanpixel6api36DebugAndroidTest
+./gradlew :collector-bitmovin-player:cleanPixel6api36DebugAndroidTest
 ## run test
 ./gradlew :collector-bitmovin-player:pixel6api36DebugAndroidTest || exit
 
 # run systemtest for THEOplayer
 ## clean test to make sure we run test everytime
-./gradlew :collector-theoplayer:cleanpixel6api36DebugAndroidTest
+./gradlew :collector-theoplayer:cleanPixel6api36DebugAndroidTest
 ## run test
 ./gradlew :collector-theoplayer:pixel6api36DebugAndroidTest || exit
 
@@ -45,7 +45,7 @@ yes | sdkmanager --licenses
 # command to run specific test (with regex) in a loop (can be used to verify flaky test is stable)
 #for i in {1..50}; do
 #   echo "RUN $i/50"
-#  ./gradlew :collector-bitmovin-player:cleanpixel6api36DebugAndroidTest
+#  ./gradlew :collector-bitmovin-player:cleanPixel6api36DebugAndroidTest
 #  ./gradlew :collector-bitmovin-player:pixel6api36DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.bitmovin.player.SsaiScenariosTest
 #done
 
@@ -54,7 +54,7 @@ yes | sdkmanager --licenses
 
 #for i in {1..50}; do
 #   echo "RUN $i/50"
-#  ./gradlew :collector-media3-exoplayer:cleanpixel6api36DebugAndroidTest
+#  ./gradlew :collector-media3-exoplayer:cleanPixel6api36DebugAndroidTest
 #  ./gradlew :collector-media3-exoplayer:pixel6api36DebugAndroidTest  -Pandroid.testInstrumentationRunnerArguments.tests_regex=com.bitmovin.analytics.media3.exoplayer.ErrorScenariosTest.test_playerReleaseDuringStartup_Should_sendEbvsSample || exit
 #done
 

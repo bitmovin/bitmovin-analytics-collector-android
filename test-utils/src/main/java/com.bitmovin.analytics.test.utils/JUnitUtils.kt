@@ -97,7 +97,7 @@ fun <T> runBlockingTest(block: suspend CoroutineScope.() -> T) {
             } else {
                 modifiedMessage += "\nTest related impressions Ids:"
                 MockedIngress.currentImpressionsIds.forEach { value ->
-                    modifiedMessage += "\n- $value : https://dashboard.bitmovin.com/analytics/sessions/" +
+                    modifiedMessage += "\n- $value : https://dashboard.bitmovin.com/observability/sessions/" +
                         "$value?licenseKey=$LICENSE_ANDROID_IOS_KEY"
                 }
             }
