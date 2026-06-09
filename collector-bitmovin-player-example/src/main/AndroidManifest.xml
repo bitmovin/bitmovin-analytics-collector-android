@@ -27,6 +27,11 @@
         <meta-data
             android:name="com.google.android.gms.ads.AD_MANAGER_APP"
             android:value="true"/>
+        <!-- Required by Google Mobile Ads SDK 20+ (play-services-ads 25.3.0); MobileAdsInitProvider
+             crashes on startup without it. This is Google's public sample App ID for test apps. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
 
         <meta-data
             android:name=

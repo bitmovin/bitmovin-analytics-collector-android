@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - [Internal] Upgraded agp to `9.2.1`
-- [Internal] Upgrade sonar plugin to `7.3.0.8198`
+- [Internal] Upgraded sonar plugin to `7.3.0.8198`
+- [Internal] Upgraded test dependencies
 - Upgraded media3-exoplayer to `1.10.1`
 - Upgraded THEOplayer to 11.4.0
 
