@@ -157,9 +157,15 @@ object MockedIngress {
 
         // Avoid blocking the test thread
         CoroutineScope(Dispatchers.IO).launch {
-            val res = httpClient.newCall(request).execute()
-            if (res.code !in 200..299) {
-                Log.e("MockedIngress", "Error while forwarding requests to the real server: ${res.code}")
+            try {
+                val res = httpClient.newCall(request).execute()
+                if (res.code !in 200..299) {
+                    Log.e("MockedIngress", "Error while forwarding requests to the real server: ${res.code}")
+                }
+            } catch (e: Exception) {
+                // Forwarding to the real server is best-effort (e.g. no network/DNS in CI).
+                // Don't let a failure here surface as an uncaught exception and fail the test.
+                Log.w("MockedIngress", "Could not forward request to the real server, continuing: ${e.message}")
             }
         }
     }
