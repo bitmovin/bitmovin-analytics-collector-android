@@ -478,6 +478,188 @@ class CsaiScenariosTest {
         }
 
     @Test
+    fun test_vodWithPreRollAd_detachedDuringAd_sourceChangedAndAttachedAgain_createsTwoSessions() =
+        runBlockingTest {
+            // arrange
+            val preRollAd =
+                GoogleImaAdDescription
+                    .Builder(TestSources.IMA_AD_SOURCE_2)
+                    .timeOffset("start")
+                    .build()
+            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
+            val sourceDescriptionWithPreRoll =
+                SourceDescription
+                    .Builder(contentSource)
+                    .ads(preRollAd)
+                    .build()
+
+            // second source the player is switched to, plain content without ads
+            val secondContentSource =
+                TypedSource
+                    .Builder(TestSources.DASH.mpdUrl!!)
+                    .type(SourceType.DASH)
+                    .build()
+            val secondSourceDescription =
+                SourceDescription
+                    .Builder(secondContentSource)
+                    .build()
+            val firstSourceMetadata =
+                SourceMetadata(
+                    videoId = "first-source-interrupted-during-ad",
+                    title = "First Source Interrupted During Ad",
+                )
+            val secondSourceMetadata =
+                SourceMetadata(
+                    videoId = "second-source-after-source-change",
+                    title = "Second Source After Source Change",
+                )
+
+            var collector: ITHEOplayerCollector? = null
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector = ITHEOplayerCollector.create(appContext, analyticsConfig)
+                collector.sourceMetadata = firstSourceMetadata
+                collector.attachPlayer(player)
+                player.source = sourceDescriptionWithPreRoll
+            }
+
+            // wait for the pre-roll ad to start and play for a bit
+            PlaybackUtils.waitUntil("pre-roll ad started") { player.ads.isPlaying }
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
+
+            // detach while the pre-roll ad is still playing, this closes the first session
+            withContext(mainScope.coroutineContext) {
+                collector!!.detachPlayer()
+            }
+
+            // wait a bit to make sure the last play sample of the first session is sent
+            Thread.sleep(500)
+
+            // change the source and attach again, this opens a new session that plays normally
+            withContext(mainScope.coroutineContext) {
+                collector!!.sourceMetadata = secondSourceMetadata
+                collector!!.attachPlayer(player)
+                player.source = secondSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(500)
+
+            withContext(mainScope.coroutineContext) {
+                collector!!.detachPlayer()
+            }
+
+            Thread.sleep(200)
+
+            // assert - two separate sessions
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(2)
+
+            // session 1: only the interrupted pre-roll ad, no content played yet
+            val firstImpression = impressionList[0]
+            DataVerifier.verifyHasNoErrorSamples(firstImpression)
+
+            // exactly one event data sample which is the ad state sample, no other samples
+            val firstEventDataList = firstImpression.eventDataList
+            assertThat(firstEventDataList).hasSize(1)
+            assertThat(firstEventDataList[0].ad).isEqualTo(1)
+            assertThat(firstEventDataList[0].videoId).isEqualTo(firstSourceMetadata.videoId)
+
+            // the ad started but was closed without completing because of the detach
+            assertThat(firstImpression.adEventDataList).hasSize(1)
+            val adSample = firstImpression.adEventDataList[0]
+            CsaiDataVerifier.verifyStaticAdData(adSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
+            assertThat(adSample.started).isEqualTo(1)
+            assertThat(adSample.closed).isEqualTo(1)
+            assertThat(adSample.completed).isEqualTo(0)
+            assertThat(adSample.adPosition).isEqualTo("pre")
+            assertThat(adSample.videoImpressionId).isEqualTo(firstEventDataList[0].impressionId)
+
+            // session 2: the second source plays normally, no ads
+            val secondImpression = impressionList[1]
+            DataVerifier.verifyHasNoErrorSamples(secondImpression)
+            assertThat(secondImpression.adEventDataList).isEmpty()
+
+            val secondEventDataList = secondImpression.eventDataList
+            DataVerifier.verifyInvariants(secondEventDataList)
+            assertThat(secondEventDataList.first().videoId).isEqualTo(secondSourceMetadata.videoId)
+            assertThat(secondEventDataList.filter { it.ad == 1 }).isEmpty()
+            DataVerifier.verifyThereWasAtLeastOnePlayingSample(secondEventDataList)
+
+            // the two sessions must be tracked under different impressions
+            assertThat(secondEventDataList.first().impressionId)
+                .isNotEqualTo(firstEventDataList.first().impressionId)
+        }
+
+    @Test
+    fun test_vodWithPreRollAd_stoppedWhilePlayingAd() =
+        runBlockingTest {
+            // arrange
+            val preRollAd =
+                GoogleImaAdDescription
+                    .Builder(TestSources.IMA_AD_SOURCE_2)
+                    .timeOffset("start")
+                    .build()
+            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
+            val sourceDescription =
+                SourceDescription
+                    .Builder(contentSource)
+                    .ads(preRollAd)
+                    .build()
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                val collector = ITHEOplayerCollector.create(appContext, analyticsConfig)
+                collector.sourceMetadata = defaultSourceMetadata
+                collector.attachPlayer(player)
+                player.source = sourceDescription
+            }
+
+            PlaybackUtils.waitUntil("pre-roll ad started") { player.ads.isPlaying }
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
+
+            // stopping playback while the ad is playing must flush the active ad as abandoned (closed),
+            // analogous to the detach scenario
+            withContext(mainScope.coroutineContext) {
+                player.stop()
+            }
+
+            // wait a bit to make sure the last play sample is sent
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            // verify 1 ad sample for the pre-roll
+            assertThat(impression.adEventDataList).hasSize(1)
+            val adSample = impression.adEventDataList[0]
+
+            CsaiDataVerifier.verifyStaticAdData(adSample, analyticsConfig, TheoPlayerConstants.playerInfo.playerName)
+            assertThat(adSample.started).isEqualTo(1)
+            assertThat(adSample.closed).isEqualTo(1)
+            assertThat(adSample.completed).isEqualTo(0)
+            assertThat(adSample.adPosition).isEqualTo("pre")
+            assertThat(adSample.playPercentage).isBetween(1, 99)
+            assertThat(adSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+
+            // expect event data sample reflecting the ad
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyInvariants(eventDataList)
+            val eventDataWithClientSideAdState = eventDataList.filter { it.ad == 1 }
+            assertThat(eventDataWithClientSideAdState).hasSize(1)
+        }
+
+    @Test
     fun test_vodWithPreRollAd_destroyedWhilePlayingAd() =
         runBlockingTest {
             // arrange
