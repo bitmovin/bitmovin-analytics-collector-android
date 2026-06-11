@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player.player
 
 import com.bitmovin.player.api.Player
+import com.bitmovin.player.api.media.video.quality.VideoQuality
 import com.bitmovin.player.base.internal.plugin.Plugin
 import com.bitmovin.player.core.internal.extensionPoint
 
@@ -47,3 +48,28 @@ internal fun Player.supportsRemovePlugin() =
     runCatching {
         extensionPoint.removePlugin(DummyAnalyticsCollectorPlugin::class)
     }.isSuccess
+
+internal fun Player.extractVideoQualityInfo(): VideoQualityHolder? {
+    val activeVideoQuality = this.playbackVideoData
+    val manifestVideoBitrate = this.resolveManifestVideoBitrate(activeVideoQuality)
+
+    // For adaptive sources (non-empty availableVideoQualities) a playbackVideoData whose id is not
+    // in the current source's manifest does not belong to this source - it is stale data left over
+    // from the previous source during a playlist transition. Reporting it would leak the previous
+    // source's bitrate into the new source, so we treat the quality as not-yet-known and let the
+    // source's VideoPlaybackQualityChanged event (or a manifest seed) populate it instead.
+    if (manifestVideoBitrate == null && !this.source?.availableVideoQualities.isNullOrEmpty()) {
+        return null
+    }
+
+    return VideoQualityHolder(activeVideoQuality, manifestVideoBitrate)
+}
+
+// Looks the currently playing quality up in [Source.availableVideoQualities] by its id to report
+// the manifest bitrate, falling back to the quality's own bitrate when no manifest match exists
+// (e.g. progressive streams or before the manifest qualities are available).
+internal fun Player.resolveManifestVideoBitrate(videoQuality: VideoQuality?): Int? {
+    videoQuality ?: return null
+    val manifestQuality = this.source?.availableVideoQualities?.firstOrNull { it.id == videoQuality.id }
+    return manifestQuality?.bitrate ?: videoQuality.bitrate
+}

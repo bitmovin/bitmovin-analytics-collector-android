@@ -236,12 +236,12 @@ internal class BitmovinSdkAdapter(
         data.droppedFrames = totalDroppedVideoFrames
         totalDroppedVideoFrames = 0
 
-        val videoQuality = playbackQualityProvider.currentVideoQuality
-        if (videoQuality != null) {
-            data.videoBitrate = videoQuality.bitrate
-            data.videoPlaybackHeight = videoQuality.height
-            data.videoPlaybackWidth = videoQuality.width
-            data.videoCodec = videoQuality.codec
+        val videoQualityHolder = playbackQualityProvider.getVideoQualityHolder()
+        if (videoQualityHolder != null) {
+            data.videoBitrate = videoQualityHolder.currentBitrateFromManifest ?: videoQualityHolder.currentVideoQuality?.bitrate ?: 0
+            data.videoPlaybackHeight = videoQualityHolder.currentVideoQuality?.height ?: 0
+            data.videoPlaybackWidth = videoQualityHolder.currentVideoQuality?.width ?: 0
+            data.videoCodec = videoQualityHolder.currentVideoQuality?.codec
         }
 
         val audioQuality = playbackQualityProvider.currentAudioQuality
@@ -288,6 +288,12 @@ internal class BitmovinSdkAdapter(
         totalDroppedVideoFrames = 0
         drmDownloadTime = null
         isVideoAttemptedPlay = false
+        // Clear the cached playback qualities on every source change. Automatic playlist
+        // transitions don't emit a `Play` event, so `startup()` (and its reset) is never
+        // invoked for the new source - without this, the new session's startup and first
+        // playing samples would report the previous source's quality/bitrate until the new
+        // source's VideoPlaybackQualityChanged event arrives.
+        playbackQualityProvider.resetPlaybackQualities()
         ssaiService.resetSourceRelatedState()
     }
 
@@ -501,7 +507,7 @@ internal class BitmovinSdkAdapter(
             // in order to avoid unnecessary logging,
             // we will ignore it if the current position didn't move yet
             // this is best effort but should work for most cases
-            if (position < 0.01) {
+            if (position < 10) {
                 return
             }
 
@@ -556,7 +562,7 @@ internal class BitmovinSdkAdapter(
                 position,
                 playbackQualityProvider.didVideoQualityChange(event.newVideoQuality),
             ) {
-                playbackQualityProvider.currentVideoQuality = event.newVideoQuality
+                playbackQualityProvider.setVideoQuality(event.newVideoQuality)
             }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
@@ -691,6 +697,10 @@ internal class BitmovinSdkAdapter(
             val shouldStartup = player.isPlaying
             ssaiService.flushCurrentActiveAd(true)
             stateMachine.sourceChange(videoEndTimeOfPreviousSource, position, shouldStartup)
+            // `sourceChange` resets the playback qualities. Seed the new source's quality from its
+            // manifest so the startup sample does not fall back to the previous source's stale
+            // playbackVideoData before the new VideoPlaybackQualityChanged event arrives.
+            playbackQualityProvider.seedVideoQualityFromSource(event.to)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
         }

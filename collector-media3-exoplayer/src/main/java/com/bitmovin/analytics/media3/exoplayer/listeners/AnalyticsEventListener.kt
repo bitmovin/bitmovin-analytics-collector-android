@@ -219,7 +219,7 @@ internal class AnalyticsEventListener(
             stateMachine.videoQualityChanged(
                 position,
                 qualityEventDataManipulator.hasVideoFormatChanged(format),
-            ) { qualityEventDataManipulator.currentVideoFormat = format }
+            ) { qualityEventDataManipulator.setVideoFormat(format) }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
         }

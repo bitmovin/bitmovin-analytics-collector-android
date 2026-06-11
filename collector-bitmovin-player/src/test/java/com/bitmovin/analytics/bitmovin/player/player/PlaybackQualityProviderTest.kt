@@ -3,6 +3,7 @@ package com.bitmovin.analytics.bitmovin.player.player
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.media.audio.quality.AudioQuality
 import com.bitmovin.player.api.media.video.quality.VideoQuality
+import com.bitmovin.player.api.source.Source
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -26,17 +27,17 @@ class PlaybackQualityProviderTest {
         every { playerMock.playbackVideoData }.returns(quality)
 
         // act and assert
-        assertThat(qualityProvider.currentVideoQuality).isEqualTo(quality)
+        assertThat(qualityProvider.getVideoQualityHolder()?.currentVideoQuality).isEqualTo(quality)
     }
 
     @Test
     fun test_currentVideoQuality_Should_returnQualityStored() {
         // arrange
         val quality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
-        qualityProvider.currentVideoQuality = quality
+        qualityProvider.setVideoQuality(quality)
 
         // act and assert
-        assertThat(qualityProvider.currentVideoQuality).isEqualTo(quality)
+        assertThat(qualityProvider.getVideoQualityHolder()?.currentVideoQuality).isEqualTo(quality)
     }
 
     @Test
@@ -65,7 +66,7 @@ class PlaybackQualityProviderTest {
         val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
         val newVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
 
-        qualityProvider.currentVideoQuality = oldVideoQuality
+        qualityProvider.setVideoQuality(oldVideoQuality)
 
         // act
         val didChange = qualityProvider.didVideoQualityChange(newVideoQuality)
@@ -80,7 +81,7 @@ class PlaybackQualityProviderTest {
         val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
         val newVideoQuality = VideoQuality("id", "label", 456, 123, 123, "dummy", 30.0f, 1, 1)
 
-        qualityProvider.currentVideoQuality = oldVideoQuality
+        qualityProvider.setVideoQuality(oldVideoQuality)
 
         // act
         val didChange = qualityProvider.didVideoQualityChange(newVideoQuality)
@@ -120,6 +121,74 @@ class PlaybackQualityProviderTest {
     }
 
     @Test
+    fun test_currentVideoManifestBitrate_Should_resolveManifestBitrateOfMatchingAvailableQuality() {
+        // arrange
+        // the playing quality reports the actual media bitrate (14097792), which differs from the
+        // bitrate the same representation (matched by id) declares in the manifest (4800000)
+        val playingQuality = VideoQuality("1080_4800000", "label", 14097792, -1, 14097792, "avc1.4D4032", 25.0f, 1920, 1080)
+        val manifestQuality = VideoQuality("1080_4800000", "label", 4800000, -1, 4800000, "avc1.42c00d", 25.0f, 1920, 1080)
+        val sourceMock = mockk<Source>(relaxed = true)
+        every { sourceMock.availableVideoQualities }.returns(listOf(manifestQuality))
+        every { playerMock.source }.returns(sourceMock)
+
+        // act
+        qualityProvider.setVideoQuality(playingQuality)
+
+        // assert
+        assertThat(qualityProvider.getVideoQualityHolder()?.currentBitrateFromManifest).isEqualTo(4800000)
+    }
+
+    @Test
+    fun test_currentVideoManifestBitrate_Should_fallBackToQualityBitrateWhenNoManifestMatch() {
+        // arrange
+        val playingQuality = VideoQuality("only_in_playback", "label", 14097792, -1, 14097792, "avc1.4D4032", 25.0f, 1920, 1080)
+        val sourceMock = mockk<Source>(relaxed = true)
+        every { sourceMock.availableVideoQualities }.returns(emptyList())
+        every { playerMock.source }.returns(sourceMock)
+
+        // act
+        qualityProvider.setVideoQuality(playingQuality)
+
+        // assert
+        assertThat(qualityProvider.getVideoQualityHolder()?.currentBitrateFromManifest).isEqualTo(14097792)
+    }
+
+    @Test
+    fun test_currentVideoManifestBitrate_Should_fallBackToQualityBitrateWhenNoSource() {
+        // arrange
+        val playingQuality = VideoQuality("id", "label", 628000, -1, 628000, "avc1.4D400D", 25.0f, 640, 360)
+        every { playerMock.source }.returns(null)
+
+        // act
+        qualityProvider.setVideoQuality(playingQuality)
+
+        // assert
+        assertThat(qualityProvider.getVideoQualityHolder()?.currentBitrateFromManifest).isEqualTo(628000)
+    }
+
+    @Test
+    fun test_currentVideoManifestBitrate_Should_beResolvedAtCaptureTimeNotReResolvedOnAccess() {
+        // arrange: capture the quality while the DASH source is active (id matches -> 4800000)
+        val playingQuality = VideoQuality("1080_4800000", "label", 14097792, -1, 14097792, "avc1.4D4032", 25.0f, 1920, 1080)
+        val dashSource = mockk<Source>(relaxed = true)
+        every { dashSource.availableVideoQualities }.returns(
+            listOf(VideoQuality("1080_4800000", "label", 4800000, -1, 4800000, "avc1.42c00d", 25.0f, 1920, 1080)),
+        )
+        every { playerMock.source }.returns(dashSource)
+        qualityProvider.setVideoQuality(playingQuality)
+
+        // act: the active source advances to a different source (playlist) where the id no longer matches
+        val nextSource = mockk<Source>(relaxed = true)
+        every { nextSource.availableVideoQualities }.returns(
+            listOf(VideoQuality("1", "label", 9979760, -1, 9979760, "avc1", 25.0f, 1920, 1080)),
+        )
+        every { playerMock.source }.returns(nextSource)
+
+        // assert: the manifest bitrate stays the value resolved at capture time, not re-resolved
+        assertThat(qualityProvider.getVideoQualityHolder()?.currentBitrateFromManifest).isEqualTo(4800000)
+    }
+
+    @Test
     fun test_resetPlaybackQualities_Should_setQualitiesToNull() {
         // arrage
         val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
@@ -132,14 +201,14 @@ class PlaybackQualityProviderTest {
         every { playerMock.playbackAudioData }.returns(newAudioQuality)
         every { playerMock.playbackVideoData }.returns(newVideoQuality)
 
-        qualityProvider.currentVideoQuality = oldVideoQuality
+        qualityProvider.setVideoQuality(oldVideoQuality)
         qualityProvider.currentAudioQuality = oldAudioQuality
 
         // act
         qualityProvider.resetPlaybackQualities()
 
         // assert
-        assertThat(qualityProvider.currentVideoQuality).isEqualTo(newVideoQuality)
+        assertThat(qualityProvider.getVideoQualityHolder()?.currentVideoQuality).isEqualTo(newVideoQuality)
         assertThat(qualityProvider.currentAudioQuality).isEqualTo(newAudioQuality)
     }
 }

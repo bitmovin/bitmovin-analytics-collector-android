@@ -12,6 +12,7 @@ object TestSources {
             "hls",
             false,
             210000,
+            videoBitrates = listOf(628000, 928000, 1728000, 2528000, 4928000, 9728000),
         )
 
     val THEO_BIGBUCKBUNNY =
@@ -24,6 +25,11 @@ object TestSources {
             "dash",
             false,
             596460,
+            videoBitrates =
+                listOf(
+                    45373, 88482, 127412, 176780, 216536, 252988, 317328, 368912, 503270, 568500,
+                    771359, 987061, 1174238, 1431232, 2070985, 2384387, 2884382, 3245900, 3493765, 3792491,
+                ),
         )
 
     val DASH =
@@ -36,6 +42,7 @@ object TestSources {
             "dash",
             false,
             210000,
+            videoBitrates = listOf(250000, 400000, 800000, 1200000, 2400000, 4800000),
         )
 
     val DASH_LIVE =
@@ -48,6 +55,8 @@ object TestSources {
             "dash",
             true,
             0,
+            // live signal - ladder may change
+            videoBitrates = listOf(300000),
         )
 
     /**
@@ -66,6 +75,7 @@ object TestSources {
             "dash",
             false,
             888000,
+            videoBitrates = listOf(258157),
         )
 
     /**
@@ -83,6 +93,8 @@ object TestSources {
             "hls",
             false,
             888000,
+            videoBitrates =
+                listOf(258157, 520929, 831270, 1144430, 1558322, 4149264, 6214307, 10285391),
         )
 
     val PROGRESSIVE =
@@ -108,6 +120,8 @@ object TestSources {
             "hls",
             true,
             0,
+            // live signal - ladder may change
+            videoBitrates = listOf(230000, 630000, 1427999, 2373000),
         )
 
     val IVS_LIVE_2 =
@@ -121,6 +135,8 @@ object TestSources {
             "hls",
             true,
             0,
+            // live signal - ladder may change
+            videoBitrates = listOf(230000, 630000, 1427999, 2373000, 6047508),
         )
 
     val IVS_VOD_1 =
@@ -134,6 +150,8 @@ object TestSources {
             "hls",
             false,
             362356,
+            // audio-only rendition (130015) excluded
+            videoBitrates = listOf(230000, 630000, 1396515, 2341515),
         )
 
     val BBB =
@@ -158,6 +176,7 @@ object TestSources {
             "dash",
             false,
             0,
+            videoBitrates = listOf(250000),
         )
 
     val MISSING_SEGMENT =
@@ -170,6 +189,7 @@ object TestSources {
             "dash",
             false,
             0,
+            videoBitrates = listOf(250000),
         )
 
     val NONE_EXISTING_STREAM =
@@ -196,6 +216,7 @@ object TestSources {
             210000,
             drmSchema = "widevine",
             drmLicenseUrl = "https://cwip-shaka-proxy.appspot.com/no_auth",
+            videoBitrates = listOf(250000, 400000, 800000, 1200000, 2400000, 4800000),
         )
 
     // These are IMA Sample Tags from https://developers.google.com/interactive-media-ads/docs/sdks/android/tags

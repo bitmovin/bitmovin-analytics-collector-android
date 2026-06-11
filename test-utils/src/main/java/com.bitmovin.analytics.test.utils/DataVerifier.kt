@@ -22,25 +22,6 @@ object DataVerifier {
     const val PLAYING = "playing"
     const val PAUSE = "pause"
 
-    // verifies properties that are not specific to playback order
-    fun verifyStaticData(
-        eventDataList: MutableList<EventData>,
-        analyticsConfig: BitmovinAnalyticsConfig,
-        expectedStreamData: StreamData,
-        expectedPlayerInfo: PlayerInfo,
-        is4kTV: Boolean = false,
-    ) {
-        if (eventDataList.size == 0) {
-            fail<Nothing>("No eventData samples collected")
-        }
-
-        verifyStaticData(eventDataList, expectedStreamData, expectedPlayerInfo, is4kTV)
-
-        for (eventData in eventDataList) {
-            verifyAnalyticsConfig(eventData, analyticsConfig)
-        }
-    }
-
     private const val MIN_AVG_BANDWIDTH_IN_KBPS = 128f // ~128 kbps
     private const val MAX_AVG_BANDWIDTH_IN_KBPS = 600 * 1024f // ~600 Mbps
 
@@ -202,6 +183,7 @@ object DataVerifier {
             // bitrate is set to -1 mostly but sometimes to 4800000
         } else {
             assertThat(eventData.videoBitrate).isGreaterThan(0)
+            assertThat(eventData.videoBitrate).isIn(expectedData.videoBitrates)
         }
 
         assertThat(eventData.isLive).isEqualTo(expectedData.isLive)

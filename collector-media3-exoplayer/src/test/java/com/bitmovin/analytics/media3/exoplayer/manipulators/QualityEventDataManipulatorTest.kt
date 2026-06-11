@@ -78,7 +78,7 @@ class QualityEventDataManipulatorTest {
     @Test
     fun `hasVideoFormatChanged should return true if currentVideoFormat is null`() {
         // arrange
-        qualityEventDataManipulator.currentVideoFormat = null
+        qualityEventDataManipulator.setVideoFormat(null)
 
         // act
         val hasVideoFormatChanged = qualityEventDataManipulator.hasVideoFormatChanged(mockk(relaxed = true))
@@ -91,7 +91,7 @@ class QualityEventDataManipulatorTest {
     fun `hasVideoFormatChanged should return true if currentVideoFormat's bitrate is different from newFormat`() {
         // arrange
         val newFormat = Format.Builder().setAverageBitrate(789).build()
-        qualityEventDataManipulator.currentVideoFormat = Format.Builder().setAverageBitrate(123).build()
+        qualityEventDataManipulator.setVideoFormat(Format.Builder().setAverageBitrate(123).build())
 
         // act
         val hasVideoFormatChanged = qualityEventDataManipulator.hasVideoFormatChanged(newFormat)
@@ -105,7 +105,7 @@ class QualityEventDataManipulatorTest {
     fun `hasVideoFormatChanged should return true if currentVideoFormat's width is different from newFormat`() {
         // arrange
         val newFormat = Format.Builder().setWidth(789).build()
-        qualityEventDataManipulator.currentVideoFormat = Format.Builder().setWidth(123).build()
+        qualityEventDataManipulator.setVideoFormat(Format.Builder().setWidth(123).build())
 
         // act
         val hasVideoFormatChanged = qualityEventDataManipulator.hasVideoFormatChanged(newFormat)
@@ -119,7 +119,7 @@ class QualityEventDataManipulatorTest {
     fun `hasVideoFormatChanged should return true if currentVideoFormat's height is different from newFormat`() {
         // arrange
         val newFormat = Format.Builder().setHeight(789).build()
-        qualityEventDataManipulator.currentVideoFormat = Format.Builder().setHeight(123).build()
+        qualityEventDataManipulator.setVideoFormat(Format.Builder().setHeight(123).build())
 
         // act
         val hasVideoFormatChanged = qualityEventDataManipulator.hasVideoFormatChanged(newFormat)
@@ -138,7 +138,7 @@ class QualityEventDataManipulatorTest {
                 .setWidth(234)
                 .setHeight(345)
                 .build()
-        qualityEventDataManipulator.currentVideoFormat = videoFormatFromExo
+        qualityEventDataManipulator.setVideoFormat(videoFormatFromExo)
         val data = mockk<EventData>(relaxed = true)
 
         // act
@@ -171,14 +171,14 @@ class QualityEventDataManipulatorTest {
     fun `reset will set Formats to null`() {
         // arrange
         qualityEventDataManipulator.currentAudioFormat = mockk()
-        qualityEventDataManipulator.currentVideoFormat = mockk()
+        qualityEventDataManipulator.setVideoFormat(mockk(relaxed = true))
 
         // act
         qualityEventDataManipulator.reset()
 
         // assert
         assertThat(qualityEventDataManipulator.currentAudioFormat?.bitrate).isNull()
-        assertThat(qualityEventDataManipulator.currentVideoFormat?.bitrate).isNull()
+        assertThat(qualityEventDataManipulator.videoFormatHolder).isNull()
     }
 
     @Test
@@ -194,7 +194,7 @@ class QualityEventDataManipulatorTest {
         qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
 
         // assert
-        assertThat(qualityEventDataManipulator.currentVideoFormat?.bitrate).isEqualTo(videoFormatFromExo.bitrate)
+        assertThat(qualityEventDataManipulator.videoFormatHolder?.currentVideoFormat?.bitrate).isEqualTo(videoFormatFromExo.bitrate)
         assertThat(qualityEventDataManipulator.currentAudioFormat?.bitrate).isEqualTo(audioFormatFromExo.bitrate)
     }
 }

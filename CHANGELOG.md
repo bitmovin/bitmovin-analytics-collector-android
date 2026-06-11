@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
+- Bitmovin and media3-exoplayer: Change video bitrate detection to use manifest specified bitrate
 - [Internal] Upgraded agp to `9.2.1`
 - [Internal] Upgraded sonar plugin to `7.3.0.8198`
 - [Internal] Upgraded test dependencies
