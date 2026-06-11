@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v3.28.0
+
 ### Changed
 - Bitmovin and media3-exoplayer: Change video bitrate detection to use manifest specified bitrate
 - [Internal] Upgraded agp to `9.2.1`
@@ -14,7 +16,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Upgraded test dependencies
 - Upgraded media3-exoplayer to `1.10.1`
 - Upgraded THEOplayer to 11.4.0
-
 
 ## v3.27.0
 

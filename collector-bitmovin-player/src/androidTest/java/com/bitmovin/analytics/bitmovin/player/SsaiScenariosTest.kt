@@ -833,9 +833,6 @@ class SsaiScenariosTest {
             assertThat(adSampleWithError.started).isEqualTo(1)
             assertThat(adSampleWithError.errorCode).isNotNull()
             assertThat(adSampleWithError.errorMessage).isNotNull()
-
-            // FIXME: needs to be discussed in the team if we want to
-            // set it like this for errors
             assertThat(adSampleWithError.exitedAdBreak).isFalse
         }
 

@@ -280,7 +280,6 @@ class PlayerStateMachine(
         shouldStartup: Boolean,
     ) {
         transitionState(PlayerStates.SOURCE_CHANGED, oldVideoTime, null)
-        // FIXME: reset playback qualities here!!!!
         resetSourceRelatedState()
         identicalErrorReportingLimiter.reset()
         if (shouldStartup) {
