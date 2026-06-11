@@ -47,7 +47,6 @@ import org.junit.runner.RunWith
 
 // System test for basic playing scenarios using bitmovin player
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
-// Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
 class BundledAnalyticsTest {
     private val mainScope = MainScope()

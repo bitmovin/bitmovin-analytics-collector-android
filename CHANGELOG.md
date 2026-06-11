@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Changed
+- Upgraded bitmovin player to `3.154.0`
+
 ## v3.28.0
 
 ### Changed
@@ -15,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Internal] Upgraded sonar plugin to `7.3.0.8198`
 - [Internal] Upgraded test dependencies
 - Upgraded media3-exoplayer to `1.10.1`
-- Upgraded THEOplayer to 11.4.0
+- Upgraded THEOplayer to `11.4.0`
 
 ## v3.27.0
 
