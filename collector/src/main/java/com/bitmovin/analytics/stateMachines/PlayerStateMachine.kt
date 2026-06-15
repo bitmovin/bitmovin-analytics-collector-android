@@ -102,9 +102,17 @@ class PlayerStateMachine(
         heartbeatHandler.removeCallbacksAndMessages(null)
     }
 
+    var lastSampleTriggered = false
+
     // last sample of session when collector is detached
     // player destroyed, or source unloaded, or programChange happened
     fun triggerLastSampleOfSession(sampleTriggerReason: SampleTriggerReason) {
+        BitmovinLog.d(TAG, "Last sample triggered $sampleTriggerReason")
+
+        if (lastSampleTriggered) {
+            return
+        }
+
         // we only send the last sample if we are in a state that is not triggering
         // an immediate sample by itself and ignore PAUSE, since that one is not relevant as a last sample
         if (currentState === PlayerStates.PLAYING ||
@@ -113,6 +121,8 @@ class PlayerStateMachine(
         ) {
             triggerSample(sampleTriggerReason)
         }
+
+        lastSampleTriggered = true
     }
 
     // Exoplayer does not have a 'playerWasReleased' event, so we can not detect when
@@ -189,6 +199,7 @@ class PlayerStateMachine(
         videoStartFailedReason = null
         isStartupFinished = false
         startupTime = 0
+        lastSampleTriggered = false
     }
 
     fun resetStateMachine() {
@@ -270,6 +281,9 @@ class PlayerStateMachine(
         errorCode: ErrorCode,
         originalNativeError: Any?,
     ) {
+        if (this.isInStartupState()) {
+            this.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
+        }
         val transformedErrorCode = transformErrorWithUserCallback(analytics.config.errorTransformerCallback, errorCode, originalNativeError)
         transitionState(PlayerStates.ERROR, videoTime, transformedErrorCode)
     }

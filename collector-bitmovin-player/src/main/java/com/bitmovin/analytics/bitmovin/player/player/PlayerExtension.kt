@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player.player
 
+import com.bitmovin.analytics.adapters.PlayerActivity
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.media.video.quality.VideoQuality
 import com.bitmovin.player.base.internal.plugin.Plugin
@@ -72,4 +73,17 @@ internal fun Player.resolveManifestVideoBitrate(videoQuality: VideoQuality?): In
     videoQuality ?: return null
     val manifestQuality = this.source?.availableVideoQualities?.firstOrNull { it.id == videoQuality.id }
     return manifestQuality?.bitrate ?: videoQuality.bitrate
+}
+
+internal fun Player.getCurrentPlayerActivity(): PlayerActivity {
+    var playerActivity = PlayerActivity.UNKNOWN
+    if (this.isPaused) {
+        playerActivity = PlayerActivity.PAUSED
+    } else if (this.isPlaying) {
+        playerActivity = PlayerActivity.PLAYING
+    } else if (this.isStalled) {
+        playerActivity = PlayerActivity.STALLED
+    }
+
+    return playerActivity
 }

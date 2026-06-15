@@ -116,12 +116,15 @@ class CsaiScenariosTest {
         return player!!
     }
 
-    private fun createPlayerWithoutAnalytics(advertisingConfig: AdvertisingConfig): Player {
+    private fun createPlayerWithoutAnalytics(
+        advertisingConfig: AdvertisingConfig,
+        isAutoplayEnabled: Boolean = true,
+    ): Player {
         var player: Player? = null
 
         runBlockingTest {
             withContext(mainScope.coroutineContext) {
-                val playbackConfig = PlaybackConfig(isMuted = true, isAutoplayEnabled = true)
+                val playbackConfig = PlaybackConfig(isMuted = true, isAutoplayEnabled = isAutoplayEnabled)
                 val playerConfig =
                     PlayerConfig(
                         key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
@@ -658,6 +661,96 @@ class CsaiScenariosTest {
             DataVerifier.verifyInvariants(eventDataList)
             val eventDataWithAdState = eventDataList.filter { it.ad == 1 }
             assertThat(eventDataWithAdState).hasSize(1)
+        }
+
+    @Test
+    fun test_vodWithImaPreRollAd_notBundled_autoplay_attachAfterAdStart() =
+        runBlockingTest {
+            // arrange
+            // Non-bundled collector + autoplay + attaching AFTER the source has been loaded.
+            // This is the scenario that exercises BitmovinSdkAdapter.checkAutoplayStartup(): at attach
+            // time the source is already set and autoplay is enabled, so the adapter manually moves the
+            // state machine into startup. The pre-roll ad then plays before the content.
+            val imaAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_AD_SOURCE_2)
+            val preRoll = AdItem("pre", imaAdSource)
+            val advertisingConfig = AdvertisingConfig(preRoll)
+            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
+            val sourceMetadata =
+                SourceMetadata(
+                    videoId = "preroll-autoplay-attach-after-load",
+                    title = metadataGenerator.getTestTitle(),
+                )
+
+            val collector = IBitmovinPlayerCollector.create(appContext, analyticsConfig)
+            val localPlayer = createPlayerWithoutAnalytics(advertisingConfig)
+
+            // act - load the source first (autoplay starts the pre-roll), then attach the collector.
+            withContext(mainScope.coroutineContext) {
+                val source = defaultSource
+                collector.setSourceMetadata(source, sourceMetadata)
+                localPlayer.load(source)
+            }
+
+            // wait for pre-roll ad to start and finish, then wait for content to play
+            PlaybackUtils.waitUntil("pre-roll ad started") { localPlayer.isAd }
+
+            // wait a bit, to make sure we attach while the ad is playing
+            Thread.sleep(1000)
+            withContext(mainScope.coroutineContext) {
+                collector.attachPlayer(localPlayer)
+            }
+
+            PlaybackUtils.waitUntil("pre-roll ad finished") { !localPlayer.isAd }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                localPlayer.pause()
+            }
+
+            Thread.sleep(500)
+
+            withContext(mainScope.coroutineContext) {
+                collector.detachPlayer()
+                localPlayer.destroy()
+            }
+
+            Thread.sleep(200)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            // the pre-roll CSAI ad must be tracked and linked to the (single) video impression
+            assertThat(impression.adEventDataList).hasSize(1)
+            val adSample = impression.adEventDataList[0]
+            CsaiDataVerifier.verifyStaticAdData(adSample, analyticsConfig, sourceMetadata = sourceMetadata)
+            assertThat(adSample.adPosition).isEqualTo("pre")
+            assertThat(adSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
+
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyStaticData(eventDataList, sourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
+            DataVerifier.verifyInvariants(eventDataList)
+
+            // exactly one ad-state content sample, and the startup sample is the very next sample:
+            // AD -> startup -> playing
+            val eventDataWithAdState = eventDataList.filter { it.ad == 1 }
+            assertThat(eventDataWithAdState).hasSize(1)
+            DataVerifier.verifyStartupSampleIsSentAfterPreRollAd(impression)
+
+            // assert the explicit AD -> startup -> playing ordering on the sample stream
+            val adIndex = eventDataList.indexOfFirst { it.state == "ad" }
+            val startupIndex = eventDataList.indexOfFirst { it.state == DataVerifier.STARTUP }
+            val playingIndex = eventDataList.indexOfFirst { it.state == DataVerifier.PLAYING }
+            assertThat(adIndex).isGreaterThanOrEqualTo(0)
+            assertThat(startupIndex).isEqualTo(adIndex + 1)
+            assertThat(playingIndex).isGreaterThan(startupIndex)
+
+            // there must be exactly one startup sample carrying the video startup time
+            DataVerifier.verifySessionHasOnlyOneSampleWithVideoStartupTime(eventDataList)
         }
 
     @Volatile

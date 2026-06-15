@@ -19,6 +19,13 @@ internal class PlayerEventListener(
             val videoTime = exoPlayerContext.position
             error.printStackTrace()
             val errorCode = Media3ExoPlayerExceptionMapper.map(error)
+
+            // TODO: this should be removed, but if we only check for
+            // inStartupState() inside the statemachine,
+            // this would change the behaviour to only
+            // track errors that are happening when play was pressed
+            // and not errors during loading (the other collectors
+            // are only tracking errors while in startup state and not in ready state)
             if (!stateMachine.isStartupFinished) {
                 stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
             }

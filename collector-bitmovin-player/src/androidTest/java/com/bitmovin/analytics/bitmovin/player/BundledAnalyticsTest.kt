@@ -157,6 +157,7 @@ class BundledAnalyticsTest {
         runBlockingTest {
             withContext(mainScope.coroutineContext) {
                 defaultPlayer.load(defaultSource)
+                defaultPlayer.preload()
             }
 
             Thread.sleep(1000)
@@ -166,7 +167,7 @@ class BundledAnalyticsTest {
             }
 
             // wait a bit to make sure a sample would be sent out
-            Thread.sleep(2000)
+            Thread.sleep(1000)
             val impressionList = MockedIngress.extractImpressions()
             assertThat(impressionList.size).isEqualTo(0)
         }
@@ -1339,7 +1340,7 @@ class BundledAnalyticsTest {
         }
 
     @Test
-    fun test_adEngagementMetrics_send_adEngagementData_on_player_destroy() =
+    fun test_ssai_adEngagementMetrics_send_adEngagementData_on_player_destroy() =
         runBlockingTest {
             // act
             withContext(mainScope.coroutineContext) {

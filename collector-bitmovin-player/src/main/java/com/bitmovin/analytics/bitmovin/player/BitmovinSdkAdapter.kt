@@ -10,6 +10,8 @@ import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinHttpRequestTrackingAdapter
+import com.bitmovin.analytics.bitmovin.player.listeners.AnalyticsEventListeners
+import com.bitmovin.analytics.bitmovin.player.manipulators.PlaybackEventDataManipulator
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
 import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.bitmovin.player.player.attachCollector
@@ -19,39 +21,17 @@ import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.MetadataProvider
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
-import com.bitmovin.analytics.dtos.ErrorCode
-import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.dtos.FeatureConfigContainer
-import com.bitmovin.analytics.dtos.SubtitleDto
-import com.bitmovin.analytics.enums.CastTech
-import com.bitmovin.analytics.enums.DRMType
 import com.bitmovin.analytics.enums.PlayerType
-import com.bitmovin.analytics.enums.StreamFormat
-import com.bitmovin.analytics.enums.VideoStartFailedReason
-import com.bitmovin.analytics.error.ExceptionMapper
 import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.license.LicenseKeyProvider
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
-import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.utils.BitmovinLog
-import com.bitmovin.analytics.utils.DownloadSpeedMeasurement
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
-import com.bitmovin.analytics.utils.Util
 import com.bitmovin.player.api.Player
-import com.bitmovin.player.api.deficiency.ErrorEvent
-import com.bitmovin.player.api.drm.ClearKeyConfig
-import com.bitmovin.player.api.drm.WidevineConfig
-import com.bitmovin.player.api.event.PlayerEvent
-import com.bitmovin.player.api.event.SourceEvent
-import com.bitmovin.player.api.event.on
-import com.bitmovin.player.api.media.subtitle.SubtitleTrack
-import com.bitmovin.player.api.network.HttpRequestType
-import com.bitmovin.player.api.recovery.RetryPlaybackAction
 import com.bitmovin.player.api.source.Source
-import com.bitmovin.player.api.source.SourceType
-import java.util.Date
 
 internal class BitmovinSdkAdapter(
     private val player: Player,
@@ -76,22 +56,34 @@ internal class BitmovinSdkAdapter(
         bitmovinAnalytics,
         ssaiApiProxy,
         looper,
-    ),
-    EventDataManipulator {
+    ) {
     private val downloadSpeedMeter = DownloadSpeedMeter()
-    private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
-    private var totalDroppedVideoFrames = 0
-    private var isVideoAttemptedPlay = false
 
-    // When transitioning in a Playlist, BitmovinPlayer will already return the
-    // new source in `getSource`, but we are still interested in sending a sample
-    // with information of the previous one.
-    // TODO: we should solve this with the cache, and avoid the properties here
-    private var overrideCurrentSource: Source? = null
-    override var drmDownloadTime: Long? = null
-        private set
+    private val eventListeners: AnalyticsEventListeners by lazy {
+        AnalyticsEventListeners(
+            player = player,
+            playerContext = playerContext,
+            playerEventReporter = playerEventReporter,
+            playbackQualityProvider = playbackQualityProvider,
+            downloadSpeedMeter = downloadSpeedMeter,
+        )
+    }
 
-    override val eventDataManipulators: Collection<EventDataManipulator> by lazy { listOf(this) }
+    override val drmDownloadTime: Long?
+        get() = eventListeners.drmDownloadTime
+
+    override val eventDataManipulators: Collection<EventDataManipulator> by lazy {
+        listOf(
+            PlaybackEventDataManipulator(
+                player = player,
+                playerContext = playerContext,
+                adapter = this,
+                playbackQualityProvider = playbackQualityProvider,
+                playerLicenseProvider = playerLicenseProvider,
+                downloadSpeedMeter = downloadSpeedMeter,
+            ),
+        )
+    }
 
     override fun createHttpRequestTrackingAdapter(
         onAnalyticsReleasingObservable: Observable<OnAnalyticsReleasingEventListener>,
@@ -105,200 +97,34 @@ internal class BitmovinSdkAdapter(
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = super.init()
         player.attachCollector()
-        addPlayerListeners()
-        checkAutoplayStartup()
+        eventListeners.registerEventListeners()
+        checkLateAttachingOnStartup()
         return features
     }
 
-    private fun addPlayerListeners() {
-        BitmovinLog.d(TAG, "Adding Player Listeners")
-        player.on(::onSourceEventSourceLoaded)
-        player.on(::onSourceEventSourceUnloaded)
-        player.on(::onPlayerEventPlay)
-        player.on(::onPlayerEventPlaying)
-        player.on(::onPlayerEventPaused)
-        player.on(::onPlayerEventStallEnded)
-        player.on(::onPlayerEventSeeked)
-        player.on(::onPlayerEventSeek)
-        player.on(::onPlayerEventStallStarted)
-        player.on(::onPlayerEventPlaybackFinished)
-        player.on(::onPlayerEventVideoPlaybackQualityChanged)
-        player.on(::onPlayerEventAudioPlaybackQualityChanged)
-        player.on(::onPlayerEventDroppedVideoFrames)
-        player.on(::onSourceEventSubtitleChanged)
-        player.on(::onSourceEventAudioChanged)
-        player.on(::onSourceEventDownloadFinished)
-        player.on(::onPlayerEventDestroy)
-        player.on(::onPlayerErrorEvent)
-        player.on(::onSourceErrorEvent)
-        player.on(::onPlayerEventAdBreakStarted)
-        player.on(::onPlayerEventAdBreakFinished)
-        player.on(::onPlayerEventTimeChanged)
-        player.on(::onPlayerEventPlaylistTransition)
-        // Event was added in Player 3.128.0
-        runCatching { player.on(::onPlayerEventRetryPlaybackAttempt) }
-    }
+    val currentSource: Source?
+        get() = eventListeners.currentSource
 
-    private fun removePlayerListener() {
-        BitmovinLog.d(TAG, "Removing Player Listeners")
-        player.off(::onSourceEventSourceLoaded)
-        player.off(::onSourceEventSourceUnloaded)
-        player.off(::onPlayerEventPlay)
-        player.off(::onPlayerEventPlaying)
-        player.off(::onPlayerEventPaused)
-        player.off(::onPlayerEventStallEnded)
-        player.off(::onPlayerEventSeeked)
-        player.off(::onPlayerEventSeek)
-        player.off(::onPlayerEventStallStarted)
-        player.off(::onPlayerEventPlaybackFinished)
-        player.off(::onPlayerEventVideoPlaybackQualityChanged)
-        player.off(::onPlayerEventAudioPlaybackQualityChanged)
-        player.off(::onPlayerEventDroppedVideoFrames)
-        player.off(::onSourceEventSubtitleChanged)
-        player.off(::onSourceEventAudioChanged)
-        player.off(::onSourceEventDownloadFinished)
-        player.off(::onPlayerEventDestroy)
-        player.off(::onPlayerErrorEvent)
-        player.off(::onSourceErrorEvent)
-        player.off(::onPlayerEventAdBreakStarted)
-        player.off(::onPlayerEventAdBreakFinished)
-        player.off(::onPlayerEventTimeChanged)
-        player.off(::onPlayerEventPlaylistTransition)
-        runCatching { player.off(::onPlayerEventRetryPlaybackAttempt) }
-    }
-
-    private val currentSource: Source?
-        get() = overrideCurrentSource ?: player.source
-
-    // TODO [AN-3689]: refactor to use separate manipulators for this method
-    @Suppress("DEPRECATION") // player.subtitle and player.audio are deprecated in newer Bitmovin Player SDK versions
-    override fun manipulate(data: EventData) {
-        val source = currentSource
-        val sourceMetadata = this.getCurrentSourceMetadata()
-
-        // videoDuration and isLive,
-        var playerIsLive = false
-        if (source != null) {
-            val duration = source.duration
-            if (duration != -1.0) {
-                // source is loaded and duration is available
-                if (duration == Double.POSITIVE_INFINITY) {
-                    playerIsLive = true
-                } else {
-                    playerIsLive = false
-                    data.videoDuration = Util.secondsToMillis(duration)
-                }
-            }
-        }
-        data.isLive = sourceMetadata.isLive ?: playerIsLive
-
-        // streamFormat, mpdUrl, and m3u8Url
-        if (source != null) {
-            val sourceConfig = source.config
-            when (sourceConfig.type) {
-                SourceType.Hls -> {
-                    data.m3u8Url = sourceConfig.url
-                    data.streamFormat = StreamFormat.HLS.value
-                }
-
-                SourceType.Dash -> {
-                    data.mpdUrl = sourceConfig.url
-                    data.streamFormat = StreamFormat.DASH.value
-                }
-
-                SourceType.Progressive -> {
-                    data.progUrl = sourceConfig.url
-                    data.streamFormat = StreamFormat.PROGRESSIVE.value
-                }
-
-                SourceType.Smooth -> data.streamFormat = StreamFormat.SMOOTH.value
-            }
-            val drmConfig = sourceConfig.drmConfig
-            when {
-                drmConfig is WidevineConfig -> data.drmType = DRMType.WIDEVINE.value
-                drmConfig is ClearKeyConfig -> data.drmType = DRMType.CLEARKEY.value
-                drmConfig != null -> {
-                    BitmovinLog.d(TAG, "Warning: unknown DRM Type " + drmConfig.javaClass.simpleName)
-                }
-            }
-        }
-
-        // version
-        data.version = playerContext.playerVersion
-
-        // isCasting
-        data.isCasting = player.isCasting
-        if (player.isCasting) {
-            data.castTech = CastTech.GoogleCast.value
-        }
-
-        // DroppedVideoFrames
-        data.droppedFrames = totalDroppedVideoFrames
-        totalDroppedVideoFrames = 0
-
-        val videoQualityHolder = playbackQualityProvider.getVideoQualityHolder()
-        if (videoQualityHolder != null) {
-            data.videoBitrate = videoQualityHolder.currentBitrateFromManifest ?: videoQualityHolder.currentVideoQuality?.bitrate ?: 0
-            data.videoPlaybackHeight = videoQualityHolder.currentVideoQuality?.height ?: 0
-            data.videoPlaybackWidth = videoQualityHolder.currentVideoQuality?.width ?: 0
-            data.videoCodec = videoQualityHolder.currentVideoQuality?.codec
-        }
-
-        val audioQuality = playbackQualityProvider.currentAudioQuality
-        if (audioQuality != null) {
-            data.audioBitrate = audioQuality.bitrate
-            data.audioCodec = audioQuality.codec
-        }
-
-        // Subtitle info
-        val subtitle = getSubtitleDto(player.subtitle)
-        data.subtitleLanguage = subtitle.subtitleLanguage
-        data.subtitleEnabled = subtitle.subtitleEnabled
-
-        // Audio language
-        val audioTrack = player.audio
-        if (audioTrack?.id != null) {
-            data.audioLanguage = audioTrack.language
-        }
-
-        data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
-
-        data.playerKey = playerLicenseProvider.getBitmovinPlayerLicenseKey(player.config)
-
-        data.isMuted = playerContext.isMuted
-    }
-
-    private fun getSubtitleDto(subtitleTrack: SubtitleTrack?): SubtitleDto {
-        val isEnabled = subtitleTrack?.id != null && subtitleTrack.id != "bitmovin-off"
-        return SubtitleDto(
-            isEnabled,
-            if (isEnabled) subtitleTrack?.language ?: subtitleTrack?.label else null,
-        )
-    }
+    fun getAndResetDroppedFrames(): Int = eventListeners.getAndResetDroppedFrames()
 
     override fun release() {
-        removePlayerListener()
-
-        stateMachine.resetStateMachine()
+        eventListeners.unregisterEventListeners()
+        playerEventReporter.onPlayerRelease()
         player.detachCollector()
     }
 
     override fun resetSourceRelatedState() {
-        overrideCurrentSource = null
-        totalDroppedVideoFrames = 0
-        drmDownloadTime = null
-        isVideoAttemptedPlay = false
+        eventListeners.resetSourceRelatedState()
         // Clear the cached playback qualities on every source change. Automatic playlist
         // transitions don't emit a `Play` event, so `startup()` (and its reset) is never
         // invoked for the new source - without this, the new session's startup and first
         // playing samples would report the previous source's quality/bitrate until the new
         // source's VideoPlaybackQualityChanged event arrives.
         playbackQualityProvider.resetPlaybackQualities()
+
+        // TODO: this needs to move out of the player specific adapters
         ssaiService.resetSourceRelatedState()
     }
-
-    val position: Long
-        get() = BitmovinUtil.getCurrentTimeInMs(player)
 
     override fun createAdAdapter(): AdAdapter {
         return BitmovinSdkAdAdapter(player)
@@ -317,405 +143,34 @@ internal class BitmovinSdkAdapter(
     }
 
     /*
-     * Because of the late initialization of the Adapter we do not get the first
+     * When the adapter is late attached we do not get the first
      * couple of events so in case the player starts a video due to autoplay=true we
      * need to transition into startup state manually
      *
-     * TODO [AN-3602]: Is this really true? Since this would mean that customers are attaching after loading the source.
-     * And thus we might run into issues in case customer attaches before loading the source and
+     * We might run into issues in case customer attaches before loading the source and
      * has autoplay enabled for the current source. This could then create another impression if
      * customer is not loading the source immediately for some reason.
+     * Since this would mean that the integration is wrong, we will not care about that scenario.
+     * (Also this is only possible with the standalone collector)
      */
-    private fun checkAutoplayStartup() {
+    private fun checkLateAttachingOnStartup() {
         val playbackConfig = player.config.playbackConfig
         val source = player.source
 
         if (source != null && playbackConfig.isAutoplayEnabled) {
             BitmovinLog.d(TAG, "Detected Autoplay going to startup")
-            startup()
-        }
-    }
+            playbackQualityProvider.resetPlaybackQualities()
 
-    private fun startup() {
-        playbackQualityProvider.resetPlaybackQualities()
-        stateMachine.transitionState(PlayerStates.STARTUP, position)
-
-        if (!player.isAd) {
-            // if ad is playing as first thing we prevent from sending the
-            // VideoStartFailedReason.PAGE_CLOSED / VideoStartFailedReason.PLAYER_ERROR
-            // because actual video is not playing yet
-            isVideoAttemptedPlay = true
-        }
-    }
-
-    private fun onSourceEventSourceLoaded(
-        @Suppress("UNUSED_PARAMETER") event: SourceEvent.Loaded,
-    ) {
-        BitmovinLog.d(TAG, "On Source Loaded")
-        isVideoAttemptedPlay = false
-    }
-
-    private fun onSourceEventSourceUnloaded(
-        @Suppress("UNUSED_PARAMETER") event: SourceEvent.Unloaded,
-    ) {
-        try {
-            ssaiService.flushCurrentActiveAd(true)
-            BitmovinLog.d(TAG, "On Source Unloaded")
-            stateMachine.resetStateMachine()
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventDestroy(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Destroy,
-    ) {
-        try {
-            ssaiService.flushCurrentActiveAd(true)
-            BitmovinLog.d(TAG, "On Destroy")
-            if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
-                stateMachine.exitBeforeVideoStart(position)
-            }
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventPlaybackFinished(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.PlaybackFinished,
-    ) {
-        try {
-            BitmovinLog.d(TAG, "On Playback Finished Listener")
-            // if it's live stream we are using currentPosition of playback as videoTime
-            val videoTime =
-                if (player.duration != Double.POSITIVE_INFINITY) Util.secondsToMillis(player.duration) else position
-            stateMachine.transitionState(PlayerStates.PAUSE, videoTime)
-            stateMachine.resetStateMachine()
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventPaused(event: PlayerEvent.Paused) {
-        try {
-            BitmovinLog.d(TAG, "On Pause Listener")
-            // used value from event instead of player.currentTime because in case player is transitioning to ads
-            // player.currentTime will be 0 and mess videoTimeEnd measurement
-            val videoPosition = Util.secondsToMillis(event.time)
             if (player.isAd) {
-                stateMachine.startAd(videoPosition)
+                playerEventReporter.onAdStarted(playerContext.position)
             } else {
-                stateMachine.pause(videoPosition)
+                playerEventReporter.onPlay(playerContext.position)
             }
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventPlay(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Play,
-    ) {
-        try {
-            BitmovinLog.d(TAG, "On Play Listener")
-            if (!stateMachine.isStartupFinished) {
-                startup()
-            }
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventPlaying(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Playing,
-    ) {
-        try {
-            BitmovinLog.d(TAG, "On Playing Listener " + stateMachine.currentState.name)
-            stateMachine.transitionState(PlayerStates.PLAYING, position)
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventTimeChanged(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.TimeChanged,
-    ) {
-        try {
-            if (!player.isStalled && !player.isPaused && player.isPlaying) {
-                stateMachine.transitionState(PlayerStates.PLAYING, position)
-            }
-
-            stateMachine.handlePlayerTimeUpdate()
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventSeeked(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Seeked,
-    ) {
-        BitmovinLog.d(TAG, "On Seeked Listener")
-
-        if (player.isPaused) {
-            stateMachine.transitionState(PlayerStates.PAUSE, position)
-        }
-    }
-
-    private fun onPlayerEventSeek(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.Seek,
-    ) {
-        try {
-            BitmovinLog.d(TAG, "On Seek Listener")
-
-            if (!stateMachine.isStartupFinished) {
-                return
-            }
-            stateMachine.transitionState(PlayerStates.SEEKING, position)
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventStallEnded(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.StallEnded,
-    ) {
-        try {
-            BitmovinLog.d(TAG, "On Stall Ended: " + player.isPlaying)
-
-            if (!stateMachine.isStartupFinished) {
-                return
-            }
-            if (player.isPlaying &&
-                stateMachine.currentState !== PlayerStates.PLAYING
-            ) {
-                stateMachine.transitionState(PlayerStates.PLAYING, position)
-            } else if (player.isPaused &&
-                stateMachine.currentState !== PlayerStates.PAUSE
-            ) {
-                stateMachine.transitionState(PlayerStates.PAUSE, position)
-            }
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    @Suppress("DEPRECATION") // SourceEvent.AudioChanged is deprecated in newer Bitmovin Player SDK versions
-    private fun onSourceEventAudioChanged(event: SourceEvent.AudioChanged) {
-        try {
-            BitmovinLog.d(TAG, "On AudioChanged")
-
-            // this event is sometime fired at the beginning after startup is finished
-            // in order to avoid unnecessary logging,
-            // we will ignore it if the current position didn't move yet
-            // this is best effort but should work for most cases
-            if (position < 10) {
-                return
-            }
-
-            stateMachine.audioTrackChanged(
-                position,
-                event.oldAudioTrack?.language,
-                event.newAudioTrack?.language,
-            )
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    @Suppress("DEPRECATION") // SourceEvent.SubtitleChanged is deprecated in newer Bitmovin Player SDK versions
-    private fun onSourceEventSubtitleChanged(event: SourceEvent.SubtitleChanged) {
-        try {
-            BitmovinLog.d(TAG, "On SubtitleChanged")
-
-            stateMachine.subtitleChanged(
-                position,
-                getSubtitleDto(event.oldSubtitleTrack),
-                getSubtitleDto(event.newSubtitleTrack),
-            )
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventStallStarted(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.StallStarted,
-    ) {
-        try {
-            BitmovinLog.d(TAG, "On Stall Started Listener isPlaying:" + player.isPlaying)
-            if (!stateMachine.isStartupFinished) {
-                return
-            }
-
-            // if stalling is triggered by a seeking event
-            // we count the buffering time towards the seeking time
-            if (stateMachine.currentState !== PlayerStates.SEEKING) {
-                stateMachine.transitionState(PlayerStates.BUFFERING, position)
-            }
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventVideoPlaybackQualityChanged(event: PlayerEvent.VideoPlaybackQualityChanged) {
-        try {
-            BitmovinLog.d(TAG, "On Video Quality Changed")
-            stateMachine.videoQualityChanged(
-                position,
-                playbackQualityProvider.didVideoQualityChange(event.newVideoQuality),
-            ) {
-                playbackQualityProvider.setVideoQuality(event.newVideoQuality)
-            }
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventDroppedVideoFrames(event: PlayerEvent.DroppedVideoFrames) {
-        try {
-            totalDroppedVideoFrames += event.droppedFrames
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventAudioPlaybackQualityChanged(event: PlayerEvent.AudioPlaybackQualityChanged) {
-        try {
-            BitmovinLog.d(TAG, "On Audio Quality Changed")
-
-            stateMachine.audioQualityChanged(
-                position,
-                playbackQualityProvider.didAudioQualityChange(event.newAudioQuality),
-            ) {
-                playbackQualityProvider.currentAudioQuality = event.newAudioQuality
-            }
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onSourceEventDownloadFinished(event: SourceEvent.DownloadFinished) {
-        try {
-            if (event.downloadType.toString().contains("drm/license")) {
-                drmDownloadTime = Util.secondsToMillis(event.downloadTime)
-            }
-
-            // We only track videos segments to be consistent with the other implementations.
-            // A manifest download or audio download should NOT count as a segment.
-            // Progressive sources are not tracked, since partial downloads are not
-            // well supported in terms of download time on exoplayer and bitmovin player
-            // this is consistent with other platforms
-            if (event.downloadType == HttpRequestType.MediaVideo) {
-                addSpeedMeasurement(event)
-            }
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun addSpeedMeasurement(event: SourceEvent.DownloadFinished) {
-        val measurement =
-            DownloadSpeedMeasurement(
-                downloadSizeInBytes = event.size,
-                durationInMs = Util.secondsToMillis(event.downloadTime),
-                // We don't have this information with the Bitmovin Player Collector.
-                timeToFirstByteInMs = null,
-                timestamp = Date(event.timestamp),
-                httpStatusCode = event.httpStatus,
-            )
-        downloadSpeedMeter.addMeasurement(measurement)
-    }
-
-    private fun onPlayerErrorEvent(event: PlayerEvent.Error) {
-        BitmovinLog.d(TAG, "onPlayerError")
-        handleErrorEvent(event, exceptionMapper.map(event))
-    }
-
-    private fun onSourceErrorEvent(event: SourceEvent.Error) {
-        BitmovinLog.d(TAG, "onSourceError")
-        handleErrorEvent(event, exceptionMapper.map(event))
-    }
-
-    private fun handleErrorEvent(
-        originalNativeError: ErrorEvent,
-        errorCode: ErrorCode,
-    ) {
-        try {
-            val videoTime = position
-            if (!stateMachine.isStartupFinished && isVideoAttemptedPlay) {
-                stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
-            }
-            stateMachine.error(videoTime, errorCode, originalNativeError)
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventAdBreakStarted(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.AdBreakStarted,
-    ) {
-        try {
-            BitmovinLog.d(TAG, "Event: AdBreakStarted")
-            stateMachine.startAd(position)
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventAdBreakFinished(
-        @Suppress("UNUSED_PARAMETER") event: PlayerEvent.AdBreakFinished,
-    ) {
-        try {
-            BitmovinLog.d(TAG, "Event: AdBreakFinished")
-            stateMachine.endAd()
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventPlaylistTransition(event: PlayerEvent.PlaylistTransition) {
-        try {
-            BitmovinLog.d(
-                TAG,
-                "Event PlaylistTransition" +
-                    " from: " +
-                    event.from.config.url +
-                    " to: " +
-                    event.to.config.url,
-            )
-
-            // The `sourceChange` will send the remaining sample from the previous
-            // source, but the player will already return the new source on
-            // `getSource()`.
-            // That's why we need to override it here, and this will be reset
-            // automatically
-            // once the StateMachine triggers `resetSourceRelatedState`.
-            overrideCurrentSource = event.from
-            // Transitioning can either be triggered by finishing the previous
-            // source or seeking to another source. In both cases, we set the
-            // videoEndTime to the duration of the old source.
-            val videoEndTimeOfPreviousSource =
-                Util.secondsToMillis(overrideCurrentSource?.duration)
-            val shouldStartup = player.isPlaying
-            ssaiService.flushCurrentActiveAd(true)
-            stateMachine.sourceChange(videoEndTimeOfPreviousSource, position, shouldStartup)
-            // `sourceChange` resets the playback qualities. Seed the new source's quality from its
-            // manifest so the startup sample does not fall back to the previous source's stale
-            // playbackVideoData before the new VideoPlaybackQualityChanged event arrives.
-            playbackQualityProvider.seedVideoQualityFromSource(event.to)
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, e.message, e)
-        }
-    }
-
-    private fun onPlayerEventRetryPlaybackAttempt(event: SourceEvent.RetryPlaybackAttempt) {
-        BitmovinLog.d(TAG, "onRetryPlaybackAttempt: action=${event.retryAction}")
-        if (event.retryAction == RetryPlaybackAction.SkipToNextSource) {
-            val error = event.errorEvent
-            handleErrorEvent(error, exceptionMapper.map(error))
         }
     }
 
     companion object {
-        private const val TAG = "BitmovinPlayerAdapter"
+        private const val TAG = "BitmovinSdkAdapter"
         private const val PLAYER_TECH = "Android:Exoplayer"
         private val PLAYER_INFO = PlayerInfo(PLAYER_TECH, PlayerType.BITMOVIN)
     }

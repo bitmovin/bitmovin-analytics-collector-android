@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Upgraded bitmovin player to `3.154.0`
+- [Internal] Mature refactoring around bitmovin player (Splitting up the adapter in Listener and Manipulator, pushing logic into core module)
 
 ## v3.28.0
 

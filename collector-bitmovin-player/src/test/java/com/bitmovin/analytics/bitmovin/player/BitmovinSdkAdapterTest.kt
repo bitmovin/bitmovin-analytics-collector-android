@@ -1,15 +1,7 @@
 package com.bitmovin.analytics.bitmovin.player
 
-import com.bitmovin.analytics.api.AnalyticsConfig
-import com.bitmovin.analytics.api.DefaultMetadata
-import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
-import com.bitmovin.analytics.data.DeviceInformation
-import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.MetadataProvider
-import com.bitmovin.analytics.data.PlayerInfo
-import com.bitmovin.analytics.dtos.EventData
-import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.QualityChangeEventLimiter
@@ -20,7 +12,6 @@ import com.bitmovin.player.api.event.PlayerEvent
 import com.bitmovin.player.api.event.SourceEvent
 import com.bitmovin.player.api.media.audio.quality.AudioQuality
 import com.bitmovin.player.api.recovery.RetryPlaybackAction
-import com.bitmovin.player.api.source.Source
 import io.mockk.MockKAnnotations
 import io.mockk.clearMocks
 import io.mockk.every
@@ -33,7 +24,6 @@ import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
-import java.util.UUID
 import kotlin.reflect.KClass
 
 class BitmovinSdkAdapterTest {
@@ -229,61 +219,6 @@ class BitmovinSdkAdapterTest {
     }
 
     @Test
-    fun `manipulate sets isLive to true from player given no sourceMetadata set`() {
-        // arrange
-        every { metadataProvider.getSourceMetadata(any()) } returns null
-
-        val eventData = createTestEventData()
-        val currentSource: Source = mockk(relaxed = true)
-        every { currentSource.duration } returns Double.POSITIVE_INFINITY
-        every { player.source } returns currentSource
-
-        // act
-        bitmovinSdkAdapter.manipulate(eventData)
-
-        // assert
-        assertThat(eventData.isLive).isTrue
-        assertThat(eventData.videoDuration).isEqualTo(0)
-    }
-
-    @Test
-    fun `manipulate sets isLive to false from player given no sourceMetadata set`() {
-        // arrange
-        every { metadataProvider.getSourceMetadata(any()) } returns null
-
-        val eventData = createTestEventData()
-        val currentSource: Source = mockk(relaxed = true)
-        every { currentSource.duration } returns 1234.0
-        every { player.source } returns currentSource
-
-        // act
-        bitmovinSdkAdapter.manipulate(eventData)
-
-        // assert
-        assertThat(eventData.isLive).isFalse
-        assertThat(eventData.videoDuration).isEqualTo(1234000L)
-    }
-
-    @Test
-    fun `manipulate sets isLive to true from sourceMetadata`() {
-        // arrange
-        val sourceMetadata = SourceMetadata(isLive = true)
-        every { metadataProvider.getSourceMetadata(any()) } returns sourceMetadata
-
-        val eventData = createTestEventData()
-        val currentSource: Source = mockk(relaxed = true)
-        every { currentSource.duration } returns 1234.0
-        every { player.source } returns currentSource
-
-        // act
-        bitmovinSdkAdapter.manipulate(eventData)
-
-        // assert
-        assertThat(eventData.isLive).isTrue
-        assertThat(eventData.videoDuration).isEqualTo(1234000L)
-    }
-
-    @Test
     fun `onRetryPlaybackAttempt with SkipToNextSource triggers error`() {
         val listener = captureRetryPlaybackAttemptListener()
         val mockError = mockk<ErrorEvent>(relaxed = true)
@@ -318,21 +253,5 @@ class BitmovinSdkAdapterTest {
         bitmovinSdkAdapter.init()
         clearMocks(playerStateMachine, answers = false)
         return slot.captured
-    }
-
-    private fun createTestEventData(sourceMetadata: SourceMetadata = SourceMetadata()): EventData {
-        val analyticsConfig = AnalyticsConfig(licenseKey = "licenseKey")
-        return EventDataFactory(
-            analyticsConfig,
-            mockk(relaxed = true),
-            mockk(relaxed = true),
-        ).create(
-            UUID.randomUUID().toString(),
-            sourceMetadata,
-            DefaultMetadata(),
-            DeviceInformation("myManufacturer", "myModel", false, "de", "package-name", 100, 200),
-            PlayerInfo("Android:Bitmovin", PlayerType.BITMOVIN),
-            null,
-        )
     }
 }

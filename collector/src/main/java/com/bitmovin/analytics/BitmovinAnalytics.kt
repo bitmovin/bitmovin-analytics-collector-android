@@ -39,7 +39,7 @@ class BitmovinAnalytics(
     private val featureManager = FeatureManager<FeatureConfigContainer>()
     private val eventDataDispatcher = eventDataDispatcherFactory.create(this)
     private var stateMachineListener: StateMachineListener? = null
-    private val adAnalytics: BitmovinAdAnalytics? =
+    internal val adAnalytics: BitmovinAdAnalytics? =
         if (!config.adTrackingDisabled) BitmovinAdAnalytics(this) else null
 
     private val cacheService = CacheService()

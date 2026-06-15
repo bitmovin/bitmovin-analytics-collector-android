@@ -38,6 +38,15 @@ abstract class DefaultPlayerAdapter(
     protected abstract val eventDataManipulators: Collection<EventDataManipulator>
     abstract override val playerContext: PlayerContext
 
+    /**
+     * Player-agnostic event API that player-specific adapters should use to report
+     * playback events instead of driving the [stateMachine] directly. Created lazily
+     * because it depends on the [playerContext] provided by the concrete adapter.
+     */
+    val playerEventReporter: PlayerEventReporter by lazy {
+        DefaultPlayerEventReporter(stateMachine, playerContext, ssaiService, bitmovinAnalytics)
+    }
+
     // TODO [AN-4317]: this wiring is not good, we should aim for getting rid of the PlayerAdapter dependency
     private val ssaiEngagementMetricsService: SsaiEngagementMetricsService =
         SsaiEngagementMetricsService(analytics = bitmovinAnalytics, analyticsConfig = config, playerAdapter = this, Handler(looper))

@@ -1,7 +1,6 @@
 package com.bitmovin.analytics.theoplayer.listeners
 
 import com.bitmovin.analytics.BitmovinAnalytics
-import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.SampleTriggerReason
@@ -225,9 +224,6 @@ internal class AnalyticsEventListeners(
         BitmovinLog.d(TAG, "Event: ErrorEvent")
         try {
             val videoTime = player.currentPositionInMs()
-            if (stateMachine.isInStartupState()) {
-                stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
-            }
             val errorCode = TheoPlayerExceptionMapper.map(originalNativeError)
             stateMachine.error(videoTime, errorCode, originalNativeError)
         } catch (e: Exception) {
