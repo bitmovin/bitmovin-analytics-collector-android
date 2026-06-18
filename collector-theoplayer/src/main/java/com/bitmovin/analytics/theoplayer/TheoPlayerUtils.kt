@@ -1,6 +1,7 @@
 package com.bitmovin.analytics.theoplayer
 
 import com.bitmovin.analytics.utils.Util
+import com.theoplayer.android.api.event.ads.AdIntegrationKind
 
 internal object TheoPlayerUtils {
     private const val GOOGLE_IMA_AD_CLASSNAME =
@@ -15,5 +16,11 @@ internal object TheoPlayerUtils {
 
     val isTheoImaAdBreakClassLoaded by lazy {
         Util.isClassLoaded(GOOGLE_IMA_ADBREAK_CLASSNAME, this.javaClass.classLoader)
+    }
+
+    fun isClientSideAd(adIntegrationKind: AdIntegrationKind?): Boolean {
+        // in case it is not Google_Ime we assume SSAI
+        // This is following what the conviva integration does
+        return adIntegrationKind == AdIntegrationKind.GOOGLE_IMA
     }
 }

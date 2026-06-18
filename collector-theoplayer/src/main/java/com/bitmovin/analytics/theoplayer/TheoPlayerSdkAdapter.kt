@@ -44,7 +44,7 @@ internal class TheoPlayerSdkAdapter(
     private val playerStatisticsProvider: PlayerStatisticsProvider,
     metadataProvider: MetadataProvider,
     bitmovinAnalytics: BitmovinAnalytics,
-    ssaiApiProxy: SsaiApiProxy,
+    private val ssaiApiProxy: SsaiApiProxy,
     looper: Looper,
 ) : DefaultPlayerAdapter(
         config,
@@ -110,7 +110,7 @@ internal class TheoPlayerSdkAdapter(
         if (Looper.getMainLooper().isCurrentThread) sendSampleCodeBlock() else mainHandler.post(sendSampleCodeBlock)
     }
 
-    override fun createAdAdapter(): AdAdapter = TheoPlayerAdAdapter(player)
+    override fun createAdAdapter(): AdAdapter = TheoPlayerAdAdapter(player, ssaiApiProxy)
 
     override val eventDataManipulators: Collection<EventDataManipulator>
         get() = listOf(playbackEventDataManipulator)

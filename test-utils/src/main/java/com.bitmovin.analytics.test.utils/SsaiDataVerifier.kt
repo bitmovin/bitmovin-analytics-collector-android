@@ -140,7 +140,9 @@ object SsaiDataVerifier {
             assertThat(it.path).isNotEmpty()
             assertThat(it.platform).isNotEmpty()
             assertThat(it.player).isNotEmpty()
-            assertThat(it.playerKey).isNotEmpty()
+            if (it.player == "bitmovin") {
+                assertThat(it.playerKey).isNotEmpty()
+            }
             assertThat(it.playerTech).isNotEmpty()
             assertThat(it.screenHeight).isGreaterThan(0)
             assertThat(it.screenWidth).isGreaterThan(0)

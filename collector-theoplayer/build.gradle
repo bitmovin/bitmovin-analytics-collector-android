@@ -90,6 +90,8 @@ dependencies {
 
     androidTestImplementation "com.theoplayer.theoplayer-sdk-android:core:${rootProject.ext.theoPlayerVersion}"
     androidTestImplementation "com.theoplayer.theoplayer-sdk-android:integration-ads-ima:${rootProject.ext.theoPlayerVersion}"
+    // Google DAI (server-side ad insertion) is delivered through its own integration on Android
+    androidTestImplementation "com.theoplayer.theoplayer-sdk-android:integration-ads-dai:${rootProject.ext.theoPlayerVersion}"
     androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"
     androidTestImplementation "org.assertj:assertj-core:${rootProject.ext.assertjCoreVersion}"

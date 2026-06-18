@@ -6,6 +6,9 @@ import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
 import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdQuartile
+import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
+import com.bitmovin.analytics.api.ssai.SsaiApi
+import com.bitmovin.analytics.theoplayer.TheoPlayerUtils
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.THEOplayerGlobal
@@ -28,18 +31,24 @@ import com.theoplayer.android.api.ads.AdBreak as TheoAdBreak
 
 internal class TheoPlayerAdAdapter(
     private val player: Player,
+    private val ssaiApi: SsaiApi,
 ) : AdAdapter {
     private val observableSupport = ObservableSupport<AdAnalyticsEventListener>()
     private var currentAd: Ad? = null
     private var currentTheoAdBreak: TheoAdBreak? = null
-
     private val adBreakBeginListener =
         EventListener<AdBreakBeginEvent> { event ->
             try {
                 BitmovinLog.d(TAG, "ad break begin")
                 val adBreak = event.adBreak ?: return@EventListener
                 currentTheoAdBreak = adBreak
-                observableSupport.notify { it.onAdBreakStarted(AdBreakMapper.fromTheoAdBreak(adBreak)) }
+
+                if (TheoPlayerUtils.isClientSideAd(adBreak.integration)) {
+                    observableSupport.notify { it.onAdBreakStarted(AdBreakMapper.fromTheoAdBreak(adBreak)) }
+                } else {
+                    // TODO: add metadata
+                    ssaiApi.adBreakStart()
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Break Begin", e)
             }
@@ -53,7 +62,13 @@ internal class TheoPlayerAdAdapter(
                 if (theoAd.type != "linear") return@EventListener
                 val mappedAd = AdMapper.fromTheoAd(theoAd)
                 currentAd = mappedAd
-                observableSupport.notify { it.onAdStarted(mappedAd) }
+
+                if (TheoPlayerUtils.isClientSideAd(theoAd.integration)) {
+                    observableSupport.notify { it.onAdStarted(mappedAd) }
+                } else {
+                    // TODO: add data
+                    ssaiApi.adStart()
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Begin", e)
             }
@@ -64,29 +79,46 @@ internal class TheoPlayerAdAdapter(
             try {
                 BitmovinLog.d(TAG, "ad end")
                 val theoAd = event.ad ?: return@EventListener
+
+                // FIXME: type linear also true for SSAI?
                 if (theoAd.type != "linear") return@EventListener
-                observableSupport.notify { it.onAdFinished() }
+
+                if (TheoPlayerUtils.isClientSideAd(theoAd.integration)) {
+                    observableSupport.notify { it.onAdFinished() }
+                } else {
+                    // TODO: is this the right call here?
+                    ssaiApi.adQuartileFinished(SsaiAdQuartile.COMPLETED)
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad End", e)
             }
         }
 
     private val adBreakEndListener =
-        EventListener<AdBreakEndEvent> { _ ->
+        EventListener<AdBreakEndEvent> { event ->
             try {
                 BitmovinLog.d(TAG, "ad break end")
                 currentTheoAdBreak = null
-                observableSupport.notify { it.onAdBreakFinished() }
+
+                if (TheoPlayerUtils.isClientSideAd(event.adBreak.integration)) {
+                    observableSupport.notify { it.onAdBreakFinished() }
+                } else {
+                    ssaiApi.adBreakEnd()
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Break End", e)
             }
         }
 
     private val adSkipListener =
-        EventListener<AdSkipEvent> { _ ->
+        EventListener<AdSkipEvent> { event ->
             try {
                 BitmovinLog.d(TAG, "ad skipped")
-                observableSupport.notify { it.onAdSkipped() }
+                val theoAd = event.ad ?: return@EventListener
+
+                if (TheoPlayerUtils.isClientSideAd(theoAd.integration)) {
+                    observableSupport.notify { it.onAdSkipped() }
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Skip", e)
             }
@@ -102,8 +134,12 @@ internal class TheoPlayerAdAdapter(
                         AdBreakMapper.fromTheoAdBreak(theoAdBreak)
                     } else {
                         // error fired before any ad break was created (e.g. early load failure)
+                        // FIXME: how should we handle this? opt for CSAI or SSAI?
                         AdBreak(id = Util.uUID, ads = emptyList())
                     }
+
+                // FIXME: Do we need to block SSAI here? How should we handle null adbreak in that
+                // case?
                 observableSupport.notify {
                     it.onAdError(adBreak, 0, event.error)
                 }
@@ -113,30 +149,44 @@ internal class TheoPlayerAdAdapter(
         }
 
     private val adFirstQuartileListener =
-        EventListener<AdFirstQuartileEvent> { _ ->
+        EventListener<AdFirstQuartileEvent> { event ->
             try {
                 BitmovinLog.d(TAG, "ad first quartile")
-                observableSupport.notify { it.onAdQuartile(AdQuartile.FIRST_QUARTILE) }
+                if (TheoPlayerUtils.isClientSideAd(event.ad?.integration)) {
+                    observableSupport.notify { it.onAdQuartile(AdQuartile.FIRST_QUARTILE) }
+                } else {
+                    ssaiApi.adQuartileFinished(SsaiAdQuartile.FIRST)
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad First Quartile", e)
             }
         }
 
     private val adMidpointListener =
-        EventListener<AdMidpointEvent> { _ ->
+        EventListener<AdMidpointEvent> { event ->
             try {
                 BitmovinLog.d(TAG, "ad midpoint")
-                observableSupport.notify { it.onAdQuartile(AdQuartile.MIDPOINT) }
+
+                if (TheoPlayerUtils.isClientSideAd(event.ad?.integration)) {
+                    observableSupport.notify { it.onAdQuartile(AdQuartile.MIDPOINT) }
+                } else {
+                    ssaiApi.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Midpoint", e)
             }
         }
 
     private val adThirdQuartileListener =
-        EventListener<AdThirdQuartileEvent> { _ ->
+        EventListener<AdThirdQuartileEvent> { event ->
             try {
                 BitmovinLog.d(TAG, "ad third quartile")
-                observableSupport.notify { it.onAdQuartile(AdQuartile.THIRD_QUARTILE) }
+
+                if (TheoPlayerUtils.isClientSideAd(event.ad?.integration)) {
+                    observableSupport.notify { it.onAdQuartile(AdQuartile.THIRD_QUARTILE) }
+                } else {
+                    ssaiApi.adQuartileFinished(SsaiAdQuartile.THIRD)
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Third Quartile", e)
             }
@@ -146,7 +196,10 @@ internal class TheoPlayerAdAdapter(
         EventListener<AdClickedEvent> { it ->
             try {
                 BitmovinLog.d(TAG, "ad clicked")
-                observableSupport.notify { it.onAdClicked(null) }
+
+                if (TheoPlayerUtils.isClientSideAd(it.ad?.integration)) {
+                    observableSupport.notify { it.onAdClicked(null) }
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Clicked", e)
             }

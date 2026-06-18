@@ -1,27 +1,24 @@
 package com.bitmovin.analytics.theoplayer
+
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.bitmovin.analytics.api.AnalyticsConfig
-import com.bitmovin.analytics.api.CustomData
+import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
-import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
-import com.bitmovin.analytics.api.ssai.SsaiAdPosition
-import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.test.utils.DataVerifier
 import com.bitmovin.analytics.test.utils.MetadataUtils
 import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.PlaybackUtils
 import com.bitmovin.analytics.test.utils.SsaiDataVerifier
 import com.bitmovin.analytics.test.utils.TestConfig
-import com.bitmovin.analytics.test.utils.TestSources
 import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.analytics.theoplayer.api.ITHEOplayerCollector
 import com.theoplayer.android.api.THEOplayerConfig
 import com.theoplayer.android.api.THEOplayerView
+import com.theoplayer.android.api.ads.ima.GoogleImaIntegrationFactory
 import com.theoplayer.android.api.player.Player
+import com.theoplayer.android.api.source.GoogleDaiTypedSource
 import com.theoplayer.android.api.source.SourceDescription
-import com.theoplayer.android.api.source.SourceType
-import com.theoplayer.android.api.source.TypedSource
+import com.theoplayer.android.api.source.ssai.dai.GoogleDaiVodConfiguration
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -32,13 +29,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-// System test for SSAI scenarios using theoplayer
-// Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
 @RunWith(AndroidJUnit4::class)
 class SsaiScenariosTest {
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-    private val defaultSample = TestSources.HLS_REDBULL
 
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()
@@ -46,31 +40,40 @@ class SsaiScenariosTest {
     private var defaultSourceMetadata: SourceMetadata
         get() =
             SourceMetadata(
-                title = MetadataUtils.MetadataGenerator.getTestTitle(),
-                customData = CustomData(customData1 = "custom-data-1"),
+                title = metadataGenerator.getTestTitle(),
+                videoId = "ssaiTest",
+                path = "testPath",
             )
         set(_) {}
 
+    // Google's public DAI VOD sample ("tears-of-steel"), as used in THEOplayer's own docs.
+    private val daiContentSourceID = "2548831"
+    private val daiVideoID = "tears-of-steel"
+
+    private val defaultMetadata = DefaultMetadata(cdnProvider = "cdnProvider", customUserId = "customUserId1")
+
     private lateinit var player: Player
     private lateinit var theoPlayerView: THEOplayerView
-    private lateinit var defaultAnalyticsConfig: AnalyticsConfig
     private lateinit var mockedIngressUrl: String
 
-    private val defaultHlsSource =
-        TypedSource
-            .Builder(defaultSample.m3u8Url!!)
-            .type(SourceType.HLS)
+    private val daiConfig =
+        GoogleDaiVodConfiguration.Builder(
+            // apiKey, contentSourceID, videoID
+            "",
+            daiContentSourceID,
+            daiVideoID,
+        ).build()
+    private val daiSource =
+        GoogleDaiTypedSource.Builder(daiConfig)
             .build()
-
-    private val defaultSourceDescription =
+    private val googleDaiSourceDescription =
         SourceDescription
-            .Builder(defaultHlsSource)
+            .Builder(daiSource)
             .build()
 
     @Before
     fun setup() {
         mockedIngressUrl = MockedIngress.startServer()
-        defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
 
         val playerConfig =
             THEOplayerConfig.Builder()
@@ -81,6 +84,12 @@ class SsaiScenariosTest {
             withContext(mainScope.coroutineContext) {
                 theoPlayerView = THEOplayerView(appContext, playerConfig)
                 player = theoPlayerView.player
+                // Google DAI is delivered through the Google IMA integration, which must be
+                // explicitly registered for DAI sources to work.
+                val imaIntegration = GoogleImaIntegrationFactory.createGoogleImaIntegration(theoPlayerView)
+                player.addIntegration(imaIntegration)
+                player.useLowestRendition()
+                player.volume = 0.0
             }
         }
     }
@@ -94,951 +103,106 @@ class SsaiScenariosTest {
                 }
             }
         }
-        // wait a bit to make sure the player is destroyed
-        Thread.sleep(100)
         MockedIngress.stopServer()
-        // wait a bit to make sure the server is stopped before next test starts
-        Thread.sleep(100)
     }
 
     @Test
-    fun test_adBreakStart_adStart_adStart_adBreakEnd_sets_right_values() =
+    fun test_vodWithGoogleDaiPreRollAd_playWithAutoplay() =
         runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
+            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
 
             // act
             withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
+                player.isAutoplay = true
+                val collector = ITHEOplayerCollector.create(appContext, analyticsConfig, defaultMetadata)
+                collector.sourceMetadata = defaultSourceMetadata
                 collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                collector.ssai.adBreakStart(
-                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                )
-                collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-                )
-                player.play()
+                player.source = googleDaiSourceDescription
             }
 
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
+            // wait for the DAI pre-roll ad to start and finish, then let content play
+            PlaybackUtils.waitUntil("pre-roll ad started") { player.ads.isPlaying }
+            PlaybackUtils.waitUntil("pre-roll ad finished") { !player.ads.isPlaying }
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 15000)
 
             withContext(mainScope.coroutineContext) {
-                collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData2 = "ad-test-custom-data-2")),
-                )
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adBreakEnd()
                 player.pause()
-                collector.detachPlayer()
             }
 
+            // wait a bit to make sure the last play sample is sent
             Thread.sleep(500)
 
             // assert
             val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
+            assertThat(impressionList).hasSize(1)
 
             val impression = impressionList.first()
             DataVerifier.verifyHasNoErrorSamples(impression)
 
+            // the DAI pre-roll is server-side inserted, so it is tracked as an SSAI ad sample
+            assertThat(impression.adEventDataList).isNotEmpty
+            SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(impression.adEventDataList)
+
+            // all ad samples must reference the same video impression
+            val impressionId = impression.eventDataList.first().impressionId
+            impression.adEventDataList.forEach {
+                assertThat(it.videoImpressionId).isEqualTo(impressionId)
+            }
+
+            // event data is linked to the SSAI ad and carries the routing header
             val eventDataList = impression.eventDataList
-            assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
-
-            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-            assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
-
-            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
-            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
-            DataVerifier.verifyDataForSsaiAdSamples(
-                firstAdSamples,
-                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-                CustomData(customData1 = "ad-test-custom-data-1"),
-                0,
-            )
-
-            val secondAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 1)
-            assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
-            DataVerifier.verifyDataForSsaiAdSamples(
-                secondAdSamples,
-                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
-                CustomData(customData1 = defaultSourceMetadata.customData.customData1, customData2 = "ad-test-custom-data-2"),
-                1,
-            )
-
-            val samplesAfterEndAdBreak = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 1)
-            assertThat(samplesAfterEndAdBreak.size).isGreaterThanOrEqualTo(1)
-            DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterEndAdBreak)
-            DataVerifier.verifyCustomData(samplesAfterEndAdBreak, defaultSourceMetadata.customData)
+            DataVerifier.verifyInvariants(eventDataList)
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(eventDataList)
+            DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
         }
 
     @Test
-    fun test_ignore_adStart_call_if_adBreakStart_has_not_been_called() =
+    fun test_vodWithGoogleDaiPreRollAd_abandonDuringAd() =
         runBlockingTest {
             // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
+            val analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
             // act
             withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
+                val collector = ITHEOplayerCollector.create(appContext, analyticsConfig, defaultMetadata)
+                collector.sourceMetadata = defaultSourceMetadata
                 collector.attachPlayer(player)
-                player.source = defaultSourceDescription
+                player.source = googleDaiSourceDescription
                 player.play()
             }
 
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adStart(SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"))
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
-
-            withContext(mainScope.coroutineContext) {
-                player.pause()
-                collector.detachPlayer()
-            }
-
-            Thread.sleep(500)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            DataVerifier.verifyHasNoErrorSamples(impression)
-
-            val eventDataList = impression.eventDataList
-            assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
-            DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
-        }
-
-    @Test
-    fun test_ignore_adBreakEnd_call_if_adBreakStart_has_not_been_called() =
-        runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
-            // act
-            withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
-                collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adBreakEnd()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
-
-            withContext(mainScope.coroutineContext) {
-                player.pause()
-                collector.detachPlayer()
-            }
-
-            Thread.sleep(500)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            DataVerifier.verifyHasNoErrorSamples(impression)
-
-            val eventDataList = impression.eventDataList
-            assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
-            DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
-        }
-
-    @Test
-    fun test_no_sample_sent_when_adBreak_was_closed_without_adStart_call_during_adBreak() =
-        runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
-            // act
-            withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
-                collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                player.play()
-                collector.ssai.adBreakStart(SsaiAdBreakMetadata(SsaiAdPosition.PREROLL))
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adBreakEnd()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
-
-            withContext(mainScope.coroutineContext) {
-                player.pause()
-                collector.detachPlayer()
-            }
-
-            Thread.sleep(500)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            DataVerifier.verifyHasNoErrorSamples(impression)
-
-            val eventDataList = impression.eventDataList
-            assertThat(eventDataList.size).isGreaterThanOrEqualTo(2)
-            DataVerifier.verifyHasNoSsaiAdSamples(eventDataList)
-        }
-
-    @Test
-    fun test_do_not_reset_adIndex_between_adBreaks() =
-        runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
-            // act
-            withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
-                collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                collector.ssai.adBreakStart(
-                    SsaiAdBreakMetadata(
-                        SsaiAdPosition.PREROLL,
-                    ),
-                )
-                collector.ssai.adStart(
-                    SsaiAdMetadata(
-                        "test-ad-id-1",
-                        "test-ad-system-1",
-                        CustomData(customData1 = "ad-test-custom-data-1"),
-                    ),
-                )
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adBreakEnd()
-                player.pause()
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adBreakStart(
-                    SsaiAdBreakMetadata(
-                        SsaiAdPosition.MIDROLL,
-                    ),
-                )
-                collector.ssai.adStart(SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"))
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
-
-            withContext(mainScope.coroutineContext) {
-                player.pause()
-                collector.detachPlayer()
-            }
-
-            Thread.sleep(500)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            DataVerifier.verifyHasNoErrorSamples(impression)
-
-            val eventDataList = impression.eventDataList
-            assertThat(eventDataList.size).isGreaterThanOrEqualTo(6)
-
-            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-            assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
-
-            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
-            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
-            DataVerifier.verifyDataForSsaiAdSamples(
-                firstAdSamples,
-                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-                CustomData(customData1 = "ad-test-custom-data-1"),
-                0,
-            )
-
-            val samplesBetweenAds = DataVerifier.getSamplesBetweenAds(eventDataList, 0)
-            assertThat(samplesBetweenAds.size).isGreaterThanOrEqualTo(3)
-            DataVerifier.verifyHasNoSsaiAdSamples(samplesBetweenAds)
-            DataVerifier.verifyCustomData(samplesBetweenAds, defaultSourceMetadata.customData)
-
-            val secondAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 1)
-            assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
-            DataVerifier.verifyDataForSsaiAdSamples(
-                secondAdSamples,
-                SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL),
-                SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
-                CustomData(customData1 = defaultSourceMetadata.customData.customData1),
-                1,
-            )
-        }
-
-    @Test
-    fun test_increase_and_set_adIndex_only_on_every_first_ad_sample() =
-        runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
-            // act
-            withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
-                collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                collector.ssai.adBreakStart(
-                    SsaiAdBreakMetadata(
-                        SsaiAdPosition.PREROLL,
-                    ),
-                )
-                collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-                )
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
-
-            withContext(mainScope.coroutineContext) {
-                player.pause()
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData2 = "ad-test-custom-data-2")),
-                )
-                player.pause()
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adBreakEnd()
-                player.pause()
-                collector.detachPlayer()
-            }
-
-            Thread.sleep(500)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            DataVerifier.verifyHasNoErrorSamples(impression)
-
-            val eventDataList = impression.eventDataList
-            assertThat(eventDataList.size).isGreaterThanOrEqualTo(8)
-
-            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-            assertThat(samplesBeforeFirstAd.size).isEqualTo(0)
-
-            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
-            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
-            DataVerifier.verifyDataForSsaiAdSamples(
-                firstAdSamples,
-                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-                CustomData(customData1 = "ad-test-custom-data-1"),
-                0,
-            )
-
-            val secondAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 1)
-            assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)
-            DataVerifier.verifyDataForSsaiAdSamples(
-                secondAdSamples,
-                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                SsaiAdMetadata("test-ad-id-2", "test-ad-system-2"),
-                CustomData(customData1 = defaultSourceMetadata.customData.customData1, customData2 = "ad-test-custom-data-2"),
-                1,
-            )
-
-            val samplesAfterEndAdBreak = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 1)
-            assertThat(samplesAfterEndAdBreak.size).isGreaterThanOrEqualTo(1)
-            DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterEndAdBreak)
-            DataVerifier.verifyCustomData(samplesAfterEndAdBreak, defaultSourceMetadata.customData)
-        }
-
-    @Test
-    fun test_does_not_ignore_adBreakStart_when_player_is_paused() =
-        runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
-            // act
-            withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
-                collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
-
-            withContext(mainScope.coroutineContext) {
-                player.pause()
-                collector.ssai.adBreakStart(
-                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                )
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-                )
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
-
-            withContext(mainScope.coroutineContext) {
-                player.pause()
-                collector.detachPlayer()
-            }
-
-            Thread.sleep(500)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            DataVerifier.verifyHasNoErrorSamples(impression)
-
-            val eventDataList = impression.eventDataList
-            assertThat(eventDataList.size).isGreaterThanOrEqualTo(5)
-
-            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-            assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(4)
-            DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
-
-            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
-            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(1)
-            DataVerifier.verifyDataForSsaiAdSamples(
-                firstAdSamples,
-                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-                CustomData(customData1 = "ad-test-custom-data-1"),
-                0,
-            )
-        }
-
-    @Test
-    fun test_does_not_send_sample_but_sets_metadata_when_adStart_called_with_player_paused() =
-        runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
-            // act
-            withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
-                collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                player.play()
-                collector.ssai.adBreakStart(
-                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                )
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
-
-            withContext(mainScope.coroutineContext) {
-                player.pause()
-                collector.ssai.adStart(
-                    SsaiAdMetadata(
-                        "test-ad-id-1",
-                        "test-ad-system-1",
-                        CustomData(customData1 = "ad-test-custom-data-1"),
-                    ),
-                )
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
-
-            withContext(mainScope.coroutineContext) {
-                player.pause()
-                collector.detachPlayer()
-            }
-
-            Thread.sleep(500)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            DataVerifier.verifyHasNoErrorSamples(impression)
-
-            val eventDataList = impression.eventDataList
-            assertThat(eventDataList.size).isGreaterThanOrEqualTo(4)
-
-            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-            assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
-            DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
-            DataVerifier.verifyCustomData(samplesBeforeFirstAd, defaultSourceMetadata.customData)
-
-            val firstAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
-            assertThat(firstAdSamples.size).isGreaterThanOrEqualTo(2)
-            DataVerifier.verifyDataForSsaiAdSamples(
-                firstAdSamples,
-                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-                CustomData(customData1 = "ad-test-custom-data-1"),
-                0,
-            )
-        }
-
-    @Test
-    fun test_does_not_send_sample_but_resets_ssai_related_data_when_adBreakEnd_called_with_player_paused() =
-        runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
-            // act
-            withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
-                collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1500)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adBreakStart(
-                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                )
-                collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-                )
-                player.pause()
-                collector.ssai.adBreakEnd()
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
-
-            withContext(mainScope.coroutineContext) {
-                player.pause()
-                collector.detachPlayer()
-            }
-
-            Thread.sleep(500)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            DataVerifier.verifyHasNoErrorSamples(impression)
-
-            val eventDataList = impression.eventDataList
-            assertThat(eventDataList.size).isGreaterThanOrEqualTo(5)
-
-            val samplesBeforeFirstAd = DataVerifier.getSamplesBeforeFirstSsaiAd(eventDataList)
-            assertThat(samplesBeforeFirstAd.size).isGreaterThanOrEqualTo(2)
-            DataVerifier.verifyHasNoSsaiAdSamples(samplesBeforeFirstAd)
-
-            val firstAdSample = DataVerifier.getSsaiSamplesByIndex(eventDataList, 0)
-            assertThat(firstAdSample.size).isGreaterThanOrEqualTo(1)
-            DataVerifier.verifyDataForSsaiAdSamples(
-                firstAdSample,
-                SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),
-                SsaiAdMetadata("test-ad-id-1", "test-ad-system-1"),
-                CustomData(customData1 = "ad-test-custom-data-1"),
-                0,
-            )
-
-            val samplesAfterFirstAd = DataVerifier.getAllSamplesAfterSsaiAdWithIndex(eventDataList, 0)
-            assertThat(samplesAfterFirstAd.size).isGreaterThanOrEqualTo(2)
-            DataVerifier.verifyHasNoSsaiAdSamples(samplesAfterFirstAd)
-            DataVerifier.verifyCustomData(samplesAfterFirstAd, defaultSourceMetadata.customData)
-        }
-
-    @Test
-    fun test_adEngagementMetrics_track_adbreakabandonment_metadata_when_adbreak_completes() =
-        runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
-            // act
-            withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
-                collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                collector.ssai.adBreakStart(
-                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL, expectedPaidAds = 2, expectedSlates = 1),
-                )
-
-                collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-                )
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 200)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 400)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 600)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 800)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
-                collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData2 = "ad-test-custom-data-2")),
-                )
-            }
-
+            // wait for the DAI pre-roll ad to start and finish, then let content play
+            PlaybackUtils.waitUntil("pre-roll ad started") { player.ads.isPlaying }
             TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1000)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1200)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1400)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1600)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
-                collector.ssai.adStart(
-                    SsaiAdMetadata(
-                        "test-ad-id-3-slate",
-                        "test-ad-system-3",
-                        CustomData(customData2 = "ad-test-custom-data-3"),
-                        isSlate = true,
-                    ),
-                )
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1800)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2200)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2400)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
-                collector.ssai.adBreakEnd()
-                player.pause()
-                collector.detachPlayer()
-            }
-
-            Thread.sleep(500)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            DataVerifier.verifyHasNoErrorSamples(impression)
-
-            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
-
-            val adEventDataList = impression.adEventDataList
-            assertThat(adEventDataList).hasSize(3)
-
-            val firstAdSample = adEventDataList[0]
-            assertThat(firstAdSample.started).isEqualTo(1)
-            assertThat(firstAdSample.quartile1).isEqualTo(1)
-            assertThat(firstAdSample.midpoint).isEqualTo(1)
-            assertThat(firstAdSample.quartile3).isEqualTo(1)
-            assertThat(firstAdSample.completed).isEqualTo(1)
-            assertThat(firstAdSample.exitedAdBreak).isFalse
-            assertThat(firstAdSample.expectedPaidAds).isEqualTo(2)
-            assertThat(firstAdSample.completedPaidAds).isEqualTo(1)
-            assertThat(firstAdSample.expectedSlates).isEqualTo(1)
-            assertThat(firstAdSample.completedSlates).isEqualTo(0)
-
-            val secondAdSample = adEventDataList[1]
-            assertThat(secondAdSample.started).isEqualTo(1)
-            assertThat(secondAdSample.quartile1).isEqualTo(1)
-            assertThat(secondAdSample.midpoint).isEqualTo(1)
-            assertThat(secondAdSample.quartile3).isEqualTo(1)
-            assertThat(secondAdSample.completed).isEqualTo(1)
-            assertThat(secondAdSample.exitedAdBreak).isFalse
-            assertThat(secondAdSample.expectedPaidAds).isEqualTo(2)
-            assertThat(secondAdSample.completedPaidAds).isEqualTo(2)
-            assertThat(secondAdSample.expectedSlates).isEqualTo(1)
-            assertThat(secondAdSample.completedSlates).isEqualTo(0)
-
-            val thirdAdSample = adEventDataList[2]
-            assertThat(thirdAdSample.started).isEqualTo(1)
-            assertThat(thirdAdSample.quartile1).isEqualTo(1)
-            assertThat(thirdAdSample.midpoint).isEqualTo(1)
-            assertThat(thirdAdSample.quartile3).isEqualTo(1)
-            assertThat(thirdAdSample.completed).isEqualTo(1)
-            assertThat(thirdAdSample.isSlate).isTrue
-            assertThat(thirdAdSample.exitedAdBreak).isTrue
-            assertThat(thirdAdSample.expectedPaidAds).isEqualTo(2)
-            assertThat(thirdAdSample.completedPaidAds).isEqualTo(2)
-            assertThat(thirdAdSample.expectedSlates).isEqualTo(1)
-            assertThat(thirdAdSample.completedSlates).isEqualTo(1)
-
-            assertThat(firstAdSample.adImpressionId).isNotEqualTo(secondAdSample.adImpressionId)
-            assertThat(firstAdSample.videoImpressionId).isEqualTo(secondAdSample.videoImpressionId)
-        }
-
-    @Test
-    fun test_adEngagementMetrics_sends_adabandonment_metadata_on_detach() =
-        runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
-            // act
-            withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
-                collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                collector.ssai.adBreakStart(
-                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL, expectedPaidAds = 3, expectedSlates = 3),
-                )
-
-                collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-                )
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 200)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 400)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 600)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 800)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
-                collector.ssai.adStart(
-                    adMetadata = SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData1 = "ad-test-custom-data-2")),
-                )
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1200)
-
-            withContext(mainScope.coroutineContext) {
-                collector.detachPlayer()
-            }
-
-            Thread.sleep(500)
-
-            // assert
-            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
-
-            val impression = impressionList.first()
-            DataVerifier.verifyHasNoErrorSamples(impression)
-
-            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
-
-            val adEventDataList = impression.adEventDataList
-            assertThat(adEventDataList).hasSize(2)
-
-            val firstAdSample = adEventDataList[0]
-            assertThat(firstAdSample.started).isEqualTo(1)
-            assertThat(firstAdSample.quartile1).isEqualTo(1)
-            assertThat(firstAdSample.midpoint).isEqualTo(1)
-            assertThat(firstAdSample.quartile3).isEqualTo(1)
-            assertThat(firstAdSample.completed).isEqualTo(1)
-            assertThat(firstAdSample.exitedAdBreak).isFalse
-            assertThat(firstAdSample.expectedPaidAds).isEqualTo(3)
-            assertThat(firstAdSample.expectedSlates).isEqualTo(3)
-            assertThat(firstAdSample.completedPaidAds).isEqualTo(1)
-            assertThat(firstAdSample.completedSlates).isEqualTo(0)
-
-            val secondAdSample = adEventDataList[1]
-            assertThat(secondAdSample.started).isEqualTo(1)
-            assertThat(secondAdSample.quartile1).isEqualTo(0)
-            assertThat(secondAdSample.midpoint).isEqualTo(0)
-            assertThat(secondAdSample.quartile3).isEqualTo(0)
-            assertThat(secondAdSample.completed).isEqualTo(0)
-            assertThat(secondAdSample.exitedAdBreak).isTrue
-            assertThat(secondAdSample.expectedPaidAds).isEqualTo(3)
-            assertThat(secondAdSample.expectedSlates).isEqualTo(3)
-            assertThat(secondAdSample.completedPaidAds).isEqualTo(1)
-            assertThat(secondAdSample.completedSlates).isEqualTo(0)
-        }
-
-    @Test
-    fun test_adEngagementMetrics_sends_adabandonment_metadata_on_player_destroy() =
-        runBlockingTest {
-            // arrange
-            val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
-            collector.sourceMetadata = defaultSourceMetadata
-
-            // act
-            withContext(mainScope.coroutineContext) {
-                player.useLowestRendition()
-                collector.attachPlayer(player)
-                player.source = defaultSourceDescription
-                collector.ssai.adBreakStart(
-                    SsaiAdBreakMetadata(SsaiAdPosition.PREROLL, expectedPaidAds = 3, expectedSlates = 3),
-                )
-
-                collector.ssai.adStart(
-                    SsaiAdMetadata("test-ad-id-1", "test-ad-system-1", CustomData(customData1 = "ad-test-custom-data-1")),
-                )
-                player.play()
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 200)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.FIRST)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 400)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 600)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.THIRD)
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 800)
-
-            withContext(mainScope.coroutineContext) {
-                collector.ssai.adQuartileFinished(SsaiAdQuartile.COMPLETED)
-                collector.ssai.adStart(
-                    adMetadata = SsaiAdMetadata("test-ad-id-2", "test-ad-system-2", CustomData(customData1 = "ad-test-custom-data-2")),
-                )
-            }
-
-            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 1200)
 
             withContext(mainScope.coroutineContext) {
                 theoPlayerView.onDestroy()
             }
 
+            // wait a bit to make sure the last play sample is sent
             Thread.sleep(500)
 
             // assert
             val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
-            assertThat(impressionList.size).isEqualTo(1)
+            assertThat(impressionList).hasSize(1)
 
             val impression = impressionList.first()
             DataVerifier.verifyHasNoErrorSamples(impression)
+            assertThat(impression.adEventDataList).hasSize(1)
+            SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(impression.adEventDataList)
 
-            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
+            val adSample = impression.adEventDataList.first()
 
-            val adEventDataList = impression.adEventDataList
-            assertThat(adEventDataList).hasSize(2)
+            // all ad samples must reference the same video impression
+            val impressionId = impression.eventDataList.first().impressionId
+            assertThat(adSample.videoImpressionId).isEqualTo(impressionId)
+            assertThat(adSample.started).isEqualTo(1)
+            assertThat(adSample.completed).isEqualTo(0)
+            assertThat(adSample.exitedAdBreak).isTrue
 
-            val firstAdSample = adEventDataList[0]
-            assertThat(firstAdSample.started).isEqualTo(1)
-            assertThat(firstAdSample.quartile1).isEqualTo(1)
-            assertThat(firstAdSample.midpoint).isEqualTo(1)
-            assertThat(firstAdSample.quartile3).isEqualTo(1)
-            assertThat(firstAdSample.completed).isEqualTo(1)
-            assertThat(firstAdSample.exitedAdBreak).isFalse
-            assertThat(firstAdSample.expectedPaidAds).isEqualTo(3)
-            assertThat(firstAdSample.expectedSlates).isEqualTo(3)
-            assertThat(firstAdSample.completedPaidAds).isEqualTo(1)
-            assertThat(firstAdSample.completedSlates).isEqualTo(0)
-
-            val secondAdSample = adEventDataList[1]
-            assertThat(secondAdSample.started).isEqualTo(1)
-            assertThat(secondAdSample.quartile1).isEqualTo(0)
-            assertThat(secondAdSample.midpoint).isEqualTo(0)
-            assertThat(secondAdSample.quartile3).isEqualTo(0)
-            assertThat(secondAdSample.completed).isEqualTo(0)
-            assertThat(secondAdSample.exitedAdBreak).isTrue
-            assertThat(secondAdSample.expectedPaidAds).isEqualTo(3)
-            assertThat(secondAdSample.expectedSlates).isEqualTo(3)
-            assertThat(secondAdSample.completedPaidAds).isEqualTo(1)
-            assertThat(secondAdSample.completedSlates).isEqualTo(0)
+            // event data is linked to the SSAI ad and carries the routing header
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyInvariants(eventDataList)
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(eventDataList)
+            DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
         }
 }

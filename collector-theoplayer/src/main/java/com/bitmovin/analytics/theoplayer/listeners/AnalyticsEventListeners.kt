@@ -4,6 +4,7 @@ import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.stateMachines.SampleTriggerReason
+import com.bitmovin.analytics.theoplayer.TheoPlayerUtils
 import com.bitmovin.analytics.theoplayer.errors.TheoPlayerExceptionMapper
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
@@ -235,26 +236,30 @@ internal class AnalyticsEventListeners(
         EventListener<AdBreakBeginEvent> { event ->
             try {
                 BitmovinLog.d(TAG, "ad break begin")
-                stateMachine.startAd(player.currentPositionInMs())
+                if (TheoPlayerUtils.isClientSideAd(event.adBreak.integration)) {
+                    stateMachine.startAd(player.currentPositionInMs())
+                }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Break Begin", e)
             }
         }
 
     private val adBreakEndListener =
-        EventListener<AdBreakEndEvent> { _ ->
+        EventListener<AdBreakEndEvent> { event ->
             try {
                 BitmovinLog.d(TAG, "ad break end")
-                stateMachine.endAd()
+                if (TheoPlayerUtils.isClientSideAd(event.adBreak.integration)) {
+                    stateMachine.endAd()
 
-                // in case startup is not finished yet
-                // and player isn't paused after the ad (might not be pausible, but here
-                // for safety reasons) we are transitioning into startup
-                // this is needed since we saw issues in production where
-                // the PLAY event wasn't issued after the ad, which lead
-                // to missing startups after pre-roll ads
-                if (!stateMachine.isStartupFinished && !player.isPaused) {
-                    startupInitiated(player.currentPositionInMs())
+                    // in case startup is not finished yet
+                    // and player isn't paused after the ad (might not be pausible, but here
+                    // for safety reasons) we are transitioning into startup
+                    // this is needed since we saw issues in production where
+                    // the PLAY event wasn't issued after the ad, which lead
+                    // to missing startups after pre-roll ads
+                    if (!stateMachine.isStartupFinished && !player.isPaused) {
+                        startupInitiated(player.currentPositionInMs())
+                    }
                 }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Break End", e)
