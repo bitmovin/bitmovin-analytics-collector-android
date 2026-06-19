@@ -1,9 +1,9 @@
 package com.bitmovin.analytics.ssai
 
-import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
-import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
+import com.bitmovin.analytics.api.ads.AdBreakMetadata
+import com.bitmovin.analytics.api.ads.AdMetadata
+import com.bitmovin.analytics.api.ads.AdQuartileMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
-import com.bitmovin.analytics.api.ssai.SsaiAdQuartileMetadata
 import com.bitmovin.analytics.api.ssai.SsaiApi
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.dtos.ErrorCode
@@ -24,9 +24,9 @@ class SsaiService(
     private val stateMachine: PlayerStateMachine,
     private val ssaiEngagementMetricsService: SsaiEngagementMetricsService,
 ) : SsaiApi, EventDataManipulator {
-    var adMetadata: SsaiAdMetadata? = null
+    var adMetadata: AdMetadata? = null
         private set
-    private var adBreakMetadata: SsaiAdBreakMetadata? = null
+    private var adBreakMetadata: AdBreakMetadata? = null
     private var isFirstSampleOfAd = false
     private var state: SsaiState = SsaiState.NOT_ACTIVE
 
@@ -34,7 +34,7 @@ class SsaiService(
     // this way the current adIndex is the one of the current playing ad
     private var adIndex: Int = INDEX_INITIAL_VALUE
 
-    override fun adBreakStart(adBreakMetadata: SsaiAdBreakMetadata?) {
+    override fun adBreakStart(adBreakMetadata: AdBreakMetadata?) {
         if (this.state != SsaiState.NOT_ACTIVE) {
             return
         }
@@ -44,7 +44,7 @@ class SsaiService(
         this.ssaiEngagementMetricsService.adBreakStart()
     }
 
-    override fun adStart(adMetadata: SsaiAdMetadata?) {
+    override fun adStart(adMetadata: AdMetadata?) {
         if (this.state == SsaiState.NOT_ACTIVE) {
             return
         }
@@ -75,7 +75,7 @@ class SsaiService(
 
     override fun adQuartileFinished(
         adQuartile: SsaiAdQuartile,
-        adQuartileMetadata: SsaiAdQuartileMetadata?,
+        adQuartileMetadata: AdQuartileMetadata?,
     ) {
         if (this.state != SsaiState.AD_RUNNING) {
             return

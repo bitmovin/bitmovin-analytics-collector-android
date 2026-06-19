@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded bitmovin player to `3.154.0`
 - [Internal] Mature refactoring around bitmovin player (Splitting up the adapter in Listener and Manipulator, pushing logic into core module)
 
+### Added
+- New public objects AdBreakMetadata, AdMetadata and AdQuartileMetadata
+
+### Deprecated
+- SsaiAdBreakMetadata, SsaiAdMetadata and SsaiAdQuartileMetadata Objects are superseeded by AdBreakMetadata, AdMetadata and AdQuartileMetadata
+
 ## v3.28.0
 
 ### Changed

@@ -16,8 +16,8 @@ import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.LogLevel
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
-import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
+import com.bitmovin.analytics.api.ads.AdBreakMetadata
+import com.bitmovin.analytics.api.ads.AdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
@@ -153,11 +153,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.ssaiStart).setOnClickListener {
-            player.analytics?.ssai?.adBreakStart(SsaiAdBreakMetadata(SsaiAdPosition.MIDROLL))
+            player.analytics?.ssai?.adBreakStart(
+                AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(),
+            )
         }
 
         findViewById<Button>(R.id.ssaiNext).setOnClickListener {
-            val metadata = SsaiAdMetadata("adId1", "adSystem1", CustomData(customData1 = "ssai1 custom data"))
+            val metadata =
+                AdMetadata.Builder()
+                    .setAdId("adId1")
+                    .setAdSystem("adSystem1")
+                    .setCustomData(CustomData(customData1 = "ssai1 custom data"))
+                    .build()
             player.analytics?.ssai?.adStart(metadata)
         }
 

@@ -6,6 +6,9 @@ import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
 import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.ads.AdBreak
 import com.bitmovin.analytics.ads.AdQuartile
+import com.bitmovin.analytics.api.ads.AdBreakMetadata
+import com.bitmovin.analytics.api.ads.AdMetadata
+import com.bitmovin.analytics.api.ads.AdQuartileMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
 import com.bitmovin.analytics.api.ssai.SsaiApi
 import com.bitmovin.analytics.theoplayer.TheoPlayerUtils
@@ -40,14 +43,18 @@ internal class TheoPlayerAdAdapter(
         EventListener<AdBreakBeginEvent> { event ->
             try {
                 BitmovinLog.d(TAG, "ad break begin")
-                val adBreak = event.adBreak ?: return@EventListener
-                currentTheoAdBreak = adBreak
+                val nativeAdBreak = event.adBreak ?: return@EventListener
+                currentTheoAdBreak = nativeAdBreak
+                val extractedAdBreakMetadata = AdBreakMapper.fromTheoAdBreak(nativeAdBreak)
 
-                if (TheoPlayerUtils.isClientSideAd(adBreak.integration)) {
-                    observableSupport.notify { it.onAdBreakStarted(AdBreakMapper.fromTheoAdBreak(adBreak)) }
+                if (TheoPlayerUtils.isClientSideAd(nativeAdBreak.integration)) {
+                    observableSupport.notify { it.onAdBreakStarted(extractedAdBreakMetadata) }
                 } else {
-                    // TODO: add metadata
-                    ssaiApi.adBreakStart()
+                    val adBreakMetadata =
+                        AdBreakMetadata.Builder()
+                            .setAdPosition(extractedAdBreakMetadata.position?.mapToSsaiAdPosition())
+                            .build()
+                    ssaiApi.adBreakStart(adBreakMetadata)
                 }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Break Begin", e)
@@ -66,8 +73,12 @@ internal class TheoPlayerAdAdapter(
                 if (TheoPlayerUtils.isClientSideAd(theoAd.integration)) {
                     observableSupport.notify { it.onAdStarted(mappedAd) }
                 } else {
-                    // TODO: add data
-                    ssaiApi.adStart()
+                    val ssaiAdMetadata =
+                        AdMetadata.Builder()
+                            .setAdId(mappedAd.id)
+                            .setAdSystem(mappedAd.adSystemName)
+                            .build()
+                    ssaiApi.adStart(ssaiAdMetadata)
                 }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Begin", e)
@@ -77,17 +88,16 @@ internal class TheoPlayerAdAdapter(
     private val adEndListener =
         EventListener<AdEndEvent> { event ->
             try {
+                // according to NFL, adEnd is signaling completion of an ad (for ssai and csai)
                 BitmovinLog.d(TAG, "ad end")
                 val theoAd = event.ad ?: return@EventListener
-
                 // FIXME: type linear also true for SSAI?
                 if (theoAd.type != "linear") return@EventListener
 
                 if (TheoPlayerUtils.isClientSideAd(theoAd.integration)) {
                     observableSupport.notify { it.onAdFinished() }
                 } else {
-                    // TODO: is this the right call here?
-                    ssaiApi.adQuartileFinished(SsaiAdQuartile.COMPLETED)
+                    ssaiApi.adQuartileFinished(SsaiAdQuartile.COMPLETED, AdQuartileMetadata.Builder().build())
                 }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad End", e)
@@ -155,7 +165,7 @@ internal class TheoPlayerAdAdapter(
                 if (TheoPlayerUtils.isClientSideAd(event.ad?.integration)) {
                     observableSupport.notify { it.onAdQuartile(AdQuartile.FIRST_QUARTILE) }
                 } else {
-                    ssaiApi.adQuartileFinished(SsaiAdQuartile.FIRST)
+                    ssaiApi.adQuartileFinished(SsaiAdQuartile.FIRST, AdQuartileMetadata.Builder().build())
                 }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad First Quartile", e)
@@ -170,7 +180,7 @@ internal class TheoPlayerAdAdapter(
                 if (TheoPlayerUtils.isClientSideAd(event.ad?.integration)) {
                     observableSupport.notify { it.onAdQuartile(AdQuartile.MIDPOINT) }
                 } else {
-                    ssaiApi.adQuartileFinished(SsaiAdQuartile.MIDPOINT)
+                    ssaiApi.adQuartileFinished(SsaiAdQuartile.MIDPOINT, AdQuartileMetadata.Builder().build())
                 }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Midpoint", e)
@@ -185,7 +195,7 @@ internal class TheoPlayerAdAdapter(
                 if (TheoPlayerUtils.isClientSideAd(event.ad?.integration)) {
                     observableSupport.notify { it.onAdQuartile(AdQuartile.THIRD_QUARTILE) }
                 } else {
-                    ssaiApi.adQuartileFinished(SsaiAdQuartile.THIRD)
+                    ssaiApi.adQuartileFinished(SsaiAdQuartile.THIRD, AdQuartileMetadata.Builder().build())
                 }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Third Quartile", e)

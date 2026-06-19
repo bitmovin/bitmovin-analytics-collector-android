@@ -6,6 +6,10 @@ import java.time.Duration
 /**
  * Provides metadata for ad
  */
+@Deprecated(
+    message = "Use AdMetadata instead, built via AdMetadata.Builder.",
+    replaceWith = ReplaceWith("AdMetadata", "com.bitmovin.analytics.api.ads.AdMetadata"),
+)
 data class SsaiAdMetadata(
     /**
      * Id to identify the ad in the adSystem

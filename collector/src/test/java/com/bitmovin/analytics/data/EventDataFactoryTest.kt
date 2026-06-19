@@ -4,7 +4,7 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
+import com.bitmovin.analytics.api.ads.AdMetadata
 import com.bitmovin.analytics.license.DeferredLicenseKeyProvider
 import com.bitmovin.analytics.license.LicenseKeyState
 import com.bitmovin.analytics.utils.UserAgentProvider
@@ -20,15 +20,16 @@ class EventDataFactoryTest {
         // arrange
         // metadata
         val ssaiMetadata =
-            SsaiAdMetadata(
-                customData =
+            AdMetadata.Builder()
+                .setCustomData(
                     CustomData(
                         customData1 = "ssai-custom-data-1",
                         customData2 = "ssai-custom-data-2",
                         customData3 = "ssai-custom-data-3",
                         customData48 = "ssai-custom-data-48",
                     ),
-            )
+                )
+                .build()
         val defaultCustomData =
             CustomData(
                 customData1 = "default-custom-data-1",

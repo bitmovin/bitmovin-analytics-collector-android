@@ -3,6 +3,10 @@ package com.bitmovin.analytics.api.ssai
 /**
  * Provides Metadata for the ad break
  */
+@Deprecated(
+    message = "Use AdBreakMetadata instead, built via AdBreakMetadata.Builder.",
+    replaceWith = ReplaceWith("AdBreakMetadata", "com.bitmovin.analytics.api.ads.AdBreakMetadata"),
+)
 data class SsaiAdBreakMetadata(
     /**
      * Position of the ad break. Also called Ad Placement Type

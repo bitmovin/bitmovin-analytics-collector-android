@@ -3,7 +3,7 @@ package com.bitmovin.analytics.data
 import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
-import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
+import com.bitmovin.analytics.api.ads.AdMetadata
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
 import com.bitmovin.analytics.data.manipulators.EventDataManipulatorPipeline
 import com.bitmovin.analytics.dtos.EventData
@@ -27,7 +27,7 @@ class EventDataFactory(
         defaultMetadata: DefaultMetadata,
         deviceInformation: DeviceInformation,
         playerInfo: PlayerInfo,
-        ssaiAdMetadata: SsaiAdMetadata?,
+        ssaiAdMetadata: AdMetadata?,
     ): EventData {
         var mergedCustomData = ApiV3Utils.mergeCustomData(sourceMetadata.customData, defaultMetadata.customData)
         mergedCustomData = ApiV3Utils.mergeCustomData(ssaiAdMetadata?.customData, mergedCustomData)
@@ -62,7 +62,7 @@ class EventDataFactory(
         defaultMetadata: DefaultMetadata,
         deviceInformation: DeviceInformation,
         playerInfo: PlayerInfo,
-        ssaiAdMetadata: SsaiAdMetadata?,
+        ssaiAdMetadata: AdMetadata?,
     ): EventData {
         var mergedCustomData = ApiV3Utils.mergeCustomData(sourceMetadata.customData, defaultMetadata.customData)
         mergedCustomData = ApiV3Utils.mergeCustomData(ssaiAdMetadata?.customData, mergedCustomData)

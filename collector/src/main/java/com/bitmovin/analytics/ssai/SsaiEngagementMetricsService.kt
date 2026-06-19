@@ -4,11 +4,11 @@ import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.api.AnalyticsConfig
+import com.bitmovin.analytics.api.ads.AdBreakMetadata
+import com.bitmovin.analytics.api.ads.AdMetadata
+import com.bitmovin.analytics.api.ads.AdQuartileMetadata
 import com.bitmovin.analytics.api.error.ErrorSeverity
-import com.bitmovin.analytics.api.ssai.SsaiAdBreakMetadata
-import com.bitmovin.analytics.api.ssai.SsaiAdMetadata
 import com.bitmovin.analytics.api.ssai.SsaiAdQuartile
-import com.bitmovin.analytics.api.ssai.SsaiAdQuartileMetadata
 import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.internal.InternalBitmovinApi
@@ -43,8 +43,8 @@ class SsaiEngagementMetricsService(
 
     @Synchronized
     fun markAdStart(
-        adBreakMetadata: SsaiAdBreakMetadata?,
-        adMetadata: SsaiAdMetadata?,
+        adBreakMetadata: AdBreakMetadata?,
+        adMetadata: AdMetadata?,
         adIndex: Int,
     ) {
         if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
@@ -65,10 +65,10 @@ class SsaiEngagementMetricsService(
 
     @Synchronized
     fun markQuartileFinished(
-        adBreakMetadata: SsaiAdBreakMetadata?,
+        adBreakMetadata: AdBreakMetadata?,
         quartile: SsaiAdQuartile,
-        adMetadata: SsaiAdMetadata?,
-        adQuartileMetadata: SsaiAdQuartileMetadata?,
+        adMetadata: AdMetadata?,
+        adQuartileMetadata: AdQuartileMetadata?,
         adIndex: Int,
     ) {
         if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
@@ -92,8 +92,8 @@ class SsaiEngagementMetricsService(
 
     @Synchronized
     fun sendAdErrorSample(
-        adBreakMetadata: SsaiAdBreakMetadata?,
-        adMetadata: SsaiAdMetadata?,
+        adBreakMetadata: AdBreakMetadata?,
+        adMetadata: AdMetadata?,
         adIndex: Int,
         errorCode: Int,
         errorMessage: String,
@@ -148,10 +148,10 @@ class SsaiEngagementMetricsService(
     }
 
     private fun createAndUpsertQuartileSample(
-        adBreakMetadata: SsaiAdBreakMetadata?,
+        adBreakMetadata: AdBreakMetadata?,
         adQuartile: SsaiAdQuartile,
-        adMetadata: SsaiAdMetadata?,
-        adQuartileMetadata: SsaiAdQuartileMetadata?,
+        adMetadata: AdMetadata?,
+        adQuartileMetadata: AdQuartileMetadata?,
         adIndex: Int,
     ) {
         val adEventData = createBasicSsaiAdEventData(adBreakMetadata, adMetadata, adIndex)
@@ -175,8 +175,8 @@ class SsaiEngagementMetricsService(
     }
 
     private fun createBasicSsaiAdEventData(
-        adBreakMetadata: SsaiAdBreakMetadata?,
-        adMetadata: SsaiAdMetadata?,
+        adBreakMetadata: AdBreakMetadata?,
+        adMetadata: AdMetadata?,
         adIndex: Int,
     ): AdEventData {
         val eventData = playerAdapter.createEventDataForAdSample()
@@ -206,7 +206,7 @@ class SsaiEngagementMetricsService(
 
     private fun updateCompletedAdsInfo(
         adEventData: AdEventData,
-        adBreakMetadata: SsaiAdBreakMetadata?,
+        adBreakMetadata: AdBreakMetadata?,
     ) {
         // Completion counts are only meaningful when the surrounding break declared expected values
         adEventData.completedPaidAds =

@@ -792,6 +792,60 @@ public final class com/bitmovin/analytics/api/SourceMetadata$Creator : android/o
 	public synthetic fun newArray (I)[Ljava/lang/Object;
 }
 
+public final class com/bitmovin/analytics/api/ads/AdBreakMetadata {
+	public synthetic fun <init> (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;Ljava/lang/Integer;Ljava/lang/Integer;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdPosition ()Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;
+	public final fun getExpectedPaidAds ()Ljava/lang/Integer;
+	public final fun getExpectedSlates ()Ljava/lang/Integer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/api/ads/AdBreakMetadata$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/bitmovin/analytics/api/ads/AdBreakMetadata;
+	public final fun setAdPosition (Lcom/bitmovin/analytics/api/ssai/SsaiAdPosition;)Lcom/bitmovin/analytics/api/ads/AdBreakMetadata$Builder;
+	public final fun setExpectedPaidAds (Ljava/lang/Integer;)Lcom/bitmovin/analytics/api/ads/AdBreakMetadata$Builder;
+	public final fun setExpectedSlates (Ljava/lang/Integer;)Lcom/bitmovin/analytics/api/ads/AdBreakMetadata$Builder;
+}
+
+public final class com/bitmovin/analytics/api/ads/AdMetadata {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ZLjava/time/Duration;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdId ()Ljava/lang/String;
+	public final fun getAdSystem ()Ljava/lang/String;
+	public final fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
+	public final fun getDuration ()Ljava/time/Duration;
+	public fun hashCode ()I
+	public final fun isSlate ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/api/ads/AdMetadata$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/bitmovin/analytics/api/ads/AdMetadata;
+	public final fun setAdId (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
+	public final fun setAdSystem (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
+	public final fun setCustomData (Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
+	public final fun setDuration (Ljava/time/Duration;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
+	public final fun setIsSlate (Z)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
+}
+
+public final class com/bitmovin/analytics/api/ads/AdQuartileMetadata {
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFailedBeaconUrl ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/bitmovin/analytics/api/ads/AdQuartileMetadata$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/bitmovin/analytics/api/ads/AdQuartileMetadata;
+	public final fun setFailedBeaconUrl (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdQuartileMetadata$Builder;
+}
+
 public final class com/bitmovin/analytics/api/error/AnalyticsError {
 	public fun <init> (ILjava/lang/String;Lcom/bitmovin/analytics/api/error/ErrorSeverity;)V
 	public fun equals (Ljava/lang/Object;)Z
@@ -912,17 +966,23 @@ public final class com/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata {
 
 public abstract interface class com/bitmovin/analytics/api/ssai/SsaiApi {
 	public abstract fun adBreakEnd ()V
-	public abstract fun adBreakStart (Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;)V
+	public abstract fun adBreakStart (Lcom/bitmovin/analytics/api/ads/AdBreakMetadata;)V
+	public fun adBreakStart (Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;)V
 	public static synthetic fun adBreakStart$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;ILjava/lang/Object;)V
-	public abstract fun adQuartileFinished (Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata;)V
+	public abstract fun adQuartileFinished (Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;Lcom/bitmovin/analytics/api/ads/AdQuartileMetadata;)V
+	public fun adQuartileFinished (Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata;)V
 	public static synthetic fun adQuartileFinished$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata;ILjava/lang/Object;)V
-	public abstract fun adStart (Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;)V
+	public abstract fun adStart (Lcom/bitmovin/analytics/api/ads/AdMetadata;)V
+	public fun adStart (Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;)V
 	public static synthetic fun adStart$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;ILjava/lang/Object;)V
 }
 
 public final class com/bitmovin/analytics/api/ssai/SsaiApi$DefaultImpls {
+	public static fun adBreakStart (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;)V
 	public static synthetic fun adBreakStart$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdBreakMetadata;ILjava/lang/Object;)V
+	public static fun adQuartileFinished (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata;)V
 	public static synthetic fun adQuartileFinished$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartile;Lcom/bitmovin/analytics/api/ssai/SsaiAdQuartileMetadata;ILjava/lang/Object;)V
+	public static fun adStart (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;)V
 	public static synthetic fun adStart$default (Lcom/bitmovin/analytics/api/ssai/SsaiApi;Lcom/bitmovin/analytics/api/ssai/SsaiAdMetadata;ILjava/lang/Object;)V
 }
 
