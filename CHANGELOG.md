@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - THEOplayer: Directly implement SSAI tracking within AdEvents, retiring SSAI API
 - Upgraded bitmovin player to `3.154.0`
+- Upgraded THEOplayer to `11.5.0`
 - [Internal] Mature refactoring around bitmovin player (Splitting up the adapter in Listener and Manipulator, pushing logic into core module)
 
 ### Added
