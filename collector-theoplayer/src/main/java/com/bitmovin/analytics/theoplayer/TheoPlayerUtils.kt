@@ -19,6 +19,11 @@ internal object TheoPlayerUtils {
     }
 
     fun isClientSideAd(adIntegrationKind: AdIntegrationKind?): Boolean {
+        // if adIntegrationKind is null we opt for CSAI, to keep current behaviour
+        if (adIntegrationKind == null) {
+            return true
+        }
+
         // in case it is not Google_Ime we assume SSAI
         // This is following what the conviva integration does
         return adIntegrationKind == AdIntegrationKind.GOOGLE_IMA

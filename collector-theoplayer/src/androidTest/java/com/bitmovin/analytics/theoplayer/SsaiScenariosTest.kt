@@ -143,6 +143,23 @@ class SsaiScenariosTest {
             assertThat(impression.adEventDataList).isNotEmpty
             SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(impression.adEventDataList)
 
+            // the ad metadata fields extracted from the IMA ad are reported on the SSAI ad samples
+            val adSample = impression.adEventDataList.first()
+            // the DAI ad break is inserted at the start of playback, so it is a pre-roll
+            assertThat(adSample.adPosition).isEqualTo("preroll")
+            assertThat(adSample.adId).isNotEmpty()
+            assertThat(adSample.adSystem).isNotEmpty()
+            assertThat(adSample.universalAdIdValue).isNotEmpty()
+            assertThat(adSample.universalAdIdRegistry).isNotEmpty()
+            assertThat(adSample.creativeId).isNotEmpty()
+            assertThat(adSample.creativeAdId).isNotEmpty()
+            assertThat(adSample.adDuration).isNotNull
+            assertThat(adSample.adDuration).isGreaterThan(0)
+
+            // FIXME: verify how we can extract this ("" is reported)
+            assertThat(adSample.advertiserName).isNotNull
+            assertThat(adSample.adTitle).isNotEmpty()
+
             // all ad samples must reference the same video impression
             val impressionId = impression.eventDataList.first().impressionId
             impression.adEventDataList.forEach {
@@ -198,6 +215,7 @@ class SsaiScenariosTest {
             assertThat(adSample.started).isEqualTo(1)
             assertThat(adSample.completed).isEqualTo(0)
             assertThat(adSample.exitedAdBreak).isTrue
+            assertThat(adSample.adDuration).isGreaterThan(0)
 
             // event data is linked to the SSAI ad and carries the routing header
             val eventDataList = impression.eventDataList

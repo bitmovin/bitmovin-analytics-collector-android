@@ -168,8 +168,12 @@ class DefaultStateMachineListener(
             data.errorData = serialize(errorCode.legacyErrorData)
             data.errorSeverity = errorCode.errorSeverity
 
-            // send ad Error Sample to report errors also in ad metrics in case ssai ad is currently running
-            if (errorCode.errorCode != AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode.errorCode) {
+            // We have a clash with errorCode 10000 (Too Many Quality Changes on analytics and Ad_Error on TheoPlayer)
+            // Thus we don't report that code if it is informational (indicates that it is internal)
+            if (isTooManyQualityChangesError(errorCode.errorCode) && errorCode.errorSeverity == ErrorSeverity.INFO) {
+                // do nothing for quality change errors with info severity
+            } else {
+                // send ad Error Sample to report errors also in ad metrics in case ssai ad is currently running
                 ssaiService.sendAdErrorSample(errorCode)
             }
         }
@@ -331,5 +335,9 @@ class DefaultStateMachineListener(
         eventData.supportedVideoCodecs = Util.supportedVideoFormats
 
         analytics.sendEventData(eventData)
+    }
+
+    internal fun isTooManyQualityChangesError(errorCode: Int?): Boolean {
+        return errorCode == AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode.errorCode
     }
 }

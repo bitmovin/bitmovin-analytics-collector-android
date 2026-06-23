@@ -16,18 +16,20 @@ internal object AdBreakMapper {
                 id = Util.uUID,
                 ads = emptyList(),
             )
-
         try {
+            // This is used for SSAI and CSAI if ima is used for integration
             if (TheoPlayerUtils.isTheoImaAdBreakClassLoaded && playerAdBreak is GoogleImaAdBreak) {
                 val imaAdPodInfo = playerAdBreak.imaAdPodInfo
 
                 if (imaAdPodInfo != null) {
                     result.scheduleTime = Util.secondsToMillis(imaAdPodInfo.timeOffset)
                     result.position = getPosition(playerAdBreak.timeOffset)
-
 //                TODO: it seems like we cannot detect the tagType (vast vs vmap) same for tagUrl
 //                TODO: Clarify: scheduleTime vs position vs offset? (also ad vs adBreak)
                 }
+            } else {
+                // in case we don't have ima, we fallback to the generic interface
+                result.position = getPosition(playerAdBreak.timeOffset)
             }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "on fromTheoAdBreak", e)

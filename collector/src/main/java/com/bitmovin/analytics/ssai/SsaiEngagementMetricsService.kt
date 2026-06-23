@@ -184,6 +184,12 @@ class SsaiEngagementMetricsService(
         adEventData.adImpressionId = getOrCreateAdImpressionId()
         adEventData.adId = adMetadata?.adId
         adEventData.adSystem = adMetadata?.adSystem
+        adEventData.universalAdIdValue = adMetadata?.universalAdIdValue
+        adEventData.universalAdIdRegistry = adMetadata?.universalAdIdRegistry
+        adEventData.creativeId = adMetadata?.creativeId
+        adEventData.creativeAdId = adMetadata?.creativeAdId
+        adEventData.advertiserName = adMetadata?.advertiserName
+        adEventData.adTitle = adMetadata?.title
         adEventData.adPosition = adBreakMetadata?.adPosition?.position
         adEventData.adIndex = adIndex
         adEventData.adPodPosition = this.adPodPosition

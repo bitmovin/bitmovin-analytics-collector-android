@@ -30,6 +30,7 @@ import com.theoplayer.android.api.event.ads.AdsEventTypes
 import com.theoplayer.android.api.event.player.PlayEvent
 import com.theoplayer.android.api.event.player.PlayerEventTypes
 import com.theoplayer.android.api.player.Player
+import java.time.Duration
 import com.theoplayer.android.api.ads.AdBreak as TheoAdBreak
 
 internal class TheoPlayerAdAdapter(
@@ -66,6 +67,8 @@ internal class TheoPlayerAdAdapter(
             try {
                 BitmovinLog.d(TAG, "ad begin")
                 val theoAd = event.ad ?: return@EventListener
+
+                // non-linear ads are not tracked
                 if (theoAd.type != "linear") return@EventListener
                 val mappedAd = AdMapper.fromTheoAd(theoAd)
                 currentAd = mappedAd
@@ -77,6 +80,13 @@ internal class TheoPlayerAdAdapter(
                         AdMetadata.Builder()
                             .setAdId(mappedAd.id)
                             .setAdSystem(mappedAd.adSystemName)
+                            .setUniversalAdIdValue(mappedAd.universalAdIdValue)
+                            .setUniversalAdIdRegistry(mappedAd.universalAdIdRegistry)
+                            .setCreativeId(mappedAd.creativeId)
+                            .setCreativeAdId(mappedAd.creativeAdId)
+                            .setAdvertiserName(mappedAd.advertiserName)
+                            .setTitle(mappedAd.title)
+                            .setDuration(mappedAd.duration?.let { Duration.ofMillis(it) })
                             .build()
                     ssaiApi.adStart(ssaiAdMetadata)
                 }
@@ -91,7 +101,8 @@ internal class TheoPlayerAdAdapter(
                 // according to NFL, adEnd is signaling completion of an ad (for ssai and csai)
                 BitmovinLog.d(TAG, "ad end")
                 val theoAd = event.ad ?: return@EventListener
-                // FIXME: type linear also true for SSAI?
+
+                // non-linear ads are not tracked
                 if (theoAd.type != "linear") return@EventListener
 
                 if (TheoPlayerUtils.isClientSideAd(theoAd.integration)) {
@@ -148,10 +159,12 @@ internal class TheoPlayerAdAdapter(
                         AdBreak(id = Util.uUID, ads = emptyList())
                     }
 
-                // FIXME: Do we need to block SSAI here? How should we handle null adbreak in that
-                // case?
-                observableSupport.notify {
-                    it.onAdError(adBreak, 0, event.error)
+                if (TheoPlayerUtils.isClientSideAd(event.ad?.integration)) {
+                    observableSupport.notify {
+                        it.onAdError(adBreak, 0, event.error)
+                    }
+                } else {
+                    // TODO: handle error for SSAI usecase
                 }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Error", e)

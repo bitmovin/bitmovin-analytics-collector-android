@@ -21,6 +21,7 @@ internal object AdMapper {
         ad.adModule = theoAd.integration.type
 
         try {
+            // This is used for both CSAI an SSAI
             if (TheoPlayerUtils.isTheoImaClassLoaded && theoAd is GoogleImaAd) {
                 extractMetadataFromGoogleImaAd(ad, theoAd)
                 return ad
@@ -29,9 +30,11 @@ internal object AdMapper {
             BitmovinLog.e(TAG, "on fromTheoAd", e)
         }
 
+        // This is used for both CSAI an SSAI
         if (theoAd is LinearAd) {
             extractMetadataFromLinearAd(ad, theoAd)
         }
+
         return ad
     }
 
@@ -68,6 +71,8 @@ internal object AdMapper {
         ad.bitrate = googleImaAd.vastMediaBitrate
         ad.width = googleImaAd.imaAd.width
         ad.height = googleImaAd.imaAd.height
+
+        // TODO: can we get isSlate somehow
     }
 
     private fun extractImaTitleWithFallback(googleImaAd: GoogleImaAd): String? {
