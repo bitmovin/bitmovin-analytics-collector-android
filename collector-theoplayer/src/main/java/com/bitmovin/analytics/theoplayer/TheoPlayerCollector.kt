@@ -23,6 +23,8 @@ import com.theoplayer.android.api.player.Player
 internal class TheoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Context) :
     DefaultCollector<Player>(analyticsConfig, context.applicationContext),
     ITHEOplayerCollector {
+    // Used internally to track SSAI ads automatically through the player's ad events.
+    // The public [ssai] API is retired and intentionally does not expose this proxy.
     private val ssaiApiProxy = SsaiApiProxy()
 
     override var sourceMetadata: SourceMetadata
@@ -31,8 +33,14 @@ internal class TheoPlayerCollector(analyticsConfig: AnalyticsConfig, context: Co
             metadataProvider.setSourceMetadata(value)
         }
 
+    @Deprecated(
+        message =
+            "Manual SSAI tracking is no longer required for THEOplayer. SSAI ads are tracked " +
+                "automatically through the player's ad events. This API is a no-op.",
+        level = DeprecationLevel.WARNING,
+    )
     override val ssai: SsaiApi
-        get() = ssaiApiProxy
+        get() = NoOpSsaiApi
 
     override fun createAdapter(
         player: Player,

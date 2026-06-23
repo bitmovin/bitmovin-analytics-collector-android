@@ -6,6 +6,7 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.CustomData
 import com.bitmovin.analytics.api.DefaultMetadata
 import com.bitmovin.analytics.api.SourceMetadata
+import com.bitmovin.analytics.api.ssai.SsaiApi
 import com.bitmovin.analytics.theoplayer.TheoPlayerCollector
 import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.player.Player
@@ -29,6 +30,21 @@ public interface ITHEOplayerCollector : AnalyticsCollector<Player> {
      * https://developer.bitmovin.com/playback/docs/how-can-values-of-customdata-and-other-metadata-fields-be-changed
      */
     public var customData: CustomData
+
+    /**
+     * Track Server-Side Ad Insertion (SSAI) related data.
+     *
+     * Manual SSAI tracking is no longer required for the THEOplayer collector: SSAI ads are
+     * tracked automatically through the player's ad events. This API is retained for binary
+     * compatibility only and is now a no-op — calls to it have no effect.
+     */
+    @Deprecated(
+        message =
+            "Manual SSAI tracking is no longer required for THEOplayer. SSAI ads are tracked " +
+                "automatically through the player's ad events. This API is a no-op.",
+        level = DeprecationLevel.WARNING,
+    )
+    override val ssai: SsaiApi
 
     public companion object Factory {
         /**

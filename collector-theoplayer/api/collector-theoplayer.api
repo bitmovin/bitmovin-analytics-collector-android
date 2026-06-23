@@ -5,6 +5,7 @@ public abstract interface class com/bitmovin/analytics/theoplayer/api/ITHEOplaye
 	public abstract fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
 	public static fun getSdkVersion ()Ljava/lang/String;
 	public abstract fun getSourceMetadata ()Lcom/bitmovin/analytics/api/SourceMetadata;
+	public abstract fun getSsai ()Lcom/bitmovin/analytics/api/ssai/SsaiApi;
 	public abstract fun setCustomData (Lcom/bitmovin/analytics/api/CustomData;)V
 	public abstract fun setSourceMetadata (Lcom/bitmovin/analytics/api/SourceMetadata;)V
 }
