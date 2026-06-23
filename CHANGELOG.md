@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v3.29.0
+
 ### Changed
 - THEOplayer: SSAI Ads are automatically tracked, retiring SSAI API
 - Upgraded bitmovin player to `3.154.0`
