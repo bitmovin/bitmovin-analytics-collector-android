@@ -156,7 +156,8 @@ class SsaiScenariosTest {
             assertThat(adSample.adDuration).isNotNull
             assertThat(adSample.adDuration).isGreaterThan(0)
 
-            // FIXME: verify how we can extract this ("" is reported)
+            // for some reason it is reported with "" on the teststream
+            // but this at least makes sure that we read some value
             assertThat(adSample.advertiserName).isNotNull
             assertThat(adSample.adTitle).isNotEmpty()
 
