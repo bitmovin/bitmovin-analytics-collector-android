@@ -32,6 +32,7 @@ data class Ad(
     var pricingCurrency: String? = null,
     var skippableAfter: Long? = null,
     var skippable: Boolean? = null,
+    var isSlate: Boolean? = null,
     var duration: Long? = null,
     var dealId: String? = null,
     var adModule: String? = null,

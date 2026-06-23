@@ -142,6 +142,55 @@ class TestSsaiAdIntegration(
     }
 
     /**
+     * Drives a single ad break whose ads each carry an integration-specific custom-data payload,
+     * played through all quartiles to completion. One ad is created per entry in [customData], so
+     * the break is a single pod (see [playAdBreak] for why all ads are created up front).
+     *
+     * Mirrors how a real custom integration (e.g. MediaKind) surfaces its ad metadata: the player
+     * exposes each ad's payload verbatim via [com.theoplayer.android.api.ads.Ad.getCustomData], and
+     * the collector's per-integration mapper reads it from there.
+     */
+    suspend fun playAdBreakWithCustomData(
+        timeOffset: Int,
+        customData: List<Any?>,
+        durationInSeconds: Int = 5,
+        stepDelayMs: Long = 500,
+    ) {
+        val controller = this.controller ?: return
+
+        val adBreak = onMain { controller.createAdBreak(AdBreakInit(timeOffset = timeOffset)) }
+        val ads =
+            onMain {
+                customData.mapIndexed { index, data ->
+                    controller.createAd(
+                        AdInit(
+                            type = "linear",
+                            id = "test-ssai-customdata-$timeOffset-$index",
+                            duration = durationInSeconds,
+                            customData = data,
+                        ),
+                        adBreak,
+                    )
+                }
+            }
+
+        for (ad in ads) {
+            onMain { controller.beginAd(ad) }
+            delay(stepDelayMs)
+            onMain { controller.updateAdProgress(ad, 0.25) }
+            delay(stepDelayMs)
+            onMain { controller.updateAdProgress(ad, 0.5) }
+            delay(stepDelayMs)
+            onMain { controller.updateAdProgress(ad, 0.75) }
+            delay(stepDelayMs)
+            onMain { controller.endAd(ad) }
+        }
+
+        delay(stepDelayMs)
+        onMain { controller.removeAdBreak(adBreak) }
+    }
+
+    /**
      * Begins a single-ad server-side break, plays into the ad, then raises a fatal error through the
      * controller while the ad is still in progress. [ServerSideAdIntegrationController.fatalError]
      * surfaces as a player error event which the collector routes through its state machine - and,

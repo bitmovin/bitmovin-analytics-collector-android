@@ -26,6 +26,11 @@ internal object AdMapper {
                 extractMetadataFromGoogleImaAd(ad, theoAd)
                 return ad
             }
+
+            if (MediaKindAdMapper.isMediaKindAd(theoAd)) {
+                MediaKindAdMapper.extractMetadata(ad, theoAd)
+                return ad
+            }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "on fromTheoAd", e)
         }
@@ -71,8 +76,6 @@ internal object AdMapper {
         ad.bitrate = googleImaAd.vastMediaBitrate
         ad.width = googleImaAd.imaAd.width
         ad.height = googleImaAd.imaAd.height
-
-        // TODO: can we get isSlate somehow
     }
 
     private fun extractImaTitleWithFallback(googleImaAd: GoogleImaAd): String? {

@@ -523,4 +523,119 @@ class CustomSsaiScenariosTest {
             SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(eventDataList1)
             DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList1)
         }
+
+    @Test
+    fun test_customSsai_mediaKind_multipleAds_mapEachCustomDataMapOntoItsOwnAdSample() =
+        runBlockingTest {
+            // mimic the MediaKind custom integration: ads report customIntegration == "mediakind" and
+            // carry all their metadata in a map on Ad.customData (rather than on a dedicated ad type).
+            ssaiIntegration = TestSsaiAdIntegration(mainScope, integrationId = "mediakind")
+
+            // arrange + act
+            attachCollectorAndWaitUntilSsaiReady()
+
+            // let regular content play before the ad break
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+            // a two-ad pod: a paid ad followed by a slate. Mixed value types and an unknown key verify
+            // value stringification and that unknown keys are ignored by MediaKindAdMapper.
+            val firstAdCustomData =
+                mapOf(
+                    "adSystem" to "MediaKind",
+                    "creativeId" to "creative-1",
+                    "creativeAdId" to "creative-ad-1",
+                    "advertiserName" to "ACME Corp",
+                    "title" to "MediaKind Ad One",
+                    "universalAdIdValue" to "uaid-1",
+                    "universalAdIdRegistry" to "ad-id.org",
+                    "isSlate" to false,
+                    "unknownKey" to "should-be-ignored",
+                )
+            val secondAdCustomData =
+                mapOf(
+                    "adSystem" to "MediaKind",
+                    "creativeId" to "creative-2",
+                    "advertiserName" to "Globex",
+                    "title" to "MediaKind Slate",
+                    "isSlate" to "true",
+                )
+
+            ssaiIntegration.playAdBreakWithCustomData(
+                timeOffset = 0,
+                customData = listOf(firstAdCustomData, secondAdCustomData),
+            )
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 6000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+            // wait a bit to make sure the last play sample is sent
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(1)
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            // one ad sample per ad in the pod
+            val adEventDataList = impression.adEventDataList
+            assertThat(adEventDataList).hasSize(2)
+
+            val firstAd = adEventDataList[0]
+            val secondAd = adEventDataList[1]
+
+            // both ads play through every quartile and share the same pod at increasing positions
+            adEventDataList.forEachIndexed { index, adSample ->
+                assertThat(adSample.started).isEqualTo(1)
+                assertThat(adSample.quartile1).isEqualTo(1)
+                assertThat(adSample.midpoint).isEqualTo(1)
+                assertThat(adSample.quartile3).isEqualTo(1)
+                assertThat(adSample.completed).isEqualTo(1)
+                assertThat(adSample.adIndex).isEqualTo(index)
+                assertThat(adSample.adPodPosition).isEqualTo(index)
+                assertThat(adSample.adPosition).isEqualTo("preroll")
+                assertThat(adSample.adSystem).isEqualTo("MediaKind")
+                // duration is read off the LinearAd (5s default), reported in milliseconds
+                assertThat(adSample.adDuration).isEqualTo(5000)
+            }
+
+            // the ad id is intrinsic to the ad (Ad.getId()), not taken from the customData map
+            assertThat(firstAd.adId).isEqualTo("test-ssai-customdata-0-0")
+            assertThat(secondAd.adId).isEqualTo("test-ssai-customdata-0-1")
+
+            // each ad's own customData map is mapped onto its own sample
+            assertThat(firstAd.creativeId).isEqualTo("creative-1")
+            assertThat(firstAd.creativeAdId).isEqualTo("creative-ad-1")
+            assertThat(firstAd.advertiserName).isEqualTo("ACME Corp")
+            assertThat(firstAd.adTitle).isEqualTo("MediaKind Ad One")
+            assertThat(firstAd.universalAdIdValue).isEqualTo("uaid-1")
+            assertThat(firstAd.universalAdIdRegistry).isEqualTo("ad-id.org")
+            assertThat(firstAd.isSlate).isFalse
+
+            assertThat(secondAd.creativeId).isEqualTo("creative-2")
+            assertThat(secondAd.advertiserName).isEqualTo("Globex")
+            assertThat(secondAd.adTitle).isEqualTo("MediaKind Slate")
+            assertThat(secondAd.isSlate).isTrue
+            // keys absent from the second ad's map stay null
+            assertThat(secondAd.creativeAdId).isNull()
+            assertThat(secondAd.universalAdIdValue).isNull()
+
+            // verify basic ad info per ad: the two samples are distinct ads (each with its own
+            // adImpressionId), so they can't be checked as a single ad impression in one call.
+            SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(listOf(firstAd))
+            SsaiDataVerifier.verifySamplesHaveBasicAdInfoSet(listOf(secondAd))
+            assertThat(firstAd.adImpressionId).isNotEqualTo(secondAd.adImpressionId)
+
+            // both ads belong to the same video impression
+            val impressionId = impression.eventDataList.first().impressionId
+            adEventDataList.forEach {
+                assertThat(it.videoImpressionId).isEqualTo(impressionId)
+            }
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyInvariants(eventDataList)
+            SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(eventDataList)
+            DataVerifier.verifyThereWasAtLeastOnePlayingSample(eventDataList)
+        }
 }

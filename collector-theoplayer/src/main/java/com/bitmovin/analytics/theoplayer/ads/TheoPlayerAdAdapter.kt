@@ -86,6 +86,7 @@ internal class TheoPlayerAdAdapter(
                             .setCreativeAdId(mappedAd.creativeAdId)
                             .setAdvertiserName(mappedAd.advertiserName)
                             .setTitle(mappedAd.title)
+                            .setIsSlate(mappedAd.isSlate ?: false)
                             .setDuration(mappedAd.duration?.let { Duration.ofMillis(it) })
                             .build()
                     ssaiApi.adStart(ssaiAdMetadata)
