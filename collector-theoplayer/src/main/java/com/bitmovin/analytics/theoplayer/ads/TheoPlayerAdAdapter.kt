@@ -156,7 +156,7 @@ internal class TheoPlayerAdAdapter(
                         AdBreakMapper.fromTheoAdBreak(theoAdBreak)
                     } else {
                         // error fired before any ad break was created (e.g. early load failure)
-                        // FIXME: how should we handle this? opt for CSAI or SSAI?
+                        // FIXME [AN-5557]: how should we handle this? opt for CSAI or SSAI?
                         AdBreak(id = Util.uUID, ads = emptyList())
                     }
 
@@ -165,7 +165,7 @@ internal class TheoPlayerAdAdapter(
                         it.onAdError(adBreak, 0, event.error)
                     }
                 } else {
-                    // TODO: handle error for SSAI usecase
+                    // TODO [AN-5557]: handle error for SSAI usecase
                 }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Error", e)

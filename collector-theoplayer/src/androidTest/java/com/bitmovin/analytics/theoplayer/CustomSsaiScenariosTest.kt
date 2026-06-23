@@ -39,8 +39,6 @@ class CustomSsaiScenariosTest {
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
-    // FIXME: verify existing test cases a bit more since they are claude generated
-
     @get:Rule
     val metadataGenerator = MetadataUtils.MetadataGenerator()
 
