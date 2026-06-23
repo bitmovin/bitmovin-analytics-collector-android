@@ -55,8 +55,6 @@ class AdMetadata private constructor(
     class Builder {
         private var adId: String? = null
         private var adSystem: String? = null
-
-        // FIXME: naming?
         private var universalAdIdValue: String? = null
         private var universalAdIdRegistry: String? = null
         private var creativeId: String? = null
@@ -66,8 +64,6 @@ class AdMetadata private constructor(
         private var customData: CustomData? = null
         private var isSlate: Boolean = false
         private var duration: Duration? = null
-
-        // FIXME: add more fields that are used by NFL
 
         fun setAdId(adId: String?) = apply { this.adId = adId }
 
