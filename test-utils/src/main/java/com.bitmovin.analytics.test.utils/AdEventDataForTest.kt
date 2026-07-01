@@ -2,6 +2,7 @@ package com.bitmovin.analytics.test.utils
 
 import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.DeviceInformationDto
 import com.bitmovin.analytics.utils.Util
 import kotlinx.serialization.Serializable
 
@@ -192,6 +193,7 @@ data class AdEventDataForTest(
     var player: String,
     var playerKey: String? = null,
     var playerTech: String,
+    var deviceInformation: DeviceInformationDto,
     var screenHeight: Int,
     var screenWidth: Int,
     // this is playerVersion NOT analyticsVersion
@@ -413,6 +415,7 @@ data class AdEventDataForTest(
             player = player,
             playerKey = playerKey,
             playerTech = playerTech,
+            deviceInformation = deviceInformation,
             screenHeight = screenHeight,
             screenWidth = screenWidth,
             version = version,

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+- Added missing device information to ad samples
+
 ## v3.29.0
 
 ### Changed

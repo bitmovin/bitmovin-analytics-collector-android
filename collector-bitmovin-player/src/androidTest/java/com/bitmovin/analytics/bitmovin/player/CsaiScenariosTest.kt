@@ -262,6 +262,7 @@ class CsaiScenariosTest {
             val adSample = impression.adEventDataList[0]
 
             CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig, sourceMetadata = defaultSourceMetadata)
+            CsaiDataVerifier.verifyDeviceInformation(adSample)
 //            TODO: this doesn't work for progressive ads anymore https://bitmovin.atlassian.net/browse/PA-4011
 //            CsaiDataVerifier.verifyFullyPlayedAd(adSample)
             assertThat(adSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)

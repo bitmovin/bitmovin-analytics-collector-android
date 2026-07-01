@@ -105,6 +105,16 @@ object SsaiDataVerifier {
         assertThat(adEventData.experimentName).isEqualTo(expectedCustomData.experimentName)
     }
 
+    // verifies that the device information is added to the ad event data
+    fun verifyDeviceInformation(
+        adEventData: AdEventDataForTest,
+        expectedIsTV: Boolean = false,
+    ) {
+        assertThat(adEventData.deviceInformation.manufacturer).isNotEmpty
+        assertThat(adEventData.deviceInformation.model).isNotEmpty
+        assertThat(adEventData.deviceInformation.isTV).isEqualTo(expectedIsTV)
+    }
+
     fun verifySamplesHaveSameAdSystem(
         adEventDataList: List<AdEventDataForTest>,
         adSystem: String,

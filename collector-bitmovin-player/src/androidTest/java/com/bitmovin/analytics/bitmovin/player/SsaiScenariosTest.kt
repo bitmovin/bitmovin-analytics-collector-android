@@ -165,6 +165,7 @@ class SsaiScenariosTest {
 
             val firstSsaiAdSample = SsaiDataVerifier.getSsaiAdEventSampleByAdIndex(impression.adEventDataList, 0)
             SsaiDataVerifier.verifyCustomData(firstSsaiAdSample, exepctedCustomDataOnFirstSample)
+            SsaiDataVerifier.verifyDeviceInformation(firstSsaiAdSample)
 
             val secondAdSamples = DataVerifier.getSsaiSamplesByIndex(eventDataList, 1)
             assertThat(secondAdSamples.size).isGreaterThanOrEqualTo(1)

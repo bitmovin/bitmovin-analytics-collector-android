@@ -146,6 +146,16 @@ object CsaiDataVerifier {
         verifyCustomData(adEventData, sourceMetadata.customData)
     }
 
+    // verifies that the device information is added to the ad event data
+    fun verifyDeviceInformation(
+        adSample: AdEventDataForTest,
+        expectedIsTV: Boolean = false,
+    ) {
+        assertThat(adSample.deviceInformation.manufacturer).isNotEmpty
+        assertThat(adSample.deviceInformation.model).isNotEmpty
+        assertThat(adSample.deviceInformation.isTV).isEqualTo(expectedIsTV)
+    }
+
     fun verifyFullyPlayedAd(adSample: AdEventDataForTest) {
         assertThat(adSample.started).isEqualTo(1)
         assertThat(adSample.quartile1).isEqualTo(1)

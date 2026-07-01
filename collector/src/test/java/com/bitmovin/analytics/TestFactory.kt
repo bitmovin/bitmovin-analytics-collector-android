@@ -8,6 +8,7 @@ import com.bitmovin.analytics.data.EventDataFactory
 import com.bitmovin.analytics.data.PlayerInfo
 import com.bitmovin.analytics.data.UserIdProvider
 import com.bitmovin.analytics.dtos.AdEventData
+import com.bitmovin.analytics.dtos.DeviceInformationDto
 import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.enums.PlayerType
@@ -63,6 +64,13 @@ object TestFactory {
             domain = "bitmovin.com",
             language = "en",
             player = "bitmovin player",
+            deviceInformation =
+                DeviceInformationDto(
+                    manufacturer = "manufacturer",
+                    model = "model",
+                    isTV = false,
+                    deviceClass = null,
+                ),
             screenHeight = 9,
             screenWidth = 16,
             platform = "android",
