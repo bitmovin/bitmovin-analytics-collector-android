@@ -1,6 +1,6 @@
 package com.bitmovin.analytics.theoplayer.listeners
 
-import com.bitmovin.analytics.stateMachines.PlayerStateMachine
+import com.bitmovin.analytics.adapters.PlayerEventReporter
 import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
 import com.theoplayer.android.api.event.EventListener
@@ -13,7 +13,7 @@ import com.theoplayer.android.api.event.track.mediatrack.video.list.VideoTrackLi
 import com.theoplayer.android.api.player.Player
 
 internal class SourceEventListeners(
-    private val stateMachine: PlayerStateMachine,
+    private val playerEventReporter: PlayerEventReporter,
     private val player: Player,
     private val playbackQualityProvider: PlaybackQualityProvider,
 ) {
@@ -23,7 +23,7 @@ internal class SourceEventListeners(
     private val videoQualityChangeListener =
         EventListener<ActiveQualityChangedEvent> { event ->
             val newVideoQuality = event.quality
-            stateMachine.videoQualityChanged(
+            playerEventReporter.onVideoQualityChanged(
                 player.currentPositionInMs(),
                 playbackQualityProvider.didVideoQualityChange(newVideoQuality),
             ) {

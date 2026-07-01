@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Changed
+- [Internal] Refactored theoplayer to avoid direct statemachine calls
+
 ### Fixed
 - Added missing device information to ad samples
 

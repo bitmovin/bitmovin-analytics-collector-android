@@ -20,7 +20,6 @@ import com.bitmovin.analytics.features.Feature
 import com.bitmovin.analytics.features.httprequesttracking.OnDownloadFinishedEventListener
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
-import com.bitmovin.analytics.stateMachines.SampleTriggerReason
 import com.bitmovin.analytics.theoplayer.ads.TheoPlayerAdAdapter
 import com.bitmovin.analytics.theoplayer.features.TheoPlayerHttpRequestTrackingAdapter
 import com.bitmovin.analytics.theoplayer.listeners.AnalyticsEventListeners
@@ -70,8 +69,8 @@ internal class TheoPlayerSdkAdapter(
     ): Observable<OnDownloadFinishedEventListener> =
         TheoPlayerHttpRequestTrackingAdapter(player, onAnalyticsReleasingObservable, drmInfoProvider)
 
-    private val analyticsEventListeners = AnalyticsEventListeners(bitmovinAnalytics, stateMachine, player, playbackQualityProvider)
-    private val sourceEventListeners = SourceEventListeners(stateMachine, player, playbackQualityProvider)
+    private val analyticsEventListeners = AnalyticsEventListeners(bitmovinAnalytics, playerEventReporter, player)
+    private val sourceEventListeners = SourceEventListeners(playerEventReporter, player, playbackQualityProvider)
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
         val features = super.init()
@@ -92,7 +91,7 @@ internal class TheoPlayerSdkAdapter(
             sourceEventListeners.unregisterSourceListeners()
 
             playerStatisticsProvider.reset()
-            stateMachine.resetStateMachine()
+            playerEventReporter.onPlayerRelease()
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.toString())
         }
@@ -100,11 +99,7 @@ internal class TheoPlayerSdkAdapter(
 
     override fun triggerSampleOnDetach() {
         val sendSampleCodeBlock = {
-            if (stateMachine.isInStartupState()) {
-                stateMachine.exitBeforeVideoStart(player.currentPositionInMs())
-            } else {
-                stateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
-            }
+            playerEventReporter.onPlayerDestroy(player.currentPositionInMs())
         }
         // We need to make sure this is executed on Main thread because THEO does not always send detach events from main
         if (Looper.getMainLooper().isCurrentThread) sendSampleCodeBlock() else mainHandler.post(sendSampleCodeBlock)

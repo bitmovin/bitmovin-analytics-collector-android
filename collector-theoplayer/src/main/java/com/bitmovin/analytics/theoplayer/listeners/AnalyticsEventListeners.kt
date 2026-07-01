@@ -1,12 +1,9 @@
 package com.bitmovin.analytics.theoplayer.listeners
 
 import com.bitmovin.analytics.BitmovinAnalytics
-import com.bitmovin.analytics.stateMachines.PlayerStateMachine
-import com.bitmovin.analytics.stateMachines.PlayerStates
-import com.bitmovin.analytics.stateMachines.SampleTriggerReason
+import com.bitmovin.analytics.adapters.PlayerEventReporter
 import com.bitmovin.analytics.theoplayer.TheoPlayerUtils
 import com.bitmovin.analytics.theoplayer.errors.TheoPlayerExceptionMapper
-import com.bitmovin.analytics.theoplayer.player.PlaybackQualityProvider
 import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
@@ -47,9 +44,8 @@ import com.theoplayer.android.api.player.Player
 
 internal class AnalyticsEventListeners(
     private val bitmovinAnalytics: BitmovinAnalytics,
-    private val stateMachine: PlayerStateMachine,
+    private val playerEventReporter: PlayerEventReporter,
     private val player: Player,
-    private val playbackQualityProvider: PlaybackQualityProvider,
 ) {
     @Volatile
     private var lastUpdatedPositionMs = 0L
@@ -156,29 +152,20 @@ internal class AnalyticsEventListeners(
 
     private fun handlePlayEvent(playEvent: PlayEvent) {
         BitmovinLog.d(TAG, "Event: PlayEvent")
-
-        if (!stateMachine.isStartupFinished) {
-            val currentTimeMs = Util.secondsToMillis(playEvent.currentTime)
-            startupInitiated(currentTimeMs)
-        }
+        // Startup is only initiated once per session; the reporter guards against duplicate startups.
+        playerEventReporter.onPlay(Util.secondsToMillis(playEvent.currentTime))
     }
 
     private fun handleSourceChange(sourceChangeEvent: SourceChangeEvent) {
         BitmovinLog.d(TAG, "Event: SourceChange")
-        stateMachine.triggerLastSampleOfSession(SampleTriggerReason.SOURCE_CHANGE)
-        stateMachine.resetStateMachine()
-    }
-
-    private fun startupInitiated(currentPositionMs: Long) {
-        playbackQualityProvider.resetPlaybackQualities()
-        stateMachine.transitionState(PlayerStates.STARTUP, currentPositionMs)
+        playerEventReporter.onSourceUnloaded()
     }
 
     private fun onSeeked(seekedEvent: SeekedEvent) {
         BitmovinLog.d(TAG, "Event: SEEKED")
 
         if (player.isPaused) {
-            stateMachine.transitionState(PlayerStates.PAUSE, player.currentPositionInMs())
+            playerEventReporter.onPause(player.currentPositionInMs())
         }
     }
 
@@ -187,14 +174,13 @@ internal class AnalyticsEventListeners(
         // for some reason the seekingEvent contains the currentTime it was seeked to
         // and not the original position it was seeked from, therefore
         // we use a workaround and just use the last updated position
-        val positionAfterSeek = Util.secondsToMillis(seekingEvent.currentTime)
         val positionBeforeSeek = lastUpdatedPositionMs
-        stateMachine.transitionState(PlayerStates.SEEKING, positionBeforeSeek)
+        playerEventReporter.onSeekStarted(positionBeforeSeek)
     }
 
     private fun handlePlayingEvent(playingEvent: PlayingEvent) {
         BitmovinLog.d(TAG, "Event: PlayingEvent")
-        stateMachine.transitionState(PlayerStates.PLAYING, player.currentPositionInMs())
+        playerEventReporter.onPlaying(player.currentPositionInMs())
     }
 
     private fun onDestroy(destroyEvent: DestroyEvent) {
@@ -204,21 +190,19 @@ internal class AnalyticsEventListeners(
 
     private fun onPause(pauseEvent: PauseEvent) {
         BitmovinLog.d(TAG, "Event: PauseEvent")
-        stateMachine.pause(player.currentPositionInMs())
+        playerEventReporter.onPause(player.currentPositionInMs())
     }
 
     private fun handleTimeUpdateEvent(timeUpdateEvent: TimeUpdateEvent) {
         lastUpdatedPositionMs = Util.secondsToMillis(timeUpdateEvent.currentTime)
-        stateMachine.handlePlayerTimeUpdate()
+        playerEventReporter.onTimeUpdate()
     }
 
     private fun onBuffering(waitingEvent: WaitingEvent) {
         BitmovinLog.d(TAG, "Event: waitingEvent")
-        // optiview player emits waiting event while seeking, thus we don't want to move to buffering
-        if (stateMachine.currentState == PlayerStates.SEEKING) {
-            return
-        }
-        stateMachine.transitionState(PlayerStates.BUFFERING, player.currentPositionInMs())
+        // Suppression of buffering while seeking (optiview player emits waiting events during seeks)
+        // and before startup is finished is handled inside the reporter.
+        playerEventReporter.onBuffering(player.currentPositionInMs())
     }
 
     private fun handleErrorEvent(originalNativeError: ErrorEvent) {
@@ -226,7 +210,7 @@ internal class AnalyticsEventListeners(
         try {
             val videoTime = player.currentPositionInMs()
             val errorCode = TheoPlayerExceptionMapper.map(originalNativeError)
-            stateMachine.error(videoTime, errorCode, originalNativeError)
+            playerEventReporter.onError(videoTime, errorCode, originalNativeError)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
         }
@@ -237,7 +221,7 @@ internal class AnalyticsEventListeners(
             try {
                 BitmovinLog.d(TAG, "ad break begin")
                 if (TheoPlayerUtils.isClientSideAd(event.adBreak.integration)) {
-                    stateMachine.startAd(player.currentPositionInMs())
+                    playerEventReporter.onAdStarted(player.currentPositionInMs())
                 }
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, "On Ad Break Begin", e)
@@ -249,16 +233,17 @@ internal class AnalyticsEventListeners(
             try {
                 BitmovinLog.d(TAG, "ad break end")
                 if (TheoPlayerUtils.isClientSideAd(event.adBreak.integration)) {
-                    stateMachine.endAd()
+                    playerEventReporter.onAdFinished()
 
                     // in case startup is not finished yet
                     // and player isn't paused after the ad (might not be pausible, but here
                     // for safety reasons) we are transitioning into startup
                     // this is needed since we saw issues in production where
                     // the PLAY event wasn't issued after the ad, which lead
-                    // to missing startups after pre-roll ads
-                    if (!stateMachine.isStartupFinished && !player.isPaused) {
-                        startupInitiated(player.currentPositionInMs())
+                    // to missing startups after pre-roll ads.
+                    // The reporter guards onPlay against duplicate startups once startup is finished.
+                    if (!player.isPaused) {
+                        playerEventReporter.onPlay(player.currentPositionInMs())
                     }
                 }
             } catch (e: Exception) {
