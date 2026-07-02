@@ -137,6 +137,19 @@ interface PlayerEventReporter {
     )
 
     /**
+     * onErrorMedia3 is specific for media3 adapter, since for that player
+     * all errors before and during startup are handled as videoStartup errors.
+     * This differs from the other adapter, where only errors during startup count
+     * for startup errors.
+     * TODO: this should be consolidated
+     */
+    fun onErrorMedia3(
+        position: Long,
+        error: ErrorCode,
+        nativeError: Any?,
+    )
+
+    /**
      * Playback reached the end of the content. The session is closed out (paused) and
      * the state machine is reset so a subsequent replay starts a fresh session.
      */
@@ -156,5 +169,6 @@ interface PlayerEventReporter {
 
     fun onPlayerDestroy(position: Long)
 
+    // TODO: consolidate, better naming
     fun onPlayerRelease()
 }

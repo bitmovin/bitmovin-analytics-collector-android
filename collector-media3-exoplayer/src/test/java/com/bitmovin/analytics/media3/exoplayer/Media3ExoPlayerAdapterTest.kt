@@ -77,7 +77,7 @@ class Media3ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(
+        adapter.analyticsEventListener.onVideoInputFormatChanged(
             getEventTime(20L),
             Format.Builder().setAverageBitrate(bitrate).build(),
             null,
@@ -87,7 +87,7 @@ class Media3ExoPlayerAdapterTest {
         verify(exactly = 1) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
 
         // act
-        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(
+        adapter.analyticsEventListener.onVideoInputFormatChanged(
             getEventTime(30L),
             Format.Builder().setAverageBitrate(bitrate).build(),
             null,
@@ -106,7 +106,7 @@ class Media3ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(
+        adapter.analyticsEventListener.onAudioInputFormatChanged(
             getEventTime(20L),
             Format.Builder().setAverageBitrate(bitrate).build(),
             null,
@@ -116,7 +116,7 @@ class Media3ExoPlayerAdapterTest {
         verify(exactly = 1) { stateMachine.transitionState(PlayerStates.QUALITYCHANGE, any()) }
 
         // act
-        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(
+        adapter.analyticsEventListener.onAudioInputFormatChanged(
             getEventTime(30L),
             Format.Builder().setAverageBitrate(bitrate).build(),
             null,
@@ -135,7 +135,7 @@ class Media3ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onVideoInputFormatChanged(
+        adapter.analyticsEventListener.onVideoInputFormatChanged(
             getEventTime(20L),
             Format.Builder().setAverageBitrate(bitrate).build(),
             null,
@@ -154,7 +154,7 @@ class Media3ExoPlayerAdapterTest {
         transitionToPlaying()
 
         // act
-        adapter.defaultAnalyticsListener.onAudioInputFormatChanged(
+        adapter.analyticsEventListener.onAudioInputFormatChanged(
             getEventTime(20L),
             Format.Builder().setAverageBitrate(bitrate).build(),
             null,

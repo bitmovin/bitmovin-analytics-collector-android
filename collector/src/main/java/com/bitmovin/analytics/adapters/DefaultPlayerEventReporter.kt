@@ -3,6 +3,7 @@ package com.bitmovin.analytics.adapters
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.dtos.ErrorCode
 import com.bitmovin.analytics.dtos.SubtitleDto
+import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.ssai.SsaiService
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
 import com.bitmovin.analytics.stateMachines.PlayerStates
@@ -130,6 +131,20 @@ internal class DefaultPlayerEventReporter(
         error: ErrorCode,
         nativeError: Any?,
     ) {
+        stateMachine.error(position, error, nativeError)
+    }
+
+    override fun onErrorMedia3(
+        position: Long,
+        error: ErrorCode,
+        nativeError: Any?,
+    ) {
+        // TODO: this should be streamlined with onError
+        // we need to discuss if we want to count errors before startup AND during startup
+        // or only errors during startup as videoStartFailed
+        if (!stateMachine.isStartupFinished) {
+            stateMachine.videoStartFailedReason = VideoStartFailedReason.PLAYER_ERROR
+        }
         stateMachine.error(position, error, nativeError)
     }
 

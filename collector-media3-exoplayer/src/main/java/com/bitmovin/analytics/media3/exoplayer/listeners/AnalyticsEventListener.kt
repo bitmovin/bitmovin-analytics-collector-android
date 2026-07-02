@@ -10,6 +10,7 @@ import androidx.media3.exoplayer.DecoderReuseEvaluation
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.source.LoadEventInfo
 import androidx.media3.exoplayer.source.MediaLoadData
+import com.bitmovin.analytics.adapters.PlayerEventReporter
 import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerUtil
 import com.bitmovin.analytics.media3.exoplayer.manipulators.QualityEventDataManipulator
 import com.bitmovin.analytics.media3.exoplayer.player.DrmInfoProvider
@@ -27,6 +28,7 @@ import java.util.Locale
 @androidx.annotation.OptIn(UnstableApi::class)
 internal class AnalyticsEventListener(
     private val stateMachine: PlayerStateMachine,
+    private val playerEventReporter: PlayerEventReporter,
     private val exoPlayerContext: Media3ExoPlayerContext,
     private val qualityEventDataManipulator: QualityEventDataManipulator,
     private val downloadSpeedMeter: DownloadSpeedMeter,
@@ -77,11 +79,11 @@ internal class AnalyticsEventListener(
             BitmovinLog.d(TAG, "onIsPlayingChanged $isPlaying")
             this.playbackInfoProvider.isPlaying = isPlaying
             if (isPlaying) {
-                stateMachine.transitionState(PlayerStates.PLAYING, position)
+                playerEventReporter.onPlaying(position)
             } else if (stateMachine.currentState !== PlayerStates.SEEKING &&
                 stateMachine.currentState !== PlayerStates.BUFFERING
             ) {
-                stateMachine.pause(position)
+                playerEventReporter.onPause(position)
             }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
@@ -98,9 +100,9 @@ internal class AnalyticsEventListener(
             BitmovinLog.d(
                 TAG,
                 String.format(
-                    "onPlaybackStateChanged: %s playWhenready: %b isPlaying: %b",
+                    "onPlaybackStateChanged: %s playWhenReady: %b isPlaying: %b",
                     Media3ExoPlayerUtil.exoStateToString(state),
-                    exoPlayerContext.playWhenReady,
+                    exoPlayerContext.isAutoplay(),
                     exoPlayerContext.isPlaying(),
                 ),
             )
@@ -109,7 +111,7 @@ internal class AnalyticsEventListener(
                 Player.STATE_READY -> // if autoplay is enabled startup state is not yet finished
                     // if collector is attached late or ConcatenatingMediaSource is used we miss other events
                     // for transitioning out from READY state
-                    if (!stateMachine.isStartupFinished && exoPlayerContext.playWhenReady) {
+                    if (!stateMachine.isStartupFinished && exoPlayerContext.isAutoplay()) {
                         if (stateMachine.currentState == PlayerStates.READY) {
                             startup(videoTime)
                         } else if (stateMachine.currentState !== PlayerStates.STARTUP && stateMachine.currentState !== PlayerStates.READY) {
@@ -122,7 +124,7 @@ internal class AnalyticsEventListener(
                     if (!stateMachine.isStartupFinished) {
                         // this is the case when there is no preloading
                         // player is now starting to get content before playing it
-                        if (exoPlayerContext.playWhenReady) {
+                        if (exoPlayerContext.isAutoplay()) {
                             startup(videoTime)
                         } else {
                             // this is the case when preloading of content is setup
@@ -156,7 +158,7 @@ internal class AnalyticsEventListener(
         try {
             val videoTime = eventTime.currentPlaybackPositionMs
             BitmovinLog.d(TAG, "onSeekStarted on position: $videoTime")
-            stateMachine.seekStarted(videoTime)
+            playerEventReporter.onSeekStarted(videoTime)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
         }
@@ -182,7 +184,6 @@ internal class AnalyticsEventListener(
             // we need to look into the current media, instead of the loadEventInfo, because the loadEventInfo
             // shows segments for DASH and HLS which could have similar file extensions as progressive
             val isProgressiveMedia = Util.isLikelyProgressiveStream(exoPlayerContext.getUriOfCurrentMedia)
-
             if (!isProgressiveMedia && isTrackablePacket(mediaLoadData, loadEventInfo)) {
                 addSpeedMeasurement(loadEventInfo)
             }
@@ -199,7 +200,7 @@ internal class AnalyticsEventListener(
         BitmovinLog.d(TAG, String.format(Locale.US, "onAudioInputFormatChanged: Bitrate: %d", format.bitrate))
 
         try {
-            stateMachine.videoQualityChanged(
+            playerEventReporter.onAudioQualityChanged(
                 position,
                 qualityEventDataManipulator.hasAudioFormatChanged(format),
             ) { qualityEventDataManipulator.currentAudioFormat = format }
@@ -216,7 +217,7 @@ internal class AnalyticsEventListener(
         BitmovinLog.d(TAG, String.format(Locale.US, "onVideoInputFormatChanged: Bitrate: %d", format.bitrate))
 
         try {
-            stateMachine.videoQualityChanged(
+            playerEventReporter.onVideoQualityChanged(
                 position,
                 qualityEventDataManipulator.hasVideoFormatChanged(format),
             ) { qualityEventDataManipulator.setVideoFormat(format) }
@@ -228,9 +229,7 @@ internal class AnalyticsEventListener(
     override fun onPlayerReleased(eventTime: AnalyticsListener.EventTime) {
         try {
             BitmovinLog.d(TAG, "On Destroy")
-            if (stateMachine.isInStartupState()) {
-                stateMachine.exitBeforeVideoStart(position)
-            }
+            playerEventReporter.onPlayerDestroy(position)
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
         }
@@ -279,7 +278,7 @@ internal class AnalyticsEventListener(
 
     private fun startup(position: Long) {
         qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
-        stateMachine.transitionState(PlayerStates.STARTUP, position)
+        playerEventReporter.onPlay(position)
     }
 
     private fun addSpeedMeasurement(loadEventInfo: LoadEventInfo) {
@@ -293,12 +292,12 @@ internal class AnalyticsEventListener(
     }
 
     /**
-     * This method check if we should track the download speed measurement on this packet or not.
+     * This method checks if we should track the download speed measurement on this packet or not.
      *
      * Our criteria is:
      * - We don't track progressives medias (but we DO track segments that have a file extension similar to progressive)
      * - We only track video (not audio track, manifest, etc).
-     *
+     * FIXME: move into Utils
      */
     private fun isTrackablePacket(
         mediaLoadData: MediaLoadData,

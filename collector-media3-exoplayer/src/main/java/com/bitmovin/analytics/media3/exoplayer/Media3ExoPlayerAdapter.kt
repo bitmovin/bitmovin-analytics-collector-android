@@ -28,8 +28,6 @@ import com.bitmovin.analytics.media3.exoplayer.player.PlaybackInfoProvider
 import com.bitmovin.analytics.media3.exoplayer.player.PlayerStatisticsProvider
 import com.bitmovin.analytics.ssai.SsaiApiProxy
 import com.bitmovin.analytics.stateMachines.PlayerStateMachine
-import com.bitmovin.analytics.stateMachines.PlayerStates
-import com.bitmovin.analytics.stateMachines.SampleTriggerReason
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 
@@ -71,9 +69,10 @@ internal class Media3ExoPlayerAdapter(
             playerContext,
         )
 
-    internal val defaultAnalyticsListener =
+    internal val analyticsEventListener =
         AnalyticsEventListener(
             stateMachine,
+            playerEventReporter,
             playerContext,
             qualityEventDataManipulator,
             meter,
@@ -82,7 +81,7 @@ internal class Media3ExoPlayerAdapter(
             drmInfoProvider,
         )
 
-    private val defaultPlayerEventListener = PlayerEventListener(stateMachine, playerContext)
+    private val playerEventListener = PlayerEventListener(playerEventReporter, playerContext)
 
     override val drmDownloadTime: Long?
         get() = drmInfoProvider.drmDownloadTime
@@ -92,8 +91,8 @@ internal class Media3ExoPlayerAdapter(
     ): Observable<OnDownloadFinishedEventListener> = Media3ExoPlayerHttpRequestTrackingAdapter(player, onAnalyticsReleasingObservable)
 
     init {
-        player.addListener(defaultPlayerEventListener)
-        player.addAnalyticsListener(defaultAnalyticsListener)
+        player.addListener(playerEventListener)
+        player.addAnalyticsListener(analyticsEventListener)
     }
 
     override fun init(): Collection<Feature<FeatureConfigContainer, *>> {
@@ -116,11 +115,7 @@ internal class Media3ExoPlayerAdapter(
 
     override fun triggerSampleOnDetach() {
         Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
-            if (stateMachine.isInStartupState()) {
-                stateMachine.exitBeforeVideoStart(playerContext.position)
-            } else {
-                stateMachine.triggerLastSampleOfSession(SampleTriggerReason.DETACH)
-            }
+            playerEventReporter.onPlayerDestroy(playerContext.position)
         }
     }
 
@@ -131,14 +126,14 @@ internal class Media3ExoPlayerAdapter(
         // we execute the whole method on the main thread to make sure the order is kept
         Media3ExoPlayerUtil.executeSyncOrAsyncOnLooperThread(player.applicationLooper) {
             try {
-                player.removeListener(defaultPlayerEventListener)
-                player.removeAnalyticsListener(defaultAnalyticsListener)
+                player.removeListener(playerEventListener)
+                player.removeAnalyticsListener(analyticsEventListener)
 
                 meter.reset()
                 playerStatisticsProvider.reset()
                 playbackInfoProvider.reset()
                 qualityEventDataManipulator.reset()
-                stateMachine.resetStateMachine()
+                playerEventReporter.onPlayerRelease()
             } catch (e: Exception) {
                 BitmovinLog.e(TAG, e.toString())
             }
@@ -153,9 +148,9 @@ internal class Media3ExoPlayerAdapter(
         ssaiService.resetSourceRelatedState()
     }
 
-    private fun startup(position: Long) {
+    private fun manualStartup(position: Long) {
         qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
-        stateMachine.transitionState(PlayerStates.STARTUP, position)
+        playerEventReporter.onPlay(position)
     }
 
     /*
@@ -179,17 +174,14 @@ internal class Media3ExoPlayerAdapter(
                 TAG,
                 "Collector was attached while media source was already loading, transitioning to startup state.",
             )
-            startup(position)
+            manualStartup(position)
             if (playbackState == Player.STATE_READY) {
                 BitmovinLog.d(
                     TAG,
                     "Collector was attached while media source was already playing, transitioning to playing state",
                 )
 
-                // We need to add at least one ms here because code executes so fast that time tracked between startup and played could be 0ms
-                // this prevents cases where we run into videoStartupTime = 0
-                stateMachine.addStartupTime(1)
-                stateMachine.transitionState(PlayerStates.PLAYING, position)
+                playerEventReporter.onPlaying(position)
             }
         }
     }
