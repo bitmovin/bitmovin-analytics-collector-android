@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v3.29.1
+
 ### Changed
 - [Internal] Refactored theoplayer to avoid direct statemachine calls
 - [Internal] Started with refactoring of media3 player, to avoid statemachine calls
