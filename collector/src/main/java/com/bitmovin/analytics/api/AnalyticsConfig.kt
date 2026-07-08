@@ -45,10 +45,8 @@ data class AnalyticsConfig(
     val logLevel: LogLevel = LogLevel.ERROR,
     /**
      * Config to enable tracking of SSAI engagement metrics (quartile level)
-     * This is an opt in feature and off by default.
-     *
-     * It also needs to be enabled on account level,
-     * please contact Bitmovin Support to enable it for your account.
+     * This flag is ignored for THEOplayer where ssai engagement tracking is always enabled.
+     * For other players (Bitmovin, Media3-Exoplayer) it is by default disabled.
      */
     val ssaiEngagementTrackingEnabled: Boolean = false,
     /**
@@ -185,10 +183,8 @@ data class AnalyticsConfig(
         logLevel: LogLevel = LogLevel.ERROR,
         /**
          * Config to enable tracking of SSAI engagement metrics (quartile level)
-         * This is an opt in feature and off by default.
-         *
-         * It also needs to be enabled on account level,
-         * please contact Bitmovin Support to enable it for your account.
+         * This flag is ignored for THEOplayer where ssai engagement tracking is always enabled.
+         * For other players (Bitmovin, Media3-Exoplayer) it is by default disabled.
          */
         ssaiEngagementTrackingEnabled: Boolean = false,
     ) : this(

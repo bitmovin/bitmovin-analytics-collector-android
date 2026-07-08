@@ -167,7 +167,7 @@ class CustomSsaiScenariosTest {
         }
 
     @Test
-    fun test_customSsai_engagementTrackingDisabled_doesNotTrackAdSamples() =
+    fun test_customSsai_engagementTrackingDisabled_doesStillTrackAdSamples() =
         runBlockingTest {
             // arrange + act: with SSAI engagement tracking disabled, no SSAI ad samples must be sent
             attachCollectorAndWaitUntilSsaiReady(ssaiEngagementTrackingEnabled = false)
@@ -192,8 +192,10 @@ class CustomSsaiScenariosTest {
             val impression = impressionList.first()
             DataVerifier.verifyHasNoErrorSamples(impression)
 
-            // engagement tracking is off -> no ad engagement samples are produced
-            assertThat(impression.adEventDataList).isEmpty()
+            // engagement tracking is off, but internally overwritten
+            // since we always want to track ad engagement for theo
+            // thus we expect ad events
+            assertThat(impression.adEventDataList).isNotEmpty
 
             // content is still tracked and the regular event data is still marked as SSAI related
             val eventDataList = impression.eventDataList

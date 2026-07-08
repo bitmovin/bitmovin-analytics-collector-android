@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v3.30.0
+
+### Changed
+- THEOplayer: Always enable ssai engagement tracking
+
 ## v3.29.1
 
 ### Changed
