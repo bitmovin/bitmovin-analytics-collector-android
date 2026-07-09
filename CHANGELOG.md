@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - THEOplayer: Always enable ssai engagement tracking
+- Upgraded THEOplayer to `11.6.1`
+- Upgraded Bitmovin Player to `3.157.0`
 
 ## v3.29.1
 
