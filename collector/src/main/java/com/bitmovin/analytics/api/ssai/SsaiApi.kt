@@ -80,8 +80,7 @@ interface SsaiApi {
      * Marks an AdQuartile as finished
      * No-op if no ad is currently running
      *
-     * Tracking Ad Engagement on Quartile level is an opt-in feature and off by default.
-     * It needs to be enabled through the AnalyticsConfig by setting `ssaiEngagementTrackingEnabled` to `true`.
+     * Tracking Ad Engagement on Quartile level is always enabled.
      * Please contact Bitmovin Support to enable it also on server side for your account.
      *
      * @param adQuartileMetadata [com.bitmovin.analytics.api.ads.AdQuartileMetadata] Provides metadata for the quartile

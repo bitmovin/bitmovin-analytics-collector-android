@@ -66,8 +66,7 @@ public interface ITHEOplayerCollector : AnalyticsCollector<Player> {
             analyticsConfig: AnalyticsConfig,
             defaultMetadata: DefaultMetadata = DefaultMetadata(),
         ): ITHEOplayerCollector {
-            val alwaysEnableSsaiEngagementConfig = analyticsConfig.copy(ssaiEngagementTrackingEnabled = true)
-            val collector = TheoPlayerCollector(alwaysEnableSsaiEngagementConfig, context)
+            val collector = TheoPlayerCollector(analyticsConfig, context)
             collector.defaultMetadata = defaultMetadata
             return collector
         }

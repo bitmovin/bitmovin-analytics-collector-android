@@ -3,7 +3,6 @@ package com.bitmovin.analytics.ssai
 import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
-import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.ads.AdBreakMetadata
 import com.bitmovin.analytics.api.ads.AdMetadata
 import com.bitmovin.analytics.api.ads.AdQuartileMetadata
@@ -25,16 +24,10 @@ import org.junit.Test
 class SsaiEngagementMetricsServiceTest {
     private lateinit var ssaiEngagementMetricsService: SsaiEngagementMetricsService
 
-    private lateinit var ssaiEngagementMetricsServiceDisabled: SsaiEngagementMetricsService
     private val analytics: BitmovinAnalytics = mockk()
     private val playerAdapter: PlayerAdapter = mockk()
     private val handlerMock = mockk<Handler>()
     private val systemTimeServiceMock = mockk<SystemTimeService>()
-    private val analyticsConfig =
-        AnalyticsConfig(
-            "dummyLicenseKey",
-            ssaiEngagementTrackingEnabled = true,
-        )
 
     @Before
     fun setUp() {
@@ -43,13 +36,7 @@ class SsaiEngagementMetricsServiceTest {
         ssaiEngagementMetricsService =
             SsaiEngagementMetricsService(
                 analytics,
-                analyticsConfig, playerAdapter, handlerMock, systemTimeServiceMock,
-            )
-
-        ssaiEngagementMetricsServiceDisabled =
-            SsaiEngagementMetricsService(
-                analytics,
-                AnalyticsConfig("dummyLicense"), playerAdapter, handlerMock, systemTimeServiceMock,
+                playerAdapter, handlerMock, systemTimeServiceMock,
             )
     }
 
@@ -85,18 +72,6 @@ class SsaiEngagementMetricsServiceTest {
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 1)
 
         verify(exactly = 1) { analytics.sendAdEventData(any()) }
-    }
-
-    @Test
-    fun `markAdStart should be noop if adEngagementTracking is disabled`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
-        ssaiEngagementMetricsServiceDisabled.adBreakStart()
-        ssaiEngagementMetricsServiceDisabled.markAdStart(
-            AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(),
-            adMetadata,
-            0,
-        )
-        verify(exactly = 0) { analytics.sendAdEventData(any()) }
     }
 
     @Test
@@ -150,23 +125,6 @@ class SsaiEngagementMetricsServiceTest {
         assertThat(adEventData.adSystem).isEqualTo("testAdSystem")
         assertThat(adEventData.adIndex).isEqualTo(1)
         assertThat(adEventData.adPosition).isEqualTo("midroll")
-    }
-
-    @Test
-    fun `markQuartileFinished should NOT create sample if adEngagementTracking is disabled`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
-        val adQuartileMetadata = AdQuartileMetadata.Builder().setFailedBeaconUrl("dummyUrl").build()
-
-        ssaiEngagementMetricsServiceDisabled.markQuartileFinished(
-            AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(),
-            SsaiAdQuartile.FIRST,
-            adMetadata,
-            adQuartileMetadata,
-            1,
-        )
-        ssaiEngagementMetricsServiceDisabled.flushCurrentActiveAd(false)
-
-        verify(exactly = 0) { analytics.sendAdEventData(any()) }
     }
 
     @Test
@@ -306,27 +264,6 @@ class SsaiEngagementMetricsServiceTest {
         assertThat(adEventData.errorCode).isEqualTo(1234)
         assertThat(adEventData.errorMessage).isEqualTo("testMessage")
         assertThat(adEventData.errorSeverity).isEqualTo(ErrorSeverity.INFO)
-    }
-
-    @Test
-    fun `sendAdErrorSample should NOT sendout sample if ssaiEngagement is disabled`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
-        ssaiEngagementMetricsServiceDisabled.adBreakStart()
-        ssaiEngagementMetricsServiceDisabled.markAdStart(
-            AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(),
-            adMetadata,
-            0,
-        )
-        ssaiEngagementMetricsServiceDisabled.sendAdErrorSample(
-            AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(),
-            adMetadata,
-            0,
-            1234,
-            "testMessage",
-            ErrorSeverity.CRITICAL,
-        )
-
-        verify(exactly = 0) { analytics.sendAdEventData(any()) }
     }
 
     @Test

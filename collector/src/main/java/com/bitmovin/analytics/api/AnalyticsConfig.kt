@@ -44,11 +44,11 @@ data class AnalyticsConfig(
      */
     val logLevel: LogLevel = LogLevel.ERROR,
     /**
-     * Config to enable tracking of SSAI engagement metrics (quartile level)
-     * This flag is ignored for THEOplayer where ssai engagement tracking is always enabled.
-     * For other players (Bitmovin, Media3-Exoplayer) it is by default disabled.
+     * SSAI engagement tracking (quartile level) is always enabled.
+     * This flag is deprecated and ignored for all players.
      */
-    val ssaiEngagementTrackingEnabled: Boolean = false,
+    @Deprecated("SSAI engagement tracking is always enabled. This flag is ignored for all players.")
+    val ssaiEngagementTrackingEnabled: Boolean = true,
     /**
      * Callback to transform errors before they are sent to the analytics backend.
      * This can be used to modify the error code, message or severity.
@@ -96,7 +96,7 @@ data class AnalyticsConfig(
         retryPolicy = retryPolicy,
         backendUrl = backendUrl,
         logLevel = LogLevel.ERROR,
-        ssaiEngagementTrackingEnabled = false,
+        ssaiEngagementTrackingEnabled = true,
     )
 
     constructor(
@@ -142,7 +142,7 @@ data class AnalyticsConfig(
         retryPolicy = retryPolicy,
         backendUrl = backendUrl,
         logLevel = logLevel,
-        ssaiEngagementTrackingEnabled = false,
+        ssaiEngagementTrackingEnabled = true,
     )
 
     constructor(
@@ -182,11 +182,10 @@ data class AnalyticsConfig(
          */
         logLevel: LogLevel = LogLevel.ERROR,
         /**
-         * Config to enable tracking of SSAI engagement metrics (quartile level)
-         * This flag is ignored for THEOplayer where ssai engagement tracking is always enabled.
-         * For other players (Bitmovin, Media3-Exoplayer) it is by default disabled.
+         * SSAI engagement tracking (quartile level) is always enabled.
+         * This flag is deprecated and ignored for all players.
          */
-        ssaiEngagementTrackingEnabled: Boolean = false,
+        ssaiEngagementTrackingEnabled: Boolean = true,
     ) : this(
         licenseKey = licenseKey,
         adTrackingDisabled = adTrackingDisabled,
@@ -208,7 +207,7 @@ data class AnalyticsConfig(
         private var retryPolicy: RetryPolicy = RetryPolicy.NO_RETRY
         private var backendUrl: String = DEFAULT_BACKEND_URL
         private var logLevel: LogLevel = LogLevel.ERROR
-        private var ssaiEngagementTrackingEnabled: Boolean = false
+        private var ssaiEngagementTrackingEnabled: Boolean = true
         private var errorTransformerCallback: ErrorTransformerCallback? = null
 
         fun setAdTrackingDisabled(adTrackingDisabled: Boolean) = apply { this.adTrackingDisabled = adTrackingDisabled }
@@ -221,6 +220,7 @@ data class AnalyticsConfig(
 
         fun setLogLevel(logLevel: LogLevel) = apply { this.logLevel = logLevel }
 
+        @Deprecated("SSAI engagement tracking is always enabled. This flag is ignored for all players.")
         fun setSsaiEngagementTrackingEnabled(ssaiEngagementTrackingEnabled: Boolean) =
             apply {
                 this.ssaiEngagementTrackingEnabled = ssaiEngagementTrackingEnabled

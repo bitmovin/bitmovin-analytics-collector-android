@@ -59,12 +59,10 @@ class Phone2PlayerParallelScenariosTest {
             val player1AnalyticsConfig =
                 TestConfig.createAnalyticsConfig(
                     backendUrl = mockedIngressUrl,
-                    ssaiEngagementTrackingEnabled = false,
                 )
             val player2AnalyticsConfig =
                 TestConfig.createAnalyticsConfig(
                     backendUrl = mockedIngressUrl,
-                    ssaiEngagementTrackingEnabled = false,
                 )
 
             val player1Config =

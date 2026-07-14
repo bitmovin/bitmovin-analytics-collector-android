@@ -3,7 +3,6 @@ package com.bitmovin.analytics.ssai
 import android.os.Handler
 import com.bitmovin.analytics.BitmovinAnalytics
 import com.bitmovin.analytics.adapters.PlayerAdapter
-import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.ads.AdBreakMetadata
 import com.bitmovin.analytics.api.ads.AdMetadata
 import com.bitmovin.analytics.api.ads.AdQuartileMetadata
@@ -21,7 +20,6 @@ import kotlin.time.toKotlinDuration
 @InternalBitmovinApi
 class SsaiEngagementMetricsService(
     private val analytics: BitmovinAnalytics,
-    private val analyticsConfig: AnalyticsConfig,
     private val playerAdapter: PlayerAdapter,
     private val ssaiTimeoutHandler: Handler,
     private val systemTimeService: SystemTimeService = SystemTimeService(),
@@ -47,10 +45,6 @@ class SsaiEngagementMetricsService(
         adMetadata: AdMetadata?,
         adIndex: Int,
     ) {
-        if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
-            return
-        }
-
         flushCurrentActiveAd(false)
         resetStateOnNewAd()
         currentAdIsSlate = adMetadata?.isSlate ?: false
@@ -71,10 +65,6 @@ class SsaiEngagementMetricsService(
         adQuartileMetadata: AdQuartileMetadata?,
         adIndex: Int,
     ) {
-        if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
-            return
-        }
-
         // we make sure that each quartile is sent at most once per ad id,
         // to avoid duplicates in the metrics
         if (quartilesFinishedWithCurrentAd.add(quartile)) {
@@ -99,10 +89,6 @@ class SsaiEngagementMetricsService(
         errorMessage: String,
         errorSeverity: ErrorSeverity,
     ) {
-        if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
-            return
-        }
-
         // we need to make sure that we only send one error sample per active ad, to not inflate metrics
         if (errorSentForCurrentAd) {
             return
@@ -118,10 +104,6 @@ class SsaiEngagementMetricsService(
 
     @Synchronized
     fun flushCurrentActiveAd(isLastSampleOfAdBreak: Boolean) {
-        if (!analyticsConfig.ssaiEngagementTrackingEnabled) {
-            return
-        }
-
         sendAndClearAdSample(isLastSampleOfAdBreak)
     }
 

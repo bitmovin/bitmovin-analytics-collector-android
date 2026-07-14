@@ -258,15 +258,17 @@ class SsaiScenariosTest {
         }
 
     @Test
-    fun test_adEngagementMetricsDisabled_DO_NOT_track_all_quartiles() =
+    fun test_adEngagementMetricsWithoutFlagSet_does_still_track_all_quartiles() =
         runBlockingTest {
             // arrange
-            val configWithSsaiEngagementTrackingDisabled =
+            // the deprecated ssaiEngagementTrackingEnabled flag is not set here,
+            // but it is ignored and engagement tracking is always enabled
+            val configWithoutSsaiEngagementTrackingFlag =
                 AnalyticsConfig(
                     licenseKey = defaultAnalyticsConfig.licenseKey,
                     backendUrl = mockedIngressUrl,
                 )
-            val collector = IBitmovinPlayerCollector.create(appContext, configWithSsaiEngagementTrackingDisabled, defaultMetadata)
+            val collector = IBitmovinPlayerCollector.create(appContext, configWithoutSsaiEngagementTrackingFlag, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -320,7 +322,14 @@ class SsaiScenariosTest {
             SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
 
             val adEventDataList = impression.adEventDataList
-            assertThat(adEventDataList).hasSize(0)
+            assertThat(adEventDataList).hasSize(1)
+
+            val adSample = adEventDataList[0]
+            assertThat(adSample.started).isEqualTo(1)
+            assertThat(adSample.quartile1).isEqualTo(1)
+            assertThat(adSample.midpoint).isEqualTo(1)
+            assertThat(adSample.quartile3).isEqualTo(1)
+            assertThat(adSample.completed).isEqualTo(1)
         }
 
     @Test
@@ -838,17 +847,19 @@ class SsaiScenariosTest {
         }
 
     @Test
-    fun test_adEngagementMetricsDisabled_do_NOT_track_error() =
+    fun test_adEngagementMetricsWithoutFlagSet_does_still_track_error() =
         runBlockingTest {
             val corruptedStream = TestSources.CORRUPT_DASH
             val corruptedStreamSource = Source(SourceConfig.fromUrl(corruptedStream.mpdUrl!!))
             // arrange
-            val configWithSsaiEngagementTrackingDisabled =
+            // the deprecated ssaiEngagementTrackingEnabled flag is not set here,
+            // but it is ignored and engagement tracking is always enabled
+            val configWithoutSsaiEngagementTrackingFlag =
                 AnalyticsConfig(
                     licenseKey = defaultAnalyticsConfig.licenseKey,
                     backendUrl = mockedIngressUrl,
                 )
-            val collector = IBitmovinPlayerCollector.create(appContext, configWithSsaiEngagementTrackingDisabled, defaultMetadata)
+            val collector = IBitmovinPlayerCollector.create(appContext, configWithoutSsaiEngagementTrackingFlag, defaultMetadata)
 
             // act
             withContext(mainScope.coroutineContext) {
@@ -884,7 +895,12 @@ class SsaiScenariosTest {
             SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
 
             val adEventDataList = impression.adEventDataList
-            assertThat(adEventDataList).hasSize(0)
+            assertThat(adEventDataList).hasSize(1)
+
+            val adSampleWithError = adEventDataList[0]
+            assertThat(adSampleWithError.started).isEqualTo(1)
+            assertThat(adSampleWithError.errorCode).isNotNull()
+            assertThat(adSampleWithError.errorMessage).isNotNull()
         }
 
     @Test

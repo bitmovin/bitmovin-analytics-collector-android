@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Changed
+- SSAI engagement tracking (quartile level) is now always enabled for all players
+
+### Deprecated
+- `ssaiEngagementTrackingEnabled` in `AnalyticsConfig` is deprecated and ignored for all players, since SSAI engagement tracking is now always enabled
+
 ## v3.30.0
 
 ### Changed
