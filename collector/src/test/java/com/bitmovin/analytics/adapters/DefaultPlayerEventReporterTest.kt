@@ -13,6 +13,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 
@@ -46,6 +47,17 @@ class DefaultPlayerEventReporterTest {
         reporter.onPlay(123)
 
         verify(exactly = 0) { stateMachine.transitionState(PlayerStates.STARTUP, any()) }
+    }
+
+    @Test
+    fun `isStartupFinished reflects the state machine`() {
+        every { stateMachine.isStartupFinished } returns true
+
+        assertThat(reporter.isStartupFinished).isTrue()
+
+        every { stateMachine.isStartupFinished } returns false
+
+        assertThat(reporter.isStartupFinished).isFalse()
     }
 
     @Test

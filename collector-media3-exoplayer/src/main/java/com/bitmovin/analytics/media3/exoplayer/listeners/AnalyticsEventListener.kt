@@ -57,7 +57,7 @@ internal class AnalyticsEventListener(
         // this gets triggered after user clicks play
         if (playbackInfoProvider.isInInitialBufferState &&
             playWhenReady &&
-            !stateMachine.isStartupFinished
+            !playerEventReporter.isStartupFinished
         ) {
             startup(position)
         } else if (!playWhenReady && stateMachine.isInStartupState()) {
@@ -111,7 +111,7 @@ internal class AnalyticsEventListener(
                 Player.STATE_READY -> // if autoplay is enabled startup state is not yet finished
                     // if collector is attached late or ConcatenatingMediaSource is used we miss other events
                     // for transitioning out from READY state
-                    if (!stateMachine.isStartupFinished && exoPlayerContext.isAutoplay()) {
+                    if (!playerEventReporter.isStartupFinished && exoPlayerContext.isAutoplay()) {
                         if (stateMachine.currentState == PlayerStates.READY) {
                             startup(videoTime)
                         } else if (stateMachine.currentState !== PlayerStates.STARTUP && stateMachine.currentState !== PlayerStates.READY) {
@@ -121,7 +121,7 @@ internal class AnalyticsEventListener(
                         stateMachine.transitionState(PlayerStates.PAUSE, exoPlayerContext.position)
                     }
                 Player.STATE_BUFFERING ->
-                    if (!stateMachine.isStartupFinished) {
+                    if (!playerEventReporter.isStartupFinished) {
                         // this is the case when there is no preloading
                         // player is now starting to get content before playing it
                         if (exoPlayerContext.isAutoplay()) {

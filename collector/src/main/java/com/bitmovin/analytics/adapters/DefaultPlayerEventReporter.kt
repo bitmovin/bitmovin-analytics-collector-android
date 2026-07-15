@@ -27,6 +27,9 @@ internal class DefaultPlayerEventReporter(
     private val ssaiService: SsaiService,
     private val bitmovinAnalytics: BitmovinAnalytics,
 ) : PlayerEventReporter {
+    override val isStartupFinished: Boolean
+        get() = stateMachine.isStartupFinished
+
     override fun onPlay(position: Long) {
         // Startup is only initiated once per session; subsequent play events are no-ops here.
         if (!stateMachine.isStartupFinished) {

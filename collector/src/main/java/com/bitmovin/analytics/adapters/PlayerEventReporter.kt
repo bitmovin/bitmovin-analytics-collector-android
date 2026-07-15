@@ -16,6 +16,14 @@ import com.bitmovin.analytics.dtos.SubtitleDto
  */
 interface PlayerEventReporter {
     /**
+     * Whether the startup phase of the current session has finished (the first frame
+     * was rendered and the startup sample was sent). Read-only; adapters may use this
+     * for their own pre-startup bookkeeping, all state transitions stay with the
+     * implementation.
+     */
+    val isStartupFinished: Boolean
+
+    /**
      * The player intends to start or resume playback (e.g. native "play" event).
      * The implementation decides whether this initiates startup or is a no-op
      * (startup is only initiated while it has not finished yet).
