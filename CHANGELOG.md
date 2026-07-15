@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v3.31.0
+
 ### Changed
 - SSAI engagement tracking (quartile level) is now always enabled for all players
 
