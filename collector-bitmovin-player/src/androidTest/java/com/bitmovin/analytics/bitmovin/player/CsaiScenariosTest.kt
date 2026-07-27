@@ -27,7 +27,6 @@ import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdvertisingConfig
 import com.bitmovin.player.api.analytics.create
 import com.bitmovin.player.api.event.PlayerEvent
-import com.bitmovin.player.api.event.on
 import com.bitmovin.player.api.source.Source
 import com.bitmovin.player.api.source.SourceBuilder
 import com.bitmovin.player.api.source.SourceConfig
@@ -429,6 +428,190 @@ class CsaiScenariosTest {
             DataVerifier.verifyInvariants(eventDataList)
             val eventDataWithAdState = eventDataList.filter { it.ad == 1 }
             assertThat(eventDataWithAdState).hasSize(1)
+        }
+
+    @Test
+    fun test_vodWithImaMidRollAd_sourceChangeWhileAdIsPlaying_marksAdAsAbandoned() =
+        runBlockingTest {
+            val imaAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_AD_SOURCE_2)
+            val midRoll = AdItem("2", imaAdSource)
+            val advertisingConfig = AdvertisingConfig(midRoll)
+            val localPlayer = createPlayer(advertisingConfig)
+
+            val sourceMetadataTwo =
+                SourceMetadata(
+                    videoId = "new-video-after-source-change",
+                    title = "New Video After Source Change",
+                )
+            val sourceTwo =
+                SourceBuilder(SourceConfig.fromUrl(TestSources.DASH.mpdUrl!!))
+                    .configureAnalytics(sourceMetadataTwo)
+                    .build()
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                localPlayer.load(defaultSource)
+            }
+
+            var adStarted = false
+            localPlayer.on(PlayerEvent.AdStarted::class, {
+                adStarted = true
+            })
+
+            // wait for mid-roll ad to start (triggered at 3s of content) and play for a bit
+            PlaybackUtils.waitUntil("mid-roll ad started") { adStarted }
+            Thread.sleep(1000)
+
+            // change the source while the mid-roll ad is still playing
+            withContext(mainScope.coroutineContext) {
+                localPlayer.load(sourceTwo)
+                localPlayer.play()
+            }
+
+            Thread.sleep(1000)
+
+            // wait for content of the new source to play,
+            // but stay below the 2s mark so the mid-roll is not triggered again
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 1000)
+
+            withContext(mainScope.coroutineContext) {
+                localPlayer.pause()
+            }
+
+            Thread.sleep(500)
+
+            withContext(mainScope.coroutineContext) {
+                localPlayer.destroy()
+            }
+
+            Thread.sleep(200)
+
+            // assert - the source change during the ad must close the first session
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(2)
+
+            // session 1: content playback of the first source with the abandoned mid-roll ad
+            val impression1 = impressionList[0]
+            DataVerifier.verifyHasNoErrorSamples(impression1)
+            assertThat(impression1.adEventDataList).hasSize(1)
+
+            val adSample = impression1.adEventDataList[0]
+            CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
+            // the ad was started but neither completed nor skipped -> closed means abandonment
+            assertThat(adSample.started).isEqualTo(1)
+            assertThat(adSample.closed).isEqualTo(1)
+            assertThat(adSample.completed).isEqualTo(0)
+            assertThat(adSample.skipped).isEqualTo(0)
+            assertThat(adSample.playPercentage).isLessThan(100)
+            assertThat(adSample.videoImpressionId).isEqualTo(impression1.eventDataList[0].impressionId)
+
+            val eventDataList1 = impression1.eventDataList
+            DataVerifier.verifyInvariants(eventDataList1)
+            val eventDataWithAdState = eventDataList1.filter { it.ad == 1 }
+            assertThat(eventDataWithAdState).hasSize(1)
+
+            // session 2: new source without any ad samples
+            val impression2 = impressionList[1]
+            DataVerifier.verifyHasNoErrorSamples(impression2)
+            assertThat(impression2.adEventDataList).isEmpty()
+
+            val eventDataList2 = impression2.eventDataList
+            DataVerifier.verifyInvariants(eventDataList2)
+            assertThat(eventDataList2.first().videoId).isEqualTo(sourceMetadataTwo.videoId)
+            assertThat(eventDataList2.first().impressionId).isNotEqualTo(eventDataList1.first().impressionId)
+        }
+
+    @Test
+    fun test_vodWithImaPreRollAd_sourceChangeWhileAdIsPlaying_marksAdAsAbandoned() =
+        runBlockingTest {
+            val imaAdSource = AdSource(AdSourceType.Ima, TestSources.IMA_AD_SOURCE_2)
+            val midRoll = AdItem("pre", imaAdSource)
+            val advertisingConfig = AdvertisingConfig(midRoll)
+            val localPlayer = createPlayer(advertisingConfig)
+
+            val sourceMetadataTwo =
+                SourceMetadata(
+                    videoId = "new-video-after-source-change",
+                    title = "New Video After Source Change",
+                )
+            val sourceTwo =
+                SourceBuilder(SourceConfig.fromUrl(TestSources.DASH.mpdUrl!!))
+                    .configureAnalytics(sourceMetadataTwo)
+                    .build()
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                localPlayer.load(defaultSource)
+            }
+
+            var adStarted = false
+            localPlayer.on(PlayerEvent.AdStarted::class, {
+                adStarted = true
+            })
+
+            PlaybackUtils.waitUntil("pre-roll ad started") { adStarted }
+            Thread.sleep(1000)
+
+            // change the source while the ad is still playing
+            withContext(mainScope.coroutineContext) {
+                adStarted = false
+                localPlayer.load(sourceTwo)
+            }
+
+            Thread.sleep(1000)
+
+            PlaybackUtils.waitUntil("pre-roll ad started") { adStarted }
+            Thread.sleep(500)
+
+            withContext(mainScope.coroutineContext) {
+                localPlayer.destroy()
+            }
+
+            Thread.sleep(200)
+
+            // assert - the source change during the ad must close the first session
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(2)
+
+            // session 1: content playback of the first source with the abandoned ad
+            val impression1 = impressionList[0]
+            DataVerifier.verifyHasNoErrorSamples(impression1)
+            assertThat(impression1.adEventDataList).hasSize(1)
+
+            val adSampleImpression1 = impression1.adEventDataList[0]
+            CsaiDataVerifier.verifyStaticAdData(adSampleImpression1, defaultAnalyticsConfig)
+            // the ad was started but neither completed nor skipped -> closed means abandonment
+            assertThat(adSampleImpression1.started).isEqualTo(1)
+            assertThat(adSampleImpression1.closed).isEqualTo(1)
+            assertThat(adSampleImpression1.completed).isEqualTo(0)
+            assertThat(adSampleImpression1.skipped).isEqualTo(0)
+            assertThat(adSampleImpression1.playPercentage).isLessThan(100)
+            assertThat(adSampleImpression1.videoImpressionId).isEqualTo(impression1.eventDataList[0].impressionId)
+
+            val eventDataList1 = impression1.eventDataList
+            DataVerifier.verifyInvariants(eventDataList1)
+            val eventDataWithAdState = eventDataList1.filter { it.ad == 1 }
+            assertThat(eventDataWithAdState).hasSize(1)
+
+            // session 2: new source should have the pre-roll ad fully played
+            val impression2 = impressionList[1]
+            DataVerifier.verifyHasNoErrorSamples(impression2)
+            assertThat(impression2.adEventDataList).hasSize(1)
+
+            val eventDataList2 = impression2.eventDataList
+            DataVerifier.verifyInvariants(eventDataList2)
+            assertThat(eventDataList2.first().videoId).isEqualTo(sourceMetadataTwo.videoId)
+            assertThat(eventDataList2.first().impressionId).isNotEqualTo(eventDataList1.first().impressionId)
+
+            val adSampleImpression2 = impression2.adEventDataList[0]
+            CsaiDataVerifier.verifyStaticAdData(adSampleImpression2, defaultAnalyticsConfig)
+            // the ad was started but neither completed nor skipped -> closed means abandonment
+            assertThat(adSampleImpression2.started).isEqualTo(1)
+            assertThat(adSampleImpression2.closed).isEqualTo(1)
+            assertThat(adSampleImpression2.completed).isEqualTo(0)
+            assertThat(adSampleImpression2.skipped).isEqualTo(0)
+            assertThat(adSampleImpression2.playPercentage).isLessThan(100)
+            assertThat(adSampleImpression2.videoImpressionId).isEqualTo(impression2.eventDataList[0].impressionId)
         }
 
     @Test
