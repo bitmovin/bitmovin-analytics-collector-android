@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - THEOplayer: SSAI Ads are automatically tracked, retiring SSAI API
 - Upgraded bitmovin player to `3.154.0`
 - Upgraded THEOplayer to `11.5.0`
-- [Internal] Mature refactoring around bitmovin player (Splitting up the adapter in Listener and Manipulator, pushing logic into core module)
+- [Internal] Major refactoring around bitmovin player (Splitting up the adapter in Listener and Manipulator, pushing logic into core module)
 
 ### Added
 - New public objects AdBreakMetadata, AdMetadata and AdQuartileMetadata
