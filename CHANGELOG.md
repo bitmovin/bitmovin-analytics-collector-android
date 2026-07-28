@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Changed
+- Upgraded compileSdk to android 37
+
 ## v3.31.0
 
 ### Changed

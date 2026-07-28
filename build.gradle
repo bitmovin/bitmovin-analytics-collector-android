@@ -100,8 +100,8 @@ ext {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
     exampleAppJvmTarget = jvmTarget
 
-    compileSdk = 36
-    targetSdkVersion = 36
+    compileSdk = 37
+    targetSdkVersion = 37
 
     // player versions
     bitmovinPlayerVersion = '3.157.0'
