@@ -15,25 +15,37 @@ object PlaybackUtils {
         val maxWaitMs = 45000L
         var waitingTotalMs = 0L
         val waitingDeltaMs = 100L
-        val channel = Channel<Unit>()
+        // the condition is evaluated on the main thread, but the result needs to be
+        // reported back to the test thread, since an exception thrown inside the
+        // MainScope coroutine crashes the app instead of failing the test
+        val channel = Channel<Result<Boolean>>()
 
         MainScope().launch {
-            while (!condition()) {
-                delay(waitingDeltaMs)
-                waitingTotalMs += waitingDeltaMs
+            val conditionFulfilled =
+                runCatching {
+                    while (!condition()) {
+                        delay(waitingDeltaMs)
+                        waitingTotalMs += waitingDeltaMs
 
-                if (waitingTotalMs >= maxWaitMs) {
-                    Assertions.fail<Nothing>("expected condition ($conditionName) wasn't fulfilled within $maxWaitMs ms")
+                        if (waitingTotalMs >= maxWaitMs) {
+                            return@runCatching false
+                        }
+                    }
+                    true
                 }
+
+            channel.send(conditionFulfilled)
+        }
+
+        val conditionFulfilled =
+            runBlocking {
+                channel.receive()
             }
 
-            channel.send(Unit)
-        }
-
-        runBlocking {
-            channel.receive()
-        }
-
         channel.close()
+
+        if (!conditionFulfilled.getOrThrow()) {
+            Assertions.fail<Nothing>("expected condition ($conditionName) wasn't fulfilled within $maxWaitMs ms")
+        }
     }
 }
