@@ -59,8 +59,8 @@ jobs:
       - name: Allow access to Test Sources
         env:
           S3_AUTHORIZE_KEY: ${{ secrets.S3_AUTHORIZE_KEY }}
-        run: |
-          curl --ipv4 "https://us-central1-bitmovin-api.cloudfunctions.net/authorizeS3Bucket?key=$S3_AUTHORIZE_KEY"
+        run: | 
+          curl --ipv4 "https://authorize-s3-bucket-52499724934.europe-west1.run.app/?key=$S3_AUTHORIZE_KEY"
 
       - name: Run Tests - ${{ matrix.module }}
         run: |
