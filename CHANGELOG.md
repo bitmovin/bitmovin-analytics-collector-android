@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Upgraded compileSdk to android 37
+- Upgraded THEOplayer to 11.7.0
 
 ## v3.31.0
 
