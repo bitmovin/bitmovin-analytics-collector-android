@@ -297,7 +297,7 @@ internal class AnalyticsEventListener(
      * Our criteria is:
      * - We don't track progressives medias (but we DO track segments that have a file extension similar to progressive)
      * - We only track video (not audio track, manifest, etc).
-     * FIXME: move into Utils
+     * FIXME: rename and move into Utils
      */
     private fun isTrackablePacket(
         mediaLoadData: MediaLoadData,

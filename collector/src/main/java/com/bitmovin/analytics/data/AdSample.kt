@@ -4,6 +4,7 @@ import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.api.error.ErrorSeverity
 
 data class AdSample(
+    val adImpressionId: String,
     var adStartupTime: Long? = null,
     var clicked: Long = 0,
     var clickPosition: Long? = null,

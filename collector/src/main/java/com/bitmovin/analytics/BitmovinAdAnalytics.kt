@@ -82,7 +82,7 @@ class BitmovinAdAnalytics(
         }
 
         this.resetActiveAd()
-        val adSample = AdSample(ad = ad)
+        val adSample = AdSample(adImpressionId = Util.uUID, ad = ad)
 
         val elapsedTimeAtPlayEventTemp = this.elapsedTimeAtPlayEvent
         var elapsedTimeAtAdStartupTemp = this.elapsedTimeAtAdStartup
@@ -136,7 +136,7 @@ class BitmovinAdAnalytics(
         code: Int,
         message: String?,
     ) {
-        val adSample = this.activeAdSample ?: AdSample()
+        val adSample = this.activeAdSample ?: AdSample(Util.uUID)
 
         if (adSample.ad.id != null && adBreak.ads.any { ad -> ad.id == adSample.ad.id }) {
             adSample.errorPosition = this.currentTime
@@ -163,9 +163,15 @@ class BitmovinAdAnalytics(
     ) {
         this.adManifestDownloadTimes.put(adBreak.id, downloadTime)
 
-        // FIXME: why are we doing this?
+        // This is undocummented legacy behaviour
+        // but likely we are sending an ad request for the vmap
+        // tag to track the manifest load time
         if (adBreak.tagType == AdTagType.VMAP) {
-            this.sendAnalyticsRequest(adBreak)
+            // we create an empty adSample in order to have a adImpressionId for the manifest sample
+            // this mimics existig behaviour, but is likely affecting the ad count, while it shouldn't
+            // TODO: AN-5667
+            val adSample = AdSample(Util.uUID)
+            this.sendAnalyticsRequest(adBreak, adSample)
         }
     }
 
@@ -248,21 +254,20 @@ class BitmovinAdAnalytics(
 
     private fun sendAnalyticsRequest(
         adBreak: AdBreak,
-        adSample: AdSample? = null,
+        adSample: AdSample,
     ) {
         val eventData = playerAdapter?.createEventDataForAdSample() ?: return
         val adEventData = AdEventData.fromEventData(eventData, AdType.CLIENT_SIDE)
 
         adEventData.analyticsVersion = Util.analyticsVersion
 
-        adEventData.adModule = adSample?.ad?.adModule
+        adEventData.adModule = adSample.ad.adModule
         adEventData.adModuleVersion = playerAdapter?.playerContext?.playerVersion
 
         adEventData.manifestDownloadTime = getAndRemoveAdManifestDownloadTime(adBreak)
         adEventData.autoplay = playerAdapter?.playerContext?.isAutoplay()
         adEventData.setAdBreak(adBreak)
         adEventData.setAdSample(adSample)
-        adEventData.adImpressionId = Util.uUID
         analytics.sendAdEventData(adEventData)
     }
 

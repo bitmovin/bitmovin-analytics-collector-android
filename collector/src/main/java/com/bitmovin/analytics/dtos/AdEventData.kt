@@ -491,7 +491,7 @@ data class AdEventData(
         if (adSample == null) {
             return
         }
-
+        adImpressionId = adSample.adImpressionId
         wrapperAdsCount = adSample.ad.wrapperAdsCount
         adSkippable = adSample.ad.skippable
         adSkippableAfter = adSample.ad.skippableAfter
