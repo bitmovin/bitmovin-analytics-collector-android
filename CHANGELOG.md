@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v3.32.0
+
 ### Fixed
 - Usage of java.time.Duration on SSAI API, which is not compatible with minSdk 23. Added two new setter to be compatible.
 
