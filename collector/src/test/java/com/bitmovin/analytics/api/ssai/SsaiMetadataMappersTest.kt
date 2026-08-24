@@ -10,6 +10,7 @@ import com.bitmovin.analytics.ssai.toAdMetadata
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import java.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class SsaiMetadataMappersTest {
     @Test
@@ -30,6 +31,7 @@ class SsaiMetadataMappersTest {
         assertThat(mapped.adSystem).isEqualTo("ad-system")
         assertThat(mapped.customData).isEqualTo(customData)
         assertThat(mapped.isSlate).isTrue()
+        assertThat(mapped.durationInMs).isEqualTo(15_000L)
         assertThat(mapped.duration).isEqualTo(Duration.ofSeconds(15))
     }
 
@@ -41,6 +43,7 @@ class SsaiMetadataMappersTest {
         assertThat(mapped.adSystem).isNull()
         assertThat(mapped.customData).isNull()
         assertThat(mapped.isSlate).isFalse()
+        assertThat(mapped.durationInMs).isNull()
         assertThat(mapped.duration).isNull()
     }
 
@@ -76,6 +79,17 @@ class SsaiMetadataMappersTest {
 
         assertThat(a).isEqualTo(b)
         assertThat(a.hashCode()).isEqualTo(b.hashCode())
+    }
+
+    @Test
+    fun `AdMetadata duration setters are equivalent`() {
+        val fromMillis = AdMetadata.Builder().setDurationInMs(15_000).build()
+        val fromKotlinDuration = AdMetadata.Builder().setDuration(15.seconds).build()
+        val fromJavaDuration = AdMetadata.Builder().setDuration(Duration.ofSeconds(15)).build()
+
+        assertThat(fromMillis.durationInMs).isEqualTo(15_000L)
+        assertThat(fromKotlinDuration).isEqualTo(fromMillis)
+        assertThat(fromJavaDuration).isEqualTo(fromMillis)
     }
 
     @Test

@@ -14,8 +14,6 @@ import com.bitmovin.analytics.internal.InternalBitmovinApi
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.SystemTimeService
 import com.bitmovin.analytics.utils.Util
-import kotlin.time.DurationUnit
-import kotlin.time.toKotlinDuration
 
 @InternalBitmovinApi
 class SsaiEngagementMetricsService(
@@ -176,7 +174,7 @@ class SsaiEngagementMetricsService(
         adEventData.adIndex = adIndex
         adEventData.adPodPosition = this.adPodPosition
         adEventData.isSlate = adMetadata?.isSlate ?: false
-        adEventData.adDuration = adMetadata?.duration?.toKotlinDuration()?.toLong(DurationUnit.MILLISECONDS)
+        adEventData.adDuration = adMetadata?.durationInMs
         adEventData.expectedPaidAds = limitToPositiveValues(adBreakMetadata?.expectedPaidAds, "expectedPaidAds")
         adEventData.expectedSlates = limitToPositiveValues(adBreakMetadata?.expectedSlates, "expectedSlates")
 

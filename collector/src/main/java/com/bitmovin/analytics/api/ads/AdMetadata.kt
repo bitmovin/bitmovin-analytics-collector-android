@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.api.ads
 
 import com.bitmovin.analytics.api.CustomData
-import java.time.Duration
+import kotlin.time.Duration
 
 /**
  * Metadata for a single ad.
@@ -48,10 +48,23 @@ class AdMetadata private constructor(
      */
     val isSlate: Boolean,
     /**
+     * Duration of the ad in milliseconds.
+     */
+    val durationInMs: Long?,
+) {
+    /**
      * Duration of the ad.
      */
-    val duration: Duration?,
-) {
+    @Deprecated(
+        message =
+            "java.time.Duration requires API level 26 or core library desugaring in the consuming app. " +
+                "Use durationInMs instead.",
+        replaceWith = ReplaceWith("durationInMs"),
+    )
+    @Suppress("NewApi")
+    val duration: java.time.Duration?
+        get() = durationInMs?.let { java.time.Duration.ofMillis(it) }
+
     class Builder {
         private var adId: String? = null
         private var adSystem: String? = null
@@ -63,7 +76,7 @@ class AdMetadata private constructor(
         private var title: String? = null
         private var customData: CustomData? = null
         private var isSlate: Boolean = false
-        private var duration: Duration? = null
+        private var durationInMs: Long? = null
 
         fun setAdId(adId: String?) = apply { this.adId = adId }
 
@@ -85,7 +98,25 @@ class AdMetadata private constructor(
 
         fun setIsSlate(isSlate: Boolean) = apply { this.isSlate = isSlate }
 
-        fun setDuration(duration: Duration?) = apply { this.duration = duration }
+        /**
+         * Sets the duration of the ad in milliseconds.
+         */
+        fun setDurationInMs(durationInMs: Long?) = apply { this.durationInMs = durationInMs }
+
+        /**
+         * Sets the duration of the ad. Convenience overload for Kotlin callers,
+         * not callable from Java (use [setDurationInMs] instead).
+         */
+        fun setDuration(duration: Duration?) = apply { this.durationInMs = duration?.inWholeMilliseconds }
+
+        @Deprecated(
+            message =
+                "java.time.Duration requires API level 26 or core library desugaring in the consuming app. " +
+                    "Use setDurationInMs or the kotlin.time.Duration overload instead.",
+            replaceWith = ReplaceWith("setDurationInMs(duration?.toMillis())"),
+        )
+        @Suppress("NewApi")
+        fun setDuration(duration: java.time.Duration?) = apply { this.durationInMs = duration?.toMillis() }
 
         fun build(): AdMetadata =
             AdMetadata(
@@ -99,7 +130,7 @@ class AdMetadata private constructor(
                 title = title,
                 customData = customData,
                 isSlate = isSlate,
-                duration = duration,
+                durationInMs = durationInMs,
             )
     }
 
@@ -116,7 +147,7 @@ class AdMetadata private constructor(
             title == other.title &&
             customData == other.customData &&
             isSlate == other.isSlate &&
-            duration == other.duration
+            durationInMs == other.durationInMs
     }
 
     override fun hashCode(): Int {
@@ -130,12 +161,13 @@ class AdMetadata private constructor(
         result = 31 * result + (title?.hashCode() ?: 0)
         result = 31 * result + (customData?.hashCode() ?: 0)
         result = 31 * result + isSlate.hashCode()
-        result = 31 * result + (duration?.hashCode() ?: 0)
+        result = 31 * result + (durationInMs?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String =
         "AdMetadata(adId=$adId, adSystem=$adSystem, universalAdIdValue=$universalAdIdValue, " +
             "universalAdIdRegistry=$universalAdIdRegistry, creativeId=$creativeId, creativeAdId=$creativeAdId, " +
-            "advertiserName=$advertiserName, title=$title, customData=$customData, isSlate=$isSlate, duration=$duration)"
+            "advertiserName=$advertiserName, title=$title, customData=$customData, isSlate=$isSlate, " +
+            "durationInMs=$durationInMs)"
 }

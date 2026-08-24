@@ -811,7 +811,7 @@ public final class com/bitmovin/analytics/api/ads/AdBreakMetadata$Builder {
 }
 
 public final class com/bitmovin/analytics/api/ads/AdMetadata {
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ZLjava/time/Duration;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ZLjava/lang/Long;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAdId ()Ljava/lang/String;
 	public final fun getAdSystem ()Ljava/lang/String;
@@ -820,6 +820,7 @@ public final class com/bitmovin/analytics/api/ads/AdMetadata {
 	public final fun getCreativeId ()Ljava/lang/String;
 	public final fun getCustomData ()Lcom/bitmovin/analytics/api/CustomData;
 	public final fun getDuration ()Ljava/time/Duration;
+	public final fun getDurationInMs ()Ljava/lang/Long;
 	public final fun getTitle ()Ljava/lang/String;
 	public final fun getUniversalAdIdRegistry ()Ljava/lang/String;
 	public final fun getUniversalAdIdValue ()Ljava/lang/String;
@@ -838,6 +839,8 @@ public final class com/bitmovin/analytics/api/ads/AdMetadata$Builder {
 	public final fun setCreativeId (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
 	public final fun setCustomData (Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
 	public final fun setDuration (Ljava/time/Duration;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
+	public final fun setDuration-BwNAW2A (Lkotlin/time/Duration;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
+	public final fun setDurationInMs (Ljava/lang/Long;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
 	public final fun setIsSlate (Z)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
 	public final fun setTitle (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
 	public final fun setUniversalAdIdRegistry (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;

@@ -30,7 +30,6 @@ import com.theoplayer.android.api.event.ads.AdsEventTypes
 import com.theoplayer.android.api.event.player.PlayEvent
 import com.theoplayer.android.api.event.player.PlayerEventTypes
 import com.theoplayer.android.api.player.Player
-import java.time.Duration
 import com.theoplayer.android.api.ads.AdBreak as TheoAdBreak
 
 internal class TheoPlayerAdAdapter(
@@ -87,7 +86,7 @@ internal class TheoPlayerAdAdapter(
                             .setAdvertiserName(mappedAd.advertiserName)
                             .setTitle(mappedAd.title)
                             .setIsSlate(mappedAd.isSlate ?: false)
-                            .setDuration(mappedAd.duration?.let { Duration.ofMillis(it) })
+                            .setDurationInMs(mappedAd.duration)
                             .build()
                     ssaiApi.adStart(ssaiAdMetadata)
                 }

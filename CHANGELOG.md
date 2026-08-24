@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+- Usage of java.time.Duration on SSAI API, which is not compatible with minSdk 23. Added two new setter to be compatible.
+
 ### Changed
 - Upgraded compileSdk to android 37
 - Upgraded THEOplayer to 11.7.0
