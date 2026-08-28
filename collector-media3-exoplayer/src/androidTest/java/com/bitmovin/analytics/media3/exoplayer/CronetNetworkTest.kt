@@ -13,6 +13,7 @@ import com.bitmovin.analytics.media3.exoplayer.api.IMedia3ExoPlayerCollector
 import com.bitmovin.analytics.test.utils.DataVerifier
 import com.bitmovin.analytics.test.utils.MetadataUtils
 import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.PlayerSettings
 import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.test.utils.TestSources
 import com.bitmovin.analytics.test.utils.runBlockingTest
@@ -111,6 +112,49 @@ class CronetNetworkTest {
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
+            DataVerifier.verifyBandwidthMetrics(eventDataList)
+        }
+
+    @Test
+    fun test_downloadTracking_withCronetNetworkStack_withoutAutoplay() =
+        runBlockingTest {
+            val collector = IMedia3ExoPlayerCollector.create(appContext, defaultAnalyticsConfig)
+            collector.sourceMetadata = defaultSourceMetadata
+
+            withContext(mainScope.coroutineContext) {
+                player.volume = 0.0f
+                collector.attachPlayer(player)
+                player.setMediaItem(defaultMediaItem)
+                player.prepare()
+            }
+
+            // we wait until the player is ready before calling play, to make sure it is not tracked as autoplay
+            Media3PlayerPlaybackUtils.waitUntilPlayerIsReady(player)
+
+            withContext(mainScope.coroutineContext) {
+                player.play()
+            }
+
+            Media3PlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+                collector.detachPlayer()
+                player.release()
+            }
+
+            Thread.sleep(500)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(1)
+
+            val impression = impressions.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyStartupSample(eventDataList[0])
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = false))
             DataVerifier.verifyBandwidthMetrics(eventDataList)
         }
 

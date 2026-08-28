@@ -14,6 +14,7 @@ import com.bitmovin.analytics.media3.exoplayer.api.IMedia3ExoPlayerCollector
 import com.bitmovin.analytics.test.utils.DataVerifier
 import com.bitmovin.analytics.test.utils.MetadataUtils
 import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.PlayerSettings
 import com.bitmovin.analytics.test.utils.SsaiDataVerifier
 import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.test.utils.TestSources
@@ -118,6 +119,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
@@ -188,6 +190,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
@@ -230,6 +233,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
@@ -273,6 +277,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
@@ -340,6 +345,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
@@ -429,6 +435,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
@@ -510,6 +517,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
@@ -576,6 +584,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
@@ -640,6 +649,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
@@ -780,6 +790,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)
@@ -895,6 +906,7 @@ class SsaiScenariosTest {
             assertThat(impressionList.size).isEqualTo(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             SsaiDataVerifier.verifySsaiRelatedSamplesHaveHeaderSet(impression.eventDataList)

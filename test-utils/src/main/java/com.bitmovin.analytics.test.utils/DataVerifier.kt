@@ -161,9 +161,15 @@ object DataVerifier {
         }
 
         // Autoplay should only be included in the Startup packets
-        assertThat(EventDataUtils.getStartupEvent(eventDataList).autoplay).isEqualTo(expectedPlayerSettings.isAutoPlayEnabled)
+        // (an EBVS sample is the startup sample of a failed session, even if the state machine
+        // never reached the startup state, e.g. error before play was called)
+        val startupEvents = eventDataList.filter { it.state?.lowercase() == STARTUP || it.videoStartFailed }
+        assertThat(startupEvents).isNotEmpty
+        for (eventData in startupEvents) {
+            assertThat(eventData.autoplay).isEqualTo(expectedPlayerSettings.isAutoPlayEnabled)
+        }
 
-        val nonStartupEvents = eventDataList.filter { it.state != STARTUP }
+        val nonStartupEvents = eventDataList - startupEvents.toSet()
         for (eventData in nonStartupEvents) {
             assertThat(eventData.autoplay).isEqualTo(null)
         }

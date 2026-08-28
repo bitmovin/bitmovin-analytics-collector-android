@@ -52,9 +52,9 @@ internal class Media3ExoPlayerAdapter(
         looper,
     ) {
     private val meter = DownloadSpeedMeter()
-    override val playerContext: Media3ExoPlayerContext = Media3ExoPlayerContext(player)
-    private val playerStatisticsProvider = PlayerStatisticsProvider()
     private val playbackInfoProvider = PlaybackInfoProvider()
+    override val playerContext: Media3ExoPlayerContext = Media3ExoPlayerContext(player, playbackInfoProvider)
+    private val playerStatisticsProvider = PlayerStatisticsProvider()
     private val drmInfoProvider = DrmInfoProvider()
 
     private val qualityEventDataManipulator = QualityEventDataManipulator(player)
@@ -149,6 +149,8 @@ internal class Media3ExoPlayerAdapter(
     }
 
     private fun manualStartup(position: Long) {
+        // we only end up here if playWhenReady was already set while the content was loading
+        playbackInfoProvider.isAutoplay = true
         qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
         playerEventReporter.onPlay(position)
     }

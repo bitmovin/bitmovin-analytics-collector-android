@@ -8,6 +8,7 @@ import com.bitmovin.analytics.api.error.ErrorSeverity
 import com.bitmovin.analytics.test.utils.DataVerifier
 import com.bitmovin.analytics.test.utils.MetadataUtils
 import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.PlayerSettings
 import com.bitmovin.analytics.test.utils.RepeatRule
 import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.test.utils.TestSources
@@ -131,6 +132,7 @@ class ErrorScenariosTest {
             assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
             assertThat(eventData.duration).isGreaterThan(10)
             assertThat(eventData.errorCode).isNull()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyStartupSampleOnError(eventData, TheoPlayerConstants.playerInfo)
         }
     }
@@ -243,6 +245,7 @@ class ErrorScenariosTest {
             val sample = eventDataList.first()
             assertThat(sample.videoStartFailed).isTrue()
             assertThat(sample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             assertThat(sample.errorMessage).isNotEmpty()
             assertThat(sample.errorCode).isNotNull()
             assertThat(sample.errorSeverity).isEqualTo(ErrorSeverity.CRITICAL)
@@ -259,6 +262,74 @@ class ErrorScenariosTest {
                 assertThat(it.success).isFalse
                 assertThat(it.downloadTime).isGreaterThan(0)
             }
+        }
+    }
+
+    @Test
+    fun test_nonExistingStream_withoutAutoplay_Should_sendErrorSampleWithAutoplayFalse() {
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                val playerConfig =
+                    THEOplayerConfig.Builder()
+                        .license(TheoPlayerTestUtils.TESTING_LICENSE)
+                        .build()
+                val theoPlayerView = THEOplayerView(appContext, playerConfig)
+                player = theoPlayerView.player
+                player.isAutoplay = false
+
+                val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+
+                val nonExistingStreamSample = TestSources.NONE_EXISTING_STREAM
+                val sourceMetadata =
+                    SourceMetadata(
+                        title = metadataGenerator.getTestTitle(),
+                        videoId = "nonexisting_stream_no_autoplay_id",
+                        path = "nonexisting_stream_no_autoplay_path",
+                        customData = TestConfig.createDummyCustomData(),
+                        cdnProvider = "cdn_provider",
+                    )
+
+                collector.sourceMetadata = sourceMetadata
+                collector.attachPlayer(player)
+
+                val typedSource =
+                    TypedSource
+                        .Builder(nonExistingStreamSample.m3u8Url!!)
+                        .type(SourceType.HLS)
+                        .build()
+
+                val sourceDescription =
+                    SourceDescription
+                        .Builder(typedSource)
+                        .build()
+
+                player.source = sourceDescription
+                // start playback explicitly instead of via autoplay
+                player.play()
+            }
+
+            MockedIngress.waitForErrorDetailSample(timeout = 40.seconds)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(1)
+
+            val impression = impressions.first()
+            val eventDataList = impression.eventDataList
+            assertThat(eventDataList).hasSize(1)
+
+            val sample = eventDataList.first()
+            assertThat(sample.videoStartFailed).isTrue()
+            assertThat(sample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = false))
+            assertThat(sample.errorMessage).isNotEmpty()
+            assertThat(sample.errorCode).isNotNull()
+            assertThat(sample.errorSeverity).isEqualTo(ErrorSeverity.CRITICAL)
+
+            val errorDetailList = impression.errorDetailList
+            assertThat(errorDetailList).hasSize(1)
+            val errorDetail = errorDetailList.first()
+            assertThat(errorDetail.data.exceptionMessage).isNotEmpty()
+            assertThat(errorDetail.httpRequests).hasSizeGreaterThan(0)
         }
     }
 
@@ -316,6 +387,7 @@ class ErrorScenariosTest {
             val sample = eventDataList.first()
             assertThat(sample.videoStartFailed).isTrue()
             assertThat(sample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             assertThat(sample.errorMessage).isNotEmpty()
             assertThat(sample.errorCode).isEqualTo(5000)
             assertThat(sample.errorSeverity).isEqualTo(ErrorSeverity.CRITICAL)

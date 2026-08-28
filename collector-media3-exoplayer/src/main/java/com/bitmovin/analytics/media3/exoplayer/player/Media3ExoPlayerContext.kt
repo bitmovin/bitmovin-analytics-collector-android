@@ -6,7 +6,12 @@ import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.media3.exoplayer.Media3ExoPlayerUtil
 
-internal class Media3ExoPlayerContext(private val player: Player) : PlayerContext {
+internal class Media3ExoPlayerContext(
+    private val player: Player,
+    // only needed for the context instance that is used for reporting (the adapter's one),
+    // the state machine only relies on position and isPlaying
+    private val playbackInfoProvider: PlaybackInfoProvider? = null,
+) : PlayerContext {
     override fun isPlaying(): Boolean {
         return player.isPlaying
     }
@@ -37,7 +42,19 @@ internal class Media3ExoPlayerContext(private val player: Player) : PlayerContex
             return 0
         }
 
-    override fun isAutoplay(): Boolean = player.playWhenReady
+    /**
+     * Raw playWhenReady flag of the player, used for the state handling in the listeners.
+     * This is not the same as autoplay, since it is also true once the user pressed play.
+     */
+    val playWhenReady: Boolean
+        get() = player.playWhenReady
+
+    val isReady: Boolean
+        get() = player.playbackState == Player.STATE_READY
+
+    // once startup has begun we know if it was triggered by autoplay or by the user,
+    // before that (e.g. errors before the first play) we fall back to the playWhenReady flag
+    override fun isAutoplay(): Boolean = playbackInfoProvider?.isAutoplay ?: player.playWhenReady
 
     // it is enough to have volume OR deviceVolume set to muted
     // this means as soon as one is muted we report it as muted

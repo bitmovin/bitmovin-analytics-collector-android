@@ -147,7 +147,8 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyStartupSample(eventDataList[0])
             DataVerifier.verifyInvariants(eventDataList)
             DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true, true))
+            // play() was called after the player was ready, thus this is not autoplay
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = false))
             DataVerifier.verifyBandwidthMetrics(eventDataList)
         }
 
@@ -260,6 +261,11 @@ class PhoneBasicScenariosTest {
             val dashEvents = impressions[1]
             val hlsEvents = impressions[2]
 
+            // play() was called right after prepare(), thus playback started via autoplay
+            DataVerifier.verifyPlayerSetting(progEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
+            DataVerifier.verifyPlayerSetting(dashEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
+            DataVerifier.verifyPlayerSetting(hlsEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
+
             DataVerifier.verifyHasNoErrorSamples(progEvents)
             DataVerifier.verifyHasNoErrorSamples(dashEvents)
             DataVerifier.verifyHasNoErrorSamples(hlsEvents)
@@ -342,7 +348,8 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyStartupSample(eventDataList[0])
             DataVerifier.verifyInvariants(eventDataList)
             DataVerifier.verifyVideoStartEndTimesOnContinuousPlayback(eventDataList)
-            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(true, true))
+            // play() was called after the player was ready, thus this is not autoplay
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = false))
         }
 
     @Test
@@ -396,6 +403,8 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList
+            // play() was called after the player was ready, thus this is not autoplay
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = false))
 
             val customDataEvents = eventDataList.filter { it.state == "customdatachange" }.toMutableList()
             val nonCustomDataEvents = eventDataList.filter { it.state != "customdatachange" }.toMutableList()
@@ -530,6 +539,7 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyHasNoErrorSamples(drmImpression)
             val startupSample = drmImpression.eventDataList.first()
             DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, verifyDrmType = false)
+            DataVerifier.verifyPlayerSetting(drmImpression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
         }
 
     @Test
@@ -584,6 +594,11 @@ class PhoneBasicScenariosTest {
             val startupSample = drmImpression.eventDataList.first()
 
             DataVerifier.verifyDrmStartupSample(startupSample, sample.drmSchema, isAutoPlay = false, verifyDrmType = false)
+            // playback was started explicitly via play() after the player was ready, so autoplay must be false
+            DataVerifier.verifyPlayerSetting(
+                drmImpression.eventDataList,
+                PlayerSettings(isMuted = false, isAutoPlayEnabled = false),
+            )
         }
 
     @Test
@@ -649,12 +664,15 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyStartupSample(dashImpression.eventDataList[0])
             DataVerifier.verifyMpdSourceUrl(dashImpression.eventDataList, dashSource.mpdUrl!!)
             DataVerifier.verifyThereWasAtLeastOnePlayingSample(dashImpression.eventDataList)
+            DataVerifier.verifyPlayerSetting(dashImpression.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
 
             val hlsImpression = impressions[1]
             DataVerifier.verifyHasNoErrorSamples(hlsImpression)
             DataVerifier.verifyStartupSample(hlsImpression.eventDataList[0], isFirstImpression = false)
             DataVerifier.verifyM3u8SourceUrl(hlsImpression.eventDataList, defaultSample.m3u8Url!!)
             DataVerifier.verifyThereWasAtLeastOnePlayingSample(hlsImpression.eventDataList)
+            // playWhenReady is still true from the first session, thus the second one is also autoplay
+            DataVerifier.verifyPlayerSetting(hlsImpression.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
         }
 
     @Test
@@ -700,6 +718,7 @@ class PhoneBasicScenariosTest {
             assertThat(impressionsList).hasSize(1)
 
             val impression = impressionsList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val seeks = impression.eventDataList.filter { it.state == DataVerifier.SEEKING }
@@ -776,6 +795,7 @@ class PhoneBasicScenariosTest {
             assertThat(impressionsList).hasSize(1)
 
             val impression = impressionsList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val seeks = impression.eventDataList.filter { it.state == DataVerifier.SEEKING }
@@ -840,6 +860,7 @@ class PhoneBasicScenariosTest {
             // (using lowest quality doesn't trigger qualitychange events)
             assertThat(impression.eventDataList).hasSize(3)
             DataVerifier.verifyStartupSample(impression.eventDataList[0])
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
 
             // second sample is playing sample triggered through playing heartbeat
             val secondSample = impression.eventDataList[1]
@@ -917,6 +938,7 @@ class PhoneBasicScenariosTest {
             assertThat(impressionsList).hasSize(1)
 
             val impression = impressionsList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val subtitleEnabledSamples = impression.eventDataList.filter { it.subtitleEnabled }
@@ -990,6 +1012,7 @@ class PhoneBasicScenariosTest {
             assertThat(impressionList).hasSize(1)
 
             val impression = impressionList.first()
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             val dubbingSamples = impression.eventDataList.filter { it.audioLanguage == "dubbing" }
             val englishSamples = impression.eventDataList.filter { it.audioLanguage == "en" }
 
@@ -1056,6 +1079,7 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val eventDataList = impression.eventDataList.toMutableList()
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             val filteredList = EventDataUtils.filterNonDeterministicEvents(eventDataList)
             assertThat(filteredList).hasSizeGreaterThanOrEqualTo(2)
 

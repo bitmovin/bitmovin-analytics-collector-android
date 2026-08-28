@@ -15,6 +15,7 @@ import com.bitmovin.analytics.test.utils.DataVerifier
 import com.bitmovin.analytics.test.utils.MetadataUtils
 import com.bitmovin.analytics.test.utils.MockedIngress
 import com.bitmovin.analytics.test.utils.MockedIngress.waitForErrorDetailSample
+import com.bitmovin.analytics.test.utils.PlayerSettings
 import com.bitmovin.analytics.test.utils.RepeatRule
 import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.test.utils.TestSources
@@ -122,6 +123,7 @@ class ErrorScenariosTest {
             val eventData = impression.eventDataList.first()
             assertThat(eventData.videoStartFailed).isTrue()
             assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = false))
             assertThat(eventData.duration).isGreaterThan(10)
             DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
         }
@@ -167,6 +169,7 @@ class ErrorScenariosTest {
             assertThat(eventData.errorCode).isEqualTo(2203)
             assertThat(eventData.videoStartFailed).isTrue()
             assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = false))
             DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
 
             DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)
@@ -499,6 +502,7 @@ class ErrorScenariosTest {
             assertThat(eventData.errorCode).isEqualTo(2203)
             assertThat(eventData.videoStartFailed).isTrue()
             assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            DataVerifier.verifyPlayerSetting(firstImpression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = false))
             DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
 
             DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)

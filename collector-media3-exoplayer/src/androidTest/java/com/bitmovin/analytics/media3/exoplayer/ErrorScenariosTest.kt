@@ -17,6 +17,7 @@ import com.bitmovin.analytics.test.utils.DataVerifier
 import com.bitmovin.analytics.test.utils.MetadataUtils
 import com.bitmovin.analytics.test.utils.MockedIngress
 import com.bitmovin.analytics.test.utils.MockedIngress.waitForErrorDetailSample
+import com.bitmovin.analytics.test.utils.PlayerSettings
 import com.bitmovin.analytics.test.utils.RepeatRule
 import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.test.utils.TestSources
@@ -118,6 +119,8 @@ class ErrorScenariosTest {
             val impressionId = eventData.impressionId
             assertThat(eventData.errorMessage).startsWith("Source Error: ERROR_CODE_IO_BAD_HTTP_STATUS")
             assertThat(eventData.errorCode).isEqualTo(PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
+            // playWhenReady was never set, so autoplay must be reported as false
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = false))
             DataVerifier.verifyStreamFormatAndUrlTracking(eventData)
 
             DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
@@ -292,6 +295,7 @@ class ErrorScenariosTest {
             val startupSample = impression.eventDataList.first()
             assertThat(startupSample.videoStartFailed).isTrue
             assertThat(startupSample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             assertThat(startupSample.errorMessage).startsWith("Source Error: ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED")
             assertThat(startupSample.errorCode).isEqualTo(PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED)
 
@@ -349,6 +353,7 @@ class ErrorScenariosTest {
             val eventData = impression.eventDataList.first()
             assertThat(eventData.videoStartFailed).isTrue()
             assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
 
             // verify that collector detaching after player release does not send further samples
@@ -402,6 +407,7 @@ class ErrorScenariosTest {
             val eventData = impression.eventDataList.first()
             assertThat(eventData.videoStartFailed).isTrue()
             assertThat(eventData.videoStartFailedReason).isEqualTo("PAGE_CLOSED")
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             DataVerifier.verifyStartupSampleOnError(eventData, Media3ExoPlayerConstants.playerInfo)
 
             // verify that destroying of player after detaching collector does not send further samples
@@ -560,6 +566,7 @@ class ErrorScenariosTest {
             val firstStartupSample = impression.eventDataList.first()
             assertThat(firstStartupSample.videoStartFailed).isTrue
             assertThat(firstStartupSample.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = true))
             assertThat(firstStartupSample.errorMessage).startsWith("Source Error: ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED")
             assertThat(firstStartupSample.errorCode).isEqualTo(PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED)
             assertThat(firstStartupSample.errorSeverity).isEqualTo(ErrorSeverity.INFO)

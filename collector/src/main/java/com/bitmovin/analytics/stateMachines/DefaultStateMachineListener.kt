@@ -160,6 +160,7 @@ class DefaultStateMachineListener(
         if (videoStartFailedReason != null) {
             data.videoStartFailedReason = videoStartFailedReason.reason
             data.videoStartFailed = true
+            data.autoplay = playerAdapter.playerContext.isAutoplay()
         }
 
         if (errorCode != null) {
@@ -317,6 +318,8 @@ class DefaultStateMachineListener(
             }
         }
         data.videoStartFailedReason = videoStartFailedReason.reason
+
+        data.autoplay = playerAdapter.playerContext.isAutoplay()
         data.duration = durationInStartupStateMs
         analytics.sendEventData(data)
         // we implicitly detach and don't want to send the last sample out

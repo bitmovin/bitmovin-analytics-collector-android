@@ -13,6 +13,7 @@ import com.bitmovin.analytics.test.utils.DataVerifier
 import com.bitmovin.analytics.test.utils.EventDataUtils
 import com.bitmovin.analytics.test.utils.MetadataUtils
 import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.PlaybackUtils
 import com.bitmovin.analytics.test.utils.PlayerSettings
 import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.test.utils.TestSources
@@ -138,6 +139,63 @@ class PhoneBasicScenariosTest {
             // verify durations of each state are within a reasonable range
             DataVerifier.verifyPlayTimeIsCorrect(eventDataList, playedToMs)
             DataVerifier.verifyPauseTimeIsCorrect(eventDataList, pauseTimeMs)
+        }
+
+    @Test
+    fun test_vod_playPauseWithoutAutoplay() =
+        runBlockingTest {
+            // arrange
+            val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
+
+            // act
+            withContext(mainScope.coroutineContext) {
+                collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
+                collector.attachPlayer(defaultPlayer)
+                defaultPlayer.load(defaultSource)
+            }
+
+            // wait until the source is loaded before starting playback manually
+            PlaybackUtils.waitUntil("sourceLoaded") { defaultPlayer.duration > 0 }
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 2000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+            }
+
+            val pauseTimeMs = 850L
+            Thread.sleep(pauseTimeMs)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.play()
+            }
+
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(defaultPlayer, 4000)
+
+            withContext(mainScope.coroutineContext) {
+                defaultPlayer.pause()
+                collector.detachPlayer()
+            }
+
+            Thread.sleep(500)
+
+            // assert
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList.size).isEqualTo(1)
+
+            val impression = impressionList.first()
+            DataVerifier.verifyHasNoErrorSamples(impression)
+
+            val eventDataList = impression.eventDataList
+            DataVerifier.verifyStaticData(eventDataList, defaultSourceMetadata, defaultSample, BitmovinPlayerConstants.playerInfo)
+            DataVerifier.verifyStartupSample(eventDataList[0])
+            DataVerifier.verifyPlayerSetting(eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = false))
+            DataVerifier.verifyExactlyOnePauseSample(eventDataList)
+            DataVerifier.verifyInvariants(eventDataList)
         }
 
     @Test
@@ -795,6 +853,7 @@ class PhoneBasicScenariosTest {
             assertThat(eventData.errorMessage).isEqualTo("An unexpected HTTP status code was received: Response code: 404")
             assertThat(eventData.errorCode).isEqualTo(2203)
             assertThat(eventData.videoStartFailedReason).isEqualTo("PLAYER_ERROR")
+            DataVerifier.verifyPlayerSetting(impression.eventDataList, PlayerSettings(isMuted = false, isAutoPlayEnabled = false))
             DataVerifier.verifyStartupSampleOnError(eventData, BitmovinPlayerConstants.playerInfo)
 
             DataVerifier.verifyStaticErrorDetails(errorDetail, impressionId, defaultAnalyticsConfig.licenseKey)

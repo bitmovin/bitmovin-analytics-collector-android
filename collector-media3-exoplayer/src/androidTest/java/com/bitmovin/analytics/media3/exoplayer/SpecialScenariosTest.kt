@@ -13,6 +13,7 @@ import com.bitmovin.analytics.test.utils.DataVerifier
 import com.bitmovin.analytics.test.utils.EventDataUtils
 import com.bitmovin.analytics.test.utils.MetadataUtils
 import com.bitmovin.analytics.test.utils.MockedIngress
+import com.bitmovin.analytics.test.utils.PlayerSettings
 import com.bitmovin.analytics.test.utils.TestConfig
 import com.bitmovin.analytics.test.utils.TestSources
 import com.bitmovin.analytics.test.utils.runBlockingTest
@@ -108,6 +109,8 @@ class SpecialScenariosTest {
 
             val progEvents = impressions[0]
             val dashEvents = impressions[1]
+            DataVerifier.verifyPlayerSetting(progEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
+            DataVerifier.verifyPlayerSetting(dashEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
 
             DataVerifier.verifyHasNoErrorSamples(progEvents)
             DataVerifier.verifyHasNoErrorSamples(dashEvents)
@@ -165,6 +168,8 @@ class SpecialScenariosTest {
 
             val progEvents = impressions[0]
             val dashEvents = impressions[1]
+            DataVerifier.verifyPlayerSetting(progEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
+            DataVerifier.verifyPlayerSetting(dashEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
 
             DataVerifier.verifyHasNoErrorSamples(progEvents)
             DataVerifier.verifyHasNoErrorSamples(dashEvents)
@@ -234,6 +239,9 @@ class SpecialScenariosTest {
 
             val progEvents = impressions[0]
             val dashEvents = impressions[1]
+            DataVerifier.verifyPlayerSetting(progEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
+            // playWhenReady was disabled before preparing and play() was called once the player was ready
+            DataVerifier.verifyPlayerSetting(dashEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = false))
 
             DataVerifier.verifyHasNoErrorSamples(progEvents)
             DataVerifier.verifyHasNoErrorSamples(dashEvents)
@@ -293,6 +301,9 @@ class SpecialScenariosTest {
 
             val progEvents = impressions[0]
             val dashEvents = impressions[1]
+            DataVerifier.verifyPlayerSetting(progEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
+            // setting a new media item while playing implicitly starts the new session via autoplay
+            DataVerifier.verifyPlayerSetting(dashEvents.eventDataList, PlayerSettings(isMuted = true, isAutoPlayEnabled = true))
 
             DataVerifier.verifyHasNoErrorSamples(progEvents)
             DataVerifier.verifyHasNoErrorSamples(dashEvents)

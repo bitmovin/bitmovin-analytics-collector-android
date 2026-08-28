@@ -59,7 +59,10 @@ internal class AnalyticsEventListener(
             playWhenReady &&
             !playerEventReporter.isStartupFinished
         ) {
-            startup(position)
+            // ExoPlayer has no autoplay config, so we treat it as autoplay if play was requested
+            // before the content was ready (e.g. prepare() directly followed by play()).
+            // If the player was already ready, playback was started by the user.
+            startup(position, isAutoplay = !exoPlayerContext.isReady)
         } else if (!playWhenReady && stateMachine.isInStartupState()) {
             // in case we are in startupstate but playWhenReady is for some reason
             // not set, it indicates that player will not start playing without
@@ -102,7 +105,7 @@ internal class AnalyticsEventListener(
                 String.format(
                     "onPlaybackStateChanged: %s playWhenReady: %b isPlaying: %b",
                     Media3ExoPlayerUtil.exoStateToString(state),
-                    exoPlayerContext.isAutoplay(),
+                    exoPlayerContext.playWhenReady,
                     exoPlayerContext.isPlaying(),
                 ),
             )
@@ -111,9 +114,9 @@ internal class AnalyticsEventListener(
                 Player.STATE_READY -> // if autoplay is enabled startup state is not yet finished
                     // if collector is attached late or ConcatenatingMediaSource is used we miss other events
                     // for transitioning out from READY state
-                    if (!playerEventReporter.isStartupFinished && exoPlayerContext.isAutoplay()) {
+                    if (!playerEventReporter.isStartupFinished && exoPlayerContext.playWhenReady) {
                         if (stateMachine.currentState == PlayerStates.READY) {
-                            startup(videoTime)
+                            startup(videoTime, isAutoplay = true)
                         } else if (stateMachine.currentState !== PlayerStates.STARTUP && stateMachine.currentState !== PlayerStates.READY) {
                             stateMachine.transitionState(PlayerStates.READY, position)
                         }
@@ -124,8 +127,8 @@ internal class AnalyticsEventListener(
                     if (!playerEventReporter.isStartupFinished) {
                         // this is the case when there is no preloading
                         // player is now starting to get content before playing it
-                        if (exoPlayerContext.isAutoplay()) {
-                            startup(videoTime)
+                        if (exoPlayerContext.playWhenReady) {
+                            startup(videoTime, isAutoplay = true)
                         } else {
                             // this is the case when preloading of content is setup
                             // so at this point player is getting content and will start
@@ -276,7 +279,11 @@ internal class AnalyticsEventListener(
         }
     }
 
-    private fun startup(position: Long) {
+    private fun startup(
+        position: Long,
+        isAutoplay: Boolean,
+    ) {
+        playbackInfoProvider.isAutoplay = isAutoplay
         qualityEventDataManipulator.setFormatsFromPlayerOnStartup()
         playerEventReporter.onPlay(position)
     }
