@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v3.32.1
+
 ### Fixed
 - Make autoplay tracking more reliable
 
