@@ -1,0 +1,20 @@
+version: 2
+registries:
+  bitmovin-artifactory:
+    type: maven-repository
+    url: https://artifacts.bitmovin.com/artifactory/public-releases
+  theoplayer-releases:
+    type: maven-repository
+    url: https://maven.theoplayer.com/releases
+updates:
+  - package-ecosystem: "gradle"
+    registries:
+      - bitmovin-artifactory
+      - theoplayer-releases
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      time: "06:00"
+      timezone: "Europe/Vienna"
+    open-pull-requests-limit: 20
+    rebase-strategy: "disabled"
