@@ -341,14 +341,6 @@ public final class com/bitmovin/analytics/api/AnalyticsConfig$Builder {
 public final class com/bitmovin/analytics/api/AnalyticsConfig$Companion {
 }
 
-public final class com/bitmovin/analytics/api/AnalyticsConfig$Creator : android/os/Parcelable$Creator {
-	public fun <init> ()V
-	public final fun createFromParcel (Landroid/os/Parcel;)Lcom/bitmovin/analytics/api/AnalyticsConfig;
-	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
-	public final fun newArray (I)[Lcom/bitmovin/analytics/api/AnalyticsConfig;
-	public synthetic fun newArray (I)[Ljava/lang/Object;
-}
-
 public final class com/bitmovin/analytics/api/CustomData : android/os/Parcelable {
 	public static final field CREATOR Landroid/os/Parcelable$Creator;
 	public fun <init> ()V
@@ -679,14 +671,6 @@ public final class com/bitmovin/analytics/api/CustomData$Builder {
 	public final fun setExperimentName (Ljava/lang/String;)Lcom/bitmovin/analytics/api/CustomData$Builder;
 }
 
-public final class com/bitmovin/analytics/api/CustomData$Creator : android/os/Parcelable$Creator {
-	public fun <init> ()V
-	public final fun createFromParcel (Landroid/os/Parcel;)Lcom/bitmovin/analytics/api/CustomData;
-	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
-	public final fun newArray (I)[Lcom/bitmovin/analytics/api/CustomData;
-	public synthetic fun newArray (I)[Ljava/lang/Object;
-}
-
 public final class com/bitmovin/analytics/api/DefaultMetadata : android/os/Parcelable {
 	public static final field CREATOR Landroid/os/Parcelable$Creator;
 	public fun <init> ()V
@@ -715,14 +699,6 @@ public final class com/bitmovin/analytics/api/DefaultMetadata$Builder {
 	public final fun setCdnProvider (Ljava/lang/String;)Lcom/bitmovin/analytics/api/DefaultMetadata$Builder;
 	public final fun setCustomData (Lcom/bitmovin/analytics/api/CustomData;)Lcom/bitmovin/analytics/api/DefaultMetadata$Builder;
 	public final fun setCustomUserId (Ljava/lang/String;)Lcom/bitmovin/analytics/api/DefaultMetadata$Builder;
-}
-
-public final class com/bitmovin/analytics/api/DefaultMetadata$Creator : android/os/Parcelable$Creator {
-	public fun <init> ()V
-	public final fun createFromParcel (Landroid/os/Parcel;)Lcom/bitmovin/analytics/api/DefaultMetadata;
-	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
-	public final fun newArray (I)[Lcom/bitmovin/analytics/api/DefaultMetadata;
-	public synthetic fun newArray (I)[Ljava/lang/Object;
 }
 
 public final class com/bitmovin/analytics/api/LogLevel : java/lang/Enum {
@@ -782,14 +758,6 @@ public final class com/bitmovin/analytics/api/SourceMetadata$Builder {
 	public final fun setPath (Ljava/lang/String;)Lcom/bitmovin/analytics/api/SourceMetadata$Builder;
 	public final fun setTitle (Ljava/lang/String;)Lcom/bitmovin/analytics/api/SourceMetadata$Builder;
 	public final fun setVideoId (Ljava/lang/String;)Lcom/bitmovin/analytics/api/SourceMetadata$Builder;
-}
-
-public final class com/bitmovin/analytics/api/SourceMetadata$Creator : android/os/Parcelable$Creator {
-	public fun <init> ()V
-	public final fun createFromParcel (Landroid/os/Parcel;)Lcom/bitmovin/analytics/api/SourceMetadata;
-	public synthetic fun createFromParcel (Landroid/os/Parcel;)Ljava/lang/Object;
-	public final fun newArray (I)[Lcom/bitmovin/analytics/api/SourceMetadata;
-	public synthetic fun newArray (I)[Ljava/lang/Object;
 }
 
 public final class com/bitmovin/analytics/api/ads/AdBreakMetadata {
