@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v3.33.0
+
+### Changed
+- Set the minCompileSdk to 1, which was accidentally upgraded to compileSdk (currently 37) during AGP 9.x upgrade
+
 ## v3.32.1
 
 ### Fixed
