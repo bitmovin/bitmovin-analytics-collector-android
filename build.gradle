@@ -103,6 +103,11 @@ ext {
     compileSdk = 37
     targetSdkVersion = 37
 
+    // since AGP 9.x the minCompileSdk is enforced with the compileSdk by default
+    // we don't want to force upgrades for the customer, thus we are overwritting it with 1
+    // This is similar to what player folks are doing
+    minCompileSdk = 1
+
     // player versions
     bitmovinPlayerVersion = '3.157.0'
     media3PlayerVersion = '1.10.1'
@@ -138,6 +143,21 @@ ext {
     // cronet network stack systemtests dependencies
     cronetApi = '143.7445.0'
     cronetGooglePlay = '18.1.1'
+}
+
+// Enforce the minCompileSdk written into the AAR metadata of every library module.
+// Without this, AGP stamps the module's compileSdk as minCompileSdk, forcing
+// customers to upgrade their compileSdk when consuming our artifacts.
+subprojects {
+    plugins.withId('com.android.library') {
+        android {
+            defaultConfig {
+                aarMetadata {
+                    minCompileSdk = rootProject.ext.minCompileSdk
+                }
+            }
+        }
+    }
 }
 
 tasks.register('createPrePushHook') {
