@@ -24,7 +24,7 @@ buildscript {
 plugins {
     id 'java'
     id 'jacoco'
-    id "org.sonarqube" version "7.3.0.8198"
+    id "org.sonarqube" version "7.4.0.8496"
     id 'org.jetbrains.kotlinx.binary-compatibility-validator' version '0.18.1'
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
 }
