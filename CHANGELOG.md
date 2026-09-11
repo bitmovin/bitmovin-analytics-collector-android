@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded `kotlinx-coroutines-android' from `1.8.1` to `1.11.0`
 - [Internal] Upgraded `jacoco` to `0.8.15`
 - [Internal] Upgraded agp from `9.2.1` to `9.3.2`
+- [Internal] Upgraded gradle from `9.4.1` to `9.7.1`
 
 ## v3.33.0
 
