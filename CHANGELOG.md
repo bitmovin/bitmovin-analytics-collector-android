@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded THEOplayer to `11.10.2`
 - Upgraded bitmovin player to `3.165.0`
 - Upgraded media3-exoplayer to `1.11.0`
+- Upgraded `okhttp` from `5.3.2` to `5.5.0`
 - Upgraded `gson` from `2.13.2` to `2.14.0`
 - Upgraded `kotlinx-serialization-json` from `1.6.3` to `1.11.0`
 - Upgraded `kotlinx-coroutines-android' from `1.8.1` to `1.11.0`
