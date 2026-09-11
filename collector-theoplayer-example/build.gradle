@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId 'com.bitmovin.analytics.theoplayer.example'
-        minSdkVersion rootProject.ext.minSdkVersion
+        minSdkVersion 24 // theoplayer requires minsdk 24 with version 11.11.0
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.version

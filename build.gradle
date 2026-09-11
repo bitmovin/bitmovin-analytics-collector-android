@@ -111,7 +111,7 @@ ext {
     // player versions
     bitmovinPlayerVersion = '3.165.0'
     media3PlayerVersion = '1.11.0'
-    theoPlayerVersion = '11.10.2'
+    theoPlayerVersion = '11.11.0'
     desugarJdkLibsVersion = '2.1.5'
 
     // collector dependencies

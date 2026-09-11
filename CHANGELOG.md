@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Development
 
 ### Changed
-- Upgraded THEOplayer to `11.10.2`
+- Upgraded THEOplayer to `11.11.0`
 - Upgraded bitmovin player to `3.165.0`
 - Upgraded media3-exoplayer to `1.11.0`
 - Upgraded `okhttp` from `5.3.2` to `5.5.0`
