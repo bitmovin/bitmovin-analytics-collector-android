@@ -83,7 +83,8 @@ class ErrorScenariosTest {
 
             withContext(mainScope.coroutineContext) {
                 val playerConfig =
-                    THEOplayerConfig.Builder()
+                    THEOplayerConfig
+                        .Builder()
                         .license(TheoPlayerTestUtils.TESTING_LICENSE)
                         .build()
 
@@ -142,7 +143,8 @@ class ErrorScenariosTest {
         runBlockingTest {
             withContext(mainScope.coroutineContext) {
                 val playerConfig =
-                    THEOplayerConfig.Builder()
+                    THEOplayerConfig
+                        .Builder()
                         .license("123123123") // invalid license
                         .build()
 
@@ -177,7 +179,7 @@ class ErrorScenariosTest {
             val eventDataList = impression.eventDataList
             assertThat(eventDataList).hasSize(1)
             val sample = eventDataList.first()
-            assertThat(sample.errorCode).isEqualTo(5001)
+            assertThat(sample.errorCode).isEqualTo(2000)
             assertThat(sample.errorMessage).isNotEmpty
             assertThat(sample.errorSeverity).isEqualTo(ErrorSeverity.CRITICAL)
 
@@ -197,7 +199,8 @@ class ErrorScenariosTest {
         runBlockingTest {
             withContext(mainScope.coroutineContext) {
                 val playerConfig =
-                    THEOplayerConfig.Builder()
+                    THEOplayerConfig
+                        .Builder()
                         .license(TheoPlayerTestUtils.TESTING_LICENSE)
                         .build()
                 val theoPlayerView = THEOplayerView(appContext, playerConfig)
@@ -270,7 +273,8 @@ class ErrorScenariosTest {
         runBlockingTest {
             withContext(mainScope.coroutineContext) {
                 val playerConfig =
-                    THEOplayerConfig.Builder()
+                    THEOplayerConfig
+                        .Builder()
                         .license(TheoPlayerTestUtils.TESTING_LICENSE)
                         .build()
                 val theoPlayerView = THEOplayerView(appContext, playerConfig)
@@ -348,7 +352,8 @@ class ErrorScenariosTest {
 
             withContext(mainScope.coroutineContext) {
                 val playerConfig =
-                    THEOplayerConfig.Builder()
+                    THEOplayerConfig
+                        .Builder()
                         .license(TheoPlayerTestUtils.TESTING_LICENSE)
                         .build()
 

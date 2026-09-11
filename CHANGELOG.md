@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Changed
+- Upgraded THEOplayer to `11.10.2`
+- Upgraded bitmovin player to `3.165.0`
+- Upgraded media3-exoplayer to `1.11.0`
+
 ## v3.33.0
 
 ### Changed
