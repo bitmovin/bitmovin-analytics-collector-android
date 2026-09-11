@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Upgraded media3-exoplayer to `1.11.0`
 - Upgraded `gson` from `2.13.2` to `2.14.0`
 - Upgraded `kotlinx-serialization-json` from `1.6.3` to `1.11.0`
+- Upgraded `kotlinx-coroutines-android' from `1.8.1` to `1.11.0`
 - [Internal] Upgraded `jacoco` to `0.8.15`
 
 ## v3.33.0
