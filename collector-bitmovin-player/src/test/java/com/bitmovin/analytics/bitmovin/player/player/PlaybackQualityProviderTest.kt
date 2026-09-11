@@ -2,6 +2,7 @@ package com.bitmovin.analytics.bitmovin.player.player
 
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.media.audio.quality.AudioQuality
+import com.bitmovin.player.api.media.video.quality.DynamicRange
 import com.bitmovin.player.api.media.video.quality.VideoQuality
 import com.bitmovin.player.api.source.Source
 import io.mockk.every
@@ -23,7 +24,7 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentVideoQuality_Should_returnQualityFromPlayerInitially() {
         // arrange
-        val quality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
+        val quality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1, DynamicRange.SDR)
         every { playerMock.playbackVideoData }.returns(quality)
 
         // act and assert
@@ -33,7 +34,7 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentVideoQuality_Should_returnQualityStored() {
         // arrange
-        val quality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
+        val quality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1, DynamicRange.SDR)
         qualityProvider.setVideoQuality(quality)
 
         // act and assert
@@ -63,8 +64,8 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_didVideoQualityChange_Should_returnFalseWithSameQuality() {
         // arrage
-        val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
-        val newVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
+        val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1, DynamicRange.SDR)
+        val newVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1, DynamicRange.SDR)
 
         qualityProvider.setVideoQuality(oldVideoQuality)
 
@@ -78,8 +79,8 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_didVideoQualityChange_Should_returnTrueWithDifferentQuality() {
         // arrage
-        val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
-        val newVideoQuality = VideoQuality("id", "label", 456, 123, 123, "dummy", 30.0f, 1, 1)
+        val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1, DynamicRange.SDR)
+        val newVideoQuality = VideoQuality("id", "label", 456, 123, 123, "dummy", 30.0f, 1, 1, DynamicRange.SDR)
 
         qualityProvider.setVideoQuality(oldVideoQuality)
 
@@ -125,8 +126,10 @@ class PlaybackQualityProviderTest {
         // arrange
         // the playing quality reports the actual media bitrate (14097792), which differs from the
         // bitrate the same representation (matched by id) declares in the manifest (4800000)
-        val playingQuality = VideoQuality("1080_4800000", "label", 14097792, -1, 14097792, "avc1.4D4032", 25.0f, 1920, 1080)
-        val manifestQuality = VideoQuality("1080_4800000", "label", 4800000, -1, 4800000, "avc1.42c00d", 25.0f, 1920, 1080)
+        val playingQuality =
+            VideoQuality("1080_4800000", "label", 14097792, -1, 14097792, "avc1.4D4032", 25.0f, 1920, 1080, DynamicRange.SDR)
+        val manifestQuality =
+            VideoQuality("1080_4800000", "label", 4800000, -1, 4800000, "avc1.42c00d", 25.0f, 1920, 1080, DynamicRange.SDR)
         val sourceMock = mockk<Source>(relaxed = true)
         every { sourceMock.availableVideoQualities }.returns(listOf(manifestQuality))
         every { playerMock.source }.returns(sourceMock)
@@ -141,7 +144,8 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentVideoManifestBitrate_Should_fallBackToQualityBitrateWhenNoManifestMatch() {
         // arrange
-        val playingQuality = VideoQuality("only_in_playback", "label", 14097792, -1, 14097792, "avc1.4D4032", 25.0f, 1920, 1080)
+        val playingQuality =
+            VideoQuality("only_in_playback", "label", 14097792, -1, 14097792, "avc1.4D4032", 25.0f, 1920, 1080, DynamicRange.SDR)
         val sourceMock = mockk<Source>(relaxed = true)
         every { sourceMock.availableVideoQualities }.returns(emptyList())
         every { playerMock.source }.returns(sourceMock)
@@ -156,7 +160,7 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentVideoManifestBitrate_Should_fallBackToQualityBitrateWhenNoSource() {
         // arrange
-        val playingQuality = VideoQuality("id", "label", 628000, -1, 628000, "avc1.4D400D", 25.0f, 640, 360)
+        val playingQuality = VideoQuality("id", "label", 628000, -1, 628000, "avc1.4D400D", 25.0f, 640, 360, DynamicRange.SDR)
         every { playerMock.source }.returns(null)
 
         // act
@@ -169,10 +173,11 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_currentVideoManifestBitrate_Should_beResolvedAtCaptureTimeNotReResolvedOnAccess() {
         // arrange: capture the quality while the DASH source is active (id matches -> 4800000)
-        val playingQuality = VideoQuality("1080_4800000", "label", 14097792, -1, 14097792, "avc1.4D4032", 25.0f, 1920, 1080)
+        val playingQuality =
+            VideoQuality("1080_4800000", "label", 14097792, -1, 14097792, "avc1.4D4032", 25.0f, 1920, 1080, DynamicRange.SDR)
         val dashSource = mockk<Source>(relaxed = true)
         every { dashSource.availableVideoQualities }.returns(
-            listOf(VideoQuality("1080_4800000", "label", 4800000, -1, 4800000, "avc1.42c00d", 25.0f, 1920, 1080)),
+            listOf(VideoQuality("1080_4800000", "label", 4800000, -1, 4800000, "avc1.42c00d", 25.0f, 1920, 1080, DynamicRange.SDR)),
         )
         every { playerMock.source }.returns(dashSource)
         qualityProvider.setVideoQuality(playingQuality)
@@ -180,7 +185,7 @@ class PlaybackQualityProviderTest {
         // act: the active source advances to a different source (playlist) where the id no longer matches
         val nextSource = mockk<Source>(relaxed = true)
         every { nextSource.availableVideoQualities }.returns(
-            listOf(VideoQuality("1", "label", 9979760, -1, 9979760, "avc1", 25.0f, 1920, 1080)),
+            listOf(VideoQuality("1", "label", 9979760, -1, 9979760, "avc1", 25.0f, 1920, 1080, DynamicRange.SDR)),
         )
         every { playerMock.source }.returns(nextSource)
 
@@ -191,10 +196,10 @@ class PlaybackQualityProviderTest {
     @Test
     fun test_resetPlaybackQualities_Should_setQualitiesToNull() {
         // arrage
-        val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1)
+        val oldVideoQuality = VideoQuality("id", "label", 123, 123, 123, "dummy", 30.0f, 1, 1, DynamicRange.SDR)
         val oldAudioQuality = AudioQuality("id", "label", 123, 123, 123, "dummy", 2)
 
-        val newVideoQuality = VideoQuality("id2", "label2", 456, 123, 123, "dummy", 30.0f, 1, 1)
+        val newVideoQuality = VideoQuality("id2", "label2", 456, 123, 123, "dummy", 30.0f, 1, 1, DynamicRange.SDR)
         val newAudioQuality = AudioQuality("id2", "label2", 456, 123, 123, "dummy", 2)
 
         // since qualities are null after reset, player will be called for current qualities

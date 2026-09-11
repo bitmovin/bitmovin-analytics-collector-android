@@ -115,12 +115,12 @@ ext {
     desugarJdkLibsVersion = '2.1.5'
 
     // collector dependencies
-    gsonVersion = '2.13.2'
+    gsonVersion = '2.14.0'
     okhttp3Version = '5.3.2'
     appCompatVersion = '1.7.1'
 
     coroutinesVersion = "1.8.1"
-    kotlinxSerialization = "1.6.3" // used for serialization of events in the collector
+    kotlinxSerialization = "1.11.0"
 
     // systemtest and example apps dependencies
     playServicesAdsVersion = '25.3.0'
