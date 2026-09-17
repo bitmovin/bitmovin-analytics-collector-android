@@ -43,6 +43,10 @@ jobs:
 
       - name: Setup Android
         uses: android-actions/setup-android@v4
+        with:
+          # The action defaults to 'tools platform-tools', but the legacy 'tools' package
+          # was removed from Google's SDK repository, which makes `sdkmanager tools` fail.
+          packages: platform-tools
 
       - name: Enable KVM
         run: |
