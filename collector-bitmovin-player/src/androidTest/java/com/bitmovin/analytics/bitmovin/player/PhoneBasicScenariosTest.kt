@@ -1309,9 +1309,10 @@ class PhoneBasicScenariosTest {
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val seeks =
-                impression.eventDataList.filter {
-                    it.state == DataVerifier.SEEKING
-                }.sortedBy { it.sequenceNumber }
+                impression.eventDataList
+                    .filter {
+                        it.state == DataVerifier.SEEKING
+                    }.sortedBy { it.sequenceNumber }
 
             assertThat(seeks).hasSize(2)
 

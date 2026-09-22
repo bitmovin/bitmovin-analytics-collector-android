@@ -70,13 +70,9 @@ object MockedIngress {
         Thread.sleep(2000)
     }
 
-    fun hasNoSamplesReceived(): Boolean {
-        return server.requestCount == 0
-    }
+    fun hasNoSamplesReceived(): Boolean = server.requestCount == 0
 
-    fun requestCount(): Int {
-        return server.requestCount
-    }
+    fun requestCount(): Int = server.requestCount
 
     fun setServerOnline() {
         if (::server.isInitialized) {
@@ -115,16 +111,18 @@ object MockedIngress {
                 }
                 lastRequestReceivedTimestamp = System.currentTimeMillis()
                 when (request.path) {
-                    "/licensing" ->
+                    "/licensing" -> {
                         return if (request.body.readUtf8().contains("nonExistingKey")) {
-                            MockResponse().setResponseCode(403)
+                            MockResponse()
+                                .setResponseCode(403)
                                 .setBody(
                                     """
                                     {"status":"denied","message":"License key not found."}
                                     """.trimIndent(),
                                 )
                         } else {
-                            MockResponse().setResponseCode(200)
+                            MockResponse()
+                                .setResponseCode(200)
                                 .setBody(
                                     """
                                     {
@@ -140,7 +138,11 @@ object MockedIngress {
                                     """.trimIndent(),
                                 )
                         }
-                    "/analytics" -> trackImpressionsIds(request)
+                    }
+
+                    "/analytics" -> {
+                        trackImpressionsIds(request)
+                    }
                 }
                 return MockResponse().setResponseCode(200)
             }
@@ -149,7 +151,8 @@ object MockedIngress {
     private fun sendToRealServer(recordedRequest: RecordedRequest) {
         val body = recordedRequest.body.copy().readUtf8()
         val request =
-            Request.Builder()
+            Request
+                .Builder()
                 .url(backendUrl + recordedRequest.path)
                 .headers(recordedRequest.headers)
                 .post(body.toRequestBody(JSON_CONTENT_TYPE))
@@ -206,7 +209,8 @@ object MockedIngress {
         timeout: Duration,
     ) {
         withTimeoutOrNull(timeout) {
-            runInterruptible(Dispatchers.IO) { // server.takeRequest is blocking
+            runInterruptible(Dispatchers.IO) {
+                // server.takeRequest is blocking
                 generateSequence { server.takeRequest() }
                     .onEach { alreadyTakenRequests.add(it) }
                     .first { it.requestUrl?.encodedPath == encodedPath }
@@ -249,6 +253,7 @@ object MockedIngress {
                         } ?: eventDataMap.put(eventData.impressionId, listOf(eventData))
                     }
                 }
+
                 "/analytics/a" -> {
                     val adEventData =
                         DataSerializerKotlinX.deserialize(
@@ -266,6 +271,7 @@ object MockedIngress {
                         } ?: adEventDataMap.put(adEventData.videoImpressionId, listOf(adEventData))
                     }
                 }
+
                 "/analytics/error" -> {
                     val errorDetail =
                         DataSerializerKotlinX.deserialize(

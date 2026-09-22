@@ -3,7 +3,10 @@
 package com.bitmovin.analytics.bitmovinplayer.example
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.StrictMode
+import android.util.Log
 import android.view.Menu
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +25,7 @@ import com.bitmovin.analytics.api.ssai.SsaiAdPosition
 import com.bitmovin.analytics.bitmovinplayer.example.databinding.ActivityMainBinding
 import com.bitmovin.analytics.enums.CDNProvider
 import com.bitmovin.analytics.test.utils.TestSources
+import com.bitmovin.player.api.ExperimentalBitmovinApi
 import com.bitmovin.player.api.PlaybackConfig
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.PlayerBuilder
@@ -32,7 +36,10 @@ import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdvertisingConfig
 import com.bitmovin.player.api.analytics.AnalyticsApi.Companion.analytics
 import com.bitmovin.player.api.analytics.SourceAnalyticsApi.Companion.analytics
+import com.bitmovin.player.api.buffer.BufferType
 import com.bitmovin.player.api.drm.WidevineConfig
+import com.bitmovin.player.api.live.SourceLiveConfig
+import com.bitmovin.player.api.media.MediaType
 import com.bitmovin.player.api.playlist.PlaylistConfig
 import com.bitmovin.player.api.playlist.PlaylistOptions
 import com.bitmovin.player.api.source.Source
@@ -45,6 +52,34 @@ class MainActivity : AppCompatActivity() {
     private lateinit var player: Player
     private var currentPlaylistItemIndex = 0
 
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    // the effective target playback latency is only provided asynchronously by the player,
+    // so we log the value received for the previous tick
+    private var lastEffectiveTargetPlaybackLatency: Double? = null
+
+    @OptIn(ExperimentalBitmovinApi::class)
+    private val latencyLogger =
+        object : Runnable {
+            override fun run() {
+                val effectiveTarget = lastEffectiveTargetPlaybackLatency
+                player.lowLatency.getTargetPlaybackLatency { lastEffectiveTargetPlaybackLatency = it }
+                val forwardBuffer = player.buffer.getLevel(BufferType.ForwardDuration, MediaType.Video).level
+                Log.d(
+                    LATENCY_LOG_TAG,
+                    "latency: ${player.lowLatency.latency} s, " +
+                        "targetLatency: ${player.lowLatency.targetLatency} s, " +
+                        "targetPlaybackLatency (effective): $effectiveTarget s, " +
+                        "currentTime: ${player.currentTime} s, " +
+                        "timeShift: ${player.timeShift} s, " +
+                        "playbackSpeed: ${player.playbackSpeed}, " +
+                        "forwardBuffer: $forwardBuffer s, " +
+                        "isLive: ${player.isLive}, isPlaying: ${player.isPlaying}, isStalled: ${player.isStalled}",
+                )
+                mainHandler.postDelayed(this, LATENCY_LOG_INTERVAL_MS)
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -52,7 +87,8 @@ class MainActivity : AppCompatActivity() {
         // Policy to verify that main scope is not misused
         // for IO calls
         StrictMode.setThreadPolicy(
-            StrictMode.ThreadPolicy.Builder()
+            StrictMode.ThreadPolicy
+                .Builder()
                 .detectDiskWrites()
                 .detectDiskReads()
                 .detectCustomSlowCalls()
@@ -130,6 +166,21 @@ class MainActivity : AppCompatActivity() {
             this.player.load(drmSource)
         }
 
+        findViewById<Button>(R.id.use_low_latency_source).setOnClickListener {
+            val lowLatencyMetadata =
+                SourceMetadata(
+                    title = "Low Latency Live",
+                    videoId = "lowLatencyLiveVideoId",
+                )
+            val lowLatencySource =
+                SourceBuilder(createLowLatencySourceConfig(targetLatencySeconds = 5.0))
+                    .configureAnalytics(lowLatencyMetadata)
+                    .build()
+
+            this.player.load(lowLatencySource)
+            startLatencyLogging()
+        }
+
         findViewById<Button>(R.id.seek_next_source).setOnClickListener {
             currentPlaylistItemIndex++
             val playListSize = player.playlist.sources.size
@@ -160,7 +211,8 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.ssaiNext).setOnClickListener {
             val metadata =
-                AdMetadata.Builder()
+                AdMetadata
+                    .Builder()
                     .setAdId("adId1")
                     .setAdSystem("adSystem1")
                     .setCustomData(CustomData(customData1 = "ssai1 custom data"))
@@ -236,15 +288,18 @@ class MainActivity : AppCompatActivity() {
         // add metadata to sources
         val liveSimSource =
             SourceBuilder(sourceConfig = SourceConfig.fromUrl(TestSources.DASH_LIVE.mpdUrl!!))
-                .configureAnalytics(liveSimMetadata).build()
+                .configureAnalytics(liveSimMetadata)
+                .build()
 
         val redbullSource =
             SourceBuilder(sourceConfig = SourceConfig.fromUrl(TestSources.HLS_REDBULL.m3u8Url!!))
-                .configureAnalytics(redbullMetadata).build()
+                .configureAnalytics(redbullMetadata)
+                .build()
 
         val sintelSource =
             SourceBuilder(sourceConfig = SourceConfig.fromUrl(TestSources.DASH_SINTEL_WITH_SUBTITLES.mpdUrl!!))
-                .configureAnalytics(sintelMetadata).build()
+                .configureAnalytics(sintelMetadata)
+                .build()
 
         val playlistConfig = PlaylistConfig(listOf(redbullSource, sintelSource, liveSimSource), PlaylistOptions())
         player.load(playlistConfig)
@@ -271,11 +326,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        stopLatencyLogging()
         binding.playerView.onDestroy()
         super.onDestroy()
     }
 
+    private fun startLatencyLogging() {
+        stopLatencyLogging()
+        lastEffectiveTargetPlaybackLatency = null
+        mainHandler.post(latencyLogger)
+    }
+
+    private fun stopLatencyLogging() {
+        mainHandler.removeCallbacks(latencyLogger)
+    }
+
     companion object {
+        private const val LATENCY_LOG_TAG = "LatencyLogger"
+        private const val LATENCY_LOG_INTERVAL_MS = 500L
+
         private val corruptedSource = Source.create(SourceConfig.fromUrl(TestSources.CORRUPT_DASH.mpdUrl!!))
         private val bbbSource = Source.create(SourceConfig.fromUrl(TestSources.BBB.progUrl!!))
         private val progresiveSource = Source.create(SourceConfig.fromUrl(TestSources.PROGRESSIVE.progUrl!!))
@@ -286,6 +355,13 @@ class MainActivity : AppCompatActivity() {
 
             // Attach DRM handling to the source config
             sourceConfig.drmConfig = WidevineConfig(TestSources.DRM_DASH_WIDEVINE.drmLicenseUrl)
+            return sourceConfig
+        }
+
+        private fun createLowLatencySourceConfig(targetLatencySeconds: Double): SourceConfig {
+            val sourceConfig = SourceConfig.fromUrl(TestSources.DASH_LOW_LATENCY_LIVE.mpdUrl!!)
+            // enables low latency playback for this source with the given target latency (in seconds)
+            sourceConfig.liveConfig = SourceLiveConfig(targetLatency = targetLatencySeconds)
             return sourceConfig
         }
 

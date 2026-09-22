@@ -27,8 +27,26 @@ object TestSources {
             596460,
             videoBitrates =
                 listOf(
-                    45373, 88482, 127412, 176780, 216536, 252988, 317328, 368912, 503270, 568500,
-                    771359, 987061, 1174238, 1431232, 2070985, 2384387, 2884382, 3245900, 3493765, 3792491,
+                    45373,
+                    88482,
+                    127412,
+                    176780,
+                    216536,
+                    252988,
+                    317328,
+                    368912,
+                    503270,
+                    568500,
+                    771359,
+                    987061,
+                    1174238,
+                    1431232,
+                    2070985,
+                    2384387,
+                    2884382,
+                    3245900,
+                    3493765,
+                    3792491,
                 ),
         )
 
@@ -57,6 +75,26 @@ object TestSources {
             0,
             // live signal - ladder may change
             videoBitrates = listOf(300000),
+        )
+
+    /**
+     * Low latency live stream (LL-DASH, chunked CMAF) from the DASH-IF livesim2 reference server.
+     * 8s segments with 1s chunks (`chunkdur_1`) and availabilityTimeOffset of 7s (`ato_7`),
+     * MPD-level UTCTiming (`utc_direct`) so the player can measure the latency,
+     * ServiceDescription target latency 3.5s, timeShiftBufferDepth 1min.
+     */
+    val DASH_LOW_LATENCY_LIVE =
+        StreamData(
+            "avc1.",
+            "mp4a.40.2",
+            null,
+            null,
+            "https://livesim2.dashif.org/livesim2/utc_direct/chunkdur_1/ato_7/testpic4_8s/Manifest.mpd",
+            "dash",
+            true,
+            0,
+            // live signal - ladder may change
+            videoBitrates = listOf(303780, 603844, 1203833),
         )
 
     /**

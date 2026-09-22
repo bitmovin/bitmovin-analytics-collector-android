@@ -4,6 +4,8 @@ import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.adapters.PlayerEventReporter
 import com.bitmovin.analytics.bitmovin.player.BitmovinPlayerExceptionMapper
 import com.bitmovin.analytics.bitmovin.player.BitmovinUtil
+import com.bitmovin.analytics.bitmovin.player.player.LatencyMeter
+import com.bitmovin.analytics.bitmovin.player.player.LiveLatencyTracker
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
 import com.bitmovin.analytics.bitmovin.player.player.getCurrentPlayerActivity
 import com.bitmovin.analytics.dtos.ErrorCode
@@ -36,7 +38,9 @@ internal class AnalyticsEventListeners(
     private val playerEventReporter: PlayerEventReporter,
     private val playbackQualityProvider: PlaybackQualityProvider,
     private val downloadSpeedMeter: DownloadSpeedMeter,
+    private val latencyMeter: LatencyMeter,
 ) {
+    private val liveLatencyTracker = LiveLatencyTracker(player, latencyMeter)
     private val exceptionMapper: ExceptionMapper<ErrorEvent> = BitmovinPlayerExceptionMapper()
     private var totalDroppedVideoFrames = 0
 
@@ -106,6 +110,7 @@ internal class AnalyticsEventListeners(
         player.off(::onPlayerEventTimeChanged)
         player.off(::onPlayerEventPlaylistTransition)
         runCatching { player.off(::onPlayerEventRetryPlaybackAttempt) }
+        liveLatencyTracker.release()
     }
 
     fun getAndResetDroppedFrames(): Int {
@@ -118,6 +123,7 @@ internal class AnalyticsEventListeners(
         overrideCurrentSource = null
         totalDroppedVideoFrames = 0
         drmDownloadTime = null
+        liveLatencyTracker.resetSourceRelatedState()
     }
 
     private fun onSourceEventSourceLoaded(
@@ -209,6 +215,7 @@ internal class AnalyticsEventListeners(
             }
 
             playerEventReporter.onTimeUpdate()
+            liveLatencyTracker.onTimeChanged()
         } catch (e: Exception) {
             BitmovinLog.e(TAG, e.message, e)
         }

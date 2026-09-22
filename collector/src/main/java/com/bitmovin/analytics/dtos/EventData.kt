@@ -87,6 +87,8 @@ data class EventData(
     var videoStartFailedReason: String? = null,
     var isProgramChange: Boolean? = null,
     var downloadSpeedInfo: DownloadSpeedInfo? = null,
+    // Live latency information, only set on playing samples of live streams (see [LatencyInfo])
+    var latencyInfo: LatencyInfo? = null,
     var retryCount: Int = 0,
     val player: String,
     var playerKey: String? = null,

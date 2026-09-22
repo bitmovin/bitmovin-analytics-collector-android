@@ -10,6 +10,10 @@ object EventDataUtils {
         // since they are non deterministic and would probably make the test flaky
         result.removeAll { x -> x.state?.lowercase() == DataVerifier.QUALITYCHANGE }
         result.removeAll { x -> x.state?.lowercase() == DataVerifier.BUFFERING }
+
+        // on startup there is a race condition, where sometimes the player emits an audiotrack change
+        // event after startup. filtering it helps to make the tests less flaky
+        result.removeAll { x -> x.state?.lowercase() == DataVerifier.AUDIOTRACKCHANGE }
         return result
     }
 
@@ -20,7 +24,6 @@ object EventDataUtils {
      * @return EventData
      * @throws NoSuchElementException if there is no startup event in the list
      */
-    fun getStartupEvent(eventDataList: MutableList<EventData>): EventData {
-        return eventDataList.first { x -> x.state?.lowercase() == DataVerifier.STARTUP }
-    }
+    fun getStartupEvent(eventDataList: MutableList<EventData>): EventData =
+        eventDataList.first { x -> x.state?.lowercase() == DataVerifier.STARTUP }
 }

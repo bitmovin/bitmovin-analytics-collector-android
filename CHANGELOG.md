@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+- Tracking of live latency for the bitmovin player. Latency is only tracked if there is a targetLatency configured on the player or can be derived from the manifest.
+
 ## v3.34.0
 
 ### Changed

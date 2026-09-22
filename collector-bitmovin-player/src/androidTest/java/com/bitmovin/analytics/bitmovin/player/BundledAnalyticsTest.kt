@@ -752,14 +752,12 @@ class BundledAnalyticsTest {
             DataVerifier.verifyHasNoErrorSamples(impression2)
 
             val samplesBeforeCustomDataChange =
-                impression1.eventDataList.filter {
-                        x ->
+                impression1.eventDataList.filter { x ->
                     x.customData1 != "setOnSource1"
                 }
 
             val samplesAfterCustomDataChange =
-                impression1.eventDataList.filter {
-                        x ->
+                impression1.eventDataList.filter { x ->
                     x.customData1 == "setOnSource1"
                 }
 
@@ -842,14 +840,12 @@ class BundledAnalyticsTest {
             DataVerifier.verifyHasNoErrorSamples(impression2)
 
             val samplesBeforeCustomDataChange =
-                impression1.eventDataList.filter {
-                        x ->
+                impression1.eventDataList.filter { x ->
                     x.customData1 != "setOnSource1"
                 }
 
             val samplesAfterCustomDataChange =
-                impression1.eventDataList.filter {
-                        x ->
+                impression1.eventDataList.filter { x ->
                     x.customData1 == "setOnSource1"
                 }
 
@@ -1315,9 +1311,10 @@ class BundledAnalyticsTest {
             DataVerifier.verifyHasNoErrorSamples(impression)
 
             val seeks =
-                impression.eventDataList.filter {
-                    it.state == DataVerifier.SEEKING
-                }.sortedBy { it.sequenceNumber }
+                impression.eventDataList
+                    .filter {
+                        it.state == DataVerifier.SEEKING
+                    }.sortedBy { it.sequenceNumber }
 
             assertThat(seeks).hasSize(2)
 

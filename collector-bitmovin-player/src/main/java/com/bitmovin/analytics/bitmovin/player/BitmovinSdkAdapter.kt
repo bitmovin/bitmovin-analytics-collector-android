@@ -12,6 +12,7 @@ import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.features.BitmovinHttpRequestTrackingAdapter
 import com.bitmovin.analytics.bitmovin.player.listeners.AnalyticsEventListeners
 import com.bitmovin.analytics.bitmovin.player.manipulators.PlaybackEventDataManipulator
+import com.bitmovin.analytics.bitmovin.player.player.LatencyMeter
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
 import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.bitmovin.player.player.attachCollector
@@ -58,6 +59,7 @@ internal class BitmovinSdkAdapter(
         looper,
     ) {
     private val downloadSpeedMeter = DownloadSpeedMeter()
+    private val latencyMeter = LatencyMeter()
 
     private val eventListeners: AnalyticsEventListeners by lazy {
         AnalyticsEventListeners(
@@ -66,6 +68,7 @@ internal class BitmovinSdkAdapter(
             playerEventReporter = playerEventReporter,
             playbackQualityProvider = playbackQualityProvider,
             downloadSpeedMeter = downloadSpeedMeter,
+            latencyMeter = latencyMeter,
         )
     }
 
@@ -81,6 +84,7 @@ internal class BitmovinSdkAdapter(
                 playbackQualityProvider = playbackQualityProvider,
                 playerLicenseProvider = playerLicenseProvider,
                 downloadSpeedMeter = downloadSpeedMeter,
+                latencyMeter = latencyMeter,
             ),
         )
     }
@@ -126,9 +130,7 @@ internal class BitmovinSdkAdapter(
         ssaiService.resetSourceRelatedState()
     }
 
-    override fun createAdAdapter(): AdAdapter {
-        return BitmovinSdkAdAdapter(player)
-    }
+    override fun createAdAdapter(): AdAdapter = BitmovinSdkAdAdapter(player)
 
     override fun getCurrentSourceMetadata(): SourceMetadata {
         val activeSourceForSample = currentSource

@@ -13,6 +13,7 @@ import com.bitmovin.analytics.dtos.HttpRequest
 import com.bitmovin.analytics.enums.StreamFormat
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
+import org.assertj.core.api.Assertions.within
 
 object DataVerifier {
     const val QUALITYCHANGE = "qualitychange"
@@ -21,6 +22,7 @@ object DataVerifier {
     const val SEEKING = "seeking"
     const val PLAYING = "playing"
     const val PAUSE = "pause"
+    const val AUDIOTRACKCHANGE = "audiotrackchange"
 
     private const val MIN_AVG_BANDWIDTH_IN_KBPS = 128f // ~128 kbps
     private const val MAX_AVG_BANDWIDTH_IN_KBPS = 600 * 1024f // ~600 Mbps
@@ -670,6 +672,38 @@ object DataVerifier {
         verifyAtLeastOneSampleHasState(eventDataList, PLAYING)
     }
 
+    fun verifyLatencyInfoIsNotTracked(eventDataList: List<EventData>) {
+        assertThat(eventDataList).allMatch { x ->
+            x.latencyInfo == null
+        }
+    }
+
+    fun verifyLatencyInfoIsTracked(
+        eventDataList: List<EventData>,
+        expectedTargetLatency: Long? = null,
+    ) {
+        // if a playing sample is very short it could be that we don't track the latency
+        // given that it is triggered by time changed
+        val playingSamples = eventDataList.filter { x -> x.played > 350 }
+        playingSamples.forEach {
+            assertThat(it.latencyInfo).isNotNull
+            assertThat(it.latencyInfo!!.avgLatency).isGreaterThan(0)
+
+            // avg latency delta can also be negative
+            assertThat(it.latencyInfo!!.avgLatencyDelta).isNotEqualTo(0)
+
+            if (expectedTargetLatency == null) {
+                assertThat(it.latencyInfo!!.targetLatency).isGreaterThan(0)
+            } else {
+                assertThat(it.latencyInfo!!.targetLatency).isEqualTo(expectedTargetLatency)
+                // the delta is averaged per measurement and converted to ms separately from the
+                // average latency, so both can be off by one ms due to truncation
+                val expectedDeltaLatency = it.latencyInfo!!.avgLatency - (expectedTargetLatency)
+                assertThat(it.latencyInfo!!.avgLatencyDelta).isCloseTo(expectedDeltaLatency, within(1L))
+            }
+        }
+    }
+
     fun verifyMpdSourceUrl(
         eventDataList: MutableList<EventData>,
         expectedMpdSourceUrl: String,
@@ -713,9 +747,11 @@ object DataVerifier {
         if (startIndex == -1) return mutableListOf()
 
         val endIndex =
-            eventDataList.subList(startIndex, eventDataList.size).indexOfFirst {
-                it.adIndex == adIndex + 1 || it.ad != 2
-            }.let { if (it == -1) eventDataList.size else startIndex + it }
+            eventDataList
+                .subList(startIndex, eventDataList.size)
+                .indexOfFirst {
+                    it.adIndex == adIndex + 1 || it.ad != 2
+                }.let { if (it == -1) eventDataList.size else startIndex + it }
 
         return eventDataList.subList(startIndex, endIndex)
     }

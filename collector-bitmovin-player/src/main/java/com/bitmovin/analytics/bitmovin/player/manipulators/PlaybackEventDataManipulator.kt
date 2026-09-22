@@ -3,6 +3,7 @@ package com.bitmovin.analytics.bitmovin.player.manipulators
 import com.bitmovin.analytics.adapters.PlayerContext
 import com.bitmovin.analytics.bitmovin.player.BitmovinSdkAdapter
 import com.bitmovin.analytics.bitmovin.player.BitmovinUtil
+import com.bitmovin.analytics.bitmovin.player.player.LatencyMeter
 import com.bitmovin.analytics.bitmovin.player.player.PlaybackQualityProvider
 import com.bitmovin.analytics.bitmovin.player.player.PlayerLicenseProvider
 import com.bitmovin.analytics.data.manipulators.EventDataManipulator
@@ -10,6 +11,7 @@ import com.bitmovin.analytics.dtos.EventData
 import com.bitmovin.analytics.enums.CastTech
 import com.bitmovin.analytics.enums.DRMType
 import com.bitmovin.analytics.enums.StreamFormat
+import com.bitmovin.analytics.stateMachines.PlayerStates
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.DownloadSpeedMeter
 import com.bitmovin.analytics.utils.Util
@@ -25,6 +27,7 @@ internal class PlaybackEventDataManipulator(
     private val playbackQualityProvider: PlaybackQualityProvider,
     private val playerLicenseProvider: PlayerLicenseProvider,
     private val downloadSpeedMeter: DownloadSpeedMeter,
+    private val latencyMeter: LatencyMeter,
 ) : EventDataManipulator {
     @Suppress("DEPRECATION") // player.subtitle and player.audio are deprecated in newer Bitmovin Player SDK versions
     override fun manipulate(data: EventData) {
@@ -67,12 +70,20 @@ internal class PlaybackEventDataManipulator(
                     data.streamFormat = StreamFormat.PROGRESSIVE.value
                 }
 
-                SourceType.Smooth -> data.streamFormat = StreamFormat.SMOOTH.value
+                SourceType.Smooth -> {
+                    data.streamFormat = StreamFormat.SMOOTH.value
+                }
             }
             val drmConfig = sourceConfig.drmConfig
             when {
-                drmConfig is WidevineConfig -> data.drmType = DRMType.WIDEVINE.value
-                drmConfig is ClearKeyConfig -> data.drmType = DRMType.CLEARKEY.value
+                drmConfig is WidevineConfig -> {
+                    data.drmType = DRMType.WIDEVINE.value
+                }
+
+                drmConfig is ClearKeyConfig -> {
+                    data.drmType = DRMType.CLEARKEY.value
+                }
+
                 drmConfig != null -> {
                     BitmovinLog.d(TAG, "Warning: unknown DRM Type " + drmConfig.javaClass.simpleName)
                 }
@@ -117,7 +128,20 @@ internal class PlaybackEventDataManipulator(
         }
 
         data.downloadSpeedInfo = downloadSpeedMeter.getInfoAndReset()
+
+        setLiveLatency(data)
         data.playerKey = playerLicenseProvider.getBitmovinPlayerLicenseKey(player.config)
+    }
+
+    // Latency is only meaningful while the player is actively playing a live stream at the live edge,
+    // so it is only reported on playing samples (the meter itself drops time shifted measurements).
+    // The meter is reset on every sample so measurements never leak from one interval (or state) into the next.
+    // TODO: this should be moved into the core adapter (and statemachine shouldn't be leaked)
+    private fun setLiveLatency(data: EventData) {
+        val latencyInfo = latencyMeter.getInfoAndReset()
+        if (adapter.stateMachine.currentState == PlayerStates.PLAYING) {
+            data.latencyInfo = latencyInfo
+        }
     }
 
     companion object {
