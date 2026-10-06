@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     working_directory: ~/code
@@ -49,7 +49,6 @@ jobs:
           path: collector-theoplayer/build/test-results
 
 workflows:
-  version: 2
   android-build:
     jobs:
       - build:
