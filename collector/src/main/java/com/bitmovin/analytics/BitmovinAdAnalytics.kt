@@ -92,6 +92,8 @@ class BitmovinAdAnalytics(
         // affected users in terms of waiting for the ad/video to start
         if (playerAdapter?.stateMachine?.isStartupFinished == false && elapsedTimeAtPlayEventTemp != null) {
             elapsedTimeAtAdStartupTemp = elapsedTimeAtPlayEventTemp
+            // only the first ad of a pre-roll pod waits on PLAY, later ads start when the previous ad ends
+            this.elapsedTimeAtPlayEvent = null
         }
 
         adSample.adStartupTime = if (elapsedTimeAtAdStartupTemp != null) Util.elapsedTime - elapsedTimeAtAdStartupTemp else null
