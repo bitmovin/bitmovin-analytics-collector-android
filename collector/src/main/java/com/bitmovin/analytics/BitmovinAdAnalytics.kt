@@ -71,7 +71,8 @@ class BitmovinAdAnalytics(
     // which is time between PLAY event and adStarted
     // compared to adBreakStarted -> adStarted for other cases
     override fun onPlayEvent() {
-        if (playerAdapter?.stateMachine?.isStartupFinished == false) {
+        // a PLAY inside the break is a resume, not the viewer's start
+        if (playerAdapter?.stateMachine?.isStartupFinished == false && this.activeAdBreak == null) {
             this.elapsedTimeAtPlayEvent = Util.elapsedTime
         }
     }

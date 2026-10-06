@@ -67,6 +67,31 @@ class BitmovinAdAnalyticsTest {
     }
 
     @Test
+    fun `pre-roll pod ignores a PLAY from resuming the first ad`() {
+        val firstAd = Ad(isLinear = true, id = "ad-1", duration = 15_000)
+        val secondAd = Ad(isLinear = true, id = "ad-2", duration = 15_000)
+        val adBreak = AdBreak(id = "pre-roll", ads = listOf(firstAd, secondAd))
+
+        now = 1_000
+        adAnalytics.onPlayEvent()
+        now = 1_500
+        adAnalytics.onAdBreakStarted(adBreak)
+        now = 3_000
+        adAnalytics.onAdStarted(firstAd)
+        now = 5_000
+        adAnalytics.onPlayEvent()
+        now = 18_000
+        adAnalytics.onAdFinished()
+        now = 18_100
+        adAnalytics.onAdStarted(secondAd)
+        now = 33_100
+        adAnalytics.onAdFinished()
+
+        assertThat(sentSamples.map { it.adPodPosition to it.adStartupTime })
+            .containsExactly(0 to 2_000L, 1 to 100L)
+    }
+
+    @Test
     fun `mid-roll pod measures the first ad from the break start and later ads from the previous ad's end`() {
         every { playerAdapter.stateMachine.isStartupFinished } returns true
         val firstAd = Ad(isLinear = true, id = "ad-1", duration = 15_000)
