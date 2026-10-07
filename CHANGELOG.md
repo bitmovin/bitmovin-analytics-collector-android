@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+- Ad startup time of the 2nd and later ads in a pre-roll ad pod was measured from the PLAY event instead of from the end of the previous ad, and so included the duration of all earlier ads in the pod
+
 ## v3.35.0
 
 ### Added

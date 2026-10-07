@@ -1,5 +1,6 @@
 package com.bitmovin.analytics.bitmovin.player
 
+import android.util.Log
 import android.widget.LinearLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -7,6 +8,7 @@ import com.bitmovin.analytics.api.AnalyticsConfig
 import com.bitmovin.analytics.api.SourceMetadata
 import com.bitmovin.analytics.bitmovin.player.api.IBitmovinPlayerCollector
 import com.bitmovin.analytics.data.persistence.EventDatabaseTestHelper
+import com.bitmovin.analytics.test.utils.AdEventDataForTest
 import com.bitmovin.analytics.test.utils.CsaiDataVerifier
 import com.bitmovin.analytics.test.utils.DataVerifier
 import com.bitmovin.analytics.test.utils.EventDataUtils
@@ -1162,15 +1164,21 @@ class CsaiScenariosTest {
                     object : Dispatcher() {
                         override fun dispatch(request: RecordedRequest): MockResponse =
                             when {
-                                request.path?.startsWith("/vast") == true ->
+                                request.path?.startsWith("/vast") == true -> {
                                     MockResponse().setResponseCode(200).setBody(vastXml)
-                                request.path?.endsWith(".m3u8") == true ->
-                                    MockResponse().setResponseCode(200)
+                                }
+
+                                request.path?.endsWith(".m3u8") == true -> {
+                                    MockResponse()
+                                        .setResponseCode(200)
                                         .addHeader("Content-Type", "application/x-mpegURL")
                                         .setBody(hlsPlaylist)
-                                else ->
+                                }
+
+                                else -> {
                                     // Segment returns 404 - fails when IMA tries to play
                                     MockResponse().setResponseCode(404)
+                                }
                             }
                     }
 
@@ -1212,4 +1220,108 @@ class CsaiScenariosTest {
                 adServer.shutdown()
             }
         }
+
+    @Test
+    fun test_vodWithVastPreRollPod_secondAdStartupTimeExcludesFirstAd() =
+        runBlockingTest {
+            val adSamples = playVastPodOf2sAds(position = "pre", contentPlayedToMs = 2000)
+
+            assertThat(adSamples.map { it.adPosition }).containsOnly("pre")
+            // the 2nd ad's startup time must not contain the 1st ad's 2 s of playback
+            assertThat(adSamples[1].adStartupTime).isBetween(1, AD_DURATION_MS - 1)
+        }
+
+    @Test
+    fun test_vodWithVastMidRollPod_secondAdStartupTimeExcludesFirstAd() =
+        runBlockingTest {
+            val adSamples = playVastPodOf2sAds(position = "3", contentPlayedToMs = 6000)
+
+            assertThat(adSamples.map { it.adPosition }).containsOnly("mid")
+            assertThat(adSamples[0].adStartupTime).isBetween(1, AD_DURATION_MS - 1)
+            assertThat(adSamples[1].adStartupTime).isBetween(1, AD_DURATION_MS - 1)
+        }
+
+    // Plays a VAST 3 pod of two 2 s ads and returns its ad samples ordered by pod position
+    private suspend fun playVastPodOf2sAds(
+        position: String,
+        contentPlayedToMs: Long,
+    ): List<AdEventDataForTest> {
+        val adServer = MockWebServer()
+        try {
+            adServer.start()
+            val vastAd = { id: String, sequence: Int ->
+                """
+                <Ad id="$id" sequence="$sequence">
+                  <InLine>
+                    <AdSystem>Test</AdSystem>
+                    <AdTitle>$id</AdTitle>
+                    <Impression><![CDATA[]]></Impression>
+                    <Creatives>
+                      <Creative>
+                        <Linear>
+                          <Duration>00:00:02</Duration>
+                          <MediaFiles>
+                            <MediaFile type="video/mp4" width="640" height="360" delivery="progressive">
+                              <![CDATA[${progressiveAdSource.tag}]]>
+                            </MediaFile>
+                          </MediaFiles>
+                        </Linear>
+                      </Creative>
+                    </Creatives>
+                  </InLine>
+                </Ad>
+                """
+            }
+            val vastXml =
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <VAST version="3.0">
+                ${vastAd("pod-ad-1", 1)}
+                ${vastAd("pod-ad-2", 2)}
+                </VAST>
+                """.trimIndent()
+            adServer.dispatcher =
+                object : Dispatcher() {
+                    // IMA requests the VAST from a WebView, which needs CORS headers on the response
+                    override fun dispatch(request: RecordedRequest): MockResponse =
+                        MockResponse()
+                            .setResponseCode(200)
+                            .addHeader("Content-Type", "application/xml")
+                            .addHeader("Access-Control-Allow-Origin", request.getHeader("Origin") ?: "*")
+                            .addHeader("Access-Control-Allow-Credentials", "true")
+                            .setBody(vastXml)
+                }
+
+            val imaAdSource = AdSource(AdSourceType.Ima, adServer.url("/vast").toString())
+            val localPlayer = createPlayer(AdvertisingConfig(AdItem(position, imaAdSource)))
+
+            withContext(mainScope.coroutineContext) {
+                localPlayer.load(defaultSource)
+            }
+
+            PlaybackUtils.waitUntil("ad break started") { localPlayer.isAd }
+            BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, contentPlayedToMs)
+
+            withContext(mainScope.coroutineContext) {
+                localPlayer.pause()
+            }
+            Thread.sleep(500)
+
+            val impression = MockedIngress.waitForRequestsAndExtractImpressions().single()
+            val adSamples = impression.adEventDataList.sortedBy { it.adPodPosition }
+            adSamples.forEach {
+                Log.i("AN-5915", "position=${it.adPosition} adPodPosition=${it.adPodPosition} adStartupTime=${it.adStartupTime} ms")
+            }
+
+            assertThat(adSamples.map { it.adPodPosition }).containsExactly(0, 1)
+            adSamples.forEach { CsaiDataVerifier.verifyFullyPlayedAd(it) }
+            return adSamples
+        } finally {
+            adServer.shutdown()
+        }
+    }
+
+    companion object {
+        private const val AD_DURATION_MS = 2000L
+    }
 }

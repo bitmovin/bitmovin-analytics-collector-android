@@ -71,7 +71,8 @@ class BitmovinAdAnalytics(
     // which is time between PLAY event and adStarted
     // compared to adBreakStarted -> adStarted for other cases
     override fun onPlayEvent() {
-        if (playerAdapter?.stateMachine?.isStartupFinished == false) {
+        // a PLAY inside the break is a resume, not the viewer's start
+        if (playerAdapter?.stateMachine?.isStartupFinished == false && this.activeAdBreak == null) {
             this.elapsedTimeAtPlayEvent = Util.elapsedTime
         }
     }
@@ -92,6 +93,8 @@ class BitmovinAdAnalytics(
         // affected users in terms of waiting for the ad/video to start
         if (playerAdapter?.stateMachine?.isStartupFinished == false && elapsedTimeAtPlayEventTemp != null) {
             elapsedTimeAtAdStartupTemp = elapsedTimeAtPlayEventTemp
+            // only the first ad of a pre-roll pod waits on PLAY, later ads start when the previous ad ends
+            this.elapsedTimeAtPlayEvent = null
         }
 
         adSample.adStartupTime = if (elapsedTimeAtAdStartupTemp != null) Util.elapsedTime - elapsedTimeAtAdStartupTemp else null
