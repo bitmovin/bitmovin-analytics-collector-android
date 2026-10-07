@@ -75,6 +75,7 @@ jobs:
         if: always()
         with:
           name: test-results-${{ matrix.module }}
+          overwrite: true
           path: ${{ matrix.module }}/build/outputs/androidTest-results/managedDevice/debug/pixel6api36/
 
       - name: Upload Test Reports - ${{ matrix.module }}
@@ -82,6 +83,7 @@ jobs:
         if: always()
         with:
           name: test-reports-${{ matrix.module }}
+          overwrite: true
           path: ${{ matrix.module }}/build/reports/androidTests/managedDevice/debug/pixel6api36/
 
   report:
