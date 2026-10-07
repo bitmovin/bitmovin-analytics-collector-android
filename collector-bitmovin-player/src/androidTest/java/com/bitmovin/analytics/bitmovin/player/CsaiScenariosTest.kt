@@ -1164,15 +1164,21 @@ class CsaiScenariosTest {
                     object : Dispatcher() {
                         override fun dispatch(request: RecordedRequest): MockResponse =
                             when {
-                                request.path?.startsWith("/vast") == true ->
+                                request.path?.startsWith("/vast") == true -> {
                                     MockResponse().setResponseCode(200).setBody(vastXml)
-                                request.path?.endsWith(".m3u8") == true ->
-                                    MockResponse().setResponseCode(200)
+                                }
+
+                                request.path?.endsWith(".m3u8") == true -> {
+                                    MockResponse()
+                                        .setResponseCode(200)
                                         .addHeader("Content-Type", "application/x-mpegURL")
                                         .setBody(hlsPlaylist)
-                                else ->
+                                }
+
+                                else -> {
                                     // Segment returns 404 - fails when IMA tries to play
                                     MockResponse().setResponseCode(404)
+                                }
                             }
                     }
 
