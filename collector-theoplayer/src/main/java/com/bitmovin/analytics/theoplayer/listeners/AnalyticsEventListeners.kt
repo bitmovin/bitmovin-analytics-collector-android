@@ -51,10 +51,9 @@ internal class AnalyticsEventListeners(
     private var lastUpdatedPositionMs = 0L
 
     @Volatile
-    private var awaitingPlayingAfterSeek = false
+    private var awaitingPlaying = false
 
-    @Volatile
-    private var positionAfterSeekMs: Long? = null
+    private val playbackProgressDetector = PlaybackProgressDetector()
 
     // Event listener references for registration and unregistration
     private val playListener = EventListener<PlayEvent> { event -> handlePlayEvent(event) }
@@ -158,6 +157,7 @@ internal class AnalyticsEventListeners(
 
     private fun handlePlayEvent(playEvent: PlayEvent) {
         BitmovinLog.d(TAG, "Event: PlayEvent")
+        startAwaitingPlaying()
         // Startup is only initiated once per session; the reporter guards against duplicate startups.
         playerEventReporter.onPlay(Util.secondsToMillis(playEvent.currentTime))
     }
@@ -181,14 +181,13 @@ internal class AnalyticsEventListeners(
         // and not the original position it was seeked from, therefore
         // we use a workaround and just use the last updated position
         val positionBeforeSeek = lastUpdatedPositionMs
-        awaitingPlayingAfterSeek = true
-        positionAfterSeekMs = null
+        startAwaitingPlaying()
         playerEventReporter.onSeekStarted(positionBeforeSeek)
     }
 
     private fun handlePlayingEvent(playingEvent: PlayingEvent) {
         BitmovinLog.d(TAG, "Event: PlayingEvent")
-        awaitingPlayingAfterSeek = false
+        awaitingPlaying = false
         playerEventReporter.onPlaying(player.currentPositionInMs())
     }
 
@@ -199,26 +198,34 @@ internal class AnalyticsEventListeners(
 
     private fun onPause(pauseEvent: PauseEvent) {
         BitmovinLog.d(TAG, "Event: PauseEvent")
-        awaitingPlayingAfterSeek = false
+        awaitingPlaying = false
         playerEventReporter.onPause(player.currentPositionInMs())
     }
 
     private fun handleTimeUpdateEvent(timeUpdateEvent: TimeUpdateEvent) {
         val positionMs = Util.secondsToMillis(timeUpdateEvent.currentTime)
         lastUpdatedPositionMs = positionMs
-        recoverFromSeekWithoutPlaying(positionMs)
+        recoverFromMissingPlaying(timeUpdateEvent.date.time, positionMs)
         playerEventReporter.onTimeUpdate()
     }
 
-    // AN-5942: some seeks end without a PLAYING event, which left the collector in SEEKING for hours
-    private fun recoverFromSeekWithoutPlaying(positionMs: Long) {
-        if (!awaitingPlayingAfterSeek || player.isSeeking || player.isPaused) return
+    private fun startAwaitingPlaying() {
+        awaitingPlaying = true
+        playbackProgressDetector.reset()
+    }
 
-        val baselineMs = positionAfterSeekMs
-        if (baselineMs == null) {
-            positionAfterSeekMs = positionMs
-        } else if (positionMs > baselineMs) {
-            awaitingPlayingAfterSeek = false
+    // AN-5942: THEOplayer sometimes omits PLAYING after a play or seek, which left the collector sending no samples
+    private fun recoverFromMissingPlaying(
+        eventTimeMs: Long,
+        positionMs: Long,
+    ) {
+        if (!awaitingPlaying) return
+        if (player.isSeeking || player.isPaused) {
+            playbackProgressDetector.reset()
+            return
+        }
+        if (playbackProgressDetector.hasPlaybackProgressed(eventTimeMs, positionMs)) {
+            awaitingPlaying = false
             playerEventReporter.onPlaying(positionMs)
         }
     }

@@ -2,6 +2,7 @@ package com.bitmovin.analytics.theoplayer.listeners
 
 import com.bitmovin.analytics.adapters.PlayerEventReporter
 import com.theoplayer.android.api.event.EventListener
+import com.theoplayer.android.api.event.player.PlayEvent
 import com.theoplayer.android.api.event.player.PlayerEventTypes
 import com.theoplayer.android.api.event.player.PlayingEvent
 import com.theoplayer.android.api.event.player.SeekedEvent
@@ -16,10 +17,12 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
+import java.util.Date
 
 class AnalyticsEventListenersTest {
     private val player = mockk<Player>(relaxed = true)
     private val reporter = mockk<PlayerEventReporter>(relaxed = true)
+    private val playListener = slot<EventListener<PlayEvent>>()
     private val seekingListener = slot<EventListener<SeekingEvent>>()
     private val seekedListener = slot<EventListener<SeekedEvent>>()
     private val playingListener = slot<EventListener<PlayingEvent>>()
@@ -27,6 +30,7 @@ class AnalyticsEventListenersTest {
 
     @Before
     fun setup() {
+        every { player.addEventListener(PlayerEventTypes.PLAY, capture(playListener)) } just Runs
         every { player.addEventListener(PlayerEventTypes.SEEKING, capture(seekingListener)) } just Runs
         every { player.addEventListener(PlayerEventTypes.SEEKED, capture(seekedListener)) } just Runs
         every { player.addEventListener(PlayerEventTypes.PLAYING, capture(playingListener)) } just Runs
@@ -40,10 +44,30 @@ class AnalyticsEventListenersTest {
     fun `playhead advancing after a seek without a PLAYING event reports playing`() {
         seek()
 
-        timeUpdate(10.0)
-        timeUpdate(10.5)
+        timeUpdate(10.0, atMs = 0)
+        timeUpdate(10.25, atMs = 250)
 
-        verify(exactly = 1) { reporter.onPlaying(10_500) }
+        verify(exactly = 1) { reporter.onPlaying(10_250) }
+    }
+
+    @Test
+    fun `playhead advancing after PLAY without a PLAYING event reports playing`() {
+        playListener.captured.handleEvent(mockk<PlayEvent>(relaxed = true))
+
+        timeUpdate(0.0, atMs = 0)
+        timeUpdate(0.25, atMs = 250)
+
+        verify(exactly = 1) { reporter.onPlaying(250) }
+    }
+
+    @Test
+    fun `a playhead jump after a seek does not report playing`() {
+        seek()
+
+        timeUpdate(10.0, atMs = 0)
+        timeUpdate(40.0, atMs = 250)
+
+        verify(exactly = 0) { reporter.onPlaying(any()) }
     }
 
     @Test
@@ -51,8 +75,8 @@ class AnalyticsEventListenersTest {
         every { player.isSeeking } returns true
         seekingListener.captured.handleEvent(mockk<SeekingEvent>(relaxed = true))
 
-        timeUpdate(10.0)
-        timeUpdate(10.5)
+        timeUpdate(10.0, atMs = 0)
+        timeUpdate(10.25, atMs = 250)
 
         verify(exactly = 0) { reporter.onPlaying(any()) }
     }
@@ -62,8 +86,8 @@ class AnalyticsEventListenersTest {
         seek()
         every { player.isPaused } returns true
 
-        timeUpdate(10.0)
-        timeUpdate(10.5)
+        timeUpdate(10.0, atMs = 0)
+        timeUpdate(10.25, atMs = 250)
 
         verify(exactly = 0) { reporter.onPlaying(any()) }
     }
@@ -74,8 +98,8 @@ class AnalyticsEventListenersTest {
         every { player.currentTime } returns 10.0
         playingListener.captured.handleEvent(mockk<PlayingEvent>(relaxed = true))
 
-        timeUpdate(10.0)
-        timeUpdate(10.5)
+        timeUpdate(10.0, atMs = 0)
+        timeUpdate(10.25, atMs = 250)
 
         verify(exactly = 1) { reporter.onPlaying(any()) }
     }
@@ -87,8 +111,16 @@ class AnalyticsEventListenersTest {
         seekedListener.captured.handleEvent(mockk<SeekedEvent>(relaxed = true))
     }
 
-    private fun timeUpdate(seconds: Double) {
+    private fun timeUpdate(
+        seconds: Double,
+        atMs: Long,
+    ) {
         every { player.currentTime } returns seconds
-        timeUpdateListener.captured.handleEvent(mockk<TimeUpdateEvent> { every { currentTime } returns seconds })
+        timeUpdateListener.captured.handleEvent(
+            mockk<TimeUpdateEvent> {
+                every { currentTime } returns seconds
+                every { date } returns Date(atMs)
+            },
+        )
     }
 }
