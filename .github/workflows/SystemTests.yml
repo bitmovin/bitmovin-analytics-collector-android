@@ -60,14 +60,39 @@ jobs:
           gradle-version: wrapper
           cache-read-only: false
 
+      # authorize-s3-bucket adds this runner's IP with a read-modify-write of the bucket policy, so
+      # matrix jobs calling it in the same second can overwrite each other's IP. Verify and retry.
       - name: Allow access to Test Sources
         env:
           S3_AUTHORIZE_KEY: ${{ secrets.S3_AUTHORIZE_KEY }}
-        run: | 
-          curl --ipv4 "https://authorize-s3-bucket-52499724934.europe-west1.run.app/?key=$S3_AUTHORIZE_KEY"
+        run: |
+          probe="https://bitmovin-player-eu-west1-ci-input.s3.amazonaws.com/general/aom/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8"
+          for attempt in 1 2 3 4 5 6; do
+            curl -sS --ipv4 "https://authorize-s3-bucket-52499724934.europe-west1.run.app/?key=$S3_AUTHORIZE_KEY" || true
+            echo
+            sleep 10
+            status=$(curl -s --ipv4 -o /dev/null -w '%{http_code}' "$probe" || true)
+            if [ "$status" = "200" ]; then
+              echo "Test sources reachable (attempt $attempt)"
+              exit 0
+            fi
+            echo "Test sources returned HTTP $status (attempt $attempt), re-authorizing"
+            sleep $((RANDOM % 15))
+          done
+          echo "::error::S3 test bucket still denies this runner after 6 attempts"
+          exit 1
 
       - name: Run Tests - ${{ matrix.module }}
+        env:
+          S3_AUTHORIZE_KEY: ${{ secrets.S3_AUTHORIZE_KEY }}
         run: |
+          # re-authorize every 5 minutes in case another job's policy write drops this runner's IP
+          (while true; do
+            sleep 300
+            curl -s --ipv4 -o /dev/null "https://authorize-s3-bucket-52499724934.europe-west1.run.app/?key=$S3_AUTHORIZE_KEY" || true
+          done) &
+          reauthorize=$!
+          trap 'kill $reauthorize' EXIT
           ./gradlew :${{ matrix.module }}:pixel6api36DebugAndroidTest
 
       - name: Upload Test Results - ${{ matrix.module }}
