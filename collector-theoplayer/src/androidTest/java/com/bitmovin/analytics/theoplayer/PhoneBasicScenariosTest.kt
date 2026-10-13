@@ -166,7 +166,8 @@ class PhoneBasicScenariosTest {
         defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
 
         val playerConfig =
-            THEOplayerConfig.Builder()
+            THEOplayerConfig
+                .Builder()
                 .license(TheoPlayerTestUtils.TESTING_LICENSE) // empty license for testing
                 .build()
 
@@ -487,7 +488,6 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
-    @Test
     fun test_vodDash_seekWithinBuffer_returnsToPlaying() {
         runBlockingTest {
             withContext(mainScope.coroutineContext) {
@@ -622,6 +622,7 @@ class PhoneBasicScenariosTest {
         assertThat(sampleAfterSeek.played).isGreaterThan(1500)
     }
 
+    @Test
     fun test_vodDash_playQualityChangePlay() {
         runBlockingTest {
             withContext(mainScope.coroutineContext) {
@@ -1101,10 +1102,8 @@ class PhoneBasicScenariosTest {
                                 com.theoplayer.android.api.source.drm.KeySystemConfiguration
                                     .Builder(sample.drmLicenseUrl!!)
                                     .build(),
-                            )
-                            .build(),
-                    )
-                    .build()
+                            ).build(),
+                    ).build()
 
             val drmSourceDescription =
                 SourceDescription

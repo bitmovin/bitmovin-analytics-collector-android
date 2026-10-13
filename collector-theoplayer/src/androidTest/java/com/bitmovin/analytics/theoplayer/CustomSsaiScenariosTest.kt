@@ -66,7 +66,8 @@ class CustomSsaiScenariosTest {
         mockedIngressUrl = MockedIngress.startServer()
 
         val playerConfig =
-            THEOplayerConfig.Builder()
+            THEOplayerConfig
+                .Builder()
                 .license(TheoPlayerTestUtils.TESTING_LICENSE)
                 .build()
 
@@ -254,7 +255,6 @@ class CustomSsaiScenariosTest {
         }
 
     @Test
-    @Test
     fun test_customSsai_seekDuringAd_returnsToPlaying() =
         runBlockingTest {
             attachCollectorAndWaitUntilSsaiReady()
@@ -287,6 +287,7 @@ class CustomSsaiScenariosTest {
             assertThat(sampleAfterSeek.played).isGreaterThan(1500)
         }
 
+    @Test
     fun test_customSsai_midRollAdBreak_hasContentSamplesBeforeAndAfterAd() =
         runBlockingTest {
             // arrange + act
