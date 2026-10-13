@@ -14,6 +14,7 @@ import com.bitmovin.analytics.test.utils.TestSources
 import com.bitmovin.analytics.test.utils.TestSources.DASH_SINTEL_WITH_SUBTITLES
 import com.bitmovin.analytics.test.utils.runBlockingTest
 import com.bitmovin.analytics.theoplayer.api.ITHEOplayerCollector
+import com.bitmovin.analytics.theoplayer.player.currentPositionInMs
 import com.theoplayer.android.api.THEOplayerConfig
 import com.theoplayer.android.api.THEOplayerView
 import com.theoplayer.android.api.event.player.PlayerEventTypes
@@ -486,6 +487,141 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    @Test
+    fun test_vodDash_seekWithinBuffer_returnsToPlaying() {
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                player.isAutoplay = true
+                val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+                collector.sourceMetadata = defaultSourceMetadata
+                collector.attachPlayer(player)
+                player.source = defaultDashSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
+
+            withContext(mainScope.coroutineContext) {
+                // already buffered, so the seek does not stall
+                player.currentTime = 3.00
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 7000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(300)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(1)
+
+            val eventDataList = impressions.first().eventDataList
+            val seekIndex = eventDataList.indexOfLast { it.state == "seeking" }
+            assertThat(seekIndex).isGreaterThanOrEqualTo(0)
+            assertThat(eventDataList[seekIndex].seeked).isLessThan(2000)
+
+            val sampleAfterSeek = eventDataList[seekIndex + 1]
+            assertThat(sampleAfterSeek.state).isEqualTo("playing")
+            assertThat(sampleAfterSeek.played).isGreaterThan(2000)
+        }
+    }
+
+    @Test
+    fun test_liveStream_seekBackWithinBuffer_returnsToPlaying() {
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                player.isAutoplay = true
+                val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+                collector.sourceMetadata = liveSourceMetadata
+                collector.attachPlayer(player)
+                player.source = liveSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerIsPlaying(player)
+            val startMs = withContext(mainScope.coroutineContext) { player.currentPositionInMs() }
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, startMs + 4000)
+
+            val seekFromMs =
+                withContext(mainScope.coroutineContext) {
+                    val positionMs = player.currentPositionInMs()
+                    player.currentTime = (positionMs - 2000) / 1000.0
+                    positionMs
+                }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, seekFromMs + 2000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(300)
+
+            assertLastSeekIsFollowedByPlaying()
+        }
+    }
+
+    @Test
+    fun test_liveStream_seekToLiveEdge_returnsToPlaying() {
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                player.isAutoplay = true
+                val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+                collector.sourceMetadata = liveSourceMetadata
+                collector.attachPlayer(player)
+                player.source = liveSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerIsPlaying(player)
+            val startMs = withContext(mainScope.coroutineContext) { player.currentPositionInMs() }
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, startMs + 2000)
+
+            val behindLiveMs =
+                withContext(mainScope.coroutineContext) {
+                    val positionMs = player.currentPositionInMs() - 10_000
+                    player.currentTime = positionMs / 1000.0
+                    positionMs
+                }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, behindLiveMs + 3000)
+
+            val liveEdgeMs =
+                withContext(mainScope.coroutineContext) {
+                    val seekable = player.seekable
+                    val liveEdgeSeconds = seekable.getEnd(seekable.length() - 1)
+                    player.currentTime = liveEdgeSeconds
+                    (liveEdgeSeconds * 1000).toLong()
+                }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, liveEdgeMs + 3000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(300)
+
+            assertLastSeekIsFollowedByPlaying()
+        }
+    }
+
+    private fun assertLastSeekIsFollowedByPlaying() {
+        val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+        assertThat(impressions).hasSize(1)
+
+        val eventDataList = impressions.first().eventDataList
+        val seekIndex = eventDataList.indexOfLast { it.state == "seeking" }
+        assertThat(seekIndex).isGreaterThanOrEqualTo(0)
+        assertThat(eventDataList[seekIndex].seeked).isLessThan(5000)
+
+        val sampleAfterSeek = eventDataList[seekIndex + 1]
+        assertThat(sampleAfterSeek.state).isEqualTo("playing")
+        assertThat(sampleAfterSeek.played).isGreaterThan(1500)
+    }
+
     fun test_vodDash_playQualityChangePlay() {
         runBlockingTest {
             withContext(mainScope.coroutineContext) {

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+- THEOplayer: the collector could stay in the seeking state when a seek ended without a PLAYING event, which stopped playback samples and dropped the ad index of SSAI ads played meanwhile
+
 ## v3.35.1
 
 ### Fixed

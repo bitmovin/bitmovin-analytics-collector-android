@@ -50,6 +50,12 @@ internal class AnalyticsEventListeners(
     @Volatile
     private var lastUpdatedPositionMs = 0L
 
+    @Volatile
+    private var awaitingPlayingAfterSeek = false
+
+    @Volatile
+    private var positionAfterSeekMs: Long? = null
+
     // Event listener references for registration and unregistration
     private val playListener = EventListener<PlayEvent> { event -> handlePlayEvent(event) }
     private val playingListener = EventListener<PlayingEvent> { event -> handlePlayingEvent(event) }
@@ -175,11 +181,14 @@ internal class AnalyticsEventListeners(
         // and not the original position it was seeked from, therefore
         // we use a workaround and just use the last updated position
         val positionBeforeSeek = lastUpdatedPositionMs
+        awaitingPlayingAfterSeek = true
+        positionAfterSeekMs = null
         playerEventReporter.onSeekStarted(positionBeforeSeek)
     }
 
     private fun handlePlayingEvent(playingEvent: PlayingEvent) {
         BitmovinLog.d(TAG, "Event: PlayingEvent")
+        awaitingPlayingAfterSeek = false
         playerEventReporter.onPlaying(player.currentPositionInMs())
     }
 
@@ -190,12 +199,28 @@ internal class AnalyticsEventListeners(
 
     private fun onPause(pauseEvent: PauseEvent) {
         BitmovinLog.d(TAG, "Event: PauseEvent")
+        awaitingPlayingAfterSeek = false
         playerEventReporter.onPause(player.currentPositionInMs())
     }
 
     private fun handleTimeUpdateEvent(timeUpdateEvent: TimeUpdateEvent) {
-        lastUpdatedPositionMs = Util.secondsToMillis(timeUpdateEvent.currentTime)
+        val positionMs = Util.secondsToMillis(timeUpdateEvent.currentTime)
+        lastUpdatedPositionMs = positionMs
+        recoverFromSeekWithoutPlaying(positionMs)
         playerEventReporter.onTimeUpdate()
+    }
+
+    // AN-5942: some seeks end without a PLAYING event, which left the collector in SEEKING for hours
+    private fun recoverFromSeekWithoutPlaying(positionMs: Long) {
+        if (!awaitingPlayingAfterSeek || player.isSeeking || player.isPaused) return
+
+        val baselineMs = positionAfterSeekMs
+        if (baselineMs == null) {
+            positionAfterSeekMs = positionMs
+        } else if (positionMs > baselineMs) {
+            awaitingPlayingAfterSeek = false
+            playerEventReporter.onPlaying(positionMs)
+        }
     }
 
     private fun onBuffering(waitingEvent: WaitingEvent) {

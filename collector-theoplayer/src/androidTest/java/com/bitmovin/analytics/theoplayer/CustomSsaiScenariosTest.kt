@@ -254,6 +254,39 @@ class CustomSsaiScenariosTest {
         }
 
     @Test
+    @Test
+    fun test_customSsai_seekDuringAd_returnsToPlaying() =
+        runBlockingTest {
+            attachCollectorAndWaitUntilSsaiReady()
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 3000)
+
+            ssaiIntegration.beginOpenAdBreak(timeOffset = 0)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
+
+            withContext(mainScope.coroutineContext) {
+                player.currentTime = 3.5
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 6000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+            Thread.sleep(300)
+
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(1)
+
+            val eventDataList = impressionList.first().eventDataList
+            val seekIndex = eventDataList.indexOfLast { it.state == "seeking" }
+            assertThat(seekIndex).isGreaterThanOrEqualTo(0)
+            assertThat(eventDataList[seekIndex].seeked).isLessThan(5000)
+
+            val sampleAfterSeek = eventDataList[seekIndex + 1]
+            assertThat(sampleAfterSeek.state).isEqualTo("playing")
+            assertThat(sampleAfterSeek.played).isGreaterThan(1500)
+        }
+
     fun test_customSsai_midRollAdBreak_hasContentSamplesBeforeAndAfterAd() =
         runBlockingTest {
             // arrange + act
