@@ -623,6 +623,131 @@ class PhoneBasicScenariosTest {
     }
 
     @Test
+    fun test_vodDash_missingPlayingEvent_completesStartup() {
+        runBlockingTest {
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                player.isAutoplay = true
+                val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+                collector.sourceMetadata = defaultSourceMetadata
+                collector.attachPlayer(PlayerWithSuppressedPlayingEvents(player))
+                player.source = defaultDashSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(300)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(1)
+
+            val eventDataList = impressions.first().eventDataList
+            assertThat(eventDataList.first().state).isEqualTo("startup")
+            assertThat(eventDataList.first().videoStartupTime).isGreaterThan(0)
+            assertThat(eventDataList.none { it.videoStartFailed }).isTrue
+            assertThat(eventDataList.sumOf { it.played }).isGreaterThan(2500)
+        }
+    }
+
+    @Test
+    fun test_vodDash_missingPlayingEventAfterSeek_returnsToPlaying() {
+        runBlockingTest {
+            val playerWithoutPlaying = PlayerWithSuppressedPlayingEvents(player).apply { suppressPlaying = false }
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                player.isAutoplay = true
+                val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+                collector.sourceMetadata = defaultSourceMetadata
+                collector.attachPlayer(playerWithoutPlaying)
+                player.source = defaultDashSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
+
+            playerWithoutPlaying.suppressPlaying = true
+            withContext(mainScope.coroutineContext) {
+                player.currentTime = 3.00
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 7000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(300)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(1)
+
+            val eventDataList = impressions.first().eventDataList
+            val seekIndex = eventDataList.indexOfLast { it.state == "seeking" }
+            assertThat(seekIndex).isGreaterThanOrEqualTo(0)
+            assertThat(eventDataList[seekIndex].seeked).isLessThan(2000)
+            assertThat(eventDataList).hasSizeGreaterThan(seekIndex + 1)
+
+            val sampleAfterSeek = eventDataList[seekIndex + 1]
+            assertThat(sampleAfterSeek.state).isEqualTo("playing")
+            assertThat(sampleAfterSeek.played).isGreaterThan(2000)
+        }
+    }
+
+    @Test
+    fun test_vodDash_missingPlayingEventAfterPausedSeek_staysPausedUntilPlaybackResumes() {
+        runBlockingTest {
+            val playerWithoutPlaying = PlayerWithSuppressedPlayingEvents(player).apply { suppressPlaying = false }
+            withContext(mainScope.coroutineContext) {
+                player.useLowestRendition()
+                player.isAutoplay = true
+                val collector = ITHEOplayerCollector.create(appContext, defaultAnalyticsConfig)
+                collector.sourceMetadata = defaultSourceMetadata
+                collector.attachPlayer(playerWithoutPlaying)
+                player.source = defaultDashSourceDescription
+            }
+
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
+
+            playerWithoutPlaying.suppressPlaying = true
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+                player.currentTime = 3.00
+            }
+            Thread.sleep(2000)
+
+            withContext(mainScope.coroutineContext) {
+                player.play()
+            }
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 6000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+
+            Thread.sleep(300)
+
+            val impressions = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressions).hasSize(1)
+
+            val eventDataList = impressions.first().eventDataList
+            val seekIndex = eventDataList.indexOfLast { it.state == "seeking" }
+            assertThat(seekIndex).isGreaterThanOrEqualTo(0)
+            assertThat(eventDataList).hasSizeGreaterThan(seekIndex + 2)
+
+            val pausedAfterSeek = eventDataList[seekIndex + 1]
+            assertThat(pausedAfterSeek.state).isEqualTo("pause")
+            assertThat(pausedAfterSeek.paused).isGreaterThan(1500)
+
+            val playingAfterResume = eventDataList[seekIndex + 2]
+            assertThat(playingAfterResume.state).isEqualTo("playing")
+            assertThat(playingAfterResume.played).isGreaterThan(1500)
+        }
+    }
+
+    @Test
     fun test_vodDash_playQualityChangePlay() {
         runBlockingTest {
             withContext(mainScope.coroutineContext) {

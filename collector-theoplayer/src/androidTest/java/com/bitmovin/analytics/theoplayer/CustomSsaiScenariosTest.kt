@@ -99,7 +99,10 @@ class CustomSsaiScenariosTest {
      * Creates and attaches a collector, registers the custom SSAI integration on the player and
      * waits until the integration is ready to drive ad breaks. Shared by every scenario.
      */
-    private suspend fun attachCollectorAndWaitUntilSsaiReady(ssaiEngagementTrackingEnabled: Boolean = true) {
+    private suspend fun attachCollectorAndWaitUntilSsaiReady(
+        ssaiEngagementTrackingEnabled: Boolean = true,
+        collectedPlayer: Player = player,
+    ) {
         val analyticsConfig =
             TestConfig.createAnalyticsConfig(
                 backendUrl = mockedIngressUrl,
@@ -108,7 +111,7 @@ class CustomSsaiScenariosTest {
         withContext(mainScope.coroutineContext) {
             val collector = ITHEOplayerCollector.create(appContext, analyticsConfig, defaultMetadata)
             collector.sourceMetadata = defaultSourceMetadata
-            collector.attachPlayer(player)
+            collector.attachPlayer(collectedPlayer)
             player.isAutoplay = true
         }
         ssaiIntegration.register(player, contentUrl, contentType)
@@ -285,6 +288,38 @@ class CustomSsaiScenariosTest {
             val sampleAfterSeek = eventDataList[seekIndex + 1]
             assertThat(sampleAfterSeek.state).isEqualTo("playing")
             assertThat(sampleAfterSeek.played).isGreaterThan(1500)
+        }
+
+    @Test
+    fun test_customSsai_missingPlayingEventAfterSeek_everyAdHasAnAdIndexSample() =
+        runBlockingTest {
+            val playerWithoutPlaying = PlayerWithSuppressedPlayingEvents(player).apply { suppressPlaying = false }
+            attachCollectorAndWaitUntilSsaiReady(collectedPlayer = playerWithoutPlaying)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4000)
+
+            playerWithoutPlaying.suppressPlaying = true
+            withContext(mainScope.coroutineContext) {
+                player.currentTime = 3.0
+            }
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 4500)
+
+            ssaiIntegration.playAdBreak(timeOffset = 0, adCount = 3)
+            TheoPlayerPlaybackUtils.waitUntilPlayerHasPlayedToMs(player, 12000)
+
+            withContext(mainScope.coroutineContext) {
+                player.pause()
+            }
+            Thread.sleep(300)
+
+            val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+            assertThat(impressionList).hasSize(1)
+            val impression = impressionList.first()
+
+            val adIndicesInAdTable = impression.adEventDataList.map { it.adIndex }
+            assertThat(adIndicesInAdTable).containsExactly(0, 1, 2)
+
+            val adIndicesInPlaybackTable = impression.eventDataList.mapNotNull { it.adIndex }
+            assertThat(adIndicesInPlaybackTable).containsExactly(0, 1, 2)
         }
 
     @Test
