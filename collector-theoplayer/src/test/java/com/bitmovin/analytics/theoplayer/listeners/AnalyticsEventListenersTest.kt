@@ -104,6 +104,24 @@ class AnalyticsEventListenersTest {
         verify(exactly = 1) { reporter.onPlaying(any()) }
     }
 
+    @Test
+    fun `rapid short seeks do not report playing until playback resumes`() {
+        seek()
+        timeUpdate(10.0, atMs = 0)
+        seek()
+        timeUpdate(10.3, atMs = 200)
+        seek()
+        timeUpdate(10.6, atMs = 400)
+        seek()
+        timeUpdate(10.9, atMs = 600)
+
+        verify(exactly = 0) { reporter.onPlaying(any()) }
+
+        timeUpdate(11.25, atMs = 850)
+
+        verify(exactly = 1) { reporter.onPlaying(11_250) }
+    }
+
     private fun seek() {
         every { player.isSeeking } returns true
         seekingListener.captured.handleEvent(mockk<SeekingEvent>(relaxed = true))
