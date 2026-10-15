@@ -50,6 +50,11 @@ internal class AnalyticsEventListeners(
     @Volatile
     private var lastUpdatedPositionMs = 0L
 
+    @Volatile
+    private var awaitingPlaying = false
+
+    private val playbackProgressDetector = PlaybackProgressDetector()
+
     // Event listener references for registration and unregistration
     private val playListener = EventListener<PlayEvent> { event -> handlePlayEvent(event) }
     private val playingListener = EventListener<PlayingEvent> { event -> handlePlayingEvent(event) }
@@ -152,6 +157,7 @@ internal class AnalyticsEventListeners(
 
     private fun handlePlayEvent(playEvent: PlayEvent) {
         BitmovinLog.d(TAG, "Event: PlayEvent")
+        startAwaitingPlaying()
         // Startup is only initiated once per session; the reporter guards against duplicate startups.
         playerEventReporter.onPlay(Util.secondsToMillis(playEvent.currentTime))
     }
@@ -175,11 +181,13 @@ internal class AnalyticsEventListeners(
         // and not the original position it was seeked from, therefore
         // we use a workaround and just use the last updated position
         val positionBeforeSeek = lastUpdatedPositionMs
+        startAwaitingPlaying()
         playerEventReporter.onSeekStarted(positionBeforeSeek)
     }
 
     private fun handlePlayingEvent(playingEvent: PlayingEvent) {
         BitmovinLog.d(TAG, "Event: PlayingEvent")
+        awaitingPlaying = false
         playerEventReporter.onPlaying(player.currentPositionInMs())
     }
 
@@ -190,12 +198,36 @@ internal class AnalyticsEventListeners(
 
     private fun onPause(pauseEvent: PauseEvent) {
         BitmovinLog.d(TAG, "Event: PauseEvent")
+        awaitingPlaying = false
         playerEventReporter.onPause(player.currentPositionInMs())
     }
 
     private fun handleTimeUpdateEvent(timeUpdateEvent: TimeUpdateEvent) {
-        lastUpdatedPositionMs = Util.secondsToMillis(timeUpdateEvent.currentTime)
+        val positionMs = Util.secondsToMillis(timeUpdateEvent.currentTime)
+        lastUpdatedPositionMs = positionMs
+        recoverFromMissingPlaying(timeUpdateEvent.date.time, positionMs)
         playerEventReporter.onTimeUpdate()
+    }
+
+    private fun startAwaitingPlaying() {
+        awaitingPlaying = true
+        playbackProgressDetector.reset()
+    }
+
+    // AN-5942: THEOplayer sometimes omits PLAYING after a play or seek, which left the collector sending no samples
+    private fun recoverFromMissingPlaying(
+        eventTimeMs: Long,
+        positionMs: Long,
+    ) {
+        if (!awaitingPlaying) return
+        if (player.isSeeking || player.isPaused) {
+            playbackProgressDetector.reset()
+            return
+        }
+        if (playbackProgressDetector.hasPlaybackProgressed(eventTimeMs, positionMs)) {
+            awaitingPlaying = false
+            playerEventReporter.onPlaying(positionMs)
+        }
     }
 
     private fun onBuffering(waitingEvent: WaitingEvent) {
