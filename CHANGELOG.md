@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Fixed
+- Samples created before the license response were dropped when the collector was detached before it arrived, e.g. an exit before video start right after creating the player
+
 ## v3.35.2
 
 ### Fixed
