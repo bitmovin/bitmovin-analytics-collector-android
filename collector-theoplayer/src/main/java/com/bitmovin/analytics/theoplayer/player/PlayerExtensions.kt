@@ -13,30 +13,25 @@ import java.lang.Double.isFinite
 import kotlin.Boolean
 import kotlin.Long
 
-// This is similar how it is tracked in the conviva adapter
+// Same rule as THEOplayer's conviva connector (ConvivaHandler.getPlayerState)
 internal fun Player.isPlaying(): Boolean {
-    if (this.isPaused && this.isEnded) {
+    if (this.isPaused || this.isEnded) {
         return false
     }
 
     return this.readyState >= ReadyState.HAVE_FUTURE_DATA
 }
 
-internal fun Player.currentPositionInMs(): Long {
-    return Util.secondsToMillis(this.currentTime)
-}
+internal fun Player.currentPositionInMs(): Long = Util.secondsToMillis(this.currentTime)
 
-internal fun Player.isLiveStream(): Boolean? {
-    return if (!this.duration.isNaN()) {
+internal fun Player.isLiveStream(): Boolean? =
+    if (!this.duration.isNaN()) {
         !isFinite(this.duration)
     } else {
         null
     }
-}
 
-internal fun Player.getActiveSource(): TypedSource? {
-    return this.source?.sources?.firstOrNull()
-}
+internal fun Player.getActiveSource(): TypedSource? = this.source?.sources?.firstOrNull()
 
 internal fun Player.getDrmType(): String? {
     val drmConfig = this.getActiveSource()?.drm
