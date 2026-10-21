@@ -71,13 +71,21 @@ internal class BitmovinSdkAdAdapter(
     private val playerEventAdErrorListener: (PlayerEvent.AdError) -> Unit = method@{ event ->
         try {
             BitmovinLog.d(TAG, "On Ad Error")
-            val adConf = event.adConfig ?: return@method
+            val adConf = event.adConfig
+            if (adConf != null) {
+                observableSupport.notify {
+                    it.onAdError(
+                        adBreakMapper.fromPlayerAdConfiguration(adConf),
+                        event.code,
+                        event.message,
+                    )
+                }
+                return@method
+            }
+            // no ad item: the player's "Ad break not loaded" (2001) that follows an already reported load error
+            val adItem = event.adItem ?: return@method
             observableSupport.notify {
-                it.onAdError(
-                    adBreakMapper.fromPlayerAdConfiguration(adConf),
-                    event.code,
-                    event.message,
-                )
+                it.onAdLoadError(adBreakMapper.fromPlayerAdItem(adItem), event.code, event.message)
             }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "On Ad Error", e)

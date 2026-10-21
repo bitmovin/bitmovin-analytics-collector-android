@@ -5,6 +5,9 @@ package com.bitmovin.analytics.bitmovin.player.utils
 import com.bitmovin.analytics.ads.AdPosition
 import com.bitmovin.player.api.advertising.AdBreak
 import com.bitmovin.player.api.advertising.AdConfig
+import com.bitmovin.player.api.advertising.AdItem
+import com.bitmovin.player.api.advertising.AdSource
+import com.bitmovin.player.api.advertising.AdSourceType
 import com.bitmovin.player.api.advertising.AdTag
 import com.bitmovin.player.api.advertising.AdTagType
 import com.bitmovin.player.api.advertising.ima.ImaAdBreak
@@ -105,6 +108,43 @@ class AdBreakMapperTest {
         `when`(imaAdBreak.position).thenReturn("00:10:00.000")
         collectorAdBreak = adBreakMapper.fromPlayerAdConfiguration(imaAdBreak)
         assertThat(collectorAdBreak.position).isEqualTo(AdPosition.MID)
+    }
+
+    @Test
+    fun fromPlayerAdItemShouldSetTheLastSourceAndScheduleOfTheAdItem() {
+        val adItem =
+            AdItem(
+                sources =
+                    arrayOf(
+                        AdSource(AdSourceType.Bitmovin, "https://ads.example.com/first.xml"),
+                        AdSource(AdSourceType.Bitmovin, "https://ads.example.com/fallback.xml"),
+                    ),
+                position = "25%",
+                replaceContentDuration = TEN_SECONDS,
+                preloadOffset = TEN_SECONDS,
+            )
+
+        val collectorAdBreak = adBreakMapper.fromPlayerAdItem(adItem)
+
+        assertThat(collectorAdBreak.id).isEqualTo("notset")
+        assertThat(collectorAdBreak.ads).isEmpty()
+        assertThat(collectorAdBreak.tagUrl).isEqualTo("https://ads.example.com/fallback.xml")
+        assertThat(collectorAdBreak.fallbackIndex).isEqualTo(1)
+        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.MID)
+        assertThat(collectorAdBreak.offset).isEqualTo("25%")
+        assertThat(collectorAdBreak.replaceContentDuration).isEqualTo(TEN_SECONDS_IN_MS)
+        assertThat(collectorAdBreak.preloadOffset).isEqualTo(TEN_SECONDS_IN_MS)
+    }
+
+    @Test
+    fun fromPlayerAdItemPreRollShouldNotSetAnOffset() {
+        val adItem = AdItem("pre", AdSource(AdSourceType.Bitmovin, "https://ads.example.com/first.xml"))
+
+        val collectorAdBreak = adBreakMapper.fromPlayerAdItem(adItem)
+
+        assertThat(collectorAdBreak.position).isEqualTo(AdPosition.PRE)
+        assertThat(collectorAdBreak.offset).isNull()
+        assertThat(collectorAdBreak.fallbackIndex).isEqualTo(0)
     }
 
     companion object {

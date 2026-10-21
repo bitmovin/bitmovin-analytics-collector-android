@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - THEOplayer: a paused or ended player was treated as playing when its buffer was filled, so heartbeat samples could continue if the PAUSE event was missed
+- [AN-5906] Bitmovin Player: an ad that failed to load (for example an empty, unparseable, failed or timed-out VAST response) was dropped. It is now sent as one ad sample that is not started, with the player's error code and message
 
 ## v3.35.2
 

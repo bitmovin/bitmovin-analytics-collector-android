@@ -7,6 +7,7 @@ import com.bitmovin.analytics.bitmovin.player.BitmovinUtil
 import com.bitmovin.analytics.utils.secondsToMillisecondsLong
 import com.bitmovin.player.api.advertising.AdBreakConfig
 import com.bitmovin.player.api.advertising.AdConfig
+import com.bitmovin.player.api.advertising.AdItem
 import com.bitmovin.player.api.advertising.ima.ImaAdBreak
 import java.util.ArrayList
 
@@ -17,6 +18,24 @@ internal class AdBreakMapper {
         fromPlayerAdConfiguration(collectorAdBreak, adConfig)
 
         return collectorAdBreak
+    }
+
+    fun fromPlayerAdItem(adItem: AdItem): AdBreak {
+        val position = BitmovinUtil.getAdPositionFromPlayerPosition(adItem.position)
+        return AdBreak(
+            id = "notset",
+            ads = emptyList(),
+            position = position,
+            offset = if (position == AdPosition.MID) adItem.position else null,
+            replaceContentDuration = adItem.replaceContentDuration.secondsToMillisecondsLong(),
+            preloadOffset = adItem.preloadOffset.secondsToMillisecondsLong(),
+            // the player reports a load error only once its waterfall is exhausted, so the last source failed
+            tagUrl = adItem.sources.lastOrNull()?.tag,
+            fallbackIndex =
+                adItem.sources.lastIndex
+                    .coerceAtLeast(0)
+                    .toLong(),
+        )
     }
 
     private fun fromPlayerAdConfiguration(

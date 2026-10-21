@@ -4,6 +4,7 @@ import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.PlayerAdapter
 import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.ads.AdBreak
+import com.bitmovin.analytics.ads.AdPosition
 import com.bitmovin.analytics.dtos.AdEventData
 import com.bitmovin.analytics.utils.Util
 import io.mockk.every
@@ -32,6 +33,7 @@ class BitmovinAdAnalyticsTest {
         every { playerAdapter.stateMachine.isStartupFinished } returns false
         every { playerAdapter.createEventDataForAdSample() } answers { TestFactory.createEventData() }
         every { analytics.sendAdEventData(capture(sentSamples)) } returns Unit
+        every { analytics.config.errorTransformerCallback } returns null
 
         adAnalytics = BitmovinAdAnalytics(analytics)
         adAnalytics.attachAdapter(playerAdapter, adAdapter)
@@ -113,5 +115,51 @@ class BitmovinAdAnalyticsTest {
         verify(exactly = 2) { analytics.sendAdEventData(any()) }
         assertThat(sentSamples.map { it.adPodPosition to it.adStartupTime })
             .containsExactly(0 to 400L, 1 to 250L)
+    }
+
+    @Test
+    fun `ad that fails to load is sent as one unstarted error sample`() {
+        val failedBreak =
+            AdBreak(
+                id = "notset",
+                ads = emptyList(),
+                position = AdPosition.PRE,
+                tagUrl = "https://ads.example.com/vast.xml",
+                fallbackIndex = 1,
+            )
+
+        adAnalytics.onAdLoadError(failedBreak, 303, "No ads")
+
+        assertThat(sentSamples).hasSize(1)
+        val sample = sentSamples.single()
+        assertThat(sample.started).isEqualTo(0L)
+        assertThat(sample.completed).isEqualTo(0L)
+        assertThat(sample.errorCode).isEqualTo(303)
+        assertThat(sample.errorMessage).isEqualTo("No ads")
+        assertThat(sample.adTagUrl).isEqualTo("https://ads.example.com/vast.xml")
+        assertThat(sample.adPosition).isEqualTo("pre")
+        assertThat(sample.adFallbackIndex).isEqualTo(1L)
+        assertThat(sample.adImpressionId).isNotNull()
+    }
+
+    @Test
+    fun `ad that fails to load while another ad plays leaves the playing ad's sample untouched`() {
+        every { playerAdapter.stateMachine.isStartupFinished } returns true
+        val playingAd = Ad(isLinear = true, id = "ad-1", duration = 15_000)
+        val playingBreak = AdBreak(id = "mid-roll", ads = listOf(playingAd))
+
+        now = 100_000
+        adAnalytics.onAdBreakStarted(playingBreak)
+        now = 100_400
+        adAnalytics.onAdStarted(playingAd)
+        now = 105_000
+        adAnalytics.onAdLoadError(AdBreak(id = "notset", ads = emptyList()), 1008, "Timeout")
+        now = 115_400
+        adAnalytics.onAdFinished()
+
+        assertThat(sentSamples.map { Triple(it.started, it.completed, it.errorCode) })
+            .containsExactly(Triple(0L, 0L, 1008), Triple(1L, 1L, null))
+        assertThat(sentSamples[1].adStartupTime).isEqualTo(400L)
+        assertThat(sentSamples[0].adImpressionId).isNotEqualTo(sentSamples[1].adImpressionId)
     }
 }

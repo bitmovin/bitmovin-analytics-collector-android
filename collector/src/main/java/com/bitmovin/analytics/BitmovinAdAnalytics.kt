@@ -146,6 +146,27 @@ class BitmovinAdAnalytics(
             adSample.errorPercentage = Util.calculatePercentage(adSample.errorPosition, adSample.ad.duration, true)
         }
 
+        this.setError(adSample, code, message)
+        this.completeAd(adBreak, adSample, adSample.errorPosition ?: 0)
+    }
+
+    // the failed ad never started, so an ad playing meanwhile keeps its own sample and timers
+    override fun onAdLoadError(
+        adBreak: AdBreak,
+        code: Int,
+        message: String?,
+    ) {
+        val adSample = AdSample(Util.uUID)
+        this.setError(adSample, code, message)
+        this.setExitPosition(adSample, 0)
+        this.sendAnalyticsRequest(adBreak, adSample)
+    }
+
+    private fun setError(
+        adSample: AdSample,
+        code: Int,
+        message: String?,
+    ) {
         val errorCode = ErrorCode(code, message ?: "", ErrorData())
         val transformedError =
             ErrorTransformationHelper.transformErrorWithUserCallback(
@@ -157,7 +178,6 @@ class BitmovinAdAnalytics(
         adSample.errorCode = transformedError.errorCode
         adSample.errorMessage = transformedError.message
         adSample.errorSeverity = transformedError.errorSeverity
-        this.completeAd(adBreak, adSample, adSample.errorPosition ?: 0)
     }
 
     override fun onAdManifestLoaded(
@@ -232,14 +252,21 @@ class BitmovinAdAnalytics(
         adSample: AdSample,
         exitPosition: Long? = 0,
     ) {
-        adSample.exitPosition = exitPosition
-        adSample.timePlayed = exitPosition
-        adSample.playPercentage = Util.calculatePercentage(adSample.timePlayed, adSample.ad.duration, true)
+        this.setExitPosition(adSample, exitPosition)
 
         // reset elapsedTimeAtAdStartup for the next ad, in case there are multiple ads in one ad break
         this.elapsedTimeAtAdStartup = Util.elapsedTime
         this.isPlaying = false
         this.sendAnalyticsRequest(adBreak, adSample)
+    }
+
+    private fun setExitPosition(
+        adSample: AdSample,
+        exitPosition: Long?,
+    ) {
+        adSample.exitPosition = exitPosition
+        adSample.timePlayed = exitPosition
+        adSample.playPercentage = Util.calculatePercentage(adSample.timePlayed, adSample.ad.duration, true)
     }
 
     private fun resetActiveAd() {

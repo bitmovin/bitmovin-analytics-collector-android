@@ -23,6 +23,12 @@ interface AdAnalyticsEventListener {
         message: String?,
     )
 
+    fun onAdLoadError(
+        adBreak: AdBreak,
+        code: Int,
+        message: String?,
+    )
+
     fun onAdSkipped()
 
     fun onAdManifestLoaded(
