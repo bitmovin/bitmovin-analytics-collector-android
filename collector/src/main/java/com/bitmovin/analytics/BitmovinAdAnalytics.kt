@@ -153,13 +153,14 @@ class BitmovinAdAnalytics(
     // the failed ad never started, so an ad playing meanwhile keeps its own sample and timers
     override fun onAdLoadError(
         adBreak: AdBreak,
+        ad: Ad,
         code: Int,
         message: String?,
     ) {
-        val adSample = AdSample(Util.uUID)
+        val adSample = AdSample(Util.uUID, ad = ad)
         this.setError(adSample, code, message)
         this.setExitPosition(adSample, 0)
-        this.sendAnalyticsRequest(adBreak, adSample)
+        this.sendAnalyticsRequest(adBreak, adSample, hasManifestDownloadTime = false)
     }
 
     private fun setError(
@@ -285,6 +286,7 @@ class BitmovinAdAnalytics(
     private fun sendAnalyticsRequest(
         adBreak: AdBreak,
         adSample: AdSample,
+        hasManifestDownloadTime: Boolean = true,
     ) {
         val eventData = playerAdapter?.createEventDataForAdSample() ?: return
         val adEventData = AdEventData.fromEventData(eventData, AdType.CLIENT_SIDE)
@@ -294,7 +296,7 @@ class BitmovinAdAnalytics(
         adEventData.adModule = adSample.ad.adModule
         adEventData.adModuleVersion = playerAdapter?.playerContext?.playerVersion
 
-        adEventData.manifestDownloadTime = getAndRemoveAdManifestDownloadTime(adBreak)
+        adEventData.manifestDownloadTime = if (hasManifestDownloadTime) getAndRemoveAdManifestDownloadTime(adBreak) else null
         adEventData.autoplay = playerAdapter?.playerContext?.isAutoplay()
         adEventData.setAdBreak(adBreak)
         adEventData.setAdSample(adSample)

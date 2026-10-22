@@ -3,9 +3,11 @@ package com.bitmovin.analytics.bitmovin.player
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
+import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.bitmovin.player.utils.AdBreakMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdQuartileFactory
+import com.bitmovin.analytics.bitmovin.player.utils.BITMOVIN_AD_MODULE
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.event.PlayerEvent
@@ -85,7 +87,7 @@ internal class BitmovinSdkAdAdapter(
             // no ad item: the player's "Ad break not loaded" (2001) that follows an already reported load error
             val adItem = event.adItem ?: return@method
             observableSupport.notify {
-                it.onAdLoadError(adBreakMapper.fromPlayerAdItem(adItem), event.code, event.message)
+                it.onAdLoadError(adBreakMapper.fromPlayerAdItem(adItem), Ad(adModule = BITMOVIN_AD_MODULE), event.code, event.message)
             }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "On Ad Error", e)

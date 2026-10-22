@@ -25,6 +25,7 @@ interface AdAnalyticsEventListener {
 
     fun onAdLoadError(
         adBreak: AdBreak,
+        ad: Ad,
         code: Int,
         message: String?,
     )

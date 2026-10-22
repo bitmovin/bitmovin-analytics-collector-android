@@ -421,7 +421,7 @@ class CsaiScenariosTest {
             val adSample = impression.adEventDataList[0]
 
             CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
-            assertThat(adSample.started).isEqualTo(1)
+            assertThat(adSample.started).isEqualTo(1L)
             assertThat(adSample.closed).isEqualTo(1)
             assertThat(adSample.completed).isEqualTo(0)
             assertThat(adSample.videoImpressionId).isEqualTo(impression.eventDataList[0].impressionId)
@@ -500,7 +500,7 @@ class CsaiScenariosTest {
             val adSample = impression1.adEventDataList[0]
             CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
             // the ad was started but neither completed nor skipped -> closed means abandonment
-            assertThat(adSample.started).isEqualTo(1)
+            assertThat(adSample.started).isEqualTo(1L)
             assertThat(adSample.closed).isEqualTo(1)
             assertThat(adSample.completed).isEqualTo(0)
             assertThat(adSample.skipped).isEqualTo(0)
@@ -1216,6 +1216,102 @@ class CsaiScenariosTest {
                 assertThat(adSample.errorMessage).isNotBlank
                 assertThat(adSample.adPosition).isEqualTo("pre")
                 assertThat(adSample.adTagUrl).isNotEmpty
+            } finally {
+                adServer.shutdown()
+            }
+        }
+
+    @Test
+    fun test_vodWithVastPreRollAd_vastNotReachable_sendsOneUnstartedErrorSample() =
+        runBlockingTest {
+            val adServer = MockWebServer()
+            try {
+                adServer.start()
+                adServer.dispatcher =
+                    object : Dispatcher() {
+                        override fun dispatch(request: RecordedRequest): MockResponse = MockResponse().setResponseCode(404)
+                    }
+
+                val preRoll = AdItem("pre", AdSource(AdSourceType.Bitmovin, adServer.url("/vast").toString()))
+                val localPlayer = createPlayer(AdvertisingConfig(preRoll))
+
+                var adErrorOccurred = false
+
+                withContext(mainScope.coroutineContext) {
+                    localPlayer.on(PlayerEvent.AdError::class) { adErrorOccurred = true }
+                    localPlayer.load(defaultSource)
+                }
+
+                PlaybackUtils.waitUntil("ad error occurred") { adErrorOccurred }
+                BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
+
+                withContext(mainScope.coroutineContext) {
+                    localPlayer.destroy()
+                }
+
+                Thread.sleep(500)
+
+                val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+                assertThat(impressionList).hasSize(1)
+
+                val impression = impressionList.first()
+                assertThat(impression.adEventDataList).hasSize(1)
+                val adSample = impression.adEventDataList[0]
+
+                CsaiDataVerifier.verifyStaticAdData(adSample, defaultAnalyticsConfig)
+                assertThat(adSample.started).isEqualTo(0L)
+                assertThat(adSample.errorCode).isNotNull
+                assertThat(adSample.errorMessage).isNotBlank
+                assertThat(adSample.adPosition).isEqualTo("pre")
+                assertThat(adSample.adTagUrl).isEqualTo(adServer.url("/vast").toString())
+                assertThat(adSample.adModule).isEqualTo("DefaultAdvertisingService")
+            } finally {
+                adServer.shutdown()
+            }
+        }
+
+    @Test
+    fun test_vodWithPreRollAd_firstSourceFailsAndFallbackPlays_sendsOnlyThePlayedAd() =
+        runBlockingTest {
+            val adServer = MockWebServer()
+            try {
+                adServer.start()
+                adServer.dispatcher =
+                    object : Dispatcher() {
+                        override fun dispatch(request: RecordedRequest): MockResponse = MockResponse().setResponseCode(404)
+                    }
+
+                val preRoll =
+                    AdItem(
+                        "pre",
+                        AdSource(AdSourceType.Bitmovin, adServer.url("/vast").toString()),
+                        progressiveAdSource,
+                    )
+                val localPlayer = createPlayer(AdvertisingConfig(preRoll))
+
+                withContext(mainScope.coroutineContext) {
+                    localPlayer.load(defaultSource)
+                }
+
+                PlaybackUtils.waitUntil("pre-roll ad started") { localPlayer.isAd }
+                PlaybackUtils.waitUntil("pre-roll ad finished") { !localPlayer.isAd }
+                BitmovinPlaybackUtils.waitUntilPlayerPlayedToMs(localPlayer, 2000)
+
+                withContext(mainScope.coroutineContext) {
+                    localPlayer.destroy()
+                }
+
+                Thread.sleep(500)
+
+                val impressionList = MockedIngress.waitForRequestsAndExtractImpressions()
+                assertThat(impressionList).hasSize(1)
+
+                val impression = impressionList.first()
+                assertThat(impression.adEventDataList).hasSize(1)
+                val adSample = impression.adEventDataList[0]
+
+                assertThat(adSample.started).isEqualTo(1L)
+                assertThat(adSample.errorCode).isNull()
             } finally {
                 adServer.shutdown()
             }

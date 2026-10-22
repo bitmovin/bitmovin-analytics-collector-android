@@ -45,6 +45,7 @@ class BitmovinSdkAdAdapterTest {
                         it.position == AdPosition.PRE &&
                         it.ads.isEmpty()
                 },
+                match { it.adModule == "DefaultAdvertisingService" },
                 303,
                 "No ads",
             )
@@ -57,7 +58,7 @@ class BitmovinSdkAdAdapterTest {
         adErrorListener.captured(PlayerEvent.AdError(failedAdItem, 303, "No ads", null))
         adErrorListener.captured(PlayerEvent.AdError(null, 2001, "Cannot play ad: Ad break not loaded", null))
 
-        verify(exactly = 1) { listener.onAdLoadError(any(), any(), any()) }
+        verify(exactly = 1) { listener.onAdLoadError(any(), any(), any(), any()) }
         verify(exactly = 0) { listener.onAdError(any(), any(), any()) }
     }
 
@@ -69,6 +70,6 @@ class BitmovinSdkAdAdapterTest {
         adErrorListener.captured(PlayerEvent.AdError(failedAdItem, 2203, "Bad HTTP status", adBreak))
 
         verify(exactly = 1) { listener.onAdError(match { it.id == "break-1" }, 2203, "Bad HTTP status") }
-        verify(exactly = 0) { listener.onAdLoadError(any(), any(), any()) }
+        verify(exactly = 0) { listener.onAdLoadError(any(), any(), any(), any()) }
     }
 }

@@ -16,7 +16,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [35])
 class BitmovinAdAnalyticsTest {
     private val analytics: BitmovinAnalytics = mockk(relaxed = true)
     private val playerAdapter: PlayerAdapter = mockk(relaxed = true)
@@ -128,7 +133,7 @@ class BitmovinAdAnalyticsTest {
                 fallbackIndex = 1,
             )
 
-        adAnalytics.onAdLoadError(failedBreak, 303, "No ads")
+        adAnalytics.onAdLoadError(failedBreak, Ad(), 303, "No ads")
 
         assertThat(sentSamples).hasSize(1)
         val sample = sentSamples.single()
@@ -153,7 +158,7 @@ class BitmovinAdAnalyticsTest {
         now = 100_400
         adAnalytics.onAdStarted(playingAd)
         now = 105_000
-        adAnalytics.onAdLoadError(AdBreak(id = "notset", ads = emptyList()), 1008, "Timeout")
+        adAnalytics.onAdLoadError(AdBreak(id = "notset", ads = emptyList()), Ad(), 1008, "Timeout")
         now = 115_400
         adAnalytics.onAdFinished()
 
@@ -161,5 +166,32 @@ class BitmovinAdAnalyticsTest {
             .containsExactly(Triple(0L, 0L, 1008), Triple(1L, 1L, null))
         assertThat(sentSamples[1].adStartupTime).isEqualTo(400L)
         assertThat(sentSamples[0].adImpressionId).isNotEqualTo(sentSamples[1].adImpressionId)
+    }
+
+    @Test
+    fun `ad that fails to load carries the ad module it was given`() {
+        adAnalytics.onAdLoadError(
+            AdBreak(id = "notset", ads = emptyList()),
+            Ad(adModule = "DefaultAdvertisingService"),
+            303,
+            "No ads",
+        )
+
+        assertThat(sentSamples.single().adModule).isEqualTo("DefaultAdvertisingService")
+    }
+
+    @Test
+    fun `ad that fails to load leaves a cached manifest download time for its break`() {
+        every { playerAdapter.stateMachine.isStartupFinished } returns true
+        val ad = Ad(isLinear = true, id = "ad-1", duration = 15_000)
+        val loadedBreak = AdBreak(id = "notset", ads = listOf(ad))
+
+        adAnalytics.onAdManifestLoaded(loadedBreak, 250)
+        adAnalytics.onAdLoadError(AdBreak(id = "notset", ads = emptyList()), Ad(), 1008, "Timeout")
+        adAnalytics.onAdBreakStarted(loadedBreak)
+        adAnalytics.onAdStarted(ad)
+        adAnalytics.onAdFinished()
+
+        assertThat(sentSamples.map { it.manifestDownloadTime }).containsExactly(null, 250L)
     }
 }
