@@ -49,6 +49,9 @@ import org.junit.runner.RunWith
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
 @RunWith(AndroidJUnit4::class)
 class BundledAnalyticsTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var defaultPlayer: Player
@@ -84,7 +87,7 @@ class BundledAnalyticsTest {
             defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
 
             withContext(mainScope.coroutineContext) {
-                defaultPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig)
+                defaultPlayer = players.track(Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig))
             }
         }
 
@@ -267,7 +270,7 @@ class BundledAnalyticsTest {
             lateinit var localPlayer: Player
 
             withContext(mainScope.coroutineContext) {
-                localPlayer = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+                localPlayer = players.track(Player.create(appContext, playerConfig, defaultAnalyticsConfig))
                 localPlayer.load(defaultSource)
             }
 
@@ -314,7 +317,7 @@ class BundledAnalyticsTest {
             lateinit var localPlayer: Player
 
             withContext(mainScope.coroutineContext) {
-                localPlayer = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+                localPlayer = players.track(Player.create(appContext, playerConfig, defaultAnalyticsConfig))
                 localPlayer.load(defaultSource)
                 localPlayer.play()
             }
@@ -373,7 +376,7 @@ class BundledAnalyticsTest {
 
             // act
             withContext(mainScope.coroutineContext) {
-                localPlayer = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+                localPlayer = players.track(Player.create(appContext, playerConfig, defaultAnalyticsConfig))
                 localPlayer.load(liveSource)
             }
 
@@ -589,7 +592,7 @@ class BundledAnalyticsTest {
             lateinit var localPlayer: Player
 
             withContext(mainScope.coroutineContext) {
-                localPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig, defaultMetadata)
+                localPlayer = players.track(Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig, defaultMetadata))
                 localPlayer.load(defaultSource)
             }
 
@@ -714,7 +717,7 @@ class BundledAnalyticsTest {
             lateinit var localPlayer: Player
 
             withContext(mainScope.coroutineContext) {
-                localPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig, defaultMetadata)
+                localPlayer = players.track(Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig, defaultMetadata))
                 localPlayer.load(playlistConfig)
                 localPlayer.play()
             }
@@ -915,7 +918,7 @@ class BundledAnalyticsTest {
             lateinit var localPlayer: Player
 
             withContext(mainScope.coroutineContext) {
-                localPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig, defaultMetadata)
+                localPlayer = players.track(Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig, defaultMetadata))
                 localPlayer.load(hlsSource)
                 localPlayer.play()
             }
@@ -992,7 +995,7 @@ class BundledAnalyticsTest {
             lateinit var localPlayer: Player
 
             withContext(mainScope.coroutineContext) {
-                localPlayer = Player.create(appContext, defaultPlayerConfig, wrongAnalyticsConfig)
+                localPlayer = players.track(Player.create(appContext, defaultPlayerConfig, wrongAnalyticsConfig))
                 localPlayer.load(defaultSource)
                 localPlayer.play()
             }
@@ -1035,7 +1038,7 @@ class BundledAnalyticsTest {
             lateinit var localPlayer: Player
 
             withContext(mainScope.coroutineContext) {
-                localPlayer = Player.create(appContext, defaultPlayerConfig, analyticsOfflineConfig)
+                localPlayer = players.track(Player.create(appContext, defaultPlayerConfig, analyticsOfflineConfig))
                 localPlayer.load(offlineSource)
                 localPlayer.play()
             }
@@ -1066,7 +1069,7 @@ class BundledAnalyticsTest {
 
             lateinit var localPlayerOnline: Player
             withContext(mainScope.coroutineContext) {
-                localPlayerOnline = Player.create(appContext, defaultPlayerConfig, analyticsOnlineConfig)
+                localPlayerOnline = players.track(Player.create(appContext, defaultPlayerConfig, analyticsOnlineConfig))
                 localPlayerOnline.load(onlineSource)
                 localPlayerOnline.play()
             }

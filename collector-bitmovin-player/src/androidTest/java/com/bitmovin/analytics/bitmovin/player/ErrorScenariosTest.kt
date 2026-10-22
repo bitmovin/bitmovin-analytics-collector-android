@@ -56,6 +56,9 @@ import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class ErrorScenariosTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var defaultPlayer: Player
@@ -81,7 +84,8 @@ class ErrorScenariosTest {
             defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
 
             withContext(mainScope.coroutineContext) {
-                defaultPlayer = Player(appContext, defaultPlayerConfig, AnalyticsPlayerConfig.Enabled(defaultAnalyticsConfig))
+                defaultPlayer =
+                    players.track(Player(appContext, defaultPlayerConfig, AnalyticsPlayerConfig.Enabled(defaultAnalyticsConfig)))
             }
         }
 
@@ -210,19 +214,18 @@ class ErrorScenariosTest {
                                                     override fun overrideDecodersPriority(
                                                         context: DecoderPriorityProvider.DecoderContext,
                                                         preferredDecoders: List<MediaCodecInfo>,
-                                                    ): List<MediaCodecInfo> {
-                                                        return if (!context.isAd && context.mediaType == MediaType.Video) {
+                                                    ): List<MediaCodecInfo> =
+                                                        if (!context.isAd && context.mediaType == MediaType.Video) {
                                                             // Do not use software decoders
                                                             preferredDecoders.filter { !it.isSoftware }
                                                         } else {
                                                             preferredDecoders
                                                         }
-                                                    }
                                                 },
                                         ),
                                 ),
                         )
-                    val player = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+                    val player = players.track(Player.create(appContext, playerConfig, defaultAnalyticsConfig))
                     player.load(source)
                 }
 
@@ -277,7 +280,7 @@ class ErrorScenariosTest {
                         key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
                         playbackConfig = PlaybackConfig(),
                     )
-                val player = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+                val player = players.track(Player.create(appContext, playerConfig, defaultAnalyticsConfig))
 
                 player.load(source)
             }
@@ -329,7 +332,7 @@ class ErrorScenariosTest {
                         key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
                         playbackConfig = PlaybackConfig(),
                     )
-                val player = Player.create(appContext, playerConfig, configWithTransformer)
+                val player = players.track(Player.create(appContext, playerConfig, configWithTransformer))
 
                 player.load(source)
             }
@@ -376,7 +379,7 @@ class ErrorScenariosTest {
                         playbackConfig = PlaybackConfig(),
                         networkConfig = NetworkConfig(preprocessHttpRequestCallback = ::preprocessHttpRequest),
                     )
-                val player = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+                val player = players.track(Player.create(appContext, playerConfig, defaultAnalyticsConfig))
                 player.load(source)
             }
 
@@ -472,7 +475,7 @@ class ErrorScenariosTest {
             var player: Player
             // act
             withContext(mainScope.coroutineContext) {
-                player = Player(appContext, playerConfig, analyticsConfig)
+                player = players.track(Player(appContext, playerConfig, analyticsConfig))
                 player.load(playlistConfig)
                 player.play()
             }

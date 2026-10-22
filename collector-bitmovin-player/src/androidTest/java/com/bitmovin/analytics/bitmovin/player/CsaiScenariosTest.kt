@@ -48,6 +48,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class CsaiScenariosTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private val defaultSample = TestSources.HLS_REDBULL
@@ -109,7 +112,7 @@ class CsaiScenariosTest {
                         playbackConfig = playbackConfig,
                         advertisingConfig = advertisingConfig,
                     )
-                player = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+                player = players.track(Player.create(appContext, playerConfig, defaultAnalyticsConfig))
                 player.setAdViewGroup(LinearLayout(appContext))
             }
         }
@@ -132,7 +135,7 @@ class CsaiScenariosTest {
                         playbackConfig = playbackConfig,
                         advertisingConfig = advertisingConfig,
                     )
-                player = Player.create(appContext, playerConfig)
+                player = players.track(Player.create(appContext, playerConfig))
                 player.setAdViewGroup(LinearLayout(appContext))
             }
         }

@@ -37,6 +37,9 @@ private const val ANALYTICS_LICENSE_KEY = "17e6ea02-cb5a-407f-9d6b-9400358fbcc0"
 
 @RunWith(AndroidJUnit4::class)
 class DeferredLicenseLoadingTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var defaultPlayer: Player
@@ -250,12 +253,14 @@ class DeferredLicenseLoadingTest {
         advertisingConfig: AdvertisingConfig = AdvertisingConfig(),
     ) {
         defaultPlayer =
-            Player.create(
-                appContext,
-                PlayerConfig(
-                    key = PLAYER_LICENSE_KEY,
-                    playbackConfig = playbackConfig,
-                    advertisingConfig = advertisingConfig,
+            players.track(
+                Player.create(
+                    appContext,
+                    PlayerConfig(
+                        key = PLAYER_LICENSE_KEY,
+                        playbackConfig = playbackConfig,
+                        advertisingConfig = advertisingConfig,
+                    ),
                 ),
             )
     }

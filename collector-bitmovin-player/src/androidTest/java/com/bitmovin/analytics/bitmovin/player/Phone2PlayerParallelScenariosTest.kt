@@ -26,6 +26,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class Phone2PlayerParallelScenariosTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -77,8 +80,8 @@ class Phone2PlayerParallelScenariosTest {
                 )
 
             withContext(mainScope.coroutineContext) {
-                player1 = Player.create(appContext, player1Config, player1AnalyticsConfig)
-                player2 = Player.create(appContext, player2Config, player2AnalyticsConfig)
+                player1 = players.track(Player.create(appContext, player1Config, player1AnalyticsConfig))
+                player2 = players.track(Player.create(appContext, player2Config, player2AnalyticsConfig))
                 player1.load(source1)
                 player2.load(source2)
             }
