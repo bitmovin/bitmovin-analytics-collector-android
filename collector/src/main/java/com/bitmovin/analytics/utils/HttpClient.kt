@@ -12,7 +12,10 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 
-class HttpClient(private val context: Context, private val client: OkHttpClient) {
+class HttpClient(
+    private val context: Context,
+    private val client: OkHttpClient,
+) {
     fun post(
         url: String,
         postBody: String?,
@@ -31,13 +34,15 @@ class HttpClient(private val context: Context, private val client: OkHttpClient)
             }
 
         val request =
-            Request.Builder()
+            Request
+                .Builder()
                 .url(urlWithRouting)
                 .header("Origin", String.format("http://%s", context.packageName))
                 .post(postBody.orEmpty().toRequestBody(JSON_CONTENT_TYPE))
                 .build()
 
-        client.newCall(request)
+        client
+            .newCall(request)
             .enqueue(
                 object : Callback {
                     override fun onFailure(
@@ -53,8 +58,7 @@ class HttpClient(private val context: Context, private val client: OkHttpClient)
                         call: Call,
                         response: Response,
                     ) {
-                        callback?.onResponse(call, response)
-                        response.close()
+                        response.use { callback?.onResponse(call, it) }
                     }
                 },
             )
