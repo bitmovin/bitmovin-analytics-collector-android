@@ -31,6 +31,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ProgramChangeScenariosTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -73,7 +76,7 @@ class ProgramChangeScenariosTest {
                     key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
                     playbackConfig = PlaybackConfig(isAutoplayEnabled = true),
                 )
-            player = Player.create(appContext, playerConfig)
+            player = players.track(Player.create(appContext, playerConfig))
         }
 
     @After

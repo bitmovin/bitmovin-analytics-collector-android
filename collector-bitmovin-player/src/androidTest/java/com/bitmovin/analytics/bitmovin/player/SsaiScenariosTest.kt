@@ -47,6 +47,9 @@ import java.time.Duration
 // Tests can be run automatically with gradle managed device through running ./runSystemTests.sh` in the root folder
 @RunWith(AndroidJUnit4::class)
 class SsaiScenariosTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var defaultPlayer: Player
@@ -78,7 +81,7 @@ class SsaiScenariosTest {
                 playbackConfig = PlaybackConfig(),
                 adaptationConfig = AdaptationConfig(maxSelectableVideoBitrate = 628000),
             )
-        defaultPlayer = Player.create(appContext, playerConfig)
+        defaultPlayer = players.track(Player.create(appContext, playerConfig))
     }
 
     @After
@@ -1906,7 +1909,7 @@ class SsaiScenariosTest {
                         key = "a6e31908-550a-4f75-b4bc-a9d89880a733",
                         playbackConfig = PlaybackConfig(),
                     )
-                val player = Player.create(appContext, playerConfig, configWithTransformer)
+                val player = players.track(Player.create(appContext, playerConfig, configWithTransformer))
 
                 player.analytics?.ssai?.adBreakStart(
                     SsaiAdBreakMetadata(SsaiAdPosition.PREROLL),

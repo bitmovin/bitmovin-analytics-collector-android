@@ -42,6 +42,9 @@ import org.junit.runner.RunWith
 // Tests use logcat logs to get the sent analytics samples
 @RunWith(AndroidJUnit4::class)
 class PhoneBasicScenariosTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var defaultPlayer: Player
@@ -69,7 +72,7 @@ class PhoneBasicScenariosTest {
             mockedIngressUrl = MockedIngress.startServer()
             defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
             val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = PlaybackConfig())
-            defaultPlayer = Player.create(appContext, playerConfig)
+            defaultPlayer = players.track(Player.create(appContext, playerConfig))
         }
 
     @After
@@ -313,7 +316,7 @@ class PhoneBasicScenariosTest {
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
             val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
             val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
-            val localPlayer = Player.create(appContext, playerConfig)
+            val localPlayer = players.track(Player.create(appContext, playerConfig))
             collector.setSourceMetadata(defaultSource, defaultSourceMetadata)
 
             // act
@@ -367,7 +370,7 @@ class PhoneBasicScenariosTest {
             val collector = IBitmovinPlayerCollector.create(appContext, defaultAnalyticsConfig)
             val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
             val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
-            val localPlayer = Player.create(appContext, playerConfig)
+            val localPlayer = players.track(Player.create(appContext, playerConfig))
             val liveSourceMetadata =
                 SourceMetadata(
                     title = metadataGenerator.getTestTitle(),

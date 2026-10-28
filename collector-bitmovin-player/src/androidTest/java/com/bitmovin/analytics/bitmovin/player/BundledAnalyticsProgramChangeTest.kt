@@ -34,6 +34,9 @@ import org.junit.runner.RunWith
 // (player created with an AnalyticsConfig instead of a standalone collector).
 @RunWith(AndroidJUnit4::class)
 class BundledAnalyticsProgramChangeTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -79,7 +82,7 @@ class BundledAnalyticsProgramChangeTest {
                     playbackConfig = PlaybackConfig(isAutoplayEnabled = true),
                 )
             withContext(mainScope.coroutineContext) {
-                player = Player.create(appContext, playerConfig, defaultAnalyticsConfig)
+                player = players.track(Player.create(appContext, playerConfig, defaultAnalyticsConfig))
             }
         }
 

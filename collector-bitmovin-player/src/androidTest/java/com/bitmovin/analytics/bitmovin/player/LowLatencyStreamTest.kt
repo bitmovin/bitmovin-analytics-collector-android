@@ -41,6 +41,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class LowLatencyStreamTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var player: Player
@@ -60,7 +63,7 @@ class LowLatencyStreamTest {
             analyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
             val playbackConfig = PlaybackConfig(isAutoplayEnabled = true, isMuted = true)
             val playerConfig = PlayerConfig(key = "a6e31908-550a-4f75-b4bc-a9d89880a733", playbackConfig = playbackConfig)
-            player = Player.create(appContext, playerConfig)
+            player = players.track(Player.create(appContext, playerConfig))
         }
 
     @After
