@@ -23,12 +23,14 @@ internal class SimpleEventDataDispatcher(
     private val backendFactory: BackendFactory,
     private val licenseCall: LicenseCall,
     private val scopeProvider: ScopeProvider,
-) : IEventDataDispatcher, AuthenticationCallback {
+) : IEventDataDispatcher,
+    AuthenticationCallback {
     private lateinit var backend: Backend
     private lateinit var ioScope: CoroutineScope
     private val data: Queue<EventData> = ConcurrentLinkedQueue()
     private val adData: Queue<AdEventData> = ConcurrentLinkedQueue()
     private var enabled = false
+    private var attached = false
 
     init {
         createBackend()
@@ -41,6 +43,10 @@ internal class SimpleEventDataDispatcher(
 
     @Synchronized
     override fun authenticationCompleted(response: AuthenticationResponse) {
+        if (!attached) {
+            completeAfterDetach(response)
+            return
+        }
         val success =
             when (response) {
                 is AuthenticationResponse.Granted -> {
@@ -61,16 +67,31 @@ internal class SimpleEventDataDispatcher(
         callback?.authenticationCompleted(success)
     }
 
+    @Synchronized
     override fun enable() {
+        ioScope.cancel()
+        attached = true
         createBackend()
         ioScope.launch { licenseCall.authenticate(this@SimpleEventDataDispatcher) }
     }
 
+    // AN-5976: data queued before the license response is sent once it is granted, as on Web and iOS
+    @Synchronized
     override fun disable() {
+        attached = false
+        enabled = false
+        if (data.isEmpty() && adData.isEmpty()) {
+            ioScope.cancel()
+        }
+    }
+
+    private fun completeAfterDetach(response: AuthenticationResponse) {
+        if (response is AuthenticationResponse.Granted) {
+            forwardQueuedEvents(response.licenseKey)
+        }
         data.clear()
         adData.clear()
         ioScope.cancel()
-        enabled = false
     }
 
     override fun add(data: EventData) {

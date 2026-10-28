@@ -9,6 +9,7 @@ import com.bitmovin.analytics.enums.AdType
 import com.bitmovin.analytics.enums.PlayerType
 import com.bitmovin.analytics.license.AuthenticationResponse
 import com.bitmovin.analytics.license.LicenseCall
+import com.bitmovin.analytics.license.LicenseCallback
 import com.bitmovin.analytics.utils.TestScopeProvider
 import com.bitmovin.analytics.utils.areScopesCancelled
 import io.mockk.clearMocks
@@ -16,9 +17,9 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
 class SimpleEventDataDispatcherTest {
@@ -26,6 +27,7 @@ class SimpleEventDataDispatcherTest {
     private val backendFactory = mockk<BackendFactory>()
     private val backend = mockk<Backend>()
     private val licenseCall = mockk<LicenseCall>()
+    private val licenseCallback = mockk<LicenseCallback>(relaxed = true)
     private lateinit var scopeProvider: TestScopeProvider
     private lateinit var config: AnalyticsConfig
     private lateinit var dispatcher: SimpleEventDataDispatcher
@@ -39,7 +41,7 @@ class SimpleEventDataDispatcherTest {
             SimpleEventDataDispatcher(
                 context,
                 config,
-                null,
+                licenseCallback,
                 backendFactory,
                 licenseCall,
                 scopeProvider,
@@ -48,7 +50,7 @@ class SimpleEventDataDispatcherTest {
 
     @After
     fun teardown() {
-        clearMocks(context, backendFactory, licenseCall)
+        clearMocks(context, backendFactory, licenseCall, licenseCallback)
     }
 
     @Test
@@ -63,9 +65,7 @@ class SimpleEventDataDispatcherTest {
         verify { backendFactory.createBackend(config, context, any()) }
     }
 
-    // FIXME: why do we need the scope in the constructor?
     @Test
-    @Ignore("This test fails as the scope created in the constructor is not cancelled. This is a bug.")
     fun `disabling the dispatcher cancels the scope`() {
         dispatcher.enable()
         dispatcher.disable()
@@ -110,6 +110,73 @@ class SimpleEventDataDispatcherTest {
         )
 
         verify(exactly = 1) { backend.sendAd(match { it.key == "authenticated-key" }) }
+    }
+
+    @Test
+    fun `data queued before detach is sent when the license is granted after detach`() {
+        dispatcher.enable()
+        dispatcher.add(createTestEventData())
+        dispatcher.addAd(createTestAdEventData())
+        dispatcher.disable()
+
+        dispatcher.authenticationCompleted(
+            AuthenticationResponse.Granted("authenticated-key", null),
+        )
+
+        verify(exactly = 1) { backend.send(match { it.key == "authenticated-key" }) }
+        verify(exactly = 1) { backend.sendAd(match { it.key == "authenticated-key" }) }
+    }
+
+    @Test
+    fun `data queued before detach is dropped when the license is denied after detach`() {
+        dispatcher.enable()
+        dispatcher.add(createTestEventData())
+        dispatcher.disable()
+
+        dispatcher.authenticationCompleted(AuthenticationResponse.Denied("denied"))
+
+        verify(exactly = 0) { backend.send(any()) }
+    }
+
+    @Test
+    fun `detaching with queued data keeps the scope until the license call completes`() {
+        dispatcher.enable()
+        dispatcher.add(createTestEventData())
+        dispatcher.disable()
+
+        assertThat(scopeProvider.areScopesCancelled).isFalse
+
+        dispatcher.authenticationCompleted(AuthenticationResponse.Error)
+
+        assertThat(scopeProvider.areScopesCancelled).isTrue
+    }
+
+    @Test
+    fun `a license response after detach does not notify the collector`() {
+        dispatcher.enable()
+        dispatcher.add(createTestEventData())
+        dispatcher.disable()
+
+        dispatcher.authenticationCompleted(
+            AuthenticationResponse.Granted("authenticated-key", null),
+        )
+
+        verify(exactly = 0) { licenseCallback.configureFeatures(any(), any()) }
+        verify(exactly = 0) { licenseCallback.authenticationCompleted(any()) }
+    }
+
+    @Test
+    fun `a license granted after detach does not authenticate the next attach`() {
+        dispatcher.enable()
+        dispatcher.disable()
+        dispatcher.authenticationCompleted(
+            AuthenticationResponse.Granted("authenticated-key", null),
+        )
+
+        dispatcher.enable()
+        dispatcher.add(createTestEventData())
+
+        verify(exactly = 0) { backend.send(any()) }
     }
 }
 
