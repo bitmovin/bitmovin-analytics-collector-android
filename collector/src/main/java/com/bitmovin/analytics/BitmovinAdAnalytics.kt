@@ -185,7 +185,7 @@ class BitmovinAdAnalytics(
         adBreak: AdBreak,
         downloadTime: Long,
     ) {
-        this.adManifestDownloadTimes.put(adBreak.id, downloadTime)
+        adBreak.id?.let { this.adManifestDownloadTimes.put(it, downloadTime) }
 
         // This is undocummented legacy behaviour
         // but likely we are sending an ad request for the vmap
@@ -276,11 +276,8 @@ class BitmovinAdAnalytics(
     }
 
     private fun getAndRemoveAdManifestDownloadTime(adBreak: AdBreak?): Long? {
-        if (adBreak == null) {
-            return null
-        }
-
-        return adManifestDownloadTimes.remove(adBreak.id)
+        val adBreakId = adBreak?.id ?: return null
+        return adManifestDownloadTimes.remove(adBreakId)
     }
 
     private fun sendAnalyticsRequest(

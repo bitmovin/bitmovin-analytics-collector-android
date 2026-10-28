@@ -23,7 +23,8 @@ internal class AdBreakMapper {
     fun fromPlayerAdItem(adItem: AdItem): AdBreak {
         val position = BitmovinUtil.getAdPositionFromPlayerPosition(adItem.position)
         return AdBreak(
-            id = "notset",
+            // an ad item has no break id; web sends none either
+            id = null,
             ads = emptyList(),
             position = position,
             offset = if (position == AdPosition.MID) adItem.position else null,

@@ -126,7 +126,7 @@ class AdBreakMapperTest {
 
         val collectorAdBreak = adBreakMapper.fromPlayerAdItem(adItem)
 
-        assertThat(collectorAdBreak.id).isEqualTo("notset")
+        assertThat(collectorAdBreak.id).isNull()
         assertThat(collectorAdBreak.ads).isEmpty()
         assertThat(collectorAdBreak.tagUrl).isEqualTo("https://ads.example.com/fallback.xml")
         assertThat(collectorAdBreak.fallbackIndex).isEqualTo(1)

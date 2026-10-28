@@ -158,7 +158,7 @@ class BitmovinAdAnalyticsTest {
         now = 100_400
         adAnalytics.onAdStarted(playingAd)
         now = 105_000
-        adAnalytics.onAdLoadError(AdBreak(id = "notset", ads = emptyList()), Ad(), 1008, "Timeout")
+        adAnalytics.onAdLoadError(AdBreak(id = null, ads = emptyList()), Ad(), 1008, "Timeout")
         now = 115_400
         adAnalytics.onAdFinished()
 
@@ -171,7 +171,7 @@ class BitmovinAdAnalyticsTest {
     @Test
     fun `ad that fails to load carries the ad module it was given`() {
         adAnalytics.onAdLoadError(
-            AdBreak(id = "notset", ads = emptyList()),
+            AdBreak(id = null, ads = emptyList()),
             Ad(adModule = "DefaultAdvertisingService"),
             303,
             "No ads",
@@ -181,13 +181,20 @@ class BitmovinAdAnalyticsTest {
     }
 
     @Test
+    fun `ad that fails to load without a break id is sent without a player ad id`() {
+        adAnalytics.onAdLoadError(AdBreak(id = null, ads = emptyList()), Ad(), 1008, "Timeout")
+
+        assertThat(sentSamples.single().adIdPlayer).isNull()
+    }
+
+    @Test
     fun `ad that fails to load leaves a cached manifest download time for its break`() {
         every { playerAdapter.stateMachine.isStartupFinished } returns true
         val ad = Ad(isLinear = true, id = "ad-1", duration = 15_000)
         val loadedBreak = AdBreak(id = "notset", ads = listOf(ad))
 
         adAnalytics.onAdManifestLoaded(loadedBreak, 250)
-        adAnalytics.onAdLoadError(AdBreak(id = "notset", ads = emptyList()), Ad(), 1008, "Timeout")
+        adAnalytics.onAdLoadError(AdBreak(id = null, ads = emptyList()), Ad(), 1008, "Timeout")
         adAnalytics.onAdBreakStarted(loadedBreak)
         adAnalytics.onAdStarted(ad)
         adAnalytics.onAdFinished()

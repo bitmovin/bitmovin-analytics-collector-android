@@ -1,7 +1,7 @@
 package com.bitmovin.analytics.ads
 
 data class AdBreak(
-    var id: String,
+    var id: String?,
     var ads: List<Ad>,
     var position: AdPosition? = null,
     var offset: String? = null,
