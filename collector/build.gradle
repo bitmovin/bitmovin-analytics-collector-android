@@ -90,6 +90,7 @@ dependencies {
     testImplementation "org.robolectric:robolectric:${rootProject.ext.robolectricVersion}"
     testImplementation "androidx.test:core:${rootProject.ext.testCoreXVersion}"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${rootProject.ext.coroutinesVersion}"
+    testImplementation "com.squareup.okhttp3:mockwebserver:${rootProject.ext.okhttp3Version}"
 
     androidTestImplementation "androidx.test:runner:${rootProject.ext.testRunnerVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitXVersion}"

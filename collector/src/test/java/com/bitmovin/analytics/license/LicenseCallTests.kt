@@ -12,15 +12,19 @@ import io.mockk.mockkConstructor
 import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.slot
+import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Response
+import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 
 private const val TEST_LICENSE_KEY = "test-license-key"
 
@@ -29,6 +33,11 @@ class LicenseCallTests {
     fun setup() {
         mockkStatic(Uri::class)
         every { Uri.parse(any()) } returns mockk(relaxed = true)
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 
     private fun createLicenseCall(responseBody: String): DefaultLicenseCall {
@@ -235,4 +244,83 @@ class LicenseCallTests {
 
         verify { callback.authenticationCompleted(expected) }
     }
+
+    @Test
+    fun testLicenseCallReportsErrorOnceWhenReadingTheResponseBodyFails() =
+        runTest {
+            verifyErrorReportedOnce(responseWithBodyThrowing(IOException("stream reset")))
+        }
+
+    @Test
+    fun testLicenseCallReportsErrorOnceWhenHandlingTheResponseThrows() =
+        runTest {
+            verifyErrorReportedOnce(responseWithBodyThrowing(IllegalStateException("closed")))
+        }
+
+    @Test
+    fun testLicenseCallReportsErrorOnceWhenTheRequestCannotBeSent() =
+        runTest {
+            val licenseCall =
+                createLicenseCall(
+                    mockk<HttpClient> {
+                        every { post(any(), any(), any()) } throws
+                            IllegalArgumentException("bad url")
+                    },
+                )
+            val callback = mockk<AuthenticationCallback>(relaxed = true)
+
+            licenseCall.authenticate(callback)
+
+            verify(exactly = 1) { callback.authenticationCompleted(any()) }
+            verify { callback.authenticationCompleted(AuthenticationResponse.Error) }
+        }
+
+    @Test
+    fun testLicenseCallDoesNotReportAgainWhenTheCallbackThrows() =
+        runTest {
+            val response = mockk<Response>(relaxed = true) { every { body } returns getGrantedResponseBody("").toResponseBody() }
+            val licenseCall = createLicenseCall(httpClientAnswering(response))
+            val callback =
+                mockk<AuthenticationCallback> {
+                    every { authenticationCompleted(any()) } throws
+                        IllegalStateException("callback failed")
+                }
+
+            licenseCall.authenticate(callback)
+
+            verify(exactly = 1) { callback.authenticationCompleted(any()) }
+        }
+
+    private suspend fun verifyErrorReportedOnce(response: Response) {
+        val licenseCall = createLicenseCall(httpClientAnswering(response))
+        val callback = mockk<AuthenticationCallback>(relaxed = true)
+
+        licenseCall.authenticate(callback)
+
+        verify(exactly = 1) { callback.authenticationCompleted(any()) }
+        verify { callback.authenticationCompleted(AuthenticationResponse.Error) }
+    }
+
+    private fun responseWithBodyThrowing(exception: Exception): Response {
+        val body = mockk<ResponseBody>(relaxed = true) { every { string() } throws exception }
+        return mockk(relaxed = true) { every { this@mockk.body } returns body }
+    }
+
+    // like OkHttp, swallow what onResponse throws so the test sees only what reaches the callback
+    private fun httpClientAnswering(response: Response): HttpClient {
+        val callbackSlot = slot<Callback>()
+        return mockk {
+            every { post(any(), any(), capture(callbackSlot)) }.answers {
+                runCatching { callbackSlot.captured.onResponse(mockk(), response) }
+            }
+        }
+    }
+
+    private fun createLicenseCall(httpClient: HttpClient) =
+        DefaultLicenseCall(
+            config = AnalyticsConfig(TEST_LICENSE_KEY),
+            licenseKeyProvider = InstantLicenseKeyProvider(TEST_LICENSE_KEY),
+            context = mockk(relaxed = true),
+            httpClient = httpClient,
+        )
 }
