@@ -31,6 +31,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class CronetNetworkTest {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -63,7 +66,7 @@ class CronetNetworkTest {
             mockedIngressUrl = MockedIngress.startServer()
             defaultAnalyticsConfig = TestConfig.createAnalyticsConfig(backendUrl = mockedIngressUrl)
             withContext(mainScope.coroutineContext) {
-                defaultPlayer = Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig)
+                defaultPlayer = players.track(Player.create(appContext, defaultPlayerConfig, defaultAnalyticsConfig))
             }
         }
 

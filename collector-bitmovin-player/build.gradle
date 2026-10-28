@@ -19,6 +19,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments listener: "com.bitmovin.analytics.test.utils.HeapUsageListener"
         multiDexEnabled true
     }
 

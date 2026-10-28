@@ -30,6 +30,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SourceChangeScenarios {
+    @get:Rule
+    val players = DestroyPlayersRule()
+
     private val mainScope = MainScope()
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var defaultPlayer: Player
@@ -81,7 +84,7 @@ class SourceChangeScenarios {
 
             withContext(mainScope.coroutineContext) {
                 defaultPlayer =
-                    Player(appContext, defaultPlayerConfig, AnalyticsPlayerConfig.Enabled(defaultAnalyticsConfig))
+                    players.track(Player(appContext, defaultPlayerConfig, AnalyticsPlayerConfig.Enabled(defaultAnalyticsConfig)))
             }
         }
 
