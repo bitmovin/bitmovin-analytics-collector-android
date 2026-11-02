@@ -6,10 +6,10 @@ import com.bitmovin.player.api.advertising.LinearAd
 import com.bitmovin.player.api.advertising.ima.ImaAdData
 import com.bitmovin.player.api.advertising.vast.VastAdData
 
+internal const val BITMOVIN_AD_MODULE = "DefaultAdvertisingService"
+
 internal class AdMapper {
-    fun fromPlayerAd(playerAd: com.bitmovin.player.api.advertising.Ad): Ad {
-        return fromPlayerAd(Ad(), playerAd)
-    }
+    fun fromPlayerAd(playerAd: com.bitmovin.player.api.advertising.Ad): Ad = fromPlayerAd(Ad(), playerAd)
 
     fun fromPlayerAd(
         collectorAd: Ad,
@@ -25,7 +25,7 @@ internal class AdMapper {
         collectorAd.minBitrate = playerAd.data?.minBitrate
         collectorAd.maxBitrate = playerAd.data?.maxBitrate
         collectorAd.mimeType = playerAd.data?.mimeType
-        collectorAd.adModule = "DefaultAdvertisingService"
+        collectorAd.adModule = BITMOVIN_AD_MODULE
 
         if (playerAd.data is VastAdData) {
             fromVastAdData(collectorAd, playerAd.data as VastAdData)

@@ -146,6 +146,28 @@ class BitmovinAdAnalytics(
             adSample.errorPercentage = Util.calculatePercentage(adSample.errorPosition, adSample.ad.duration, true)
         }
 
+        this.setError(adSample, code, message)
+        this.completeAd(adBreak, adSample, adSample.errorPosition ?: 0)
+    }
+
+    // the failed ad never started, so an ad playing meanwhile keeps its own sample and timers
+    override fun onAdLoadError(
+        adBreak: AdBreak,
+        ad: Ad,
+        code: Int,
+        message: String?,
+    ) {
+        val adSample = AdSample(Util.uUID, ad = ad)
+        this.setError(adSample, code, message)
+        this.setExitPosition(adSample, 0)
+        this.sendAnalyticsRequest(adBreak, adSample, hasManifestDownloadTime = false)
+    }
+
+    private fun setError(
+        adSample: AdSample,
+        code: Int,
+        message: String?,
+    ) {
         val errorCode = ErrorCode(code, message ?: "", ErrorData())
         val transformedError =
             ErrorTransformationHelper.transformErrorWithUserCallback(
@@ -157,14 +179,13 @@ class BitmovinAdAnalytics(
         adSample.errorCode = transformedError.errorCode
         adSample.errorMessage = transformedError.message
         adSample.errorSeverity = transformedError.errorSeverity
-        this.completeAd(adBreak, adSample, adSample.errorPosition ?: 0)
     }
 
     override fun onAdManifestLoaded(
         adBreak: AdBreak,
         downloadTime: Long,
     ) {
-        this.adManifestDownloadTimes.put(adBreak.id, downloadTime)
+        adBreak.id?.let { this.adManifestDownloadTimes.put(it, downloadTime) }
 
         // This is undocummented legacy behaviour
         // but likely we are sending an ad request for the vmap
@@ -232,14 +253,21 @@ class BitmovinAdAnalytics(
         adSample: AdSample,
         exitPosition: Long? = 0,
     ) {
-        adSample.exitPosition = exitPosition
-        adSample.timePlayed = exitPosition
-        adSample.playPercentage = Util.calculatePercentage(adSample.timePlayed, adSample.ad.duration, true)
+        this.setExitPosition(adSample, exitPosition)
 
         // reset elapsedTimeAtAdStartup for the next ad, in case there are multiple ads in one ad break
         this.elapsedTimeAtAdStartup = Util.elapsedTime
         this.isPlaying = false
         this.sendAnalyticsRequest(adBreak, adSample)
+    }
+
+    private fun setExitPosition(
+        adSample: AdSample,
+        exitPosition: Long?,
+    ) {
+        adSample.exitPosition = exitPosition
+        adSample.timePlayed = exitPosition
+        adSample.playPercentage = Util.calculatePercentage(adSample.timePlayed, adSample.ad.duration, true)
     }
 
     private fun resetActiveAd() {
@@ -248,16 +276,14 @@ class BitmovinAdAnalytics(
     }
 
     private fun getAndRemoveAdManifestDownloadTime(adBreak: AdBreak?): Long? {
-        if (adBreak == null) {
-            return null
-        }
-
-        return adManifestDownloadTimes.remove(adBreak.id)
+        val adBreakId = adBreak?.id ?: return null
+        return adManifestDownloadTimes.remove(adBreakId)
     }
 
     private fun sendAnalyticsRequest(
         adBreak: AdBreak,
         adSample: AdSample,
+        hasManifestDownloadTime: Boolean = true,
     ) {
         val eventData = playerAdapter?.createEventDataForAdSample() ?: return
         val adEventData = AdEventData.fromEventData(eventData, AdType.CLIENT_SIDE)
@@ -267,7 +293,7 @@ class BitmovinAdAnalytics(
         adEventData.adModule = adSample.ad.adModule
         adEventData.adModuleVersion = playerAdapter?.playerContext?.playerVersion
 
-        adEventData.manifestDownloadTime = getAndRemoveAdManifestDownloadTime(adBreak)
+        adEventData.manifestDownloadTime = if (hasManifestDownloadTime) getAndRemoveAdManifestDownloadTime(adBreak) else null
         adEventData.autoplay = playerAdapter?.playerContext?.isAutoplay()
         adEventData.setAdBreak(adBreak)
         adEventData.setAdSample(adSample)

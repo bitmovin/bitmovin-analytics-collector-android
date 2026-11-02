@@ -3,11 +3,15 @@ package com.bitmovin.analytics.bitmovin.player
 import com.bitmovin.analytics.ObservableSupport
 import com.bitmovin.analytics.adapters.AdAdapter
 import com.bitmovin.analytics.adapters.AdAnalyticsEventListener
+import com.bitmovin.analytics.ads.Ad
 import com.bitmovin.analytics.bitmovin.player.utils.AdBreakMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdMapper
 import com.bitmovin.analytics.bitmovin.player.utils.AdQuartileFactory
+import com.bitmovin.analytics.bitmovin.player.utils.BITMOVIN_AD_MODULE
 import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.player.api.Player
+import com.bitmovin.player.api.advertising.AdConfig
+import com.bitmovin.player.api.advertising.AdItem
 import com.bitmovin.player.api.event.PlayerEvent
 
 /**
@@ -68,16 +72,18 @@ internal class BitmovinSdkAdAdapter(
         }
     }
 
-    private val playerEventAdErrorListener: (PlayerEvent.AdError) -> Unit = method@{ event ->
+    private val playerEventAdErrorListener: (PlayerEvent.AdError) -> Unit = { event ->
         try {
             BitmovinLog.d(TAG, "On Ad Error")
-            val adConf = event.adConfig ?: return@method
-            observableSupport.notify {
-                it.onAdError(
-                    adBreakMapper.fromPlayerAdConfiguration(adConf),
-                    event.code,
-                    event.message,
-                )
+            val adConfig = event.adConfig
+            val adItem = event.adItem
+            when {
+                adConfig != null -> notifyAdError(adConfig, event)
+
+                adItem != null -> notifyAdLoadError(adItem, event)
+
+                // the player's "Ad break not loaded" (2001) repeats a load error already sent for the ad item
+                else -> Unit
             }
         } catch (e: Exception) {
             BitmovinLog.e(TAG, "On Ad Error", e)
@@ -156,6 +162,24 @@ internal class BitmovinSdkAdAdapter(
 
     override fun unsubscribe(listener: AdAnalyticsEventListener) {
         observableSupport.unsubscribe(listener)
+    }
+
+    private fun notifyAdError(
+        adConfig: AdConfig,
+        event: PlayerEvent.AdError,
+    ) {
+        observableSupport.notify {
+            it.onAdError(adBreakMapper.fromPlayerAdConfiguration(adConfig), event.code, event.message)
+        }
+    }
+
+    private fun notifyAdLoadError(
+        adItem: AdItem,
+        event: PlayerEvent.AdError,
+    ) {
+        observableSupport.notify {
+            it.onAdLoadError(adBreakMapper.fromPlayerAdItem(adItem), Ad(adModule = BITMOVIN_AD_MODULE), event.code, event.message)
+        }
     }
 
     companion object {
