@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v3.35.3
+
 ### Fixed
 - THEOplayer: a paused or ended player was treated as playing when its buffer was filled, so heartbeat samples could continue if the PAUSE event was missed
 - Samples created before the license response were dropped when the collector was detached before it arrived, e.g. an exit before video start right after creating the player
