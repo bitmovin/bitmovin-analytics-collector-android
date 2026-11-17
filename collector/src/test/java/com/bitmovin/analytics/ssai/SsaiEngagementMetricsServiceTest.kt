@@ -36,13 +36,20 @@ class SsaiEngagementMetricsServiceTest {
         ssaiEngagementMetricsService =
             SsaiEngagementMetricsService(
                 analytics,
-                playerAdapter, handlerMock, systemTimeServiceMock,
+                playerAdapter,
+                handlerMock,
+                systemTimeServiceMock,
             )
     }
 
     @Test
     fun `markAdStart should createSampleWithStartedFlag`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
         ssaiEngagementMetricsService.flushCurrentActiveAd(false)
@@ -65,8 +72,35 @@ class SsaiEngagementMetricsServiceTest {
     }
 
     @Test
+    fun `adModule from AdMetadata should be set on the samples of that ad`() {
+        val adWithModule =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdModule("optiview-ads")
+                .build()
+        val adWithoutModule = AdMetadata.Builder().setAdId("testId2").build()
+        val adBreakMetadata = AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build()
+        ssaiEngagementMetricsService.adBreakStart()
+        ssaiEngagementMetricsService.markAdStart(adBreakMetadata, adWithModule, 0)
+        ssaiEngagementMetricsService.markQuartileFinished(adBreakMetadata, SsaiAdQuartile.FIRST, adWithModule, null, 0)
+        ssaiEngagementMetricsService.markAdStart(adBreakMetadata, adWithoutModule, 1)
+        ssaiEngagementMetricsService.flushCurrentActiveAd(false)
+
+        val adEventDataList = mutableListOf<AdEventData>()
+        verify { analytics.sendAdEventData(capture(adEventDataList)) }
+        assertThat(adEventDataList.map { it.adIndex to it.adModule }.distinct())
+            .containsExactly(0 to "optiview-ads", 1 to null)
+    }
+
+    @Test
     fun `markAdStart should flush out existing sample before creating new one`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 1)
@@ -76,7 +110,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `markAdStart should create new AdId on every call`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 1)
@@ -98,7 +137,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `markQuartileFinished should mark correct quartile field and set data`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         val adQuartileMetadata = AdQuartileMetadata.Builder().setFailedBeaconUrl("dummyUrl").build()
 
         ssaiEngagementMetricsService.markQuartileFinished(
@@ -129,7 +173,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `markQuartileFinished should merge quartile fields field and set data`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         val adQuartileMetadata = AdQuartileMetadata.Builder().setFailedBeaconUrl("dummyUrl").build()
 
         ssaiEngagementMetricsService.markQuartileFinished(
@@ -224,7 +273,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `sendAdErrorSample should sendout existing sample with error data`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
         ssaiEngagementMetricsService.markQuartileFinished(
@@ -268,7 +322,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `sendAdErrorSample is not send twice on one ad`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
         ssaiEngagementMetricsService.sendAdErrorSample(
@@ -292,7 +351,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `sendAdErrorSample is called once per ad`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
         ssaiEngagementMetricsService.sendAdErrorSample(
@@ -318,7 +382,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `timeout for flushing is reset on ad started`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
 
@@ -328,7 +397,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `timeout for flushing is postponed on quartile call`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
 
@@ -349,7 +423,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `timeout for flushing is cleared on error`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
 
@@ -370,7 +449,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `timeout for flushing is postponed on completed`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
 
@@ -391,7 +475,12 @@ class SsaiEngagementMetricsServiceTest {
 
     @Test
     fun `timeout for flushing is cleared on flushOfCurrentSamples`() {
-        val adMetadata = AdMetadata.Builder().setAdId("testId").setAdSystem("testAdSystem").build()
+        val adMetadata =
+            AdMetadata
+                .Builder()
+                .setAdId("testId")
+                .setAdSystem("testAdSystem")
+                .build()
         ssaiEngagementMetricsService.adBreakStart()
         ssaiEngagementMetricsService.markAdStart(AdBreakMetadata.Builder().setAdPosition(SsaiAdPosition.MIDROLL).build(), adMetadata, 0)
 

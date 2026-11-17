@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+### Added
+- `AdMetadata.adModule` to report the module or integration that delivered an SSAI ad
+
+### Changed
+- THEOplayer: `adModule` now contains the custom integration id when the ad reports one (e.g. `mediakind`, `optiview-ads`) instead of the generic integration type (`custom`, `google-ima`)
+
+### Fixed
+- THEOplayer: `adModule` was not set for server-side ads
+- THEOplayer: ad metadata from `Ad.customData` (e.g. `creativeId`, `creativeAdId`, `adSystem`) was only read for MediaKind ads. It is now read for all ads not served through IMA, including OptiView Ads
+
 ## v3.35.3
 
 ### Fixed

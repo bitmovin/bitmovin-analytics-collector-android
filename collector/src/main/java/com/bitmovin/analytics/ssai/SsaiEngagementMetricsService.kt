@@ -164,6 +164,7 @@ class SsaiEngagementMetricsService(
         adEventData.adImpressionId = getOrCreateAdImpressionId()
         adEventData.adId = adMetadata?.adId
         adEventData.adSystem = adMetadata?.adSystem
+        adEventData.adModule = adMetadata?.adModule
         adEventData.universalAdIdValue = adMetadata?.universalAdIdValue
         adEventData.universalAdIdRegistry = adMetadata?.universalAdIdRegistry
         adEventData.creativeId = adMetadata?.creativeId
@@ -300,9 +301,7 @@ class SsaiEngagementMetricsService(
         adSample1.completedSlates = adSample2.completedSlates ?: adSample1.completedSlates
     }
 
-    private fun getOrCreateAdImpressionId(): String {
-        return adImpressionId ?: Util.uUID
-    }
+    private fun getOrCreateAdImpressionId(): String = adImpressionId ?: Util.uUID
 
     private fun limitToPositiveValues(
         number: Int?,

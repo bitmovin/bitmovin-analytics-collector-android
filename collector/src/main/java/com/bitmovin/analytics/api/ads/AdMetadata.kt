@@ -51,6 +51,10 @@ class AdMetadata private constructor(
      * Duration of the ad in milliseconds.
      */
     val durationInMs: Long?,
+    /**
+     * The module or integration that delivered the ad (e.g. "optiview-ads", "mediakind").
+     */
+    val adModule: String?,
 ) {
     /**
      * Duration of the ad.
@@ -77,6 +81,7 @@ class AdMetadata private constructor(
         private var customData: CustomData? = null
         private var isSlate: Boolean = false
         private var durationInMs: Long? = null
+        private var adModule: String? = null
 
         fun setAdId(adId: String?) = apply { this.adId = adId }
 
@@ -118,6 +123,8 @@ class AdMetadata private constructor(
         @Suppress("NewApi")
         fun setDuration(duration: java.time.Duration?) = apply { this.durationInMs = duration?.toMillis() }
 
+        fun setAdModule(adModule: String?) = apply { this.adModule = adModule }
+
         fun build(): AdMetadata =
             AdMetadata(
                 adId = adId,
@@ -131,6 +138,7 @@ class AdMetadata private constructor(
                 customData = customData,
                 isSlate = isSlate,
                 durationInMs = durationInMs,
+                adModule = adModule,
             )
     }
 
@@ -147,7 +155,8 @@ class AdMetadata private constructor(
             title == other.title &&
             customData == other.customData &&
             isSlate == other.isSlate &&
-            durationInMs == other.durationInMs
+            durationInMs == other.durationInMs &&
+            adModule == other.adModule
     }
 
     override fun hashCode(): Int {
@@ -162,6 +171,7 @@ class AdMetadata private constructor(
         result = 31 * result + (customData?.hashCode() ?: 0)
         result = 31 * result + isSlate.hashCode()
         result = 31 * result + (durationInMs?.hashCode() ?: 0)
+        result = 31 * result + (adModule?.hashCode() ?: 0)
         return result
     }
 
@@ -169,5 +179,5 @@ class AdMetadata private constructor(
         "AdMetadata(adId=$adId, adSystem=$adSystem, universalAdIdValue=$universalAdIdValue, " +
             "universalAdIdRegistry=$universalAdIdRegistry, creativeId=$creativeId, creativeAdId=$creativeAdId, " +
             "advertiserName=$advertiserName, title=$title, customData=$customData, isSlate=$isSlate, " +
-            "durationInMs=$durationInMs)"
+            "durationInMs=$durationInMs, adModule=$adModule)"
 }

@@ -51,7 +51,8 @@ internal class TheoPlayerAdAdapter(
                     observableSupport.notify { it.onAdBreakStarted(extractedAdBreakMetadata) }
                 } else {
                     val adBreakMetadata =
-                        AdBreakMetadata.Builder()
+                        AdBreakMetadata
+                            .Builder()
                             .setAdPosition(extractedAdBreakMetadata.position?.mapToSsaiAdPosition())
                             .build()
                     ssaiApi.adBreakStart(adBreakMetadata)
@@ -76,7 +77,8 @@ internal class TheoPlayerAdAdapter(
                     observableSupport.notify { it.onAdStarted(mappedAd) }
                 } else {
                     val ssaiAdMetadata =
-                        AdMetadata.Builder()
+                        AdMetadata
+                            .Builder()
                             .setAdId(mappedAd.id)
                             .setAdSystem(mappedAd.adSystemName)
                             .setUniversalAdIdValue(mappedAd.universalAdIdValue)
@@ -87,6 +89,7 @@ internal class TheoPlayerAdAdapter(
                             .setTitle(mappedAd.title)
                             .setIsSlate(mappedAd.isSlate ?: false)
                             .setDurationInMs(mappedAd.duration)
+                            .setAdModule(mappedAd.adModule)
                             .build()
                     ssaiApi.adStart(ssaiAdMetadata)
                 }

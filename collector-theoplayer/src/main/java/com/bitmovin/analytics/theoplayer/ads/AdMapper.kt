@@ -6,6 +6,7 @@ import com.bitmovin.analytics.utils.BitmovinLog
 import com.bitmovin.analytics.utils.Util
 import com.theoplayer.android.api.ads.LinearAd
 import com.theoplayer.android.api.ads.ima.GoogleImaAd
+import com.theoplayer.android.api.event.ads.AdIntegrationKind
 import com.theoplayer.android.api.ads.Ad as TheoAd
 
 internal object AdMapper {
@@ -18,29 +19,45 @@ internal object AdMapper {
         if (skipOffset >= 0) {
             ad.skippableAfter = skipOffset * 1000L
         }
-        ad.adModule = theoAd.integration.type
-
-        try {
-            // This is used for both CSAI an SSAI
-            if (TheoPlayerUtils.isTheoImaClassLoaded && theoAd is GoogleImaAd) {
-                extractMetadataFromGoogleImaAd(ad, theoAd)
-                return ad
-            }
-
-            if (MediaKindAdMapper.isMediaKindAd(theoAd)) {
-                MediaKindAdMapper.extractMetadata(ad, theoAd)
-                return ad
-            }
-        } catch (e: Exception) {
-            BitmovinLog.e(TAG, "on fromTheoAd", e)
-        }
+        ad.adModule = resolveAdModule(theoAd)
 
         // This is used for both CSAI an SSAI
         if (theoAd is LinearAd) {
             extractMetadataFromLinearAd(ad, theoAd)
         }
 
+        try {
+            // This is used for both CSAI an SSAI
+            if (TheoPlayerUtils.isTheoImaClassLoaded && theoAd is GoogleImaAd) {
+                extractMetadataFromGoogleImaAd(ad, theoAd)
+            }
+        } catch (e: Exception) {
+            BitmovinLog.e(TAG, "on fromTheoAd", e)
+        }
+
+        try {
+            // Integrations like MediaKind or OptiView Ads expose ad metadata through customData.
+            // This is applied on top of the IMA metadata, since OptiView Ads on Android reports its
+            // ads with integration "google-ima" while carrying the actual ad metadata in customData.
+            CustomDataAdMapper.extractMetadata(ad, theoAd)
+        } catch (e: Exception) {
+            BitmovinLog.e(TAG, "on fromTheoAd customData", e)
+        }
+
         return ad
+    }
+
+    /**
+     * The [AdIntegrationKind] alone doesn't allow distinguishing between integrations: e.g. MediaKind
+     * reports "custom" and OptiView Ads reports "google-ima" on Android. If a custom integration id
+     * (e.g. "mediakind", "optiview-ads") is set, it is reported instead.
+     */
+    private fun resolveAdModule(theoAd: TheoAd): String {
+        val customIntegration = theoAd.customIntegration
+        if (!customIntegration.isNullOrBlank()) {
+            return customIntegration
+        }
+        return theoAd.integration.type
     }
 
     private fun extractMetadataFromLinearAd(

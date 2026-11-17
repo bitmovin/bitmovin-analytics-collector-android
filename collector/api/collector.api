@@ -779,9 +779,10 @@ public final class com/bitmovin/analytics/api/ads/AdBreakMetadata$Builder {
 }
 
 public final class com/bitmovin/analytics/api/ads/AdMetadata {
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ZLjava/lang/Long;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/bitmovin/analytics/api/CustomData;ZLjava/lang/Long;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAdId ()Ljava/lang/String;
+	public final fun getAdModule ()Ljava/lang/String;
 	public final fun getAdSystem ()Ljava/lang/String;
 	public final fun getAdvertiserName ()Ljava/lang/String;
 	public final fun getCreativeAdId ()Ljava/lang/String;
@@ -801,6 +802,7 @@ public final class com/bitmovin/analytics/api/ads/AdMetadata$Builder {
 	public fun <init> ()V
 	public final fun build ()Lcom/bitmovin/analytics/api/ads/AdMetadata;
 	public final fun setAdId (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
+	public final fun setAdModule (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
 	public final fun setAdSystem (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
 	public final fun setAdvertiserName (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
 	public final fun setCreativeAdId (Ljava/lang/String;)Lcom/bitmovin/analytics/api/ads/AdMetadata$Builder;
