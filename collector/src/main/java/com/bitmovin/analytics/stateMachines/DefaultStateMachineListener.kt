@@ -105,6 +105,7 @@ class DefaultStateMachineListener(
             data.paused = duration
         } else if (stateMachine.currentState === PlayerStates.BUFFERING) {
             data.buffered = duration
+            data.bufferingIndex = stateMachine.consumeBufferingIndexForFirstSample()
         } else if (stateMachine.currentState === PlayerStates.SEEKING) {
             data.seeked = duration
         } else if (stateMachine.currentState === PlayerStates.AD) {
@@ -140,6 +141,7 @@ class DefaultStateMachineListener(
         data.state = stateMachine.currentState.name
         data.duration = duration
         data.buffered = duration
+        data.bufferingIndex = stateMachine.consumeBufferingIndexForFirstSample()
         data.videoTimeStart = stateMachine.videoTimeStart
         data.videoTimeEnd = stateMachine.videoTimeEnd
         analytics.sendEventData(data)
@@ -340,7 +342,6 @@ class DefaultStateMachineListener(
         analytics.sendEventData(eventData)
     }
 
-    internal fun isTooManyQualityChangesError(errorCode: Int?): Boolean {
-        return errorCode == AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode.errorCode
-    }
+    internal fun isTooManyQualityChangesError(errorCode: Int?): Boolean =
+        errorCode == AnalyticsErrorCodes.ANALYTICS_QUALITY_CHANGE_THRESHOLD_EXCEEDED.errorCode.errorCode
 }

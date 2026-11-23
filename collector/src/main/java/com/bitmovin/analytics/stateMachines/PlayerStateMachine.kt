@@ -46,6 +46,12 @@ class PlayerStateMachine(
         private set
 
     private var currentRebufferingIntervalIndex = 0
+
+    // 0-based index the next buffering period in the current impression will get
+    private var bufferingIndex = 0
+
+    // index of the current buffering period until its first sample has been sent, null otherwise
+    private var pendingBufferingIndex: Int? = null
     private val heartbeatDelay = HEARTBEAT_INTERVAL.toLong() // 60 seconds
     var videoStartFailedReason: VideoStartFailedReason? = null
 
@@ -55,9 +61,7 @@ class PlayerStateMachine(
         resetStateMachine()
     }
 
-    fun isInStartupState(): Boolean {
-        return currentState === PlayerStates.STARTUP
-    }
+    fun isInStartupState(): Boolean = currentState === PlayerStates.STARTUP
 
     fun enableHeartbeat() {
         heartbeatHandler.postDelayed(
@@ -95,6 +99,32 @@ class PlayerStateMachine(
             },
             rebufferingIntervals[currentRebufferingIntervalIndex].toLong(),
         )
+    }
+
+    // A program change starts a new impression without resetting the source related state,
+    // so the buffering index needs to be reset separately. An ongoing buffering period
+    // continues in the new impression and is counted there as its first buffering.
+    private fun resetBufferingIndexForNewImpression() {
+        bufferingIndex = 0
+        pendingBufferingIndex = null
+        if (currentState === PlayerStates.BUFFERING) {
+            markBufferingStarted()
+        }
+    }
+
+    internal fun markBufferingStarted() {
+        pendingBufferingIndex = bufferingIndex++
+    }
+
+    /**
+     * Returns the 0-based index of the current buffering period within the impression exactly once
+     * per buffering period (for the first buffering sample), null for all subsequent samples of the
+     * same buffering period.
+     */
+    internal fun consumeBufferingIndexForFirstSample(): Int? {
+        val index = pendingBufferingIndex
+        pendingBufferingIndex = null
+        return index
     }
 
     fun disableRebufferHeartbeat() {
@@ -190,6 +220,8 @@ class PlayerStateMachine(
             disableHeartbeat()
         }
         disableRebufferHeartbeat()
+        pendingBufferingIndex = null
+        bufferingIndex = 0
         videoStartTimeoutTimer.cancel()
         bufferingTimeoutTimer.cancel()
         qualityChangeEventLimiter.reset()
@@ -310,6 +342,7 @@ class PlayerStateMachine(
         } else {
             triggerLastSampleOfSession(SampleTriggerReason.PROGRAM_CHANGE)
             analytics.resetSequenceNumberAndImpressionId()
+            resetBufferingIndexForNewImpression()
             onAfterSessionReset()
             triggerProgramChangeSample()
         }
@@ -409,9 +442,7 @@ class PlayerStateMachine(
         analytics.updateCacheVideoTime(playerContext.position)
     }
 
-    fun shouldReportError(errorCode: ErrorCode): Boolean {
-        return identicalErrorReportingLimiter.shouldReportError(errorCode)
-    }
+    fun shouldReportError(errorCode: ErrorCode): Boolean = identicalErrorReportingLimiter.shouldReportError(errorCode)
 
     fun resetIdenticalErrorReportingLimiter() {
         identicalErrorReportingLimiter.reset()

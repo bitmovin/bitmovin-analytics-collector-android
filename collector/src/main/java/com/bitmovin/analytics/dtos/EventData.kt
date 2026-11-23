@@ -86,6 +86,10 @@ data class EventData(
     var videoStartFailed: Boolean = false,
     var videoStartFailedReason: String? = null,
     var isProgramChange: Boolean? = null,
+    // 0-based index of the buffering period within the impression, only set on the first sample
+    // of each buffering period (null otherwise). A single buffering period can be split into multiple
+    // samples (rebuffer heartbeat), so this allows counting the number of bufferings.
+    var bufferingIndex: Int? = null,
     var downloadSpeedInfo: DownloadSpeedInfo? = null,
     // Live latency information, only set on playing samples of live streams (see [LatencyInfo])
     var latencyInfo: LatencyInfo? = null,

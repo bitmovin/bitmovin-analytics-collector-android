@@ -16,6 +16,7 @@ import com.bitmovin.analytics.enums.VideoStartFailedReason
 import com.bitmovin.analytics.error.IdenticalErrorReportingLimiter
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -94,6 +95,130 @@ class PlayerStateMachineTest {
         // Assert
         verify(exactly = 1) { listener.onTriggerSample(any(), eq(0), eq(SampleTriggerReason.DETACH)) }
         assertEquals(PlayerStates.BUFFERING, playerStateMachine.currentState)
+    }
+
+    @Test
+    fun `only first sample of a buffering period gets the buffering index`() {
+        // Arrange
+        val heartbeatRunnable = slot<Runnable>()
+        every { heartbeatHandlerMock.postDelayed(capture(heartbeatRunnable), any()) } returns true
+        val bufferingIndices = recordBufferingIndices()
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+
+        // Act
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+        heartbeatRunnable.captured.run() // first rebuffer heartbeat
+        heartbeatRunnable.captured.run() // second rebuffer heartbeat
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0) // buffering ends
+
+        // Assert
+        assertEquals(listOf(0, null, null), bufferingIndices)
+    }
+
+    @Test
+    fun `buffering index counts buffering periods, not samples`() {
+        // Arrange
+        val heartbeatRunnable = slot<Runnable>()
+        every { heartbeatHandlerMock.postDelayed(capture(heartbeatRunnable), any()) } returns true
+        val bufferingIndices = recordBufferingIndices()
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+
+        // Act
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+        heartbeatRunnable.captured.run()
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+
+        // Assert
+        assertEquals(listOf(0, 1, null, 2), bufferingIndices)
+    }
+
+    @Test
+    fun `buffering index restarts after state machine reset (new impression)`() {
+        // Arrange
+        val bufferingIndices = recordBufferingIndices()
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+
+        // Act
+        playerStateMachine.resetStateMachine()
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+
+        // Assert
+        assertEquals(listOf(0, 0), bufferingIndices)
+    }
+
+    @Test
+    fun `buffering index restarts after program change (new impression)`() {
+        // Arrange
+        val bufferingIndices = recordBufferingIndices()
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+
+        // Act
+        playerStateMachine.programChange {}
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+
+        // Assert
+        assertEquals(listOf(0, 1, null, 0), bufferingIndices)
+    }
+
+    @Test
+    fun `buffering ongoing during program change is counted as first buffering of the new impression`() {
+        // Arrange
+        val heartbeatRunnable = slot<Runnable>()
+        every { heartbeatHandlerMock.postDelayed(capture(heartbeatRunnable), any()) } returns true
+        val bufferingIndices = recordBufferingIndices()
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+        playerStateMachine.transitionState(PlayerStates.BUFFERING, 0)
+
+        // Act
+        playerStateMachine.programChange {} // last sample of old impression is a buffering sample
+        heartbeatRunnable.captured.run() // rebuffer heartbeat in the new impression
+        heartbeatRunnable.captured.run()
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+
+        // Assert
+        assertEquals(listOf(0, 1, 0, null, null), bufferingIndices)
+    }
+
+    @Test
+    fun `consumeBufferingIndexForFirstSample returns null when not buffering`() {
+        playerStateMachine.transitionState(PlayerStates.STARTUP, 0)
+        playerStateMachine.transitionState(PlayerStates.PLAYING, 0)
+
+        assertEquals(null, playerStateMachine.consumeBufferingIndexForFirstSample())
+    }
+
+    private fun recordBufferingIndices(): MutableList<Int?> {
+        val bufferingIndices = mutableListOf<Int?>()
+        val listener = mockk<StateMachineListener>(relaxed = true)
+        every { listener.onTriggerSample(any(), any(), any()) } answers {
+            bufferingIndices.add(firstArg<PlayerStateMachine>().consumeBufferingIndexForFirstSample())
+        }
+        every { listener.onRebuffering(any(), any()) } answers {
+            bufferingIndices.add(firstArg<PlayerStateMachine>().consumeBufferingIndexForFirstSample())
+        }
+        playerStateMachine.listeners.subscribe(listener)
+        return bufferingIndices
     }
 
     @Test

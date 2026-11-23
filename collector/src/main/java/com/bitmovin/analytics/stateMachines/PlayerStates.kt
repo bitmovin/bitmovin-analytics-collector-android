@@ -68,6 +68,7 @@ class PlayerStates {
                     machine: PlayerStateMachine,
                     data: Void?,
                 ) {
+                    machine.markBufferingStarted()
                     machine.enableRebufferHeartbeat()
                     machine.bufferingTimeoutTimer.start()
                 }
