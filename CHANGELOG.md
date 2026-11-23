@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Development
 
+## v3.36.1
+
 ### Added
 - `bufferingIndex` on the first sample of each buffering period. It is the 0-based index of the buffering period within an impression (0, 1, 2, …), so bufferings can be counted even when rebuffer heartbeats split one buffering period into several samples
 
